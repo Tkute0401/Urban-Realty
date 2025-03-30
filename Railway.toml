@@ -1,7 +1,5 @@
 [build]
-builder = "nixpacks"
-provider = "railwayapp/nixpacks:edge"  # Use the latest version
-buildCommand = "npm run install-all && npm run build"
+builder = "docker"
 
 [deploy]
 startCommand = "npm start"
