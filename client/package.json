@@ -28,6 +28,7 @@
     "react-router-dom": "^7.4.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
+    "vite": "^6.2.0",
     "swiper": "^11.2.6",
     "yup": "^1.6.1"
   },
