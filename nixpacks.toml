@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['nodejs', 'npm']
+nixPkgs = ['nodejs-22.13.0', 'nodePackages.npm']
 
 [phases.install]
 cmds = ['npm install', 'cd client && npm install']
