@@ -13,7 +13,7 @@ connectDB();
 
 // Configure paths - CHANGED FROM ../../client/dist to ./client/dist
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join(__dirname, 'client/dist'); // Updated path
+const clientDistDir = path.join('/app/client/dist'); // Updated path
 
 // Create directories
 [uploadsDir, clientDistDir].forEach(dir => {

@@ -5,7 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { 
   Box, TextField, Button, Grid, MenuItem, Chip, Typography, Paper,
   CircularProgress, Alert, FormControlLabel, Checkbox, Container,
-  FormHelperText, InputAdornment
+  FormHelperText, InputAdornment,
+  IconButton
 } from '@mui/material';
 import { CloudUpload, Delete } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';

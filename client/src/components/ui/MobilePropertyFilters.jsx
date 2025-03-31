@@ -1,3 +1,5 @@
+const { IconButton } = require("@mui/material");
+
 const MobilePropertyFilters = ({ open, onClose, filters, setFilters }) => {
     const theme = useTheme();
   

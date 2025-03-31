@@ -34,6 +34,11 @@ COPY --from=backend-builder /app ./
 # Create directories
 RUN mkdir -p /app/uploads
 
+# Add verification step before CMD
+RUN ls -la /app/client/dist && \
+    echo "Frontend files:" && \
+    ls -la /app/client/dist
+
 # Verify file locations
 RUN ls -la /app/client/dist && \
     ls -la /app
