@@ -405,7 +405,7 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
   if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
     return next(
       new ErrorResponse(
-        `User ${req.user.id} is not authorized to delete this property`,property,
+        `User ${req.user.id} is not authorized to delete this property  ${property.agent}`,
         401
       )
     );
