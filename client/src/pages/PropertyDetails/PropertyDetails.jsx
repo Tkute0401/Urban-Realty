@@ -37,11 +37,7 @@ const PropertyDetails = () => {
     clearProperty
   } = useProperties();
 
-  // Initialize state with proper data structure
-  const [property, setProperty] = useState(() => {
-    const updatedProperty = location.state?.updatedProperty;
-    return updatedProperty?.data || updatedProperty || null;
-  });
+  const [property, setProperty] = useState(location.state?.updatedProperty || null);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -50,9 +46,8 @@ const PropertyDetails = () => {
         setError(null);
         
         if (!location.state?.updatedProperty) {
-          const response = await getProperty(id);
-          // Handle both possible response structures
-          setProperty(response.data?.data || response.data || null);
+          const data = await getProperty(id);
+          setProperty(data);
         }
       } catch (err) {
         console.error('Error fetching property:', err);
@@ -93,40 +88,21 @@ const PropertyDetails = () => {
     });
   };
 
-  const getAddressPart = (part) => {
-    if (!property) return '';
-    return property.address?.[part] || property.location?.[part] || '';
-  };
-
-  const fullAddress = [
-    getAddressPart('line1'),
-    getAddressPart('street'),
-    getAddressPart('city'),
-    getAddressPart('state'),
-    getAddressPart('zipCode')
-  ].filter(Boolean).join(', ');
-
   const handleWhatsAppClick = () => {
-    const phoneNumber = property?.agent?.mobile?.replace(/\D/g, '');
-    if (!phoneNumber) return;
-    
+    const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
     const link = window.location.href;
-    const message = `Hi, I'm interested in your property "${property?.title}" at ${fullAddress}. ${link}`;
+    const message = `Hi, I'm interested in your property "${property.title}" at ${fullAddress}. ${link}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleCallClick = () => {
-    const phoneNumber = property?.agent?.mobile?.replace(/\D/g, '');
-    if (!phoneNumber) return;
+    const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
     window.open(`tel:${phoneNumber}`, '_blank');
   };
 
   const handleEmailClick = () => {
-    if (!property?.agent?.email) return;
-    window.open(`mailto:${property.agent.email}?subject=Inquiry about ${property.title}`, '_blank');
+    window.open(`mailto:${property.agent?.email}?subject=Inquiry about ${property.title}`, '_blank');
   };
-
-  const isOwner = user?.role === 'agent' && user.id === property?.agent?._id;
 
   if (loading) {
     return (
@@ -165,12 +141,10 @@ const PropertyDetails = () => {
     );
   }
 
-  if (!property || !property.title) {
+  if (!property) {
     return (
       <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h6" gutterBottom>
-          {property ? 'Property data incomplete' : 'Property not found'}
-        </Typography>
+        <Typography variant="h6" gutterBottom>Property not found</Typography>
         <Button 
           variant="contained" 
           onClick={() => navigate('/properties')}
@@ -182,6 +156,17 @@ const PropertyDetails = () => {
     );
   }
 
+  const getAddressPart = (part) => property.address?.[part] || property.location?.[part] || '';
+  const fullAddress = [
+    getAddressPart('line1'),
+    getAddressPart('street'),
+    getAddressPart('city'),
+    getAddressPart('state'),
+    getAddressPart('zipCode')
+  ].filter(Boolean).join(', ');
+
+  const isOwner = user?.role === 'agent' && user.id === property.agent?._id;
+
   return (
     <Box sx={{ 
       maxWidth: 1400, 
@@ -189,7 +174,7 @@ const PropertyDetails = () => {
       p: { xs: 1, sm: 2, md: 3 },
       pb: { xs: 6, sm: 3 }
     }}>
-      {/* Back button */}
+      {/* Back button with improved styling */}
       <Button
         startIcon={<ArrowBack />}
         onClick={() => navigate('/properties')}
@@ -204,35 +189,20 @@ const PropertyDetails = () => {
         Back to Properties
       </Button>
 
-      {/* Main content */}
+      {/* Main content with better spacing */}
       <Grid container spacing={{ xs: 2, md: 4 }}>
         <Grid item xs={12} md={8}>
-          {/* Image gallery with fallback */}
+          {/* Enhanced image gallery */}
           <Box sx={{ 
             borderRadius: 2,
             overflow: 'hidden',
             boxShadow: 1,
-            mb: 3,
-            minHeight: 300,
-            backgroundColor: 'action.hover'
+            mb: 3
           }}>
-            {property.images?.length > 0 ? (
-              <PropertyImageGallery images={property.images} />
-            ) : (
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 300
-              }}>
-                <Typography variant="h6" color="text.secondary">
-                  No images available
-                </Typography>
-              </Box>
-            )}
+            <PropertyImageGallery images={property.images || []} />
           </Box>
 
-          {/* Description section */}
+          {/* Description section with better typography */}
           <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
               Property Description
@@ -246,43 +216,37 @@ const PropertyDetails = () => {
                 color: 'text.secondary'
               }}
             >
-              {property.description || 'No description available'}
+              {property.description}
             </Typography>
           </Paper>
 
-          {/* Amenities with fallback */}
+          {/* Amenities with chips */}
           <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
               Amenities
             </Typography>
-            {property.amenities?.length > 0 ? (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {property.amenities.map((amenity, index) => (
-                  <Chip 
-                    key={index}
-                    label={amenity}
-                    icon={<Check fontSize="small" />}
-                    color="primary"
-                    variant="outlined"
-                    sx={{ 
-                      backgroundColor: 'rgba(46, 134, 171, 0.1)',
-                      borderColor: 'primary.main'
-                    }}
-                  />
-                ))}
-              </Box>
-            ) : (
-              <Typography color="text.secondary">
-                No amenities listed
-              </Typography>
-            )}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {property.amenities?.map((amenity, index) => (
+                <Chip 
+                  key={index}
+                  label={amenity}
+                  icon={<Check fontSize="small" />}
+                  color="primary"
+                  variant="outlined"
+                  sx={{ 
+                    backgroundColor: 'rgba(46, 134, 171, 0.1)',
+                    borderColor: 'primary.main'
+                  }}
+                />
+              ))}
+            </Box>
           </Paper>
         </Grid>
 
-        {/* Sidebar */}
+        {/* Sidebar with sticky positioning */}
         <Grid item xs={12} md={4}>
           <Box sx={{ position: 'sticky', top: 20 }}>
-            {/* Price card */}
+            {/* Price card with improved styling */}
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Typography 
@@ -295,82 +259,80 @@ const PropertyDetails = () => {
                 >
                   {formatPrice(property.price || 0)}
                 </Typography>
-                {property.status && (
-                  <Chip 
-                    label={property.status} 
-                    color={
-                      property.status === 'For Sale' ? 'primary' : 
-                      property.status === 'For Rent' ? 'secondary' : 'default'
-                    } 
-                    size="medium"
-                    sx={{ 
-                      ml: 2,
-                      fontWeight: 700,
-                      textTransform: 'uppercase'
-                    }} 
-                  />
-                )}
+                <Chip 
+                  label={property.status} 
+                  color={
+                    property.status === 'For Sale' ? 'primary' : 
+                    property.status === 'For Rent' ? 'secondary' : 'default'
+                  } 
+                  size="medium"
+                  sx={{ 
+                    ml: 2,
+                    fontWeight: 700,
+                    textTransform: 'uppercase'
+                  }} 
+                />
               </Box>
 
               {isOwner && (
-                <>
-                  <Typography 
-                    variant="caption" 
-                    color="primary" 
-                    display="block" 
-                    sx={{ 
-                      fontWeight: 600,
-                      display: 'flex',
-                      alignItems: 'center',
-                      mt: -0.5,
-                      mb: 1
-                    }}
-                  >
-                    <Check fontSize="small" sx={{ mr: 0.5 }} />
-                    Your listing
-                  </Typography>
-
-                  <Box sx={{ 
-                    display: 'flex', 
-                    gap: 1, 
-                    mt: 2,
-                    mb: 2,
-                    borderTop: '1px solid',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    py: 2
-                  }}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      startIcon={<Edit />}
-                      onClick={handleEdit}
-                      fullWidth
-                      sx={{
-                        fontWeight: 600,
-                        textTransform: 'none'
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<Delete />}
-                      onClick={() => setDeleteConfirmOpen(true)}
-                      fullWidth
-                      sx={{
-                        fontWeight: 600,
-                        textTransform: 'none'
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
-                </>
+                <Typography 
+                  variant="caption" 
+                  color="primary" 
+                  display="block" 
+                  sx={{ 
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    mt: -0.5,
+                    mb: 1
+                  }}
+                >
+                  <Check fontSize="small" sx={{ mr: 0.5 }} />
+                  Your listing
+                </Typography>
               )}
 
-              {/* Contact agent section */}
+              {isOwner && (
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 1, 
+                  mt: 2,
+                  mb: 2,
+                  borderTop: '1px solid',
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  py: 2
+                }}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<Edit />}
+                    onClick={handleEdit}
+                    fullWidth
+                    sx={{
+                      fontWeight: 600,
+                      textTransform: 'none'
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Delete />}
+                    onClick={() => setDeleteConfirmOpen(true)}
+                    fullWidth
+                    sx={{
+                      fontWeight: 600,
+                      textTransform: 'none'
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+              )}
+
+              {/* Contact form with better layout */}
               <Box sx={{ mt: 3 }}>
                 <Typography 
                   variant="h6" 
@@ -384,112 +346,81 @@ const PropertyDetails = () => {
                   Contact Agent
                 </Typography>
                 
-                {property.agent ? (
-                  <>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      mb: 2,
-                      p: 2,
-                      backgroundColor: 'rgba(46, 134, 171, 0.05)',
-                      borderRadius: 1
-                    }}>
-                      <Avatar 
-                        src={property.agent.avatar}
-                        sx={{ 
-                          width: 56, 
-                          height: 56,
-                          mr: 2,
-                          backgroundColor: 'primary.main',
-                          color: 'white'
-                        }}
-                      >
-                        {property.agent.name?.charAt(0)}
-                      </Avatar>
-                      <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                          {property.agent.name}
-                        </Typography>
-                        {property.agent.company && (
-                          <Typography variant="body2" color="text.secondary">
-                            {property.agent.company}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  mb: 2,
+                  p: 2,
+                  backgroundColor: 'rgba(46, 134, 171, 0.05)',
+                  borderRadius: 1
+                }}>
+                  <Avatar 
+                    src={property.agent?.avatar}
+                    sx={{ 
+                      width: 56, 
+                      height: 56,
+                      mr: 2,
+                      backgroundColor: 'primary.main',
+                      color: 'white'
+                    }}
+                  >
+                    {property.agent?.name?.charAt(0)}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                      {property.agent?.name || 'N/A'}
+                    </Typography>
+                    {property.agent?.company && (
+                      <Typography variant="body2" color="text.secondary">
+                        {property.agent.company}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
 
-                    <Stack spacing={2} sx={{ mt: 3 }}>
-                      {property.agent.mobile && (
-                        <Button 
-                          fullWidth
-                          variant="contained" 
-                          color="primary"
-                          size="large"
-                          onClick={handleWhatsAppClick}
-                          startIcon={<WhatsApp />}
-                          sx={{ 
-                            py: 1.5,
-                            fontWeight: 600,
-                            '&:hover': {
-                              transform: 'translateY(-2px)'
-                            },
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          WhatsApp
-                        </Button>
-                      )}
-                      
-                      {property.agent.mobile && (
-                        <Button 
-                          fullWidth
-                          variant="outlined" 
-                          size="large"
-                          onClick={handleCallClick}
-                          startIcon={<Phone />}
-                          sx={{ 
-                            py: 1.5,
-                            fontWeight: 600,
-                            '&:hover': {
-                              transform: 'translateY(-2px)'
-                            },
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          Call Agent
-                        </Button>
-                      )}
-
-                      {property.agent.email && (
-                        <Button 
-                          fullWidth
-                          variant="outlined" 
-                          size="large"
-                          onClick={handleEmailClick}
-                          startIcon={<Email />}
-                          sx={{ 
-                            py: 1.5,
-                            fontWeight: 600,
-                            '&:hover': {
-                              transform: 'translateY(-2px)'
-                            },
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          Email Agent
-                        </Button>
-                      )}
-                    </Stack>
-                  </>
-                ) : (
-                  <Typography color="text.secondary">
-                    No agent information available
-                  </Typography>
-                )}
+                {/* Contact buttons with better spacing */}
+                <Stack spacing={2} sx={{ mt: 3 }}>
+                  <Button 
+                    fullWidth
+                    variant="contained" 
+                    color="primary"
+                    size="large"
+                    onClick={handleWhatsAppClick}
+                    startIcon={<WhatsApp />}
+                    sx={{ 
+                      py: 1.5,
+                      fontWeight: 600,
+                      '&:hover': {
+                        transform: 'translateY(-2px)'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    WhatsApp
+                  </Button>
+                  
+                  <Button 
+                    fullWidth
+                    variant="outlined" 
+                    size="large"
+                    onClick={handleCallClick}
+                    startIcon={<Phone />}
+                    sx={{ 
+                      py: 1.5,
+                      fontWeight: 600,
+                      '&:hover': {
+                        transform: 'translateY(-2px)'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Call Agent
+                  </Button>
+                </Stack>
               </Box>
             </Paper>
 
-            {/* Location section */}
+            {/* Map section with better styling */}
             <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
               <Typography 
                 variant="h6" 
@@ -509,39 +440,23 @@ const PropertyDetails = () => {
                 border: '1px solid',
                 borderColor: 'divider'
               }}>
-                {property.location?.coordinates ? (
-                  <PropertyMap 
-                    location={property.location} 
-                    address={property.address || {}} 
-                  />
-                ) : (
-                  <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    backgroundColor: 'action.hover'
-                  }}>
-                    <Typography color="text.secondary">
-                      Location not available
-                    </Typography>
-                  </Box>
-                )}
+                <PropertyMap 
+                  location={property.location} 
+                  address={property.address || {}} 
+                />
               </Box>
-              {fullAddress && (
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    mt: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    color: 'text.secondary'
-                  }}
-                >
-                  <LocationOn fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
-                  {fullAddress}
-                </Typography>
-              )}
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  mt: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: 'text.secondary'
+                }}
+              >
+                <LocationOn fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
+                {fullAddress}
+              </Typography>
             </Paper>
           </Box>
         </Grid>
