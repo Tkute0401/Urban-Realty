@@ -74,7 +74,7 @@ export const PropertiesProvider = ({ children }) => {
         return cache[id];
       }
 
-      const response = await axios.get(`/properties/${id}`);
+      const response = await axios.get(`https://urban-realty-production-cc1f.up.railway.app/api/v1/properties/${id}`);
       console.log('Received property data:', response.data);
       const propertyData = response.data?.data ?? response.data;
       
