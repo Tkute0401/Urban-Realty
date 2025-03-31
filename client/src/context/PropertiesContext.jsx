@@ -73,8 +73,9 @@ export const PropertiesProvider = ({ children }) => {
         setProperty(cache[id]);
         return cache[id];
       }
-
-      const response = await axios.get(`https://urban-realty-production-cc1f.up.railway.app/api/v1/properties/${id}`);
+  
+      // Use relative URL here too
+      const response = await axios.get(`/properties/${id}`);
       console.log('Received property data:', response.data);
       const propertyData = response.data?.data ?? response.data;
       
@@ -126,7 +127,8 @@ export const PropertiesProvider = ({ children }) => {
         }
       };
   
-      const response = await axios.put(`https://urban-realty-production-cc1f.up.railway.app/api/v1/properties/${id}`, formData, config);
+      // Use relative URL instead of absolute
+      const response = await axios.put(`/properties/${id}`, formData, config);
       const responseData = response.data?.data || response.data || response;
       
       if (!responseData) {
