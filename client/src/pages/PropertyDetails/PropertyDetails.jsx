@@ -47,6 +47,7 @@ const PropertyDetails = () => {
         
         if (!location.state?.updatedProperty) {
           const data = await getProperty(id);
+          console.log('Fetched property:', data);
           setProperty(data);
         }
       } catch (err) {
@@ -166,7 +167,7 @@ const PropertyDetails = () => {
   ].filter(Boolean).join(', ');
 
   const isOwner = user?.role === 'agent' && user.id === property.agent?._id;
-
+  console.log('property', property);
   return (
     <Box sx={{ 
       maxWidth: 1400, 
