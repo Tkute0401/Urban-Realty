@@ -1,35 +1,42 @@
-# Stage 1: Build frontend
+# Stage 1: Frontend build
 FROM node:18-alpine AS frontend-builder
 
-WORKDIR /frontend
-COPY client/package.json client/package-lock.json ./
+WORKDIR /app/client
+COPY client/package*.json ./
 RUN npm install
 COPY client .
+ARG VITE_API_BASE_URL
+ARG VITE_GOOGLE_MAPS_API_KEY
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
 RUN npm run build
 
-# Stage 2: Build backend
+# Stage 2: Backend build
 FROM node:18-alpine AS backend-builder
 
-WORKDIR /backend
-COPY server/package.json server/package-lock.json ./
+WORKDIR /app
+COPY ./package*.json ./
 RUN npm install
 COPY server .
 
-# Stage 3: Runtime image
+# Final stage
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy built frontend
-COPY --from=frontend-builder /frontend/dist ./client/dist
+# Copy built frontend to /app/client/dist
+COPY --from=frontend-builder /app/client/dist ./client/dist
 
 # Copy backend
-COPY --from=backend-builder /backend ./server
-COPY --from=backend-builder /backend/node_modules ./server/node_modules
+COPY --from=backend-builder /app/node_modules ./node_modules
+COPY --from=backend-builder /app ./
 
-# Create uploads directory
-RUN mkdir -p /app/server/uploads
+# Create directories
+RUN mkdir -p /app/uploads
 
-# Environment variables will be passed at runtime
+# Verify file locations
+RUN ls -la /app/client/dist && \
+    ls -la /app
+
 EXPOSE 5000
-CMD ["node", "server/server.js"]
+CMD ["node", "server.js"]
