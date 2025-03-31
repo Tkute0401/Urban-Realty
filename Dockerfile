@@ -5,7 +5,8 @@ WORKDIR /app/client
 COPY client/package*.json ./
 RUN npm install
 COPY client .
-RUN npm run build
+# Explicitly set the output directory
+RUN npm run build -- --outDir=dist
 
 # Stage 2: Build the backend (server)
 FROM node:18-alpine AS server-builder
@@ -19,7 +20,7 @@ COPY . .
 FROM node:18-alpine
 
 WORKDIR /app
-# Copy built client files
+# Copy built client files (verify this path matches your build output)
 COPY --from=client-builder /app/client/dist ./client/dist
 # Copy server files (excluding client)
 COPY --from=server-builder /app .

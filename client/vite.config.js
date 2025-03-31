@@ -19,7 +19,18 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../server/public',
+    outDir: 'dist', // Changed from '../server/public'
     emptyOutDir: true,
-  },
+    chunkSizeWarningLimit: 1000, // Added to handle large chunks
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Example of code splitting - adjust based on your dependencies
+          react: ['react', 'react-dom'],
+          mui: ['@mui/material', '@mui/icons-material'],
+          vendor: ['axios', 'formik', 'yup'],
+        }
+      }
+    }
+  }
 });
