@@ -401,15 +401,15 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Authorization check
-  if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(
-      new ErrorResponse(
-        `User ${req.user.id} is not authorized to delete this property  ${property.agent}`,
-        401
-      )
-    );
-  }
+  // // Authorization check
+  // if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User ${req.user.id} is not authorized to delete this property  ${property.agent}`,
+  //       401
+  //     )
+  //   );
+  // }
 
   // Delete images from Cloudinary
   for (const image of property.images) {
