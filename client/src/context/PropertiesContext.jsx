@@ -75,6 +75,7 @@ export const PropertiesProvider = ({ children }) => {
       }
 
       const response = await axios.get(`/properties/${id}`);
+      console.log('Received property data:', response.data);
       const propertyData = response.data?.data ?? response.data;
       
       if (!propertyData) {
