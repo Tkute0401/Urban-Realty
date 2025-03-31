@@ -126,7 +126,7 @@ export const PropertiesProvider = ({ children }) => {
         }
       };
   
-      const response = await axios.put(`/properties/${id}`, formData, config);
+      const response = await axios.put(`https://urban-realty-production-cc1f.up.railway.app/api/v1/properties/${id}`, formData, config);
       const responseData = response.data?.data || response.data || response;
       
       if (!responseData) {
