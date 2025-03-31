@@ -9,26 +9,22 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api/v1')
-      }
+  define: {
+    'process.env': {
+      VITE_API_BASE_URL: JSON.stringify(process.env.VITE_API_BASE_URL),
+      VITE_GOOGLE_MAPS_API_KEY: JSON.stringify(process.env.VITE_GOOGLE_MAPS_API_KEY)
     }
   },
   build: {
-    outDir: 'dist', // Changed from '../server/public'
+    outDir: '../client/dist',
     emptyOutDir: true,
-    chunkSizeWarningLimit: 1000, // Added to handle large chunks
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
         manualChunks: {
-          // Example of code splitting - adjust based on your dependencies
           react: ['react', 'react-dom'],
           mui: ['@mui/material', '@mui/icons-material'],
-          vendor: ['axios', 'formik', 'yup'],
+          maps: ['@react-google-maps/api', 'react-leaflet'],
         }
       }
     }

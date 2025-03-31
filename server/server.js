@@ -11,17 +11,21 @@ const app = express();
 // Connect to database
 connectDB();
 
-// Create uploads directory if it doesn't exist
+// Create directories
 const uploadsDir = path.join(__dirname, 'uploads');
-try {
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-    console.log('Uploads directory created successfully');
+const clientDistDir = path.join(__dirname, '../../client/dist');
+
+[uploadsDir, clientDistDir].forEach(dir => {
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Directory created: ${dir}`);
+    }
+  } catch (err) {
+    console.error(`Error creating ${dir}:`, err);
+    process.exit(1);
   }
-} catch (err) {
-  console.error('Error creating uploads directory:', err);
-  process.exit(1);
-}
+});
 
 // Middleware
 app.use(cors({
@@ -33,54 +37,35 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static files
 app.use('/uploads', express.static(uploadsDir));
+app.use(express.static(clientDistDir)); // Serve React build
 
-// Route files
-const authRoutes = require('./routes/authRoutes');
-const propertyRoutes = require('./routes/propertyRoutes');
+// Routes
+app.use('/api/v1/auth', require('./routes/authRoutes'));
+app.use('/api/v1/properties', require('./routes/propertyRoutes'));
 
-// Mount routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/properties', propertyRoutes);
+// Health checks
+app.get('/api/v1/health', (req, res) => res.status(200).json({ status: 'healthy' }));
+app.get('/api/v1/test', (req, res) => res.json({ status: 'success' }));
 
-// Test route
-app.get('/api/v1/test', (req, res) => {
-  res.json({ 
-    status: 'success',
-    message: "API is working!",
-    timestamp: new Date().toISOString()
-  });
+// SPA Fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientDistDir, 'index.html'));
 });
 
-// Health check endpoint
-app.get('/api/v1/health', (req, res) => {
-  res.status(200).json({
-    status: 'healthy',
-    database: 'connected',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Error handling middleware
+// Error handling
 app.use(errorHandler);
+app.use((req, res) => res.status(404).json({ success: false, error: 'Not found' }));
 
-// Handle 404
-app.use((req, res, next) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found'
-  });
-});
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.error(`Error: ${err.message}`);
-  server.close(() => process.exit(1));
-});
-
+// Server
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`Uploads directory: ${uploadsDir}`);
+  console.log(`Serving static files from: ${clientDistDir}`);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error(`Error: ${err.message}`);
+  server.close(() => process.exit(1));
 });
 
 module.exports = server;
