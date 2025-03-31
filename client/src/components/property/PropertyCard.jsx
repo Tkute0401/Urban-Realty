@@ -5,7 +5,6 @@ import { formatPrice } from '../../utils/format';
 import { useState } from 'react';
 
 const PropertyCard = ({ property, compact = false }) => {
-  console.log('PropertyCard:', property);
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
