@@ -11,10 +11,11 @@ const app = express();
 // Connect to database
 connectDB();
 
-// Create directories
+// Configure paths - CHANGED FROM ../../client/dist to ./client/dist
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join(__dirname, '../../client/dist');
+const clientDistDir = path.join(__dirname, 'client/dist'); // Updated path
 
+// Create directories
 [uploadsDir, clientDistDir].forEach(dir => {
   try {
     if (!fs.existsSync(dir)) {
@@ -39,17 +40,42 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(clientDistDir)); // Serve React build
 
-// Routes
+// API Routes
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/properties', require('./routes/propertyRoutes'));
 
-// Health checks
-app.get('/api/v1/health', (req, res) => res.status(200).json({ status: 'healthy' }));
-app.get('/api/v1/test', (req, res) => res.json({ status: 'success' }));
+// Health endpoints
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy',
+    staticFilesPath: clientDistDir,
+    uploadsPath: uploadsDir
+  });
+});
 
-// SPA Fallback
+app.get('/api/v1/test', (req, res) => {
+  res.json({ 
+    status: 'success',
+    message: 'API is working',
+    staticFiles: fs.existsSync(path.join(clientDistDir, 'index.html')) 
+      ? 'Found' 
+      : 'Not found'
+  });
+});
+
+// SPA Fallback - MUST BE LAST ROUTE
 app.get('*', (req, res) => {
-  res.sendFile(path.join(clientDistDir, 'index.html'));
+  const indexPath = path.join(clientDistDir, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error(`Frontend file not found at: ${indexPath}`);
+    res.status(500).json({ 
+      success: false,
+      error: 'Frontend assets not found',
+      path: indexPath
+    });
+  }
 });
 
 // Error handling
@@ -61,10 +87,14 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   console.log(`Serving static files from: ${clientDistDir}`);
+  console.log(`Uploads directory: ${uploadsDir}`);
+  
+  // Verify frontend files
+  console.log('Frontend files:', fs.readdirSync(clientDistDir));
 });
 
 process.on('unhandledRejection', (err) => {
-  console.error(`Error: ${err.message}`);
+  console.error(`Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));
 });
 
