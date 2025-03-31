@@ -21,7 +21,7 @@ const Properties = () => {
 
     fetchProperties();
   }, []);
-
+  
   return (
     <Container maxWidth="xl" sx={{ py: 6 }}>
       <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
