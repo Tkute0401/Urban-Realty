@@ -8,7 +8,6 @@ const upload = require('../middleware/multer'); // Import the configured Multer 
 
 // Public routes
 router.get('/', propertyController.getProperties);
-router.delete('/:id', propertyController.deleteProperty);
 
 // Add this with the other routes
 router.get('/featured', propertyController.getFeaturedProperties);
@@ -66,7 +65,7 @@ router.put(
   propertyController.updateProperty
 );
 
-
+router.delete('/:id', protect, propertyController.deleteProperty);
 
 router.put(
   '/:id/photo',
