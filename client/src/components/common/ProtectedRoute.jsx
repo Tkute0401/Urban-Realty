@@ -6,7 +6,7 @@ const ProtectedRoute = () => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
 
-  console.log('ProtectedRoute check:', { user, path: location.pathname });
+  
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
