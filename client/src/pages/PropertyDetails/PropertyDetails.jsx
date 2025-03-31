@@ -66,7 +66,9 @@ const PropertyDetails = () => {
     try {
       setDeleting(true);
       setDeleteError(null);
+      
       await deleteProperty(id);
+      
       navigate('/properties', { 
         state: { 
           message: 'Property deleted successfully',
@@ -75,7 +77,18 @@ const PropertyDetails = () => {
       });
     } catch (err) {
       console.error('Delete error:', err);
-      setDeleteError(err.response?.data?.message || err.message || 'Failed to delete property');
+      
+      // Handle unauthorized specifically
+      if (err.message === 'Not authorized to delete this property') {
+        setDeleteError('You are not authorized to delete this property');
+      } else {
+        setDeleteError(err.response?.data?.message || err.message || 'Failed to delete property');
+        
+        // Only logout if it's an authentication error (401)
+        if (err.response?.status === 401) {
+          // Handle logout logic if needed
+        }
+      }
     } finally {
       setDeleting(false);
       setDeleteConfirmOpen(false);

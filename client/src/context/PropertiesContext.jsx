@@ -163,18 +163,40 @@ export const PropertiesProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      await axios.delete(`/properties/${id}`);
+      
+      // Add authorization header if needed
+      const config = {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      };
+      
+      const response = await axios.delete(`/properties/${id}`, config);
+      
+      // Handle successful deletion
       setProperties(prev => prev.filter(p => p._id !== id));
       setCache(prev => {
         const newCache = { ...prev };
         delete newCache[id];
         return newCache;
       });
+      
       if (property?._id === id) {
         setProperty(null);
       }
+      
+      return response.data; // Return the response for handling in components
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete property');
+      console.error('Delete error details:', err);
+      
+      // Handle unauthorized error specifically
+      if (err.response?.status === 403) {
+        setError('You are not authorized to delete this property');
+        throw new Error('Not authorized to delete this property');
+      }
+      
+      // For other errors
+      setError(err.response?.data?.error || err.message || 'Failed to delete property');
       throw err;
     } finally {
       setLoading(false);
