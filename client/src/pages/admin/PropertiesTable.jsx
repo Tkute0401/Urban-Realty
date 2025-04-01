@@ -19,7 +19,7 @@ import {
   InputAdornment
 } from '@mui/material';
 import { MoreVert, Delete, Visibility, Edit } from '@mui/icons-material';
-import axios from '../../../services/axios';
+import axios from '../../services/axios';
 import { useNavigate } from 'react-router-dom';
 
 const PropertiesTable = () => {
