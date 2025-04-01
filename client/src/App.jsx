@@ -29,6 +29,15 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/properties" element={<PropertyList />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
+            <Route element={<RoleRoute allowedRoles={['admin']} />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="properties" element={<AdminProperties />} />
+                  <Route path="agents" element={<AdminAgents />} />
+                  <Route path="contacts" element={<AdminContacts />} />
+                </Route>
+            </Route>
             
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
