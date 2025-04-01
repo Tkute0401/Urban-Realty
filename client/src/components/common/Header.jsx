@@ -83,6 +83,7 @@ const Header = () => {
           </Button>
         </Box>
         {user?.role === 'admin' && (<Button 
+          align="right"
           component={Link} 
           to="/admin">
             Admin
