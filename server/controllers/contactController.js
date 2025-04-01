@@ -101,3 +101,40 @@ exports.updateContactRequest = asyncHandler(async (req, res, next) => {
     data: contactRequest
   });
 });
+
+// @desc    Get all contact requests (Admin)
+// @route   GET /api/v1/admin/contacts
+// @access  Private/Admin
+exports.getContactRequests = asyncHandler(async (req, res, next) => {
+  const contacts = await ContactRequest.find()
+    .populate('property', 'title price')
+    .populate('agent', 'name email mobile')
+    .populate('user', 'name email mobile')
+    .sort('-createdAt');
+
+  res.status(200).json({
+    success: true,
+    count: contacts.length,
+    data: contacts
+  });
+});
+
+// @desc    Delete contact request (Admin)
+// @route   DELETE /api/v1/admin/contacts/:id
+// @access  Private/Admin
+exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
+  const contactRequest = await ContactRequest.findById(req.params.id);
+
+  if (!contactRequest) {
+    return next(
+      new ErrorResponse(`Contact request not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  await contactRequest.remove();
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
