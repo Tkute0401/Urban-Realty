@@ -214,7 +214,9 @@ const ContactsTable = () => {
           <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
         </MenuItem>
       </Menu>
+      {console.log(contacts)}
     </Paper>
+    
   );
 };
 
