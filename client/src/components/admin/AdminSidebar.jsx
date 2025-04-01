@@ -10,7 +10,8 @@ import {
   ListItemText,
   Toolbar,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Typography
 } from '@mui/material';
 import {
   Dashboard,
