@@ -17,11 +17,11 @@ import { ThemeProvider } from '@mui/material';
 import { urbanRealtyTheme } from './Theme/NewTheme';
 import RoleRoute from './components/common/RoleRoute';
 import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboard from './components/admin/Dashboard';
-import AdminUsers from './pages/admin/Users';
-import AdminProperties from './pages/admin/Properties';
-import AdminContacts from './pages/admin/AdminContacts';
-
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UsersPage from './pages/admin/UsersPage';
+import PropertiesPage from './pages/admin/PropertiesPage';
+import AgentsPage from './pages/admin/AgentsPage';
+import InquiriesPage from './pages/admin/InquiriesPage';
 function App() {
   return (
     <ThemeProvider theme={urbanRealtyTheme}>
@@ -35,14 +35,15 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/properties" element={<PropertyList />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
-            <Route element={<RoleRoute allowedRoles={['admin']} />}>
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="users" element={<AdminUsers />} />
-                  <Route path="properties" element={<AdminProperties />} />
-                  {/* <Route path="agents" element={<AdminAgents />} /> */}
-                  <Route path="contacts" element={<AdminContacts />} />
-                </Route>
+            
+            <Route element={<AdminRoute />}>
+              <Route element={<AdminLayout />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<UsersPage />} />
+                <Route path="/admin/properties" element={<PropertiesPage />} />
+                <Route path="/admin/agents" element={<AgentsPage />} />
+                <Route path="/admin/inquiries" element={<InquiriesPage />} />
+              </Route>
             </Route>
             
             {/* Protected Routes */}
