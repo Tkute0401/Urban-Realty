@@ -82,10 +82,15 @@ const Header = () => {
             </Typography>
           </Button>
         </Box>
-
+        {user?.role === 'admin' && (<Button 
+          component={Link} 
+          to="/admin">
+            Admin
+          </Button>)}
         {/* Navigation Links */}
         {isMobile ? (
           <>
+
             <IconButton
               color="inherit"
               aria-label="menu"

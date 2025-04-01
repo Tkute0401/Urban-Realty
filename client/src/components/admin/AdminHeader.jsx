@@ -1,8 +1,8 @@
-import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Button } from '@mui/material';
 import { Menu as MenuIcon, AccountCircle } from '@mui/icons-material';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const AdminHeader = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -33,9 +33,16 @@ const AdminHeader = () => {
         >
           <MenuIcon />
         </IconButton>
+        
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           Admin Panel
         </Typography>
+        <Button
+          variant="contained"
+          color="error"
+          component={Link}
+          to="/"
+        >Home</Button>
         <div>
           <IconButton
             onClick={handleMenuOpen}
