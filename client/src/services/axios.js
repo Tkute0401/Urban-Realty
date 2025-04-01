@@ -132,19 +132,4 @@ export const formDataRequest = (url, data, method = 'post', config = {}) => {
   });
 };
 
-// Add these to your existing axios service
-export const getAdminDashboardStats = ()=> {
-  console.log('getAdminDashboardStats');
-  axios.get('/admin/dashboard');}
-export const getAdminUsers = (params) => axios.get('/admin/users', { params });
-export const getAdminProperties = (params) => axios.get('/admin/properties', { params });
-export const getAdminInquiries = (params) => axios.get('/admin/inquiries', { params });
-export const getAdminInquiry = (id) => axios.get(`/admin/inquiries/${id}`);
-export const updateUserRole = (id, role) => axios.put(`/admin/users/${id}/role`, { role });
-export const toggleFeaturedProperty = (id, featured) => axios.patch(`/api/v1/admin/properties/${id}/featured`, { featured });
-export const updateInquiryStatus = (id, status) => axios.patch(` /admin/inquiries/${id}/status`, { status });
-export const deleteAdminUser = (id) => axios.delete(` /admin/users/${id}`);
-export const deleteAdminProperty = (id) => axios.delete(` /admin/properties/${id}`);
-export const deleteAdminInquiry = (id) => axios.delete(` /admin/inquiries/${id}`);
-
 export default instance;

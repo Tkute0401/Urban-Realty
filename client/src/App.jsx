@@ -15,14 +15,12 @@ import AddProperty from './pages/AddProperty/AddProperty';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { ThemeProvider } from '@mui/material';
 import { urbanRealtyTheme } from './Theme/NewTheme';
-import RoleRoute from './components/common/RoleRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AgentsPage from './pages/admin/AgentsPage';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
-import AdminInquiries from './pages/admin/AdminInquiries';
-import AdminRoute from './components/common/AdminRoute';
+import AdminContacts from './pages/admin/AdminContacts';
+
 function App() {
   return (
     <ThemeProvider theme={urbanRealtyTheme}>
@@ -37,16 +35,15 @@ function App() {
             <Route path="/properties" element={<PropertyList />} />
             <Route path="/properties/:id" element={<PropertyDetails />} />
             
-            <Route element={<AdminRoute />}>
+            {/* Admin Routes */}
+            <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route element={<AdminLayout />}>
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/properties" element={<AdminProperties />} />
-                <Route path="/admin/agents" element={<AgentsPage />} />
-                <Route path="/admin/inquiries" element={<AdminInquiries />} />
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="properties" element={<AdminProperties />} />
+                <Route path="contacts" element={<AdminContacts />} />
               </Route>
             </Route>
-            
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/properties/:id/edit" element={<EditProperty />} />

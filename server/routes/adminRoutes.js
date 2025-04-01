@@ -1,42 +1,30 @@
-// server/routes/adminRoutes.js
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
-const {
-  getUsers,
-  getUser,
-  updateUser,
-  deleteUser,
-  updateUserRole
-} = require('../controllers/adminController');
+const adminController = require('../controllers/adminController');
 
-router.use(protect);
-router.use(authorize('admin'));
+// User management
+router.get('/users', protect, authorize('admin'), adminController.getUsers);
+router.get('/users/:id', protect, authorize('admin'), adminController.getUser);
+router.put('/users/:id', protect, authorize('admin'), adminController.updateUser);
+router.delete('/users/:id', protect, authorize('admin'), adminController.deleteUser);
 
-router.route('/users')
-  .get(getUsers);
+// Property management
+router.get('/properties', protect, authorize('admin'), adminController.getProperties);
+router.get('/properties/:id', protect, authorize('admin'), adminController.getProperty);
+router.delete('/properties/:id', protect, authorize('admin'), adminController.deleteProperty);
 
-router.route('/users/:id')
-  .get(getUser)
-  .put(updateUser)
-  .delete(deleteUser);
+// Agent management
+router.get('/agents', protect, authorize('admin'), adminController.getAgents);
+router.get('/agents/:id', protect, authorize('admin'), adminController.getAgent);
+router.put('/agents/:id/verify', protect, authorize('admin'), adminController.verifyAgent);
 
-router.route('/users/:id/role')
-  .put(updateUserRole);
+// Contact requests
+router.get('/contacts', protect, authorize('admin'), adminController.getContactRequests);
+router.get('/contacts/:id', protect, authorize('admin'), adminController.getContactRequest);
+router.delete('/contacts/:id', protect, authorize('admin'), adminController.deleteContactRequest);
 
-router.route('/properties')
-  .get(getAllProperties);
-
-router.route('/properties/:id')
-  .delete(deleteProperty);
-
-router.route('/properties/:id/featured')
-  .patch(toggleFeatured);
-
-router.route('/inquiries')
-  .get(getInquiries);
-
-router.route('/inquiries/:id/status')
-  .patch(updateInquiryStatus);
+// Statistics
+router.get('/stats', protect, authorize('admin'), adminController.getStats);
 
 module.exports = router;
