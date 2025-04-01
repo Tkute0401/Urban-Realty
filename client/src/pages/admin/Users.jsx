@@ -54,6 +54,7 @@ import {
       setUsers(users.map(user => 
         user._id === updatedUser._id ? updatedUser : user
       ));
+      console.log("    ");
     };
   
     const handleUserDeleted = (userId) => {
