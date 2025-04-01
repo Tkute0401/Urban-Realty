@@ -28,7 +28,7 @@ const AdminDashboard = () => {
       setError(null);
       
       const response = await axios.get('/admin/dashboard');
-      console.log(response.data);
+      console.log(response);
       const { stats, featuredProperties, recentInquiries } = response.data.data;
       
       setStats(stats);
