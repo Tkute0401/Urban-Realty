@@ -3,6 +3,7 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/client
 COPY client/package*.json ./
+RUN yarn cache clean
 RUN yarn install
 COPY client .
 ARG VITE_API_BASE_URL
