@@ -50,7 +50,12 @@ const UserSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true
-  }
+  },
+  occupation: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Occupation cannot be more than 100 characters']
+  },
 });
 
 // Encrypt password using bcrypt

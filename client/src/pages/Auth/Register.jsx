@@ -19,7 +19,9 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    role: 'buyer'
+    role: 'buyer',
+    mobile: '',
+    occupation: ''
   });
   
   const { register, error, clearError, loading } = useAuth();
@@ -92,6 +94,25 @@ const Register = () => {
                 onChange={handleChange}
                 required
                 inputProps={{ minLength: 6 }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Mobile Number"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Occupation"
+                name="occupation"
+                value={formData.occupation}
+                onChange={handleChange}
+                helperText="What do you do?"
               />
             </Grid>
             <Grid item xs={12}>

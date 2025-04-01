@@ -39,17 +39,39 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/admin/users/:id
 // @access  Private/Admin
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-  
-  if (!user) {
-    return next(
-      new ErrorResponse(`User not found with id of ${req.params.id}`, 404)
-    );
+  const { name, email, mobile, role, occupation } = req.body;
+  const userId = req.params.id;
+  if (occupation==undefined) occupation='';
+
+  const updateFields = {};
+  if (name) updateFields.name = name;
+  if (email) updateFields.email = email;
+  if (mobile !== undefined) updateFields.mobile = mobile;
+  if (role) updateFields.role = role;
+  if (occupation !== undefined) updateFields.occupation = occupation;
+
+  // Check if email is being updated and if it's already in use
+  if (email) {
+    const existingUser = await User.findOne({ 
+      email: { $regex: new RegExp(`^${email}$`, 'i') },
+      _id: { $ne: userId }
+    });
+    
+    if (existingUser) {
+      return next(new ErrorResponse('Email already in use', 400));
+    }
   }
-  
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    updateFields,
+    { new: true, runValidators: true }
+  ).select('-password');
+
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
   res.status(200).json({
     success: true,
     data: user
@@ -253,30 +275,37 @@ exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/admin/stats
 // @access  Private/Admin
 exports.getStats = asyncHandler(async (req, res, next) => {
-  const usersCount = await User.countDocuments();
-  const agentsCount = await User.countDocuments({ role: 'agent' });
-  const propertiesCount = await Property.countDocuments();
-  const contactsCount = await ContactRequest.countDocuments();
-  
-  // Get recent activities
-  const recentUsers = await User.find().sort('-createdAt').limit(5);
-  const recentProperties = await Property.find().sort('-createdAt').limit(5);
-  const recentContacts = await ContactRequest.find().sort('-createdAt').limit(5);
-  
-  res.status(200).json({
-    success: true,
-    data: {
-      counts: {
-        users: usersCount,
-        agents: agentsCount,
-        properties: propertiesCount,
-        contacts: contactsCount
-      },
-      recent: {
-        users: recentUsers,
-        properties: recentProperties,
-        contacts: recentContacts
+  try {
+    const [usersCount, agentsCount, propertiesCount, contactsCount, recentUsers, recentProperties, recentContacts] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ role: 'agent' }),
+      Property.countDocuments(),
+      ContactRequest.countDocuments(),
+      User.find().sort('-createdAt').limit(5),
+      Property.find().sort('-createdAt').limit(5).populate('agent', 'name email'),
+      ContactRequest.find().sort('-createdAt').limit(5)
+        .populate('property', 'title')
+        .populate('user', 'name email')
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        counts: {
+          users: usersCount,
+          agents: agentsCount,
+          properties: propertiesCount,
+          contacts: contactsCount
+        },
+        recent: {
+          users: recentUsers,
+          properties: recentProperties,
+          contacts: recentContacts
+        }
       }
-    }
-  });
+    });
+  } catch (err) {
+    console.error('Error fetching stats:', err);
+    next(new ErrorResponse('Failed to fetch dashboard statistics', 500));
+  }
 });
