@@ -30,7 +30,7 @@ const AdminInquiries = () => {
       setLoading(true);
       setError(null);
       
-      let url = '/api/v1/admin/inquiries';
+      let url = '/admin/inquiries';
       if (statusFilter !== 'all') {
         url += `?status=${statusFilter}`;
       }
@@ -50,7 +50,7 @@ const AdminInquiries = () => {
 
   const handleDeleteInquiry = async () => {
     try {
-      await axios.delete(`/api/v1/admin/inquiries/${selectedInquiry._id}`);
+      await axios.delete(`/admin/inquiries/${selectedInquiry._id}`);
       setOpenDeleteDialog(false);
       fetchInquiries();
     } catch (err) {
@@ -60,7 +60,7 @@ const AdminInquiries = () => {
 
   const updateInquiryStatus = async (inquiryId, newStatus) => {
     try {
-      await axios.patch(`/api/v1/admin/inquiries/${inquiryId}/status`, {
+      await axios.patch(`/admin/inquiries/${inquiryId}/status`, {
         status: newStatus
       });
       fetchInquiries();

@@ -45,7 +45,7 @@ const AgentInquiries = () => {
     ['agentInquiries', page, rowsPerPage, searchTerm], 
     async () => {
       const res = await axios.get(
-        `/api/v1/inquiries/my-inquiries?page=${page + 1}&limit=${rowsPerPage}&search=${searchTerm}`
+        `/inquiries/my-inquiries?page=${page + 1}&limit=${rowsPerPage}&search=${searchTerm}`
       );
       return res.data;
     }

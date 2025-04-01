@@ -29,7 +29,7 @@ const UsersTable = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('/api/v1/admin/users');
+        const response = await axios.get('/admin/users');
         console.log(response.data);
         if (response.data.success) {
           setUsers(response.data.data || []); // Ensure we always have an array
@@ -59,7 +59,7 @@ const UsersTable = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/v1/admin/users/${selectedUser._id}`);
+      await axios.delete(`/admin/users/${selectedUser._id}`);
       setUsers(users.filter(user => user._id !== selectedUser._id));
     } catch (err) {
       console.error('Error deleting user:', err);
@@ -71,7 +71,7 @@ const UsersTable = () => {
 
   const handleVerifyAgent = async () => {
     try {
-      const response = await axios.put(`/api/v1/admin/agents/${selectedUser._id}/verify`);
+      const response = await axios.put(`/admin/agents/${selectedUser._id}/verify`);
       setUsers(users.map(user => 
         user._id === selectedUser._id ? response.data.data : user
       ));

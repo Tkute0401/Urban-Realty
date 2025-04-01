@@ -29,7 +29,7 @@ const AgentsPage = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get('/api/v1/admin/users?role=agent');
+      const response = await axios.get('/admin/users?role=agent');
       setAgents(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load agents');
@@ -44,7 +44,7 @@ const AgentsPage = () => {
 
   const handleDeleteAgent = async () => {
     try {
-      await axios.delete(`/api/v1/admin/users/${selectedAgent._id}`);
+      await axios.delete(`/admin/users/${selectedAgent._id}`);
       setOpenDeleteDialog(false);
       fetchAgents();
     } catch (err) {
@@ -54,7 +54,7 @@ const AgentsPage = () => {
 
   const toggleAgentStatus = async (agentId, isActive) => {
     try {
-      await axios.patch(`/api/v1/admin/users/${agentId}/status`, {
+      await axios.patch(`/admin/users/${agentId}/status`, {
         active: !isActive
       });
       fetchAgents();

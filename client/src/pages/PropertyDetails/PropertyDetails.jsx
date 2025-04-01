@@ -97,7 +97,7 @@ const PropertyDetails = () => {
   const handleContactSubmit = async () => {
     try {
       setContactLoading(true);
-      await axios.post(`/api/v1/properties/${id}/contact`, {
+      await axios.post(`/properties/${id}/contact`, {
         message,
         contactMethod
       });

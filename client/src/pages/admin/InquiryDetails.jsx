@@ -26,7 +26,7 @@ const InquiryDetails = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`/api/v1/admin/inquiries/${id}`);
+      const response = await axios.get(`/admin/inquiries/${id}`);
       setInquiry(response.data.data);
       setStatus(response.data.data.status);
     } catch (err) {
@@ -42,7 +42,7 @@ const InquiryDetails = () => {
 
   const updateStatus = async () => {
     try {
-      await axios.patch(`/api/v1/admin/inquiries/${id}/status`, { status });
+      await axios.patch(`/admin/inquiries/${id}/status`, { status });
       fetchInquiry();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update status');
