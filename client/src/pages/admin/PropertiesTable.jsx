@@ -21,6 +21,7 @@ import {
 import { MoreVert, Delete, Visibility, Edit } from '@mui/icons-material';
 import axios from '../../services/axios';
 import { useNavigate } from 'react-router-dom';
+import SearchBar from '../../components/home/SearchBar';
 
 const PropertiesTable = () => {
   const [properties, setProperties] = useState([]);
@@ -113,7 +114,7 @@ const PropertiesTable = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search />
+                <SearchBar />
               </InputAdornment>
             ),
           }}
