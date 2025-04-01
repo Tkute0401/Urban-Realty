@@ -1,111 +1,102 @@
 require('dotenv').config({ path: `${__dirname}/.env` });
 const express = require('express');
-const fs = require('fs');
+const cors = require('cors');
 const path = require('path');
-const http = require('http');
+const fs = require('fs');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
-// Initialize Express app
 const app = express();
 
-// Connect to MongoDB
+// Connect to database
 connectDB();
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join(__dirname, '..', 'client', 'dist'); // Adjust based on your frontend location
+const clientDistDir = path.join('/app/client/dist'); // Updated path
 
-// Create required directories
-const createDirectories = () => {
-  const directories = [uploadsDir];
-  
-  // Only try to create client directory if serving frontend
-  if (process.env.SERVE_FRONTEND === 'true') {
-    directories.push(clientDistDir);
-  }
-
-  directories.forEach(dir => {
-    try {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-        console.log(`✓ Created directory: ${dir}`);
-      }
-    } catch (err) {
-      console.error(`✗ Failed to create ${dir}:`, err);
-      process.exit(1);
+// Create directories
+[uploadsDir, clientDistDir].forEach(dir => {
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Directory created: ${dir}`);
     }
-  });
-};
-
-createDirectories();
+  } catch (err) {
+    console.error(`Error creating ${dir}:`, err);
+    process.exit(1);
+  }
+});
 
 // Middleware
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static files
 app.use('/uploads', express.static(uploadsDir));
+app.use(express.static(clientDistDir)); // Serve React build
 
-// Only serve frontend if configured to do so
-if (process.env.SERVE_FRONTEND === 'true') {
-  app.use(express.static(clientDistDir));
-  
-  // SPA Fallback Route (must be last)
-  app.get('*', (req, res) => {
-    const indexPath = path.join(clientDistDir, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      console.error('Frontend build not found at:', indexPath);
-      res.status(500).json({
-        success: false,
-        error: 'Frontend assets not found'
-      });
-    }
+// API Routes
+app.use('/api/v1/auth', require('./routes/authRoutes'));
+app.use('/api/v1/properties', require('./routes/propertyRoutes'));
+app.use('/api/v1/contacts', require('./routes/contactRoutes'));
+app.use('/api/v1/admin', require('./routes/adminRoutes'));
+
+// Health endpoints
+app.get('/api/v1/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy',
+    staticFilesPath: clientDistDir,
+    uploadsPath: uploadsDir
   });
-}
+});
 
-// Error handling middleware
-app.use(errorHandler);
+app.get('/api/v1/test', (req, res) => {
+  res.json({ 
+    status: 'success',
+    message: 'API is working',
+    staticFiles: fs.existsSync(path.join(clientDistDir, 'index.html')) 
+      ? 'Found' 
+      : 'Not found'
+  });
+});
 
-// Create HTTP server
-const server = http.createServer(app);
-
-// Start server
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`
-  ==============================================
-  🏡 Urban Realty Server
-  ==============================================
-  Environment: ${process.env.NODE_ENV || 'development'}
-  Listening on: http://localhost:${PORT}
-  Database: ${process.env.MONGO_URI ? 'Connected' : 'Not configured'}
-  Uploads directory: ${uploadsDir}
-  Serving frontend: ${process.env.SERVE_FRONTEND === 'true' ? 'Yes' : 'No'}
-  ==============================================
-  `);
-
-  // Verify critical paths
-  console.log('\n🔍 Path Verification:');
-  console.log(`  ${fs.existsSync(uploadsDir) ? '✓' : '✗'} Uploads directory`);
-  if (process.env.SERVE_FRONTEND === 'true') {
-    console.log(`  ${fs.existsSync(clientDistDir) ? '✓' : '✗'} Client build`);
+// SPA Fallback - MUST BE LAST ROUTE
+app.get('*', (req, res) => {
+  const indexPath = path.join(clientDistDir, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error(`Frontend file not found at: ${indexPath}`);
+    res.status(500).json({ 
+      success: false,
+      error: 'Frontend assets not found',
+      path: indexPath
+    });
   }
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('\n🔴 Received SIGTERM. Shutting down gracefully...');
-  server.close(() => {
-    console.log('🛑 Server terminated');
-    process.exit(0);
-  });
+// Error handling
+app.use(errorHandler);
+app.use((req, res) => res.status(404).json({ success: false, error: 'Not found' }));
+
+// Server
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Serving static files from: ${clientDistDir}`);
+  console.log(`Uploads directory: ${uploadsDir}`);
+  
+  // Verify frontend files
+  console.log('Frontend files:', fs.readdirSync(clientDistDir));
 });
 
 process.on('unhandledRejection', (err) => {
-  console.error('⚠️ Unhandled rejection:', err);
+  console.error(`Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));
 });
 
