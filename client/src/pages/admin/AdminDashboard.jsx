@@ -1,6 +1,6 @@
 import { Grid, Typography, Card, CardContent, CircularProgress, Box } from '@mui/material';
 import { useEffect, useState } from 'react';
-import axios from '../../../services/axios';
+import axios from '../../services/axios';
 import RecentUsers from '../components/RecentUsers';
 import RecentProperties from '../components/RecentProperties';
 import RecentContacts from '../components/RecentContacts';
