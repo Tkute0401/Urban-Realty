@@ -88,6 +88,7 @@ const ContactsTable = () => {
   const filteredContacts = contacts.filter(contact => 
     contact.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     contact.property?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    contact.property?.agent?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     contact.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -138,6 +139,7 @@ const ContactsTable = () => {
             <TableRow>
               <TableCell>User</TableCell>
               <TableCell>Property</TableCell>
+              <TableCell>Agent</TableCell>
               <TableCell>Method</TableCell>
               <TableCell>Date</TableCell>
               <TableCell>Status</TableCell>
@@ -168,6 +170,17 @@ const ContactsTable = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
+                      <Box display="flex" alignItems="center">
+                        <Avatar 
+                          src={contact.property?.agent?.avatar}
+                          sx={{ width: 32, height: 32, mr: 1 }}
+                        >
+                          {contact.property?.agent?.name?.charAt(0)}
+                        </Avatar>
+                        <Typography>{contact.property?.agent?.name}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
                       {getContactMethodIcon(contact.contactMethod)}
                     </TableCell>
                     <TableCell>
@@ -192,7 +205,7 @@ const ContactsTable = () => {
                 ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={7} align="center">
                   <Typography>No contacts found</Typography>
                 </TableCell>
               </TableRow>
