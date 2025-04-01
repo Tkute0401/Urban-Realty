@@ -96,7 +96,7 @@ const PropertiesTable = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/admin/properties/${selectedProperty._id}/edit`);
+    navigate(`/properties/${selectedProperty._id}/edit`);
     handleMenuClose();
   };
 
