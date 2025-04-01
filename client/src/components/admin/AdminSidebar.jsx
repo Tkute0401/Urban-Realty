@@ -11,7 +11,8 @@ import {
   Toolbar,
   useTheme,
   useMediaQuery,
-  Typography
+  Typography,
+  IconButton
 } from '@mui/material';
 import {
   Dashboard,
