@@ -20,6 +20,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 import AdminContacts from './pages/admin/AdminContacts';
+import AgentsPage from './pages/admin/AgentsPage';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
+                <Route path="agents" element={<AgentsPage />} />
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="properties" element={<AdminProperties />} />
                 <Route path="contacts" element={<AdminContacts />} />
