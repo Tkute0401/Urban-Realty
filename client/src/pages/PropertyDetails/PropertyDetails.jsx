@@ -108,61 +108,74 @@ const PropertyDetails = () => {
   const handleContactSubmit = async () => {
     try {
       setContactLoading(true);
-      
-      if (contactMethod === 'whatsapp') {
-        const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
-        const link = window.location.href;
-        const messageText = message || `Hello, I'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}). ${link}`;
-        window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`, '_blank');
-        
-        // Also create a contact request record
-        await axios.post(`/contacts/property/${id}`, {
-          message: messageText,
-          contactMethod: 'whatsapp'
-        });
-        
+      setError(null);
+      setContactSuccess(false);
+  
+      // Prepare common message content
+      const propertyLink = window.location.href;
+      const defaultMessage = `Hello, I'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}).\n\n${propertyLink}\n\nCould you please provide more information about:\n- Availability\n- Viewing options\n- Any additional details`;
+      const finalMessage = message.trim() || defaultMessage;
+  
+      // Handle external communication methods (whatsapp, call, email)
+      if (['whatsapp', 'call', 'email'].includes(contactMethod)) {
+        // 1. First open the external communication channel
+        switch (contactMethod) {
+          case 'whatsapp':
+            const whatsappNumber = property.agent?.mobile?.replace(/\D/g, '');
+            if (!whatsappNumber) throw new Error('Agent phone number not available');
+            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(finalMessage)}`, '_blank');
+            break;
+          
+          case 'call':
+            const callNumber = property.agent?.mobile?.replace(/\D/g, '');
+            if (!callNumber) throw new Error('Agent phone number not available');
+            window.open(`tel:${callNumber}`, '_blank');
+            break;
+          
+          case 'email':
+            if (!property.agent?.email) throw new Error('Agent email not available');
+            const subject = `Inquiry about ${property.title}`;
+            window.open(`mailto:${property.agent.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(finalMessage)}`, '_blank');
+            break;
+        }
+  
+        // 2. Then create the contact record (fire-and-forget approach)
+        try {
+          await axios.post(`/contacts/property/${id}`, {
+            message: finalMessage,
+            contactMethod
+          });
+        } catch (err) {
+          console.error('Contact record creation failed:', err);
+          // Non-critical failure - we don't show this to the user
+        }
+  
         setContactSuccess(true);
         return;
       }
-      
-      if (contactMethod === 'call') {
-        const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
-        window.open(`tel:${phoneNumber}`, '_blank');
-        
-        // Also create a contact request record
-        await axios.post(`/contacts/property/${id}`, {
-          message: 'Requested phone call',
-          contactMethod: 'phone'
+  
+      // Handle internal message method (no external communication)
+      if (contactMethod === 'message') {
+        if (!finalMessage.trim()) {
+          throw new Error('Please enter a message');
+        }
+  
+        // Create contact record (critical for this method)
+        const response = await axios.post(`/contacts/property/${id}`, {
+          message: finalMessage,
+          contactMethod
         });
-        
+  
         setContactSuccess(true);
         return;
       }
-
-      // For email/message
-      const response = await axios.post(`/contacts/property/${id}`, {
-        message,
-        contactMethod: contactMethod === 'email' ? 'email' : 'message'
-      });
-      
-      if (contactMethod === 'email') {
-        const subject = `Inquiry about ${property.title}`;
-        const body = message || `Hello,\n\nI'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}).\n\nCould you please provide more information about:\n- Availability\n- Viewing options\n- Any additional details\n\n${window.location.href}`;
-        window.open(`mailto:${property.agent?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
-      }
-      
-      setContactSuccess(true);
+  
+      throw new Error('Invalid contact method');
     } catch (err) {
-      console.error('Error sending contact request:', err);
+      console.error('Contact error:', err);
       setError(err.response?.data?.message || err.message || 'Failed to send contact request');
     } finally {
       setContactLoading(false);
-      if (contactSuccess) {
-        setTimeout(() => {
-          setContactOpen(false);
-          setMessage('');
-        }, 2000);
-      }
     }
   };
 
