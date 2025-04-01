@@ -18,9 +18,10 @@ import {
   TextField,
   InputAdornment,
   Avatar,
-  Tooltip
+  Tooltip,
+  Button
 } from '@mui/material';
-import { MoreVert, Delete, Visibility, Edit, Search } from '@mui/icons-material';
+import { MoreVert, Delete, Visibility, Edit, Search, Add } from '@mui/icons-material';
 import axios from '../../services/axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -100,6 +101,10 @@ const PropertiesTable = () => {
     handleMenuClose();
   };
 
+  const handleAddProperty = () => {
+    navigate('/properties/new');
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -138,9 +143,8 @@ const PropertiesTable = () => {
 
   return (
     <Paper>
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <TextField
-          fullWidth
           variant="outlined"
           placeholder="Search properties..."
           value={searchTerm}
@@ -152,8 +156,16 @@ const PropertiesTable = () => {
               </InputAdornment>
             ),
           }}
-          sx={{ mb: 2 }}
+          sx={{ width: '50%' }}
         />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={handleAddProperty}
+        >
+          Add Property
+        </Button>
       </Box>
 
       <TableContainer>
