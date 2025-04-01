@@ -16,6 +16,11 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import { ThemeProvider } from '@mui/material';
 import { urbanRealtyTheme } from './Theme/NewTheme';
 import RoleRoute from './components/common/RoleRoute';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './components/admin/Dashboard';
+import AdminUsers from './pages/admin/Users';
+import AdminProperties from './pages/admin/Properties';
+import AdminContacts from './pages/admin/AdminContacts';
 
 function App() {
   return (
@@ -35,7 +40,7 @@ function App() {
                   <Route index element={<AdminDashboard />} />
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="properties" element={<AdminProperties />} />
-                  <Route path="agents" element={<AdminAgents />} />
+                  {/* <Route path="agents" element={<AdminAgents />} /> */}
                   <Route path="contacts" element={<AdminContacts />} />
                 </Route>
             </Route>
