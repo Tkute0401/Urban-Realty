@@ -18,10 +18,10 @@ import { urbanRealtyTheme } from './Theme/NewTheme';
 import RoleRoute from './components/common/RoleRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import PropertiesPage from './pages/admin/PropertiesPage';
 import AgentsPage from './pages/admin/AgentsPage';
 import InquiriesPage from './pages/admin/InquiriesPage';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminProperties from './pages/admin/AdminProperties';
 function App() {
   return (
     <ThemeProvider theme={urbanRealtyTheme}>
@@ -40,7 +40,7 @@ function App() {
               <Route element={<AdminLayout />}>
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/properties" element={<PropertiesPage />} />
+                <Route path="/admin/properties" element={<AdminProperties />} />
                 <Route path="/admin/agents" element={<AgentsPage />} />
                 <Route path="/admin/inquiries" element={<InquiriesPage />} />
               </Route>
