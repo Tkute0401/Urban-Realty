@@ -39,6 +39,8 @@ const AdminHeader = () => {
         </Typography>
         <Button
         align="right"
+          variant="text"
+          color="inherit"
           component={Link}
           to="/"
         >Home</Button>
