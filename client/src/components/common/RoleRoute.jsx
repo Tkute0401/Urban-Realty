@@ -1,3 +1,4 @@
+// src/components/common/RoleRoute.jsx
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import PropTypes from 'prop-types';
@@ -6,7 +7,7 @@ const RoleRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; // Or your custom loader
+    return <div>Loading...</div>;
   }
 
   if (!user) {
