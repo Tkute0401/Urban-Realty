@@ -1,5 +1,5 @@
 // src/context/AgentsContext.js
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import axios from '../services/axios';
 
 const AgentsContext = createContext();
