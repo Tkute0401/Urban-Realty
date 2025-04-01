@@ -1,10 +1,11 @@
-const Property = require('../models/Property');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const Property = require('../models/Property');
+const User = require('../models/User');
 const geocoder = require('../utils/geocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
-const mongoose = require('mongoose');
+const Inquiry = require('../models/Inquiry');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -14,102 +15,7 @@ cloudinary.config({
   secure: true
 });
 
-// Helper functions
-const parseAddress = (address) => {
-  if (typeof address === 'string') {
-    try {
-      return JSON.parse(address);
-    } catch (err) {
-      throw new Error('Invalid address format. Address should be a valid JSON object');
-    }
-  }
-  return address;
-};
-
-const validateAddress = (address) => {
-  if (!address) throw new Error('Address is required');
-  
-  const requiredFields = ['street', 'city', 'state', 'country'];
-  const missingFields = requiredFields.filter(field => !address[field]);
-  
-  if (missingFields.length > 0) {
-    throw new Error(`Missing address fields: ${missingFields.join(', ')}`);
-  }
-  
-  if (address.country === 'India' && !address.zipCode) {
-    throw new Error('Zip code is required for Indian addresses');
-  }
-};
-
-const geocodeWithRetry = async (addressString, retries = 3, delay = 1000) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const loc = await geocoder.geocode(addressString);
-      if (loc && loc.length > 0) return loc;
-    } catch (err) {
-      if (i === retries - 1) throw err;
-      await new Promise(res => setTimeout(res, delay));
-    }
-  }
-  return null;
-};
-
-const processGeocodeResult = (geocodeResult) => {
-  if (!geocodeResult || geocodeResult.length === 0) {
-    throw new Error('No results found for this address');
-  }
-
-  const result = geocodeResult[0];
-  
-  return {
-    type: 'Point',
-    coordinates: [result.longitude, result.latitude],
-    street: result.streetName || result.streetNumber || '',
-    city: result.city || '',
-    state: result.state || result.stateCode || '',
-    zipCode: result.zipcode || '',
-    country: result.country || result.countryCode || '',
-    formattedAddress: result.formattedAddress || ''
-  };
-};
-
-const uploadImagesToCloudinary = async (files) => {
-  const images = [];
-  
-  for (const file of files) {
-    try {
-      if (!fs.existsSync(file.path)) {
-        console.error('File does not exist:', file.path);
-        continue;
-      }
-
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: 'real-estate/properties',
-        width: 1200,
-        height: 800,
-        crop: 'fill',
-        quality: 'auto:good'
-      });
-      
-      images.push({
-        url: result.secure_url,
-        publicId: result.public_id,
-        width: result.width,
-        height: result.height
-      });
-      
-      fs.unlinkSync(file.path);
-    } catch (err) {
-      console.error('Error uploading image:', err);
-      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      throw err;
-    }
-  }
-  
-  return images;
-};
-
-// @desc    Get all properties with agent mobile numbers
+// @desc    Get all properties
 // @route   GET /api/v1/properties
 // @access  Public
 exports.getProperties = asyncHandler(async (req, res, next) => {
@@ -132,6 +38,12 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       { 'address.state': { $regex: req.query.search, $options: 'i' } },
       { buildingName: { $regex: req.query.search, $options: 'i' } }
     ];
+  }
+
+  // Price range filtering
+  if (req.query.price) {
+    const [min, max] = req.query.price.split('-');
+    reqQuery.price = { $gte: parseInt(min), $lte: parseInt(max) };
   }
 
   // Create query string
@@ -184,7 +96,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Get single property with agent mobile
+// @desc    Get single property
 // @route   GET /api/v1/properties/:id
 // @access  Public
 exports.getProperty = asyncHandler(async (req, res, next) => {
@@ -205,193 +117,97 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
 
 // @desc    Create new property
 // @route   POST /api/v1/properties
-// @access  Private
+// @access  Private (Agent/Admin)
 exports.createProperty = asyncHandler(async (req, res, next) => {
-  try {
-    // Parse and validate address
-    const address = parseAddress(req.body.address);
-    validateAddress(address);
+  // Add user to req.body
+  req.body.agent = req.user.id;
 
-    // Geocode the address
-    const addressString = `${address.street}, ${address.city}, ${address.state}, ${address.zipCode}, ${address.country}`;
-    const geocodeResult = await geocodeWithRetry(addressString);
-    
-    if (!geocodeResult || geocodeResult.length === 0) {
-      return next(new ErrorResponse('Could not geocode the address', 400));
-    }
+  // Check for published property by same agent
+  const publishedProperty = await Property.findOne({ agent: req.user.id });
 
-    const location = processGeocodeResult(geocodeResult);
-
-    // Process images
-    const images = req.files?.length > 0 
-      ? await uploadImagesToCloudinary(req.files)
-      : [];
-
-    // Create property
-    const property = await Property.create({
-      ...req.body,
-      address,
-      location,
-      images,
-      agent: req.user.id
-    });
-
-    res.status(201).json({ 
-      success: true, 
-      data: property 
-    });
-
-  } catch (err) {
-    // Clean up any uploaded files on error
-    if (req.files) {
-      req.files.forEach(file => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      });
-    }
-    
-    next(err);
+  // If agent is not admin, they can only add one property
+  if (publishedProperty && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `Agent with ID ${req.user.id} has already published a property`,
+        400
+      )
+    );
   }
+
+  // Process images
+  const images = req.files?.length > 0 
+    ? await uploadImagesToCloudinary(req.files)
+    : [];
+
+  // Create property
+  const property = await Property.create({
+    ...req.body,
+    images
+  });
+
+  res.status(201).json({ 
+    success: true, 
+    data: property 
+  });
 });
 
 // @desc    Update property
 // @route   PUT /api/v1/properties/:id
-// @access  Private
+// @access  Private (Agent/Admin)
 exports.updateProperty = asyncHandler(async (req, res, next) => {
-  try {
-    const propertyId = req.params.id;
-    
-    if (!propertyId) {
-      return next(new ErrorResponse('Property ID is required', 400));
-    }
+  let property = await Property.findById(req.params.id);
 
-    // Find property with agent populated
-    let property = await Property.findById(propertyId).populate('agent');
-    if (!property) {
-      return next(new ErrorResponse(`Property not found with id ${propertyId}`, 404));
-    }
-
-    // Verify ownership
-    if (property.agent._id.toString() !== req.user.id && req.user.role !== 'admin') {
-      return next(new ErrorResponse('Not authorized to update this property', 401));
-    }
-
-    // Process address updates
-    if (req.body.address) {
-      try {
-        const parsedAddress = typeof req.body.address === 'string' 
-          ? JSON.parse(req.body.address) 
-          : req.body.address;
-
-        // Validate required fields
-        if (!parsedAddress.street || !parsedAddress.city || !parsedAddress.state) {
-          throw new Error('Street, city and state are required');
-        }
-
-        // Update address fields
-        property.address = {
-          line1: parsedAddress.line1 || property.address.line1 || '',
-          street: parsedAddress.street,
-          city: parsedAddress.city,
-          state: parsedAddress.state,
-          zipCode: parsedAddress.zipCode || property.address.zipCode || '',
-          country: parsedAddress.country || property.address.country || 'India'
-        };
-
-        // Geocode new address
-        const addressString = `${property.address.street}, ${property.address.city}, ${property.address.state}, ${property.address.zipCode}, ${property.address.country}`;
-        const geocodeResult = await geocodeWithRetry(addressString);
-        
-        if (!geocodeResult || geocodeResult.length === 0) {
-          throw new Error('Could not geocode the address');
-        }
-
-        // Update location with new coordinates
-        property.location = processGeocodeResult(geocodeResult);
-
-      } catch (err) {
-        return next(new ErrorResponse(`Address error: ${err.message}`, 400));
-      }
-    }
-
-    // Update other fields
-    const updatableFields = [
-      'title', 'description', 'type', 'status', 'price',
-      'bedrooms', 'bathrooms', 'area', 'buildingName', 'floorNumber', 'featured'
-    ];
-
-    updatableFields.forEach(field => {
-      if (req.body[field] !== undefined) {
-        property[field] = req.body[field];
-      }
-    });
-
-    // Update amenities
-    if (req.body.amenities !== undefined) {
-      property.amenities = Array.isArray(req.body.amenities) 
-        ? req.body.amenities 
-        : [req.body.amenities].filter(Boolean);
-    }
-
-    // Process existing images
-    if (req.body.existingImages !== undefined) {
-      try {
-        property.images = Array.isArray(req.body.existingImages)
-          ? req.body.existingImages.map(img => {
-              const parsed = typeof img === 'string' ? JSON.parse(img) : img;
-              return {
-                url: parsed.url,
-                publicId: parsed.publicId,
-                _id: parsed._id || new mongoose.Types.ObjectId(),
-                width: parsed.width,
-                height: parsed.height
-              };
-            })
-          : [];
-      } catch (err) {
-        return next(new ErrorResponse('Invalid image data format', 400));
-      }
-    }
-
-    // Process new images
-    if (req.files?.length > 0) {
-      try {
-        const newImages = await uploadImagesToCloudinary(req.files);
-        property.images = [...property.images, ...newImages];
-      } catch (err) {
-        return next(new ErrorResponse('Failed to upload new images', 500));
-      }
-    }
-
-    // Save the updated property
-    const updatedProperty = await property.save();
-    
-    // Get fully populated property for response
-    const populatedProperty = await Property.findById(updatedProperty._id)
-      .populate('agent', 'name email phone mobile');
-
-    res.status(200).json({
-      success: true,
-      message: 'Property updated successfully',
-      data: populatedProperty
-    });
-
-  } catch (err) {
-    // Clean up uploaded files if error occurred
-    if (req.files) {
-      req.files.forEach(file => {
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
-        }
-      });
-    }
-    
-    next(err);
+  if (!property) {
+    return next(
+      new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
+    );
   }
+
+  // Make sure user is property agent or admin
+  if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to update this property`,
+        401
+      )
+    );
+  }
+
+  // Process new images
+  let newImages = [];
+  if (req.files?.length > 0) {
+    newImages = await uploadImagesToCloudinary(req.files);
+  }
+
+  // Process existing images
+  let existingImages = [];
+  if (req.body.existingImages) {
+    try {
+      existingImages = JSON.parse(req.body.existingImages);
+    } catch (err) {
+      return next(new ErrorResponse('Invalid existing images data', 400));
+    }
+  }
+
+  // Update property
+  property = await Property.findByIdAndUpdate(req.params.id, {
+    ...req.body,
+    images: [...existingImages, ...newImages]
+  }, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({ 
+    success: true, 
+    data: property 
+  });
 });
 
 // @desc    Delete property
 // @route   DELETE /api/v1/properties/:id
-// @access  Private
+// @access  Private (Agent/Admin)
 exports.deleteProperty = asyncHandler(async (req, res, next) => {
   const property = await Property.findById(req.params.id);
 
@@ -401,15 +217,15 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // // Authorization check
-  // if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
-  //   return next(
-  //     new ErrorResponse(
-  //       `User ${req.user.id} is not authorized to delete this property  ${property.agent}`,
-  //       401
-  //     )
-  //   );
-  // }
+  // Make sure user is property agent or admin
+  if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to delete this property`,
+        401
+      )
+    );
+  }
 
   // Delete images from Cloudinary
   for (const image of property.images) {
@@ -420,12 +236,11 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
     }
   }
 
-  await Property.deleteOne({ _id: req.params.id });
+  await property.remove();
 
   res.status(200).json({ 
     success: true, 
-    data: {},
-    message: 'Property deleted successfully'
+    data: {} 
   });
 });
 
@@ -462,14 +277,14 @@ exports.getPropertiesInRadius = asyncHandler(async (req, res, next) => {
 
 // @desc    Upload photo for property
 // @route   PUT /api/v1/properties/:id/photo
-// @access  Private
+// @access  Private (Agent/Admin)
 exports.uploadPropertyPhoto = asyncHandler(async (req, res, next) => {
   const property = await Property.findById(req.params.id);
   if (!property) {
     return next(new ErrorResponse(`Property not found with id of ${req.params.id}`, 404));
   }
 
-  // Authorization check
+  // Make sure user is property agent or admin
   if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
     return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this property`, 401));
   }
@@ -518,7 +333,7 @@ exports.uploadPropertyPhoto = asyncHandler(async (req, res, next) => {
   }
 });
 
-// @desc    Get featured properties with agent mobile
+// @desc    Get featured properties
 // @route   GET /api/v1/properties/featured
 // @access  Public
 exports.getFeaturedProperties = asyncHandler(async (req, res, next) => {
@@ -534,13 +349,69 @@ exports.getFeaturedProperties = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Error handling middleware for geocoding
-exports.handleGeocoderError = (err, req, res, next) => {
-  if (err.message.includes('Geocoding') || err.message.includes('Google Maps')) {
-    return res.status(400).json({
-      success: false,
-      error: 'Could not process the provided address. Please check the address and try again.'
-    });
+// @desc    Create property inquiry
+// @route   POST /api/v1/properties/:id/inquiries
+// @access  Public
+exports.createInquiry = asyncHandler(async (req, res, next) => {
+  const property = await Property.findById(req.params.id).populate('agent');
+  if (!property) {
+    return next(new ErrorResponse(`Property not found with id of ${req.params.id}`, 404));
   }
-  next(err);
+
+  const { name, email, phone, message } = req.body;
+
+  const inquiry = await Inquiry.create({
+    property: req.params.id,
+    from: { name, email, phone },
+    to: {
+      name: property.agent.name,
+      email: property.agent.email,
+      phone: property.agent.mobile || property.agent.phone
+    },
+    message
+  });
+
+  // TODO: Send email notification to agent
+
+  res.status(201).json({
+    success: true,
+    data: inquiry
+  });
+});
+
+// Helper function to upload images to Cloudinary
+const uploadImagesToCloudinary = async (files) => {
+  const images = [];
+  
+  for (const file of files) {
+    try {
+      if (!fs.existsSync(file.path)) {
+        console.error('File does not exist:', file.path);
+        continue;
+      }
+
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'real-estate/properties',
+        width: 1200,
+        height: 800,
+        crop: 'fill',
+        quality: 'auto:good'
+      });
+      
+      images.push({
+        url: result.secure_url,
+        publicId: result.public_id,
+        width: result.width,
+        height: result.height
+      });
+      
+      fs.unlinkSync(file.path);
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      throw err;
+    }
+  }
+  
+  return images;
 };
