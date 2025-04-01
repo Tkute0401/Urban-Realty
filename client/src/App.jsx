@@ -18,7 +18,7 @@ import { urbanRealtyTheme } from './Theme/NewTheme';
 import RoleRoute from './components/common/RoleRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import UsersPage from './pages/admin/UsersPage';
+import UsersPage from './pages/admin/AdminUsers';
 import PropertiesPage from './pages/admin/PropertiesPage';
 import AgentsPage from './pages/admin/AgentsPage';
 import InquiriesPage from './pages/admin/InquiriesPage';
