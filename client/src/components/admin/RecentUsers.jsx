@@ -11,7 +11,28 @@ import {
     useTheme
   } from '@mui/material';
   import { Person, VerifiedUser, Schedule } from '@mui/icons-material';
-  import { formatDistanceToNow } from 'date-fns';
+  
+  const formatTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    
+    const intervals = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60
+    };
+    
+    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+      const interval = Math.floor(seconds / secondsInUnit);
+      if (interval >= 1) {
+        return interval === 1 ? `${interval} ${unit} ago` : `${interval} ${unit}s ago`;
+      }
+    }
+    
+    return 'Just now';
+  };
   
   const RecentUsers = ({ users }) => {
     const theme = useTheme();
@@ -73,7 +94,7 @@ import {
                         color: theme.palette.text.secondary 
                       }} />
                       <Typography variant="caption" color="text.secondary">
-                        {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                        {formatTimeAgo(user.createdAt)}
                       </Typography>
                     </Box>
                   }
