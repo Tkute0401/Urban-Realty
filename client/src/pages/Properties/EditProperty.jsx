@@ -66,7 +66,6 @@ const EditProperty = () => {
   const propertyStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
   const amenitiesList = ['Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony', 'WiFi', 'Air Conditioning'];
 
-  // Initialize form when property is fetched
   useEffect(() => {
     if (fetchedProperty && !fetchLoading) {
       setFormData({
@@ -95,7 +94,6 @@ const EditProperty = () => {
     }
   }, [fetchedProperty, fetchLoading]);
 
-  // Set selected agent when property or agents are loaded
   useEffect(() => {
     if (fetchedProperty?.agent) {
       if (agents.length > 0) {
@@ -107,7 +105,6 @@ const EditProperty = () => {
     }
   }, [fetchedProperty, agents]);
 
-  // Fetch property and agents when component mounts
   useEffect(() => {
     if (id && !hasFetched.current) {
       hasFetched.current = true;
@@ -143,7 +140,7 @@ const EditProperty = () => {
       ];
   
       fields.forEach(field => {
-        if (formData[field] !== undefined) {
+        if (formData[field] !== undefined && formData[field] !== null) {
           formDataToSend.append(field, formData[field]);
         }
       });
@@ -153,18 +150,18 @@ const EditProperty = () => {
         formDataToSend.append('agent', selectedAgent._id);
       }
   
-      // Add address
+      // Add address as JSON string
       formDataToSend.append('address', JSON.stringify(formData.address));
   
       // Add amenities
       if (formData.amenities?.length > 0) {
-        formData.amenities.forEach(a => formDataToSend.append('amenities[]', a));
+        formData.amenities.forEach(a => formDataToSend.append('amenities', a));
       }
   
       // Add existing images
       if (existingImages?.length > 0) {
         existingImages.forEach(img => {
-          formDataToSend.append('existingImages[]', JSON.stringify({
+          formDataToSend.append('existingImages', JSON.stringify({
             url: img.url,
             publicId: img.publicId,
             _id: img._id || img.id
@@ -179,6 +176,9 @@ const EditProperty = () => {
   
       // Track upload progress
       const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
         onUploadProgress: progressEvent => {
           const percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
@@ -189,10 +189,8 @@ const EditProperty = () => {
 
       await updateProperty(id, formDataToSend, config);
       
-      // Show success message
       setSuccess(true);
       
-      // Redirect after delay
       setTimeout(() => {
         navigate('/admin/properties', {
           state: { message: 'Property updated successfully!' }
@@ -311,14 +309,7 @@ const EditProperty = () => {
           </Alert>
         </Snackbar>
 
-        <Typography 
-          variant="h4" 
-          gutterBottom 
-          sx={{ 
-            mb: { xs: 2, sm: 3 },
-            fontSize: { xs: '1.5rem', sm: '2rem' }
-          }}
-        >
+        <Typography variant="h4" gutterBottom sx={{ mb: { xs: 2, sm: 3 } }}>
           Edit Property
         </Typography>
         
@@ -328,13 +319,11 @@ const EditProperty = () => {
           </Alert>
         )}
 
-        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
-          {/* Agent Selection (for admin only) */}
+        <Grid container spacing={2}>
+          {/* Agent Selection */}
           {user?.role === 'admin' && (
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Property Agent
-              </Typography>
+              <Typography variant="h6" gutterBottom>Property Agent</Typography>
               <Autocomplete
                 options={agents}
                 getOptionLabel={(option) => `${option.name} (${option.email})`}
@@ -353,10 +342,7 @@ const EditProperty = () => {
                 renderOption={(props, option) => (
                   <li {...props} key={option._id}>
                     <Box display="flex" alignItems="center">
-                      <Avatar 
-                        src={option.photo} 
-                        sx={{ width: 24, height: 24, mr: 1 }}
-                      />
+                      <Avatar src={option.photo} sx={{ width: 24, height: 24, mr: 1 }} />
                       <Box>
                         <Typography variant="body1">{option.name}</Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -370,7 +356,7 @@ const EditProperty = () => {
             </Grid>
           )}
 
-          {/* Title */}
+          {/* Property Details */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -383,7 +369,6 @@ const EditProperty = () => {
             />
           </Grid>
 
-          {/* Description */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -398,7 +383,6 @@ const EditProperty = () => {
             />
           </Grid>
 
-          {/* Property Type */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               select
@@ -416,7 +400,6 @@ const EditProperty = () => {
             </TextField>
           </Grid>
 
-          {/* Status */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               select
@@ -434,7 +417,6 @@ const EditProperty = () => {
             </TextField>
           </Grid>
 
-          {/* Featured Property */}
           {(user?.role === 'admin' || user?.role === 'agent') && (
             <Grid item xs={12} md={4}>
               <FormControlLabel
@@ -451,7 +433,6 @@ const EditProperty = () => {
             </Grid>
           )}
 
-          {/* Price */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -463,15 +444,12 @@ const EditProperty = () => {
               required
               size={isMobile ? 'small' : 'medium'}
               InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">₹</InputAdornment>
-                ),
+                startAdornment: <InputAdornment position="start">₹</InputAdornment>,
                 inputProps: { min: 0 }
               }}
             />
           </Grid>
 
-          {/* Bedrooms */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -486,7 +464,6 @@ const EditProperty = () => {
             />
           </Grid>
 
-          {/* Bathrooms */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -501,7 +478,6 @@ const EditProperty = () => {
             />
           </Grid>
 
-          {/* Area */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -516,7 +492,6 @@ const EditProperty = () => {
             />
           </Grid>
 
-          {/* Building Name */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -528,7 +503,6 @@ const EditProperty = () => {
             />
           </Grid>
 
-          {/* Floor Number */}
           <Grid item xs={12} sm={6} md={4}>
             <TextField
               fullWidth
@@ -542,9 +516,7 @@ const EditProperty = () => {
 
           {/* Address Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
-              Address Details
-            </Typography>
+            <Typography variant="h6" gutterBottom>Address Details</Typography>
             <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider' }}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
@@ -618,9 +590,7 @@ const EditProperty = () => {
 
           {/* Amenities */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Amenities
-            </Typography>
+            <Typography variant="h6" gutterBottom>Amenities</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {amenitiesList.map(amenity => (
                 <Chip
@@ -635,35 +605,18 @@ const EditProperty = () => {
             </Box>
           </Grid>
 
-          {/* Existing Images */}
+          {/* Images */}
           {existingImages.length > 0 && (
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Current Images
-              </Typography>
-              <FormHelperText sx={{ mb: 1 }}>
-                Click the delete icon to remove images
-              </FormHelperText>
-              <Box sx={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: 2, 
-                mb: 2,
-                maxHeight: 300,
-                overflowY: 'auto'
-              }}>
+              <Typography variant="h6" gutterBottom>Current Images</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
                 {existingImages.map((img, index) => (
                   <Box key={index} sx={{ position: 'relative' }}>
                     <Box
                       component="img"
                       src={img.url || img}
                       alt={`Property image ${index + 1}`}
-                      sx={{ 
-                        width: 120, 
-                        height: 120,
-                        objectFit: 'cover',
-                        borderRadius: 1
-                      }}
+                      sx={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 1 }}
                     />
                     <IconButton
                       size="small"
@@ -674,9 +627,7 @@ const EditProperty = () => {
                         right: 4, 
                         color: 'white', 
                         backgroundColor: 'rgba(0,0,0,0.5)',
-                        '&:hover': {
-                          backgroundColor: 'rgba(0,0,0,0.7)'
-                        }
+                        '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' }
                       }}
                     >
                       <Delete fontSize="small" />
@@ -687,35 +638,20 @@ const EditProperty = () => {
             </Grid>
           )}
 
-          {/* New Images */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Add New Images
-            </Typography>
+            <Typography variant="h6" gutterBottom>Add New Images</Typography>
             <FormHelperText sx={{ mb: 1 }}>
               {`You can upload up to ${10 - existingImages.length - images.length} more images (5MB each)`}
             </FormHelperText>
             
-            <Box sx={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              gap: 2, 
-              mb: 2,
-              maxHeight: 300,
-              overflowY: 'auto'
-            }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
               {imagePreviews.map((preview, index) => (
                 <Box key={index} sx={{ position: 'relative' }}>
                   <Box
                     component="img"
                     src={preview}
                     alt={`Preview ${index}`}
-                    sx={{ 
-                      width: 120, 
-                      height: 120,
-                      objectFit: 'cover',
-                      borderRadius: 1
-                    }}
+                    sx={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 1 }}
                   />
                   <IconButton
                     size="small"
@@ -726,9 +662,7 @@ const EditProperty = () => {
                       right: 4, 
                       color: 'white', 
                       backgroundColor: 'rgba(0,0,0,0.5)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0,0,0,0.7)'
-                      }
+                      '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' }
                     }}
                   >
                     <Delete fontSize="small" />
@@ -762,23 +696,15 @@ const EditProperty = () => {
             )}
           </Grid>
 
-          {/* Submit Buttons */}
           <Grid item xs={12} sx={{ mt: 2 }}>
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: 2
-            }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
                 disabled={loading}
                 startIcon={loading ? <CircularProgress size={20} /> : null}
-                sx={{ 
-                  flex: 1,
-                  py: 1.5
-                }}
+                sx={{ flex: 1, py: 1.5 }}
               >
                 {loading ? 'Updating...' : 'Update Property'}
               </Button>
@@ -786,10 +712,7 @@ const EditProperty = () => {
               <Button
                 variant="outlined"
                 size="large"
-                sx={{ 
-                  flex: 1,
-                  py: 1.5
-                }}
+                sx={{ flex: 1, py: 1.5 }}
                 onClick={() => navigate('/admin/properties')}
               >
                 Cancel
