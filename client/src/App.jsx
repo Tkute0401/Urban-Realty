@@ -15,6 +15,7 @@ import AddProperty from './pages/AddProperty/AddProperty';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { ThemeProvider } from '@mui/material';
 import { urbanRealtyTheme } from './Theme/NewTheme';
+import RoleRoute from './components/common/RoleRoute';
 
 function App() {
   return (
