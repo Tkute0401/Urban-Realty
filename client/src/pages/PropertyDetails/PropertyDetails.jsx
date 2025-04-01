@@ -4,7 +4,7 @@ import {
   CircularProgress, Alert, Dialog, DialogActions, 
   DialogContent, DialogTitle, IconButton, useMediaQuery, 
   Stack, Avatar, FormControl, InputLabel, Select, MenuItem,
-  TextField
+  TextField, RadioGroup, FormControlLabel, Radio
 } from '@mui/material';
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
@@ -38,7 +38,7 @@ const PropertyDetails = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
   const [contactOpen, setContactOpen] = useState(false);
-  const [contactMethod, setContactMethod] = useState('whatsapp');
+  const [contactMethod, setContactMethod] = useState('message');
   const [message, setMessage] = useState('');
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
@@ -102,46 +102,68 @@ const PropertyDetails = () => {
     setMessage(prefilledMessage);
     setContactOpen(true);
     setContactSuccess(false);
+    setContactMethod('message'); // Reset to default
   };
 
   const handleContactSubmit = async () => {
     try {
       setContactLoading(true);
+      
+      if (contactMethod === 'whatsapp') {
+        const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
+        const link = window.location.href;
+        const messageText = message || `Hello, I'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}). ${link}`;
+        window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`, '_blank');
+        
+        // Also create a contact request record
+        await axios.post(`/properties/${id}/contact`, {
+          message: messageText,
+          contactMethod: 'whatsapp'
+        });
+        
+        setContactSuccess(true);
+        return;
+      }
+      
+      if (contactMethod === 'call') {
+        const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
+        window.open(`tel:${phoneNumber}`, '_blank');
+        
+        // Also create a contact request record
+        await axios.post(`/properties/${id}/contact`, {
+          message: 'Requested phone call',
+          contactMethod: 'phone'
+        });
+        
+        setContactSuccess(true);
+        return;
+      }
+
+      // For email/message
       const response = await axios.post(`/properties/${id}/contact`, {
         message,
-        contactMethod
+        contactMethod: contactMethod === 'email' ? 'email' : 'message'
       });
       
+      if (contactMethod === 'email') {
+        const subject = `Inquiry about ${property.title}`;
+        const body = message || `Hello,\n\nI'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}).\n\nCould you please provide more information about:\n- Availability\n- Viewing options\n- Any additional details\n\n${window.location.href}`;
+        window.open(`mailto:${property.agent?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+      }
+      
       setContactSuccess(true);
-      setTimeout(() => {
-        setContactOpen(false);
-        setMessage('');
-        setContactMethod('whatsapp');
-      }, 2000);
     } catch (err) {
       console.error('Error sending contact request:', err);
-      // Handle error (show error message, etc.)
+      setError(err.response?.data?.message || err.message || 'Failed to send contact request');
     } finally {
       setContactLoading(false);
+      if (contactSuccess) {
+        setTimeout(() => {
+          setContactOpen(false);
+          setMessage('');
+        }, 2000);
+      }
     }
-  };
-
-  const handleWhatsAppClick = () => {
-    const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
-    const link = window.location.href;
-    const messageText = `Hello, I'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}). ${link}`;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`, '_blank');
-  };
-
-  const handleCallClick = () => {
-    const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
-    window.open(`tel:${phoneNumber}`, '_blank');
-  };
-
-  const handleEmailClick = () => {
-    const subject = `Inquiry about ${property.title}`;
-    const body = `Hello,\n\nI'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}).\n\nCould you please provide more information about:\n- Availability\n- Viewing options\n- Any additional details\n\n${window.location.href}`;
-    window.open(`mailto:${property.agent?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
   };
 
   if (loading) {
@@ -418,63 +440,25 @@ const PropertyDetails = () => {
                   </Box>
                 </Box>
 
-                {/* Contact buttons */}
-                <Stack spacing={2} sx={{ mt: 3 }}>
-                  <Button 
-                    fullWidth
-                    variant="contained" 
-                    color="primary"
-                    size="large"
-                    onClick={handleWhatsAppClick}
-                    startIcon={<WhatsApp />}
-                    sx={{ 
-                      py: 1.5,
-                      fontWeight: 600,
-                      '&:hover': {
-                        transform: 'translateY(-2px)'
-                      },
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    WhatsApp
-                  </Button>
-                  
-                  <Button 
-                    fullWidth
-                    variant="outlined" 
-                    size="large"
-                    onClick={handleCallClick}
-                    startIcon={<Phone />}
-                    sx={{ 
-                      py: 1.5,
-                      fontWeight: 600,
-                      '&:hover': {
-                        transform: 'translateY(-2px)'
-                      },
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    Call Agent
-                  </Button>
-
-                  <Button 
-                    fullWidth
-                    variant="outlined" 
-                    size="large"
-                    onClick={handleContactOpen}
-                    startIcon={<Email />}
-                    sx={{ 
-                      py: 1.5,
-                      fontWeight: 600,
-                      '&:hover': {
-                        transform: 'translateY(-2px)'
-                      },
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    Send Message
-                  </Button>
-                </Stack>
+                {/* Contact button */}
+                <Button 
+                  fullWidth
+                  variant="contained" 
+                  color="primary"
+                  size="large"
+                  onClick={handleContactOpen}
+                  startIcon={<Email />}
+                  sx={{ 
+                    py: 1.5,
+                    fontWeight: 600,
+                    '&:hover': {
+                      transform: 'translateY(-2px)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Contact Agent
+                </Button>
               </Box>
             </Paper>
 
@@ -569,33 +553,59 @@ const PropertyDetails = () => {
             </Alert>
           ) : (
             <>
-              <TextField
-                fullWidth
-                multiline
-                rows={8}
-                label="Your Message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                sx={{ mb: 2, mt: 1 }}
-                InputProps={{
-                  style: {
-                    fontSize: '0.95rem',
-                    lineHeight: 1.5
-                  }
-                }}
-              />
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Preferred Contact Method</InputLabel>
-                <Select
+              <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
+                <RadioGroup
                   value={contactMethod}
-                  label="Preferred Contact Method"
                   onChange={(e) => setContactMethod(e.target.value)}
+                  row
+                  sx={{ justifyContent: 'space-between' }}
                 >
-                  <MenuItem value="whatsapp">WhatsApp</MenuItem>
-                  <MenuItem value="email">Email</MenuItem>
-                  <MenuItem value="phone">Phone Call</MenuItem>
-                </Select>
+                  <FormControlLabel 
+                    value="message" 
+                    control={<Radio />} 
+                    label="Message" 
+                  />
+                  <FormControlLabel 
+                    value="email" 
+                    control={<Radio />} 
+                    label="Email" 
+                  />
+                  <FormControlLabel 
+                    value="whatsapp" 
+                    control={<Radio />} 
+                    label="WhatsApp" 
+                  />
+                  <FormControlLabel 
+                    value="call" 
+                    control={<Radio />} 
+                    label="Phone Call" 
+                  />
+                </RadioGroup>
               </FormControl>
+
+              {(contactMethod === 'message' || contactMethod === 'email' || contactMethod === 'whatsapp') && (
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={8}
+                  label={contactMethod === 'whatsapp' ? 'WhatsApp Message' : contactMethod === 'email' ? 'Email Content' : 'Your Message'}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  sx={{ mb: 2 }}
+                  InputProps={{
+                    style: {
+                      fontSize: '0.95rem',
+                      lineHeight: 1.5
+                    }
+                  }}
+                />
+              )}
+
+              {contactMethod === 'call' && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  Clicking "Send Request" will initiate a phone call to the agent and create a contact record.
+                </Alert>
+              )}
             </>
           )}
         </DialogContent>
@@ -610,9 +620,12 @@ const PropertyDetails = () => {
             <Button 
               onClick={handleContactSubmit} 
               variant="contained"
-              disabled={contactLoading || !message.trim()}
+              disabled={contactLoading || ((contactMethod === 'message' || contactMethod === 'email' || contactMethod === 'whatsapp') && !message.trim())}
+              startIcon={contactLoading ? <CircularProgress size={20} /> : null}
             >
-              {contactLoading ? <CircularProgress size={24} /> : 'Send Inquiry'}
+              {contactMethod === 'call' ? 'Call Agent' : 
+               contactMethod === 'whatsapp' ? 'Open WhatsApp' : 
+               contactMethod === 'email' ? 'Send Email' : 'Send Message'}
             </Button>
           )}
         </DialogActions>
