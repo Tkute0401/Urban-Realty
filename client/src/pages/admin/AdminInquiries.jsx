@@ -1,41 +1,39 @@
 // src/pages/admin/AdminInquiries.jsx
 import { useState, useEffect } from 'react';
 import { 
-  Box, Typography, Paper, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Button, 
-  IconButton, CircularProgress, TextField, MenuItem,
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Chip, Avatar
+  Box, Typography, Paper, Table, TableBody, 
+  TableCell, TableContainer, TableHead, 
+  TableRow, Chip, Button, IconButton, 
+  Dialog, DialogTitle, DialogContent, 
+  DialogActions, TextField, MenuItem, 
+  CircularProgress, Avatar 
 } from '@mui/material';
 import { 
-  Mail, Delete, Search, Refresh, 
-  CheckCircle, Pending, Cancel
+  Edit, Delete, Email, Check, 
+  Close, ArrowForward 
 } from '@mui/icons-material';
 import axios from '../../services/axios';
-import { useNavigate } from 'react-router-dom';
-import { formatDate } from '../../utils/format';
+import { useTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 
 const AdminInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [selectedInquiry, setSelectedInquiry] = useState(null);
-  const navigate = useNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [currentInquiry, setCurrentInquiry] = useState(null);
+  const [status, setStatus] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  useEffect(() => {
+    fetchInquiries();
+  }, []);
 
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      setError(null);
-      
-      let url = '/api/v1/admin/inquiries';
-      if (statusFilter !== 'all') {
-        url += `?status=${statusFilter}`;
-      }
-      
-      const response = await axios.get(url);
+      const response = await axios.get('/api/v1/admin/inquiries');
       setInquiries(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load inquiries');
@@ -44,159 +42,120 @@ const AdminInquiries = () => {
     }
   };
 
-  useEffect(() => {
-    fetchInquiries();
-  }, [statusFilter]);
-
-  const handleDeleteInquiry = async () => {
-    try {
-      await axios.delete(`/api/v1/admin/inquiries/${selectedInquiry._id}`);
-      setOpenDeleteDialog(false);
-      fetchInquiries();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete inquiry');
-    }
+  const handleOpenDialog = (inquiry) => {
+    setCurrentInquiry(inquiry);
+    setStatus(inquiry.status);
+    setOpenDialog(true);
   };
 
-  const updateInquiryStatus = async (inquiryId, newStatus) => {
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setCurrentInquiry(null);
+  };
+
+  const handleStatusChange = async () => {
     try {
-      await axios.patch(`/api/v1/admin/inquiries/${inquiryId}/status`, {
-        status: newStatus
+      await axios.patch(`/api/v1/admin/inquiries/${currentInquiry._id}/status`, {
+        status
       });
       fetchInquiries();
+      handleCloseDialog();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update inquiry status');
+      setError(err.response?.data?.message || 'Failed to update status');
     }
   };
 
-  const filteredInquiries = inquiries.filter(inquiry => 
-    inquiry.property?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inquiry.from.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const statusIcons = {
-    pending: <Pending color="warning" />,
-    contacted: <CheckCircle color="info" />,
-    completed: <CheckCircle color="success" />,
-    rejected: <Cancel color="error" />
+  const handleDelete = async (inquiryId) => {
+    if (window.confirm('Are you sure you want to delete this inquiry?')) {
+      try {
+        await axios.delete(`/api/v1/admin/inquiries/${inquiryId}`);
+        fetchInquiries();
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete inquiry');
+      }
+    }
   };
 
-  if (loading && inquiries.length === 0) {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending': return 'default';
+      case 'contacted': return 'primary';
+      case 'completed': return 'success';
+      case 'rejected': return 'error';
+      default: return 'default';
+    }
+  };
+
+  if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
-        <CircularProgress size={60} />
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={3}>
+        <Typography color="error">{error}</Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box p={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Inquiry Management</Typography>
-        <Button 
-          variant="outlined" 
-          startIcon={<Refresh />}
-          onClick={fetchInquiries}
-        >
-          Refresh
-        </Button>
       </Box>
 
-      {error && (
-        <Box mb={3} p={2} bgcolor="error.light" borderRadius={1}>
-          <Typography color="error">{error}</Typography>
-        </Box>
-      )}
-
-      <Box display="flex" gap={2} mb={3}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search inquiries..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: <Search sx={{ mr: 1 }} />
-          }}
-        />
-        
-        <TextField
-          select
-          variant="outlined"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          sx={{ minWidth: 150 }}
-        >
-          <MenuItem value="all">All Statuses</MenuItem>
-          <MenuItem value="pending">Pending</MenuItem>
-          <MenuItem value="contacted">Contacted</MenuItem>
-          <MenuItem value="completed">Completed</MenuItem>
-          <MenuItem value="rejected">Rejected</MenuItem>
-        </TextField>
-      </Box>
-
-      <Paper>
+      <Paper elevation={3}>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Property</TableCell>
                 <TableCell>From</TableCell>
-                <TableCell>Date</TableCell>
+                <TableCell>Property</TableCell>
+                <TableCell>Message</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredInquiries.map((inquiry) => (
-                <TableRow 
-                  key={inquiry._id} 
-                  hover
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => navigate(`/admin/inquiries/${inquiry._id}`)}
-                >
+              {inquiries.map((inquiry) => (
+                <TableRow key={inquiry._id}>
                   <TableCell>
-                    <Typography fontWeight="500">
-                      {inquiry.property?.title || 'N/A'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Avatar>
-                        {inquiry.from.name.charAt(0)}
+                    <Box display="flex" alignItems="center">
+                      <Avatar sx={{ mr: 2 }}>
+                        <Email />
                       </Avatar>
                       <Box>
-                        <Typography>{inquiry.from.name}</Typography>
+                        <Typography fontWeight="500">{inquiry.from.name}</Typography>
                         <Typography variant="body2" color="text.secondary">
                           {inquiry.from.email}
                         </Typography>
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell>{formatDate(inquiry.createdAt)}</TableCell>
                   <TableCell>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      {statusIcons[inquiry.status]}
-                      <Chip 
-                        label={inquiry.status} 
-                        size="small"
-                        sx={{
-                          backgroundColor: inquiry.status === 'pending' ? 'warning.light' : 
-                                          inquiry.status === 'completed' ? 'success.light' : 
-                                          inquiry.status === 'rejected' ? 'error.light' : 'info.light',
-                          textTransform: 'capitalize'
-                        }}
-                      />
-                    </Box>
+                    {inquiry.property?.title || 'N/A'}
+                  </TableCell>
+                  <TableCell>
+                    <Typography noWrap sx={{ maxWidth: isMobile ? 100 : 200 }}>
+                      {inquiry.message}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={inquiry.status} 
+                      color={getStatusColor(inquiry.status)}
+                      size="small"
+                    />
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInquiry(inquiry);
-                        setOpenDeleteDialog(true);
-                      }}
-                    >
+                    <IconButton onClick={() => handleOpenDialog(inquiry)}>
+                      <Edit color="primary" />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(inquiry._id)}>
                       <Delete color="error" />
                     </IconButton>
                   </TableCell>
@@ -207,20 +166,58 @@ const AdminInquiries = () => {
         </TableContainer>
       </Paper>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete this inquiry? This action cannot be undone.
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle>
+          Update Inquiry Status
+          <IconButton 
+            onClick={handleCloseDialog} 
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box mb={2}>
+            <Typography variant="subtitle1" gutterBottom>
+              From: {currentInquiry?.from.name} ({currentInquiry?.from.email})
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Property: {currentInquiry?.property?.title || 'N/A'}
+            </Typography>
+            <Typography variant="body1" gutterBottom sx={{ mt: 2 }}>
+              {currentInquiry?.message}
+            </Typography>
+          </Box>
+          <Box mb={2}>
+            <TextField
+              select
+              fullWidth
+              label="Status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              margin="normal"
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="contacted">Contacted</MenuItem>
+              <MenuItem value="completed">Completed</MenuItem>
+              <MenuItem value="rejected">Rejected</MenuItem>
+            </TextField>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
           <Button 
-            onClick={handleDeleteInquiry} 
-            color="error"
-            variant="contained"
+            variant="contained" 
+            startIcon={<Check />}
+            onClick={handleStatusChange}
           >
-            Delete
+            Update
+          </Button>
+          <Button 
+            variant="outlined" 
+            startIcon={<Close />}
+            onClick={handleCloseDialog}
+          >
+            Cancel
           </Button>
         </DialogActions>
       </Dialog>
