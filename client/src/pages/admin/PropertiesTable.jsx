@@ -35,7 +35,7 @@ const PropertiesTable = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get('/api/v1/admin/properties');
+        const response = await axios.get('/admin/properties');
         setProperties(response.data.data);
       } catch (err) {
         console.error('Error fetching properties:', err);
@@ -59,7 +59,7 @@ const PropertiesTable = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/v1/admin/properties/${selectedProperty._id}`);
+      await axios.delete(`/admin/properties/${selectedProperty._id}`);
       setProperties(properties.filter(property => property._id !== selectedProperty._id));
     } catch (err) {
       console.error('Error deleting property:', err);

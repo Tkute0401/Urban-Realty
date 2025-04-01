@@ -14,7 +14,7 @@ const InquiriesPage = () => {
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
-        const response = await axios.get('/api/v1/admin/inquiries');
+        const response = await axios.get('/admin/inquiries');
         setInquiries(response.data.data);
       } catch (err) {
         console.error('Error fetching inquiries:', err);
@@ -37,7 +37,7 @@ const InquiriesPage = () => {
 
   const handleStatusChange = async (inquiryId, newStatus) => {
     try {
-      await axios.patch(`/api/v1/admin/inquiries/${inquiryId}/status`, { status: newStatus });
+      await axios.patch(`/admin/inquiries/${inquiryId}/status`, { status: newStatus });
       setInquiries(inquiries.map(inquiry => 
         inquiry._id === inquiryId ? { ...inquiry, status: newStatus } : inquiry
       ));
