@@ -7,8 +7,8 @@ import {
   import { Search, Edit, Delete, PersonAdd } from '@mui/icons-material';
   import { useState, useEffect } from 'react';
   import axios from '../../services/axios';
-  import UserEditDialog from '../../components/Admin/UserEditDialog';
-  import UserDeleteDialog from '../../components/Admin/UserDeleteDialog';
+  // import UserEditDialog from '../../components/Admin/UserEditDialog';
+  // import UserDeleteDialog from '../../components/Admin/UserDeleteDialog';
   import { useMediaQuery, useTheme } from '@mui/material';
   
   const AdminUsers = () => {
@@ -172,7 +172,7 @@ import {
             color="primary"
           />
         </Box>
-  
+{/*   
         <UserEditDialog
           open={editOpen}
           onClose={() => setEditOpen(false)}
@@ -185,7 +185,7 @@ import {
           onClose={() => setDeleteOpen(false)}
           user={selectedUser}
           onUserDeleted={handleUserDeleted}
-        />
+        /> */}
       </Box>
     );
   };
