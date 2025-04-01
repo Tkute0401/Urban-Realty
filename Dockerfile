@@ -2,9 +2,9 @@
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/client
-COPY client/package*.json ./
-RUN yarn cache clean
-RUN yarn install
+COPY client/package*.json client/.yarnrc* ./
+RUN yarn cache clean && \
+    yarn install
 COPY client .
 ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_MAPS_API_KEY
@@ -16,7 +16,7 @@ RUN npm run build
 FROM node:18-alpine AS backend-builder
 
 WORKDIR /app
-COPY ./package*.json ./
+COPY package*.json ./
 RUN npm install
 COPY server .
 
@@ -25,24 +25,17 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy built frontend to /app/client/dist
+# Copy built frontend
 COPY --from=frontend-builder /app/client/dist ./client/dist
 
 # Copy backend
-COPY --from=backend-builder /app/node_modules ./node_modules
 COPY --from=backend-builder /app ./
 
-# Create directories
+# Create uploads directory
 RUN mkdir -p /app/uploads
 
-# Add verification step before CMD
-RUN ls -la /app/client/dist && \
-    echo "Frontend files:" && \
-    ls -la /app/client/dist
-
-# Verify file locations
-RUN ls -la /app/client/dist && \
-    ls -la /app
+# Verification
+RUN ls -la /app/client/dist
 
 EXPOSE 5000
 CMD ["node", "server.js"]
