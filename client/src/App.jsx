@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { AgentsProvider } from './context/AgentsContext';
 import { PropertiesProvider } from './context/PropertiesContext';
 import Home from './pages/Home/Home';
 import Login from './pages/Auth/Login';
@@ -25,8 +26,10 @@ import AgentsPage from './pages/admin/AgentsPage';
 function App() {
   return (
     <ThemeProvider theme={urbanRealtyTheme}>
+    
     <AuthProvider>
       <PropertiesProvider>
+      <AgentsProvider>
         <Header />
         <Layout>
           <Routes>
@@ -54,6 +57,7 @@ function App() {
             </Route>
           </Routes>
         </Layout>
+        </AgentsProvider>
       </PropertiesProvider>
     </AuthProvider>
     </ThemeProvider>
