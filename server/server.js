@@ -5,12 +5,15 @@ const path = require('path');
 const fs = require('fs');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
+const adminRoutes = require('./routes/adminRoutes');
+
+
 
 const app = express();
 
 // Connect to database
 connectDB();
-
+app.use('/api/v1/admin', adminRoutes);
 // Configure paths - CHANGED FROM ../../client/dist to ./client/dist
 const uploadsDir = path.join(__dirname, 'uploads');
 const clientDistDir = path.join('/app/client/dist'); // Updated path
