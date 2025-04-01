@@ -2,11 +2,11 @@ import { useState, useRef } from 'react';
 import { useProperties } from '../../context/PropertiesContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useAgents } from '../../context/AgentsContext';
 import { 
   Box, TextField, Button, Grid, MenuItem, Chip, Typography, Paper,
   CircularProgress, Alert, FormControlLabel, Checkbox, Container,
-  FormHelperText, InputAdornment,
-  IconButton
+  FormHelperText, InputAdornment, IconButton, Autocomplete, Avatar
 } from '@mui/material';
 import { CloudUpload, Delete } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
@@ -14,6 +14,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 const AddPropertyPage = () => {
   const { createProperty, loading, error, clearErrors } = useProperties();
   const { user } = useAuth();
+  const { agents, getAgents } = useAgents();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -41,6 +42,7 @@ const AddPropertyPage = () => {
     amenities: [],
   });
   
+  const [selectedAgent, setSelectedAgent] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,6 +52,13 @@ const AddPropertyPage = () => {
   const propertyTypes = ['House', 'Apartment', 'Villa', 'Condo', 'Townhouse', 'Land', 'Commercial'];
   const propertyStatuses = ['For Sale', 'For Rent'];
   const amenitiesList = ['Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony', 'WiFi', 'Air Conditioning'];
+
+  // Fetch agents when component mounts (for admin users)
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      getAgents();
+    }
+  }, [user, getAgents]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,6 +78,11 @@ const AddPropertyPage = () => {
           formDataToSend.append(key, value);
         }
       });
+
+      // If admin is creating, add the selected agent
+      if (user?.role === 'admin' && selectedAgent) {
+        formDataToSend.append('agent', selectedAgent._id);
+      }
 
       // Append images
       images.forEach(file => {
@@ -164,6 +178,47 @@ const AddPropertyPage = () => {
         )}
 
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+          {/* Agent Selection (for admin only) */}
+          {user?.role === 'admin' && (
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Assign to Agent
+              </Typography>
+              <Autocomplete
+                options={agents}
+                getOptionLabel={(option) => `${option.name} (${option.email})`}
+                value={selectedAgent}
+                onChange={(e, newValue) => setSelectedAgent(newValue)}
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    label="Select Agent" 
+                    fullWidth 
+                    size={isMobile ? 'small' : 'medium'}
+                    required
+                  />
+                )}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                renderOption={(props, option) => (
+                  <li {...props} key={option._id}>
+                    <Box display="flex" alignItems="center">
+                      <Avatar 
+                        src={option.photo} 
+                        sx={{ width: 24, height: 24, mr: 1 }}
+                      />
+                      <Box>
+                        <Typography variant="body1">{option.name}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {option.email}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </li>
+                )}
+              />
+            </Grid>
+          )}
+
           {/* Title */}
           <Grid item xs={12}>
             <TextField
@@ -484,6 +539,7 @@ const AddPropertyPage = () => {
               component="label"
               startIcon={<CloudUpload />}
               size={isMobile ? 'small' : 'medium'}
+              disabled={imagePreviews.length >= 10}
             >
               Upload Images
               <input
@@ -493,6 +549,7 @@ const AddPropertyPage = () => {
                 accept="image/*"
                 onChange={handleImageChange}
                 ref={fileInputRef}
+                disabled={imagePreviews.length >= 10}
               />
             </Button>
             {uploadProgress.percent && (
