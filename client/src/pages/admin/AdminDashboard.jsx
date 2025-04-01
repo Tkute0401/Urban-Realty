@@ -6,16 +6,44 @@ import RecentProperties from '../../components/admin/RecentProperties';
 import RecentContacts from '../../components/admin/RecentContacts';
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    counts: {
+      users: 0,
+      agents: 0,
+      properties: 0,
+      contacts: 0
+    },
+    recent: {
+      users: [],
+      properties: [],
+      contacts: []
+    }
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const response = await axios.get('/api/v1/admin/stats');
-        setStats(response.data.data);
+        if (response.data.success) {
+          setStats({
+            counts: response.data.data.counts || {
+              users: 0,
+              agents: 0,
+              properties: 0,
+              contacts: 0
+            },
+            recent: response.data.data.recent || {
+              users: [],
+              properties: [],
+              contacts: []
+            }
+          });
+        }
       } catch (err) {
         console.error('Error fetching stats:', err);
+        setError('Failed to load dashboard data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -31,6 +59,15 @@ const AdminDashboard = () => {
       </Box>
     );
   }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+  console.log(stats);
 
   return (
     <Box>
