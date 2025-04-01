@@ -23,6 +23,7 @@ import { MoreVert, Delete, Visibility, Mail, Phone, WhatsApp, Search } from '@mu
 import axios from '../../services/axios';
 import { useNavigate } from 'react-router-dom';
 import { formatDate } from '../../../utils/format';
+import { formatPrice } from '../../utils/format';
 
 const ContactsTable = () => {
   const [contacts, setContacts] = useState([]);
