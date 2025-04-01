@@ -111,6 +111,10 @@ export const AuthProvider = ({ children }) => {
         name: userData.name,
         role: userData.role
       });
+      if (userData.role === 'admin') {
+        navigate('/admin');
+        return { success: true };
+      }
       navigate('/');
       return { success: true };
     } catch (err) {

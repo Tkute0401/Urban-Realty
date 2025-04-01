@@ -3,16 +3,33 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role, mobile } = req.body;
+  const { name, email, password, role, mobile, occupation } = req.body;
 
+  // Validate required fields
+  if (!name || !email || !password) {
+    return next(new ErrorResponse('Please provide name, email and password', 400));
+  }
+
+  // Check if user exists
+  const existingUser = await User.findOne({ 
+    email: { $regex: new RegExp(`^${email}$`, 'i') } 
+  });
+
+  if (existingUser) {
+    return next(new ErrorResponse('Email already in use', 400));
+  }
+
+  // Create user
   const user = await User.create({
     name,
     email,
     password,
-    role,
-    mobile: mobile || ''
+    role: role || 'buyer',
+    mobile: mobile || '',
+    occupation: occupation || ''
   });
 
+  // Create token
   const token = user.getSignedJwtToken();
 
   res.status(200).json({
@@ -23,7 +40,8 @@ exports.register = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       mobile: user.mobile,
-      role: user.role
+      role: user.role,
+      occupation: user.occupation
     }
   });
 });
