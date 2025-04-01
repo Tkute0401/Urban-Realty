@@ -1,26 +1,53 @@
-// server/routes/propertyRoutes.js
 const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const propertyController = require('../controllers/propertyController');
-const { protect } = require('../middleware/auth');
-const upload = require('../middleware/multer'); // Import the configured Multer instance
+const contactController = require('../controllers/contactController');
+const { protect, authorize } = require('../middleware/auth');
+const upload = require('../middleware/multer');
 
-// Public routes
+// @desc    Get all properties
+// @route   GET /api/v1/properties
+// @access  Public
 router.get('/', propertyController.getProperties);
 
-// Add this with the other routes
+// @desc    Get featured properties
+// @route   GET /api/v1/properties/featured
+// @access  Public
 router.get('/featured', propertyController.getFeaturedProperties);
-router.get('/:id', propertyController.getProperty);
+
+// @desc    Get properties within radius
+// @route   GET /api/v1/properties/radius/:zipcode/:distance
+// @access  Public
 router.get('/radius/:zipcode/:distance', propertyController.getPropertiesInRadius);
 
-// Protected routes
-// propertyRoutes.js
+// @desc    Get single property
+// @route   GET /api/v1/properties/:id
+// @access  Public
+router.get('/:id', propertyController.getProperty);
+
+// @desc    Create contact request for property
+// @route   POST /api/v1/properties/:id/contact
+// @access  Private
+router.post(
+  '/:id/contact',
+  protect,
+  [
+    check('message', 'Message is required').not().isEmpty(),
+    check('contactMethod', 'Valid contact method is required').isIn(['message', 'email', 'whatsapp', 'call'])
+  ],
+  contactController.createContactRequest
+);
+
+// @desc    Create property
+// @route   POST /api/v1/properties
+// @access  Private (Agent/Admin)
 router.post(
   '/',
   [
     protect,
-    upload.array('images', 10), // Multer first
+    authorize('agent', 'admin'),
+    upload.array('images', 10),
     [
       check('title', 'Title is required').not().isEmpty(),
       check('description', 'Description is required').not().isEmpty(),
@@ -36,22 +63,16 @@ router.post(
   propertyController.createProperty
 );
 
-
-
+// @desc    Update property
+// @route   PUT /api/v1/properties/:id
+// @access  Private (Agent/Admin)
 router.put(
   '/:id',
   [
-    protect, // Authentication first
-    upload.array('images', 10), // Then handle file uploads
+    protect,
+    authorize('agent', 'admin'),
+    upload.array('images', 10),
     [
-      check('address', 'Address is required').custom(value => {
-        try {
-          const parsed = typeof value === 'string' ? JSON.parse(value) : value;
-          return typeof parsed === 'object' && parsed !== null;
-        } catch {
-          return false;
-        }
-      }),
       check('title', 'Title is required').optional().not().isEmpty(),
       check('description', 'Description is required').optional().not().isEmpty(),
       check('type', 'Type is required').optional().isIn(['House', 'Apartment', 'Villa', 'Condo', 'Land']),
@@ -65,14 +86,21 @@ router.put(
   propertyController.updateProperty
 );
 
-router.delete('/:id', protect, propertyController.deleteProperty);
+// @desc    Delete property
+// @route   DELETE /api/v1/properties/:id
+// @access  Private (Agent/Admin)
+router.delete(
+  '/:id',
+  [protect, authorize('agent', 'admin')],
+  propertyController.deleteProperty
+);
 
+// @desc    Upload property photo
+// @route   PUT /api/v1/properties/:id/photo
+// @access  Private (Agent/Admin)
 router.put(
   '/:id/photo',
-  [
-    protect,
-    upload.single('file') // Handle single file upload
-  ],
+  [protect, authorize('agent', 'admin'), upload.single('file')],
   propertyController.uploadPropertyPhoto
 );
 

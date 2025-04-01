@@ -116,7 +116,7 @@ const PropertyDetails = () => {
         window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`, '_blank');
         
         // Also create a contact request record
-        await axios.post(`/properties/${id}/contact`, {
+        await axios.post(`/contacts/property/${id}`, {
           message: messageText,
           contactMethod: 'whatsapp'
         });
@@ -130,7 +130,7 @@ const PropertyDetails = () => {
         window.open(`tel:${phoneNumber}`, '_blank');
         
         // Also create a contact request record
-        await axios.post(`/properties/${id}/contact`, {
+        await axios.post(`/contacts/property/${id}`, {
           message: 'Requested phone call',
           contactMethod: 'phone'
         });
@@ -140,7 +140,7 @@ const PropertyDetails = () => {
       }
 
       // For email/message
-      const response = await axios.post(`/properties/${id}/contact`, {
+      const response = await axios.post(`/contacts/property/${id}`, {
         message,
         contactMethod: contactMethod === 'email' ? 'email' : 'message'
       });
