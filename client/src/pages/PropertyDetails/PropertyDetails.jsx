@@ -3,8 +3,8 @@ import {
   Box, Typography, Grid, Divider, Chip, Button, Paper, 
   CircularProgress, Alert, Dialog, DialogActions, 
   DialogContent, DialogTitle, IconButton, useMediaQuery, 
-  Stack, Avatar, List, ListItem, ListItemIcon, ListItemText,
-  TextField, FormControl, InputLabel, Select, MenuItem
+  Stack, Avatar, FormControl, InputLabel, Select, MenuItem,
+  TextField
 } from '@mui/material';
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
@@ -94,17 +94,33 @@ const PropertyDetails = () => {
     });
   };
 
+  const handleContactOpen = () => {
+    // Pre-fill the message with property details when opening the dialog
+    const propertyLink = window.location.href;
+    const prefilledMessage = `Hello, I'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}).\n\n${propertyLink}\n\nCould you please provide more information about:\n- Availability\n- Viewing options\n- Any additional details`;
+    
+    setMessage(prefilledMessage);
+    setContactOpen(true);
+    setContactSuccess(false);
+  };
+
   const handleContactSubmit = async () => {
     try {
       setContactLoading(true);
-      await axios.post(`/properties/${id}/contact`, {
+      const response = await axios.post(`/api/v1/properties/${id}/contact`, {
         message,
         contactMethod
       });
+      
       setContactSuccess(true);
-      setTimeout(() => setContactOpen(false), 2000);
+      setTimeout(() => {
+        setContactOpen(false);
+        setMessage('');
+        setContactMethod('whatsapp');
+      }, 2000);
     } catch (err) {
       console.error('Error sending contact request:', err);
+      // Handle error (show error message, etc.)
     } finally {
       setContactLoading(false);
     }
@@ -113,7 +129,7 @@ const PropertyDetails = () => {
   const handleWhatsAppClick = () => {
     const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
     const link = window.location.href;
-    const messageText = `Hi, I'm interested in your property "${property.title}" at ${fullAddress}. ${link}`;
+    const messageText = `Hello, I'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}). ${link}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`, '_blank');
   };
 
@@ -123,7 +139,9 @@ const PropertyDetails = () => {
   };
 
   const handleEmailClick = () => {
-    window.open(`mailto:${property.agent?.email}?subject=Inquiry about ${property.title}`, '_blank');
+    const subject = `Inquiry about ${property.title}`;
+    const body = `Hello,\n\nI'm interested in your property "${property.title}" at ${fullAddress} (${formatPrice(property.price)}).\n\nCould you please provide more information about:\n- Availability\n- Viewing options\n- Any additional details\n\n${window.location.href}`;
+    window.open(`mailto:${property.agent?.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
   };
 
   if (loading) {
@@ -443,7 +461,7 @@ const PropertyDetails = () => {
                     fullWidth
                     variant="outlined" 
                     size="large"
-                    onClick={() => setContactOpen(true)}
+                    onClick={handleContactOpen}
                     startIcon={<Email />}
                     sx={{ 
                       py: 1.5,
@@ -539,7 +557,10 @@ const PropertyDetails = () => {
       </Dialog>
 
       {/* Contact Dialog */}
-      <Dialog open={contactOpen} onClose={() => setContactOpen(false)}>
+      <Dialog open={contactOpen} onClose={() => {
+        setContactOpen(false);
+        setContactSuccess(false);
+      }} maxWidth="md" fullWidth>
         <DialogTitle>Contact Agent</DialogTitle>
         <DialogContent>
           {contactSuccess ? (
@@ -551,11 +572,17 @@ const PropertyDetails = () => {
               <TextField
                 fullWidth
                 multiline
-                rows={4}
-                label="Message"
+                rows={8}
+                label="Your Message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, mt: 1 }}
+                InputProps={{
+                  style: {
+                    fontSize: '0.95rem',
+                    lineHeight: 1.5
+                  }
+                }}
               />
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Preferred Contact Method</InputLabel>
@@ -573,16 +600,19 @@ const PropertyDetails = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setContactOpen(false)}>
+          <Button onClick={() => {
+            setContactOpen(false);
+            setContactSuccess(false);
+          }}>
             {contactSuccess ? 'Close' : 'Cancel'}
           </Button>
           {!contactSuccess && (
             <Button 
               onClick={handleContactSubmit} 
               variant="contained"
-              disabled={contactLoading}
+              disabled={contactLoading || !message.trim()}
             >
-              {contactLoading ? <CircularProgress size={24} /> : 'Send'}
+              {contactLoading ? <CircularProgress size={24} /> : 'Send Inquiry'}
             </Button>
           )}
         </DialogActions>

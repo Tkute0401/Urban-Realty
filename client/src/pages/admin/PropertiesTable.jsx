@@ -16,13 +16,15 @@ import {
   CircularProgress,
   TablePagination,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Avatar,
+  Tooltip
 } from '@mui/material';
 import { MoreVert, Delete, Visibility, Edit, Search } from '@mui/icons-material';
 import axios from '../../services/axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-// Price formatting utility
 const formatPrice = (price) => {
   if (!price) return '$0';
   return new Intl.NumberFormat('en-US', {
@@ -43,11 +45,13 @@ const PropertiesTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get('/admin/properties');
+        const endpoint = user?.role === 'admin' ? '/admin/properties' : '/properties';
+        const response = await axios.get(endpoint);
         if (response.data.success) {
           setProperties(response.data.data || []);
         } else {
@@ -62,7 +66,7 @@ const PropertiesTable = () => {
     };
     
     fetchProperties();
-  }, []);
+  }, [user]);
 
   const handleMenuOpen = (event, property) => {
     setAnchorEl(event.currentTarget);
@@ -92,7 +96,7 @@ const PropertiesTable = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/properties/${selectedProperty._id}/edit`);
+    navigate(`/admin/properties/${selectedProperty._id}/edit`);
     handleMenuClose();
   };
 
@@ -107,10 +111,12 @@ const PropertiesTable = () => {
 
   const filteredProperties = properties.filter(property => {
     if (!property) return false;
+    const searchLower = searchTerm.toLowerCase();
     return (
-      (property.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (property.address?.city?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (property.type?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+      (property.title?.toLowerCase() || '').includes(searchLower) ||
+      (property.agent?.name?.toLowerCase() || '').includes(searchLower) ||
+      (property.address?.city?.toLowerCase() || '').includes(searchLower) ||
+      (property.type?.toLowerCase() || '').includes(searchLower)
     );
   });
 
@@ -155,6 +161,7 @@ const PropertiesTable = () => {
           <TableHead>
             <TableRow>
               <TableCell>Title</TableCell>
+              {user?.role === 'admin' && <TableCell>Agent</TableCell>}
               <TableCell>Type</TableCell>
               <TableCell>Location</TableCell>
               <TableCell>Price</TableCell>
@@ -171,6 +178,19 @@ const PropertiesTable = () => {
                     <TableCell>
                       <Typography fontWeight="medium">{property.title}</Typography>
                     </TableCell>
+                    {user?.role === 'admin' && (
+                      <TableCell>
+                        <Box display="flex" alignItems="center">
+                          <Avatar 
+                            src={property.agent?.photo} 
+                            sx={{ width: 24, height: 24, mr: 1 }}
+                          />
+                          <Typography variant="body2">
+                            {property.agent?.name}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Chip label={property.type} color="primary" size="small" />
                     </TableCell>
@@ -198,7 +218,7 @@ const PropertiesTable = () => {
                 ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={user?.role === 'admin' ? 7 : 6} align="center">
                   <Typography>No properties found</Typography>
                 </TableCell>
               </TableRow>
@@ -230,9 +250,11 @@ const PropertiesTable = () => {
         <MenuItem onClick={handleEdit}>
           <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
         </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-          <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
-        </MenuItem>
+        {user?.role === 'admin' && (
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+            <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
+          </MenuItem>
+        )}
       </Menu>
     </Paper>
   );

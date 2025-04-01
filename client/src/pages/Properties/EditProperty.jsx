@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Box, TextField, Button, Grid, MenuItem, Chip, Typography, Paper,
   CircularProgress, Alert, IconButton, Avatar, Snackbar, FormControlLabel, 
-  Checkbox, Container, FormHelperText, InputAdornment
+  Checkbox, Container, FormHelperText, InputAdornment, Autocomplete
 } from '@mui/material';
 import { CloudUpload, Delete, CheckCircle } from '@mui/icons-material';
 import { useProperties } from '../../context/PropertiesContext';
 import { useAuth } from '../../context/AuthContext';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { useAgents } from '../../context/AgentsContext';
 
 const EditProperty = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { agents, getAgents } = useAgents();
   
   const { 
     property: fetchedProperty, 
@@ -50,6 +51,7 @@ const EditProperty = () => {
     amenities: [],
   });
   
+  const [selectedAgent, setSelectedAgent] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [images, setImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
@@ -81,11 +83,11 @@ const EditProperty = () => {
         featured: fetchedProperty.featured || false,
         address: {
           line1: fetchedProperty.address?.line1 || '',
-          street: fetchedProperty.address?.street || fetchedProperty.location?.street || '',
-          city: fetchedProperty.address?.city || fetchedProperty.location?.city || '',
-          state: fetchedProperty.address?.state || fetchedProperty.location?.state || '',
-          zipCode: fetchedProperty.address?.zipCode || fetchedProperty.location?.zipCode || '',
-          country: fetchedProperty.address?.country || fetchedProperty.location?.country || 'India'
+          street: fetchedProperty.address?.street || '',
+          city: fetchedProperty.address?.city || '',
+          state: fetchedProperty.address?.state || '',
+          zipCode: fetchedProperty.address?.zipCode || '',
+          country: fetchedProperty.address?.country || 'India'
         },
         amenities: fetchedProperty.amenities || [],
       });
@@ -93,23 +95,38 @@ const EditProperty = () => {
     }
   }, [fetchedProperty, fetchLoading]);
 
-  // Fetch property when component mounts
+  // Set selected agent when property or agents are loaded
+  useEffect(() => {
+    if (fetchedProperty?.agent) {
+      if (agents.length > 0) {
+        const agent = agents.find(a => a._id === fetchedProperty.agent._id);
+        setSelectedAgent(agent || fetchedProperty.agent);
+      } else {
+        setSelectedAgent(fetchedProperty.agent);
+      }
+    }
+  }, [fetchedProperty, agents]);
+
+  // Fetch property and agents when component mounts
   useEffect(() => {
     if (id && !hasFetched.current) {
       hasFetched.current = true;
       const fetchData = async () => {
         try {
           await getProperty(id);
+          if (user?.role === 'admin') {
+            await getAgents();
+          }
         } catch (err) {
-          console.error('Error fetching property:', err);
-          setError(err.message || 'Failed to load property');
+          console.error('Error fetching data:', err);
+          setError(err.message || 'Failed to load data');
         }
       };
       fetchData();
     }
     
     return () => clearErrors();
-  }, [id, getProperty, clearErrors]);
+  }, [id, getProperty, clearErrors, user, getAgents]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -130,6 +147,11 @@ const EditProperty = () => {
           formDataToSend.append(field, formData[field]);
         }
       });
+
+      // Add agent if admin is changing it
+      if (user?.role === 'admin' && selectedAgent) {
+        formDataToSend.append('agent', selectedAgent._id);
+      }
   
       // Add address
       formDataToSend.append('address', JSON.stringify(formData.address));
@@ -165,18 +187,15 @@ const EditProperty = () => {
         }
       };
 
-      const response = await updateProperty(id, formDataToSend, config);
+      await updateProperty(id, formDataToSend, config);
       
       // Show success message
       setSuccess(true);
       
       // Redirect after delay
       setTimeout(() => {
-        navigate(`/properties/${id}`, {
-          state: {
-            updatedProperty: response.data || response,
-            message: 'Property updated successfully!'
-          }
+        navigate('/admin/properties', {
+          state: { message: 'Property updated successfully!' }
         });
       }, 1500);
   
@@ -244,7 +263,7 @@ const EditProperty = () => {
         </Alert>
         <Button 
           variant="contained" 
-          onClick={() => navigate('/properties')}
+          onClick={() => navigate('/admin/properties')}
         >
           Back to Properties
         </Button>
@@ -258,7 +277,7 @@ const EditProperty = () => {
         <Typography variant="h6" gutterBottom>Property not found</Typography>
         <Button 
           variant="contained" 
-          onClick={() => navigate('/properties')}
+          onClick={() => navigate('/admin/properties')}
           sx={{ mt: 2 }}
         >
           Browse Properties
@@ -310,6 +329,47 @@ const EditProperty = () => {
         )}
 
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+          {/* Agent Selection (for admin only) */}
+          {user?.role === 'admin' && (
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Property Agent
+              </Typography>
+              <Autocomplete
+                options={agents}
+                getOptionLabel={(option) => `${option.name} (${option.email})`}
+                value={selectedAgent}
+                onChange={(e, newValue) => setSelectedAgent(newValue)}
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    label="Select Agent" 
+                    fullWidth 
+                    size={isMobile ? 'small' : 'medium'}
+                    required
+                  />
+                )}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                renderOption={(props, option) => (
+                  <li {...props} key={option._id}>
+                    <Box display="flex" alignItems="center">
+                      <Avatar 
+                        src={option.photo} 
+                        sx={{ width: 24, height: 24, mr: 1 }}
+                      />
+                      <Box>
+                        <Typography variant="body1">{option.name}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {option.email}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </li>
+                )}
+              />
+            </Grid>
+          )}
+
           {/* Title */}
           <Grid item xs={12}>
             <TextField
@@ -730,7 +790,7 @@ const EditProperty = () => {
                   flex: 1,
                   py: 1.5
                 }}
-                onClick={() => navigate(`/properties/${id}`)}
+                onClick={() => navigate('/admin/properties')}
               >
                 Cancel
               </Button>
