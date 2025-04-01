@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { 
   Box,
   Divider,
@@ -20,11 +19,9 @@ import {
   Home,
   Mail,
   VerifiedUser,
-  Settings,
-  Menu,
-  ChevronLeft,
-  ChevronRight
+  Settings
 } from '@mui/icons-material';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -38,27 +35,18 @@ const menuItems = [
   { text: 'Settings', icon: <Settings />, path: '/admin/settings' },
 ];
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const toggleCollapse = () => {
-    setCollapsed(!collapsed);
-  };
 
   const drawer = (
     <Box sx={{ 
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      bgcolor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.primary.light
+      bgcolor: theme.palette.background.paper,
+      borderRight: `1px solid ${theme.palette.divider}`
     }}>
       <Toolbar sx={{ 
         display: 'flex',
@@ -69,13 +57,13 @@ const AdminSidebar = () => {
       }}>
         {!collapsed && (
           <Typography variant="h6" noWrap component="div" sx={{ 
-            color: theme.palette.primary.main,
+            color: theme.palette.text.primary,
             fontWeight: 700
           }}>
             Admin Panel
           </Typography>
         )}
-        <IconButton onClick={toggleCollapse}>
+        <IconButton onClick={onToggleCollapse}>
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
         </IconButton>
       </Toolbar>
@@ -110,6 +98,9 @@ const AdminSidebar = () => {
                 py: 1.5,
                 px: collapsed ? 2.5 : 3,
                 justifyContent: collapsed ? 'center' : 'flex-start',
+                '&:hover': {
+                  backgroundColor: theme.palette.action.hover,
+                }
               }}
             >
               <ListItemIcon sx={{ 
@@ -117,7 +108,7 @@ const AdminSidebar = () => {
                 mr: collapsed ? 0 : 2,
                 color: location.pathname === item.path 
                   ? theme.palette.primary.contrastText 
-                  : 'inherit'
+                  : theme.palette.text.secondary
               }}>
                 {item.icon}
               </ListItemIcon>
@@ -146,25 +137,22 @@ const AdminSidebar = () => {
 
   if (isMobile) {
     return (
-      <>
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              borderRight: 'none'
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-      </>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onDrawerToggle}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: drawerWidth,
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
     );
   }
 
@@ -177,7 +165,6 @@ const AdminSidebar = () => {
         '& .MuiDrawer-paper': {
           width: collapsed ? 72 : drawerWidth,
           boxSizing: 'border-box',
-          borderRight: 'none',
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,

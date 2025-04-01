@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
-const AdminHeader = () => {
+const AdminHeader = ({ onMenuClick }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -24,12 +24,22 @@ const AdminHeader = () => {
   };
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar 
+      position="fixed" 
+      sx={{ 
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        backgroundColor: (theme) => theme.palette.background.paper,
+        color: (theme) => theme.palette.text.primary,
+        boxShadow: 'none',
+        borderBottom: (theme) => `1px solid ${theme.palette.divider}`
+      }}
+    >
       <Toolbar>
         <IconButton
           color="inherit"
           edge="start"
           sx={{ mr: 2 }}
+          onClick={onMenuClick}
         >
           <MenuIcon />
         </IconButton>
@@ -37,13 +47,17 @@ const AdminHeader = () => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           Admin Panel
         </Typography>
+        
         <Button
-        align="right"
           variant="text"
           color="inherit"
           component={Link}
           to="/"
-        >Home</Button>
+          sx={{ mr: 2 }}
+        >
+          Home
+        </Button>
+        
         <div>
           <IconButton
             onClick={handleMenuOpen}
