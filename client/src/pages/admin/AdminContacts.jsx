@@ -1,5 +1,5 @@
 import { Typography, Box } from '@mui/material';
-import ContactsTable from '../components/ContactsTable';
+import ContactsTable from './ContactsTable';
 
 const AdminContacts = () => {
   return (

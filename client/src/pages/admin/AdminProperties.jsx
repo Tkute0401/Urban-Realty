@@ -1,5 +1,5 @@
 import { Typography, Box } from '@mui/material';
-import PropertiesTable from '../components/PropertiesTable';
+import PropertiesTable from './PropertiesTable';
 
 const AdminProperties = () => {
   return (
