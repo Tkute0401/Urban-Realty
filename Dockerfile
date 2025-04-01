@@ -1,5 +1,5 @@
 # Stage 1: Frontend build
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/client
 COPY client/package*.json client/.yarnrc* ./
