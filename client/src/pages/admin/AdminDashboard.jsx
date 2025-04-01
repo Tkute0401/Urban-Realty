@@ -1,6 +1,9 @@
+import { Grid, Typography, Card, CardContent, CircularProgress, Box } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Grid, Typography, Card, CardContent, CircularProgress } from '@mui/material';
-import axios from '../../services/axios';
+import axios from '../../../services/axios';
+import RecentUsers from '../components/RecentUsers';
+import RecentProperties from '../components/RecentProperties';
+import RecentContacts from '../components/RecentContacts';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -9,7 +12,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('/admin/stats');
+        const response = await axios.get('/api/v1/admin/stats');
         setStats(response.data.data);
       } catch (err) {
         console.error('Error fetching stats:', err);
@@ -68,7 +71,6 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Recent activities sections */}
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <RecentUsers users={stats.recent.users} />

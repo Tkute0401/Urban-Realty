@@ -1,43 +1,47 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { 
   Box, Typography, Grid, Divider, Chip, Button, Paper, 
   CircularProgress, Alert, Dialog, DialogActions, 
-  DialogContent, DialogTitle, IconButton, useMediaQuery, useTheme,
-  Stack, Avatar, List, ListItem, ListItemIcon, ListItemText
+  DialogContent, DialogTitle, IconButton, useMediaQuery, 
+  Stack, Avatar, List, ListItem, ListItemIcon, ListItemText,
+  TextField, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
   Phone, Email, Edit, Delete, ArrowBack,
   WhatsApp, Apartment, MeetingRoom, Check, Close
 } from '@mui/icons-material';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useProperties } from '../../context/PropertiesContext';
 import PropertyImageGallery from '../../components/property/PropertyImageGallery';
 import PropertyMap from '../../components/property/PropertyMap';
 import { formatPrice } from '../../utils/format';
-import { useAuth } from '../../context/AuthContext';
-import { useProperties } from '../../context/PropertiesContext';
+import axios from '../../services/axios';
 
 const PropertyDetails = () => {
   const { id } = useParams();
   const location = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { 
     property: fetchedProperty, 
     getProperty, 
     deleteProperty,
     clearProperty
   } = useProperties();
-
+  
   const [property, setProperty] = useState(location.state?.updatedProperty || null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [contactMethod, setContactMethod] = useState('whatsapp');
+  const [message, setMessage] = useState('');
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -77,18 +81,7 @@ const PropertyDetails = () => {
       });
     } catch (err) {
       console.error('Delete error:', err);
-      
-      // Handle unauthorized specifically
-      if (err.message === 'Not authorized to delete this property') {
-        setDeleteError('You are not authorized to delete this property');
-      } else {
-        setDeleteError(err.response?.data?.message || err.message || 'Failed to delete property');
-        
-        // Only logout if it's an authentication error (401)
-        if (err.response?.status === 401) {
-          // Handle logout logic if needed
-        }
-      }
+      setDeleteError(err.response?.data?.message || err.message || 'Failed to delete property');
     } finally {
       setDeleting(false);
       setDeleteConfirmOpen(false);
@@ -101,11 +94,27 @@ const PropertyDetails = () => {
     });
   };
 
+  const handleContactSubmit = async () => {
+    try {
+      setContactLoading(true);
+      await axios.post(`/api/v1/properties/${id}/contact`, {
+        message,
+        contactMethod
+      });
+      setContactSuccess(true);
+      setTimeout(() => setContactOpen(false), 2000);
+    } catch (err) {
+      console.error('Error sending contact request:', err);
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
   const handleWhatsAppClick = () => {
     const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
     const link = window.location.href;
-    const message = `Hi, I'm interested in your property "${property.title}" at ${fullAddress}. ${link}`;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    const messageText = `Hi, I'm interested in your property "${property.title}" at ${fullAddress}. ${link}`;
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`, '_blank');
   };
 
   const handleCallClick = () => {
@@ -179,6 +188,7 @@ const PropertyDetails = () => {
   ].filter(Boolean).join(', ');
 
   const isOwner = user?.role === 'agent' && user.id === property.agent?._id;
+
   return (
     <Box sx={{ 
       maxWidth: 1400, 
@@ -186,7 +196,7 @@ const PropertyDetails = () => {
       p: { xs: 1, sm: 2, md: 3 },
       pb: { xs: 6, sm: 3 }
     }}>
-      {/* Back button with improved styling */}
+      {/* Back button */}
       <Button
         startIcon={<ArrowBack />}
         onClick={() => navigate('/properties')}
@@ -201,10 +211,10 @@ const PropertyDetails = () => {
         Back to Properties
       </Button>
 
-      {/* Main content with better spacing */}
+      {/* Main content */}
       <Grid container spacing={{ xs: 2, md: 4 }}>
         <Grid item xs={12} md={8}>
-          {/* Enhanced image gallery */}
+          {/* Image gallery */}
           <Box sx={{ 
             borderRadius: 2,
             overflow: 'hidden',
@@ -214,7 +224,7 @@ const PropertyDetails = () => {
             <PropertyImageGallery images={property.images || []} />
           </Box>
 
-          {/* Description section with better typography */}
+          {/* Description section */}
           <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
               Property Description
@@ -232,7 +242,7 @@ const PropertyDetails = () => {
             </Typography>
           </Paper>
 
-          {/* Amenities with chips */}
+          {/* Amenities */}
           <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
               Amenities
@@ -255,10 +265,10 @@ const PropertyDetails = () => {
           </Paper>
         </Grid>
 
-        {/* Sidebar with sticky positioning */}
+        {/* Sidebar */}
         <Grid item xs={12} md={4}>
           <Box sx={{ position: 'sticky', top: 20 }}>
-            {/* Price card with improved styling */}
+            {/* Price card */}
             <Paper elevation={3} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Typography 
@@ -344,7 +354,7 @@ const PropertyDetails = () => {
                 </Box>
               )}
 
-              {/* Contact form with better layout */}
+              {/* Contact form */}
               <Box sx={{ mt: 3 }}>
                 <Typography 
                   variant="h6" 
@@ -390,7 +400,7 @@ const PropertyDetails = () => {
                   </Box>
                 </Box>
 
-                {/* Contact buttons with better spacing */}
+                {/* Contact buttons */}
                 <Stack spacing={2} sx={{ mt: 3 }}>
                   <Button 
                     fullWidth
@@ -428,11 +438,29 @@ const PropertyDetails = () => {
                   >
                     Call Agent
                   </Button>
+
+                  <Button 
+                    fullWidth
+                    variant="outlined" 
+                    size="large"
+                    onClick={() => setContactOpen(true)}
+                    startIcon={<Email />}
+                    sx={{ 
+                      py: 1.5,
+                      fontWeight: 600,
+                      '&:hover': {
+                        transform: 'translateY(-2px)'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Send Message
+                  </Button>
                 </Stack>
               </Box>
             </Paper>
 
-            {/* Map section with better styling */}
+            {/* Map section */}
             <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
               <Typography 
                 variant="h6" 
@@ -507,6 +535,56 @@ const PropertyDetails = () => {
           >
             {deleting ? 'Deleting...' : 'Delete'}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Contact Dialog */}
+      <Dialog open={contactOpen} onClose={() => setContactOpen(false)}>
+        <DialogTitle>Contact Agent</DialogTitle>
+        <DialogContent>
+          {contactSuccess ? (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Your contact request has been sent successfully!
+            </Alert>
+          ) : (
+            <>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label="Message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Preferred Contact Method</InputLabel>
+                <Select
+                  value={contactMethod}
+                  label="Preferred Contact Method"
+                  onChange={(e) => setContactMethod(e.target.value)}
+                >
+                  <MenuItem value="whatsapp">WhatsApp</MenuItem>
+                  <MenuItem value="email">Email</MenuItem>
+                  <MenuItem value="phone">Phone Call</MenuItem>
+                </Select>
+              </FormControl>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setContactOpen(false)}>
+            {contactSuccess ? 'Close' : 'Cancel'}
+          </Button>
+          {!contactSuccess && (
+            <Button 
+              onClick={handleContactSubmit} 
+              variant="contained"
+              disabled={contactLoading}
+            >
+              {contactLoading ? <CircularProgress size={24} /> : 'Send'}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Box>

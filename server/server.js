@@ -5,7 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
-const adminRoutes = require('./routes/adminRoutes');
 
 
 
@@ -13,7 +12,6 @@ const app = express();
 
 // Connect to database
 connectDB();
-app.use('/api/v1/admin', adminRoutes);
 // Configure paths - CHANGED FROM ../../client/dist to ./client/dist
 const uploadsDir = path.join(__dirname, 'uploads');
 const clientDistDir = path.join('/app/client/dist'); // Updated path
@@ -44,6 +42,7 @@ app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(clientDistDir)); // Serve React build
 
 // API Routes
+app.use('/api/v1/admin', require('./routes/adminRoutes'));
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/properties', require('./routes/propertyRoutes'));
 
