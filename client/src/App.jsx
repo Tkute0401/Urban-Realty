@@ -22,6 +22,7 @@ import AgentsPage from './pages/admin/AgentsPage';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 import AdminInquiries from './pages/admin/AdminInquiries';
+import AdminRoute from './components/common/AdminRoute';
 function App() {
   return (
     <ThemeProvider theme={urbanRealtyTheme}>
