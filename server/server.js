@@ -1,74 +1,59 @@
 require('dotenv').config({ path: `${__dirname}/.env` });
 const express = require('express');
-const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 const connectDB = require('./config/db');
+const app = require('./app'); // Import the configured Express app
+const http = require('http');
+const socketio = require('socket.io');
 const errorHandler = require('./middleware/errorHandler');
+const configureSocket = require('./config/socket'); // Optional for real-time features
 
-
-
-const app = express();
-
-// Connect to database
+// Connect to MongoDB
 connectDB();
-// Configure paths - CHANGED FROM ../../client/dist to ./client/dist
-const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join('/app/client/dist'); // Updated path
 
-// Create directories
-[uploadsDir, clientDistDir].forEach(dir => {
-  try {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      console.log(`Directory created: ${dir}`);
+// Configure paths
+const uploadsDir = path.join(__dirname, 'uploads');
+const clientDistDir = path.join(__dirname, '..', 'client', 'dist'); // Adjusted path for typical React/Vue structure
+
+// Create required directories
+const createDirectories = () => {
+  [uploadsDir, clientDistDir].forEach(dir => {
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`Directory created: ${dir}`);
+      }
+    } catch (err) {
+      console.error(`Error creating ${dir}:`, err);
+      process.exit(1);
     }
-  } catch (err) {
-    console.error(`Error creating ${dir}:`, err);
-    process.exit(1);
+  });
+};
+
+createDirectories();
+
+// Create HTTP server
+const server = http.createServer(app);
+const io = socketio(server, {
+  cors: {
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ["GET", "POST"]
   }
 });
 
-// Middleware
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: true
-}));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Configure Socket.io (optional)
+configureSocket(io);
 
-// Static files
+// Serve static files
 app.use('/uploads', express.static(uploadsDir));
-app.use(express.static(clientDistDir)); // Serve React build
+app.use(express.static(clientDistDir));
 
-// API Routes
-app.use('/api/v1/admin', require('./routes/adminRoutes'));
-app.use('/api/v1/auth', require('./routes/authRoutes'));
-app.use('/api/v1/properties', require('./routes/propertyRoutes'));
-
-// Health endpoints
-app.get('/api/v1/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'healthy',
-    staticFilesPath: clientDistDir,
-    uploadsPath: uploadsDir
-  });
-});
-
-app.get('/api/v1/test', (req, res) => {
-  res.json({ 
-    status: 'success',
-    message: 'API is working',
-    staticFiles: fs.existsSync(path.join(clientDistDir, 'index.html')) 
-      ? 'Found' 
-      : 'Not found'
-  });
-});
-
-// SPA Fallback - MUST BE LAST ROUTE
+// Enhanced SPA Fallback with cache control
 app.get('*', (req, res) => {
   const indexPath = path.join(clientDistDir, 'index.html');
   if (fs.existsSync(indexPath)) {
+    res.setHeader('Cache-Control', 'no-store');
     res.sendFile(indexPath);
   } else {
     console.error(`Frontend file not found at: ${indexPath}`);
@@ -80,24 +65,41 @@ app.get('*', (req, res) => {
   }
 });
 
-// Error handling
+// Error handling (should be after all other middleware/routes)
 app.use(errorHandler);
-app.use((req, res) => res.status(404).json({ success: false, error: 'Not found' }));
 
-// Server
+// Server startup
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`Serving static files from: ${clientDistDir}`);
-  console.log(`Uploads directory: ${uploadsDir}`);
+server.listen(PORT, () => {
+  console.log(`
+  =====================================================
+  🚀 Server running in ${process.env.NODE_ENV || 'development'} mode
+  🔗 Base URL: http://localhost:${PORT}
+  📁 Uploads directory: ${uploadsDir}
+  🖥️  Serving client from: ${clientDistDir}
+  🗄️  Database: ${process.env.MONGO_URI.split('@')[1] || 'Not configured'}
+  =====================================================
+  `);
   
-  // Verify frontend files
-  console.log('Frontend files:', fs.readdirSync(clientDistDir));
+  // Verify critical directories
+  console.log('\n📂 Directory Verification:');
+  [uploadsDir, clientDistDir].forEach(dir => {
+    console.log(`  ${fs.existsSync(dir) ? '✅' : '❌'} ${dir}`);
+  });
 });
 
+// Enhanced process error handling
 process.on('unhandledRejection', (err) => {
-  console.error(`Unhandled Rejection: ${err.message}`);
+  console.error(`💥 Unhandled Rejection: ${err.stack || err.message}`);
   server.close(() => process.exit(1));
+});
+
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    console.log('🔴 Server terminated');
+    process.exit(0);
+  });
 });
 
 module.exports = server;

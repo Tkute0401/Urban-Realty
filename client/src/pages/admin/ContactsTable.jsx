@@ -37,7 +37,7 @@ const ContactsTable = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await axios.get('/admin/contacts');
+        const response = await axios.get('/api/v1/admin/contacts');
         setContacts(response.data.data);
       } catch (err) {
         console.error('Error fetching contacts:', err);
@@ -61,7 +61,7 @@ const ContactsTable = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/admin/contacts/${selectedContact._id}`);
+      await axios.delete(`/api/v1/admin/contacts/${selectedContact._id}`);
       setContacts(contacts.filter(contact => contact._id !== selectedContact._id));
     } catch (err) {
       console.error('Error deleting contact:', err);
@@ -144,63 +144,73 @@ const ContactsTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredContacts
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map(contact => (
-                <TableRow key={contact._id}>
-                  <TableCell>
-                    <Box display="flex" alignItems="center">
-                      <Avatar 
-                        src={contact.user?.avatar}
-                        sx={{ width: 32, height: 32, mr: 1 }}
-                      >
-                        {contact.user?.name?.charAt(0)}
-                      </Avatar>
-                      <Typography>{contact.user?.name}</Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography fontWeight="medium">{contact.property?.title}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatPrice(contact.property?.price)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {getContactMethodIcon(contact.contactMethod)}
-                  </TableCell>
-                  <TableCell>
-                    {formatDate(contact.createdAt)}
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={contact.status} 
-                      color={
-                        contact.status === 'pending' ? 'default' :
-                        contact.status === 'contacted' ? 'primary' :
-                        contact.status === 'completed' ? 'success' : 'error'
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={(e) => handleMenuOpen(e, contact)}>
-                      <MoreVert />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+            {filteredContacts.length > 0 ? (
+              filteredContacts
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(contact => (
+                  <TableRow key={contact._id}>
+                    <TableCell>
+                      <Box display="flex" alignItems="center">
+                        <Avatar 
+                          src={contact.user?.avatar}
+                          sx={{ width: 32, height: 32, mr: 1 }}
+                        >
+                          {contact.user?.name?.charAt(0)}
+                        </Avatar>
+                        <Typography>{contact.user?.name}</Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="medium">{contact.property?.title}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatPrice(contact.property?.price)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {getContactMethodIcon(contact.contactMethod)}
+                    </TableCell>
+                    <TableCell>
+                      {formatDate(contact.createdAt)}
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={contact.status} 
+                        color={
+                          contact.status === 'pending' ? 'default' :
+                          contact.status === 'contacted' ? 'primary' :
+                          contact.status === 'completed' ? 'success' : 'error'
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={(e) => handleMenuOpen(e, contact)}>
+                        <MoreVert />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography>No contacts found</Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredContacts.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {filteredContacts.length > 0 && (
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={filteredContacts.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      )}
 
       <Menu
         anchorEl={anchorEl}
@@ -214,9 +224,7 @@ const ContactsTable = () => {
           <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
         </MenuItem>
       </Menu>
-      {console.log(contacts)}
     </Paper>
-    
   );
 };
 
