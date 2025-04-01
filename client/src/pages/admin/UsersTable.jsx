@@ -13,7 +13,8 @@ import {
   Typography,
   Chip,
   Box,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import { MoreVert, Edit, Delete, VerifiedUser } from '@mui/icons-material';
 import axios from '../../services/axios';
@@ -21,6 +22,7 @@ import axios from '../../services/axios';
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -28,9 +30,15 @@ const UsersTable = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get('/api/v1/admin/users');
-        setUsers(response.data.data);
+        console.log(response.data);
+        if (response.data.success) {
+          setUsers(response.data.data || []); // Ensure we always have an array
+        } else {
+          setError('Failed to fetch users');
+        }
       } catch (err) {
         console.error('Error fetching users:', err);
+        setError('Failed to load users. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -55,6 +63,7 @@ const UsersTable = () => {
       setUsers(users.filter(user => user._id !== selectedUser._id));
     } catch (err) {
       console.error('Error deleting user:', err);
+      setError('Failed to delete user');
     } finally {
       handleMenuClose();
     }
@@ -68,6 +77,7 @@ const UsersTable = () => {
       ));
     } catch (err) {
       console.error('Error verifying agent:', err);
+      setError('Failed to verify agent');
     } finally {
       handleMenuClose();
     }
@@ -77,6 +87,14 @@ const UsersTable = () => {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Alert severity="error">{error}</Alert>
       </Box>
     );
   }
@@ -94,31 +112,39 @@ const UsersTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map(user => (
-            <TableRow key={user._id}>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                <Chip 
-                  label={user.role} 
-                  color={user.role === 'admin' ? 'primary' : 'default'}
-                />
-              </TableCell>
-              <TableCell>
-                {user.role === 'agent' && (
+          {users.length > 0 ? (
+            users.map(user => (
+              <TableRow key={user._id}>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
                   <Chip 
-                    label={user.isVerified ? 'Verified' : 'Unverified'} 
-                    color={user.isVerified ? 'success' : 'warning'}
+                    label={user.role} 
+                    color={user.role === 'admin' ? 'primary' : 'default'}
                   />
-                )}
-              </TableCell>
-              <TableCell>
-                <IconButton onClick={(e) => handleMenuOpen(e, user)}>
-                  <MoreVert />
-                </IconButton>
+                </TableCell>
+                <TableCell>
+                  {user.role === 'agent' && (
+                    <Chip 
+                      label={user.isVerified ? 'Verified' : 'Unverified'} 
+                      color={user.isVerified ? 'success' : 'warning'}
+                    />
+                  )}
+                </TableCell>
+                <TableCell>
+                  <IconButton onClick={(e) => handleMenuOpen(e, user)}>
+                    <MoreVert />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5} align="center">
+                <Typography variant="body1">No users found</Typography>
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
 
