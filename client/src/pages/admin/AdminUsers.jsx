@@ -1,44 +1,41 @@
 // src/pages/admin/AdminUsers.jsx
 import { useState, useEffect } from 'react';
 import { 
-  Box, Typography, Paper, Table, TableBody, 
-  TableCell, TableContainer, TableHead, 
-  TableRow, Avatar, Chip, Button, 
-  Dialog, DialogTitle, DialogContent, 
-  DialogActions, TextField, MenuItem, 
-  CircularProgress, IconButton 
+  Box, Typography, Paper, Table, TableBody, TableCell, 
+  TableContainer, TableHead, TableRow, Button, 
+  IconButton, CircularProgress, TextField, MenuItem,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  Avatar, Chip
 } from '@mui/material';
 import { 
-  Edit, Delete, Person, Add, 
-  Close, Check, Cancel 
+  Add, Edit, Delete, Search, Refresh, 
+  Person, AdminPanelSettings, Engineering
 } from '@mui/icons-material';
 import axios from '../../services/axios';
-import { useTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { formatDate } from '../../utils/format';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    role: 'buyer',
-    mobile: ''
-  });
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/v1/admin/users');
+      setError(null);
+      
+      let url = '/api/v1/admin/users';
+      if (roleFilter !== 'all') {
+        url += `?role=${roleFilter}`;
+      }
+      
+      const response = await axios.get(url);
       setUsers(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load users');
@@ -47,101 +44,92 @@ const AdminUsers = () => {
     }
   };
 
-  const handleOpenDialog = (user = null) => {
-    setCurrentUser(user);
-    if (user) {
-      setFormData({
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        mobile: user.mobile || ''
-      });
-    } else {
-      setFormData({
-        name: '',
-        email: '',
-        role: 'buyer',
-        mobile: ''
-      });
-    }
-    setOpenDialog(true);
-  };
+  useEffect(() => {
+    fetchUsers();
+  }, [roleFilter]);
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setCurrentUser(null);
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async () => {
+  const handleDeleteUser = async () => {
     try {
-      if (currentUser) {
-        await axios.put(`/api/v1/admin/users/${currentUser._id}`, formData);
-      } else {
-        await axios.post('/api/v1/admin/users', formData);
-      }
+      await axios.delete(`/api/v1/admin/users/${selectedUser._id}`);
+      setOpenDeleteDialog(false);
       fetchUsers();
-      handleCloseDialog();
     } catch (err) {
-      setError(err.response?.data?.message || 'Operation failed');
+      setError(err.response?.data?.message || 'Failed to delete user');
     }
   };
 
-  const handleDelete = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await axios.delete(`/api/v1/admin/users/${userId}`);
-        fetchUsers();
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to delete user');
-      }
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await axios.put(`/api/v1/admin/users/${userId}/role`, { role: newRole });
+      fetchUsers();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update user role');
     }
   };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'admin': return 'error';
-      case 'agent': return 'primary';
-      default: return 'default';
-    }
-  };
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  if (loading) {
+  if (loading && users.length === 0) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box p={3}>
-        <Typography color="error">{error}</Typography>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
+        <CircularProgress size={60} />
       </Box>
     );
   }
 
   return (
-    <Box p={3}>
+    <Box sx={{ p: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">User Management</Typography>
         <Button 
           variant="contained" 
           startIcon={<Add />}
-          onClick={() => handleOpenDialog()}
+          onClick={() => navigate('/admin/users/new')}
         >
           Add User
         </Button>
       </Box>
 
-      <Paper elevation={3}>
+      {error && (
+        <Box mb={3} p={2} bgcolor="error.light" borderRadius={1}>
+          <Typography color="error">{error}</Typography>
+        </Box>
+      )}
+
+      <Box display="flex" gap={2} mb={3}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: <Search sx={{ mr: 1 }} />
+          }}
+        />
+        
+        <TextField
+          select
+          variant="outlined"
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          sx={{ minWidth: 150 }}
+        >
+          <MenuItem value="all">All Roles</MenuItem>
+          <MenuItem value="buyer">Buyers</MenuItem>
+          <MenuItem value="agent">Agents</MenuItem>
+          <MenuItem value="admin">Admins</MenuItem>
+        </TextField>
+        
+        <IconButton onClick={fetchUsers}>
+          <Refresh />
+        </IconButton>
+      </Box>
+
+      <Paper>
         <TableContainer>
           <Table>
             <TableHead>
@@ -149,35 +137,46 @@ const AdminUsers = () => {
                 <TableCell>User</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Role</TableCell>
-                <TableCell>Mobile</TableCell>
+                <TableCell>Joined</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user._id}>
+              {filteredUsers.map((user) => (
+                <TableRow key={user._id} hover>
                   <TableCell>
-                    <Box display="flex" alignItems="center">
-                      <Avatar sx={{ mr: 2 }}>
-                        <Person />
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Avatar src={user.avatar}>
+                        {user.name.charAt(0)}
                       </Avatar>
-                      <Typography>{user.name}</Typography>
+                      {user.name}
                     </Box>
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={user.role} 
-                      color={getRoleColor(user.role)}
+                    <TextField
+                      select
                       size="small"
-                    />
+                      value={user.role}
+                      onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                      sx={{ minWidth: 120 }}
+                    >
+                      <MenuItem value="buyer">Buyer</MenuItem>
+                      <MenuItem value="agent">Agent</MenuItem>
+                      <MenuItem value="admin">Admin</MenuItem>
+                    </TextField>
                   </TableCell>
-                  <TableCell>{user.mobile || 'N/A'}</TableCell>
+                  <TableCell>{formatDate(user.createdAt)}</TableCell>
                   <TableCell align="right">
-                    <IconButton onClick={() => handleOpenDialog(user)}>
+                    <IconButton onClick={() => navigate(`/admin/users/${user._id}`)}>
                       <Edit color="primary" />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(user._id)}>
+                    <IconButton 
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setOpenDeleteDialog(true);
+                      }}
+                    >
                       <Delete color="error" />
                     </IconButton>
                   </TableCell>
@@ -188,91 +187,20 @@ const AdminUsers = () => {
         </TableContainer>
       </Paper>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>
-          {currentUser ? 'Edit User' : 'Add New User'}
-          <IconButton 
-            onClick={handleCloseDialog} 
-            sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Box mb={2}>
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              margin="normal"
-            />
-          </Box>
-          <Box mb={2}>
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              margin="normal"
-            />
-          </Box>
-          <Box mb={2}>
-            <TextField
-              fullWidth
-              label="Mobile"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              margin="normal"
-            />
-          </Box>
-          <Box mb={2}>
-            <TextField
-              select
-              fullWidth
-              label="Role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              margin="normal"
-            >
-              <MenuItem value="buyer">Buyer</MenuItem>
-              <MenuItem value="agent">Agent</MenuItem>
-              <MenuItem value="admin">Admin</MenuItem>
-            </TextField>
-          </Box>
-          {!currentUser && (
-            <Box mb={2}>
-              <TextField
-                fullWidth
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password || ''}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </Box>
-          )}
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete user {selectedUser?.name}? This action cannot be undone.
         </DialogContent>
         <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
           <Button 
-            variant="contained" 
-            startIcon={<Check />}
-            onClick={handleSubmit}
+            onClick={handleDeleteUser} 
+            color="error"
+            variant="contained"
           >
-            Save
-          </Button>
-          <Button 
-            variant="outlined" 
-            startIcon={<Cancel />}
-            onClick={handleCloseDialog}
-          >
-            Cancel
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
