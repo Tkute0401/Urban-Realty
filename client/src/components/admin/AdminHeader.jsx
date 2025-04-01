@@ -38,8 +38,7 @@ const AdminHeader = () => {
           Admin Panel
         </Typography>
         <Button
-          variant="contained"
-          color="error"
+        align="right"
           component={Link}
           to="/"
         >Home</Button>
