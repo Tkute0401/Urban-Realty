@@ -22,9 +22,21 @@ import { MoreVert, Delete, Visibility, Edit, Search } from '@mui/icons-material'
 import axios from '../../services/axios';
 import { useNavigate } from 'react-router-dom';
 
+// Price formatting utility
+const formatPrice = (price) => {
+  if (!price) return '$0';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
+};
+
 const PropertiesTable = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [page, setPage] = useState(0);
@@ -36,9 +48,14 @@ const PropertiesTable = () => {
     const fetchProperties = async () => {
       try {
         const response = await axios.get('/admin/properties');
-        setProperties(response.data.data);
+        if (response.data.success) {
+          setProperties(response.data.data || []);
+        } else {
+          setError('Failed to fetch properties');
+        }
       } catch (err) {
         console.error('Error fetching properties:', err);
+        setError('Failed to load properties. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -63,6 +80,7 @@ const PropertiesTable = () => {
       setProperties(properties.filter(property => property._id !== selectedProperty._id));
     } catch (err) {
       console.error('Error deleting property:', err);
+      setError('Failed to delete property');
     } finally {
       handleMenuClose();
     }
@@ -87,16 +105,27 @@ const PropertiesTable = () => {
     setPage(0);
   };
 
-  const filteredProperties = properties.filter(property => 
-    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.address?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProperties = properties.filter(property => {
+    if (!property) return false;
+    return (
+      (property.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (property.address?.city?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (property.type?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    );
+  });
 
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Typography color="error">{error}</Typography>
       </Box>
     );
   }
@@ -134,51 +163,61 @@ const PropertiesTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredProperties
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map(property => (
-                <TableRow key={property._id}>
-                  <TableCell>
-                    <Typography fontWeight="medium">{property.title}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip label={property.type} color="primary" size="small" />
-                  </TableCell>
-                  <TableCell>
-                    {property.address?.city}, {property.address?.state}
-                  </TableCell>
-                  <TableCell>
-                    {formatPrice(property.price)}
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={property.status} 
-                      color={
-                        property.status === 'For Sale' ? 'primary' : 
-                        property.status === 'For Rent' ? 'secondary' : 'default'
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={(e) => handleMenuOpen(e, property)}>
-                      <MoreVert />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+            {filteredProperties.length > 0 ? (
+              filteredProperties
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map(property => (
+                  <TableRow key={property._id}>
+                    <TableCell>
+                      <Typography fontWeight="medium">{property.title}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip label={property.type} color="primary" size="small" />
+                    </TableCell>
+                    <TableCell>
+                      {property.address?.city}, {property.address?.state}
+                    </TableCell>
+                    <TableCell>
+                      {formatPrice(property.price)}
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={property.status} 
+                        color={
+                          property.status === 'For Sale' ? 'primary' : 
+                          property.status === 'For Rent' ? 'secondary' : 'default'
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={(e) => handleMenuOpen(e, property)}>
+                        <MoreVert />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography>No properties found</Typography>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredProperties.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {filteredProperties.length > 0 && (
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={filteredProperties.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      )}
 
       <Menu
         anchorEl={anchorEl}
