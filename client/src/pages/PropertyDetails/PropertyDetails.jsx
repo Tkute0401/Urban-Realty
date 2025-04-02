@@ -128,7 +128,7 @@ const PropertyDetails = () => {
         return;
       }
       
-      if (contactMethod === 'call') {
+      if (contactMethod === 'phone') {
         const phoneNumber = property.agent?.mobile?.replace(/\D/g, '');
         window.open(`tel:${phoneNumber}`, '_blank');
         
@@ -578,7 +578,7 @@ const PropertyDetails = () => {
                     label="WhatsApp" 
                   />
                   <FormControlLabel 
-                    value="call" 
+                    value="phone" 
                     control={<Radio />} 
                     label="Phone Call" 
                   />
@@ -625,7 +625,7 @@ const PropertyDetails = () => {
               disabled={contactLoading || (( contactMethod === 'email' || contactMethod === 'whatsapp') && !message.trim())}
               startIcon={contactLoading ? <CircularProgress size={20} /> : null}
             >
-              {contactMethod === 'call' ? 'Call Agent' : 
+              {contactMethod === 'phone' ? 'Call Agent' : 
                contactMethod === 'whatsapp' ? 'Open WhatsApp' : 
                contactMethod === 'email' ? 'Send Email' : 'Send Message'}
             </Button>
