@@ -22,11 +22,11 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   //   user: req.user.id
   // });
 
-  if (existingRequest) {
-    return next(
-      new ErrorResponse('You have already contacted about this property', 400)
-    );
-  }
+  // if (existingRequest) {
+  //   return next(
+  //     new ErrorResponse('You have already contacted about this property', 400)
+  //   );
+  // }
 
   // Validate contact method
   const validMethods = ['email', 'phone', 'whatsapp'];
