@@ -17,10 +17,10 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   }
 
   // Check if already contacted
-  const existingRequest = await ContactRequest.findOne({
-    property: property._id,
-    user: req.user.id
-  });
+  // const existingRequest = await ContactRequest.findOne({
+  //   property: property._id,
+  //   user: req.user.id
+  // });
 
   if (existingRequest) {
     return next(
