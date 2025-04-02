@@ -28,24 +28,26 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // Validate contact method
+  const validMethods = ['message', 'email', 'phone', 'whatsapp'];
+  if (!validMethods.includes(req.body.contactMethod)) {
+    return next(
+      new ErrorResponse(`Invalid contact method. Must be one of: ${validMethods.join(', ')}`, 400)
+    );
+  }
+
+  // Set default message if not provided
+  const message = req.body.message || `Contact request via ${req.body.contactMethod}`;
+
   const contactRequest = await ContactRequest.create({
     property: property._id,
     agent: property.agent,
     user: req.user.id,
-    message: req.body.message,
+    message: message,
     contactMethod: req.body.contactMethod
   });
 
-  // Populate the response
-  const populatedRequest = await ContactRequest.findById(contactRequest._id)
-    .populate('property', 'title price')
-    .populate('agent', 'name email mobile')
-    .populate('user', 'name email mobile');
-
-  res.status(201).json({
-    success: true,
-    data: populatedRequest
-  });
+  // Rest of your code...
 });
 
 // @desc    Get contact requests for agent
