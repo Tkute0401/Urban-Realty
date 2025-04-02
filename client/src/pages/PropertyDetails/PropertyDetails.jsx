@@ -563,11 +563,6 @@ const PropertyDetails = () => {
                   sx={{ justifyContent: 'space-between' }}
                 >
                   <FormControlLabel 
-                    value="message" 
-                    control={<Radio />} 
-                    label="Message" 
-                  />
-                  <FormControlLabel 
                     value="email" 
                     control={<Radio />} 
                     label="Email" 

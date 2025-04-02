@@ -16,18 +16,6 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Check if already contacted
-  // const existingRequest = await ContactRequest.findOne({
-  //   property: property._id,
-  //   user: req.user.id
-  // });
-
-  // if (existingRequest) {
-  //   return next(
-  //     new ErrorResponse('You have already contacted about this property', 400)
-  //   );
-  // }
-
   // Validate contact method
   const validMethods = ['email', 'phone', 'whatsapp'];
   if (!validMethods.includes(req.body.contactMethod)) {
@@ -39,15 +27,45 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   // Set default message if not provided
   const message = req.body.message || `Contact request via ${req.body.contactMethod}`;
 
-  const contactRequest = await ContactRequest.create({
+  // Check for existing request
+  const existingRequest = await ContactRequest.findOne({
     property: property._id,
-    agent: property.agent,
     user: req.user.id,
-    message: message,
-    contactMethod: req.body.contactMethod
+    isCurrent: true
   });
 
-  // Rest of your code...
+  let contactRequest;
+
+  if (existingRequest) {
+    // Create a new version
+    contactRequest = await ContactRequest.create({
+      property: property._id,
+      agent: property.agent,
+      user: req.user.id,
+      message: message,
+      contactMethod: req.body.contactMethod,
+      version: existingRequest.version + 1,
+      previousVersions: [...existingRequest.previousVersions, existingRequest._id]
+    });
+
+    // Mark the old one as not current
+    existingRequest.isCurrent = false;
+    await existingRequest.save();
+  } else {
+    // Create first request
+    contactRequest = await ContactRequest.create({
+      property: property._id,
+      agent: property.agent,
+      user: req.user.id,
+      message: message,
+      contactMethod: req.body.contactMethod
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    data: contactRequest
+  });
 });
 
 // @desc    Get contact requests for agent
@@ -60,7 +78,15 @@ exports.getAgentContactRequests = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const contacts = await ContactRequest.find({ agent: req.user.id })
+  const contacts = await ContactRequest.find({ 
+    agent: req.user.id,
+    isCurrent: true
+  })
+    .populate({
+      path: 'previousVersions',
+      select: 'message contactMethod status createdAt',
+      options: { sort: { createdAt: -1 } }
+    })
     .populate('property', 'title price')
     .populate('user', 'name email mobile')
     .sort('-createdAt');
@@ -95,8 +121,14 @@ exports.updateContactRequest = asyncHandler(async (req, res, next) => {
     req.params.id,
     { status: req.body.status },
     { new: true, runValidators: true }
-  ).populate('property', 'title price')
-   .populate('user', 'name email mobile');
+  )
+  .populate({
+    path: 'previousVersions',
+    select: 'message contactMethod status createdAt',
+    options: { sort: { createdAt: -1 } }
+  })
+  .populate('property', 'title price')
+  .populate('user', 'name email mobile');
 
   res.status(200).json({
     success: true,
@@ -108,7 +140,14 @@ exports.updateContactRequest = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/admin/contacts
 // @access  Private/Admin
 exports.getContactRequests = asyncHandler(async (req, res, next) => {
-  const contacts = await ContactRequest.find()
+  const contacts = await ContactRequest.find({
+    isCurrent: true
+  })
+    .populate({
+      path: 'previousVersions',
+      select: 'message contactMethod status createdAt',
+      options: { sort: { createdAt: -1 } }
+    })
     .populate('property', 'title price')
     .populate('agent', 'name email mobile')
     .populate('user', 'name email mobile')
@@ -131,6 +170,20 @@ exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`Contact request not found with id of ${req.params.id}`, 404)
     );
+  }
+
+  // If this is the current version, promote the most recent previous version
+  if (contactRequest.isCurrent && contactRequest.previousVersions.length > 0) {
+    const previousVersions = await ContactRequest.find({
+      _id: { $in: contactRequest.previousVersions }
+    }).sort({ createdAt: -1 });
+
+    if (previousVersions.length > 0) {
+      const newCurrent = previousVersions[0];
+      newCurrent.isCurrent = true;
+      newCurrent.previousVersions = previousVersions.slice(1).map(v => v._id);
+      await newCurrent.save();
+    }
   }
 
   await contactRequest.remove();

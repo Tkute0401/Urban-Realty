@@ -31,14 +31,26 @@ const ContactRequestSchema = new mongoose.Schema({
     enum: ['pending', 'contacted', 'completed', 'spam'],
     default: 'pending'
   },
+  version: {
+    type: Number,
+    default: 1
+  },
+  previousVersions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ContactRequest'
+  }],
+  isCurrent: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-// Prevent duplicate contact requests
-ContactRequestSchema.index({ property: 1, user: 1 }, { unique: true });
+// Remove the unique index to allow multiple requests
+// ContactRequestSchema.index({ property: 1, user: 1 }, { unique: true });
 
 // Populate with user and property data
 ContactRequestSchema.pre(/^find/, function(next) {
