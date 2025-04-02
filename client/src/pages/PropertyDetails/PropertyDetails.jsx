@@ -603,7 +603,7 @@ const PropertyDetails = () => {
                 />
               )}
 
-              {contactMethod === 'call' && (
+              {contactMethod === 'phone' && (
                 <Alert severity="info" sx={{ mb: 2 }}>
                   Clicking "Send Request" will initiate a phone call to the agent and create a contact record.
                 </Alert>
