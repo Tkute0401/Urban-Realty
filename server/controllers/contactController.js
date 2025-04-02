@@ -29,7 +29,7 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   }
 
   // Validate contact method
-  const validMethods = ['message', 'email', 'phone', 'whatsapp'];
+  const validMethods = ['email', 'phone', 'whatsapp'];
   if (!validMethods.includes(req.body.contactMethod)) {
     return next(
       new ErrorResponse(`Invalid contact method. Must be one of: ${validMethods.join(', ')}`, 400)
