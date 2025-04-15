@@ -1,30 +1,61 @@
 const express = require('express');
 const router = express.Router();
+const { check } = require('express-validator');
+const {
+  getUsers,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  getProperties,
+  getProperty,
+  deleteProperty,
+  getContactRequests,
+  getStats
+} = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/auth');
-const adminController = require('../controllers/adminController');
 
-// User management
-router.get('/users', protect, authorize('admin'), adminController.getUsers);
-router.get('/users/:id', protect, authorize('admin'), adminController.getUser);
-router.put('/users/:id', protect, authorize('admin'), adminController.updateUser);
-router.delete('/users/:id', protect, authorize('admin'), adminController.deleteUser);
+// User Management
+router.get('/users', protect, authorize('admin'), getUsers);
 
-// Property management
-router.get('/properties', protect, authorize('admin'), adminController.getProperties);
-router.get('/properties/:id', protect, authorize('admin'), adminController.getProperty);
-router.delete('/properties/:id', protect, authorize('admin'), adminController.deleteProperty);
+router.post(
+  '/users',
+  protect,
+  authorize('admin'),
+  [
+    check('name', 'Name is required').not().isEmpty().trim().escape(),
+    check('email', 'Please include a valid email').isEmail().normalizeEmail(),
+    check('password', 'Password must be 6+ characters').isLength({ min: 6 }),
+    check('role', 'Role is required').isIn(['buyer', 'agent', 'admin'])
+  ],
+  createUser
+);
 
-// Agent management
-router.get('/agents', protect, authorize('admin'), adminController.getAgents);
-router.get('/agents/:id', protect, authorize('admin'), adminController.getAgent);
-router.put('/agents/:id/verify', protect, authorize('admin'), adminController.verifyAgent);
+router.get('/users/:id', protect, authorize('admin'), getUser);
 
-// Contact requests
-router.get('/contacts', protect, authorize('admin'), adminController.getContactRequests);
-router.get('/contacts/:id', protect, authorize('admin'), adminController.getContactRequest);
-router.delete('/contacts/:id', protect, authorize('admin'), adminController.deleteContactRequest);
+router.put(
+  '/users/:id',
+  protect,
+  authorize('admin'),
+  [
+    check('name', 'Name is required').optional().not().isEmpty().trim().escape(),
+    check('email', 'Please include a valid email').optional().isEmail().normalizeEmail(),
+    check('role', 'Invalid role').optional().isIn(['buyer', 'agent', 'admin'])
+  ],
+  updateUser
+);
+
+router.delete('/users/:id', protect, authorize('admin'), deleteUser);
+
+// Property Management
+router.get('/properties', protect, authorize('admin'), getProperties);
+router.get('/properties/:id', protect, authorize('admin'), getProperty);
+router.delete('/properties/:id', protect, authorize('admin'), deleteProperty);
+
+// Contact Management
+router.get('/contacts', protect, authorize('admin'), getContactRequests);
 
 // Statistics
-router.get('/stats', protect, authorize('admin'), adminController.getStats);
+router.get('/stats', protect, authorize('admin'), getStats);
 
 module.exports = router;

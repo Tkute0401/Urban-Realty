@@ -45,6 +45,7 @@ app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/properties', require('./routes/propertyRoutes'));
 app.use('/api/v1/contacts', require('./routes/contactRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
+app.use('/media', require('./routes/mediaRoutes'));
 
 // Health endpoints
 app.get('/api/v1/health', (req, res) => {

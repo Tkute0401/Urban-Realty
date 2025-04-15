@@ -5,7 +5,6 @@ const User = require('../models/User');
 const geocoder = require('../utils/geocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
-const Inquiry = require('../models/Inquiry');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -44,6 +43,31 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   if (req.query.price) {
     const [min, max] = req.query.price.split('-');
     reqQuery.price = { $gte: parseInt(min), $lte: parseInt(max) };
+  }
+
+  // Property type filtering
+  if (req.query.type) {
+    reqQuery.type = { $in: req.query.type.split(',') };
+  }
+
+  // Status filtering
+  if (req.query.status) {
+    reqQuery.status = { $in: req.query.status.split(',') };
+  }
+
+  // Bedrooms filtering
+  if (req.query.bedrooms) {
+    reqQuery.bedrooms = parseInt(req.query.bedrooms);
+  }
+
+  // Bathrooms filtering
+  if (req.query.bathrooms) {
+    reqQuery.bathrooms = parseInt(req.query.bathrooms);
+  }
+
+  // Amenities filtering
+  if (req.query.amenities) {
+    reqQuery.amenities = { $all: req.query.amenities.split(',') };
   }
 
   // Create query string
@@ -333,6 +357,64 @@ exports.uploadPropertyPhoto = asyncHandler(async (req, res, next) => {
   }
 });
 
+// @desc    Upload video for property
+// @route   PUT /api/v1/properties/:id/video
+// @access  Private (Agent/Admin)
+exports.uploadPropertyVideo = asyncHandler(async (req, res, next) => {
+  const property = await Property.findById(req.params.id);
+  if (!property) {
+    return next(new ErrorResponse(`Property not found with id of ${req.params.id}`, 404));
+  }
+
+  // Make sure user is property agent or admin
+  if (property.agent.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this property`, 401));
+  }
+
+  if (!req.files?.file) {
+    return next(new ErrorResponse(`Please upload a file`, 400));
+  }
+
+  const file = req.files.file;
+
+  // Validate file
+  if (!file.mimetype.startsWith('video')) {
+    return next(new ErrorResponse(`Please upload a video file`, 400));
+  }
+
+  if (file.size > process.env.MAX_VIDEO_UPLOAD) {
+    return next(new ErrorResponse(`Please upload a video less than ${process.env.MAX_VIDEO_UPLOAD / 1000000}MB`, 400));
+  }
+
+  try {
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'video',
+      folder: 'real-estate/properties/videos',
+      quality: 'auto:good',
+      chunk_size: 6000000 // 6MB chunks for large videos
+    });
+
+    property.videos = property.videos || [];
+    property.videos.push({
+      url: result.secure_url,
+      publicId: result.public_id,
+      duration: result.duration,
+      format: result.format
+    });
+
+    await property.save();
+    fs.unlinkSync(file.path);
+
+    res.status(200).json({
+      success: true,
+      data: result.secure_url
+    });
+  } catch (err) {
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    return next(new ErrorResponse('Problem with video upload', 500));
+  }
+});
+
 // @desc    Get featured properties
 // @route   GET /api/v1/properties/featured
 // @access  Public
@@ -414,4 +496,40 @@ const uploadImagesToCloudinary = async (files) => {
   }
   
   return images;
+};
+
+// Helper function to upload videos to Cloudinary
+const uploadVideosToCloudinary = async (files) => {
+  const videos = [];
+  
+  for (const file of files) {
+    try {
+      if (!fs.existsSync(file.path)) {
+        console.error('File does not exist:', file.path);
+        continue;
+      }
+
+      const result = await cloudinary.uploader.upload(file.path, {
+        resource_type: 'video',
+        folder: 'real-estate/properties/videos',
+        quality: 'auto:good',
+        chunk_size: 6000000
+      });
+      
+      videos.push({
+        url: result.secure_url,
+        publicId: result.public_id,
+        duration: result.duration,
+        format: result.format
+      });
+      
+      fs.unlinkSync(file.path);
+    } catch (err) {
+      console.error('Error uploading video:', err);
+      if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      throw err;
+    }
+  }
+  
+  return videos;
 };

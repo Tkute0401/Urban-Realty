@@ -1,4 +1,3 @@
-// server/middleware/multer.js
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -20,10 +19,11 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  // Allow both images and videos
+  if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files are allowed!'), false);
+    cb(new Error('Only image and video files are allowed!'), false);
   }
 };
 
@@ -31,9 +31,14 @@ const upload = multer({
   storage,
   fileFilter,
   limits: { 
-    fileSize: 1024 * 1024 * 5, // 5MB
+    fileSize: 1024 * 1024 * 100, // 100MB (for videos)
     files: 10 // Max 10 files
   }
 });
+
+// Helper function to get upload middleware based on media type
+exports.getUploadMiddleware = (fieldName, maxCount = 10) => {
+  return upload.array(fieldName, maxCount);
+};
 
 module.exports = upload;
