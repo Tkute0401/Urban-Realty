@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
+  // Core fields
   name: {
     type: String,
     required: [true, 'Please add a name'],
@@ -18,44 +19,61 @@ const UserSchema = new mongoose.Schema({
       'Please add a valid email'
     ]
   },
-  mobile: {
-    type: String,
-    match: [
-      /^\+?[0-9]{10,15}$/,
-      'Please add a valid mobile number with country code'
-    ]
-  },
-  role: {
-    type: String,
-    enum: ['buyer', 'agent', 'admin'],
-    default: 'buyer'
-  },
   password: {
     type: String,
     required: [true, 'Please add a password'],
     minlength: 6,
     select: false
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  
+  // Profile image reference
+  profileImage: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Media'
   },
+  
+  // Dynamic fields storage
+  dynamicFields: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
+  },
+  
+  // User type reference
+  userType: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'UserType',
+    required: true
+  },
+  
+  // Status fields
   isVerified: {
     type: Boolean,
     default: false
-  },
-  lastLogin: {
-    type: Date
   },
   active: {
     type: Boolean,
     default: true
   },
-  occupation: {
-    type: String,
-    trim: true,
-    maxlength: [100, 'Occupation cannot be more than 100 characters']
+  
+  // Timestamps
+  createdAt: {
+    type: Date,
+    default: Date.now
   },
+  lastLogin: {
+    type: Date
+  }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Virtual for user's properties
+UserSchema.virtual('properties', {
+  ref: 'Property',
+  localField: '_id',
+  foreignField: 'agent',
+  justOne: false
 });
 
 // Encrypt password using bcrypt
@@ -65,6 +83,12 @@ UserSchema.pre('save', async function(next) {
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Update timestamps on save
+UserSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
 });
 
 // Sign JWT and return
@@ -78,5 +102,13 @@ UserSchema.methods.getSignedJwtToken = function() {
 UserSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+// Cascade delete properties when user is deleted
+UserSchema.pre('remove', async function(next) {
+  if (this.dynamicFields.role === 'agent') {
+    await this.model('Property').deleteMany({ agent: this._id });
+  }
+  next();
+});
 
 module.exports = mongoose.model('User', UserSchema);
