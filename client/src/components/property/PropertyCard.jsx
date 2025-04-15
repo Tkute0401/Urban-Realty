@@ -1,8 +1,10 @@
-import { Card, CardMedia, CardContent, Typography, Box, Chip, Tooltip, useMediaQuery, useTheme } from '@mui/material';
-import { LocationOn, KingBed, Bathtub, SquareFoot, Star } from '@mui/icons-material';
+import { Card, CardMedia, CardContent, Typography, Box, Chip, Tooltip, useMediaQuery, useTheme, Badge } from '@mui/material';
+import { LocationOn, KingBed, Bathtub, SquareFoot, Star, Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '../../utils/format';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+import { PropertiesContext } from '../../context/PropertiesContext';
 
 const PropertyCard = ({ property, compact = false }) => {
   const navigate = useNavigate();
@@ -10,6 +12,9 @@ const PropertyCard = ({ property, compact = false }) => {
   const [isHovered, setIsHovered] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { user } = useContext(AuthContext);
+  const { toggleFavorite } = useContext(PropertiesContext);
+  const [isFavorite, setIsFavorite] = useState(property?.isFavorite || false);
 
   const getImageUrl = (img) => {
     try {
@@ -46,6 +51,20 @@ const PropertyCard = ({ property, compact = false }) => {
     }
   };
 
+  const handleFavoriteClick = async (e) => {
+    e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    try {
+      await toggleFavorite(property._id);
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    }
+  };
+
   const getAddressComponent = (component) => {
     if (!property?.address) return '';
     if (typeof property.address === 'string') return property.address;
@@ -67,7 +86,10 @@ const PropertyCard = ({ property, compact = false }) => {
         overflow: 'hidden',
         '&:hover': {
           transform: isMobile ? 'none' : 'translateY(-8px)',
-          boxShadow: isMobile ? 2 : 6
+          boxShadow: isMobile ? 2 : 6,
+          '& .property-actions': {
+            opacity: 1
+          }
         },
         cursor: 'pointer',
         borderRadius: 2,
@@ -83,6 +105,7 @@ const PropertyCard = ({ property, compact = false }) => {
       onMouseLeave={() => setIsHovered(false)}
       elevation={0}
     >
+      {/* Featured Badge */}
       {property?.featured && (
         <Box
           sx={{
@@ -111,6 +134,63 @@ const PropertyCard = ({ property, compact = false }) => {
         </Box>
       )}
 
+      {/* Favorite Button */}
+      <Box
+        className="property-actions"
+        sx={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          zIndex: 1,
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.3s ease'
+        }}
+      >
+        <IconButton
+          onClick={handleFavoriteClick}
+          sx={{
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            '&:hover': {
+              backgroundColor: 'rgba(255,255,255,1)'
+            }
+          }}
+        >
+          {isFavorite ? (
+            <Favorite color="error" />
+          ) : (
+            <FavoriteBorder color="action" />
+          )}
+        </IconButton>
+      </Box>
+
+      {/* Status Badge */}
+      {property?.status && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 16,
+            left: 8,
+            zIndex: 1
+          }}
+        >
+          <Chip
+            label={property.status}
+            size="small"
+            color={
+              property.status === 'For Sale' ? 'primary' : 
+              property.status === 'For Rent' ? 'secondary' : 'default'
+            }
+            sx={{
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              fontSize: '0.6rem',
+              height: 20
+            }}
+          />
+        </Box>
+      )}
+
+      {/* Image Section */}
       <Box sx={{ 
         position: 'relative',
         overflow: 'hidden',
@@ -140,6 +220,7 @@ const PropertyCard = ({ property, compact = false }) => {
         }} />
       </Box>
       
+      {/* Content Section */}
       <CardContent sx={{ 
         flexGrow: 1,
         display: 'flex',
@@ -159,20 +240,20 @@ const PropertyCard = ({ property, compact = false }) => {
             }}
           />
           
-          <Chip
-            label={property?.status || 'N/A'}
-            color={
-              property?.status === 'For Sale' ? 'primary' : 
-              property?.status === 'For Rent' ? 'secondary' : 'default'
-            }
-            size="small"
-            variant="outlined"
-            sx={{ 
-              fontSize: compact ? '0.6rem' : '0.7rem',
-              height: compact ? 22 : 24,
-              fontWeight: 600
-            }}
-          />
+          <Box display="flex" alignItems="center">
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ 
+                fontSize: compact ? '0.7rem' : '0.8rem',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <SquareFoot fontSize="small" sx={{ mr: 0.5 }} />
+              {property?.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
+            </Typography>
+          </Box>
         </Box>
 
         <Typography 
@@ -246,21 +327,6 @@ const PropertyCard = ({ property, compact = false }) => {
               </Typography>
             </Box>
           </Tooltip>
-
-          <Tooltip title="Area" arrow>
-            <Box display="flex" alignItems="center">
-              <SquareFoot fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontSize: compact ? '0.7rem' : '0.8rem',
-                  color: 'text.secondary'
-                }}
-              >
-                {property?.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
-              </Typography>
-            </Box>
-          </Tooltip>
         </Box>
 
         <Typography 
@@ -274,6 +340,11 @@ const PropertyCard = ({ property, compact = false }) => {
           }}
         >
           {formatPrice(property?.price || 0)}
+          {property?.status === 'For Rent' && (
+            <Typography component="span" variant="caption" color="text.secondary">
+              /mo
+            </Typography>
+          )}
         </Typography>
       </CardContent>
     </Card>
