@@ -1,54 +1,67 @@
+
+const ErrorResponse = require('../utils/errorResponse');
+const asyncHandler = require('../middleware/async');
 const ContactRequest = require('../models/ContactRequest');
 const Property = require('../models/Property');
 const User = require('../models/User');
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const sendEmail = require('../utils/sendEmail');
 
 // @desc    Create contact request
-// @route   POST /api/v1/contacts
+// @route   POST /api/v1/properties/:propertyId/contact
 // @access  Private
 exports.createContactRequest = asyncHandler(async (req, res, next) => {
-  const { propertyId, message, contactMethod } = req.body;
-
-  // Get property
-  const property = await Property.findById(propertyId);
+  const property = await Property.findById(req.params.propertyId);
+  
   if (!property) {
-    return next(new ErrorResponse('Property not found', 404));
+    return next(
+      new ErrorResponse(`Property not found with id of ${req.params.propertyId}`, 404)
+    );
   }
 
-  // Get agent
-  const agent = await User.findById(property.agent);
-  if (!agent || agent.role !== 'agent') {
-    return next(new ErrorResponse('Agent not found', 404));
+  // Validate contact method
+  const validMethods = ['email', 'phone', 'whatsapp'];
+  if (!validMethods.includes(req.body.contactMethod)) {
+    return next(
+      new ErrorResponse(`Invalid contact method. Must be one of: ${validMethods.join(', ')}`, 400)
+    );
   }
+
+  // Set default message if not provided
+  const message = req.body.message || `Contact request via ${req.body.contactMethod}`;
 
   // Check for existing request
   const existingRequest = await ContactRequest.findOne({
-    property: propertyId,
-    user: req.user.id
+    property: property._id,
+    user: req.user.id,
+    isCurrent: true
   });
+
+  let contactRequest;
 
   if (existingRequest) {
-    return next(new ErrorResponse('You already have an active request for this property', 400));
+    // Create a new version
+    contactRequest = await ContactRequest.create({
+      property: property._id,
+      agent: property.agent,
+      user: req.user.id,
+      message: message,
+      contactMethod: req.body.contactMethod,
+      version: existingRequest.version + 1,
+      previousVersions: [...existingRequest.previousVersions, existingRequest._id]
+    });
+
+    // Mark the old one as not current
+    existingRequest.isCurrent = false;
+    await existingRequest.save();
+  } else {
+    // Create first request
+    contactRequest = await ContactRequest.create({
+      property: property._id,
+      agent: property.agent,
+      user: req.user.id,
+      message: message,
+      contactMethod: req.body.contactMethod
+    });
   }
-
-  // Create contact request
-  const contactRequest = await ContactRequest.create({
-    property: propertyId,
-    agent: agent._id,
-    user: req.user.id,
-    message,
-    contactMethod
-  });
-
-  // Send notification email to agent
-  const contactUrl = `${req.protocol}://${req.get('host')}/api/v1/contacts/${contactRequest._id}`;
-  await sendEmail({
-    email: agent.email,
-    subject: 'New Property Inquiry',
-    message: `You have a new inquiry for your property. View details: ${contactUrl}`
-  });
 
   res.status(201).json({
     success: true,
@@ -56,79 +69,67 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Get user's contact requests
-// @route   GET /api/v1/contacts/myrequests
-// @access  Private
-exports.getMyContactRequests = asyncHandler(async (req, res, next) => {
-  let query;
-  
-  if (req.user.role === 'agent') {
-    query = { agent: req.user.id };
-  } else {
-    query = { user: req.user.id };
+// @desc    Get contact requests for agent
+// @route   GET /api/v1/contacts
+// @access  Private/Agent
+exports.getAgentContactRequests = asyncHandler(async (req, res, next) => {
+  if (req.user.role !== 'agent') {
+    return next(
+      new ErrorResponse('Only agents can access contact requests', 403)
+    );
   }
 
-  const contactRequests = await ContactRequest.find(query)
-    .populate('property')
-    .populate('user')
-    .populate('agent');
+  const contacts = await ContactRequest.find({ 
+    agent: req.user.id,
+    isCurrent: true
+  })
+    .populate({
+      path: 'previousVersions',
+      select: 'message contactMethod status createdAt',
+      options: { sort: { createdAt: -1 } }
+    })
+    .populate('property', 'title price')
+    .populate('user', 'name email mobile')
+    .sort('-createdAt');
 
   res.status(200).json({
     success: true,
-    count: contactRequests.length,
-    data: contactRequests
-  });
-});
-
-// @desc    Get single contact request
-// @route   GET /api/v1/contacts/:id
-// @access  Private
-exports.getContactRequest = asyncHandler(async (req, res, next) => {
-  const contactRequest = await ContactRequest.findById(req.params.id)
-    .populate('property')
-    .populate('user')
-    .populate('agent');
-
-  if (!contactRequest) {
-    return next(new ErrorResponse('Contact request not found', 404));
-  }
-
-  // Check authorization
-  if (
-    req.user.role !== 'admin' && 
-    contactRequest.user._id.toString() !== req.user.id && 
-    contactRequest.agent._id.toString() !== req.user.id
-  ) {
-    return next(new ErrorResponse('Not authorized to access this request', 401));
-  }
-
-  res.status(200).json({
-    success: true,
-    data: contactRequest
+    count: contacts.length,
+    data: contacts
   });
 });
 
 // @desc    Update contact request status
 // @route   PUT /api/v1/contacts/:id
-// @access  Private
+// @access  Private/Agent
 exports.updateContactRequest = asyncHandler(async (req, res, next) => {
   let contactRequest = await ContactRequest.findById(req.params.id);
 
   if (!contactRequest) {
-    return next(new ErrorResponse('Contact request not found', 404));
+    return next(
+      new ErrorResponse(`Contact request not found with id of ${req.params.id}`, 404)
+    );
   }
 
-  // Check authorization
-  if (
-    req.user.role !== 'admin' && 
-    contactRequest.agent._id.toString() !== req.user.id
-  ) {
-    return next(new ErrorResponse('Not authorized to update this request', 401));
+  // Verify agent owns this contact request
+  if (contactRequest.agent.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(
+      new ErrorResponse('Not authorized to update this contact request', 401)
+    );
   }
 
-  // Update status
-  contactRequest.status = req.body.status || contactRequest.status;
-  contactRequest = await contactRequest.save();
+  contactRequest = await ContactRequest.findByIdAndUpdate(
+    req.params.id,
+    { status: req.body.status },
+    { new: true, runValidators: true }
+  )
+  .populate({
+    path: 'previousVersions',
+    select: 'message contactMethod status createdAt',
+    options: { sort: { createdAt: -1 } }
+  })
+  .populate('property', 'title price')
+  .populate('user', 'name email mobile');
 
   res.status(200).json({
     success: true,
@@ -136,22 +137,54 @@ exports.updateContactRequest = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Delete contact request
-// @route   DELETE /api/v1/contacts/:id
-// @access  Private
+// @desc    Get all contact requests (Admin)
+// @route   GET /api/v1/admin/contacts
+// @access  Private/Admin
+exports.getContactRequests = asyncHandler(async (req, res, next) => {
+  const contacts = await ContactRequest.find({
+    isCurrent: true
+  })
+    .populate({
+      path: 'previousVersions',
+      select: 'message contactMethod status createdAt',
+      options: { sort: { createdAt: -1 } }
+    })
+    .populate('property', 'title price')
+    .populate('agent', 'name email mobile')
+    .populate('user', 'name email mobile')
+    .sort('-createdAt');
+
+  res.status(200).json({
+    success: true,
+    count: contacts.length,
+    data: contacts
+  });
+});
+
+// @desc    Delete contact request (Admin)
+// @route   DELETE /api/v1/admin/contacts/:id
+// @access  Private/Admin
 exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
   const contactRequest = await ContactRequest.findById(req.params.id);
 
   if (!contactRequest) {
-    return next(new ErrorResponse('Contact request not found', 404));
+    return next(
+      new ErrorResponse(`Contact request not found with id of ${req.params.id}`, 404)
+    );
   }
 
-  // Check authorization
-  if (
-    req.user.role !== 'admin' && 
-    contactRequest.user._id.toString() !== req.user.id
-  ) {
-    return next(new ErrorResponse('Not authorized to delete this request', 401));
+  // If this is the current version, promote the most recent previous version
+  if (contactRequest.isCurrent && contactRequest.previousVersions.length > 0) {
+    const previousVersions = await ContactRequest.find({
+      _id: { $in: contactRequest.previousVersions }
+    }).sort({ createdAt: -1 });
+
+    if (previousVersions.length > 0) {
+      const newCurrent = previousVersions[0];
+      newCurrent.isCurrent = true;
+      newCurrent.previousVersions = previousVersions.slice(1).map(v => v._id);
+      await newCurrent.save();
+    }
   }
 
   await contactRequest.remove();
@@ -161,3 +194,5 @@ exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
     data: {}
   });
 });
+
+// @desc    Delete all contact requests (Admin)

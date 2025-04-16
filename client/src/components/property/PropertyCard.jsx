@@ -1,20 +1,15 @@
-import { Card, CardMedia, CardContent, Typography, Box, Chip, Tooltip, useMediaQuery, useTheme, Badge } from '@mui/material';
-import { LocationOn, KingBed, Bathtub, SquareFoot, Star, Favorite, FavoriteBorder } from '@mui/icons-material';
+import { Box, Typography, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '../../utils/format';
-import { useState, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import { PropertiesContext } from '../../context/PropertiesContext';
+import { useState } from 'react';
+import { useMediaQuery, useTheme } from '@mui/material';
 
-const PropertyCard = ({ property, compact = false }) => {
+const PropertyCard = ({ property }) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { user } = useContext(AuthContext);
-  const { toggleFavorite } = useContext(PropertiesContext);
-  const [isFavorite, setIsFavorite] = useState(property?.isFavorite || false);
 
   const getImageUrl = (img) => {
     try {
@@ -51,20 +46,6 @@ const PropertyCard = ({ property, compact = false }) => {
     }
   };
 
-  const handleFavoriteClick = async (e) => {
-    e.stopPropagation();
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    try {
-      await toggleFavorite(property._id);
-      setIsFavorite(!isFavorite);
-    } catch (err) {
-      console.error('Error toggling favorite:', err);
-    }
-  };
-
   const getAddressComponent = (component) => {
     if (!property?.address) return '';
     if (typeof property.address === 'string') return property.address;
@@ -76,278 +57,145 @@ const PropertyCard = ({ property, compact = false }) => {
   const locationText = city && state ? `${city}, ${state}` : city || state || 'Location not specified';
 
   return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'all 0.3s ease',
-        position: 'relative',
-        overflow: 'hidden',
-        '&:hover': {
-          transform: isMobile ? 'none' : 'translateY(-8px)',
-          boxShadow: isMobile ? 2 : 6,
-          '& .property-actions': {
-            opacity: 1
-          }
-        },
-        cursor: 'pointer',
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'divider',
-        ...(compact && {
-          '& .MuiCardContent-root': { p: 1 },
-          '& .MuiTypography-h6': { fontSize: '0.875rem' }
-        })
-      }}
-      onClick={handleCardClick}
+    <div
+      className="property-card"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      elevation={0}
-    >
-      {/* Featured Badge */}
-      {property?.featured && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 8,
-            left: 8,
-            zIndex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: theme.palette.primary.main,
-            color: 'white',
-            borderRadius: 1,
-            px: 1.2,
-            py: 0.5,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-          }}
-        >
-          <Star fontSize="small" sx={{ mr: 0.5 }} />
-          <Typography 
-            variant="caption" 
-            fontWeight="bold"
-            sx={{ fontSize: '0.6rem' }}
-          >
-            Featured
-          </Typography>
-        </Box>
-      )}
-
-      {/* Favorite Button */}
-      <Box
-        className="property-actions"
-        sx={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          zIndex: 1,
-          opacity: isHovered ? 1 : 0,
-          transition: 'opacity 0.3s ease'
-        }}
-      >
-        <IconButton
-          onClick={handleFavoriteClick}
-          sx={{
-            backgroundColor: 'rgba(255,255,255,0.9)',
-            '&:hover': {
-              backgroundColor: 'rgba(255,255,255,1)'
-            }
-          }}
-        >
-          {isFavorite ? (
-            <Favorite color="error" />
-          ) : (
-            <FavoriteBorder color="action" />
-          )}
-        </IconButton>
-      </Box>
-
-      {/* Status Badge */}
-      {property?.status && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 16,
-            left: 8,
-            zIndex: 1
-          }}
-        >
-          <Chip
-            label={property.status}
-            size="small"
-            color={
-              property.status === 'For Sale' ? 'primary' : 
-              property.status === 'For Rent' ? 'secondary' : 'default'
-            }
-            sx={{
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              fontSize: '0.6rem',
-              height: 20
-            }}
-          />
-        </Box>
-      )}
-
-      {/* Image Section */}
-      <Box sx={{ 
-        position: 'relative',
+      onClick={handleCardClick}
+      style={{
+        backgroundColor: '#0B1011',
+        borderRadius: '8px',
         overflow: 'hidden',
-        height: compact ? 120 : isMobile ? 180 : 220
+        border: '1px solid #333',
+        transition: 'all 0.3s ease',
+        height: 'auto',
+        cursor: 'pointer',
+        transform: isHovered ? 'translateY(-10px)' : 'translateY(0)',
+        boxShadow: isHovered ? '0 10px 20px rgba(0, 0, 0, 0.3)' : 'none',
+        borderColor: isHovered ? '#78CADC' : '#333'
+      }}
+    >
+      <div className="property-image-container" style={{ 
+        position: 'relative',
+        height: isMobile ? '180px' : '200px',
+        overflow: 'hidden'
       }}>
-        <CardMedia
-          component="img"
-          image={primaryImage}
-          alt={property?.title || 'Property image'}
+        <img 
+          src={primaryImage} 
+          alt={property?.title || 'Property image'} 
+          className="property-image" 
           onError={handleImageError}
-          sx={{ 
+          style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            transition: 'transform 0.5s ease',
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-            backgroundColor: imageError ? '#f0f0f0' : 'transparent',
+            transition: 'transform 0.6s ease',
+            transform: isHovered ? 'scale(1.05)' : 'scale(1)'
           }}
         />
-        <Box sx={{
+        <div className="property-image-overlay" style={{
           position: 'absolute',
-          bottom: 0,
+          top: 0,
           left: 0,
           right: 0,
-          height: '30%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)'
-        }} />
-      </Box>
-      
-      {/* Content Section */}
-      <CardContent sx={{ 
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        p: compact ? 1.5 : 2
-      }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Chip
-            label={property?.type || 'N/A'}
-            color="primary"
-            size="small"
-            sx={{ 
-              textTransform: 'capitalize',
-              fontSize: compact ? '0.6rem' : '0.7rem',
-              height: compact ? 22 : 24,
-              fontWeight: 600
-            }}
-          />
-          
-          <Box display="flex" alignItems="center">
-            <Typography 
-              variant="body2" 
-              color="text.secondary"
-              sx={{ 
-                fontSize: compact ? '0.7rem' : '0.8rem',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <SquareFoot fontSize="small" sx={{ mr: 0.5 }} />
-              {property?.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Typography 
-          variant={compact ? 'subtitle2' : 'subtitle1'} 
-          component="h3" 
-          gutterBottom 
-          sx={{ 
-            fontWeight: 700,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            minHeight: compact ? '2.5em' : '3em',
-            mb: compact ? 0.5 : 1,
-            color: 'text.primary'
-          }}
-        >
-          {property?.title || 'Untitled Property'}
-        </Typography>
-
-        <Tooltip title={locationText} arrow>
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
-            mb={compact ? 1 : 1.5} 
-            sx={{
+          bottom: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5))',
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div className="property-image-actions" style={{ display: 'flex', gap: '10px' }}>
+            <button className="image-action-btn" style={{
+              backgroundColor: 'rgba(120, 202, 220, 0.8)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
               display: 'flex',
               alignItems: 'center',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontSize: compact ? '0.7rem' : '0.8rem'
-            }}
-          >
-            <LocationOn fontSize="small" sx={{ mr: 0.5, color: 'primary.main' }} />
-            {locationText}
-          </Typography>
-        </Tooltip>
+              justifyContent: 'center',
+              color: '#08171A',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              transform: isHovered ? 'translateY(0)' : 'translateY(20px)',
+              opacity: isHovered ? 1 : 0
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 19c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"></path>
+                <path d="m21 21-4.3-4.3"></path>
+                <path d="M8 11h6"></path>
+                <path d="M11 8v6"></path>
+              </svg>
+            </button>
+            <button className="image-action-btn" style={{
+              backgroundColor: 'rgba(120, 202, 220, 0.8)',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#08171A',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              transform: isHovered ? 'translateY(0)' : 'translateY(20px)',
+              opacity: isHovered ? 1 : 0,
+              transitionDelay: '0.1s'
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <path d="m21 15-5-5L5 21"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
 
-        <Box display="flex" justifyContent="space-between" mt="auto" sx={{ 
-          gap: 1,
-          mb: compact ? 0.5 : 1.5
+      <div className="property-details" style={{ padding: '1rem' }}>
+        <div className="property-price" style={{ 
+          fontSize: '1.3rem',
+          fontWeight: 'bold',
+          color: '#78CADC',
+          marginBottom: '0.5rem'
         }}>
-          <Tooltip title="Bedrooms" arrow>
-            <Box display="flex" alignItems="center">
-              <KingBed fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontSize: compact ? '0.7rem' : '0.8rem',
-                  color: 'text.secondary'
-                }}
-              >
-                {property?.bedrooms || 'N/A'}
-              </Typography>
-            </Box>
-          </Tooltip>
-
-          <Tooltip title="Bathrooms" arrow>
-            <Box display="flex" alignItems="center">
-              <Bathtub fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontSize: compact ? '0.7rem' : '0.8rem',
-                  color: 'text.secondary'
-                }}
-              >
-                {property?.bathrooms || 'N/A'}
-              </Typography>
-            </Box>
-          </Tooltip>
-        </Box>
-
-        <Typography 
-          variant={compact ? 'subtitle2' : 'subtitle1'} 
-          color="primary" 
-          fontWeight="bold" 
-          textAlign="right"
-          sx={{ 
-            fontSize: compact ? '0.875rem' : '1rem',
-            mt: 'auto'
-          }}
-        >
           {formatPrice(property?.price || 0)}
-          {property?.status === 'For Rent' && (
-            <Typography component="span" variant="caption" color="text.secondary">
-              /mo
-            </Typography>
-          )}
-        </Typography>
-      </CardContent>
-    </Card>
+        </div>
+        <div className="property-specs" style={{ 
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '0.75rem',
+          color: '#ccc',
+          fontSize: '0.9rem'
+        }}>
+          <div className="property-spec">
+            {property?.area ? `${property.area.toLocaleString()} Sqft` : 'N/A'}
+          </div>
+          <div className="property-spec-divider" style={{ margin: '0 0.5rem', color: '#555' }}>|</div>
+          <div className="property-spec">
+            {property?.bedrooms || 'N/A'} Bed
+          </div>
+          <div className="property-spec-divider" style={{ margin: '0 0.5rem', color: '#555' }}>|</div>
+          <div className="property-spec">
+            {property?.bathrooms || 'N/A'} Bath
+          </div>
+        </div>
+        <Tooltip title={locationText} arrow>
+          <div className="property-location" style={{ 
+            fontSize: '0.9rem',
+            color: '#aaa',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}>
+            {locationText}
+          </div>
+        </Tooltip>
+      </div>
+    </div>
   );
 };
 

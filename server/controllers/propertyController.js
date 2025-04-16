@@ -1,3 +1,4 @@
+
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Property = require('../models/Property');
@@ -533,3 +534,4 @@ const uploadVideosToCloudinary = async (files) => {
   
   return videos;
 };
+

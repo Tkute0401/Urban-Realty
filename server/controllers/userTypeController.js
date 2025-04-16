@@ -102,3 +102,6 @@ exports.deleteUserType = asyncHandler(async (req, res, next) => {
     data: {}
   });
 });
+
+
+

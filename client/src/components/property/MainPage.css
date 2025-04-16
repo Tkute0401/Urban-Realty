@@ -1,0 +1,543 @@
+/* MainPage.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #08171A;
+  color: white;
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out forwards;
+}
+
+.fade-in-delay-1 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.2s;
+}
+
+.fade-in-delay-2 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.4s;
+}
+
+.fade-in-delay-3 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.6s;
+}
+
+.fade-in-delay-4 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.8s;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+/* Main Container */
+.main-container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  opacity: 0;
+}
+
+/* Navbar Styles */
+.Navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: #08171A;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  max-width: 500px;
+}
+
+.Navbar input[type="searchbar"] {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid #78CADC;
+  border-radius: 5px;
+  color: white;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.Navbar input[type="searchbar"]:focus {
+  box-shadow: 0 0 0 2px rgba(120, 202, 220, 0.3);
+}
+
+.Navbar input[type="searchbar"]::placeholder {
+  color: #78CADC;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #78CADC;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.search-button:hover {
+  transform: scale(1.1);
+}
+
+/* Button section */
+.NavbarBtn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1000;
+}
+
+.BuyRentToggle {
+  display: flex;
+}
+
+.BuyRentToggle button {
+  padding: 0.75rem 2rem;
+  border: 1px solid #78CADC;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+#BuyBtn {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+#RentBtn {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.bg-cyan-400 {
+  background-color: #78CADC;
+}
+
+.bg-black-400 {
+  background-color: #0B1011;
+}
+
+.text-black {
+  color: black;
+}
+
+.text-white {
+  color: white;
+}
+
+.OtherNavbarBtn {
+  display: flex;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1000;
+}
+
+.OtherNavbarBtn button {
+  background-color: #0B1011;
+  border: 1px solid #78CADC;
+  border-radius: 4px;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.btn-animate:hover {
+  border-color: #78CADC;
+  box-shadow: 0 0 10px rgba(120, 202, 220, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Breadcrumb navigation */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 0.9rem;
+}
+
+.breadcrumb a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+  color: #78CADC;
+}
+
+.breadcrumb .separator {
+  color: #555;
+  margin: 0 4px;
+}
+
+/* Page title */
+.page-title {
+  padding: 0 2rem;
+  margin-bottom: 2rem;
+}
+
+.page-title h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.page-title h1 span {
+  color: #78CADC;
+  position: relative;
+}
+
+.page-title h1 span::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #78CADC;
+  transition: width 0.6s ease;
+}
+
+.fade-in-delay-2:hover h1 span::after {
+  width: 100%;
+}
+
+.listings-count {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+/* Filter tags */
+.filter-tags {
+  display: flex;
+  gap: 1rem;
+  padding: 0 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  background-color: #0B1011;
+  border: 1px solid #333;
+  border-radius: 50px;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.filter-tag:hover {
+  border-color: #78CADC;
+  transform: translateY(-2px);
+}
+
+.filter-label {
+  font-size: 0.9rem;
+}
+
+.filter-tag button {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.filter-tag button:hover {
+  transform: rotate(90deg);
+}
+
+/* Property Listings */
+.property-listings {
+  display: flex;
+  padding: 0 2rem;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.property-grid {
+  flex: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Property Card Styles */
+.property-card {
+  background-color: #0B1011;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+  height: auto;
+  cursor: pointer;
+}
+
+.property-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  border-color: #78CADC;
+}
+
+.property-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.property-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.property-card:hover .property-image {
+  transform: scale(1.05);
+}
+
+.property-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.property-card:hover .property-image-overlay {
+  opacity: 1;
+}
+
+.property-image-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.image-action-btn {
+  background-color: rgba(120, 202, 220, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #08171A;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.property-card:hover .image-action-btn {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.property-card:hover .image-action-btn:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+.property-card:hover .image-action-btn:nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+.image-action-btn:hover {
+  background-color: #78CADC;
+  transform: scale(1.1) translateY(0);
+}
+
+.property-details {
+  padding: 1rem;
+}
+
+.property-price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #78CADC;
+  margin-bottom: 0.5rem;
+}
+
+.property-specs {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.property-spec-divider {
+  margin: 0 0.5rem;
+  color: #555;
+}
+
+.property-location {
+  font-size: 0.9rem;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-container {
+  flex: 1;
+  min-height: 400px;
+}
+
+.map-placeholder {
+  background-color: #eee;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-weight: bold;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .property-listings {
+    flex-direction: column;
+  }
+  
+  .NavbarBtn {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .Navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-container {
+    max-width: 100%;
+  }
+  
+  .NavbarBtn {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .OtherNavbarBtn {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .OtherNavbarBtn button {
+    margin-top: 0.5rem;
+  }
+  
+  .property-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation for hover effects */
+@media (prefers-reduced-motion: no-preference) {
+  .btn-animate {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .property-card {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.4s ease, 
+                border-color 0.3s ease;
+  }
+  
+  .property-image {
+    transition: transform 0.8s cubic-bezier(0.215, 0.610, 0.355, 1);
+  }
+}
