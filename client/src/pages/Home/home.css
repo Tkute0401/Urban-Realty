@@ -1,0 +1,296 @@
+/* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic|Roboto+Slab:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic|Poppins:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic|Montserrat:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&display=auto');
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Elementor Animation Classes */
+.animated-slow {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.elementor-invisible {
+  opacity: 0;
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}
+
+.fadeInDown {
+  animation-name: fadeInDown;
+}
+
+.slideInLeft {
+  animation-name: slideInLeft;
+}
+
+.slideInRight {
+  animation-name: slideInRight;
+}
+
+.slideInUp {
+  animation-name: slideInUp;
+}
+
+/* Custom Components */
+.ff-her-banner {
+  backdrop-filter: blur(6px);
+}
+
+.ff-her-banner-new {
+  backdrop-filter: blur(6px);
+}
+
+/* Property Card Styles */
+.property-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.property-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.property-image {
+  aspect-ratio: 1;
+  object-fit: cover;
+  width: 100%;
+}
+
+.property-rating {
+  color: #ffc107;
+}
+
+.property-price {
+  color: #78cadc;
+  font-weight: bold;
+}
+
+/* Button Styles */
+.elementor-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.elementor-button-link {
+  text-decoration: none;
+}
+
+.elementor-button-sm {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+.elementor-button-icon {
+  margin-right: 8px;
+}
+
+.elementor-align-icon-right {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* Header Styles */
+.header-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+}
+
+.header-nav-item {
+  font-family: 'Lato', sans-serif;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.header-nav-item:hover {
+  color: #78cadc;
+}
+
+/* Search Section */
+.search-section {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* Hero Section */
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero-title span {
+  color: #78cadc;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .property-card {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .elementor-button {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+}
+
+/* Map Styles */
+.property-map {
+  height: 300px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Icon Styles */
+.elementor-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Transform Effects */
+.e-transform {
+  transition: transform 0.3s ease;
+}
+
+/* Custom Spacing */
+.ct-custom-spacing {
+  padding: 30px 0;
+}
+
+/* Text Alignment */
+.ct-align-center {
+  text-align: center;
+}
+
+/* Gallery Styles */
+.ct-gallery img {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* Breadcrumbs */
+.ct-breadcrumbs-shortcode {
+  margin-bottom: 2.5em;
+  --theme-text-color: rgba(255, 255, 255, 0.6);
+  --theme-link-initial-color: #fff;
+}
+
+/* Form Styles */
+.wpforms-submit-container button {
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 15px 50px;
+}
+
+/* Lazy Loading */
+.e-lazyloaded {
+  background-image: none !important;
+}
+
+/* Specific Elementor Widget Overrides */
+.elementor-widget-heading .elementor-heading-title {
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.elementor-widget-text-editor p:last-child {
+  margin-bottom: 0;
+}
+
+/* Animation Delays */
+[data-animation-delay="100"] {
+  animation-delay: 100ms;
+}
+
+[data-animation-delay="200"] {
+  animation-delay: 200ms;
+}
+
+[data-animation-delay="300"] {
+  animation-delay: 300ms;
+}
+
+[data-animation-delay="500"] {
+  animation-delay: 500ms;
+}

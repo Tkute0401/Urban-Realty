@@ -1,122 +1,78 @@
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { useThemeContext } from "../../context/ThemeContext";
-import { Box, Button, Container, Stack, Typography, useMediaQuery } from "@mui/material";
-import { urbanRealtyTheme } from "../../Theme/NewTheme";
-
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+// import StarIcon from "@heroicons/react/12/outline";
 const HeroSection = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const theme = useThemeContext();
-  const isMobile = useMediaQuery(urbanRealtyTheme.breakpoints.down('sm'));
-
+  const [searchText, setSearchText] = useState("");
+  
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        backgroundImage: `
-          linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-          url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')
-        `,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
-        height: { xs: '60vh', sm: '80vh' },
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        textAlign: 'center',
-      }}
-    >
-      <Container maxWidth="md" sx={{ 
-        position: 'relative',
-        zIndex: 2,
-        px: { xs: 2, sm: 3 }
-      }}>
-        <Typography 
-          align="center"
-          variant={isMobile ? 'h3' : 'h2'} 
-          component="h1" 
-          gutterBottom 
-          sx={{ 
-            fontWeight: 800,
-            mb: 3,
-            fontSize: { xs: '2rem', sm: '3rem', md: '3.5rem' },
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            lineHeight: 1.2
-          }}
+    <section className="pt-40 pb-32 bg-gray-900 relative">
+      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="max-w-7xl mx-auto px-8 relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
         >
-          Find Your Dream Home
-        </Typography>
-        <Typography 
-          align="center"
-          variant={isMobile ? 'h6' : 'h5'} 
-          sx={{ 
-            mb: 4,
-            fontSize: { xs: '1.1rem', sm: '1.5rem' },
-            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
-            maxWidth: '800px',
-            mx: 'auto'
-          }}
-        >
-          Discover the perfect property that matches your lifestyle and budget
-        </Typography>
-        
-        <Stack 
-          direction={{ xs: 'column', sm: 'row' }} 
-          spacing={2} 
-          justifyContent="center"
-          sx={{ mt: 3 }}
-        >
-          <Button 
-            variant="contained" 
-            size="large" 
-            onClick={() => navigate('/properties')}
-            sx={{ 
-              px: 4, 
-              py: 2,
-              width: { xs: '100%', sm: 'auto' },
-              fontSize: { xs: '1rem', sm: '1.1rem' },
-              fontWeight: 600,
-              backgroundColor: 'primary.main',
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-                transform: 'translateY(-2px)'
-              },
-              transition: 'all 0.3s ease'
-            }}
-          >
-            Browse Properties
-          </Button>
+          <h1 className="font-serif text-6xl leading-tight font-bold mb-2 text-white">
+            Find Your <br />Perfect <span className="text-sky-400">Spot.</span>
+          </h1>
           
-          {user?.role === 'agent' && (
-            <Button 
-              variant="outlined" 
-              size="large" 
-              onClick={() => navigate('/add-property')}
-              sx={{ 
-                px: 4, 
-                py: 2, 
-                color: 'red', 
-                borderColor: 'blue',
-                width: { xs: '100%', sm: 'auto' },
-                fontSize: { xs: '1rem', sm: '1.1rem' },
-                fontWeight: 600,
-                '&:hover': {
-                  backgroundColor: 'rgba(66, 157, 113, 0.1)',
-                  borderColor: 'yellow',
-                  transform: 'translateY(-2px)'
-                },
-                transition: 'all 0.3s ease'
-              }}
-            >
-              Add Property
-            </Button>
-          )}
-        </Stack>
-      </Container>
-    </Box>
+          <p className="text-gray-300 mb-8 max-w-xl mx-auto">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Ut elit tellus, luctus nec ullamcorper mattis, pulvinar
+            dapibus leo.
+          </p>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="relative max-w-2xl mx-auto"
+          >
+            <div className="relative flex items-center px-6 py-4 rounded-full bg-gray-800/80 backdrop-blur border border-gray-700">
+              <MagnifyingGlassIcon className="w-6 h-6 text-sky-400 mr-3" />
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="Didn't find what you're looking for? Try searching here..."
+                className="w-full bg-transparent outline-none text-white placeholder:text-gray-400"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="relative h-80 bg-gray-800 rounded-3xl overflow-hidden"
+        >
+          {/* Map implementation */}
+          <div className="absolute inset-0 bg-gray-700" />
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="absolute bottom-7 right-7 bg-black/70 backdrop-blur p-4 rounded-xl"
+          >
+            <div className="flex gap-1 mb-1">
+              {/* <StarIcon className="w-5 h-5 text-yellow-400 fill-yellow-400" /> */}
+              <span className="text-white text-2xl font-bold">4.9</span>
+            </div>
+            <span className="text-sm font-sans text-gray-300">FROM 6,900+ CUSTOMERS</span>
+          </motion.div>
+          
+          <div className="absolute bottom-7 left-7 text-white text-sm">
+            <p className="mb-1">EXPERIENCE THE PERFECT BLEND OF COMFORT AND</p>
+            <p>NATURE, CRAFTED FOR YOUR ULTIMATE ESCAPE.</p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 };
 
