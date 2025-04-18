@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import backgroundImage from "../../../../images/building_5.jpg";
+import backgroundImage from "../../../dist/assets/images/building_5.jpg";
 import mapImg from "../../../../images/building_2.jpg"
 import { UserIcon } from "@heroicons/react/24/outline";
 
