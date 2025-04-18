@@ -1,41 +1,88 @@
+// import { useState } from 'react';
+// import { BuildingOfficeIcon, UserIcon, MagnifyingGlassIcon, HeartIcon, HomeIcon, MapPinIcon, StarIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+// import { motion, useInView } from "framer-motion";
+
+// // BlurHeader Component
+// const BlurHeader = () => {
+//   const navigation = ['CITY', 'PROPERTY', 'SERVICES', 'CONTACT US'];
+  
+//   return (
+//     <motion.header
+//       initial={{ opacity: 0, y: -20 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.8 }}
+//       className="fixed top-0 w-full h-20 bg-black/80 backdrop-blur-md z-50"
+//     >
+//       <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-between">
+//         <div className="flex items-center gap-3">
+//           <BuildingOfficeIcon className="w-8 h-8 text-sky-400" />
+//           <span className="font-serif text-2xl font-bold text-white">UR 360</span>
+//         </div>
+
+//         <nav className="hidden lg:flex gap-10">
+//           {navigation.map((item) => (
+//             <a
+//               key={item}
+//               className="font-sans text-lg font-medium text-white hover:text-sky-400 transition-colors duration-200 cursor-pointer"
+//             >
+//               {item}
+//             </a>
+//           ))}
+//         </nav>
+
+//         <button className="flex items-center gap-2 px-4 py-2.5 border border-sky-400 rounded-lg text-white hover:bg-sky-400/20 transition-colors">
+//           <UserIcon className="w-5 h-5 text-white" />
+//           <span className="font-sans font-semibold">ACCOUNT</span>
+//         </button>
+//       </div>
+//     </motion.header>
+//   );
+// };
+
+// export default BlurHeader;
+
 import { useState } from 'react';
-import { BuildingOfficeIcon, UserIcon, MagnifyingGlassIcon, HeartIcon, HomeIcon, MapPinIcon, StarIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { motion, useInView } from "framer-motion";
+import { UserIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
 // BlurHeader Component
 const BlurHeader = () => {
   const navigation = ['CITY', 'PROPERTY', 'SERVICES', 'CONTACT US'];
   
   return (
-    <motion.header
+    <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="fixed top-0 w-full h-20 bg-black/80 backdrop-blur-md z-50"
+      className="fixed top-0 left-0 right-0 z-50 px-4 pt-4"
     >
-      <div className="max-w-7xl mx-auto px-8 h-full flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <BuildingOfficeIcon className="w-8 h-8 text-sky-400" />
-          <span className="font-serif text-2xl font-bold text-white">UR 360</span>
+      <div className="max-w-7xl mx-auto bg-black/70 backdrop-blur-md rounded-3xl border border-white/10">
+        <div className="px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 21H21M5 21V7L13 3V21M19 21V11L13 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className="font-serif text-2xl font-bold text-white">UR 360</span>
+          </div>
+
+          <nav className="hidden lg:flex gap-10">
+            {navigation.map((item) => (
+              <a
+                key={item}
+                className="font-sans text-lg font-medium text-white hover:text-sky-400 transition-colors duration-200 cursor-pointer"
+              >
+                {item}
+              </a>
+            ))}
+          </nav>
+
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors">
+            <UserIcon className="w-5 h-5 text-white" />
+            <span className="font-sans font-semibold">ACCOUNT</span>
+          </button>
         </div>
-
-        <nav className="hidden lg:flex gap-10">
-          {navigation.map((item) => (
-            <a
-              key={item}
-              className="font-sans text-lg font-medium text-white hover:text-sky-400 transition-colors duration-200 cursor-pointer"
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-
-        <button className="flex items-center gap-2 px-4 py-2.5 border border-sky-400 rounded-lg text-white hover:bg-sky-400/20 transition-colors">
-          <UserIcon className="w-5 h-5 text-white" />
-          <span className="font-sans font-semibold">ACCOUNT</span>
-        </button>
       </div>
-    </motion.header>
+    </motion.div>
   );
 };
 
