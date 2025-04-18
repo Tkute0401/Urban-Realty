@@ -19,11 +19,19 @@ export const PropertiesProvider = ({ children }) => {
       setProperties(cache[cacheKey]);
       return;
     }
-
+  
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/properties', { params });
+      
+      // Convert type parameter to backend expected format
+      const backendParams = { ...params };
+      if (params.type) {
+        backendParams.propertyType = params.type;
+        delete backendParams.type;
+      }
+      
+      const response = await axios.get('/properties', { params: backendParams });
       const data = response.data?.data ?? response.data;
       
       if (!Array.isArray(data)) {

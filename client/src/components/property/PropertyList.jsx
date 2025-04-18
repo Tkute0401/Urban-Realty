@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useProperties } from '../../context/PropertiesContext';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 
   Container, Pagination, Stack, useMediaQuery, useTheme
@@ -9,6 +10,7 @@ import { Add, Refresh } from '@mui/icons-material';
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
+  const [searchParams] = useSearchParams();
   const initialLoad = useRef(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -18,30 +20,66 @@ const PropertyList = () => {
   const [filters, setFilters] = useState({
     city: '',
     state: '',
-    price: ''
+    price: '',
+    type: ''
   });
   const [isLoaded, setIsLoaded] = useState(false);
   const itemsPerPage = 12;
 
   useEffect(() => {
-    if (initialLoad.current) {
-      getProperties();
-      initialLoad.current = false;
-      setIsLoaded(true);
+    const urlSearchTerm = searchParams.get('search');
+    const urlType = searchParams.get('type');
+    const urlStatus = searchParams.get('status');
+    
+    if (urlSearchTerm) {
+      setSearchTerm(urlSearchTerm);
     }
-  }, [getProperties]);
+    
+    if (urlType) {
+      const typeMap = {
+        'For Sale': 'BUY',
+        'For Rent': 'RENT',
+        'Land': 'LAND'
+      };
+      setActiveBtn(typeMap[urlType] || 'BUY');
+      setFilters(prev => ({ ...prev, type: urlType }));
+    }
+
+    if (urlStatus) {
+      setActiveBtn(urlStatus === 'For Rent' ? 'RENT' : 'BUY');
+    }
+
+    const fetchParams = {};
+    if (urlSearchTerm) fetchParams.search = urlSearchTerm;
+    if (urlType) fetchParams.type = urlType;
+    if (urlStatus) fetchParams.status = urlStatus;
+    
+    getProperties(fetchParams);
+    setIsLoaded(true);
+  }, [searchParams, getProperties]);
 
   const removeFilter = (filterKey) => {
     const updatedFilters = { ...filters };
     delete updatedFilters[filterKey];
     setFilters(updatedFilters);
+    // You might want to refetch properties here without the filter
   };
 
-  const filteredProperties = properties?.filter(property => 
-    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.address?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.type.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredProperties = properties?.filter(property => {
+    if (searchTerm) {
+      const matchesSearch = 
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.address?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.address?.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.buildingName?.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!matchesSearch) return false;
+    }
+    
+    if (filters.type && property.type !== filters.type) return false;
+    
+    return true;
+  }) || [];
 
   const paginatedProperties = filteredProperties.slice(
     (page - 1) * itemsPerPage,
@@ -120,9 +158,6 @@ const PropertyList = () => {
       minHeight: '100vh',
       padding: isMobile ? '1rem' : '2rem'
     }}>
-      {/* NavBar is now handled by Header component */}
-      
-      {/* Breadcrumb */}
       <div className="breadcrumb fade-in-delay-1" style={{ 
         display: 'flex',
         alignItems: 'center',
@@ -137,7 +172,6 @@ const PropertyList = () => {
         <a href="#" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s ease' }}>PROPERTIES</a>
       </div>
 
-      {/* Page Title */}
       <div className="page-title fade-in-delay-2" style={{ 
         padding: '0 2rem',
         marginBottom: '2rem'
@@ -147,18 +181,14 @@ const PropertyList = () => {
           marginBottom: '0.5rem',
           fontWeight: 'bold'
         }}>
-          Luxury Properties for <span style={{ 
-            color: '#78CADC',
-            position: 'relative'
-          }}>Sale</span>
+          {activeBtn === 'RENT' ? 'Rental' : 'Luxury'} Properties {activeBtn === 'RENT' ? 'for Rent' : 'for Sale'}
         </h1>
         <div className="listings-count" style={{ fontSize: '1rem', color: '#ccc' }}>
           {filteredProperties.length} LISTINGS
         </div>
       </div>
 
-      {/* Filter Tags */}
-      {Object.keys(filters).length > 0 && (
+      {Object.keys(filters).filter(k => filters[k]).length > 0 && (
         <div className="filter-tags fade-in-delay-3" style={{ 
           display: 'flex',
           gap: '1rem',
@@ -203,7 +233,6 @@ const PropertyList = () => {
         </div>
       )}
 
-      {/* Property Listings */}
       <div className="property-listings fade-in-delay-4" style={{ 
         display: 'flex',
         padding: '0 2rem',
