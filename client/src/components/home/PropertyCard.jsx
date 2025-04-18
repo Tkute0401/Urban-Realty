@@ -4,7 +4,7 @@ import { HeartIcon, MapPinIcon, StarIcon, UserIcon } from "@heroicons/react/24/o
 import LocalHotelOutlinedIcon from '@mui/icons-material/LocalHotelOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
-import propImg from "../../../dist/assets/images/building_2.jpg"
+import propImg from "../../../dist/assets/building_2.jpg"
 
 const PropertyCard = ({ index }) => {
   return (
