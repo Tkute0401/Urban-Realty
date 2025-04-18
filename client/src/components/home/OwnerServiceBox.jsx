@@ -26,8 +26,8 @@
 // };
 
 
-// Owner Service Block
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+
 
 // Owner Service Block
 const OwnerServiceBlock = () => {
@@ -35,12 +35,13 @@ const OwnerServiceBlock = () => {
     <section className="py-16 bg-gray-900">
       <div className="max-w-7xl mx-auto px-8">
         <div className="mb-6">
-          <span className="text-gray-400 font-sans font-bold">ARE YOU AN OWNER?</span>
-          <h2 className="font-serif text-4xl font-bold text-white">
+          {/* Text alignment adjusted to match the design exactly */}
+          <span className="text-gray-400 font-sans font-bold block tracking-wide">ARE YOU AN OWNER?</span>
+          <h2 className="font-serif text-4xl font-bold text-white leading-tight">
             Sell or Rent <span className="text-sky-400">Your Property</span> Faster with
             <br />Urban Realty 360
           </h2>
-          <p className="font-sans text-gray-300 mt-2">
+          <p className="font-sans text-gray-300 mt-2 tracking-wide text-sm">
             SELL OR RENT YOUR RESIDENTIAL/COMMERCIAL PROPERTY.
           </p>
         </div>
