@@ -33,7 +33,7 @@
 // export default ServiceBlock;
 
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import ServiceBlckImg from "../../../dist/assets/images/building_2.jpg";
+import ServiceBlckImg from "../../../dist/assets/building_2.jpg";
 
 // Service Block for Homes and Properties
 const ServiceBlock = ({ title, subtitle, buttonText, imageRight = false }) => {
