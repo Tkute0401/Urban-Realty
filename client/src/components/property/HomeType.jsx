@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './BedBath.css';
 
-const HomeType = () => {
+const HomeType = ({ onApply, currentType }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectAll, setSelectAll] = useState(true);
+  const [selectAll, setSelectAll] = useState(!currentType);
   const [selectedTypes, setSelectedTypes] = useState({
     houses: false,
     townhomes: false,
@@ -15,7 +15,19 @@ const HomeType = () => {
   });
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (currentType) {
+      const typeKey = currentType.toLowerCase().replace(/ /g, '');
+      if (typeKey in selectedTypes) {
+        setSelectedTypes({
+          ...selectedTypes,
+          [typeKey]: true
+        });
+        setSelectAll(false);
+      }
+    }
+  }, [currentType]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -43,6 +55,9 @@ const HomeType = () => {
     });
     
     setSelectedTypes(updatedTypes);
+    if (newState) {
+      onApply('');
+    }
   };
 
   const handleTypeChange = (type) => {
@@ -53,12 +68,22 @@ const HomeType = () => {
     
     setSelectedTypes(updatedTypes);
     setSelectAll(Object.values(updatedTypes).every(value => !value));
+    
+    // Convert the type to a display format
+    const displayType = type === 'condos' ? 'Condos/Co-ops' : 
+                       type === 'townhomes' ? 'Townhomes' :
+                       type === 'multifamily' ? 'Multi-family' :
+                       type === 'manufactured' ? 'Manufactured' :
+                       type.charAt(0).toUpperCase() + type.slice(1);
+    
+    if (updatedTypes[type]) {
+      onApply(displayType);
+    } else {
+      onApply('');
+    }
   };
 
-  const handleApply = () => {
-    // Here you would handle applying the filter
-    setIsOpen(false);
-  };
+  const hasActiveFilter = currentType && currentType !== '';
 
   return (
     <div className="filter-dropdown" ref={dropdownRef}>
@@ -67,6 +92,9 @@ const HomeType = () => {
         onClick={toggleDropdown}
       >
         Home Type {isOpen ? '▲' : '▼'}
+        {hasActiveFilter && (
+          <span style={{ marginLeft: '4px', color: '#78CADC' }}>•</span>
+        )}
       </button>
       
       {isOpen && (
@@ -84,80 +112,26 @@ const HomeType = () => {
               <label htmlFor="selectAll">Select All</label>
             </div>
             
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="houses" 
-                checked={selectedTypes.houses}
-                onChange={() => handleTypeChange('houses')}
-              />
-              <label htmlFor="houses">Houses</label>
-            </div>
-            
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="townhomes" 
-                checked={selectedTypes.townhomes}
-                onChange={() => handleTypeChange('townhomes')}
-              />
-              <label htmlFor="townhomes">Townhomes</label>
-            </div>
-            
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="multifamily" 
-                checked={selectedTypes.multifamily}
-                onChange={() => handleTypeChange('multifamily')}
-              />
-              <label htmlFor="multifamily">Multi-family</label>
-            </div>
-            
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="condos" 
-                checked={selectedTypes.condos}
-                onChange={() => handleTypeChange('condos')}
-              />
-              <label htmlFor="condos">Condos/Co-ops</label>
-            </div>
-            
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="lots" 
-                checked={selectedTypes.lots}
-                onChange={() => handleTypeChange('lots')}
-              />
-              <label htmlFor="lots">Lots/Land</label>
-            </div>
-            
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="apartments" 
-                checked={selectedTypes.apartments}
-                onChange={() => handleTypeChange('apartments')}
-              />
-              <label htmlFor="apartments">Apartments</label>
-            </div>
-            
-            <div className="type-option">
-              <input 
-                type="checkbox" 
-                id="manufactured" 
-                checked={selectedTypes.manufactured}
-                onChange={() => handleTypeChange('manufactured')}
-              />
-              <label htmlFor="manufactured">Manufactured</label>
-            </div>
+            {Object.entries({
+              houses: 'Houses',
+              townhomes: 'Townhomes',
+              multifamily: 'Multi-family',
+              condos: 'Condos/Co-ops',
+              lots: 'Lots/Land',
+              apartments: 'Apartments',
+              manufactured: 'Manufactured'
+            }).map(([key, label]) => (
+              <div key={key} className="type-option">
+                <input 
+                  type="checkbox" 
+                  id={key} 
+                  checked={selectedTypes[key]}
+                  onChange={() => handleTypeChange(key)}
+                />
+                <label htmlFor={key}>{label}</label>
+              </div>
+            ))}
           </div>
-          
-          <button className="apply-filter-btn" onClick={handleApply}>
-            Apply
-          </button>
         </div>
       )}
     </div>

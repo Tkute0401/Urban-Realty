@@ -1,12 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './PriceDropdown.css';
 
-const PriceDropdown = ({ activeBtn = 'BUY' }) => {
+const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin, currentMax }) => {
   const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('List Price');
+  const [activeTab, setActiveTab] = useState(activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment');
+  const [minPrice, setMinPrice] = useState(currentMin || '');
+  const [maxPrice, setMaxPrice] = useState(currentMax || '');
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  useEffect(() => {
+    setActiveTab(activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment');
+  }, [activeBtn]);
+
+  useEffect(() => {
+    if (currentMin) setMinPrice(currentMin);
+    if (currentMax) setMaxPrice(currentMax);
+  }, [currentMin, currentMax]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -24,35 +34,63 @@ const PriceDropdown = ({ activeBtn = 'BUY' }) => {
     setIsPriceOpen(!isPriceOpen);
   };
 
-  // Reset tab when switching between Buy and Rent
-  useEffect(() => {
-    setActiveTab(activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment');
-  }, [activeBtn]);
+  const handleApply = () => {
+    onApply(minPrice, maxPrice);
+    setIsPriceOpen(false);
+  };
+
+  const hasActiveFilter = minPrice || maxPrice;
+
+  const priceOptions = activeBtn === 'BUY' ? {
+    min: [
+      { value: '', label: 'No Min' },
+      { value: '1000000', label: '₹10 Lac' },
+      { value: '2000000', label: '₹20 Lac' },
+      { value: '3000000', label: '₹30 Lac' },
+      { value: '4000000', label: '₹40 Lac' },
+      { value: '5000000', label: '₹50 Lac' }
+    ],
+    max: [
+      { value: '', label: 'No Max' },
+      { value: '5000000', label: '₹50 Lac' },
+      { value: '7500000', label: '₹75 Lac' },
+      { value: '10000000', label: '₹1 Cr' },
+      { value: '15000000', label: '₹1.5 Cr' },
+      { value: '20000000', label: '₹2 Cr' }
+    ]
+  } : {
+    min: [
+      { value: '', label: 'No Min' },
+      { value: '5000', label: '₹5,000' },
+      { value: '10000', label: '₹10,000' },
+      { value: '15000', label: '₹15,000' },
+      { value: '20000', label: '₹20,000' },
+      { value: '25000', label: '₹25,000' }
+    ],
+    max: [
+      { value: '', label: 'No Max' },
+      { value: '30000', label: '₹30,000' },
+      { value: '50000', label: '₹50,000' },
+      { value: '75000', label: '₹75,000' },
+      { value: '100000', label: '₹1,00,000' },
+      { value: '150000', label: '₹1,50,000' }
+    ]
+  };
 
   return (
     <div className="price-filter-dropdown" ref={dropdownRef}>
       <button 
-        id="PriceBtn" 
-        className={`btn-animate ${isPriceOpen ? 'active-dropdown' : ''}`}
+        className={`filter-btn ${isPriceOpen ? 'active-dropdown' : ''}`}
         onClick={togglePriceDropdown}
-        style={{
-          padding: '10px 15px',
-          backgroundColor: '#0B1011',
-          color: 'white',
-          border: '1px solid #78CADC',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-        }}
       >
-        PRICE {isPriceOpen ? '▲' : '▼'}
+        Price {isPriceOpen ? '▲' : '▼'}
+        {hasActiveFilter && (
+          <span style={{ marginLeft: '4px', color: '#78CADC' }}>•</span>
+        )}
       </button>
       
       {isPriceOpen && (
-        <div className="price-dropdown-content fade-in">
+        <div className="dropdown-content fade-in">
           <h3 className="dropdown-title">Price Range</h3>
           
           {activeBtn === 'BUY' && (
@@ -76,25 +114,16 @@ const PriceDropdown = ({ activeBtn = 'BUY' }) => {
             <div className="price-field">
               <label>Minimum</label>
               <div className="select-wrapper">
-                <select className="price-select">
-                  <option>No Min</option>
-                  {activeBtn === 'BUY' ? (
-                    <>
-                      <option>₹10 Lac</option>
-                      <option>₹20 Lac</option>
-                      <option>₹30 Lac</option>
-                      <option>₹40 Lac</option>
-                      <option>₹50 Lac</option>
-                    </>
-                  ) : (
-                    <>
-                      <option>₹5,000</option>
-                      <option>₹10,000</option>
-                      <option>₹15,000</option>
-                      <option>₹20,000</option>
-                      <option>₹25,000</option>
-                    </>
-                  )}
+                <select 
+                  className="price-select"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                >
+                  {priceOptions.min.map(option => (
+                    <option key={`min-${option.value}`} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -104,31 +133,24 @@ const PriceDropdown = ({ activeBtn = 'BUY' }) => {
             <div className="price-field">
               <label>Maximum</label>
               <div className="select-wrapper">
-                <select className="price-select">
-                  <option>No Max</option>
-                  {activeBtn === 'BUY' ? (
-                    <>
-                      <option>₹50 Lac</option>
-                      <option>₹75 Lac</option>
-                      <option>₹1 Cr</option>
-                      <option>₹1.5 Cr</option>
-                      <option>₹2 Cr</option>
-                    </>
-                  ) : (
-                    <>
-                      <option>₹30,000</option>
-                      <option>₹50,000</option>
-                      <option>₹75,000</option>
-                      <option>₹1,00,000</option>
-                      <option>₹1,50,000</option>
-                    </>
-                  )}
+                <select 
+                  className="price-select"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                >
+                  {priceOptions.max.map(option => (
+                    <option key={`max-${option.value}`} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
           </div>
           
-          <button className="apply-btn">Apply</button>
+          <button className="apply-filter-btn" onClick={handleApply}>
+            Apply
+          </button>
         </div>
       )}
     </div>

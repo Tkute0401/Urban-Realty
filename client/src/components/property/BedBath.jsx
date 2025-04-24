@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './BedBath.css';
 
-const BedBath = () => {
+const BedBath = ({ onApply, currentBedrooms, currentBathrooms }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [bedrooms, setBedrooms] = useState('Any');
-  const [bathrooms, setBathrooms] = useState('Any');
+  const [bedrooms, setBedrooms] = useState(currentBedrooms || 'Any');
+  const [bathrooms, setBathrooms] = useState(currentBathrooms || 'Any');
   const [exactMatch, setExactMatch] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (currentBedrooms) setBedrooms(currentBedrooms);
+    if (currentBathrooms) setBathrooms(currentBathrooms);
+  }, [currentBedrooms, currentBathrooms]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -22,7 +26,6 @@ const BedBath = () => {
     };
   }, []);
 
-  // Add viewport edge detection
   useEffect(() => {
     if (isOpen && dropdownRef.current) {
       const dropdown = dropdownRef.current;
@@ -31,7 +34,6 @@ const BedBath = () => {
         const rect = dropdownContent.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         
-        // Check if dropdown goes off right edge
         if (rect.right > viewportWidth) {
           dropdownContent.style.left = 'auto';
           dropdownContent.style.right = '0';
@@ -45,9 +47,11 @@ const BedBath = () => {
   };
 
   const handleApply = () => {
-    // Here you would handle applying the filter
+    onApply(bedrooms, bathrooms);
     setIsOpen(false);
   };
+
+  const hasActiveFilters = bedrooms !== 'Any' || bathrooms !== 'Any';
 
   return (
     <div className="filter-dropdown" ref={dropdownRef}>
@@ -56,6 +60,9 @@ const BedBath = () => {
         onClick={toggleDropdown}
       >
         Beds & Baths {isOpen ? '▲' : '▼'}
+        {hasActiveFilters && (
+          <span style={{ marginLeft: '4px', color: '#78CADC' }}>•</span>
+        )}
       </button>
       
       {isOpen && (
@@ -64,42 +71,15 @@ const BedBath = () => {
           
           <div className="bedrooms-section">
             <div className="bedrooms-options">
-              <button 
-                className={`option-btn ${bedrooms === 'Any' ? 'active-option' : ''}`}
-                onClick={() => setBedrooms('Any')}
-              >
-                Any
-              </button>
-              <button 
-                className={`option-btn ${bedrooms === '1+' ? 'active-option' : ''}`}
-                onClick={() => setBedrooms('1+')}
-              >
-                1+
-              </button>
-              <button 
-                className={`option-btn ${bedrooms === '2+' ? 'active-option' : ''}`}
-                onClick={() => setBedrooms('2+')}
-              >
-                2+
-              </button>
-              <button 
-                className={`option-btn ${bedrooms === '3+' ? 'active-option' : ''}`}
-                onClick={() => setBedrooms('3+')}
-              >
-                3+
-              </button>
-              <button 
-                className={`option-btn ${bedrooms === '4+' ? 'active-option' : ''}`}
-                onClick={() => setBedrooms('4+')}
-              >
-                4+
-              </button>
-              <button 
-                className={`option-btn ${bedrooms === '5+' ? 'active-option' : ''}`}
-                onClick={() => setBedrooms('5+')}
-              >
-                5+
-              </button>
+              {['Any', '1+', '2+', '3+', '4+', '5+'].map(option => (
+                <button 
+                  key={`bed-${option}`}
+                  className={`option-btn ${bedrooms === option ? 'active-option' : ''}`}
+                  onClick={() => setBedrooms(option)}
+                >
+                  {option}
+                </button>
+              ))}
             </div>
             
             <div className="exact-match">
@@ -116,42 +96,15 @@ const BedBath = () => {
           <h3 className="dropdown-subtitle">Number of Bathrooms</h3>
           
           <div className="bathrooms-options">
-            <button 
-              className={`option-btn ${bathrooms === 'Any' ? 'active-option' : ''}`}
-              onClick={() => setBathrooms('Any')}
-            >
-              Any
-            </button>
-            <button 
-              className={`option-btn ${bathrooms === '1+' ? 'active-option' : ''}`}
-              onClick={() => setBathrooms('1+')}
-            >
-              1+
-            </button>
-            <button 
-              className={`option-btn ${bathrooms === '1.5+' ? 'active-option' : ''}`}
-              onClick={() => setBathrooms('1.5+')}
-            >
-              1.5+
-            </button>
-            <button 
-              className={`option-btn ${bathrooms === '2+' ? 'active-option' : ''}`}
-              onClick={() => setBathrooms('2+')}
-            >
-              2+
-            </button>
-            <button 
-              className={`option-btn ${bathrooms === '3+' ? 'active-option' : ''}`}
-              onClick={() => setBathrooms('3+')}
-            >
-              3+
-            </button>
-            <button 
-              className={`option-btn ${bathrooms === '4+' ? 'active-option' : ''}`}
-              onClick={() => setBathrooms('4+')}
-            >
-              4+
-            </button>
+            {['Any', '1+', '1.5+', '2+', '3+', '4+'].map(option => (
+              <button 
+                key={`bath-${option}`}
+                className={`option-btn ${bathrooms === option ? 'active-option' : ''}`}
+                onClick={() => setBathrooms(option)}
+              >
+                {option}
+              </button>
+            ))}
           </div>
           
           <button className="apply-filter-btn" onClick={handleApply}>
