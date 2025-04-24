@@ -13,12 +13,12 @@ const ServiceBlock = ({
 
   const handleClick = () => {
     const typeMap = {
-      'BUY A HOME': 'For Sale',
-      'RENT A HOME': 'For Rent',
+      'BUY A HOME': 'BUY',
+      'RENT A HOME': 'RENT',
       'BUY PLOTS/LAND': 'Land'
     };
     
-    navigate(`/properties?type=${typeMap[title] || 'House'}`);
+    navigate(`/properties?propertyType=${typeMap[title] || 'House'}`);
   };
 
   return (
