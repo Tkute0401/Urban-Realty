@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const Profile = () => {
   const { user, logout } = useAuth();
+  console.log(user);
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, p: 3 }}>
