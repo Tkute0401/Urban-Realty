@@ -7,9 +7,9 @@ import {
   Box, TextField, Button, Grid, MenuItem, Chip, Typography, Paper,
   CircularProgress, Alert, FormControlLabel, Checkbox, Container,
   FormHelperText, InputAdornment, IconButton, Autocomplete, Avatar,
-  FormLabel
+  FormLabel, Snackbar
 } from '@mui/material';
-import { CloudUpload, Delete, Star } from '@mui/icons-material';
+import { CloudUpload, Delete, Star, Close } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 const AddPropertyPage = () => {
@@ -49,6 +49,8 @@ const AddPropertyPage = () => {
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const fileInputRef = useRef(null);
 
   const propertyTypes = ['House', 'Apartment', 'Villa', 'Condo', 'Townhouse', 'Land', 'Commercial'];
@@ -59,12 +61,18 @@ const AddPropertyPage = () => {
     'Pet Friendly', 'Elevator', 'Laundry', 'Storage'
   ];
 
-  // Fetch agents when component mounts (for admin users)
   useEffect(() => {
     if (user?.role === 'admin') {
       getAgents();
     }
   }, [user, getAgents]);
+
+  useEffect(() => {
+    if (error) {
+      setSnackbarMessage(error);
+      setSnackbarOpen(true);
+    }
+  }, [error]);
 
   const validateForm = () => {
     const errors = {};
@@ -81,6 +89,7 @@ const AddPropertyPage = () => {
     if (!formData.address.city.trim()) errors.city = 'City is required';
     if (!formData.address.state.trim()) errors.state = 'State is required';
     if (!formData.address.zipCode.trim()) errors.zipCode = 'Zip code is required';
+    if (!formData.address.country.trim()) errors.country = 'Country is required';
     
     // Image validation
     if (imagePreviews.length === 0) errors.images = 'At least one image is required';
@@ -103,28 +112,31 @@ const AddPropertyPage = () => {
       const formDataToSend = new FormData();
       
       // Append all form fields
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'address') {
-          // Ensure all required address fields are included
-          const completeAddress = {
-            line1: value.line1 || '',
-            street: value.street || '',
-            city: value.city || '',
-            state: value.state || '',
-            zipCode: value.zipCode || '',
-            country: value.country || 'India'
-          };
-          formDataToSend.append('address', JSON.stringify(completeAddress));
-        } else if (key === 'amenities') {
-          value.forEach(amenity => formDataToSend.append('amenities[]', amenity));
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, value);
-        }
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('type', formData.type);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('bedrooms', formData.bedrooms);
+      formDataToSend.append('bathrooms', formData.bathrooms);
+      formDataToSend.append('area', formData.area);
+      formDataToSend.append('buildingName', formData.buildingName);
+      formDataToSend.append('floorNumber', formData.floorNumber);
+      formDataToSend.append('featured', formData.featured);
+      
+      // Append address
+      formDataToSend.append('address', JSON.stringify(formData.address));
+      
+      // Append amenities
+      formData.amenities.forEach(amenity => {
+        formDataToSend.append('amenities[]', amenity);
       });
 
       // If admin is creating, add the selected agent
       if (user?.role === 'admin' && selectedAgent) {
         formDataToSend.append('agent', selectedAgent._id);
+      } else {
+        formDataToSend.append('agent', user.id);
       }
 
       // Append images
@@ -146,9 +158,13 @@ const AddPropertyPage = () => {
       };
 
       await createProperty(formDataToSend, config);
-      navigate('/properties');
+      setSnackbarMessage('Property created successfully!');
+      setSnackbarOpen(true);
+      setTimeout(() => navigate('/properties'), 1500);
     } catch (err) {
       console.error('Submission error:', err);
+      setSnackbarMessage(err.message || 'Failed to create property');
+      setSnackbarOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -214,6 +230,10 @@ const AddPropertyPage = () => {
     }
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
       <Box 
@@ -238,12 +258,6 @@ const AddPropertyPage = () => {
         >
           Add New Property
         </Typography>
-        
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={clearErrors}>
-            {typeof error === 'object' ? JSON.stringify(error) : error}
-          </Alert>
-        )}
 
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
           {/* Agent Selection (for admin only) */}
@@ -554,6 +568,8 @@ const AddPropertyPage = () => {
                     onChange={handleChange}
                     required
                     size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.country}
+                    helperText={formErrors.country}
                   />
                 </Grid>
               </Grid>
@@ -696,6 +712,23 @@ const AddPropertyPage = () => {
           </Grid>
         </Grid>
       </Box>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleSnackbarClose}
+          >
+            <Close fontSize="small" />
+          </IconButton>
+        }
+      />
     </Container>
   );
 };
