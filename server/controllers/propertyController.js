@@ -40,35 +40,59 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     ];
   }
 
+  // Status filtering - fix the issue with empty strings
+  if (req.query.status) {
+    // Ensure status is a valid value
+    const validStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
+    if (validStatuses.includes(req.query.status)) {
+      reqQuery.status = req.query.status;
+    } else {
+      return next(new ErrorResponse('Invalid status value', 400));
+    }
+  }
+
   // Price range filtering
-  if (req.query.price) {
-    const [min, max] = req.query.price.split('-');
-    reqQuery.price = { $gte: parseInt(min), $lte: parseInt(max) };
+  if (req.query.priceMin || req.query.priceMax) {
+    reqQuery.price = {};
+    if (req.query.priceMin) reqQuery.price.$gte = parseInt(req.query.priceMin);
+    if (req.query.priceMax) reqQuery.price.$lte = parseInt(req.query.priceMax);
   }
 
   // Property type filtering
-  if (req.query.type) {
-    reqQuery.type = { $in: req.query.type.split(',') };
-  }
-
-  // Status filtering
-  if (req.query.status) {
-    reqQuery.status = { $in: req.query.status.split(',') };
+  if (req.query.propertyType) {
+    reqQuery.type = req.query.propertyType;
   }
 
   // Bedrooms filtering
   if (req.query.bedrooms) {
-    reqQuery.bedrooms = parseInt(req.query.bedrooms);
+    if (req.query.bedrooms.endsWith('+')) {
+      const minBedrooms = parseInt(req.query.bedrooms);
+      reqQuery.bedrooms = { $gte: minBedrooms };
+    } else {
+      reqQuery.bedrooms = parseInt(req.query.bedrooms);
+    }
   }
 
   // Bathrooms filtering
   if (req.query.bathrooms) {
-    reqQuery.bathrooms = parseInt(req.query.bathrooms);
+    if (req.query.bathrooms.endsWith('+')) {
+      const minBathrooms = parseFloat(req.query.bathrooms);
+      reqQuery.bathrooms = { $gte: minBathrooms };
+    } else {
+      reqQuery.bathrooms = parseFloat(req.query.bathrooms);
+    }
   }
 
   // Amenities filtering
   if (req.query.amenities) {
-    reqQuery.amenities = { $all: req.query.amenities.split(',') };
+    reqQuery.amenities = { $all: Array.isArray(req.query.amenities) ? req.query.amenities : [req.query.amenities] };
+  }
+
+  // Area filtering
+  if (req.query.minArea || req.query.maxArea) {
+    reqQuery.area = {};
+    if (req.query.minArea) reqQuery.area.$gte = parseInt(req.query.minArea);
+    if (reqQuery.maxArea) reqQuery.area.$lte = parseInt(req.query.maxArea);
   }
 
   // Create query string
