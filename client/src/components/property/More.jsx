@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './BedBath.css';
 
-const More = () => {
+const More = ({ onApply, currentFilters = {}, amenityOptions }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('type');
+  const [activeSection, setActiveSection] = useState('amenities');
+  const [selectedFilters, setSelectedFilters] = useState({
+    amenities: currentFilters.amenities || [],
+    city: currentFilters.city || '',
+    state: currentFilters.state || '',
+    minArea: currentFilters.minArea || '',
+    maxArea: currentFilters.maxArea || ''
+  });
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -20,32 +26,42 @@ const More = () => {
     };
   }, []);
 
-  // Add viewport edge detection
-  useEffect(() => {
-    if (isOpen && dropdownRef.current) {
-      const dropdown = dropdownRef.current;
-      const dropdownContent = dropdown.querySelector('.dropdown-content');
-      if (dropdownContent) {
-        const rect = dropdownContent.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        
-        // Check if dropdown goes off right edge
-        if (rect.right > viewportWidth) {
-          dropdownContent.style.left = 'auto';
-          dropdownContent.style.right = '0';
-        }
-      }
-    }
-  }, [isOpen]);
-
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
+  const toggleAmenity = (amenity) => {
+    setSelectedFilters(prev => {
+      const newAmenities = prev.amenities.includes(amenity)
+        ? prev.amenities.filter(a => a !== amenity)
+        : [...prev.amenities, amenity];
+      return { ...prev, amenities: newAmenities };
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const handleApply = () => {
-    // Here you would handle applying the filter
+    onApply({
+      amenities: selectedFilters.amenities,
+      city: selectedFilters.city,
+      state: selectedFilters.state,
+      minArea: selectedFilters.minArea,
+      maxArea: selectedFilters.maxArea
+    });
     setIsOpen(false);
   };
+
+  const hasSelectedFilters = selectedFilters.amenities.length > 0 || 
+    selectedFilters.city || 
+    selectedFilters.state ||
+    selectedFilters.minArea ||
+    selectedFilters.maxArea;
 
   return (
     <div className="filter-dropdown more-dropdown" ref={dropdownRef}>
@@ -54,106 +70,93 @@ const More = () => {
         onClick={toggleDropdown}
       >
         More {isOpen ? '▲' : '▼'}
+        {hasSelectedFilters && (
+          <span style={{ marginLeft: '4px', color: '#78CADC' }}>•</span>
+        )}
       </button>
       
       {isOpen && (
         <div className="dropdown-content more-content fade-in">
           <div className="more-sidebar">
-            <div 
-              className={`sidebar-item ${activeSection === 'type' ? 'active-sidebar' : ''}`}
-              onClick={() => setActiveSection('type')}
-            >
-              Type of property
-            </div>
-            <div 
-              className={`sidebar-item ${activeSection === 'construction' ? 'active-sidebar' : ''}`}
-              onClick={() => setActiveSection('construction')}
-            >
-              Construction Status
-            </div>
-            <div 
-              className={`sidebar-item ${activeSection === 'posted' ? 'active-sidebar' : ''}`}
-              onClick={() => setActiveSection('posted')}
-            >
-              Posted by
-            </div>
-            <div 
-              className={`sidebar-item ${activeSection === 'amenities' ? 'active-sidebar' : ''}`}
-              onClick={() => setActiveSection('amenities')}
-            >
-              Amenities
-            </div>
-            <div 
-              className={`sidebar-item ${activeSection === 'furnishing' ? 'active-sidebar' : ''}`}
-              onClick={() => setActiveSection('furnishing')}
-            >
-              Furnishing status
-            </div>
+            {[
+              { id: 'amenities', label: 'Amenities' },
+              { id: 'location', label: 'Location' },
+              { id: 'area', label: 'Area' }
+            ].map(({ id, label }) => (
+              <div 
+                key={id}
+                className={`sidebar-item ${activeSection === id ? 'active-sidebar' : ''}`}
+                onClick={() => setActiveSection(id)}
+              >
+                {label}
+              </div>
+            ))}
           </div>
           
           <div className="more-content-area">
-            {activeSection === 'type' && (
-              <div className="filter-section">
-                <h3 className="section-title">Type of property</h3>
-                <div className="tag-options">
-                  <button className="tag-option">+ Residential Apartment</button>
-                  <button className="tag-option">+ Residential Land</button>
-                  <button className="tag-option">+ Independent House/Villa</button>
-                  <button className="tag-option">+ Independent/Builder Floor</button>
-                  <button className="tag-option">+ Farm House</button>
-                  <button className="tag-option">+ 1 RK/ Studio Apartment</button>
-                </div>
-              </div>
-            )}
-            
-            {activeSection === 'construction' && (
-              <div className="filter-section">
-                <h3 className="section-title">Construction Status</h3>
-                <div className="tag-options">
-                  <button className="tag-option">+ New Launch</button>
-                  <button className="tag-option">+ Under Construction</button>
-                  <button className="tag-option">+ Ready to move</button>
-                </div>
-              </div>
-            )}
-            
-            {activeSection === 'posted' && (
-              <div className="filter-section">
-                <h3 className="section-title">Posted by</h3>
-                <div className="tag-options">
-                  <button className="tag-option">+ Owner</button>
-                  <button className="tag-option">+ Builder</button>
-                  <button className="tag-option">+ Dealer</button>
-                  <button className="tag-option">+ Feature Dealer</button>
-                </div>
-              </div>
-            )}
-            
             {activeSection === 'amenities' && (
               <div className="filter-section">
                 <h3 className="section-title">Amenities</h3>
                 <div className="tag-options">
-                  <button className="tag-option">+ Parking</button>
-                  <button className="tag-option">+ Park</button>
-                  <button className="tag-option">+ Power Backup</button>
-                  <button className="tag-option">+ Vaastu Compliant</button>
-                  <button className="tag-option">+ Gymnasium</button>
-                  <button className="tag-option">+ Club house</button>
-                  <button className="tag-option">+ Lift</button>
-                  <button className="tag-option">+ Swimming Pool</button>
-                  <button className="tag-option">+ Gas Pipeline</button>
-                  <button className="tag-option">+ Security Personnel</button>
+                  {amenityOptions.map(amenity => (
+                    <button 
+                      key={amenity}
+                      className={`tag-option ${selectedFilters.amenities.includes(amenity) ? 'selected' : ''}`}
+                      onClick={() => toggleAmenity(amenity)}
+                    >
+                      + {amenity}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
             
-            {activeSection === 'furnishing' && (
+            {activeSection === 'location' && (
               <div className="filter-section">
-                <h3 className="section-title">Furnishing status</h3>
-                <div className="tag-options">
-                  <button className="tag-option">+ Semifurnished</button>
-                  <button className="tag-option">+ Unfurnished</button>
-                  <button className="tag-option">+ Furnished</button>
+                <h3 className="section-title">Location</h3>
+                <div className="input-field">
+                  <label>City</label>
+                  <input
+                    type="text"
+                    value={selectedFilters.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                    placeholder="Enter city"
+                  />
+                </div>
+                <div className="input-field">
+                  <label>State</label>
+                  <input
+                    type="text"
+                    value={selectedFilters.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    placeholder="Enter state"
+                  />
+                </div>
+              </div>
+            )}
+            
+            {activeSection === 'area' && (
+              <div className="filter-section">
+                <h3 className="section-title">Area (sqft)</h3>
+                <div className="range-inputs">
+                  <div className="input-field">
+                    <label>Min Area</label>
+                    <input
+                      type="number"
+                      value={selectedFilters.minArea}
+                      onChange={(e) => handleInputChange('minArea', e.target.value)}
+                      placeholder="Min"
+                    />
+                  </div>
+                  <div className="input-field">
+                    <label>Max Area</label>
+                    <input
+                      type="number"
+                      value={selectedFilters.maxArea}
+                      onChange={(e) => handleInputChange('maxArea', e.target.value)}
+                      placeholder="Max"
+                    />
+                  </div>
                 </div>
               </div>
             )}

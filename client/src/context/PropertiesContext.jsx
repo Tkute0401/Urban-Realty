@@ -24,12 +24,30 @@ export const PropertiesProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      // Convert type parameter to backend expected format
+      // Convert parameters to backend expected format
       const backendParams = { ...params };
+      
+      // Handle status filter - ensure we don't send empty status
+      if (params.status) {
+        backendParams.status = params.status === 'BUY' ? 'For Sale' : 'For Rent';
+      } else {
+        // Remove status if empty to avoid sending empty string
+        delete backendParams.status;
+      }
+      
+      // Handle type filter
       if (params.type) {
         backendParams.propertyType = params.type;
         delete backendParams.type;
       }
+      
+      // Remove empty filters
+      Object.keys(backendParams).forEach(key => {
+        if (backendParams[key] === '' || 
+            (Array.isArray(backendParams[key]) && backendParams[key].length === 0)) {
+          delete backendParams[key];
+        }
+      });
       
       const response = await axios.get('/properties', { params: backendParams });
       const data = response.data?.data ?? response.data;
@@ -41,6 +59,12 @@ export const PropertiesProvider = ({ children }) => {
       setProperties(data);
       setCache(prev => ({ ...prev, [cacheKey]: data }));
     } catch (err) {
+      console.error('API Error:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        url: err.config?.url
+      });
       setError(err.response?.data?.message || err.message || 'Failed to fetch properties');
       setProperties([]);
     } finally {

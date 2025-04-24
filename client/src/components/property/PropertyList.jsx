@@ -3,69 +3,200 @@ import { useProperties } from '../../context/PropertiesContext';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 
-  Container, Pagination, Stack, useMediaQuery, useTheme
+  Container, Pagination, Stack, useMediaQuery, useTheme,
+  ToggleButtonGroup, ToggleButton
 } from '@mui/material';
 import PropertyCard from './PropertyCard';
 import { Add, Refresh } from '@mui/icons-material';
+import BedBath from './BedBath';
+import HomeType from './HomeType';
+import More from './More';
+import PriceDropdown from './PriceDropdown';
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialLoad = useRef(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeBtn, setActiveBtn] = useState('BUY');
+  const [propertyType, setPropertyType] = useState('ALL');
   const [filters, setFilters] = useState({
     city: '',
     state: '',
-    price: '',
-    type: ''
+    priceMin: '',
+    priceMax: '',
+    type: '',
+    bedrooms: '',
+    bathrooms: '',
+    amenities: [],
+    minArea: '',
+    maxArea: ''
   });
   const [isLoaded, setIsLoaded] = useState(false);
   const itemsPerPage = 12;
+
+  const amenityOptions = [
+    'Parking',
+    'Swimming Pool',
+    'Gym',
+    'Security',
+    'Garden',
+    'Balcony',
+    'WiFi',
+    'Air Conditioning',
+    'Furnished',
+    'Pet Friendly',
+    'Elevator',
+    'Laundry',
+    'Storage'
+  ];
 
   useEffect(() => {
     const urlSearchTerm = searchParams.get('search');
     const urlType = searchParams.get('type');
     const urlStatus = searchParams.get('status');
+    const urlCity = searchParams.get('city');
+    const urlState = searchParams.get('state');
+    const urlPriceMin = searchParams.get('priceMin');
+    const urlPriceMax = searchParams.get('priceMax');
+    const urlBedrooms = searchParams.get('bedrooms');
+    const urlBathrooms = searchParams.get('bathrooms');
+    const urlAmenities = searchParams.get('amenities');
+    const urlMinArea = searchParams.get('minArea');
+    const urlMaxArea = searchParams.get('maxArea');
+    const urlPropertyType = searchParams.get('propertyType');
     
-    if (urlSearchTerm) {
-      setSearchTerm(urlSearchTerm);
+    if (urlSearchTerm) setSearchTerm(urlSearchTerm);
+    
+    // Set property type from URL
+    if (urlPropertyType) {
+      setPropertyType(urlPropertyType);
     }
-    
+
     if (urlType) {
-      const typeMap = {
-        'For Sale': 'BUY',
-        'For Rent': 'RENT',
-        'Land': 'LAND'
-      };
-      setActiveBtn(typeMap[urlType] || 'BUY');
       setFilters(prev => ({ ...prev, type: urlType }));
     }
 
     if (urlStatus) {
-      setActiveBtn(urlStatus === 'For Rent' ? 'RENT' : 'BUY');
+      setFilters(prev => ({ ...prev, status: urlStatus }));
     }
 
-    const fetchParams = {};
-    if (urlSearchTerm) fetchParams.search = urlSearchTerm;
-    if (urlType) fetchParams.type = urlType;
-    if (urlStatus) fetchParams.status = urlStatus;
+    const newFilters = {};
+    if (urlCity) newFilters.city = urlCity;
+    if (urlState) newFilters.state = urlState;
+    if (urlPriceMin) newFilters.priceMin = urlPriceMin;
+    if (urlPriceMax) newFilters.priceMax = urlPriceMax;
+    if (urlBedrooms) newFilters.bedrooms = urlBedrooms;
+    if (urlBathrooms) newFilters.bathrooms = urlBathrooms;
+    if (urlAmenities) newFilters.amenities = urlAmenities.split(',');
+    if (urlMinArea) newFilters.minArea = urlMinArea;
+    if (urlMaxArea) newFilters.maxArea = urlMaxArea;
+
+    setFilters(prev => ({ ...prev, ...newFilters }));
+
+    const fetchParams = {
+      ...(urlSearchTerm && { search: urlSearchTerm }),
+      ...(urlType && { type: urlType }),
+      ...(urlStatus && { status: urlStatus }),
+      ...newFilters
+    };
     
     getProperties(fetchParams);
     setIsLoaded(true);
   }, [searchParams, getProperties]);
 
+  const handlePropertyTypeChange = (event, newType) => {
+    if (newType !== null) {
+      setPropertyType(newType);
+      // Update URL params
+      const params = new URLSearchParams(searchParams);
+      params.set('propertyType', newType);
+      setSearchParams(params);
+      
+      // Prepare filters for API call
+      const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Sale' : 'For Rent';
+      
+      // Create updated filters object
+      const updatedFilters = { ...filters };
+      if (statusFilter) {
+        updatedFilters.status = statusFilter;
+      } else {
+        delete updatedFilters.status;
+      }
+      
+      // Refresh properties with new filter
+      getProperties(updatedFilters);
+      setPage(1);
+    }
+  };
+
+  const handleFilterChange = (newFilters) => {
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+    
+    // Update URL params
+    const params = new URLSearchParams(searchParams);
+    if (searchTerm) params.set('search', searchTerm);
+    if (updatedFilters.type) params.set('type', updatedFilters.type);
+    if (updatedFilters.city) params.set('city', updatedFilters.city);
+    if (updatedFilters.state) params.set('state', updatedFilters.state);
+    if (updatedFilters.priceMin) params.set('priceMin', updatedFilters.priceMin);
+    if (updatedFilters.priceMax) params.set('priceMax', updatedFilters.priceMax);
+    if (updatedFilters.bedrooms) params.set('bedrooms', updatedFilters.bedrooms);
+    if (updatedFilters.bathrooms) params.set('bathrooms', updatedFilters.bathrooms);
+    if (updatedFilters.amenities?.length > 0) params.set('amenities', updatedFilters.amenities.join(','));
+    if (updatedFilters.minArea) params.set('minArea', updatedFilters.minArea);
+    if (updatedFilters.maxArea) params.set('maxArea', updatedFilters.maxArea);
+    
+    setSearchParams(params);
+    getProperties({
+      ...updatedFilters,
+      status: propertyType === 'ALL' ? '' : propertyType === 'BUY' ? 'For Sale' : 'For Rent'
+    });
+    setPage(1);
+  };
+
   const removeFilter = (filterKey) => {
     const updatedFilters = { ...filters };
-    delete updatedFilters[filterKey];
+    updatedFilters[filterKey] = filterKey === 'amenities' ? [] : '';
     setFilters(updatedFilters);
-    // You might want to refetch properties here without the filter
+    
+    // Update URL params
+    const params = new URLSearchParams(searchParams);
+    params.delete(filterKey);
+    setSearchParams(params);
+    
+    getProperties({
+      ...updatedFilters,
+      status: propertyType === 'ALL' ? '' : propertyType === 'BUY' ? 'For Sale' : 'For Rent'
+    });
+    setPage(1);
+  };
+
+  const handlePriceFilter = (min, max) => {
+    handleFilterChange({ priceMin: min, priceMax: max });
+  };
+
+  const handleBedBathFilter = (bedrooms, bathrooms) => {
+    handleFilterChange({ bedrooms, bathrooms });
+  };
+
+  const handleHomeTypeFilter = (type) => {
+    handleFilterChange({ type });
   };
 
   const filteredProperties = properties?.filter(property => {
+    // Property type filter
+    if (propertyType !== 'ALL') {
+      const statusMatch = propertyType === 'BUY' 
+        ? property.status === 'For Sale' 
+        : property.status === 'For Rent';
+      if (!statusMatch) return false;
+    }
+    
+    // Search term filter
     if (searchTerm) {
       const matchesSearch = 
         property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,7 +207,50 @@ const PropertyList = () => {
       if (!matchesSearch) return false;
     }
     
+    // Type filter
     if (filters.type && property.type !== filters.type) return false;
+    
+    // City filter
+    if (filters.city && property.address.city.toLowerCase() !== filters.city.toLowerCase()) return false;
+    
+    // State filter
+    if (filters.state && property.address.state.toLowerCase() !== filters.state.toLowerCase()) return false;
+    
+    // Price filter
+    if (filters.priceMin && property.price < parseInt(filters.priceMin)) return false;
+    if (filters.priceMax && property.price > parseInt(filters.priceMax)) return false;
+    
+    // Bedrooms filter
+    if (filters.bedrooms) {
+      if (filters.bedrooms.endsWith('+')) {
+        const minBedrooms = parseInt(filters.bedrooms);
+        if (property.bedrooms < minBedrooms) return false;
+      } else if (property.bedrooms !== parseInt(filters.bedrooms)) {
+        return false;
+      }
+    }
+    
+    // Bathrooms filter
+    if (filters.bathrooms) {
+      if (filters.bathrooms.endsWith('+')) {
+        const minBathrooms = parseFloat(filters.bathrooms);
+        if (property.bathrooms < minBathrooms) return false;
+      } else if (property.bathrooms !== parseFloat(filters.bathrooms)) {
+        return false;
+      }
+    }
+    
+    // Area filter
+    if (filters.minArea && property.area < parseInt(filters.minArea)) return false;
+    if (filters.maxArea && property.area > parseInt(filters.maxArea)) return false;
+    
+    // Amenities filter
+    if (filters.amenities?.length > 0) {
+      const hasAllAmenities = filters.amenities.every(amenity => 
+        property.amenities.includes(amenity)
+      );
+      if (!hasAllAmenities) return false;
+    }
     
     return true;
   }) || [];
@@ -167,8 +341,6 @@ const PropertyList = () => {
       }}>
         <a href="/" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s ease' }}>HOME</a>
         <span className="separator" style={{ color: '#555', margin: '0 4px' }}>&gt;</span>
-        <a href="#" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s ease' }}>{activeBtn}</a>
-        <span className="separator" style={{ color: '#555', margin: '0 4px' }}>&gt;</span>
         <a href="#" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s ease' }}>PROPERTIES</a>
       </div>
 
@@ -176,19 +348,88 @@ const PropertyList = () => {
         padding: '0 2rem',
         marginBottom: '2rem'
       }}>
-        <h1 style={{ 
-          fontSize: '2.5rem',
-          marginBottom: '0.5rem',
-          fontWeight: 'bold'
-        }}>
-          {activeBtn === 'RENT' ? 'Rental' : 'Luxury'} Properties {activeBtn === 'RENT' ? 'for Rent' : 'for Sale'}
-        </h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1 style={{ 
+            fontSize: '2.5rem',
+            marginBottom: '0.5rem',
+            fontWeight: 'bold'
+          }}>
+            {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
+            {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
+          </h1>
+          <ToggleButtonGroup
+            value={propertyType}
+            exclusive
+            onChange={handlePropertyTypeChange}
+            aria-label="property type"
+            sx={{
+              '& .MuiToggleButton-root': {
+                color: 'white',
+                borderColor: '#333',
+                '&.Mui-selected': {
+                  backgroundColor: '#78CADC',
+                  color: '#08171A',
+                  '&:hover': {
+                    backgroundColor: '#5cb3c5'
+                  }
+                },
+                '&:hover': {
+                  backgroundColor: '#1a2a30'
+                }
+              }
+            }}
+          >
+            <ToggleButton value="ALL" aria-label="all properties">
+              All
+            </ToggleButton>
+            <ToggleButton value="BUY" aria-label="buy properties">
+              Buy
+            </ToggleButton>
+            <ToggleButton value="RENT" aria-label="rent properties">
+              Rent
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </div>
         <div className="listings-count" style={{ fontSize: '1rem', color: '#ccc' }}>
           {filteredProperties.length} LISTINGS
         </div>
       </div>
 
-      {Object.keys(filters).filter(k => filters[k]).length > 0 && (
+      <div className="filter-bar" style={{
+        display: 'flex',
+        gap: '1rem',
+        padding: '0 2rem',
+        marginBottom: '2rem',
+        flexWrap: 'wrap'
+      }}>
+        <PriceDropdown 
+          activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
+          onApply={handlePriceFilter}
+          currentMin={filters.priceMin}
+          currentMax={filters.priceMax}
+        />
+        
+        <BedBath 
+          onApply={handleBedBathFilter}
+          currentBedrooms={filters.bedrooms}
+          currentBathrooms={filters.bathrooms}
+        />
+        
+        <HomeType 
+          onApply={handleHomeTypeFilter}
+          currentType={filters.type}
+        />
+        
+        <More 
+          onApply={(moreFilters) => handleFilterChange(moreFilters)}
+          currentFilters={filters}
+          amenityOptions={amenityOptions}
+        />
+      </div>
+
+      {Object.entries(filters).filter(([key, value]) => 
+        value && (Array.isArray(value) ? value.length > 0 : true))
+        .length > 0 && (
         <div className="filter-tags fade-in-delay-3" style={{ 
           display: 'flex',
           gap: '1rem',
@@ -196,8 +437,48 @@ const PropertyList = () => {
           marginBottom: '2rem',
           flexWrap: 'wrap'
         }}>
-          {Object.entries(filters).map(([key, value]) => (
-            value && (
+          {Object.entries(filters).map(([key, value]) => {
+            if (!value || (Array.isArray(value) && value.length === 0)) return null;
+            
+            if (Array.isArray(value)) {
+              return value.map(item => (
+                <div key={`${key}-${item}`} className="filter-tag" style={{ 
+                  backgroundColor: '#0B1011',
+                  border: '1px solid #333',
+                  borderRadius: '50px',
+                  padding: '0.5rem 1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <span className="filter-label" style={{ fontSize: '0.9rem' }}>
+                    {key.toUpperCase()}: {item}
+                  </span>
+                  <button onClick={() => {
+                    const updatedAmenities = filters.amenities.filter(a => a !== item);
+                    handleFilterChange({ amenities: updatedAmenities });
+                  }} style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0',
+                    transition: 'transform 0.2s ease'
+                  }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              ));
+            }
+            
+            return (
               <div key={key} className="filter-tag" style={{ 
                 backgroundColor: '#0B1011',
                 border: '1px solid #333',
@@ -228,8 +509,8 @@ const PropertyList = () => {
                   </svg>
                 </button>
               </div>
-            )
-          ))}
+            );
+          })}
         </div>
       )}
 
