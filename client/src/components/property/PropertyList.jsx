@@ -116,7 +116,7 @@ const PropertyList = () => {
       setSearchParams(params);
       
       // Prepare filters for API call
-      const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Sale' : 'For Rent';
+      const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Rent' : 'For Sale';
       
       // Create updated filters object
       const updatedFilters = { ...filters };
