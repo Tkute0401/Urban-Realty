@@ -25,7 +25,11 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('/admin/stats');
+        const response = await axios.get('/admin/stats', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         if (response.data.success) {
           setStats({
             counts: response.data.data.counts || {
