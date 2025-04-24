@@ -6,9 +6,10 @@ import { useAgents } from '../../context/AgentsContext';
 import { 
   Box, TextField, Button, Grid, MenuItem, Chip, Typography, Paper,
   CircularProgress, Alert, FormControlLabel, Checkbox, Container,
-  FormHelperText, InputAdornment, IconButton, Autocomplete, Avatar
+  FormHelperText, InputAdornment, IconButton, Autocomplete, Avatar,
+  FormLabel
 } from '@mui/material';
-import { CloudUpload, Delete } from '@mui/icons-material';
+import { CloudUpload, Delete, Star } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 const AddPropertyPage = () => {
@@ -42,6 +43,7 @@ const AddPropertyPage = () => {
     amenities: [],
   });
   
+  const [formErrors, setFormErrors] = useState({});
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [images, setImages] = useState([]);
@@ -51,7 +53,11 @@ const AddPropertyPage = () => {
 
   const propertyTypes = ['House', 'Apartment', 'Villa', 'Condo', 'Townhouse', 'Land', 'Commercial'];
   const propertyStatuses = ['For Sale', 'For Rent'];
-  const amenitiesList = ['Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony', 'WiFi', 'Air Conditioning'];
+  const amenitiesList = [
+    'Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 
+    'Balcony', 'WiFi', 'Air Conditioning', 'Furnished', 
+    'Pet Friendly', 'Elevator', 'Laundry', 'Storage'
+  ];
 
   // Fetch agents when component mounts (for admin users)
   useEffect(() => {
@@ -60,9 +66,37 @@ const AddPropertyPage = () => {
     }
   }, [user, getAgents]);
 
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.title.trim()) errors.title = 'Title is required';
+    if (!formData.description.trim()) errors.description = 'Description is required';
+    if (!formData.price) errors.price = 'Price is required';
+    if (!formData.bedrooms) errors.bedrooms = 'Bedrooms count is required';
+    if (!formData.bathrooms) errors.bathrooms = 'Bathrooms count is required';
+    if (!formData.area) errors.area = 'Area is required';
+    
+    // Address validation
+    if (!formData.address.street.trim()) errors.street = 'Street address is required';
+    if (!formData.address.city.trim()) errors.city = 'City is required';
+    if (!formData.address.state.trim()) errors.state = 'State is required';
+    if (!formData.address.zipCode.trim()) errors.zipCode = 'Zip code is required';
+    
+    // Image validation
+    if (imagePreviews.length === 0) errors.images = 'At least one image is required';
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearErrors();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -71,10 +105,19 @@ const AddPropertyPage = () => {
       // Append all form fields
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'address') {
-          formDataToSend.append(key, JSON.stringify(value));
+          // Ensure all required address fields are included
+          const completeAddress = {
+            line1: value.line1 || '',
+            street: value.street || '',
+            city: value.city || '',
+            state: value.state || '',
+            zipCode: value.zipCode || '',
+            country: value.country || 'India'
+          };
+          formDataToSend.append('address', JSON.stringify(completeAddress));
         } else if (key === 'amenities') {
-          value.forEach(amenity => formDataToSend.append('amenities', amenity));
-        } else {
+          value.forEach(amenity => formDataToSend.append('amenities[]', amenity));
+        } else if (value !== null && value !== undefined) {
           formDataToSend.append(key, value);
         }
       });
@@ -90,6 +133,10 @@ const AddPropertyPage = () => {
       });
 
       const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
         onUploadProgress: progressEvent => {
           const percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
@@ -113,6 +160,11 @@ const AddPropertyPage = () => {
     setImagePreviews([...imagePreviews, ...previews]);
     setImages([...images, ...files]);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    
+    // Clear image error if files were selected
+    if (files.length > 0) {
+      setFormErrors(prev => ({ ...prev, images: undefined }));
+    }
   };
 
   const handleRemoveImage = (index) => {
@@ -122,6 +174,11 @@ const AddPropertyPage = () => {
     newImages.splice(index, 1);
     setImagePreviews(newPreviews);
     setImages(newImages);
+    
+    // Set image error if no images left
+    if (newPreviews.length === 0) {
+      setFormErrors(prev => ({ ...prev, images: 'At least one image is required' }));
+    }
   };
 
   const handleAmenityToggle = (amenity) => {
@@ -135,12 +192,23 @@ const AddPropertyPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Clear error when field is edited
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+    
     if (name.includes('address.')) {
       const field = name.split('.')[1];
       setFormData(prev => ({
         ...prev,
         address: { ...prev.address, [field]: value }
       }));
+      
+      // Clear address errors when editing
+      if (formErrors[field]) {
+        setFormErrors(prev => ({ ...prev, [field]: undefined }));
+      }
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -173,7 +241,7 @@ const AddPropertyPage = () => {
         
         {error && (
           <Alert severity="error" sx={{ mb: 3 }} onClose={clearErrors}>
-            {error}
+            {typeof error === 'object' ? JSON.stringify(error) : error}
           </Alert>
         )}
 
@@ -196,6 +264,8 @@ const AddPropertyPage = () => {
                     fullWidth 
                     size={isMobile ? 'small' : 'medium'}
                     required
+                    error={!!formErrors.agent}
+                    helperText={formErrors.agent}
                   />
                 )}
                 isOptionEqualToValue={(option, value) => option._id === value._id}
@@ -229,6 +299,8 @@ const AddPropertyPage = () => {
               onChange={handleChange}
               required
               size={isMobile ? 'small' : 'medium'}
+              error={!!formErrors.title}
+              helperText={formErrors.title}
             />
           </Grid>
 
@@ -244,6 +316,8 @@ const AddPropertyPage = () => {
               onChange={handleChange}
               required
               size={isMobile ? 'small' : 'medium'}
+              error={!!formErrors.description}
+              helperText={formErrors.description}
             />
           </Grid>
 
@@ -295,7 +369,12 @@ const AddPropertyPage = () => {
                     color="primary"
                   />
                 }
-                label="Featured Property"
+                label={
+                  <Box display="flex" alignItems="center">
+                    <Star color={formData.featured ? "primary" : "inherit"} sx={{ mr: 1 }} />
+                    Featured Property
+                  </Box>
+                }
               />
             </Grid>
           )}
@@ -311,6 +390,8 @@ const AddPropertyPage = () => {
               onChange={handleChange}
               required
               size={isMobile ? 'small' : 'medium'}
+              error={!!formErrors.price}
+              helperText={formErrors.price}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">₹</InputAdornment>
@@ -331,6 +412,8 @@ const AddPropertyPage = () => {
               onChange={handleChange}
               required
               size={isMobile ? 'small' : 'medium'}
+              error={!!formErrors.bedrooms}
+              helperText={formErrors.bedrooms}
               InputProps={{ inputProps: { min: 0 } }}
             />
           </Grid>
@@ -346,6 +429,8 @@ const AddPropertyPage = () => {
               onChange={handleChange}
               required
               size={isMobile ? 'small' : 'medium'}
+              error={!!formErrors.bathrooms}
+              helperText={formErrors.bathrooms}
               InputProps={{ inputProps: { min: 0 } }}
             />
           </Grid>
@@ -361,6 +446,8 @@ const AddPropertyPage = () => {
               onChange={handleChange}
               required
               size={isMobile ? 'small' : 'medium'}
+              error={!!formErrors.area}
+              helperText={formErrors.area}
               InputProps={{ inputProps: { min: 0 } }}
             />
           </Grid>
@@ -415,6 +502,8 @@ const AddPropertyPage = () => {
                     onChange={handleChange}
                     required
                     size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.street}
+                    helperText={formErrors.street}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -426,6 +515,8 @@ const AddPropertyPage = () => {
                     onChange={handleChange}
                     required
                     size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.city}
+                    helperText={formErrors.city}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -437,6 +528,8 @@ const AddPropertyPage = () => {
                     onChange={handleChange}
                     required
                     size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.state}
+                    helperText={formErrors.state}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -448,6 +541,8 @@ const AddPropertyPage = () => {
                     onChange={handleChange}
                     required
                     size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.zipCode}
+                    helperText={formErrors.zipCode}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -492,6 +587,12 @@ const AddPropertyPage = () => {
             <FormHelperText sx={{ mb: 1 }}>
               Upload up to 10 images (5MB each). First image will be used as primary.
             </FormHelperText>
+            
+            {formErrors.images && (
+              <FormHelperText error sx={{ mb: 1 }}>
+                {formErrors.images}
+              </FormHelperText>
+            )}
             
             <Box sx={{ 
               display: 'flex', 

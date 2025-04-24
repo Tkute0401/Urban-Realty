@@ -126,20 +126,33 @@ export const PropertiesProvider = ({ children }) => {
     }
   }, [cache]);
 
-  const createProperty = useCallback(async (formData) => {
+  const createProperty = useCallback(async (formData, config = {}) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.post('/properties', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      
+      // Ensure headers are set properly
+      const finalConfig = {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      };
+  
+      const response = await axios.post('/properties', formData, finalConfig);
       
       const newProperty = response.data?.data ?? response.data;
       setProperties(prev => [...prev, newProperty]);
       setCache({});
       return newProperty;
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to create property');
+      const errorMsg = err.response?.data?.error || 
+                      err.response?.data?.message || 
+                      err.message || 
+                      'Failed to create property';
+      setError(errorMsg);
       throw err;
     } finally {
       setLoading(false);
