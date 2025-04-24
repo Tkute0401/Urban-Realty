@@ -196,17 +196,23 @@ PropertySchema.pre('save', function(next) {
 });
 
 // Geocode & create location field
+// Geocode & create location field
 PropertySchema.pre('save', async function(next) {
   if (!this.isModified('address')) return next();
 
   try {
+    // Ensure required address fields are present
+    if (!this.address.street || !this.address.city || !this.address.state || !this.address.zipCode) {
+      throw new Error('Missing required address fields');
+    }
+
     const addressString = [
       this.address.line1,
       this.address.street,
       this.address.city,
       this.address.state,
       this.address.zipCode,
-      this.address.country
+      this.address.country || 'India' // default to India if not specified
     ].filter(Boolean).join(', ');
 
     const loc = await geocoder.geocode(addressString);
@@ -229,7 +235,7 @@ PropertySchema.pre('save', async function(next) {
     next();
   } catch (err) {
     console.error('Geocoding error:', err);
-    next(err);
+    next(new Error(`Address validation failed: ${err.message}`));
   }
 });
 
