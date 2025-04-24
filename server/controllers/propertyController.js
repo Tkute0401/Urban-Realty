@@ -164,42 +164,106 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
   });
 });
 
+
 // @desc    Create new property
 // @route   POST /api/v1/properties
 // @access  Private (Agent/Admin)
 exports.createProperty = asyncHandler(async (req, res, next) => {
-  // Add user to req.body
-  req.body.agent = req.user.id;
+  try {
+    // Add user to req.body
+    req.body.agent = req.user.id;
 
-  // Check for published property by same agent
-  const publishedProperty = await Property.findOne({ agent: req.user.id });
+    // Check for published property by same agent
+    const publishedProperty = await Property.findOne({ agent: req.user.id });
 
-  // If agent is not admin, they can only add one property
-  if (publishedProperty && req.user.role !== 'admin') {
-    return next(
-      new ErrorResponse(
-        `Agent with ID ${req.user.id} has already published a property`,
-        400
-      )
-    );
+    // If agent is not admin, they can only add one property
+    if (publishedProperty && req.user.role !== 'admin') {
+      return next(
+        new ErrorResponse(
+          `Agent with ID ${req.user.id} has already published a property`,
+          400
+        )
+      );
+    }
+
+    // Process images
+    const images = req.files?.length > 0 
+      ? await uploadImagesToCloudinary(req.files)
+      : [];
+
+    // Parse amenities if sent as string
+    if (req.body.amenities && typeof req.body.amenities === 'string') {
+      req.body.amenities = req.body.amenities.split(',');
+    }
+
+    // Parse address if sent as string
+    if (req.body.address && typeof req.body.address === 'string') {
+      try {
+        req.body.address = JSON.parse(req.body.address);
+      } catch (err) {
+        return next(new ErrorResponse('Invalid address format', 400));
+      }
+    }
+
+    // Create property with default location
+    const propertyData = {
+      ...req.body,
+      images,
+      location: {
+        type: 'Point',
+        coordinates: [0, 0], // Default coordinates
+        formattedAddress: '',
+        street: req.body.address?.street || '',
+        city: req.body.address?.city || '',
+        state: req.body.address?.state || '',
+        zipCode: req.body.address?.zipCode || '',
+        country: req.body.address?.country || 'India'
+      }
+    };
+
+    const property = await Property.create(propertyData);
+
+    // Try to geocode if we have address
+    if (req.body.address) {
+      try {
+        const addressString = [
+          req.body.address.line1,
+          req.body.address.street,
+          req.body.address.city,
+          req.body.address.state,
+          req.body.address.zipCode,
+          req.body.address.country
+        ].filter(Boolean).join(', ');
+
+        const loc = await geocoder.geocode(addressString);
+        
+        if (loc && loc.length > 0) {
+          property.location = {
+            type: 'Point',
+            coordinates: [loc[0].longitude, loc[0].latitude],
+            formattedAddress: loc[0].formattedAddress,
+            street: loc[0].streetName || req.body.address.street,
+            city: loc[0].city || req.body.address.city,
+            state: loc[0].stateCode || req.body.address.state,
+            zipCode: loc[0].zipcode || req.body.address.zipCode,
+            country: loc[0].countryCode || req.body.address.country
+          };
+          await property.save();
+        }
+      } catch (err) {
+        console.error('Geocoding failed:', err);
+      }
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      data: property 
+    });
+  } catch (err) {
+    next(err);
   }
-
-  // Process images
-  const images = req.files?.length > 0 
-    ? await uploadImagesToCloudinary(req.files)
-    : [];
-
-  // Create property
-  const property = await Property.create({
-    ...req.body,
-    images
-  });
-
-  res.status(201).json({ 
-    success: true, 
-    data: property 
-  });
 });
+
 
 // @desc    Update property
 // @route   PUT /api/v1/properties/:id

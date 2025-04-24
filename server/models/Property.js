@@ -113,11 +113,13 @@ const PropertySchema = new mongoose.Schema({
     type: {
       type: String,
       enum: ['Point'],
+      required: true,
       default: 'Point'
     },
     coordinates: {
       type: [Number],
       required: true,
+      default: [0, 0],
       validate: {
         validator: function(v) {
           return v.length === 2 && 
@@ -196,29 +198,24 @@ PropertySchema.pre('save', function(next) {
 });
 
 // Geocode & create location field
-// Geocode & create location field
 PropertySchema.pre('save', async function(next) {
   if (!this.isModified('address')) return next();
 
   try {
-    // Ensure required address fields are present
-    if (!this.address.street || !this.address.city || !this.address.state || !this.address.zipCode) {
-      throw new Error('Missing required address fields');
-    }
-
     const addressString = [
       this.address.line1,
       this.address.street,
       this.address.city,
       this.address.state,
       this.address.zipCode,
-      this.address.country || 'India' // default to India if not specified
+      this.address.country
     ].filter(Boolean).join(', ');
 
     const loc = await geocoder.geocode(addressString);
     
     if (!loc || loc.length === 0) {
-      throw new Error('Could not geocode address');
+      console.warn('Geocoding failed, using default coordinates');
+      return next();
     }
 
     this.location = {
@@ -235,47 +232,8 @@ PropertySchema.pre('save', async function(next) {
     next();
   } catch (err) {
     console.error('Geocoding error:', err);
-    next(new Error(`Address validation failed: ${err.message}`));
+    next();
   }
-});
-
-// Automatically populate agent with contact info
-PropertySchema.pre(/^find/, function(next) {
-  this.populate({
-    path: 'agent',
-    select: 'name email phone mobile'
-  });
-  next();
-});
-
-// Static method to get avg price
-PropertySchema.statics.getAveragePrice = async function() {
-  const obj = await this.aggregate([
-    {
-      $group: {
-        _id: null,
-        averagePrice: { $avg: '$price' }
-      }
-    }
-  ]);
-
-  try {
-    await this.model('Property').findByIdAndUpdate(null, {
-      averagePrice: Math.ceil(obj[0].averagePrice / 10) * 10
-    });
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-// Call getAveragePrice after save
-PropertySchema.post('save', function() {
-  this.constructor.getAveragePrice();
-});
-
-// Call getAveragePrice after remove
-PropertySchema.post('remove', function() {
-  this.constructor.getAveragePrice();
 });
 
 // Index for geospatial queries
