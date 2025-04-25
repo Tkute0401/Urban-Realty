@@ -26,8 +26,8 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="absolute inset-x-8 top-4 bottom-16 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0 bg-white/20 backdrop-blur-md"></div>
+      <div className="absolute inset-x-8 top-4 bottom-16 rounded-3xl mx-10 overflow-hidden">
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-md"></div>
         
         <div className="relative w-full max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
@@ -42,7 +42,7 @@ const HeroSection = () => {
               {navigation.map((item) => (
                 <a
                   key={item}
-                  className="font-sans text-lg font-medium text-white hover:text-sky-400 transition-colors duration-200 cursor-pointer"
+                  className="font-sans text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-200 cursor-pointer"
                 >
                   {item}
                 </a>
@@ -60,7 +60,7 @@ const HeroSection = () => {
           <div className="w-full max-w-7xl mx-auto px-8">
             <div className="text-center mb-16">
               <h1 className="font-serif text-6xl leading-tight font-bold mb-2 text-white">
-                Find Your <br />Perfect <span className="text-sky-400">Spot.</span>
+                Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
               </h1>
               
               <p className="text-gray-300 mb-8 max-w-xl mx-auto">

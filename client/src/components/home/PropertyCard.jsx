@@ -27,7 +27,7 @@ const PropertyCard = ({ property, index }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      className="bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 cursor-pointer"
+      className="bg-[#0c0d0e] rounded-3xl overflow-hidden border border-gray-800 cursor-pointer"
       onClick={handleClick}
     >
       <div className="relative aspect-video">
@@ -43,7 +43,7 @@ const PropertyCard = ({ property, index }) => {
           </div>
         )}
         <button 
-          className="absolute top-4 right-4 p-2 bg-gray-900/50 rounded-full"
+          className="absolute top-4 right-4 p-2 bg-[#0c0d0e]/50 rounded-full"
           onClick={(e) => {
             e.stopPropagation();
             // Handle favorite
@@ -97,7 +97,7 @@ const PropertyCard = ({ property, index }) => {
             {property.status === 'For Rent' && '/mo'}
           </p>
           <button 
-            className="w-full bg-transparent border border-sky-400 text-white px-4 py-2 rounded-lg hover:bg-sky-400/20 transition-all"
+            className="w-full bg-transparent border border-[#78cadc] text-white px-4 py-2 rounded-lg hover:bg-[#78cadc]/20 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               handleClick();

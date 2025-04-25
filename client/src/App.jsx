@@ -30,7 +30,7 @@ function App() {
     <AuthProvider>
       <PropertiesProvider>
       <AgentsProvider>
-        <Header />
+        {/* <Header /> */}
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

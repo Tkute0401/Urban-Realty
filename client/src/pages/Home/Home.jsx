@@ -6,7 +6,7 @@ import ServiceBlock from "../../components/home/ServiceBlock";
 
 const Home = () => {
   return (
-    <div className="font-sans bg-gray-900 text-white">
+    <div className="font-sans bg-[#0c0d0e] text-white">
       <HeroSection />
       <PropertiesSection />
       <ServiceBlock 
