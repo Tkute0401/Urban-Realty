@@ -22,7 +22,7 @@ const ServiceBlock = ({
   };
 
   return (
-    <section className="py-16 bg-gray-900">
+    <section className="py-16 bg-[#0c0d0e]">
       <div className={`max-w-7xl mx-auto px-8 flex flex-col ${imageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12`}>
         <div className="lg:w-1/2">
           <div className="rounded-3xl overflow-hidden border border-white">
@@ -42,7 +42,7 @@ const ServiceBlock = ({
             
             <h2 className="font-serif text-5xl font-bold mb-4 text-white leading-tight">
               {subtitle} <br />
-              <span className="text-sky-400">Dream {propertyType}.</span>
+              <span className="text-[#78cadc]">Dream {propertyType}.</span>
             </h2>
             
             <p className="font-sans text-gray-300 mb-8 tracking-wide">
@@ -51,7 +51,7 @@ const ServiceBlock = ({
             
             <div className="flex justify-end">
               <button 
-                className="flex items-center gap-2 bg-sky-400 text-gray-900 font-bold px-6 py-3 rounded-lg hover:bg-sky-300 transition-colors"
+                className="flex items-center gap-2 bg-[#78cadc] text-[#0c0d0e] font-bold px-6 py-3 rounded-lg hover:bg-sky-300 transition-colors"
                 onClick={handleClick}
               >
                 <ChevronLeftIcon className="w-5 h-5" />

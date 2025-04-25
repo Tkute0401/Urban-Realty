@@ -11,15 +11,15 @@ const PropertiesSection = () => {
   };
 
   return (
-    <section className="py-20 bg-gray-900">
+    <section className="py-20 bg-[#0c0d0e]">
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex justify-between items-center">
           <h2 className="font-serif text-4xl font-bold text-white mb-4">
-            Properties based on <span className="text-sky-400">Your Location</span>
+            Properties based on <span className="text-[#78cadc]">Your Location</span>
           </h2>
           <button 
             onClick={handleViewAll}
-            className="text-sky-400 hover:text-sky-300 transition-colors"
+            className="text-[#78cadc] hover:text-sky-300 transition-colors"
           >
             View All →
           </button>
