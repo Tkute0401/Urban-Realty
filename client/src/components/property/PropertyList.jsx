@@ -70,7 +70,6 @@ const PropertyList = () => {
     
     if (urlSearchTerm) setSearchTerm(urlSearchTerm);
     
-    // Set property type from URL
     if (urlPropertyType) {
       setPropertyType(urlPropertyType);
     }
@@ -110,15 +109,12 @@ const PropertyList = () => {
   const handlePropertyTypeChange = (event, newType) => {
     if (newType !== null) {
       setPropertyType(newType);
-      // Update URL params
       const params = new URLSearchParams(searchParams);
       params.set('propertyType', newType);
       setSearchParams(params);
       
-      // Prepare filters for API call
       const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Rent' : 'For Sale';
       
-      // Create updated filters object
       const updatedFilters = { ...filters };
       if (statusFilter) {
         updatedFilters.status = statusFilter;
@@ -126,7 +122,6 @@ const PropertyList = () => {
         delete updatedFilters.status;
       }
       
-      // Refresh properties with new filter
       getProperties(updatedFilters);
       setPage(1);
     }
@@ -136,7 +131,6 @@ const PropertyList = () => {
     const updatedFilters = { ...filters, ...newFilters };
     setFilters(updatedFilters);
     
-    // Update URL params
     const params = new URLSearchParams(searchParams);
     if (searchTerm) params.set('search', searchTerm);
     if (updatedFilters.type) params.set('type', updatedFilters.type);
@@ -163,7 +157,6 @@ const PropertyList = () => {
     updatedFilters[filterKey] = filterKey === 'amenities' ? [] : '';
     setFilters(updatedFilters);
     
-    // Update URL params
     const params = new URLSearchParams(searchParams);
     params.delete(filterKey);
     setSearchParams(params);
@@ -188,7 +181,6 @@ const PropertyList = () => {
   };
 
   const filteredProperties = properties?.filter(property => {
-    // Property type filter
     if (propertyType !== 'ALL') {
       const statusMatch = propertyType === 'BUY' 
         ? property.status === 'For Sale' 
@@ -196,7 +188,6 @@ const PropertyList = () => {
       if (!statusMatch) return false;
     }
     
-    // Search term filter
     if (searchTerm) {
       const matchesSearch = 
         property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -207,20 +198,15 @@ const PropertyList = () => {
       if (!matchesSearch) return false;
     }
     
-    // Type filter
     if (filters.type && property.type !== filters.type) return false;
     
-    // City filter
     if (filters.city && property.address.city.toLowerCase() !== filters.city.toLowerCase()) return false;
     
-    // State filter
     if (filters.state && property.address.state.toLowerCase() !== filters.state.toLowerCase()) return false;
     
-    // Price filter
     if (filters.priceMin && property.price < parseInt(filters.priceMin)) return false;
     if (filters.priceMax && property.price > parseInt(filters.priceMax)) return false;
     
-    // Bedrooms filter
     if (filters.bedrooms) {
       if (filters.bedrooms.endsWith('+')) {
         const minBedrooms = parseInt(filters.bedrooms);
@@ -230,7 +216,6 @@ const PropertyList = () => {
       }
     }
     
-    // Bathrooms filter
     if (filters.bathrooms) {
       if (filters.bathrooms.endsWith('+')) {
         const minBathrooms = parseFloat(filters.bathrooms);
@@ -240,11 +225,9 @@ const PropertyList = () => {
       }
     }
     
-    // Area filter
     if (filters.minArea && property.area < parseInt(filters.minArea)) return false;
     if (filters.maxArea && property.area > parseInt(filters.maxArea)) return false;
     
-    // Amenities filter
     if (filters.amenities?.length > 0) {
       const hasAllAmenities = filters.amenities.every(amenity => 
         property.amenities.includes(amenity)
@@ -297,34 +280,6 @@ const PropertyList = () => {
     );
   }
 
-  if (!properties || properties.length === 0) {
-    return (
-      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="h6" gutterBottom>
-          No properties found
-        </Typography>
-        <Button 
-          variant="contained" 
-          onClick={getProperties}
-          startIcon={<Refresh />}
-          size={isMobile ? 'small' : 'medium'}
-          sx={{ mr: 1 }}
-        >
-          Refresh
-        </Button>
-        <Button 
-          variant="outlined" 
-          href="/add-property"
-          startIcon={<Add />}
-          size={isMobile ? 'small' : 'medium'}
-          sx={{ ml: 1 }}
-        >
-          Add Property
-        </Button>
-      </Container>
-    );
-  }
-
   return (
     <div className={`main-container ${isLoaded ? 'fade-in' : ''}`} style={{ 
       backgroundColor: '#08171A',
@@ -348,50 +303,68 @@ const PropertyList = () => {
         padding: '0 2rem',
         marginBottom: '2rem'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ 
-            fontSize: '2.5rem',
-            marginBottom: '0.5rem',
-            fontWeight: 'bold'
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '1rem' : 0
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            gap: '1rem',
+            flexDirection: isMobile ? 'column' : 'row'
           }}>
-            {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
-            {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
-          </h1>
-          <ToggleButtonGroup
-            value={propertyType}
-            exclusive
-            onChange={handlePropertyTypeChange}
-            aria-label="property type"
-            sx={{
-              '& .MuiToggleButton-root': {
-                color: 'white',
-                borderColor: '#333',
-                '&.Mui-selected': {
-                  backgroundColor: '#78CADC',
-                  color: '#08171A',
+            <h1 style={{ 
+              fontSize: '2.5rem',
+              marginBottom: '0.5rem',
+              fontWeight: 'bold',
+              textAlign: isMobile ? 'center' : 'left'
+            }}>
+              {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
+              {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
+            </h1>
+            <ToggleButtonGroup
+              value={propertyType}
+              exclusive
+              onChange={handlePropertyTypeChange}
+              aria-label="property type"
+              sx={{
+                '& .MuiToggleButton-root': {
+                  color: 'white',
+                  borderColor: '#333',
+                  '&.Mui-selected': {
+                    backgroundColor: '#78CADC',
+                    color: '#08171A',
+                    '&:hover': {
+                      backgroundColor: '#5cb3c5'
+                    }
+                  },
                   '&:hover': {
-                    backgroundColor: '#5cb3c5'
+                    backgroundColor: '#1a2a30'
                   }
-                },
-                '&:hover': {
-                  backgroundColor: '#1a2a30'
                 }
-              }
-            }}
-          >
-            <ToggleButton value="ALL" aria-label="all properties">
-              All
-            </ToggleButton>
-            <ToggleButton value="BUY" aria-label="buy properties">
-              Buy
-            </ToggleButton>
-            <ToggleButton value="RENT" aria-label="rent properties">
-              Rent
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </div>
-        <div className="listings-count" style={{ fontSize: '1rem', color: '#ccc' }}>
-          {filteredProperties.length} LISTINGS
+              }}
+            >
+              <ToggleButton value="ALL" aria-label="all properties">
+                All
+              </ToggleButton>
+              <ToggleButton value="BUY" aria-label="buy properties">
+                Buy
+              </ToggleButton>
+              <ToggleButton value="RENT" aria-label="rent properties">
+                Rent
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </div>
+          <div className="listings-count" style={{ 
+            fontSize: '1rem', 
+            color: '#ccc',
+            textAlign: isMobile ? 'center' : 'right'
+          }}>
+            {filteredProperties.length} LISTINGS
+          </div>
         </div>
       </div>
 
@@ -400,7 +373,8 @@ const PropertyList = () => {
         gap: '1rem',
         padding: '0 2rem',
         marginBottom: '2rem',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        justifyContent: isMobile ? 'center' : 'flex-end'
       }}>
         <PriceDropdown 
           activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
@@ -435,7 +409,8 @@ const PropertyList = () => {
           gap: '1rem',
           padding: '0 2rem',
           marginBottom: '2rem',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          justifyContent: isMobile ? 'center' : 'flex-start'
         }}>
           {Object.entries(filters).map(([key, value]) => {
             if (!value || (Array.isArray(value) && value.length === 0)) return null;
@@ -514,75 +489,112 @@ const PropertyList = () => {
         </div>
       )}
 
-      <div className="property-listings fade-in-delay-4" style={{ 
-        display: 'flex',
-        padding: '0 2rem',
-        gap: '2rem',
-        position: 'relative',
-        zIndex: 1,
-        flexDirection: isMobile ? 'column' : 'row'
-      }}>
-        <div className="property-grid" style={{ 
-          flex: 2,
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '2rem'
+      {!properties || properties.length === 0 ? (
+        <Container maxWidth="md" sx={{ 
+          py: 4, 
+          textAlign: 'center',
+          backgroundColor: 'rgba(11, 16, 17, 0.5)',
+          borderRadius: '8px',
+          margin: '2rem auto'
         }}>
-          {paginatedProperties.map(property => (
-            <PropertyCard key={property._id} property={property} />
-          ))}
-        </div>
-        
-        {!isMobile && (
-          <div className="map-container" style={{ flex: 1, minHeight: '400px' }}>
-            <div className="map-placeholder" style={{
-              backgroundColor: '#eee',
-              height: '100%',
-              minHeight: '400px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#333',
-              fontWeight: 'bold',
-              borderRadius: '8px',
-              background: 'linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 3s infinite'
-            }}>
-              <span>View larger map</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {filteredProperties.length > itemsPerPage && (
-        <Stack spacing={1} sx={{ 
-          mt: 4, 
-          alignItems: 'center',
-          padding: '0 2rem'
-        }}>
-          <Pagination
-            count={Math.ceil(filteredProperties.length / itemsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            size={isMobile ? 'small' : 'medium'}
-            siblingCount={isMobile ? 0 : 1}
-            sx={{ 
-              '& .MuiPaginationItem-root': { 
-                fontSize: isMobile ? '0.75rem' : '0.875rem',
-                color: 'white'
-              },
-              '& .MuiPaginationItem-root.Mui-selected': {
-                backgroundColor: '#78CADC',
-                color: '#08171A'
-              }
-            }}
-          />
-          <Typography variant="caption" color="#ccc">
-            {paginatedProperties.length} of {filteredProperties.length} properties
+          <Typography variant="h6" gutterBottom>
+            No properties found matching your criteria
           </Typography>
-        </Stack>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            Try adjusting your filters or search terms
+          </Typography>
+          <Button 
+            variant="contained" 
+            onClick={getProperties}
+            startIcon={<Refresh />}
+            size={isMobile ? 'small' : 'medium'}
+            sx={{ mr: 1 }}
+          >
+            Refresh
+          </Button>
+          <Button 
+            variant="outlined" 
+            href="/add-property"
+            startIcon={<Add />}
+            size={isMobile ? 'small' : 'medium'}
+            sx={{ ml: 1 }}
+          >
+            Add Property
+          </Button>
+        </Container>
+      ) : (
+        <>
+          <div className="property-listings fade-in-delay-4" style={{ 
+            display: 'flex',
+            padding: '0 2rem',
+            gap: '2rem',
+            position: 'relative',
+            zIndex: 1,
+            flexDirection: isMobile ? 'column' : 'row'
+          }}>
+            <div className="property-grid" style={{ 
+              flex: 2,
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '2rem'
+            }}>
+              {paginatedProperties.map(property => (
+                <PropertyCard key={property._id} property={property} />
+              ))}
+            </div>
+            
+            {!isMobile && (
+              <div className="map-container" style={{ flex: 1, minHeight: '400px' }}>
+                <div className="map-placeholder" style={{
+                  backgroundColor: '#eee',
+                  height: '100%',
+                  minHeight: '400px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#333',
+                  fontWeight: 'bold',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 3s infinite'
+                }}>
+                  <span>View larger map</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {filteredProperties.length > itemsPerPage && (
+            <Stack spacing={1} sx={{ 
+              mt: 4, 
+              alignItems: 'center',
+              padding: '0 2rem'
+            }}>
+              <Pagination
+                count={Math.ceil(filteredProperties.length / itemsPerPage)}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                size={isMobile ? 'small' : 'medium'}
+                siblingCount={isMobile ? 0 : 1}
+                sx={{ 
+                  '& .MuiPaginationItem-root': { 
+                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                    color: 'white'
+                  },
+                  '& .MuiPaginationItem-root.Mui-selected': {
+                    backgroundColor: '#78CADC',
+                    color: '#08171A'
+                  }
+                }}
+              />
+              <Typography variant="caption" color="#ccc">
+                {paginatedProperties.length} of {filteredProperties.length} properties
+              </Typography>
+            </Stack>
+          )}
+        </>
       )}
     </div>
   );

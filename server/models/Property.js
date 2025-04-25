@@ -27,7 +27,7 @@ const PropertySchema = new mongoose.Schema({
       'Land',
       'Commercial'
     ],
-    default: 'House'
+    default: 'Apartment'
   },
   status: {
     type: String,
