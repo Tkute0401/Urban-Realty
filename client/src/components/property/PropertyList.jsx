@@ -113,7 +113,7 @@ const PropertyList = () => {
       params.set('propertyType', newType);
       setSearchParams(params);
       
-      const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Rent' : 'For Sale';
+      const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Sale' : 'For Rent';
       
       const updatedFilters = { ...filters };
       if (statusFilter) {
@@ -301,106 +301,99 @@ const PropertyList = () => {
 
       <div className="page-title fade-in-delay-2" style={{ 
         padding: '0 2rem',
-        marginBottom: '2rem'
+        marginBottom: '1rem'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          flexDirection: isMobile ? 'column' : 'row',
-          gap: isMobile ? '1rem' : 0
+        <h1 style={{ 
+          fontSize: '2.5rem',
+          marginBottom: '0.5rem',
+          fontWeight: 'bold'
         }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            gap: '1rem',
-            flexDirection: isMobile ? 'column' : 'row'
-          }}>
-            <h1 style={{ 
-              fontSize: '2.5rem',
-              marginBottom: '0.5rem',
-              fontWeight: 'bold',
-              textAlign: isMobile ? 'center' : 'left'
-            }}>
-              {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
-              {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
-            </h1>
-            <ToggleButtonGroup
-              value={propertyType}
-              exclusive
-              onChange={handlePropertyTypeChange}
-              aria-label="property type"
-              sx={{
-                '& .MuiToggleButton-root': {
-                  color: 'white',
-                  borderColor: '#333',
-                  '&.Mui-selected': {
-                    backgroundColor: '#78CADC',
-                    color: '#08171A',
-                    '&:hover': {
-                      backgroundColor: '#5cb3c5'
-                    }
-                  },
-                  '&:hover': {
-                    backgroundColor: '#1a2a30'
-                  }
-                }
-              }}
-            >
-              <ToggleButton value="ALL" aria-label="all properties">
-                All
-              </ToggleButton>
-              <ToggleButton value="BUY" aria-label="buy properties">
-                Buy
-              </ToggleButton>
-              <ToggleButton value="RENT" aria-label="rent properties">
-                Rent
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </div>
-          <div className="listings-count" style={{ 
-            fontSize: '1rem', 
-            color: '#ccc',
-            textAlign: isMobile ? 'center' : 'right'
-          }}>
-            {filteredProperties.length} LISTINGS
-          </div>
+          {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
+          {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
+        </h1>
+        <div className="listings-count" style={{ fontSize: '1rem', color: '#ccc', marginBottom: '1rem' }}>
+          {filteredProperties.length} LISTINGS
         </div>
       </div>
 
-      <div className="filter-bar" style={{
+      {/* Combined toggle and filters row */}
+      <div style={{
         display: 'flex',
-        gap: '1rem',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         padding: '0 2rem',
         marginBottom: '2rem',
         flexWrap: 'wrap',
-        justifyContent: isMobile ? 'center' : 'flex-end'
+        gap: '1rem'
       }}>
-        <PriceDropdown 
-          activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
-          onApply={handlePriceFilter}
-          currentMin={filters.priceMin}
-          currentMax={filters.priceMax}
-        />
-        
-        <BedBath 
-          onApply={handleBedBathFilter}
-          currentBedrooms={filters.bedrooms}
-          currentBathrooms={filters.bathrooms}
-        />
-        
-        <HomeType 
-          onApply={handleHomeTypeFilter}
-          currentType={filters.type}
-        />
-        
-        <More 
-          onApply={(moreFilters) => handleFilterChange(moreFilters)}
-          currentFilters={filters}
-          amenityOptions={amenityOptions}
-        />
+        {/* Toggle buttons (left side) */}
+        <ToggleButtonGroup
+          value={propertyType}
+          exclusive
+          onChange={handlePropertyTypeChange}
+          aria-label="property type"
+          sx={{
+            '& .MuiToggleButton-root': {
+              color: 'white',
+              borderColor: '#333',
+              '&.Mui-selected': {
+                backgroundColor: '#78CADC',
+                color: '#08171A',
+                '&:hover': {
+                  backgroundColor: '#5cb3c5'
+                }
+              },
+              '&:hover': {
+                backgroundColor: '#1a2a30'
+              }
+            }
+          }}
+        >
+          <ToggleButton value="ALL" aria-label="all properties">
+            All
+          </ToggleButton>
+          <ToggleButton value="BUY" aria-label="buy properties">
+            Buy
+          </ToggleButton>
+          <ToggleButton value="RENT" aria-label="rent properties">
+            Rent
+          </ToggleButton>
+        </ToggleButtonGroup>
+
+        {/* Filter buttons (right side) */}
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          justifyContent: isMobile ? 'center' : 'flex-end'
+        }}>
+          <PriceDropdown 
+            activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
+            onApply={handlePriceFilter}
+            currentMin={filters.priceMin}
+            currentMax={filters.priceMax}
+          />
+          
+          <BedBath 
+            onApply={handleBedBathFilter}
+            currentBedrooms={filters.bedrooms}
+            currentBathrooms={filters.bathrooms}
+          />
+          
+          <HomeType 
+            onApply={handleHomeTypeFilter}
+            currentType={filters.type}
+          />
+          
+          <More 
+            onApply={(moreFilters) => handleFilterChange(moreFilters)}
+            currentFilters={filters}
+            amenityOptions={amenityOptions}
+          />
+        </div>
       </div>
 
+      {/* Active filters */}
       {Object.entries(filters).filter(([key, value]) => 
         value && (Array.isArray(value) ? value.length > 0 : true))
         .length > 0 && (
@@ -489,6 +482,7 @@ const PropertyList = () => {
         </div>
       )}
 
+      {/* Property listings or empty state */}
       {!properties || properties.length === 0 ? (
         <Container maxWidth="md" sx={{ 
           py: 4, 
