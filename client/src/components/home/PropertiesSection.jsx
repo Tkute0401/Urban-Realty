@@ -1,10 +1,24 @@
 import { useNavigate } from "react-router-dom";
 import { useProperties } from "../../context/PropertiesContext";
 import PropertyCard from "../property/PropertyCard";
+import { useEffect } from "react"; // Add this import
 
 const PropertiesSection = () => {
-  const { featuredProperties } = useProperties();
+  const { featuredProperties, getFeaturedProperties } = useProperties(); // Destructure getFeaturedProperties
   const navigate = useNavigate();
+
+  // Add this useEffect to fetch featured properties on component mount
+  useEffect(() => {
+    const fetchFeaturedProperties = async () => {
+      try {
+        await getFeaturedProperties();
+      } catch (error) {
+        console.error("Error fetching featured properties:", error);
+      }
+    };
+    
+    fetchFeaturedProperties();
+  }, [getFeaturedProperties]);
 
   const handleViewAll = () => {
     navigate('/properties');
@@ -25,7 +39,6 @@ const PropertiesSection = () => {
           </button>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
-          {console.log(featuredProperties)}
           {featuredProperties.slice(0, 4).map((property, index) => (
             <PropertyCard key={property._id} index={index} property={property} />
           ))}
