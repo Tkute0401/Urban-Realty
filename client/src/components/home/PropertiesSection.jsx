@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useProperties } from "../../context/PropertiesContext";
-import PropertyCard from "../property/PropertyCard";
+import PropertyCard from "./PropertyCard";
 import { useEffect } from "react"; // Add this import
 
 const PropertiesSection = () => {
