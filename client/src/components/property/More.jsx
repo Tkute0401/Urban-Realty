@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './BedBath.css';
+import './More.css';
 
 const More = ({ onApply, currentFilters = {}, amenityOptions }) => {
   const [isOpen, setIsOpen] = useState(false);
