@@ -22,7 +22,7 @@ const ServiceBlock = ({
   };
 
   return (
-    <section className="py-16 bg-[#0c0d0e]">
+    <section className="py-16 bg-[#08171A]">
       <div className={`max-w-7xl mx-auto px-8 flex flex-col ${imageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12`}>
         <div className="lg:w-1/2">
           <div className="rounded-3xl overflow-hidden border border-white">

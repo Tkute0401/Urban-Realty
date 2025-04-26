@@ -1,0 +1,182 @@
+/* Header.css - Matching the PropertyList design */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.header {
+  width: 100%;
+  background-color: #08171A;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Logo */
+.logo-container {
+  display: flex;
+  align-items: center;
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.logo-link:hover {
+  transform: translateY(-2px);
+}
+
+.logo-icon {
+  color: #78CADC;
+  font-size: 1.8rem;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+/* Navigation */
+.nav-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.nav-item:hover {
+  background-color: rgba(120, 202, 220, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-item-active {
+  background-color: #78CADC;
+  color: #08171A;
+}
+
+.nav-item-active:hover {
+  background-color: #5cb3c5;
+}
+
+.nav-item-outlined {
+  border: 1px solid #78CADC;
+}
+
+.nav-icon {
+  color: #78CADC;
+}
+
+/* Avatar */
+.user-avatar {
+  width: 38px;
+  height: 38px;
+  background-color: #78CADC;
+  color: #08171A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 600;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(120, 202, 220, 0.4);
+}
+
+/* Mobile menu */
+.menu-button {
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-button:hover {
+  background-color: rgba(120, 202, 220, 0.1);
+}
+
+.mobile-menu {
+  background-color: #0B1011;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 220px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.menu-item {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid #222;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item:hover {
+  background-color: rgba(120, 202, 220, 0.1);
+}
+
+.menu-item-icon {
+  color: #78CADC;
+}
+
+.menu-logout {
+  color: #ff6b6b;
+}
+
+/* Animation Keyframes - from PropertyList.css */
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 1rem;
+  }
+  
+  .logo-text {
+    font-size: 1.2rem;
+  }
+}

@@ -4,7 +4,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 // Owner Service Block
 const OwnerServiceBlock = () => {
   return (
-    <section className="py-16 bg-[#0c0d0e]">
+    <section className="py-16 bg-[#08171A]">
       <div className="max-w-7xl mx-auto px-8">
         <div className="mb-6">
           {/* Text alignment adjusted to match the design exactly */}
