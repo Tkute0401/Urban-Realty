@@ -25,7 +25,7 @@ const PropertiesSection = () => {
   };
 
   return (
-    <section className="py-20 bg-[#0c0d0e]">
+    <section className="py-20 bg-[#08171A]">
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex justify-between items-center">
           <h2 className="font-serif text-4xl font-bold text-white mb-4">
