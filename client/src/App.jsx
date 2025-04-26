@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AgentsProvider } from './context/AgentsContext';
 import { PropertiesProvider } from './context/PropertiesContext';
@@ -25,42 +25,45 @@ import AgentsPage from './pages/admin/AgentsPage';
 import MainPage from './components/property/MainPage';
 
 function App() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  
   return (
     <ThemeProvider theme={urbanRealtyTheme}>
-    
-    <AuthProvider>
-      <PropertiesProvider>
-      <AgentsProvider>
-        <Header />
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/properties" element={<PropertyList />} />
-            <Route path="/properties/:id" element={<PropertyDetails />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
-              <Route element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="agents" element={<AgentsPage />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="properties" element={<AdminProperties />} />
-                <Route path="contacts" element={<AdminContacts />} />
-              </Route>
-            </Route>
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/properties/:id/edit" element={<EditProperty />} />
-              <Route path="/add-property" element={<AddProperty />} />
-              <Route path="/profile" element={<Profile />} />
-            </Route>
-          </Routes>
-        </Layout>
-        </AgentsProvider>
-      </PropertiesProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <PropertiesProvider>
+          <AgentsProvider>
+            {/* Conditionally render Header based on current path */}
+            {!isHomePage && <Header />}
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/properties" element={<PropertyList />} />
+                <Route path="/properties/:id" element={<PropertyDetails />} />
+                
+                {/* Admin Routes */}
+                <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
+                  <Route element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="agents" element={<AgentsPage />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="properties" element={<AdminProperties />} />
+                    <Route path="contacts" element={<AdminContacts />} />
+                  </Route>
+                </Route>
+                {/* Protected Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/properties/:id/edit" element={<EditProperty />} />
+                  <Route path="/add-property" element={<AddProperty />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Route>
+              </Routes>
+            </Layout>
+          </AgentsProvider>
+        </PropertiesProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

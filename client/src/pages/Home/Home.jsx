@@ -15,7 +15,6 @@ const Home = () => {
         buttonText="Explore Buying"
         propertyType="Home"
       />
-      <OwnerServiceBlock />
       <ServiceBlock 
         title="RENT A HOME" 
         subtitle="Rental Homes for Everyone" 
@@ -29,6 +28,7 @@ const Home = () => {
         buttonText="Explore Plots/Land" 
         propertyType="Land"
       />
+      <OwnerServiceBlock />
     </div>
   );
 };

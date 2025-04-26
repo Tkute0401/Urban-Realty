@@ -13,6 +13,37 @@ import HomeType from './HomeType';
 import More from './More';
 import PriceDropdown from './PriceDropdown';
 import './PropertyList.css';
+// Icon components from MainPage
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+);
+
+const ZoomIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 19c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"></path>
+    <path d="m21 21-4.3-4.3"></path>
+    <path d="M8 11h6"></path>
+    <path d="M11 8v6"></path>
+  </svg>
+);
+
+const GalleryIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+    <path d="m21 15-5-5L5 21"></path>
+  </svg>
+);
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
@@ -104,7 +135,11 @@ const PropertyList = () => {
     };
     
     getProperties(fetchParams);
-    setIsLoaded(true);
+    
+    // Short delay to allow for animation to start
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
   }, [searchParams, getProperties]);
 
   const handlePropertyTypeChange = (event, newType) => {
@@ -179,6 +214,22 @@ const PropertyList = () => {
 
   const handleHomeTypeFilter = (type) => {
     handleFilterChange({ type });
+  };
+  
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams);
+    if (searchTerm) {
+      params.set('search', searchTerm);
+    } else {
+      params.delete('search');
+    }
+    setSearchParams(params);
+    getProperties({
+      ...filters,
+      search: searchTerm,
+      status: propertyType === 'ALL' ? '' : propertyType === 'BUY' ? 'For Sale' : 'For Rent'
+    });
   };
 
   const filteredProperties = properties?.filter(property => {
@@ -255,25 +306,27 @@ const PropertyList = () => {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center',
-        minHeight: '50vh'
+        minHeight: '50vh',
+        background: '#08171A'
       }}>
-        <CircularProgress size={isMobile ? 40 : 60} />
+        <CircularProgress size={isMobile ? 40 : 60} sx={{ color: '#78CADC' }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center' }}>
+      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center', color: 'white', background: '#08171A' }}>
         <Typography color="error" gutterBottom>
           Error loading properties
         </Typography>
-        <Typography variant="body2" sx={{ mb: 2 }}>{error}</Typography>
+        <Typography variant="body2" sx={{ mb: 2, color: 'white' }}>{error}</Typography>
         <Button 
           variant="contained" 
           onClick={getProperties}
           startIcon={<Refresh />}
           size={isMobile ? 'small' : 'medium'}
+          sx={{ backgroundColor: '#78CADC', '&:hover': { backgroundColor: '#5cb3c5' } }}
         >
           Retry
         </Button>
@@ -282,69 +335,101 @@ const PropertyList = () => {
   }
 
   return (
-    <div className={`main-container ${isLoaded ? 'fade-in' : ''}`}>
+    <div className={`main-container ${isLoaded ? 'fade-in-delay-1' : ''}`}>
+      {/* Navbar with search */}
+      <div className="Navbar">
+        <form onSubmit={handleSearchSubmit} className="search-container slide-in-left">
+          <input 
+            type="searchbar" 
+            placeholder="SEARCH BY LOCATION (STATE OR CITY)" 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button type="submit" className="search-button">
+            <SearchIcon />
+          </button>
+        </form>
+        <div className="NavbarBtn slide-in-right">
+        <div className="BuyRentToggle">
+  <button 
+    id="AllBtn" 
+    className={`${propertyType === 'ALL' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`} 
+    onClick={() => handlePropertyTypeChange(null, 'ALL')}
+  >
+    ALL
+  </button>
+  <button 
+    id="BuyBtn" 
+    className={`${propertyType === 'BUY' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`} 
+    onClick={() => handlePropertyTypeChange(null, 'BUY')}
+  >
+    BUY
+  </button>
+  <button 
+    id="RentBtn" 
+    className={`${propertyType === 'RENT' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`}
+    onClick={() => handlePropertyTypeChange(null, 'RENT')}
+  >
+    RENT
+  </button>
+</div>
+          <div className="OtherNavbarBtn">
+            <HomeType 
+              onApply={handleHomeTypeFilter}
+              currentType={filters.type}
+            />
+            <PriceDropdown 
+              activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
+              onApply={handlePriceFilter}
+              currentMin={filters.priceMin}
+              currentMax={filters.priceMax}
+            />
+            <BedBath 
+              onApply={handleBedBathFilter}
+              currentBedrooms={filters.bedrooms}
+              currentBathrooms={filters.bathrooms}
+            />
+            <More 
+              onApply={(moreFilters) => handleFilterChange(moreFilters)}
+              currentFilters={filters}
+              amenityOptions={amenityOptions}
+            />
+            <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Breadcrumb */}
       <div className="breadcrumb fade-in-delay-1">
         <a href="/">HOME</a>
         <span className="separator">&gt;</span>
+        {propertyType === 'BUY' && (
+          <>
+            <a href="#">BUY</a>
+            <span className="separator">&gt;</span>
+          </>
+        )}
+        {propertyType === 'RENT' && (
+          <>
+            <a href="#">RENT</a>
+            <span className="separator">&gt;</span>
+          </>
+        )}
         <a href="#">PROPERTIES</a>
       </div>
 
+      {/* Page Title */}
       <div className="page-title fade-in-delay-2">
         <h1>
-          {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
-          {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
+          {propertyType === 'RENT' ? 'Luxury Properties for ' : propertyType === 'BUY' ? 'Luxury Properties for ' : 'All Properties '}
+          <span>{propertyType === 'RENT' ? 'Rent' : propertyType === 'BUY' ? 'Sale' : ''}</span>
         </h1>
         <div className="listings-count">
-          {filteredProperties.length} LISTINGS
+          {filteredProperties.length} LISTING{filteredProperties.length !== 1 ? 'S' : ''}
         </div>
       </div>
 
-      <div className="filter-controls">
-        <ToggleButtonGroup
-          value={propertyType}
-          exclusive
-          onChange={handlePropertyTypeChange}
-          aria-label="property type"
-          className="property-type-toggle"
-        >
-          <ToggleButton value="ALL" aria-label="all properties">
-            All
-          </ToggleButton>
-          <ToggleButton value="BUY" aria-label="buy properties">
-            Buy
-          </ToggleButton>
-          <ToggleButton value="RENT" aria-label="rent properties">
-            Rent
-          </ToggleButton>
-        </ToggleButtonGroup>
-
-        <div className="filter-buttons">
-          <PriceDropdown 
-            activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
-            onApply={handlePriceFilter}
-            currentMin={filters.priceMin}
-            currentMax={filters.priceMax}
-          />
-          
-          <BedBath 
-            onApply={handleBedBathFilter}
-            currentBedrooms={filters.bedrooms}
-            currentBathrooms={filters.bathrooms}
-          />
-          
-          <HomeType 
-            onApply={handleHomeTypeFilter}
-            currentType={filters.type}
-          />
-          
-          <More 
-            onApply={(moreFilters) => handleFilterChange(moreFilters)}
-            currentFilters={filters}
-            amenityOptions={amenityOptions}
-          />
-        </div>
-      </div>
-
+      {/* Filter Tags */}
       {Object.entries(filters).filter(([key, value]) => 
         value && (Array.isArray(value) ? value.length > 0 : true))
         .length > 0 && (
@@ -362,10 +447,7 @@ const PropertyList = () => {
                     const updatedAmenities = filters.amenities.filter(a => a !== item);
                     handleFilterChange({ amenities: updatedAmenities });
                   }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
+                    <CloseIcon />
                   </button>
                 </div>
               ));
@@ -377,10 +459,7 @@ const PropertyList = () => {
                   {key.toUpperCase()}: {value}
                 </span>
                 <button onClick={() => removeFilter(key)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                  <CloseIcon />
                 </button>
               </div>
             );
@@ -389,7 +468,7 @@ const PropertyList = () => {
       )}
 
       {!properties || properties.length === 0 ? (
-        <Container maxWidth="md" className="empty-state">
+        <Container maxWidth="md" className="empty-state fade-in-delay-4">
           <Typography variant="h6" gutterBottom>
             No properties found matching your criteria
           </Typography>
@@ -401,7 +480,16 @@ const PropertyList = () => {
             onClick={getProperties}
             startIcon={<Refresh />}
             size={isMobile ? 'small' : 'medium'}
-            sx={{ mr: 1 }}
+            sx={{ 
+              mr: 1, 
+              backgroundColor: '#78CADC', 
+              '&:hover': { 
+                backgroundColor: '#5cb3c5', 
+                transform: 'translateY(-2px)', 
+                boxShadow: '0 6px 10px rgba(0,0,0,0.2)' 
+              },
+              transition: 'all 0.3s ease'
+            }}
           >
             Refresh
           </Button>
@@ -410,7 +498,17 @@ const PropertyList = () => {
             href="/add-property"
             startIcon={<Add />}
             size={isMobile ? 'small' : 'medium'}
-            sx={{ ml: 1 }}
+            sx={{ 
+              ml: 1, 
+              borderColor: '#78CADC', 
+              color: 'white',
+              '&:hover': { 
+                borderColor: '#5cb3c5', 
+                transform: 'translateY(-2px)', 
+                boxShadow: '0 6px 10px rgba(0,0,0,0.2)' 
+              },
+              transition: 'all 0.3s ease'
+            }}
           >
             Add Property
           </Button>
@@ -434,7 +532,7 @@ const PropertyList = () => {
           </div>
 
           {filteredProperties.length > itemsPerPage && (
-            <Stack spacing={1} className="pagination-container">
+            <Stack spacing={1} className="pagination-container fade-in-delay-4">
               <Pagination
                 count={Math.ceil(filteredProperties.length / itemsPerPage)}
                 page={page}
@@ -443,6 +541,11 @@ const PropertyList = () => {
                 size={isMobile ? 'small' : 'medium'}
                 siblingCount={isMobile ? 0 : 1}
                 className="custom-pagination"
+                sx={{
+                  '& .MuiPaginationItem-root': { color: 'white' },
+                  '& .MuiPaginationItem-root.Mui-selected': { backgroundColor: '#78CADC', color: '#08171A' },
+                  '& .MuiPaginationItem-root:hover': { backgroundColor: 'rgba(120, 202, 220, 0.2)' },
+                }}
               />
               <Typography variant="caption" className="pagination-count">
                 {paginatedProperties.length} of {filteredProperties.length} properties

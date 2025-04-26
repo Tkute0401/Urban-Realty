@@ -26,8 +26,8 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="absolute inset-x-8 top-4 bottom-16 rounded-3xl mx-10 overflow-hidden">
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-md"></div>
+      <div className="absolute inset-x-8 top-4 bottom-16 rounded-3xl mx-40 overflow-hidden">
+        <div className="absolute inset-0 bg-white/10 backdrop-blur"></div>
         
         <div className="relative w-full max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
@@ -97,7 +97,7 @@ const HeroSection = () => {
       
       <form onSubmit={handleSearch} className="absolute bottom-16 left-0 right-0 flex justify-center" style={{ transform: "translateY(50%)" }}>
         <div className="max-w-2xl w-full mx-8">
-          <div className="relative flex items-center px-6 py-4 rounded-full bg-white/20 backdrop-blur-md border-0">
+          <div className="relative flex items-center px-6 py-4 rounded-full bg-white/20 backdrop-blur-sm border-0">
             <MagnifyingGlassIcon className="w-6 h-6 text-white mr-3" />
             <input
               type="text"
