@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './BedBath.css';
+import './HomeType.css';
 
 const HomeType = ({ onApply, currentType }) => {
   const [isOpen, setIsOpen] = useState(false);

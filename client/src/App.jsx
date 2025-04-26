@@ -22,6 +22,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 import AdminContacts from './pages/admin/AdminContacts';
 import AgentsPage from './pages/admin/AgentsPage';
+import MainPage from './components/property/MainPage';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
     <AuthProvider>
       <PropertiesProvider>
       <AgentsProvider>
-        {/* <Header /> */}
+        <Header />
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

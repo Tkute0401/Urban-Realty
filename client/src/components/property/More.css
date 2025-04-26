@@ -1,0 +1,113 @@
+/* More Dropdown */
+.more-dropdown .dropdown-content {
+    width: 520px;
+    padding: 0;
+    display: flex;
+    height: 400px;
+    right: 0;
+    left: auto;
+}
+  
+.more-sidebar {
+    width: 180px;
+    background-color: #0A1517;
+    border-right: 1px solid #333;
+    padding: 0;
+}
+  
+.sidebar-item {
+    padding: 14px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+  
+.sidebar-item:hover {
+    background-color: rgba(120, 202, 220, 0.1);
+}
+  
+.sidebar-item.active-sidebar {
+    background-color: rgba(120, 202, 220, 0.2);
+    border-left: 3px solid #78CADC;
+    color: #78CADC;
+}
+  
+.more-content-area {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+  
+.tag-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+  
+.tag-option {
+    background-color: transparent;
+    border: 1px solid #444;
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+  
+.tag-option:hover {
+    border-color: #78CADC;
+    color: white;
+}
+  
+.tag-option.selected {
+    background-color: rgba(120, 202, 220, 0.1);
+    border-color: #78CADC;
+    color: #78CADC;
+}
+
+.input-field {
+    margin-bottom: 15px;
+}
+
+.input-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #0B1011;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+}
+
+.input-field input:focus {
+    outline: none;
+    border-color: #78CADC;
+}
+
+.range-inputs {
+    display: flex;
+    gap: 15px;
+}
+
+.range-inputs .input-field {
+    flex: 1;
+}
+
+/* More Dropdown specific apply button */
+.more-dropdown .apply-filter-btn {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 8px 8px;
+}

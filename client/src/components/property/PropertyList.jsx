@@ -12,6 +12,7 @@ import BedBath from './BedBath';
 import HomeType from './HomeType';
 import More from './More';
 import PriceDropdown from './PriceDropdown';
+import './PropertyList.css';
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
@@ -281,73 +282,30 @@ const PropertyList = () => {
   }
 
   return (
-    <div className={`main-container ${isLoaded ? 'fade-in' : ''}`} style={{ 
-      backgroundColor: '#08171A',
-      color: 'white',
-      minHeight: '100vh',
-      padding: isMobile ? '1rem' : '2rem'
-    }}>
-      <div className="breadcrumb fade-in-delay-1" style={{ 
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        padding: '1rem 2rem',
-        fontSize: '0.9rem'
-      }}>
-        <a href="/" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s ease' }}>HOME</a>
-        <span className="separator" style={{ color: '#555', margin: '0 4px' }}>&gt;</span>
-        <a href="#" style={{ color: 'white', textDecoration: 'none', transition: 'color 0.3s ease' }}>PROPERTIES</a>
+    <div className={`main-container ${isLoaded ? 'fade-in' : ''}`}>
+      <div className="breadcrumb fade-in-delay-1">
+        <a href="/">HOME</a>
+        <span className="separator">&gt;</span>
+        <a href="#">PROPERTIES</a>
       </div>
 
-      <div className="page-title fade-in-delay-2" style={{ 
-        padding: '0 2rem',
-        marginBottom: '1rem'
-      }}>
-        <h1 style={{ 
-          fontSize: '2.5rem',
-          marginBottom: '0.5rem',
-          fontWeight: 'bold'
-        }}>
+      <div className="page-title fade-in-delay-2">
+        <h1>
           {propertyType === 'RENT' ? 'Rental' : propertyType === 'BUY' ? 'Luxury' : ''} Properties{' '}
           {propertyType === 'RENT' ? 'for Rent' : propertyType === 'BUY' ? 'for Sale' : ''}
         </h1>
-        <div className="listings-count" style={{ fontSize: '1rem', color: '#ccc', marginBottom: '1rem' }}>
+        <div className="listings-count">
           {filteredProperties.length} LISTINGS
         </div>
       </div>
 
-      {/* Combined toggle and filters row */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '0 2rem',
-        marginBottom: '2rem',
-        flexWrap: 'wrap',
-        gap: '1rem'
-      }}>
-        {/* Toggle buttons (left side) */}
+      <div className="filter-controls">
         <ToggleButtonGroup
           value={propertyType}
           exclusive
           onChange={handlePropertyTypeChange}
           aria-label="property type"
-          sx={{
-            '& .MuiToggleButton-root': {
-              color: 'white',
-              borderColor: '#333',
-              '&.Mui-selected': {
-                backgroundColor: '#78CADC',
-                color: '#08171A',
-                '&:hover': {
-                  backgroundColor: '#5cb3c5'
-                }
-              },
-              '&:hover': {
-                backgroundColor: '#1a2a30'
-              }
-            }
-          }}
+          className="property-type-toggle"
         >
           <ToggleButton value="ALL" aria-label="all properties">
             All
@@ -360,13 +318,7 @@ const PropertyList = () => {
           </ToggleButton>
         </ToggleButtonGroup>
 
-        {/* Filter buttons (right side) */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          flexWrap: 'wrap',
-          justifyContent: isMobile ? 'center' : 'flex-end'
-        }}>
+        <div className="filter-buttons">
           <PriceDropdown 
             activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
             onApply={handlePriceFilter}
@@ -393,49 +345,22 @@ const PropertyList = () => {
         </div>
       </div>
 
-      {/* Active filters */}
       {Object.entries(filters).filter(([key, value]) => 
         value && (Array.isArray(value) ? value.length > 0 : true))
         .length > 0 && (
-        <div className="filter-tags fade-in-delay-3" style={{ 
-          display: 'flex',
-          gap: '1rem',
-          padding: '0 2rem',
-          marginBottom: '2rem',
-          flexWrap: 'wrap',
-          justifyContent: isMobile ? 'center' : 'flex-start'
-        }}>
+        <div className="filter-tags fade-in-delay-3">
           {Object.entries(filters).map(([key, value]) => {
             if (!value || (Array.isArray(value) && value.length === 0)) return null;
             
             if (Array.isArray(value)) {
               return value.map(item => (
-                <div key={`${key}-${item}`} className="filter-tag" style={{ 
-                  backgroundColor: '#0B1011',
-                  border: '1px solid #333',
-                  borderRadius: '50px',
-                  padding: '0.5rem 1.5rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <span className="filter-label" style={{ fontSize: '0.9rem' }}>
+                <div key={`${key}-${item}`} className="filter-tag">
+                  <span className="filter-label">
                     {key.toUpperCase()}: {item}
                   </span>
                   <button onClick={() => {
                     const updatedAmenities = filters.amenities.filter(a => a !== item);
                     handleFilterChange({ amenities: updatedAmenities });
-                  }} style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0',
-                    transition: 'transform 0.2s ease'
                   }}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -447,30 +372,11 @@ const PropertyList = () => {
             }
             
             return (
-              <div key={key} className="filter-tag" style={{ 
-                backgroundColor: '#0B1011',
-                border: '1px solid #333',
-                borderRadius: '50px',
-                padding: '0.5rem 1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.3s ease'
-              }}>
-                <span className="filter-label" style={{ fontSize: '0.9rem' }}>
+              <div key={key} className="filter-tag">
+                <span className="filter-label">
                   {key.toUpperCase()}: {value}
                 </span>
-                <button onClick={() => removeFilter(key)} style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0',
-                  transition: 'transform 0.2s ease'
-                }}>
+                <button onClick={() => removeFilter(key)}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -482,15 +388,8 @@ const PropertyList = () => {
         </div>
       )}
 
-      {/* Property listings or empty state */}
       {!properties || properties.length === 0 ? (
-        <Container maxWidth="md" sx={{ 
-          py: 4, 
-          textAlign: 'center',
-          backgroundColor: 'rgba(11, 16, 17, 0.5)',
-          borderRadius: '8px',
-          margin: '2rem auto'
-        }}>
+        <Container maxWidth="md" className="empty-state">
           <Typography variant="h6" gutterBottom>
             No properties found matching your criteria
           </Typography>
@@ -518,41 +417,16 @@ const PropertyList = () => {
         </Container>
       ) : (
         <>
-          <div className="property-listings fade-in-delay-4" style={{ 
-            display: 'flex',
-            padding: '0 2rem',
-            gap: '2rem',
-            position: 'relative',
-            zIndex: 1,
-            flexDirection: isMobile ? 'column' : 'row'
-          }}>
-            <div className="property-grid" style={{ 
-              flex: 2,
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: '2rem'
-            }}>
+          <div className="property-listings fade-in-delay-4">
+            <div className="property-grid">
               {paginatedProperties.map(property => (
                 <PropertyCard key={property._id} property={property} />
               ))}
             </div>
             
             {!isMobile && (
-              <div className="map-container" style={{ flex: 1, minHeight: '400px' }}>
-                <div className="map-placeholder" style={{
-                  backgroundColor: '#eee',
-                  height: '100%',
-                  minHeight: '400px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#333',
-                  fontWeight: 'bold',
-                  borderRadius: '8px',
-                  background: 'linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%)',
-                  backgroundSize: '200% 100%',
-                  animation: 'shimmer 3s infinite'
-                }}>
+              <div className="map-container">
+                <div className="map-placeholder">
                   <span>View larger map</span>
                 </div>
               </div>
@@ -560,11 +434,7 @@ const PropertyList = () => {
           </div>
 
           {filteredProperties.length > itemsPerPage && (
-            <Stack spacing={1} sx={{ 
-              mt: 4, 
-              alignItems: 'center',
-              padding: '0 2rem'
-            }}>
+            <Stack spacing={1} className="pagination-container">
               <Pagination
                 count={Math.ceil(filteredProperties.length / itemsPerPage)}
                 page={page}
@@ -572,18 +442,9 @@ const PropertyList = () => {
                 color="primary"
                 size={isMobile ? 'small' : 'medium'}
                 siblingCount={isMobile ? 0 : 1}
-                sx={{ 
-                  '& .MuiPaginationItem-root': { 
-                    fontSize: isMobile ? '0.75rem' : '0.875rem',
-                    color: 'white'
-                  },
-                  '& .MuiPaginationItem-root.Mui-selected': {
-                    backgroundColor: '#78CADC',
-                    color: '#08171A'
-                  }
-                }}
+                className="custom-pagination"
               />
-              <Typography variant="caption" color="#ccc">
+              <Typography variant="caption" className="pagination-count">
                 {paginatedProperties.length} of {filteredProperties.length} properties
               </Typography>
             </Stack>
