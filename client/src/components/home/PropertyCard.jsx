@@ -27,7 +27,7 @@ const PropertyCard = ({ property, index }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      className="bg-[#08171A] rounded-3xl overflow-hidden border border-gray-800 cursor-pointer"
+      className="bg-[#08171A] rounded-3xl overflow-hidden border border-[#78CADC] cursor-pointer"
       onClick={handleClick}
     >
       <div className="relative aspect-video">

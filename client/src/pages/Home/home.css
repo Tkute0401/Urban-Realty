@@ -58,6 +58,11 @@
   animation-fill-mode: both;
 }
 
+.properties-section-shadow {
+  box-shadow: 0px -25px 20px 20px rgba(0, 0, 0, 0.25);
+}
+
+
 .elementor-invisible {
   opacity: 0;
 }

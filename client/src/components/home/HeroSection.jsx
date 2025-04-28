@@ -107,8 +107,11 @@ const HeroSection = () => {
               className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 border-0"
             />
           </div>
+          
+
         </div>
       </form>
+      <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-b from-transparent to-[#08171A] pointer-events-none"></div>
     </section>
   );
 };
