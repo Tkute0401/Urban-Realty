@@ -8,7 +8,8 @@ const Home = () => {
   return (
     <div className="font-sans bg-[#0c0d0e] text-white">
       <HeroSection />
-      <PropertiesSection />
+      <PropertiesSection
+      />
       <ServiceBlock 
         title="BUY A HOME"
         subtitle="Find, Buy & Own Your"
