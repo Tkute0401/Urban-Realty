@@ -35,14 +35,14 @@ const HeroSection = () => {
               <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 21H21M5 21V7L13 3V21M19 21V11L13 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="font-serif text-2xl font-bold text-white">UR 360</span>
+              <span className="font-poppins text-2xl font-bold text-white">UR 360</span>
             </div>
 
             <nav className="hidden lg:flex gap-10">
               {navigation.map((item) => (
                 <a
                   key={item}
-                  className="font-sans text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-200 cursor-pointer"
+                  className="font-poppins text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-200 cursor-pointer"
                 >
                   {item}
                 </a>
@@ -51,7 +51,7 @@ const HeroSection = () => {
 
             <button onClick={() => navigate('/profile')} className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors">
               <UserIcon className="w-5 h-5 text-white" />
-              <span className="font-sans font-semibold">ACCOUNT</span>
+              <span className="font-poppins font-semibold">ACCOUNT</span>
             </button>
           </div>
         </div>
@@ -59,7 +59,7 @@ const HeroSection = () => {
         <div className="relative h-full flex items-center">
           <div className="w-full max-w-7xl mx-auto px-8">
             <div className="text-center mb-16">
-              <h1 className="font-serif text-6xl leading-tight font-bold mb-2 text-white">
+              <h1 className="font-poppins text-6xl leading-tight font-bold mb-2 text-white">
                 Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
               </h1>
               
@@ -88,7 +88,7 @@ const HeroSection = () => {
                   <span className="text-yellow-400 text-3xl">★</span>
                   <span className="text-white text-5xl font-bold">4.9</span>
                 </div>
-                <span className="text-sm font-sans text-gray-300">FROM 6,900+ CUSTOMERS</span>
+                <span className="text-sm font-poppins text-gray-300">FROM 6,900+ CUSTOMERS</span>
               </div>
             </div>
           </div>
