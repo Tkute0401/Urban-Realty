@@ -61,13 +61,13 @@ const PropertyCard = ({ property, index }) => {
           <span className="text-sm text-gray-400 ml-1">5.0 (??)</span>
         </div>
         
-        <h3 className="font-sans text-xl font-bold text-white mb-2">
+        <h3 className="font-poppins text-xl font-bold text-white mb-2">
           {property.buildingName || property.title}
         </h3>
         
         <div className="flex items-center gap-2 text-red-500 mb-3">
           <MapPinIcon className="w-4 h-4" />
-          <span className="font-sans text-sm">
+          <span className="font-poppins text-sm">
             {property.address?.city}, {property.address?.state}
           </span>
         </div>
@@ -103,7 +103,7 @@ const PropertyCard = ({ property, index }) => {
               handleClick();
             }}
           >
-            <span className="font-sans text-sm">View Details</span>
+            <span className="font-poppins text-sm">View Details</span>
           </button>
         </div>
       </div>

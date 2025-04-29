@@ -73,16 +73,16 @@
 // //             transition={{ duration: 0.6, delay: 0.2 }}
 // //             className={imageRight ? "text-left" : "text-right"}
 // //           >
-// //             <span className="text-gray-400 font-sans font-bold mb-2 block tracking-wide">
+// //             <span className="text-gray-400 font-poppins font-bold mb-2 block tracking-wide">
 // //               {isBuyHome ? "WANT TO BUY A HOME?" : isRentHome ? "WANT TO RENT A HOME?" : "WANT TO BUY PLOTS/LAND?"}
 // //             </span>
             
-// //             <h2 className="font-serif text-5xl font-bold mb-4 text-white leading-tight">
+// //             <h2 className="font-poppins text-5xl font-bold mb-4 text-white leading-tight">
 // //               {subtitle} <br />
 // //               <span className="text-[#78CADC]">Dream {propertyType}.</span>
 // //             </h2>
             
-// //             <p className="font-sans text-gray-300 mb-8 tracking-wide">
+// //             <p className="font-poppins text-gray-300 mb-8 tracking-wide">
 // //               {isBuyHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
 // //                isRentHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
 // //                "EXPLORE RESIDENTIAL, AGRICULTURAL, INDUSTRIAL AND COMMERCIAL PLOTS/LAND."}
@@ -183,16 +183,16 @@
 //             transition={{ duration: 0.6, delay: 0.2 }}
 //             className={imageRight ? "text-left" : "text-right"}
 //           >
-//             <span className="text-gray-400 font-sans font-bold mb-2 block tracking-wide">
+//             <span className="text-gray-400 font-poppins font-bold mb-2 block tracking-wide">
 //               {isBuyHome ? "WANT TO BUY A HOME?" : isRentHome ? "WANT TO RENT A HOME?" : "WANT TO BUY PLOTS/LAND?"}
 //             </span>
             
-//             <h2 className="font-serif text-5xl font-bold mb-4 text-white leading-tight">
+//             <h2 className="font-poppins text-5xl font-bold mb-4 text-white leading-tight">
 //               {subtitle} <br />
 //               <span className="text-[#78CADC]">Dream {propertyType}.</span>
 //             </h2>
             
-//             <p className="font-sans text-gray-300 mb-8 tracking-wide">
+//             <p className="font-poppins text-gray-300 mb-8 tracking-wide">
 //               {isBuyHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
 //                isRentHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
 //                "EXPLORE RESIDENTIAL, AGRICULTURAL, INDUSTRIAL AND COMMERCIAL PLOTS/LAND."}
@@ -290,16 +290,16 @@ const ServiceBlock = ({
             transition={{ duration: 0.6, delay: 0.2 }}
             className={imageRight ? "text-left" : "text-right"}
           >
-            <span className="text-gray-400 font-sans font-bold mb-2 block tracking-wide">
+            <span className="text-gray-400 font-poppins font-bold mb-2 block tracking-wide">
               {isBuyHome ? "WANT TO BUY A HOME?" : isRentHome ? "WANT TO RENT A HOME?" : "WANT TO BUY PLOTS/LAND?"}
             </span>
             
-            <h2 className="font-serif text-5xl font-bold mb-4 text-white leading-tight">
+            <h2 className="font-poppins text-5xl font-bold mb-4 text-white leading-tight">
               {subtitle} <br />
               <span className="text-[#78CADC]">Dream {propertyType}.</span>
             </h2>
             
-            <p className="font-sans text-gray-300 mb-8 tracking-wide">
+            <p className="font-poppins text-gray-300 mb-8 tracking-wide">
               {isBuyHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
                isRentHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
                "EXPLORE RESIDENTIAL, AGRICULTURAL, INDUSTRIAL AND COMMERCIAL PLOTS/LAND."}

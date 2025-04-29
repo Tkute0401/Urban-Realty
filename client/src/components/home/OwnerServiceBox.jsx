@@ -48,12 +48,12 @@
 //           className="lg:w-1/2 flex flex-col justify-center"
 //         >
 //           <div className="text-left">
-//             <span className="text-gray-400 font-sans font-bold block tracking-wide">ARE YOU AN OWNER?</span>
-//             <h2 className="font-serif text-4xl font-bold text-white leading-tight">
+//             <span className="text-gray-400 font-poppins font-bold block tracking-wide">ARE YOU AN OWNER?</span>
+//             <h2 className="font-poppins text-4xl font-bold text-white leading-tight">
 //               Sell or Rent <span className="text-[#78cadc]">Your Property</span> Faster with
 //               <br />Urban Realty 360
 //             </h2>
-//             <p className="font-sans text-gray-300 mt-2 tracking-wide text-sm mb-8">
+//             <p className="font-poppins text-gray-300 mt-2 tracking-wide text-sm mb-8">
 //               SELL OR RENT YOUR RESIDENTIAL/COMMERCIAL PROPERTY.
 //             </p>
             
@@ -122,12 +122,12 @@ const OwnerServiceBlock = () => {
           className="lg:w-1/2 flex flex-col justify-center"
         >
           <div className="text-left">
-            <span className="text-gray-400 font-sans font-bold block tracking-wide">ARE YOU AN OWNER?</span>
-            <h2 className="font-serif text-4xl font-bold text-white leading-tight">
+            <span className="text-gray-400 font-poppins font-bold block tracking-wide">ARE YOU AN OWNER?</span>
+            <h2 className="font-poppins text-5xl font-bold text-white leading-tight">
               Sell or Rent <span className="text-[#78cadc]">Your Property</span> Faster with
               <br />Urban Realty 360
             </h2>
-            <p className="font-sans text-gray-300 mt-2 tracking-wide text-sm mb-8">
+            <p className="font-poppins text-gray-300 mt-2 tracking-wide text-sm mb-8">
               SELL OR RENT YOUR RESIDENTIAL/COMMERCIAL PROPERTY.
             </p>
             

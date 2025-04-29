@@ -28,7 +28,7 @@ const PropertiesSection = () => {
     <section className="py-20 bg-[#08171A]">
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex justify-between items-center">
-          <h2 className="font-serif text-4xl font-bold text-white mb-4">
+          <h2 className="font-poppins text-4xl font-bold text-white mb-4">
             Properties based on <span className="text-[#78cadc]">Your Location</span>
           </h2>
           <button 
