@@ -44,7 +44,7 @@ const Login = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, border:"1px solid #78CADC", bgcolor: "#08171A", color: "#FFFFFF"}}>
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
             Login
@@ -66,7 +66,34 @@ const Login = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: '#08171A',   // default background
+                color: 'white',
+                '& fieldset': {
+                  borderColor: '#78CADC',     // normal border
+                },
+                '&:hover fieldset': {
+                  borderColor: '#78CADC',     // border when hovered
+                },
+                '&.Mui-focused': {
+                  backgroundColor: '#08171A',  // maintain background even when focused
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#78CADC',     // border when focused
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: 'white',                // label default
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: 'white',                // label when focused
+              },
+              input: {
+                color: 'white',                // text color
+              }
+            }}
           />
           <TextField
             fullWidth
@@ -76,7 +103,34 @@ const Login = () => {
             value={formData.password}
             onChange={handleChange}
             required
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: '#08171A',   // default background
+                color: 'white',
+                '& fieldset': {
+                  borderColor: '#78CADC',     // normal border
+                },
+                '&:hover fieldset': {
+                  borderColor: '#78CADC',     // border when hovered
+                },
+                '&.Mui-focused': {
+                  backgroundColor: '#08171A',  // maintain background even when focused
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#78CADC',     // border when focused
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: 'white',                // label default
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: 'white',                // label when focused
+              },
+              input: {
+                color: 'white',                // text color
+              }
+            }}
           />
           <Button
             type="submit"
@@ -84,7 +138,7 @@ const Login = () => {
             variant="contained"
             size="large"
             startIcon={<LoginIcon />}
-            sx={{ mt: 3, mb: 2, py: 1.5 }}
+            sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "#78CADC" }}
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
