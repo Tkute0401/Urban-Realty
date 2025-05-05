@@ -18,8 +18,8 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="h-[60vh] sm:h-screen relative flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-0">
+    <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0">
         <img 
           src="/building_5.jpg"
           alt="City skyline at night" 
@@ -73,20 +73,29 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <div className="relative h-full flex items-center">
+        <div className="relative h-full flex flex-col justify-center">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-8">
-            <div className="text-center mb-8 sm:mb-16">
+            {/* Main text at the top */}
+            <div className="text-center mb-4 sm:mb-6">
               <h1 className="font-poppins text-4xl sm:text-5xl md:text-6xl leading-tight font-bold mb-2 text-white">
                 Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
               </h1>
               
-              <p className="text-gray-300 mb-6 sm:mb-8 max-w-md sm:max-w-xl mx-auto text-sm sm:text-base">
+              <p className="text-gray-300 mb-4 sm:mb-6 max-w-md sm:max-w-xl mx-auto text-sm sm:text-base">
                 Discover your dream property from our extensive collection of 
                 homes, apartments, and commercial spaces across the country.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-0">
+            {/* Center text in its own row */}
+            <div className="text-white text-xs sm:text-sm text-center px-2 sm:px-4 max-w-xs sm:max-w-lg mx-auto mb-6 sm:mb-8">
+              <p className="mb-1">EXPERIENCE THE PERFECT BLEND OF COMFORT AND</p>
+              <p>NATURE, CRAFTED FOR YOUR ULTIMATE ESCAPE.</p>
+            </div>
+
+            {/* Bottom row with circular image and rating */}
+            <div className="flex items-center justify-between">
+              {/* Circular image on the left */}
               <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border border-gray-700/50">
                 <img 
                   src="/building_1.jpg" 
@@ -95,17 +104,15 @@ const HeroSection = () => {
                 />
               </div>
 
-              <div className="text-white text-xs sm:text-sm text-center px-2 sm:px-4 max-w-xs sm:max-w-lg">
-                <p className="mb-1">EXPERIENCE THE PERFECT BLEND OF COMFORT AND</p>
-                <p>NATURE, CRAFTED FOR YOUR ULTIMATE ESCAPE.</p>
-              </div>
-              
+              {/* Rating on the right */}
               <div className="bg-white/0 p-2 sm:p-4 rounded-xl">
-                <div className="flex gap-1 mb-1 items-center">
-                  <span className="text-yellow-400 text-2xl sm:text-3xl">★</span>
-                  <span className="text-white text-3xl sm:text-4xl md:text-5xl font-bold">4.9</span>
+                <div className="flex flex-col items-end">
+                  <div className="flex gap-1 mb-1 items-center">
+                    <span className="text-yellow-400 text-2xl sm:text-3xl">★</span>
+                    <span className="text-white text-3xl sm:text-4xl md:text-5xl font-bold">4.9</span>
+                  </div>
+                  <span className="text-xs sm:text-sm font-poppins text-gray-300 text-right">FROM 6,900+ CUSTOMERS</span>
                 </div>
-                <span className="text-xs sm:text-sm font-poppins text-gray-300">FROM 6,900+ CUSTOMERS</span>
               </div>
             </div>
           </div>
@@ -140,7 +147,7 @@ const HeroSection = () => {
         </motion.div>
       )}
       
-      <form onSubmit={handleSearch} className="absolute bottom-16 left-0 right-0 flex justify-center" style={{ transform: "translateY(50%)" }}>
+      <form onSubmit={handleSearch} className="absolute bottom-16 left-10 right-10 flex justify-center" style={{ transform: "translateY(50%)" }}>
         <div className="max-w-2xl w-full mx-4 sm:mx-8">
           <div className="relative flex items-center px-4 sm:px-6 py-3 sm:py-4 rounded-full bg-white/20 backdrop-blur-sm border-0">
             <MagnifyingGlassIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white mr-2 sm:mr-3" />
