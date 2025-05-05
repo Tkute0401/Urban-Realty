@@ -18,7 +18,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-hidden">
+    <section className="h-[60vh] sm:h-screen relative flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0">
         <img 
           src="/building_5.jpg"
