@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { UserIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, UserIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const HeroSection = () => {
   const [searchText, setSearchText] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   
   const navigation = ['CITY', 'PROPERTY', 'SERVICES', 'CONTACT US'];
@@ -17,7 +18,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="h-screen relative flex items-center justify-center overflow-hidden">
+    <section className="h-[700px] md:h-screen relative flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         <img 
           src="/building_5.jpg"
@@ -26,51 +27,67 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="absolute inset-x-8 top-4 bottom-16 rounded-3xl mx-40 overflow-hidden">
+      <div className="absolute inset-x-4 sm:inset-x-8 top-4 bottom-16 rounded-3xl sm:mx-4 md:mx-8 lg:mx-40 overflow-hidden">
         <div className="absolute inset-0 bg-white/10 backdrop-blur"></div>
         
-        <div className="relative w-full max-w-7xl mx-auto px-6 py-6">
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 21H21M5 21V7L13 3V21M19 21V11L13 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <span className="font-poppins text-2xl font-bold text-white">UR 360</span>
+              <span className="font-poppins text-xl sm:text-2xl font-bold text-white">UR 360</span>
             </div>
 
-            <nav className="hidden lg:flex gap-10">
+            <nav className="hidden lg:flex gap-6 xl:gap-10">
               {navigation.map((item) => (
                 <a
                   key={item}
-                  className="font-poppins text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-200 cursor-pointer"
+                  className="font-poppins text-base xl:text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-200 cursor-pointer"
                 >
                   {item}
                 </a>
               ))}
             </nav>
 
-            <button onClick={() => navigate('/profile')} className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors">
-              <UserIcon className="w-5 h-5 text-white" />
-              <span className="font-poppins font-semibold">ACCOUNT</span>
-            </button>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button 
+                onClick={() => navigate('/profile')} 
+                className="hidden sm:flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors"
+              >
+                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                <span className="font-poppins text-sm sm:text-base font-semibold">ACCOUNT</span>
+              </button>
+
+              <button 
+                className="lg:hidden p-2 text-white"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? (
+                  <XMarkIcon className="w-6 h-6" />
+                ) : (
+                  <Bars3Icon className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="relative h-full flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-8">
-            <div className="text-center mb-16">
-              <h1 className="font-poppins text-6xl leading-tight font-bold mb-2 text-white">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-8">
+            <div className="text-center mb-8 sm:mb-16">
+              <h1 className="font-poppins text-4xl sm:text-5xl md:text-6xl leading-tight font-bold mb-2 text-white">
                 Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
               </h1>
               
-              <p className="text-gray-300 mb-8 max-w-xl mx-auto">
+              <p className="text-gray-300 mb-6 sm:mb-8 max-w-md sm:max-w-xl mx-auto text-sm sm:text-base">
                 Discover your dream property from our extensive collection of 
                 homes, apartments, and commercial spaces across the country.
               </p>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="w-32 h-32 rounded-full overflow-hidden border border-gray-700/50">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-0">
+              <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border border-gray-700/50">
                 <img 
                   src="/building_1.jpg" 
                   alt="Map view" 
@@ -78,37 +95,63 @@ const HeroSection = () => {
                 />
               </div>
 
-              <div className="text-white text-sm text-center px-4 max-w-lg">
+              <div className="text-white text-xs sm:text-sm text-center px-2 sm:px-4 max-w-xs sm:max-w-lg">
                 <p className="mb-1">EXPERIENCE THE PERFECT BLEND OF COMFORT AND</p>
                 <p>NATURE, CRAFTED FOR YOUR ULTIMATE ESCAPE.</p>
               </div>
               
-              <div className="bg-white/0 p-4 rounded-xl">
+              <div className="bg-white/0 p-2 sm:p-4 rounded-xl">
                 <div className="flex gap-1 mb-1 items-center">
-                  <span className="text-yellow-400 text-3xl">★</span>
-                  <span className="text-white text-5xl font-bold">4.9</span>
+                  <span className="text-yellow-400 text-2xl sm:text-3xl">★</span>
+                  <span className="text-white text-3xl sm:text-4xl md:text-5xl font-bold">4.9</span>
                 </div>
-                <span className="text-sm font-poppins text-gray-300">FROM 6,900+ CUSTOMERS</span>
+                <span className="text-xs sm:text-sm font-poppins text-gray-300">FROM 6,900+ CUSTOMERS</span>
               </div>
             </div>
           </div>
         </div>
       </div>
       
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed top-24 left-4 right-4 z-40 bg-black/80 backdrop-blur-md rounded-2xl border border-white/10 lg:hidden"
+        >
+          <div className="flex flex-col p-4">
+            {navigation.map((item) => (
+              <a
+                key={item}
+                className="font-poppins text-lg font-medium text-white py-3 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 cursor-pointer"
+              >
+                {item}
+              </a>
+            ))}
+            <button 
+              onClick={() => navigate('/profile')} 
+              className="sm:hidden flex items-center justify-center gap-2 px-4 py-3 mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors"
+            >
+              <UserIcon className="w-5 h-5 text-white" />
+              <span className="font-poppins font-semibold">ACCOUNT</span>
+            </button>
+          </div>
+        </motion.div>
+      )}
+      
       <form onSubmit={handleSearch} className="absolute bottom-16 left-0 right-0 flex justify-center" style={{ transform: "translateY(50%)" }}>
-        <div className="max-w-2xl w-full mx-8">
-          <div className="relative flex items-center px-6 py-4 rounded-full bg-white/20 backdrop-blur-sm border-0">
-            <MagnifyingGlassIcon className="w-6 h-6 text-white mr-3" />
+        <div className="max-w-2xl w-full mx-4 sm:mx-8">
+          <div className="relative flex items-center px-4 sm:px-6 py-3 sm:py-4 rounded-full bg-white/20 backdrop-blur-sm border-0">
+            <MagnifyingGlassIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white mr-2 sm:mr-3" />
             <input
               type="text"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="Didn't find what you're looking for? Try searching here..."
-              className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 border-0"
+              className="w-full bg-transparent outline-none text-white placeholder:text-gray-400 border-0 text-sm sm:text-base"
             />
           </div>
-          
-
         </div>
       </form>
       <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-b from-transparent to-[#08171A] pointer-events-none"></div>
