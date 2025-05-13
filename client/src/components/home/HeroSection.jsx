@@ -91,7 +91,7 @@ const HeroSection = () => {
             </div>
 
             {/* Bottom row with circular image and rating */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-16 sm:mb-0"> {/* Added mb-16 for mobile */}
               {/* Circular image on the left */}
               <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border border-gray-700/50">
                 <img 
@@ -144,7 +144,8 @@ const HeroSection = () => {
         </motion.div>
       )}
       
-      <form onSubmit={handleSearch} className="absolute bottom-16 left-10 right-10 flex justify-center" style={{ transform: "translateY(50%)" }}>
+      {/* Search bar - moved outside the main container and adjusted positioning */}
+      <form onSubmit={handleSearch} className="absolute bottom-8 left-4 right-4 sm:left-10 sm:right-10 flex justify-center z-10">
         <div className="max-w-2xl w-full mx-4 sm:mx-8">
           <div className="relative flex items-center px-4 sm:px-6 py-3 sm:py-4 rounded-full bg-white/20 backdrop-blur-sm border-0">
             <MagnifyingGlassIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white mr-2 sm:mr-3" />
