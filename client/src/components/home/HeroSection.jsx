@@ -33,7 +33,7 @@ const HeroSection = () => {
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
-              <img src="/vite.png" alt="Logo" className="sm:ml-10 w-10 h-10 sm:w-20 sm:h-20" />
+              <img src="/vite.png" alt="Logo" className="sm:ml-10 w-20 h-20 sm:w-20 sm:h-20" />
             </div>
 
             <nav className="hidden lg:flex gap-6 xl:gap-10">
