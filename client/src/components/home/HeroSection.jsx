@@ -33,10 +33,7 @@ const HeroSection = () => {
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
-              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 21H21M5 21V7L13 3V21M19 21V11L13 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="font-poppins text-xl sm:text-2xl font-bold text-white">UR 360</span>
+              <img src="/vite.png" alt="Logo" className="sm:ml-10 w-10 h-10 sm:w-20 sm:h-20" />
             </div>
 
             <nav className="hidden lg:flex gap-6 xl:gap-10">
