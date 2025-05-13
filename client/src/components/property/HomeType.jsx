@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './HomeType.css';
 
-const HomeType = ({ onApply, currentType }) => {
+const HomeType = ({ onApply, currentType = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(!currentType);
   const [selectedTypes, setSelectedTypes] = useState({
@@ -16,12 +16,44 @@ const HomeType = ({ onApply, currentType }) => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    if (currentType) {
-      const typeKey = currentType.toLowerCase().replace(/ /g, '');
-      if (typeKey in selectedTypes) {
+    if (!currentType) {
+      setSelectAll(true);
+      setSelectedTypes({
+        houses: false,
+        townhomes: false,
+        multifamily: false,
+        condos: false,
+        lots: false,
+        apartments: false,
+        manufactured: false
+      });
+    } else {
+      const typeKey = currentType.toLowerCase().replace(/[/ -]/g, '');
+      const typeMap = {
+        'house': 'houses',
+        'townhouse': 'townhomes',
+        'townhome': 'townhomes',
+        'apartment': 'apartments',
+        'condo': 'condos',
+        'condos/coops': 'condos',
+        'land': 'lots',
+        'lots/land': 'lots',
+        'manufactured': 'manufactured',
+        'multifamily': 'multifamily'
+      };
+      
+      const mappedKey = typeMap[typeKey] || typeKey;
+      
+      if (mappedKey in selectedTypes) {
         setSelectedTypes({
-          ...selectedTypes,
-          [typeKey]: true
+          houses: false,
+          townhomes: false,
+          multifamily: false,
+          condos: false,
+          lots: false,
+          apartments: false,
+          manufactured: false,
+          [mappedKey]: true
         });
         setSelectAll(false);
       }
@@ -48,16 +80,16 @@ const HomeType = ({ onApply, currentType }) => {
   const handleSelectAll = () => {
     const newState = !selectAll;
     setSelectAll(newState);
-    
-    const updatedTypes = {};
-    Object.keys(selectedTypes).forEach(key => {
-      updatedTypes[key] = false;
+    setSelectedTypes({
+      houses: false,
+      townhomes: false,
+      multifamily: false,
+      condos: false,
+      lots: false,
+      apartments: false,
+      manufactured: false
     });
-    
-    setSelectedTypes(updatedTypes);
-    if (newState) {
-      onApply('');
-    }
+    onApply('');
   };
 
   const handleTypeChange = (type) => {
@@ -67,20 +99,17 @@ const HomeType = ({ onApply, currentType }) => {
     };
     
     setSelectedTypes(updatedTypes);
-    setSelectAll(Object.values(updatedTypes).every(value => !value));
+    setSelectAll(false);
     
-    // Convert the type to a display format
     const displayType = type === 'condos' ? 'Condos/Co-ops' : 
-                       type === 'townhomes' ? 'Townhomes' :
-                       type === 'multifamily' ? 'Multi-family' :
-                       type === 'manufactured' ? 'Manufactured' :
-                       type.charAt(0).toUpperCase() + type.slice(1);
+                     type === 'townhomes' ? 'Townhomes' :
+                     type === 'multifamily' ? 'Multi-family' :
+                     type === 'manufactured' ? 'Manufactured' :
+                     type === 'houses' ? 'Houses' :
+                     type === 'apartments' ? 'Apartments' :
+                     type === 'lots' ? 'Lots/Land' : '';
     
-    if (updatedTypes[type]) {
-      onApply(displayType);
-    } else {
-      onApply('');
-    }
+    onApply(updatedTypes[type] ? displayType : '');
   };
 
   const hasActiveFilter = currentType && currentType !== '';
@@ -100,7 +129,6 @@ const HomeType = ({ onApply, currentType }) => {
       {isOpen && (
         <div className="dropdown-content fade-in">
           <h3 className="dropdown-subtitle">Home Type</h3>
-          
           <div className="type-options">
             <div className="type-option">
               <input 
@@ -125,7 +153,7 @@ const HomeType = ({ onApply, currentType }) => {
                 <input 
                   type="checkbox" 
                   id={key} 
-                  checked={selectedTypes[key]}
+                  checked={selectedTypes[key] || false}
                   onChange={() => handleTypeChange(key)}
                 />
                 <label htmlFor={key}>{label}</label>

@@ -5,13 +5,23 @@ const More = ({ onApply, currentFilters = {}, amenityOptions }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('amenities');
   const [selectedFilters, setSelectedFilters] = useState({
-    amenities: currentFilters.amenities || [],
-    city: currentFilters.city || '',
-    state: currentFilters.state || '',
-    minArea: currentFilters.minArea || '',
-    maxArea: currentFilters.maxArea || ''
+    amenities: [],
+    city: '',
+    state: '',
+    minArea: '',
+    maxArea: ''
   });
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    setSelectedFilters({
+      amenities: currentFilters.amenities || [],
+      city: currentFilters.city || '',
+      state: currentFilters.state || '',
+      minArea: currentFilters.minArea || '',
+      maxArea: currentFilters.maxArea || ''
+    });
+  }, [currentFilters]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
