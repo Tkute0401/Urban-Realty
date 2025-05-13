@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './PriceDropdown.css';
 
-const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin, currentMax }) => {
+const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax = '' }) => {
   const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment');
   const [minPrice, setMinPrice] = useState(currentMin || '');
   const [maxPrice, setMaxPrice] = useState(currentMax || '');
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    setActiveTab(activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment');
-  }, [activeBtn]);
-
-  useEffect(() => {
-    if (currentMin) setMinPrice(currentMin);
-    if (currentMax) setMaxPrice(currentMax);
+    setMinPrice(currentMin || '');
+    setMaxPrice(currentMax || '');
   }, [currentMin, currentMax]);
 
   useEffect(() => {
@@ -95,17 +90,8 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin, currentMax }) =
           
           {activeBtn === 'BUY' && (
             <div className="tab-controls">
-              <button 
-                className={`tab-btn ${activeTab === 'List Price' ? 'active-tab' : ''}`}
-                onClick={() => setActiveTab('List Price')}
-              >
-                List Price
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'Monthly Payment' ? 'active-tab' : ''}`}
-                onClick={() => setActiveTab('Monthly Payment')}
-              >
-                Monthly Payment
+              <button className="tab-btn active-tab">
+                {activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment'}
               </button>
             </div>
           )}

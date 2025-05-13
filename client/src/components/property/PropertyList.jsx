@@ -3,8 +3,7 @@ import { useProperties } from '../../context/PropertiesContext';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 
-  Container, Pagination, Stack, useMediaQuery, useTheme,
-  ToggleButtonGroup, ToggleButton
+  Container, Pagination, Stack, useMediaQuery, useTheme
 } from '@mui/material';
 import PropertyCard from './PropertyCard';
 import { Add, Refresh } from '@mui/icons-material';
@@ -12,38 +11,11 @@ import BedBath from './BedBath';
 import HomeType from './HomeType';
 import More from './More';
 import PriceDropdown from './PriceDropdown';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
 import './PropertyList.css';
-// Icon components from MainPage
-const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
 
-const CloseIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
-
-const ZoomIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11 19c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"></path>
-    <path d="m21 21-4.3-4.3"></path>
-    <path d="M8 11h6"></path>
-    <path d="M11 8v6"></path>
-  </svg>
-);
-
-const GalleryIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-    <path d="m21 15-5-5L5 21"></path>
-  </svg>
-);
+// Icon components
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
@@ -52,22 +24,27 @@ const PropertyList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [propertyType, setPropertyType] = useState('ALL');
-  const [filters, setFilters] = useState({
-    city: '',
-    state: '',
-    priceMin: '',
-    priceMax: '',
-    type: '',
-    bedrooms: '',
-    bathrooms: '',
-    amenities: [],
-    minArea: '',
-    maxArea: ''
-  });
   const [isLoaded, setIsLoaded] = useState(false);
   const itemsPerPage = 12;
+
+  // Initialize filters from URL or defaults
+  const [filters, setFilters] = useState(() => {
+    const params = Object.fromEntries(searchParams.entries());
+    return {
+      search: params.search || '',
+      propertyType: params.propertyType || 'ALL',
+      type: params.type || '',
+      city: params.city || '',
+      state: params.state || '',
+      priceMin: params.priceMin || '',
+      priceMax: params.priceMax || '',
+      bedrooms: params.bedrooms || '',
+      bathrooms: params.bathrooms || '',
+      amenities: params.amenities ? params.amenities.split(',') : [],
+      minArea: params.minArea || '',
+      maxArea: params.maxArea || ''
+    };
+  });
 
   const amenityOptions = [
     'Parking',
@@ -85,202 +62,189 @@ const PropertyList = () => {
     'Storage'
   ];
 
+  // Fetch properties when filters change
   useEffect(() => {
-    const urlSearchTerm = searchParams.get('search');
-    const urlType = searchParams.get('type');
-    const urlStatus = searchParams.get('status');
-    const urlCity = searchParams.get('city');
-    const urlState = searchParams.get('state');
-    const urlPriceMin = searchParams.get('priceMin');
-    const urlPriceMax = searchParams.get('priceMax');
-    const urlBedrooms = searchParams.get('bedrooms');
-    const urlBathrooms = searchParams.get('bathrooms');
-    const urlAmenities = searchParams.get('amenities');
-    const urlMinArea = searchParams.get('minArea');
-    const urlMaxArea = searchParams.get('maxArea');
-    const urlPropertyType = searchParams.get('propertyType');
-    
-    if (urlSearchTerm) setSearchTerm(urlSearchTerm);
-    
-    if (urlPropertyType) {
-      setPropertyType(urlPropertyType);
-    }
+    const fetchData = async () => {
+      // Prepare API params
+      const apiParams = {
+        //...(filters.search && { search: filters.search }),
+        //...(filters.type && { propertyType: filters.type }),
+        //...(filters.city && { city: filters.city }),
+        //...(filters.state && { state: filters.state }),
+        //...(filters.priceMin && { priceMin: filters.priceMin }),
+        //...(filters.priceMax && { priceMax: filters.priceMax }),
+        //...(filters.bedrooms && { bedrooms: filters.bedrooms }),
+        //...(filters.bathrooms && { bathrooms: filters.bathrooms }),
+        //...(filters.amenities.length > 0 && { amenities: filters.amenities.join(',') }),
+        // ...(filters.minArea && { minArea: filters.minArea }),
+        // ...(filters.maxArea && { maxArea: filters.maxArea }),
+        // ...(filters.propertyType !== 'ALL' && { 
+        //   status: filters.propertyType === 'BUY' ? 'For Sale' : 'For Rent' 
+        // })
+      };
 
-    if (urlType) {
-      setFilters(prev => ({ ...prev, type: urlType }));
-    }
+      await getProperties(apiParams);
+      
+      // Update URL params to match current filters
+      const newSearchParams = new URLSearchParams();
+      Object.entries(apiParams).forEach(([key, value]) => {
+        if (value) newSearchParams.set(key, value);
+      });
+      setSearchParams(newSearchParams);
 
-    if (urlStatus) {
-      setFilters(prev => ({ ...prev, status: urlStatus }));
-    }
-
-    const newFilters = {};
-    if (urlCity) newFilters.city = urlCity;
-    if (urlState) newFilters.state = urlState;
-    if (urlPriceMin) newFilters.priceMin = urlPriceMin;
-    if (urlPriceMax) newFilters.priceMax = urlPriceMax;
-    if (urlBedrooms) newFilters.bedrooms = urlBedrooms;
-    if (urlBathrooms) newFilters.bathrooms = urlBathrooms;
-    if (urlAmenities) newFilters.amenities = urlAmenities.split(',');
-    if (urlMinArea) newFilters.minArea = urlMinArea;
-    if (urlMaxArea) newFilters.maxArea = urlMaxArea;
-
-    setFilters(prev => ({ ...prev, ...newFilters }));
-
-    const fetchParams = {
-      ...(urlSearchTerm && { search: urlSearchTerm }),
-      ...(urlType && { type: urlType }),
-      ...(urlStatus && { status: urlStatus }),
-      ...newFilters
+      // Short delay for animation
+      setTimeout(() => setIsLoaded(true), 100);
     };
-    
-    getProperties(fetchParams);
-    
-    // Short delay to allow for animation to start
-    setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-  }, [searchParams, getProperties]);
 
-  const handlePropertyTypeChange = (event, newType) => {
-    if (newType !== null) {
-      setPropertyType(newType);
-      const params = new URLSearchParams(searchParams);
-      params.set('propertyType', newType);
-      setSearchParams(params);
-      
-      const statusFilter = newType === 'ALL' ? null : newType === 'BUY' ? 'For Sale' : 'For Rent';
-      
-      const updatedFilters = { ...filters };
-      if (statusFilter) {
-        updatedFilters.status = statusFilter;
-      } else {
-        delete updatedFilters.status;
-      }
-      
-      getProperties(updatedFilters);
-      setPage(1);
-    }
+    fetchData();
+  }, [filters, getProperties, setSearchParams]);
+
+  // Handler for property type change
+  const handlePropertyTypeChange = (newType) => {
+    setFilters(prev => ({
+      ...prev,
+      propertyType: newType
+    }));
+    setPage(1);
   };
 
+  // Generic filter update handler
   const handleFilterChange = (newFilters) => {
-    const updatedFilters = { ...filters, ...newFilters };
-    setFilters(updatedFilters);
-    
-    const params = new URLSearchParams(searchParams);
-    if (searchTerm) params.set('search', searchTerm);
-    if (updatedFilters.type) params.set('type', updatedFilters.type);
-    if (updatedFilters.city) params.set('city', updatedFilters.city);
-    if (updatedFilters.state) params.set('state', updatedFilters.state);
-    if (updatedFilters.priceMin) params.set('priceMin', updatedFilters.priceMin);
-    if (updatedFilters.priceMax) params.set('priceMax', updatedFilters.priceMax);
-    if (updatedFilters.bedrooms) params.set('bedrooms', updatedFilters.bedrooms);
-    if (updatedFilters.bathrooms) params.set('bathrooms', updatedFilters.bathrooms);
-    if (updatedFilters.amenities?.length > 0) params.set('amenities', updatedFilters.amenities.join(','));
-    if (updatedFilters.minArea) params.set('minArea', updatedFilters.minArea);
-    if (updatedFilters.maxArea) params.set('maxArea', updatedFilters.maxArea);
-    
-    setSearchParams(params);
-    getProperties({
-      ...updatedFilters,
-      status: propertyType === 'ALL' ? '' : propertyType === 'BUY' ? 'For Sale' : 'For Rent'
-    });
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters
+    }));
     setPage(1);
   };
 
+  // Remove specific filter
   const removeFilter = (filterKey) => {
-    const updatedFilters = { ...filters };
-    updatedFilters[filterKey] = filterKey === 'amenities' ? [] : '';
-    setFilters(updatedFilters);
-    
-    const params = new URLSearchParams(searchParams);
-    params.delete(filterKey);
-    setSearchParams(params);
-    
-    getProperties({
-      ...updatedFilters,
-      status: propertyType === 'ALL' ? '' : propertyType === 'BUY' ? 'For Sale' : 'For Rent'
-    });
-    setPage(1);
+  // Create a new filters object without the removed filter
+  const updatedFilters = {
+    ...filters,
+    [filterKey]: Array.isArray(filters[filterKey]) ? [] : ''
   };
+  
+  // Update the filters state
+  setFilters(updatedFilters);
+  
+  // For specific filters that need dropdown synchronization:
+  if (filterKey === 'type') {
+    // This will trigger HomeType to reset its internal state
+    handleHomeTypeFilter('');
+  } else if (filterKey === 'bedrooms' || filterKey === 'bathrooms') {
+    handleBedBathFilter('', '');
+  } else if (filterKey === 'priceMin' || filterKey === 'priceMax') {
+    handlePriceFilter('', '');
+  }
+  // Add similar cases for other dropdown filters if needed
+  
+  setPage(1);
+};
 
+  // Specialized filter handlers
   const handlePriceFilter = (min, max) => {
-    handleFilterChange({ priceMin: min, priceMax: max });
+    handleFilterChange({ 
+      priceMin: min ? min.toString() : '',
+      priceMax: max ? max.toString() : '' 
+    });
   };
 
   const handleBedBathFilter = (bedrooms, bathrooms) => {
-    handleFilterChange({ bedrooms, bathrooms });
-  };
-
-  const handleHomeTypeFilter = (type) => {
-    handleFilterChange({ type });
-  };
-  
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (searchTerm) {
-      params.set('search', searchTerm);
-    } else {
-      params.delete('search');
-    }
-    setSearchParams(params);
-    getProperties({
-      ...filters,
-      search: searchTerm,
-      status: propertyType === 'ALL' ? '' : propertyType === 'BUY' ? 'For Sale' : 'For Rent'
+    handleFilterChange({ 
+      bedrooms: bedrooms ? bedrooms.toString() : '',
+      bathrooms: bathrooms ? bathrooms.toString() : '' 
     });
   };
 
+  const handleHomeTypeFilter = (type) => {
+  const typeMap = {
+    'Houses': 'House',
+    'Condos/Co-ops': 'Condo',
+    'Townhomes': 'Townhouse',
+    'Multi-family': 'Apartment',
+    'Manufactured': 'Manufactured',
+    'Lots/Land': 'Land',
+    'Apartments': 'Apartment'
+  };
+  
+  const dbType = typeMap[type] || type;
+  handleFilterChange({ type: dbType });
+};
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    handleFilterChange({ search: filters.search });
+  };
+
+  // Filter properties client-side (optional - can also rely on server-side filtering)
   const filteredProperties = properties?.filter(property => {
-    if (propertyType !== 'ALL') {
-      const statusMatch = propertyType === 'BUY' 
+    // Filter by property type (BUY/RENT/ALL)
+    if (filters.propertyType !== 'ALL') {
+      const statusMatch = filters.propertyType === 'BUY' 
         ? property.status === 'For Sale' 
         : property.status === 'For Rent';
       if (!statusMatch) return false;
     }
     
-    if (searchTerm) {
+    // Search term filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
       const matchesSearch = 
-        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.address?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.address?.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.buildingName?.toLowerCase().includes(searchTerm.toLowerCase());
+        (property.title && property.title.toLowerCase().includes(searchLower)) ||
+        (property.description && property.description.toLowerCase().includes(searchLower)) ||
+        (property.address?.city && property.address.city.toLowerCase().includes(searchLower)) ||
+        (property.address?.state && property.address.state.toLowerCase().includes(searchLower)) ||
+        (property.buildingName && property.buildingName.toLowerCase().includes(searchLower));
       if (!matchesSearch) return false;
     }
     
+    // Property type filter
     if (filters.type && property.type !== filters.type) return false;
     
-    if (filters.city && property.address.city.toLowerCase() !== filters.city.toLowerCase()) return false;
+    // Location filters (city/state)
+    if (filters.city && property.address?.city?.toLowerCase() !== filters.city.toLowerCase()) {
+      return false;
+    }
+    if (filters.state && property.address?.state?.toLowerCase() !== filters.state.toLowerCase()) {
+      return false;
+    }
     
-    if (filters.state && property.address.state.toLowerCase() !== filters.state.toLowerCase()) return false;
-    
+    // Price range filter
     if (filters.priceMin && property.price < parseInt(filters.priceMin)) return false;
     if (filters.priceMax && property.price > parseInt(filters.priceMax)) return false;
     
+    // Bedrooms filter
     if (filters.bedrooms) {
-      if (filters.bedrooms.endsWith('+')) {
+      if (filters.bedrooms === 'Any') {
+        // Any number of bedrooms is acceptable
+      } else if (filters.bedrooms.endsWith('+')) {
         const minBedrooms = parseInt(filters.bedrooms);
-        if (property.bedrooms < minBedrooms) return false;
-      } else if (property.bedrooms !== parseInt(filters.bedrooms)) {
-        return false;
+        if (!property.bedrooms || property.bedrooms < minBedrooms) return false;
+      } else {
+        if (property.bedrooms !== parseInt(filters.bedrooms)) return false;
       }
     }
     
+    // Bathrooms filter
     if (filters.bathrooms) {
-      if (filters.bathrooms.endsWith('+')) {
+      if (filters.bathrooms === 'Any') {
+        // Any number of bathrooms is acceptable
+      } else if (filters.bathrooms.endsWith('+')) {
         const minBathrooms = parseFloat(filters.bathrooms);
-        if (property.bathrooms < minBathrooms) return false;
-      } else if (property.bathrooms !== parseFloat(filters.bathrooms)) {
-        return false;
+        if (!property.bathrooms || property.bathrooms < minBathrooms) return false;
+      } else {
+        if (property.bathrooms !== parseFloat(filters.bathrooms)) return false;
       }
     }
     
-    if (filters.minArea && property.area < parseInt(filters.minArea)) return false;
-    if (filters.maxArea && property.area > parseInt(filters.maxArea)) return false;
+    // Area filter
+    if (filters.minArea && (!property.area || property.area < parseInt(filters.minArea))) return false;
+    if (filters.maxArea && (!property.area || property.area > parseInt(filters.maxArea))) return false;
     
+    // Amenities filter
     if (filters.amenities?.length > 0) {
+      if (!property.amenities || property.amenities.length === 0) return false;
       const hasAllAmenities = filters.amenities.every(amenity => 
         property.amenities.includes(amenity)
       );
@@ -323,7 +287,7 @@ const PropertyList = () => {
         <Typography variant="body2" sx={{ mb: 2, color: 'white' }}>{error}</Typography>
         <Button 
           variant="contained" 
-          onClick={getProperties}
+          onClick={() => getProperties({})}
           startIcon={<Refresh />}
           size={isMobile ? 'small' : 'medium'}
           sx={{ backgroundColor: '#78CADC', '&:hover': { backgroundColor: '#5cb3c5' } }}
@@ -342,44 +306,44 @@ const PropertyList = () => {
           <input 
             type="searchbar" 
             placeholder="SEARCH BY LOCATION (STATE OR CITY)" 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={filters.search} 
+            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
           />
           <button type="submit" className="search-button">
             <SearchIcon />
           </button>
         </form>
         <div className="NavbarBtn slide-in-right">
-        <div className="BuyRentToggle">
-  <button 
-    id="AllBtn" 
-    className={`${propertyType === 'ALL' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`} 
-    onClick={() => handlePropertyTypeChange(null, 'ALL')}
-  >
-    ALL
-  </button>
-  <button 
-    id="BuyBtn" 
-    className={`${propertyType === 'BUY' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`} 
-    onClick={() => handlePropertyTypeChange(null, 'BUY')}
-  >
-    BUY
-  </button>
-  <button 
-    id="RentBtn" 
-    className={`${propertyType === 'RENT' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`}
-    onClick={() => handlePropertyTypeChange(null, 'RENT')}
-  >
-    RENT
-  </button>
-</div>
+          <div className="BuyRentToggle">
+            <button 
+              id="AllBtn" 
+              className={`${filters.propertyType === 'ALL' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`} 
+              onClick={() => handlePropertyTypeChange('ALL')}
+            >
+              ALL
+            </button>
+            <button 
+              id="BuyBtn" 
+              className={`${filters.propertyType === 'BUY' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`} 
+              onClick={() => handlePropertyTypeChange('BUY')}
+            >
+              BUY
+            </button>
+            <button 
+              id="RentBtn" 
+              className={`${filters.propertyType === 'RENT' ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`}
+              onClick={() => handlePropertyTypeChange('RENT')}
+            >
+              RENT
+            </button>
+          </div>
           <div className="OtherNavbarBtn">
             <HomeType 
               onApply={handleHomeTypeFilter}
               currentType={filters.type}
             />
             <PriceDropdown 
-              activeBtn={propertyType === 'RENT' ? 'RENT' : 'BUY'} 
+              activeBtn={filters.propertyType === 'RENT' ? 'RENT' : 'BUY'} 
               onApply={handlePriceFilter}
               currentMin={filters.priceMin}
               currentMax={filters.priceMax}
@@ -403,13 +367,13 @@ const PropertyList = () => {
       <div className="breadcrumb fade-in-delay-1">
         <a href="/">HOME</a>
         <span className="separator">&gt;</span>
-        {propertyType === 'BUY' && (
+        {filters.propertyType === 'BUY' && (
           <>
             <a href="#">BUY</a>
             <span className="separator">&gt;</span>
           </>
         )}
-        {propertyType === 'RENT' && (
+        {filters.propertyType === 'RENT' && (
           <>
             <a href="#">RENT</a>
             <span className="separator">&gt;</span>
@@ -421,8 +385,8 @@ const PropertyList = () => {
       {/* Page Title */}
       <div className="page-title fade-in-delay-2">
         <h1>
-          {propertyType === 'RENT' ? 'Luxury Properties for ' : propertyType === 'BUY' ? 'Luxury Properties for ' : 'All Properties '}
-          <span>{propertyType === 'RENT' ? 'Rent' : propertyType === 'BUY' ? 'Sale' : ''}</span>
+          {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All Properties '}
+          <span>{filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : ''}</span>
         </h1>
         <div className="listings-count">
           {filteredProperties.length} LISTING{filteredProperties.length !== 1 ? 'S' : ''}
@@ -477,7 +441,7 @@ const PropertyList = () => {
           </Typography>
           <Button 
             variant="contained" 
-            onClick={getProperties}
+            onClick={() => getProperties({})}
             startIcon={<Refresh />}
             size={isMobile ? 'small' : 'medium'}
             sx={{ 
