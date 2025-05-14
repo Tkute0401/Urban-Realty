@@ -1,38 +1,21 @@
-/* Price Dropdown Styles */
-.btn-animate {
-  background-color: #0B1011;
-  border: 1px solid #78CADC;
-  border-radius: 4px;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
+/* PriceDropdown.css */
 .price-filter-dropdown {
   position: relative;
   display: inline-block;
   z-index: 1001;
 }
 
-.btn-animate.active-dropdown {
-  border-color: #78CADC;
-  box-shadow: 0 0 10px rgba(120, 202, 220, 0.3);
-  background-color: rgba(120, 202, 220, 0.1);
-}
-
 .price-dropdown-content {
   position: absolute;
   top: calc(100% + 10px);
-  right: 0; /* Changed from right: -100px to right: 0 */
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #0B1011;
   border: 1px solid #333;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   width: 400px;
-  z-index: 1100; /* Higher than the button z-index */
+  z-index: 1100;
   padding: 20px;
   color: white;
 }
@@ -44,7 +27,6 @@
   margin: 0 0 16px 0;
 }
 
-/* Tab controls */
 .tab-controls {
   display: flex;
   border-bottom: 1px solid #444;
@@ -72,7 +54,6 @@
   font-weight: 500;
 }
 
-/* Price range inputs */
 .price-range-inputs {
   display: flex;
   align-items: center;
@@ -130,7 +111,6 @@
   box-shadow: 0 0 0 2px rgba(120, 202, 220, 0.2);
 }
 
-/* Apply button */
 .apply-filter-btn {
   background-color: #78CADC;
   color: #08171A;
@@ -150,15 +130,14 @@
   transform: translateY(-2px);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
-      opacity: 0;
-      transform: translateY(-10px);
+    opacity: 0;
+    transform: translateY(-10px);
   }
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -166,21 +145,22 @@
   animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .price-dropdown-content {
-      width: 300px;
-      right: -100px;
+    width: 90vw;
+    left: 5vw;
+    right: 5vw;
+    transform: none;
   }
   
   .price-range-inputs {
-      flex-direction: column;
-      gap: 12px;
+    flex-direction: column;
+    gap: 12px;
   }
   
   .range-separator {
-      margin: 0;
-      text-align: center;
-      width: 100%;
+    margin: 0;
+    text-align: center;
+    width: 100%;
   }
 }

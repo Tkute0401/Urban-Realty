@@ -1,51 +1,4 @@
-/* client/src/components/property/BedBath.css */
-/* Common Dropdown Styles */
-.filter-dropdown {
-  position: relative;
-  display: inline-block;
-  z-index: 1001; /* Ensure dropdown button is above other elements */
-}
-.filter-btn {
-  background-color: #0B1011;
-  border: 1px solid #78CADC;
-  border-radius: 4px;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
-.filter-btn.active-dropdown {
-  position: relative;
-  z-index: 1101; /* Above the dropdown content */
-}
-
-.dropdown-content {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0; /* Changed from left: 0 to right: 0 to prevent left overflow */
-  background-color: #0B1011;
-  border: 1px solid #333;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  width: 320px;
-  z-index: 1100; /* Higher than the button z-index */
-  padding: 20px;
-  color: white;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.dropdown-subtitle {
-  font-size: 16px;
-  font-weight: 500;
-  color: white;
-  margin: 0 0 16px 0;
-}
-
-/* Beds & Baths Dropdown */
+/* BedBath.css */
 .bedrooms-section,
 .bathrooms-section {
   margin-bottom: 20px;
@@ -89,38 +42,9 @@
   color: #ccc;
 }
 
-/* Apply Button */
-.apply-filter-btn {
-  background-color: #78CADC;
-  color: #08171A;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  padding: 12px;
-  width: 100%;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-}
-
-.apply-filter-btn:hover {
-  background-color: #78CADC;
-  transform: translateY(-2px);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-      opacity: 0;
-      transform: translateY(-10px);
+@media (max-width: 768px) {
+  .bedrooms-options,
+  .bathrooms-options {
+    grid-template-columns: repeat(3, 1fr);
   }
-  to {
-      opacity: 1;
-      transform: translateY(0);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-out forwards;
 }
