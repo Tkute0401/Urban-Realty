@@ -26,13 +26,13 @@
 .price-dropdown-content {
   position: absolute;
   top: calc(100% + 10px);
-  right: 0;
+  right: 0; /* Changed from right: -100px to right: 0 */
   background-color: #0B1011;
   border: 1px solid #333;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   width: 400px;
-  z-index: 1000;
+  z-index: 1100; /* Higher than the button z-index */
   padding: 20px;
   color: white;
 }
