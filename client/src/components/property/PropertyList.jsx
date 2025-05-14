@@ -4,16 +4,14 @@ import { useSearchParams } from 'react-router-dom';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 
   Container, Pagination, Stack, useMediaQuery, useTheme,
-  Drawer, IconButton
+  Drawer, IconButton, Divider
 } from '@mui/material';
 import PropertyCard from './PropertyCard';
-import { Add, Refresh, Menu, FilterList } from '@mui/icons-material';
+import { Add, Refresh, FilterList, Close, Search } from '@mui/icons-material';
 import BedBath from './BedBath';
 import HomeType from './HomeType';
 import More from './More';
 import PriceDropdown from './PriceDropdown';
-import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
 import './PropertyList.css';
 
 const PropertyList = () => {
@@ -25,6 +23,7 @@ const PropertyList = () => {
   const [page, setPage] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
   const itemsPerPage = isMobile ? 6 : 12;
 
   // Initialize filters from URL or defaults
@@ -148,11 +147,12 @@ const PropertyList = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     handleFilterChange({ search: filters.search });
+    if (isMobile) setSearchExpanded(false);
   };
 
   // Filter properties client-side
   const filteredProperties = properties?.filter(property => {
-    // Your filter logic here
+    // Your filtering logic here
     return true;
   }) || [];
 
@@ -200,103 +200,146 @@ const PropertyList = () => {
     );
   }
 
-  // Mobile filter drawer content
+  // Mobile Filters Drawer
   const renderMobileFilters = () => (
-    <div className="mobile-filters">
-      <div className="filter-section">
-        <h3>Property Type</h3>
-        <div className="BuyRentToggle mobile-toggle">
-          <button 
-            className={`${filters.propertyType === 'ALL' ? 'active' : ''}`} 
-            onClick={() => handlePropertyTypeChange('ALL')}
-          >
-            ALL
-          </button>
-          <button 
-            className={`${filters.propertyType === 'BUY' ? 'active' : ''}`} 
-            onClick={() => handlePropertyTypeChange('BUY')}
-          >
-            BUY
-          </button>
-          <button 
-            className={`${filters.propertyType === 'RENT' ? 'active' : ''}`}
-            onClick={() => handlePropertyTypeChange('RENT')}
-          >
-            RENT
-          </button>
-        </div>
-      </div>
-
-      <div className="filter-section">
+    <Drawer
+      anchor="right"
+      open={mobileFiltersOpen}
+      onClose={() => setMobileFiltersOpen(false)}
+      sx={{
+        '& .MuiDrawer-paper': {
+          width: '85vw',
+          maxWidth: '400px',
+          backgroundColor: '#0B1011',
+          color: 'white',
+          padding: '20px'
+        }
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">Filters</Typography>
+        <IconButton onClick={() => setMobileFiltersOpen(false)} sx={{ color: 'white' }}>
+          <Close />
+        </IconButton>
+      </Box>
+      <Divider sx={{ bgcolor: '#333', mb: 3 }} />
+      
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>Property Type</Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {['ALL', 'BUY', 'RENT'].map(type => (
+              <Button
+                key={type}
+                variant={filters.propertyType === type ? 'contained' : 'outlined'}
+                onClick={() => handlePropertyTypeChange(type)}
+                sx={{
+                  flex: 1,
+                  backgroundColor: filters.propertyType === type ? '#78CADC' : 'transparent',
+                  color: filters.propertyType === type ? '#08171A' : 'white',
+                  borderColor: '#78CADC',
+                  '&:hover': {
+                    backgroundColor: filters.propertyType === type ? '#5cb3c5' : 'rgba(120, 202, 220, 0.1)'
+                  }
+                }}
+              >
+                {type}
+              </Button>
+            ))}
+          </Box>
+        </Box>
+        
         <HomeType 
           onApply={handleHomeTypeFilter}
           currentType={filters.type}
         />
-      </div>
-
-      <div className="filter-section">
+        
         <PriceDropdown 
           activeBtn={filters.propertyType === 'RENT' ? 'RENT' : 'BUY'} 
           onApply={handlePriceFilter}
           currentMin={filters.priceMin}
           currentMax={filters.priceMax}
         />
-      </div>
-
-      <div className="filter-section">
+        
         <BedBath 
           onApply={handleBedBathFilter}
           currentBedrooms={filters.bedrooms}
           currentBathrooms={filters.bathrooms}
         />
-      </div>
-
-      <div className="filter-section">
+        
         <More 
           onApply={(moreFilters) => handleFilterChange(moreFilters)}
           currentFilters={filters}
           amenityOptions={amenityOptions}
         />
-      </div>
-
-      <Button 
-        variant="contained"
-        fullWidth
-        onClick={() => setMobileFiltersOpen(false)}
-        sx={{ 
-          mt: 2,
-          backgroundColor: '#78CADC',
-          color: '#08171A',
-          '&:hover': {
-            backgroundColor: '#5cb3c5'
-          }
-        }}
-      >
-        Apply Filters
-      </Button>
-    </div>
+      </Box>
+      
+      <Box sx={{ mt: 'auto', pt: 2 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={() => setMobileFiltersOpen(false)}
+          sx={{
+            backgroundColor: '#78CADC',
+            color: '#08171A',
+            '&:hover': { backgroundColor: '#5cb3c5' }
+          }}
+        >
+          Apply Filters
+        </Button>
+      </Box>
+    </Drawer>
   );
 
   return (
     <div className={`main-container ${isLoaded ? 'fade-in-delay-1' : ''}`}>
-      {/* Mobile Header */}
-      {isMobile && (
-        <div className="mobile-header">
-          <IconButton onClick={() => setMobileFiltersOpen(true)}>
-            <FilterList sx={{ color: '#78CADC' }} />
+      {/* Mobile Search Header */}
+      {isMobile && !searchExpanded && (
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 16px',
+          backgroundColor: '#08171A',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1100
+        }}>
+          <IconButton onClick={() => setSearchExpanded(true)} sx={{ color: 'white' }}>
+            <Search />
           </IconButton>
-          <form onSubmit={handleSearchSubmit} className="mobile-search">
+          <IconButton onClick={() => setMobileFiltersOpen(true)} sx={{ color: 'white' }}>
+            <FilterList />
+          </IconButton>
+        </Box>
+      )}
+
+      {/* Expanded Mobile Search */}
+      {isMobile && searchExpanded && (
+        <Box sx={{
+          padding: '12px 16px',
+          backgroundColor: '#08171A',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1100,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
+          <IconButton onClick={() => setSearchExpanded(false)} sx={{ color: 'white' }}>
+            <Close />
+          </IconButton>
+          <form onSubmit={handleSearchSubmit} style={{ flex: 1 }}>
             <input 
-              type="search" 
-              placeholder="Search location..." 
+              type="text" 
+              className="mobile-search-input"
+              placeholder="Search by location..." 
               value={filters.search} 
               onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              autoFocus
             />
-            <button type="submit">
-              <SearchIcon />
-            </button>
           </form>
-        </div>
+        </Box>
       )}
 
       {/* Desktop Navbar with search */}
@@ -315,27 +358,16 @@ const PropertyList = () => {
           </form>
           <div className="NavbarBtn slide-in-right">
             <div className="BuyRentToggle">
-              <button 
-                id="AllBtn" 
-                className={`${filters.propertyType === 'ALL' ? 'active' : ''}`} 
-                onClick={() => handlePropertyTypeChange('ALL')}
-              >
-                ALL
-              </button>
-              <button 
-                id="BuyBtn" 
-                className={`${filters.propertyType === 'BUY' ? 'active' : ''}`} 
-                onClick={() => handlePropertyTypeChange('BUY')}
-              >
-                BUY
-              </button>
-              <button 
-                id="RentBtn" 
-                className={`${filters.propertyType === 'RENT' ? 'active' : ''}`}
-                onClick={() => handlePropertyTypeChange('RENT')}
-              >
-                RENT
-              </button>
+              {['ALL', 'BUY', 'RENT'].map(type => (
+                <button 
+                  key={type}
+                  id={`${type}Btn`}
+                  className={`${filters.propertyType === type ? 'bg-[#78CADC] text-black' : 'bg-black-400 text-white'}`}
+                  onClick={() => handlePropertyTypeChange(type)}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
             <div className="OtherNavbarBtn">
               <HomeType 
@@ -364,51 +396,33 @@ const PropertyList = () => {
         </div>
       )}
 
-      {/* Mobile Filter Drawer */}
-      <Drawer
-        anchor="left"
-        open={mobileFiltersOpen}
-        onClose={() => setMobileFiltersOpen(false)}
-        sx={{
-          '& .MuiDrawer-paper': {
-            width: '85%',
-            maxWidth: '350px',
-            backgroundColor: '#0B1011',
-            color: 'white',
-            padding: '20px'
-          }
-        }}
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-          <IconButton onClick={() => setMobileFiltersOpen(false)}>
-            <CloseIcon sx={{ color: 'white' }} />
-          </IconButton>
-        </Box>
-        {renderMobileFilters()}
-      </Drawer>
+      {/* Render mobile filters drawer */}
+      {renderMobileFilters()}
 
-      {/* Breadcrumb */}
-      <div className={`breadcrumb ${isMobile ? 'mobile-breadcrumb' : ''} fade-in-delay-1`}>
-        <a href="/">HOME</a>
-        <span className="separator">&gt;</span>
-        {filters.propertyType === 'BUY' && (
-          <>
-            <a href="#">BUY</a>
-            <span className="separator">&gt;</span>
-          </>
-        )}
-        {filters.propertyType === 'RENT' && (
-          <>
-            <a href="#">RENT</a>
-            <span className="separator">&gt;</span>
-          </>
-        )}
-        <a href="#">PROPERTIES</a>
-      </div>
+      {/* Breadcrumb - Hidden on mobile to save space */}
+      {!isMobile && (
+        <div className="breadcrumb fade-in-delay-1">
+          <a href="/">HOME</a>
+          <span className="separator">&gt;</span>
+          {filters.propertyType === 'BUY' && (
+            <>
+              <a href="#">BUY</a>
+              <span className="separator">&gt;</span>
+            </>
+          )}
+          {filters.propertyType === 'RENT' && (
+            <>
+              <a href="#">RENT</a>
+              <span className="separator">&gt;</span>
+            </>
+          )}
+          <a href="#">PROPERTIES</a>
+        </div>
+      )}
 
       {/* Page Title */}
-      <div className={`page-title ${isMobile ? 'mobile-page-title' : ''} fade-in-delay-2`}>
-        <h1>
+      <div className="page-title fade-in-delay-2" style={{ padding: isMobile ? '16px' : undefined }}>
+        <h1 style={{ fontSize: isMobile ? '1.5rem' : '2.5rem' }}>
           {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All Properties '}
           <span>{filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : ''}</span>
         </h1>
@@ -417,17 +431,24 @@ const PropertyList = () => {
         </div>
       </div>
 
-      {/* Filter Tags */}
+      {/* Filter Tags - Scrollable on mobile */}
       {Object.entries(filters).filter(([key, value]) => 
-        value && (Array.isArray(value) ? value.length > 0 : true))
-        .length > 0 && (
-        <div className={`filter-tags ${isMobile ? 'mobile-filter-tags' : ''} fade-in-delay-3`}>
+        value && (Array.isArray(value) ? value.length > 0 : true)).length > 0 && (
+        <div 
+          className="filter-tags fade-in-delay-3"
+          style={{
+            padding: isMobile ? '8px 16px' : '0 2rem',
+            overflowX: isMobile ? 'auto' : 'visible',
+            whiteSpace: isMobile ? 'nowrap' : 'wrap',
+            flexWrap: isMobile ? 'nowrap' : 'wrap'
+          }}
+        >
           {Object.entries(filters).map(([key, value]) => {
             if (!value || (Array.isArray(value) && value.length === 0)) return null;
             
             if (Array.isArray(value)) {
               return value.map(item => (
-                <div key={`${key}-${item}`} className="filter-tag">
+                <div key={`${key}-${item}`} className="filter-tag" style={{ margin: isMobile ? '0 4px' : undefined }}>
                   <span className="filter-label">
                     {key.toUpperCase()}: {item}
                   </span>
@@ -435,19 +456,19 @@ const PropertyList = () => {
                     const updatedAmenities = filters.amenities.filter(a => a !== item);
                     handleFilterChange({ amenities: updatedAmenities });
                   }}>
-                    <CloseIcon />
+                    <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
                   </button>
                 </div>
               ));
             }
             
             return (
-              <div key={key} className="filter-tag">
+              <div key={key} className="filter-tag" style={{ margin: isMobile ? '0 4px' : undefined }}>
                 <span className="filter-label">
                   {key.toUpperCase()}: {value}
                 </span>
                 <button onClick={() => removeFilter(key)}>
-                  <CloseIcon />
+                  <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
                 </button>
               </div>
             );
@@ -456,7 +477,7 @@ const PropertyList = () => {
       )}
 
       {!properties || properties.length === 0 ? (
-        <Container maxWidth="md" className={`empty-state ${isMobile ? 'mobile-empty-state' : ''} fade-in-delay-4`}>
+        <Container maxWidth="md" className="empty-state fade-in-delay-4" sx={{ py: isMobile ? 3 : 4 }}>
           <Typography variant="h6" gutterBottom>
             No properties found matching your criteria
           </Typography>
@@ -503,10 +524,26 @@ const PropertyList = () => {
         </Container>
       ) : (
         <>
-          <div className={`property-listings ${isMobile ? 'mobile-property-listings' : ''} fade-in-delay-4`}>
-            <div className={`property-grid ${isMobile ? 'mobile-property-grid' : ''}`}>
+          <div 
+            className="property-listings fade-in-delay-4"
+            style={{ 
+              padding: isMobile ? '0 8px' : '0 2rem',
+              flexDirection: isMobile ? 'column' : 'row'
+            }}
+          >
+            <div 
+              className="property-grid"
+              style={{
+                gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
+                gap: isMobile ? '8px' : '2rem'
+              }}
+            >
               {paginatedProperties.map(property => (
-                <PropertyCard key={property._id} property={property} isMobile={isMobile} />
+                <PropertyCard 
+                  key={property._id} 
+                  property={property} 
+                  isMobile={isMobile}
+                />
               ))}
             </div>
             
@@ -520,7 +557,7 @@ const PropertyList = () => {
           </div>
 
           {filteredProperties.length > itemsPerPage && (
-            <Stack spacing={1} className={`pagination-container ${isMobile ? 'mobile-pagination' : ''} fade-in-delay-4`}>
+            <Stack spacing={1} className="pagination-container fade-in-delay-4">
               <Pagination
                 count={Math.ceil(filteredProperties.length / itemsPerPage)}
                 page={page}
@@ -528,6 +565,7 @@ const PropertyList = () => {
                 color="primary"
                 size={isMobile ? 'small' : 'medium'}
                 siblingCount={isMobile ? 0 : 1}
+                boundaryCount={isMobile ? 0 : 1}
                 className="custom-pagination"
                 sx={{
                   '& .MuiPaginationItem-root': { color: 'white' },
