@@ -13,6 +13,7 @@ import HomeType from './HomeType';
 import More from './More';
 import PriceDropdown from './PriceDropdown';
 import './PropertyList.css';
+import CloseIcon from '@mui/icons-material/Close';
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
