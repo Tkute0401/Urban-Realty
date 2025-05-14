@@ -95,14 +95,8 @@ body {
 
 /* Navbar Styles - Enhanced for mobile */
 .Navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background-color: #08171A;
-  flex-wrap: wrap;
-  gap: 1rem;
-  position: relative; /* For absolute positioning of dropdowns */
+  position: relative;
+  z-index: 1000; /* Lower than dropdown z-index */
 }
 
 .search-container {
@@ -219,14 +213,8 @@ body {
 }
 
 .OtherNavbarBtn {
-  display: flex;
-  gap: 0.5rem; /* Reduced gap for mobile */
   position: relative;
-  z-index: 1000;
-  flex-wrap: wrap;
-  justify-content: center; /* Center on mobile */
-  margin-top: 0.75rem; /* Space between top buttons and these */
-  width: 100%;
+  z-index: 1000; /* Lower than dropdown z-index */
 }
 
 .OtherNavbarBtn button {

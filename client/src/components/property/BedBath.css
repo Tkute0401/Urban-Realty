@@ -3,9 +3,8 @@
 .filter-dropdown {
   position: relative;
   display: inline-block;
-  z-index: 1001;
+  z-index: 1001; /* Ensure dropdown button is above other elements */
 }
-
 .filter-btn {
   background-color: #0B1011;
   border: 1px solid #78CADC;
@@ -19,21 +18,20 @@
 }
 
 .filter-btn.active-dropdown {
-  border-color: #78CADC;
-  box-shadow: 0 0 10px rgba(120, 202, 220, 0.3);
-  background-color: rgba(120, 202, 220, 0.1);
+  position: relative;
+  z-index: 1101; /* Above the dropdown content */
 }
 
 .dropdown-content {
   position: absolute;
   top: calc(100% + 10px);
-  right: 0;
+  right: 0; /* Changed from left: 0 to right: 0 to prevent left overflow */
   background-color: #0B1011;
   border: 1px solid #333;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   width: 320px;
-  z-index: 1000;
+  z-index: 1100; /* Higher than the button z-index */
   padding: 20px;
   color: white;
   max-height: 80vh;
