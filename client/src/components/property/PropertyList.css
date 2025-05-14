@@ -848,3 +848,385 @@ body {
     padding: 1.5rem 2rem;
   }
 }
+
+/* Mobile Header */
+.mobile-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #08171A;
+  border-bottom: 1px solid #333;
+}
+
+.mobile-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: white;
+  margin-left: 1rem;
+}
+
+/* Mobile Search */
+.mobile-search-container {
+  display: flex;
+  padding: 0.5rem 1rem;
+  background-color: #08171A;
+  position: relative;
+}
+
+.mobile-search-container input[type="searchbar"] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #0B1011;
+  border: 1px solid #78CADC;
+  border-radius: 4px;
+  color: white;
+}
+
+/* Mobile Filters */
+.mobile-filters {
+  padding: 1rem;
+}
+
+.mobile-filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.mobile-filter-tags {
+  display: flex;
+  overflow-x: auto;
+  padding: 0.5rem;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-filter-tags .filter-tag {
+  flex: 0 0 auto;
+  margin-right: 0.5rem;
+}
+
+/* Mobile Property Grid */
+.mobile-property-grid {
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.mobile-results-count {
+  padding: 0.5rem 1rem;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+/* Adjust buttons for mobile */
+@media (max-width: 768px) {
+  .BuyRentToggle {
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .BuyRentToggle button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    border-radius: 4px !important;
+  }
+  
+  .OtherNavbarBtn {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .OtherNavbarBtn > * {
+    width: 100%;
+  }
+  
+  #SaveBtn {
+    margin-top: 1rem;
+  }
+}
+
+
+/* Mobile-specific styles */
+.mobile-top-bar {
+display: none;
+position: sticky;
+top: 0;
+z-index: 1000;
+background-color: #08171A;
+padding: 0.5rem;
+border-bottom: 1px solid #1E2D2F;
+}
+
+@media (max-width: 768px) {
+.mobile-top-bar {
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
+}
+
+.mobile-search-container {
+display: flex;
+width: 100%;
+transition: all 0.3s ease;
+}
+
+.mobile-search-container.expanded {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+background-color: #08171A;
+padding: 0.5rem;
+z-index: 1100;
+box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.mobile-search-form {
+display: flex;
+width: 100%;
+align-items: center;
+gap: 0.5rem;
+}
+
+.mobile-search-input {
+flex: 1;
+background-color: transparent;
+border: 1px solid #78CADC;
+border-radius: 5px;
+color: white;
+padding: 0.75rem 1rem;
+font-size: 0.9rem;
+outline: none;
+}
+
+.mobile-search-button {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+background-color: #0B1011;
+border: 1px solid #78CADC;
+border-radius: 5px;
+color: white;
+padding: 0.75rem 1rem;
+width: 100%;
+font-size: 0.9rem;
+cursor: pointer;
+}
+
+.mobile-filter-button {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+background-color: #0B1011;
+border: 1px solid #78CADC;
+border-radius: 5px;
+color: white;
+padding: 0.75rem 1rem;
+width: 100%;
+font-size: 0.9rem;
+cursor: pointer;
+position: relative;
+}
+
+.filter-badge {
+position: absolute;
+top: -8px;
+right: -8px;
+background-color: #78CADC;
+color: #08171A;
+border-radius: 50%;
+width: 20px;
+height: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 0.7rem;
+font-weight: bold;
+}
+
+.mobile-toggle-container {
+display: flex;
+width: 100%;
+border: 1px solid #78CADC;
+border-radius: 5px;
+overflow: hidden;
+}
+
+.mobile-toggle-button {
+flex: 1;
+padding: 0.75rem;
+background-color: #0B1011;
+border: none;
+color: white;
+font-size: 0.9rem;
+cursor: pointer;
+text-align: center;
+}
+
+.mobile-toggle-button.active {
+background-color: #78CADC;
+color: #08171A;
+font-weight: 600;
+}
+
+/* Mobile filter drawer styles */
+.mobile-filter-drawer {
+z-index: 1200;
+}
+
+.mobile-drawer-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 1rem;
+border-bottom: 1px solid #1E2D2F;
+}
+
+.mobile-drawer-title {
+font-size: 1.2rem;
+font-weight: 600;
+}
+
+.close-drawer-btn {
+color: white;
+}
+
+.mobile-drawer-content {
+padding: 1rem;
+overflow-y: auto;
+max-height: 60vh;
+}
+
+.mobile-filter-section {
+margin-bottom: 1.5rem;
+}
+
+.mobile-filter-section-title {
+font-size: 1rem;
+font-weight: 500;
+margin-bottom: 0.75rem;
+color: #78CADC;
+}
+
+.mobile-property-type-buttons {
+display: flex;
+gap: 0.5rem;
+margin-bottom: 1rem;
+}
+
+.mobile-filter-button {
+flex: 1;
+padding: 0.75rem;
+background-color: #0B1011;
+border: 1px solid #78CADC;
+border-radius: 4px;
+color: white;
+font-size: 0.9rem;
+cursor: pointer;
+text-align: center;
+}
+
+.mobile-filter-button.active {
+background-color: #78CADC;
+color: #08171A;
+font-weight: 600;
+border-color: #78CADC;
+}
+
+.mobile-drawer-footer {
+display: flex;
+padding: 1rem;
+border-top: 1px solid #1E2D2F;
+gap: 0.5rem;
+}
+
+.mobile-clear-filters {
+flex: 1;
+padding: 0.75rem;
+background-color: transparent;
+border: 1px solid #555;
+border-radius: 4px;
+color: white;
+font-size: 0.9rem;
+cursor: pointer;
+}
+
+.mobile-apply-filters {
+flex: 2;
+padding: 0.75rem;
+background-color: #78CADC;
+border: none;
+border-radius: 4px;
+color: #08171A;
+font-size: 0.9rem;
+font-weight: 600;
+cursor: pointer;
+}
+
+/* Mobile breadcrumb */
+.mobile-breadcrumb {
+padding: 0.5rem;
+font-size: 0.7rem;
+}
+
+/* Mobile filter tags */
+.mobile-filter-tags {
+padding: 0.5rem;
+margin-bottom: 1rem;
+}
+
+.filter-tag {
+padding: 0.3rem 0.75rem;
+font-size: 0.75rem;
+}
+
+.show-more-filters,
+.show-less-filters {
+background: transparent;
+border: none;
+color: #78CADC;
+font-size: 0.75rem;
+display: flex;
+align-items: center;
+gap: 0.25rem;
+cursor: pointer;
+}
+
+.clear-all-filters {
+background: transparent;
+border: none;
+color: #78CADC;
+font-size: 0.75rem;
+cursor: pointer;
+margin-left: 0.5rem;
+}
+
+/* Adjust property cards for mobile */
+.property-grid {
+grid-template-columns: 1fr;
+gap: 1rem;
+}
+
+/* Hide desktop elements on mobile */
+.Navbar {
+display: none;
+}
+}
+
+/* Tablet-specific styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+.property-grid {
+grid-template-columns: repeat(2, 1fr);
+}
+
+.mobile-top-bar {
+display: none;
+}
+
+.Navbar {
+display: flex;
+}
+}
