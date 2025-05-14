@@ -1,4 +1,4 @@
-/* PropertyList.css - Enhanced with MainPage design elements */
+/* PropertyList.css - Enhanced with improved mobile responsiveness */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 body {
@@ -8,7 +8,7 @@ body {
   color: white;
 }
 
-/* Animation Keyframes */
+/* Animation Keyframes - Unchanged */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -40,7 +40,7 @@ body {
   100% { background-position: 200% 0; }
 }
 
-/* Animation Classes */
+/* Animation Classes - Unchanged */
 .fade-in {
   animation: fadeIn 0.6s ease-in-out forwards;
 }
@@ -81,26 +81,28 @@ body {
   animation: slideInUp 0.6s ease-out forwards;
 }
 
-/* Main Container */
+/* Main Container - Added max-width calculation for better mobile view */
 .main-container {
   width: 100%;
-  max-width: 1600px;
+  max-width: min(1600px, 100vw - 20px);
   margin: 0 auto;
   background-color: #08171A;
   color: white;
   min-height: 100vh;
   opacity: 0;
+  padding: 0 10px; /* Add some padding for mobile */
 }
 
-/* Navbar Styles */
+/* Navbar Styles - Enhanced for mobile */
 .Navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
+  padding: 1rem;
   background-color: #08171A;
   flex-wrap: wrap;
   gap: 1rem;
+  position: relative; /* For absolute positioning of dropdowns */
 }
 
 .search-container {
@@ -108,7 +110,8 @@ body {
   align-items: center;
   flex: 1;
   position: relative;
-  max-width: 500px;
+  max-width: 100%; /* Full width on mobile */
+  min-width: 250px; /* Prevent too narrow search bar */
 }
 
 .Navbar input[type="searchbar"] {
@@ -117,7 +120,7 @@ body {
   border: 1px solid #78CADC;
   border-radius: 5px;
   color: white;
-  font-size: 1rem;
+  font-size: 0.9rem; /* Slightly smaller on mobile */
   padding: 0.75rem 1rem;
   text-transform: uppercase;
   outline: none;
@@ -131,7 +134,7 @@ body {
 .Navbar input[type="searchbar"]::placeholder {
   color: #78CADC;
   opacity: 0.7;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Smaller placeholder for mobile */
 }
 
 .search-button {
@@ -142,34 +145,43 @@ body {
   color: #78CADC;
   cursor: pointer;
   transition: transform 0.2s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-button:hover {
   transform: scale(1.1);
 }
 
-/* Button section */
+/* Button section - Better organized for mobile */
 .NavbarBtn {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
   position: relative;
   z-index: 1000;
+  width: 100%; /* Full width on mobile */
+  justify-content: center; /* Center on mobile */
 }
 
 .BuyRentToggle {
   display: flex;
+  min-width: 250px; /* Prevent too narrow buttons */
+  max-width: 100%;
 }
 
 .BuyRentToggle button {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.25rem; /* Reduced padding for mobile */
   border: 1px solid #78CADC;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Smaller font for mobile */
   text-transform: uppercase;
+  flex: 1; /* Equal width buttons */
 }
 
 #AllBtn {
@@ -208,10 +220,13 @@ body {
 
 .OtherNavbarBtn {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem; /* Reduced gap for mobile */
   position: relative;
   z-index: 1000;
   flex-wrap: wrap;
+  justify-content: center; /* Center on mobile */
+  margin-top: 0.75rem; /* Space between top buttons and these */
+  width: 100%;
 }
 
 .OtherNavbarBtn button {
@@ -219,11 +234,17 @@ body {
   border: 1px solid #78CADC;
   border-radius: 4px;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 0.9rem; /* Reduced padding for mobile */
   cursor: pointer;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.75rem; /* Smaller font for mobile */
   transition: all 0.3s ease;
+  flex: 1; /* Flexible width to fit mobile */
+  min-width: 100px; /* Min width for buttons */
+  max-width: 150px; /* Max width for buttons */
+  white-space: nowrap; /* Prevent text wrapping inside buttons */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .btn-animate:hover {
@@ -232,13 +253,23 @@ body {
   transform: translateY(-2px);
 }
 
-/* Breadcrumb navigation */
+/* Better mobile touch targets for buttons */
+.OtherNavbarBtn button,
+.custom-button,
+.custom-button-outline {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Breadcrumb navigation - Made more compact for mobile */
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  font-size: 0.9rem;
+  gap: 0.25rem; /* Reduced for mobile */
+  padding: 0.75rem 1rem; /* Reduced padding */
+  font-size: 0.8rem; /* Smaller font for mobile */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  line-height: 1.5; /* Better spacing if wraps */
 }
 
 .breadcrumb a {
@@ -253,19 +284,20 @@ body {
 
 .breadcrumb .separator {
   color: #555;
-  margin: 0 4px;
+  margin: 0 2px; /* Reduced spacing */
 }
 
-/* Page title */
+/* Page title - Reduced size for mobile */
 .page-title {
-  padding: 0 2rem;
-  margin-bottom: 2rem;
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .page-title h1 {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem); /* Responsive font size */
   margin-bottom: 0.5rem;
   font-weight: bold;
+  line-height: 1.2; /* Improved line height for wrapping */
 }
 
 .page-title h1 span {
@@ -276,7 +308,7 @@ body {
 .page-title h1 span::after {
   content: '';
   position: absolute;
-  bottom: -5px;
+  bottom: -3px; /* Adjusted for mobile */
   left: 0;
   width: 0;
   height: 2px;
@@ -289,16 +321,16 @@ body {
 }
 
 .listings-count {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #ccc;
 }
 
-/* Filter tags */
+/* Filter tags - Better wrapping for mobile */
 .filter-tags {
   display: flex;
-  gap: 1rem;
-  padding: 0 2rem;
-  margin-bottom: 2rem;
+  gap: 0.5rem; /* Smaller gap for mobile */
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -306,11 +338,12 @@ body {
   background-color: #0B1011;
   border: 1px solid #333;
   border-radius: 50px;
-  padding: 0.5rem 1.5rem;
+  padding: 0.4rem 1rem; /* Reduced padding for mobile */
   display: flex;
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
+  margin-bottom: 0.25rem; /* Add space between wrapped items */
 }
 
 .filter-tag:hover {
@@ -319,7 +352,8 @@ body {
 }
 
 .filter-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem; /* Smaller for mobile */
+  white-space: nowrap; /* Prevent awkward wrapping inside tag */
 }
 
 .filter-tag button {
@@ -330,7 +364,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 0.25rem; /* Increased touch target */
   transition: transform 0.2s ease;
 }
 
@@ -338,46 +372,53 @@ body {
   transform: rotate(90deg);
 }
 
-/* Property Listings */
+/* Property Listings - Made more flexible for mobile */
 .property-listings {
   display: flex;
-  padding: 0 2rem;
-  gap: 2rem;
+  padding: 0 1rem;
+  gap: 1.5rem;
   position: relative;
   z-index: 1;
+  flex-direction: column; /* Stack on mobile */
 }
 
 .property-grid {
-  flex: 2;
+  flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); /* Responsive grid */
+  gap: 1.5rem;
 }
 
-/* Property Card Styles */
+/* Property Card Styles - Optimized for mobile */
 .property-card {
   background-color: #0B1011;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #333;
   transition: all 0.3s ease;
-  height: auto;
+  height: 100%; /* Full height to match other cards */
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .property-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px); /* Reduced animation on mobile */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   border-color: #78CADC;
 }
 
 .property-image-container {
   position: relative;
-  height: 200px;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
   overflow: hidden;
 }
 
 .property-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -415,8 +456,8 @@ body {
   background-color: rgba(120, 202, 220, 0.8);
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 36px; /* Slightly smaller for mobile */
+  height: 36px; /* Slightly smaller for mobile */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -447,10 +488,13 @@ body {
 
 .property-details {
   padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .property-price {
-  font-size: 1.3rem;
+  font-size: 1.2rem; /* Slightly smaller for mobile */
   font-weight: bold;
   color: #78CADC;
   margin-bottom: 0.5rem;
@@ -461,7 +505,8 @@ body {
   align-items: center;
   margin-bottom: 0.75rem;
   color: #ccc;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Smaller for mobile */
+  flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
 .property-spec-divider {
@@ -470,22 +515,24 @@ body {
 }
 
 .property-location {
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Smaller for mobile */
   color: #aaa;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: auto; /* Push to bottom of flex container */
 }
 
 .map-container {
   flex: 1;
-  min-height: 400px;
+  min-height: 300px; /* Reduced height for mobile */
+  width: 100%;
 }
 
 .map-placeholder {
   background-color: #0B1011;
   height: 100%;
-  min-height: 400px;
+  min-height: 300px; /* Reduced height for mobile */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -498,23 +545,23 @@ body {
   animation: shimmer 3s infinite;
 }
 
-/* Empty state */
+/* Empty state - Made more compact for mobile */
 .empty-state {
-  margin-top: 2rem;
-  padding: 3rem;
+  margin-top: 1.5rem;
+  padding: 2rem 1rem; /* Reduced padding for mobile */
   text-align: center;
   background-color: #0B1011;
   border-radius: 8px;
   border: 1px solid #333;
 }
 
-/* Pagination styles */
+/* Pagination styles - More compact for mobile */
 .pagination-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 0;
-  margin-top: 2rem;
+  padding: 1.5rem 0; /* Reduced padding */
+  margin-top: 1.5rem;
 }
 
 .custom-pagination {
@@ -523,78 +570,10 @@ body {
 
 .pagination-count {
   color: #aaa;
-  font-size: 0.85rem;
+  font-size: 0.75rem; /* Smaller for mobile */
 }
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .property-listings {
-    flex-direction: column;
-  }
-  
-  .NavbarBtn {
-    margin-top: 1rem;
-  }
-  
-  .OtherNavbarBtn {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .Navbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .search-container {
-    max-width: 100%;
-  }
-  
-  .NavbarBtn {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .OtherNavbarBtn {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-  
-  .OtherNavbarBtn button {
-    margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-  }
-  
-  .property-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .page-title h1 {
-    font-size: 1.8rem;
-  }
-}
-
-/* Animation for hover effects */
-@media (prefers-reduced-motion: no-preference) {
-  .btn-animate {
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  }
-  
-  .property-card {
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                box-shadow 0.4s ease, 
-                border-color 0.3s ease;
-  }
-  
-  .property-image {
-    transition: transform 0.8s cubic-bezier(0.215, 0.610, 0.355, 1);
-  }
-}
-
-/* Dropdown styles for filter components */
+/* Dropdown styles for filter components - Better mobile positioning */
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -604,7 +583,8 @@ body {
   border-radius: 4px;
   padding: 1rem;
   z-index: 1500;
-  min-width: 220px;
+  min-width: min(90vw, 280px); /* Responsive width, but not too wide */
+  max-width: 90vw; /* Don't overflow screen */
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   margin-top: 0.5rem;
 }
@@ -637,12 +617,14 @@ body {
   background-color: transparent;
   border: 1px solid #555;
   color: #ccc;
+  padding: 0.5rem 1rem !important; /* Override other button styles */
 }
 
 .dropdown-apply {
   background-color: #78CADC;
   border: none;
   color: #08171A;
+  padding: 0.5rem 1rem !important; /* Override other button styles */
 }
 
 .dropdown-cancel:hover {
@@ -653,18 +635,18 @@ body {
   background-color: #5cb3c5;
 }
 
-/* Custom button styles */
+/* Custom button styles - More compact for mobile */
 .custom-button {
   background-color: #78CADC;
   color: #08171A;
   border: none;
   border-radius: 4px;
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1.25rem; /* Reduced for mobile */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Smaller for mobile */
 }
 
 .custom-button:hover {
@@ -678,12 +660,12 @@ body {
   color: #78CADC;
   border: 1px solid #78CADC;
   border-radius: 4px;
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1.25rem; /* Reduced for mobile */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.85rem; /* Smaller for mobile */
 }
 
 .custom-button-outline:hover {
@@ -691,64 +673,178 @@ body {
   transform: translateY(-2px);
 }
 
-/* Mobile-specific styles */
+/* Mobile-specific optimizations */
 @media (max-width: 768px) {
-  .mobile-search-input {
+  .Navbar {
+    padding: 1rem 0.75rem;
+  }
+  
+  .search-container {
+    max-width: 100%;
     width: 100%;
-    background-color: transparent;
-    border: 1px solid #78CADC;
-    border-radius: 5px;
-    color: white;
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
-    outline: none;
   }
-
-  .property-card {
-    height: auto;
-    margin-bottom: 8px;
+  
+  .BuyRentToggle {
+    width: 100%; /* Full width on mobile */
   }
-
+  
+  .OtherNavbarBtn {
+    margin-top: 0.75rem;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .OtherNavbarBtn button {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+    min-width: auto;
+    flex: 1;
+  }
+  
+  /* Equal width dropdown buttons on mobile */
+  .OtherNavbarBtn > * {
+    flex: 1;
+    max-width: none;
+  }
+  
+  /* Better mobile spacing */
+  .page-title {
+    padding: 0 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .page-title h1 {
+    font-size: 1.5rem;
+  }
+  
+  .property-grid {
+    grid-template-columns: 1fr; /* Single column on small mobile */
+  }
+  
+  /* Override fixed heights for better aspect ratios */
   .property-image-container {
-    height: 150px;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
   }
+  
+  /* Show map below properties on mobile */
+  .map-container {
+    order: 2;
+    margin-top: 1.5rem;
+  }
+  
+  .property-grid {
+    order: 1;
+  }
+  
+  /* Smaller buttons and spacing */
+  .image-action-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Reduce animations for better performance */
+  .property-card:hover {
+    transform: translateY(-3px);
+  }
+}
 
+/* Small mobile screens */
+@media (max-width: 480px) {
+  .BuyRentToggle button {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.7rem;
+  }
+  
+  .OtherNavbarBtn {
+    gap: 0.35rem;
+  }
+  
+  .OtherNavbarBtn button {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.65rem;
+    min-width: 65px; /* Ensure minimum width */
+  }
+  
+  /* Stack property specs on very small screens */
+  .property-specs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+  }
+  
+  .property-spec-divider {
+    display: none; /* Hide dividers when wrapped */
+  }
+  
+  /* Better spacing in tight layouts */
   .property-price {
     font-size: 1.1rem;
   }
-
-  .property-specs {
-    font-size: 0.8rem;
-  }
-
-  .property-location {
-    font-size: 0.8rem;
-  }
-
-  .filter-tags {
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .filter-tags::-webkit-scrollbar {
-    display: none;
-  }
-
+  
   .filter-tag {
-    padding: 0.4rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.3rem 0.75rem;
+  }
+  
+  .filter-label {
+    font-size: 0.75rem;
+  }
+  
+  /* Make pagination more compact */
+  .pagination-container {
+    padding: 1rem 0;
   }
 }
 
-/* Mobile tap targets */
-button, .property-card {
-  min-height: 48px;
-  min-width: 48px;
+/* Medium screens */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .property-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns on medium screens */
+  }
+  
+  .property-listings {
+    flex-direction: column; /* Stack map below on medium screens */
+  }
+  
+  .NavbarBtn {
+    width: auto;
+    flex-direction: row;
+  }
+  
+  .OtherNavbarBtn {
+    width: auto;
+  }
+  
+  .map-container {
+    margin-top: 1.5rem;
+  }
 }
 
-/* Prevent zoom on input focus */
-@media screen and (max-width: 768px) {
-  input, select, textarea {
-    font-size: 16px;
+/* Larger screens */
+@media (min-width: 1025px) {
+  .property-listings {
+    flex-direction: row; /* Side by side on large screens */
+  }
+  
+  .property-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    flex: 2;
+  }
+  
+  .map-container {
+    flex: 1;
+    position: sticky;
+    top: 2rem;
+    height: calc(100vh - 4rem);
+    max-height: 800px;
+  }
+  
+  .NavbarBtn {
+    width: auto;
+    justify-content: flex-end;
+  }
+  
+  .Navbar {
+    padding: 1.5rem 2rem;
   }
 }
