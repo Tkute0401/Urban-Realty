@@ -1,3 +1,543 @@
+/* PropertyList.css - Enhanced with proper dropdown positioning and z-index fixes */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #08171A;
+  color: white;
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.6s ease-in-out forwards;
+}
+
+.fade-in-delay-1 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.2s;
+}
+
+.fade-in-delay-2 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.4s;
+}
+
+.fade-in-delay-3 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.6s;
+}
+
+.fade-in-delay-4 {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  animation-delay: 0.8s;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+/* Main Container */
+.main-container {
+  width: 100%;
+  max-width: min(1600px, 100vw - 20px);
+  margin: 0 auto;
+  background-color: #08171A;
+  color: white;
+  min-height: 100vh;
+  opacity: 0;
+  padding: 0 10px;
+}
+
+/* Navbar Styles */
+.Navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #08171A;
+  flex-wrap: wrap;
+  gap: 1rem;
+  position: relative;
+  z-index: 1000; /* Lower than dropdown z-index */
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  max-width: 100%;
+  min-width: 250px;
+}
+
+.Navbar input[type="searchbar"] {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid #78CADC;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.Navbar input[type="searchbar"]:focus {
+  box-shadow: 0 0 0 2px rgba(120, 202, 220, 0.3);
+}
+
+.Navbar input[type="searchbar"]::placeholder {
+  color: #78CADC;
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #78CADC;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  transform: scale(1.1);
+}
+
+/* Button section */
+.NavbarBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1000;
+  width: 100%;
+  justify-content: center;
+}
+
+.BuyRentToggle {
+  display: flex;
+  min-width: 250px;
+  max-width: 100%;
+}
+
+.BuyRentToggle button {
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #78CADC;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+#AllBtn {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#BuyBtn {
+  border-radius: 0;
+}
+
+#RentBtn {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.bg-cyan-400 {
+  background-color: #78CADC;
+}
+
+.bg-black-400 {
+  background-color: #0B1011;
+}
+
+.text-black {
+  color: black;
+}
+
+.text-white {
+  color: white;
+}
+
+.OtherNavbarBtn {
+  display: flex;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1000;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.OtherNavbarBtn button {
+  background-color: #0B1011;
+  border: 1px solid #78CADC;
+  border-radius: 4px;
+  color: white;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 100px;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-animate:hover {
+  border-color: #78CADC;
+  box-shadow: 0 0 10px rgba(120, 202, 220, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Dropdown Base Styles */
+.filter-dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 1001;
+}
+
+.filter-btn {
+  background-color: #0B1011;
+  border: 1px solid #78CADC;
+  border-radius: 4px;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.filter-btn.active-dropdown {
+  border-color: #78CADC;
+  box-shadow: 0 0 10px rgba(120, 202, 220, 0.3);
+  background-color: rgba(120, 202, 220, 0.1);
+  position: relative;
+  z-index: 1101;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background-color: #0B1011;
+  border: 1px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  z-index: 1100;
+  padding: 20px;
+  color: white;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.dropdown-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  margin: 0 0 16px 0;
+}
+
+/* Price Dropdown Specific */
+.price-dropdown-content {
+  width: 400px;
+}
+
+.price-range-inputs {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.price-field {
+  flex: 1;
+}
+
+.price-field label {
+  display: block;
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.range-separator {
+  margin: 0 10px;
+  font-size: 18px;
+  color: #78CADC;
+  margin-top: 24px;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper::after {
+  content: "▼";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #78CADC;
+  pointer-events: none;
+}
+
+.price-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  appearance: none;
+  background-color: #0B1011;
+  color: white;
+  cursor: pointer;
+}
+
+.price-select:focus {
+  outline: none;
+  border-color: #78CADC;
+  box-shadow: 0 0 0 2px rgba(120, 202, 220, 0.2);
+}
+
+/* More Dropdown Specific */
+.more-dropdown .dropdown-content {
+  width: 520px;
+  padding: 0;
+  display: flex;
+  height: 400px;
+  right: 0;
+}
+
+.more-sidebar {
+  width: 180px;
+  background-color: #0A1517;
+  border-right: 1px solid #333;
+  padding: 0;
+}
+
+.sidebar-item {
+  padding: 14px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background-color: rgba(120, 202, 220, 0.1);
+}
+
+.sidebar-item.active-sidebar {
+  background-color: rgba(120, 202, 220, 0.2);
+  border-left: 3px solid #78CADC;
+  color: #78CADC;
+}
+
+.more-content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.tag-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tag-option {
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-option:hover {
+  border-color: #78CADC;
+  color: white;
+}
+
+.tag-option.selected {
+  background-color: rgba(120, 202, 220, 0.1);
+  border-color: #78CADC;
+  color: #78CADC;
+}
+
+/* Home Type Dropdown Specific */
+.type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.type-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.type-option input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.type-option label {
+  cursor: pointer;
+}
+
+/* Beds & Baths Dropdown Specific */
+.bedrooms-section,
+.bathrooms-section {
+  margin-bottom: 20px;
+}
+
+.bedrooms-options,
+.bathrooms-options {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.option-btn {
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: white;
+  padding: 8px 0;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-btn:hover {
+  border-color: #78CADC;
+}
+
+.option-btn.active-option {
+  background-color: #78CADC;
+  color: #0B1011;
+  border-color: #78CADC;
+}
+
+/* Apply Button */
+.apply-filter-btn {
+  background-color: #78CADC;
+  color: #08171A;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 12px;
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.apply-filter-btn:hover {
+  background-color: #5cb3c5;
+  transform: translateY(-2px);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .price-dropdown-content {
+    width: 300px;
+    right: 0;
+  }
+  
+  .more-dropdown .dropdown-content {
+    width: 100%;
+    max-width: 300px;
+    right: 0;
+  }
+  
+  .dropdown-content {
+    width: 280px;
+  }
+}
+
+/* Rest of your existing CSS... */
+/* (Include all the remaining CSS from your original file below this point) */
+
+
+
 /* PropertyList.css - Enhanced with improved mobile responsiveness */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -1218,3 +1758,4 @@ display: none;
 display: flex;
 }
 }
+
