@@ -91,7 +91,7 @@ const HeroSection = () => {
             </div>
 
             {/* Bottom row with circular image and rating */}
-            <div className="flex items-center justify-between mb-16 sm:mb-0"> {/* Added mb-16 for mobile */}
+            <div className="flex items-center justify-between mb-16 sm:mb-20"> {/* Added mb-16 for mobile */}
               {/* Circular image on the left */}
               <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border border-gray-700/50">
                 <img 
