@@ -3,6 +3,7 @@ import HeroSection from "../../components/home/HeroSection";
 import PropertiesSection from "../../components/home/PropertiesSection";
 import OwnerServiceBlock from "../../components/home/OwnerServiceBox";
 import ServiceBlock from "../../components/home/ServiceBlock";
+import Footer from "../../components/common/Footer";
 
 const Home = () => {
   return (
@@ -30,6 +31,7 @@ const Home = () => {
         propertyType="Land"
       />
       <OwnerServiceBlock />
+      <Footer/>
     </div>
   );
 };
