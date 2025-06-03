@@ -52,7 +52,7 @@ const BlurHeader = () => {
               />
             </div>
 
-            <nav className="hidden lg:flex gap-8 xl:gap-10">
+            <nav className="hidden xl:flex gap-8 xl:gap-10">
               {navigation.map((item) => (
                 <div key={item.name} className="relative group">
                   <button className="flex items-center gap-1 font-poppins text-base xl:text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-300">
@@ -78,13 +78,13 @@ const BlurHeader = () => {
             </nav>
 
             <div className="flex items-center gap-3 sm:gap-4">
-              <button className="hidden lg:flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-[#78cadc]/10 hover:border-[#78cadc] transition-colors duration-300 group">
+              <button className="hidden xl:flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-[#78cadc]/10 hover:border-[#78cadc] transition-colors duration-300 group">
                 <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:text-[#78cadc] transition-colors" />
                 <span className="font-poppins font-semibold text-sm sm:text-base">ACCOUNT</span>
               </button>
 
               <button 
-                className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-300"
+                className="xl:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-300"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 {isMobileMenuOpen ? (
@@ -106,7 +106,7 @@ const BlurHeader = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-20 sm:top-24 left-4 right-4 z-40 bg-[#08171A]/95 backdrop-blur-lg rounded-2xl border border-[#78cadc]/30 shadow-xl lg:hidden"
+            className="fixed top-20 sm:top-24 left-4 right-4 z-40 bg-[#08171A]/95 backdrop-blur-lg rounded-2xl border border-[#78cadc]/30 shadow-xl xl:hidden"
           >
             <div className="flex flex-col p-4 sm:p-5">
               {navigation.map((item) => (
@@ -149,7 +149,7 @@ const BlurHeader = () => {
                 </div>
               ))}
               <button 
-                className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 mt-2 rounded-lg text-white bg-[#78cadc]/10 border border-[#78cadc]/30 hover:bg-[#78cadc]/20 transition-colors"
+                className="xl:hidden flex items-center justify-center gap-2 px-4 py-3 mt-2 rounded-lg text-white bg-[#78cadc]/10 border border-[#78cadc]/30 hover:bg-[#78cadc]/20 transition-colors"
               >
                 <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#78cadc]" />
                 <span className="font-poppins font-semibold">ACCOUNT</span>
