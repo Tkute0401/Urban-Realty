@@ -48,12 +48,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {cities.map((city, index) => (
                 <li key={index}>
-                  <a 
-                    href="#" 
+                  <link 
+                    to={`/properties?city=${city}`} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
                     {city} Real Estate
-                  </a>
+                  </link>
                 </li>
               ))}
             </ul>
