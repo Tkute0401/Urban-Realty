@@ -23,6 +23,14 @@ import AdminProperties from './pages/admin/AdminProperties';
 import AdminContacts from './pages/admin/AdminContacts';
 import AgentsPage from './pages/admin/AgentsPage';
 import MainPage from './components/property/MainPage';
+import AboutUs from './components/common/footer/AboutUs';
+import ContactUs from './components/common/footer/ContactUs';
+import HelpCenter from './components/common/footer/HelpCenter';
+import PrivacyPolicy from './components/common/footer/PrivacyPolicy';
+import TermsConditions from './components/common/footer/TermsConditions';
+import Career from './components/common/footer/Career';
+import TrustSafety from './components/common/footer/TrustSafety';
+import HowWeWork from './components/common/footer/HowWeWork';
 
 function App() {
   const location = useLocation();
@@ -42,7 +50,15 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/properties" element={<PropertyList />} />
                 <Route path="/properties/:id" element={<PropertyDetails />} />
-                
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/contact" element={<ContactUs />} />
+                <Route path="/help" element={<HelpCenter />} />
+                <Route path="/privacy" element={<PrivacyPolicy />}/>
+                <Route path="/terms" element={<TermsConditions />}/>
+                <Route path="/career" element={<Career />} />
+                <Route path="/trust" element={<TrustSafety />}/>
+                <Route path="/how-we-work" element={<HowWeWork />}/>
+
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route element={<AdminLayout />}>

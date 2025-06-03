@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from 'react-router-dom';
 import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 
 const AboutUs = () => {
@@ -10,10 +11,12 @@ const AboutUs = () => {
   ];
 
   const team = [
-    { name: "Alex Johnson", role: "CEO & Founder", image: "/team1.jpg" },
-    { name: "Sarah Williams", role: "Head of Sales", image: "/team2.jpg" },
-    { name: "Michael Chen", role: "Lead Architect", image: "/team3.jpg" },
-    { name: "Emma Rodriguez", role: "Marketing Director", image: "/team4.jpg" },
+    { name: "Gaurav Kor", role: "CEO & Founder", image: "/team1.jpg" },
+    { name: "Shantanu Shimpi", role: "CEO & Co-Founder", image: "/team2.jpg", path: "https://www.linkedin.com/in/shantanu-shimpi-8017b9200?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" },
+    { name: "Chetan Sarode", role: "Head of Sales", image: "/team3.jpg" },
+    { name: "Pranav Kor", role: "Marketing Director", image: "/team4.jpg", path: "https://www.linkedin.com/in/pranav-kor-011982368?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" },
+    { name: "Tanmay Kute", role: "Senior Developer", image: "/team5.jpg", path: "https://www.linkedin.com/in/tanmay-kute-b60a0b282?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" },
+    { name: "Mrudul Bangaiya", role: "Senior Developer", image: "/team6.jpg", path: "https://www.linkedin.com/in/mrudul-bangaiya-2baa29262?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" },
   ];
 
   return (
@@ -21,7 +24,7 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
-        <img src="/about-hero.jpg" alt="Urban Realty Team" className="absolute inset-0 w-full h-full object-cover" />
+        <img src="/about-us.jpg" alt="Urban Realty Team" className="absolute inset-0 w-full h-full object-cover" />
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -59,7 +62,7 @@ const AboutUs = () => {
             <div className="relative">
               <div className="absolute -left-4 -top-4 w-24 h-24 border-t-2 border-l-2 border-[#78cadc]" />
               <div className="absolute -right-4 -bottom-4 w-24 h-24 border-b-2 border-r-2 border-[#78cadc]" />
-              <img src="/office.jpg" alt="Our Office" className="relative z-10 rounded-lg w-full h-auto" />
+              <img src="/building_4.jpg" alt="Our Office" className="relative z-10 rounded-lg w-full h-auto" />
             </div>
           </motion.div>
 
@@ -118,7 +121,9 @@ const AboutUs = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4">
                     <h3 className="text-xl font-bold">{member.name}</h3>
-                    <p className="text-[#78cadc] text-sm">{member.role}</p>
+                    <Link to={member.path}>
+                      <p className="text-[#78cadc] text-sm">{member.role}</p>
+                    </Link>
                   </div>
                 </div>
               </motion.div>

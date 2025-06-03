@@ -1,5 +1,5 @@
-// Footer.jsx
 import React from "react";
+import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -9,23 +9,27 @@ import YoutubeIcon from '@mui/icons-material/YouTube';
 
 const Footer = () => {
   const cities = [
-    "Nashik", "Delhi", "Mumbai", "Pune", "Gujrat", "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", 
+    "Nashik", "Delhi", "Mumbai", "Pune", "Bangalore", "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", 
     "Philadelphia"
   ];
 
   const resources = [
-    "Blog", "Guides", "FAQ", "Help Center", "Privacy", "Terms", 
+    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy"}, { name: "Terms & Conditions", path: "terms"}, 
     "Licenses", "Sitemap", "Ad Choices", "Accessibility"
   ];
 
   const about = [
-    "About Us", "Careers", "Contact", "Press", "Investors", 
-    "Research", "Trust & Safety", "How We Work"
+    { name: "About Us", path: "/about" }, { name: "Career", path: "/career"}, { name: "Contact Us", path: "/contact" }, "Press", "Investors", 
+    "Research", { name: "Trust & Safety", path: "/trust" }, { name: "How We Work", path: "/how-we-work" }
   ];
 
   const services = [
     "Buy a Home", "Sell a Home", "Rent a Home", "Pre-approval", 
     "Loan Calculator", "Mortgage Rates", "Real Estate Agents"
+  ];
+
+  const partners = [
+    { name: "Digital Supremacy", path: "https://digitalsupremacy.in/" }, { name: "FireFist Solutions", path: "https://firefist.co.in/" }, { name: "CodeHub India", path: "https://www.codehubindia.in/" }
   ];
 
   return (
@@ -61,12 +65,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {resources.map((item, index) => (
                 <li key={index}>
-                  <a 
-                    href="#" 
+                  <Link 
+                    to={item.path} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -78,12 +82,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {about.map((item, index) => (
                 <li key={index}>
-                  <a 
-                    href="#" 
+                  <Link 
+                    to={item.path}
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -95,17 +99,34 @@ const Footer = () => {
             <ul className="space-y-2">
               {services.map((item, index) => (
                 <li key={index}>
-                  <a 
-                    href="#" 
+                  <Link 
+                    to={item.path} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
-                    {item}
-                  </a>
+                    {item.name}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
         </div>
+
+        {/* Our Partners */}
+        <div>
+            <h3 className="font-poppins text-lg font-bold text-white mb-4">Our Partners</h3>
+            <ul className="space-y-2">
+              {partners.map((item, index) => (
+                <li key={index}>
+                  <Link 
+                    to={item.path} 
+                    className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
         {/* Divider */}
         <div className="h-px bg-[#78cadc]/20 my-8"></div>
@@ -114,7 +135,7 @@ const Footer = () => {
         <div className="flex flex-col items-center mb-12">
           <h3 className="font-poppins text-lg font-bold text-white mb-6">Connect with Us</h3>
           <div className="flex gap-6">
-            <a href="#" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
+            <a href="https://www.facebook.com/share/16U1BQ69Un/?mibextid=wwXIfr" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
               <FacebookIcon className="w-6 h-6 text-white" />
             </a>
             <a href="#" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
