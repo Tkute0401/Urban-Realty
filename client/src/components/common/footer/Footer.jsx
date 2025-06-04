@@ -14,7 +14,7 @@ const Footer = () => {
   ];
 
   const resources = [
-    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy"}, { name: "Terms & Conditions", path: "terms"}, 
+    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy-policy"}, { name: "Terms & Conditions", path: "terms"}, 
     "Licenses", "Sitemap", "Ad Choices", "Accessibility"
   ];
 
@@ -48,12 +48,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {cities.map((city, index) => (
                 <li key={index}>
-                  <link 
-                    to={`/properties?city=${city}`} 
+                  <a 
+                    href={`/properties?city=${city}`} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
                     {city} Real Estate
-                  </link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -138,18 +138,18 @@ const Footer = () => {
             <a href="https://www.facebook.com/share/16U1BQ69Un/?mibextid=wwXIfr" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
               <FacebookIcon className="w-6 h-6 text-white" />
             </a>
-            <a href="#" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
+            {/* <a href="#" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
               <XIcon className="w-6 h-6 text-white" />
-            </a>
+            </a> */}
             <a href="https://www.instagram.com/urbanrealty360?igsh=cmUyOXdweDd2ZjVr" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
               <InstagramIcon className="w-6 h-6 text-white" />
             </a>
             <a href="https://www.linkedin.com/company/uraban-realty-360" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
               <LinkedInIcon className="w-6 h-6 text-white" />
             </a>
-            <a href="#" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
+            {/* <a href="#" className="p-2 rounded-full bg-[#78cadc]/10 hover:bg-[#78cadc]/20 transition-colors">
               <YoutubeIcon className="w-6 h-6 text-white" />
-            </a>
+            </a> */}
           </div>
         </div>
 
