@@ -31,6 +31,7 @@ import TermsConditions from './components/common/footer/TermsConditions';
 import Career from './components/common/footer/Career';
 import TrustSafety from './components/common/footer/TrustSafety';
 import HowWeWork from './components/common/footer/HowWeWork';
+import Footer from './components/common/footer/Footer';
 
 function App() {
   const location = useLocation();
@@ -53,7 +54,7 @@ function App() {
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/help" element={<HelpCenter />} />
-                <Route path="/privacy" element={<PrivacyPolicy />}/>
+                <Route path="/privacy-policy" element={<PrivacyPolicy />}/>
                 <Route path="/terms" element={<TermsConditions />}/>
                 <Route path="/career" element={<Career />} />
                 <Route path="/trust" element={<TrustSafety />}/>
@@ -77,6 +78,7 @@ function App() {
                 </Route>
               </Routes>
             </Layout>
+            <Footer />
           </AgentsProvider>
         </PropertiesProvider>
       </AuthProvider>
