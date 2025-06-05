@@ -169,8 +169,14 @@ import {
   CreditCardIcon,
   LockClosedIcon
 } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 
 const TermsConditions = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   const sections = [
     {
       title: "Acceptance of Terms",

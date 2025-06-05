@@ -1,8 +1,14 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { BriefcaseIcon, BuildingOfficeIcon, RocketLaunchIcon, UserGroupIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 
 const Career = () => {
+
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   const jobOpenings = [
     {
       title: "Real Estate Agent",

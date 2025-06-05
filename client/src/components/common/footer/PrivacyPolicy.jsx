@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { ShieldCheckIcon, LockClosedIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 
 const PrivacyPolicy = () => {
+
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   const sections = [
     {
       title: "Information We Collect",

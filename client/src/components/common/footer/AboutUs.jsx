@@ -1,8 +1,13 @@
 import { motion } from "framer-motion";
 import { Link } from 'react-router-dom';
 import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { useEffect } from 'react';
 
 const AboutUs = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   const stats = [
     { value: "10K+", label: "Properties Listed", icon: <BuildingOfficeIcon className="w-8 h-8" /> },
     { value: "5K+", label: "Happy Clients", icon: <UserGroupIcon className="w-8 h-8" /> },
@@ -196,5 +201,4 @@ const AboutUs = () => {
     </div>
   );
 };
-
 export default AboutUs;

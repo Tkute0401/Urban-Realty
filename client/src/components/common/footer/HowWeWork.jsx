@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { LightBulbIcon, SparklesIcon, UserGroupIcon, ChartBarIcon, ArrowPathIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 
 const HowWeWork = () => {
+
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+    
   const processSteps = [
     {
       step: "01",

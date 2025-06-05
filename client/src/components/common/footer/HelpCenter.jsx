@@ -2,8 +2,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { LifebuoyIcon, DocumentTextIcon, PhoneIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const HelpCenter = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   // State for role selection and user question
   const [selectedRole, setSelectedRole] = useState(null);
   const [userQuestion, setUserQuestion] = useState("");
