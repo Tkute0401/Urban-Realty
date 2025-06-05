@@ -8,8 +8,7 @@
 .price-dropdown-content {
   position: absolute;
   top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   background-color: #0B1011;
   border: 1px solid #333;
   border-radius: 8px;
@@ -29,8 +28,10 @@
 
 .tab-controls {
   display: flex;
+  justify-content: center;
   border-bottom: 1px solid #444;
   margin-bottom: 16px;
+  padding-bottom: 8px;
 }
 
 .tab-btn {
@@ -111,23 +112,97 @@
   box-shadow: 0 0 0 2px rgba(120, 202, 220, 0.2);
 }
 
+.price-slider-container {
+  margin: 20px 0;
+  padding: 0 8px;
+}
+
+.slider-values {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #78CADC;
+  font-weight: 500;
+}
+
+.range-slider {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin: 0 10px; /* Added more margin */
+}
+
+.range-slider input[type="range"] {
+  position: absolute;
+  width: calc(100% - 20px); /* Adjusted width */
+  left: 10px; /* Adjusted position */
+  height: 6px; /* Thicker track */
+  background: #444;
+  -webkit-appearance: none;
+  pointer-events: none;
+  margin: 0;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 20px; /* Larger thumb */
+  height: 20px;
+  border-radius: 50%;
+  background: #78CADC;
+  border: 3px solid #0B1011; /* Border to make it stand out */
+  cursor: pointer;
+  z-index: 3;
+  margin-top: -7px;
+  position: relative;
+}
+
+.range-slider input[type="range"]:nth-child(1)::-webkit-slider-thumb {
+  z-index: 3;
+}
+
+.slider-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.slider-actions button {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reset-btn {
+  background-color: transparent;
+  border: 1px solid #444;
+  color: #ccc;
+  margin-top: 15px;
+}
+
+.reset-btn:hover {
+  border-color: #78CADC;
+  color: #78CADC;
+}
+
 .apply-filter-btn {
   background-color: #78CADC;
   color: #08171A;
   border: none;
-  border-radius: 6px;
   font-weight: 600;
-  padding: 12px;
-  width: 100%;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
 }
 
 .apply-filter-btn:hover {
-  background-color: #78CADC;
-  transform: translateY(-2px);
+  background-color: #5fb3c8;
 }
 
 @keyframes fadeIn {
@@ -145,22 +220,57 @@
   animation: fadeIn 0.3s ease-out forwards;
 }
 
+.price-slider-container {
+  margin: 20px 0;
+}
+
+.slider-values {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #78CADC;
+}
+
+.range-slider {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.range-slider input[type="range"] {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: #444;
+  -webkit-appearance: none;
+  pointer-events: none;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #78CADC;
+  cursor: pointer;
+  z-index: 2;
+  margin-top: -2px;
+}
+
+.slider-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 @media (max-width: 768px) {
   .price-dropdown-content {
     width: 90vw;
-    left: 5vw;
-    right: 5vw;
-    transform: none;
-  }
-  
-  .price-range-inputs {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .range-separator {
-    margin: 0;
-    text-align: center;
-    width: 100%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
   }
 }

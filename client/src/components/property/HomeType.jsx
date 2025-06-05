@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './HomeType.css';
+import './FilterDropdown.css';
 
 const HomeType = ({ onApply, currentType = '' }) => {
   const [isOpen, setIsOpen] = useState(false);

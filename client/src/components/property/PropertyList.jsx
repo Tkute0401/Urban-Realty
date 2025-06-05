@@ -552,21 +552,21 @@ const PropertyList = () => {
             <div className="BuyRentToggle">
               <button 
                 id="AllBtn" 
-                className={`${filters.propertyType === 'ALL' ? 'bg-cyan-400 text-black' : 'bg-black-400 text-white'}`} 
+                className={`${filters.propertyType === 'ALL' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
                 onClick={() => handlePropertyTypeChange('ALL')}
               >
                 ALL
               </button>
               <button 
                 id="BuyBtn" 
-                className={`${filters.propertyType === 'BUY' ? 'bg-cyan-400 text-black' : 'bg-black-400 text-white'}`} 
+                className={`${filters.propertyType === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
                 onClick={() => handlePropertyTypeChange('BUY')}
               >
                 BUY
               </button>
               <button 
                 id="RentBtn" 
-                className={`${filters.propertyType === 'RENT' ? 'bg-cyan-400 text-black' : 'bg-black-400 text-white'}`}
+                className={`${filters.propertyType === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
                 onClick={() => handlePropertyTypeChange('RENT')}
               >
                 RENT
