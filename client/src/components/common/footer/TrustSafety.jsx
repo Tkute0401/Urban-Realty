@@ -1,8 +1,13 @@
 import { motion } from "framer-motion";
 import { ShieldCheckIcon, LockClosedIcon, CheckBadgeIcon, HandRaisedIcon, EyeIcon } from "@heroicons/react/24/outline";
-
+import { useEffect } from "react";
 
 const TrustSafety = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   const features = [
     {
       icon: <ShieldCheckIcon className="w-8 h-8 text-[#78cadc]" />,

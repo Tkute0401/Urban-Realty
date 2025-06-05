@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
 import { PhoneIcon, EnvelopeIcon, MapPinIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { useEffect } from "react";
 
 const ContactUs = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   return (
     <section className="bg-[#08171A] min-h-screen text-white">
       {/* Header Section */}
