@@ -159,8 +159,8 @@ const HeroSection = () => {
                 <p>NATURE, CRAFTED FOR YOUR ULTIMATE ESCAPE.</p>
               </div>
 
-              <div className="flex items-center justify-between mb-8 sm:mb-12 md:mb-16 lg:mb-0">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-32 xl:h-32 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
+              <div className="flex items-center justify-between mb-8 sm:mt-20 md:mb-16 lg:mb-0">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
                   <img 
                     src="/building_1.jpg" 
                     alt="Map view" 
@@ -169,13 +169,15 @@ const HeroSection = () => {
                   />
                 </div>
 
-                <div className="bg-white/0 p-1 sm:p-2 md:p-3 lg:p-4 rounded-xl">
+                <div className="bg-white/0 p-1 sm:p-2 rounded-xl">
                   <div className="flex flex-col items-end">
-                    <div className="flex gap-1 mb-1 items-center">
-                      <span className="text-yellow-400 text-xl sm:text-2xl md:text-3xl">★</span>
-                      <span className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">4.9</span>
+                    <div className="flex gap-1 items-center">
+                      <span className="text-yellow-400 text-lg sm:text-xl md:text-2xl lg:text-3xl">★</span>
+                      <span className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">4.9</span>
                     </div>
-                    <span className="text-xxs sm:text-xs font-poppins text-gray-300 text-right">FROM 6,900+ CUSTOMERS</span>
+                    <span className="text-[0.5rem] sm:text-xs font-poppins text-gray-300 text-right mt-0.5">
+                      FROM 6,900+ CUSTOMERS
+                    </span>
                   </div>
                 </div>
               </div>

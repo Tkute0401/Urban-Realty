@@ -6,6 +6,15 @@ import HomeType from './HomeType';
 import More from './More';
 import axios from '../../services/axios';
 
+// Add these new icons
+const MenuIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+);
+
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"></circle>
@@ -74,6 +83,17 @@ const Properties = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -97,6 +117,10 @@ const Properties = () => {
     setFilters(updatedFilters);
   };
 
+  const toggleMobileMenu = () => {
+    setShowMobileMenu(!showMobileMenu);
+  };
+
   return (
     <div className={`main-container ${isLoaded ? 'fade-in' : ''}`}>
       {/* NavBar */}
@@ -112,34 +136,79 @@ const Properties = () => {
             <SearchIcon />
           </button>
         </div>
-        <div className="NavbarBtn slide-in-right">
-          <div className="BuyRentToggle">
-            <button 
-              id="BuyBtn" 
-              className={`${activeBtn === 'BUY' ? 'bg-cyan-400 text-black' : 'bg-black-400 text-white'}`} 
-              onClick={() => setActiveBtn('BUY')}
-            >
-              BUY
-            </button>
-            <button 
-              id="RentBtn" 
-              className={`${activeBtn === 'RENT' ? 'bg-cyan-400 text-black' : 'bg-black-400 text-white'}`}
-              onClick={() => setActiveBtn('RENT')}
-            >
-              RENT
-            </button>
+        
+        {isMobile ? (
+          <button className="mobile-menu-button" onClick={toggleMobileMenu}>
+            <MenuIcon />
+            <span>Filters</span>
+          </button>
+        ) : (
+          <div className="NavbarBtn slide-in-right">
+            <div className="BuyRentToggle">
+              <button 
+                id="BuyBtn" 
+                className={`${activeBtn === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
+                onClick={() => setActiveBtn('BUY')}
+              >
+                BUY
+              </button>
+              <button 
+                id="RentBtn" 
+                className={`${activeBtn === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
+                onClick={() => setActiveBtn('RENT')}
+              >
+                RENT
+              </button>
+            </div>
+            <div className="OtherNavbarBtn">
+              <HomeType />
+              <PriceDropdown activeBtn={activeBtn} />
+              <BedBath />
+              <More />
+              <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
+            </div>
           </div>
-          <div className="OtherNavbarBtn">
-            <HomeType />
-            <PriceDropdown activeBtn={activeBtn} />
-            <BedBath />
-            <More />
-            <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* Breadcrumb */}
+      {/* Mobile Menu */}
+      {isMobile && showMobileMenu && (
+        <div className="mobile-menu">
+          <div className="mobile-menu-content">
+            <div className="BuyRentToggle">
+              <button 
+                id="BuyBtn" 
+                className={`${activeBtn === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
+                onClick={() => {
+                  setActiveBtn('BUY');
+                  setShowMobileMenu(false);
+                }}
+              >
+                BUY
+              </button>
+              <button 
+                id="RentBtn" 
+                className={`${activeBtn === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
+                onClick={() => {
+                  setActiveBtn('RENT');
+                  setShowMobileMenu(false);
+                }}
+              >
+                RENT
+              </button>
+            </div>
+            <div className="mobile-menu-filters">
+              <HomeType />
+              <PriceDropdown activeBtn={activeBtn} />
+              <BedBath />
+              <More />
+              <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rest of the content remains the same */}
       <div className="breadcrumb fade-in-delay-1">
         <a href="#">HOME</a>
         <span className="separator">&gt;</span>
@@ -148,13 +217,11 @@ const Properties = () => {
         <a href="#">PROPERTIES</a>
       </div>
 
-      {/* Page Title */}
       <div className="page-title fade-in-delay-2">
         <h1>Available Properties <span>Listings</span></h1>
         <div className="listings-count">{properties.length} LISTINGS</div>
       </div>
 
-      {/* Filter Tags */}
       <div className="filter-tags fade-in-delay-3">
         {Object.entries(filters).map(([key, value]) => (
           <div key={key} className="filter-tag">
@@ -166,7 +233,6 @@ const Properties = () => {
         ))}
       </div>
 
-      {/* Property Listings */}
       <div className="property-listings fade-in-delay-4">
         <div className="property-grid">
           {loading ? (

@@ -31,7 +31,6 @@ const Home = () => {
         propertyType="Land"
       />
       <OwnerServiceBlock />
-      <Footer/>
     </div>
   );
 };

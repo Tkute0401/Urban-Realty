@@ -1,4 +1,3 @@
-/* More.css */
 .more-dropdown {
   position: relative;
   display: inline-block;
@@ -6,7 +5,7 @@
 }
 
 .more-content {
-  position: absolute;
+  position: fixed;
   top: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
@@ -127,12 +126,44 @@
   flex: 1;
 }
 
+.range-slider {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin: 0 8px; /* Add margin to prevent thumb cutoff */
+}
+
+.range-slider input[type="range"] {
+  position: absolute;
+  width: calc(100% - 16px); /* Adjust width to account for margin */
+  left: 8px; /* Center the track */
+  height: 4px;
+  background: #444;
+  -webkit-appearance: none;
+  pointer-events: none;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 18px; /* Slightly larger thumb */
+  height: 18px;
+  border-radius: 50%;
+  background: #78CADC;
+  cursor: pointer;
+  z-index: 2;
+  margin-top: -7px; /* Center the thumb vertically */
+}
+
 .more-dropdown .apply-filter-btn {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   border-radius: 0 0 8px 8px;
+  width: 10vw;
+  /* background-color: #78CADC; */
 }
 
 @media (max-width: 768px) {

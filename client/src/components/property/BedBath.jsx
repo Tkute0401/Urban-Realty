@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './BedBath.css';
+import './FilterDropdown.css';
 
 const BedBath = ({ onApply, currentBedrooms = '', currentBathrooms = '' }) => {
   const [isOpen, setIsOpen] = useState(false);

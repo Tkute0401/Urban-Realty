@@ -1,15 +1,37 @@
+// PriceDropdown.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import './PriceDropdown.css';
+import './FilterDropdown.css';
 
 const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax = '' }) => {
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [minPrice, setMinPrice] = useState(currentMin || '');
   const [maxPrice, setMaxPrice] = useState(currentMax || '');
+  const [tempValues, setTempValues] = useState({ min: currentMin || '', max: currentMax || '' });
   const dropdownRef = useRef(null);
+
+  const priceRanges = activeBtn === 'BUY' ? {
+  min: 0,
+  max: 100000000, // 10 Crore
+  step: 10000, // Smaller step for better granularity
+  format: (value) => {
+    if (value === 0) return '₹0';
+    if (value < 1000) return `₹${value}`;
+    if (value < 100000) return `₹${(value/1000).toFixed(value%1000 === 0 ? 0 : 1)} Thousand`;
+    if (value < 10000000) return `₹${(value/100000).toFixed(value%100000 === 0 ? 0 : 1)} Lac`;
+    return `₹${(value/10000000).toFixed(value%10000000 === 0 ? 0 : 1)} Cr`;
+  }
+} : {
+  min: 0,
+  max: 150000,
+  step: 1000,
+  format: (value) => value === 0 ? '₹0' : `₹${value.toLocaleString()}`
+};
 
   useEffect(() => {
     setMinPrice(currentMin || '');
     setMaxPrice(currentMax || '');
+    setTempValues({ min: currentMin || '', max: currentMax || '' });
   }, [currentMin, currentMax]);
 
   useEffect(() => {
@@ -29,51 +51,29 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
     setIsPriceOpen(!isPriceOpen);
   };
 
+  const handleSliderChange = (e, type) => {
+    const value = e.target.value;
+    setTempValues(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
+
   const handleApply = () => {
-    onApply(minPrice, maxPrice);
+    setMinPrice(tempValues.min);
+    setMaxPrice(tempValues.max);
+    onApply(tempValues.min, tempValues.max);
     setIsPriceOpen(false);
+  };
+
+  const handleReset = () => {
+    setTempValues({ min: '', max: '' });
   };
 
   const hasActiveFilter = minPrice || maxPrice;
 
-  const priceOptions = activeBtn === 'BUY' ? {
-    min: [
-      { value: '', label: 'No Min' },
-      { value: '1000000', label: '₹10 Lac' },
-      { value: '2000000', label: '₹20 Lac' },
-      { value: '3000000', label: '₹30 Lac' },
-      { value: '4000000', label: '₹40 Lac' },
-      { value: '5000000', label: '₹50 Lac' }
-    ],
-    max: [
-      { value: '', label: 'No Max' },
-      { value: '5000000', label: '₹50 Lac' },
-      { value: '7500000', label: '₹75 Lac' },
-      { value: '10000000', label: '₹1 Cr' },
-      { value: '15000000', label: '₹1.5 Cr' },
-      { value: '20000000', label: '₹2 Cr' }
-    ]
-  } : {
-    min: [
-      { value: '', label: 'No Min' },
-      { value: '5000', label: '₹5,000' },
-      { value: '10000', label: '₹10,000' },
-      { value: '15000', label: '₹15,000' },
-      { value: '20000', label: '₹20,000' },
-      { value: '25000', label: '₹25,000' }
-    ],
-    max: [
-      { value: '', label: 'No Max' },
-      { value: '30000', label: '₹30,000' },
-      { value: '50000', label: '₹50,000' },
-      { value: '75000', label: '₹75,000' },
-      { value: '100000', label: '₹1,00,000' },
-      { value: '150000', label: '₹1,50,000' }
-    ]
-  };
-
   return (
-    <div className="price-filter-dropdown" ref={dropdownRef}>
+    <div className="filter-dropdown" ref={dropdownRef}>
       <button 
         className={`filter-btn ${isPriceOpen ? 'active-dropdown' : ''}`}
         onClick={togglePriceDropdown}
@@ -86,57 +86,53 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
       
       {isPriceOpen && (
         <div className="dropdown-content fade-in">
-          <h3 className="dropdown-title">Price Range</h3>
+          <h3 className="dropdown-subtitle">Price Range</h3>
           
           {activeBtn === 'BUY' && (
-            <div className="tab-controls">
+            <div className="tab-controls" style={{ justifyContent: 'center' }}>
               <button className="tab-btn active-tab">
                 {activeBtn === 'BUY' ? 'List Price' : 'Monthly Payment'}
               </button>
             </div>
           )}
           
-          <div className="price-range-inputs">
-            <div className="price-field">
-              <label>Minimum</label>
-              <div className="select-wrapper">
-                <select 
-                  className="price-select"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                >
-                  {priceOptions.min.map(option => (
-                    <option key={`min-${option.value}`} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          <div className="price-slider-container">
+            <div className="slider-values">
+  <span>{tempValues.min ? priceRanges.format(Number(tempValues.min)) : '₹0'}</span>
+  <span>&nbsp;to&nbsp;</span>
+  <span>{tempValues.max ? priceRanges.format(Number(tempValues.max)) : '₹10 Cr'}</span>
+</div>
             
-            <div className="range-separator">–</div>
-            
-            <div className="price-field">
-              <label>Maximum</label>
-              <div className="select-wrapper">
-                <select 
-                  className="price-select"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                >
-                  {priceOptions.max.map(option => (
-                    <option key={`max-${option.value}`} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="range-slider">
+              <input
+                type="range"
+                min={priceRanges.min}
+                max={priceRanges.max}
+                step={priceRanges.step}
+                value={tempValues.min || priceRanges.min}
+                onChange={(e) => handleSliderChange(e, 'min')}
+                className="slider"
+              />
+              <input
+                type="range"
+                min={priceRanges.min}
+                max={priceRanges.max}
+                step={priceRanges.step}
+                value={tempValues.max || priceRanges.max}
+                onChange={(e) => handleSliderChange(e, 'max')}
+                className="slider"
+              />
             </div>
           </div>
           
-          <button className="apply-filter-btn" onClick={handleApply}>
-            Apply
-          </button>
+          <div className="slider-actions">
+            <button className="reset-btn" onClick={handleReset}>
+              Reset
+            </button>
+            <button className="apply-filter-btn" onClick={handleApply}>
+              Apply
+            </button>
+          </div>
         </div>
       )}
     </div>
