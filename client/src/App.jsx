@@ -31,6 +31,9 @@ import TermsConditions from './components/common/footer/TermsConditions';
 import Career from './components/common/footer/Career';
 import TrustSafety from './components/common/footer/TrustSafety';
 import HowWeWork from './components/common/footer/HowWeWork';
+import LawyerConsultancy from './components/common/footer/LaywerConsultancy';
+import PackersMovers from './components/common/footer/PackersMovers';
+import InteriorDesign from './components/common/footer/InteriorDesign';
 import Footer from './components/common/footer/Footer';
 
 function App() {
@@ -59,6 +62,9 @@ function App() {
                 <Route path="/career" element={<Career />} />
                 <Route path="/trust" element={<TrustSafety />}/>
                 <Route path="/how-we-work" element={<HowWeWork />}/>
+                <Route path="/lawyer-consultancy" element={<LawyerConsultancy />}/>
+                <Route path="/packers-and-movers" element={<PackersMovers />}/>
+                <Route path="/interior-design" element={<InteriorDesign />}/>
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>

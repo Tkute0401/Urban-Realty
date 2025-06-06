@@ -77,6 +77,11 @@ const PropertyCard = ({ property }) => {
 };
 
 const Properties = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeBtn, setActiveBtn] = useState('BUY');
   const [filters, setFilters] = useState({});

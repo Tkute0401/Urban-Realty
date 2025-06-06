@@ -5,7 +5,8 @@ import {
   Bars3Icon, 
   XMarkIcon,
   ChevronDownIcon,
-  ChevronUpIcon
+  ChevronUpIcon,
+  FunnelIcon
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,6 +16,7 @@ const HeroSection = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   
   const navigation = [
@@ -36,6 +38,13 @@ const HeroSection = () => {
     }
   ];
 
+  const filters = [
+    { name: "Home Type", options: ["All", "House", "Apartment", "Condo"] },
+    { name: "Price", options: ["Any", "$0-$500k", "$500k-$1M", "$1M+"] },
+    { name: "Bed & Bath", options: ["Any", "1+", "2+", "3+"] },
+    { name: "More", options: ["Pool", "Garage", "Pet Friendly"] }
+  ];
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchText.trim()) {
@@ -53,6 +62,7 @@ const HeroSection = () => {
 
   return (
     <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-hidden">
+      {/* Background image */}
       <div className="absolute inset-0">
         <img 
           src="/building_5.jpg"
@@ -62,11 +72,10 @@ const HeroSection = () => {
         />
       </div>
 
-      {/* Blur container that will shrink */}
+      {/* Main content container */}
       <div className="absolute inset-x-4 sm:inset-x-8 top-4 bottom-16 rounded-3xl sm:mx-4 md:mx-8 lg:mx-16 xl:mx-32 2xl:mx-40 overflow-hidden transition-all duration-300">
         <div className="absolute inset-0 bg-white/10 backdrop-blur-lg"></div>
         
-        {/* Content that scales with container */}
         <div className="relative w-full h-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col">
           {/* Navbar */}
           <div className="flex items-center justify-between">
@@ -248,9 +257,10 @@ const HeroSection = () => {
         )}
       </AnimatePresence>
       
-      {/* Fixed position search bar */}
-      <form onSubmit={handleSearch} className="absolute bottom-8 left-0 right-0 flex justify-center z-10 px-4 sm:px-8">
-        <div className="w-full max-w-2xl">
+      {/* Search and filter bar */}
+      <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center z-10 px-4 sm:px-8 gap-3">
+        {/* Search bar */}
+        <form onSubmit={handleSearch} className="w-full max-w-2xl">
           <div className="relative flex items-center px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-white/20 backdrop-blur-sm border-0 hover:bg-white/30 transition-colors duration-300">
             <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white mr-2 sm:mr-3" />
             <input
@@ -261,8 +271,80 @@ const HeroSection = () => {
               className="w-full bg-transparent text-xs sm:text-sm outline-none text-white placeholder:text-gray-400 border-0"
             />
           </div>
+        </form>
+
+        {/* Filters - shown inline on large screens */}
+        <div className="hidden lg:flex items-center justify-center gap-4 w-full max-w-2xl">
+          {filters.map((filter) => (
+            <div key={filter.name} className="relative group">
+              <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm text-white text-xs sm:text-sm hover:bg-white/20 transition-colors">
+                {filter.name}
+                <ChevronDownIcon className="w-3 h-3" />
+              </button>
+              <div className="absolute left-0 mt-2 w-40 bg-white/90 backdrop-blur-md rounded-lg shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                {filter.options.map((option) => (
+                  <button
+                    key={option}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-[#78cadc]/10 hover:text-[#08171A] transition-colors"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <button className="px-3 py-1.5 rounded-full bg-[#78cadc] text-[#08171A] text-xs sm:text-sm font-medium hover:bg-[#8DD9E5] transition-colors">
+            Save Search
+          </button>
         </div>
-      </form>
+
+        {/* Filter button for mobile/small screens */}
+        <div className="lg:hidden flex items-center justify-center gap-3 w-full max-w-2xl">
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-1 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs sm:text-sm hover:bg-white/30 transition-colors"
+          >
+            <FunnelIcon className="w-4 h-4" />
+            Filters
+          </button>
+          <button className="px-4 py-2 rounded-full bg-[#78cadc] text-[#08171A] text-xs sm:text-sm font-medium hover:bg-[#8DD9E5] transition-colors">
+            Save Search
+          </button>
+        </div>
+
+        {/* Mobile filters dropdown */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden w-full max-w-2xl bg-white/10 backdrop-blur-lg rounded-xl overflow-hidden"
+            >
+              <div className="p-4 grid grid-cols-2 gap-3">
+                {filters.map((filter) => (
+                  <div key={filter.name} className="col-span-1">
+                    <h3 className="text-white text-xs font-medium mb-1">{filter.name}</h3>
+                    <div className="flex flex-wrap gap-1">
+                      {filter.options.map((option) => (
+                        <button
+                          key={option}
+                          className="px-2 py-1 text-xs rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Gradient overlay at bottom */}
       <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-b from-transparent to-[#08171A] pointer-events-none"></div>
     </section>
   );
