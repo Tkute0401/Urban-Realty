@@ -14,7 +14,7 @@ const Footer = () => {
   ];
 
   const resources = [
-    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy-policy"}, { name: "Terms & Conditions", path: "terms"}, 
+    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy-policy"}, { name: "Terms & Conditions", path: "/terms"}, 
     "Licenses", "Sitemap", "Ad Choices", "Accessibility"
   ];
 
@@ -25,7 +25,7 @@ const Footer = () => {
 
   const services = [
     "Buy a Home", "Sell a Home", "Rent a Home", "Pre-approval", 
-    "Loan Calculator", "Mortgage Rates", "Real Estate Agents"
+    "Loan Calculator", "Mortgage Rates", "Real Estate Agents", { name: "Interior Design", path: "/interior-design"}, { name: "Lawyer Consultancy", path: "/lawyer-consultancy" }, { name: "Packers and Movers", path: "/packers-and-movers" }
   ];
 
   const partners = [

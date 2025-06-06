@@ -24,7 +24,7 @@ const BlurHeader = () => {
     },
     { 
       name: 'CONTACT US', 
-      items: ['Agents', 'Support', 'Careers', 'Feedback'] 
+      items: ['Agents', 'Support', {name: "Career", path: "/career"}, 'Feedback'] 
     }
   ];
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
