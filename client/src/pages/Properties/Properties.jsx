@@ -5,31 +5,22 @@ import BedBath from './BedBath';
 import HomeType from './HomeType';
 import More from './More';
 import axios from '../../services/axios';
-
-// Add these new icons
-const MenuIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
-
-const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
-
-const CloseIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
+import {
+  Menu as MenuIcon,
+  Search as SearchIcon,
+  Close as CloseIcon,
+  Add,
+  Image as ImageIcon,
+  FavoriteBorder,
+  FilterAlt as FilterIcon
+} from '@mui/icons-material';
 
 const PropertyCard = ({ property }) => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -43,19 +34,10 @@ const PropertyCard = ({ property }) => {
         <div className="property-image-overlay">
           <div className="property-image-actions">
             <button className="image-action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 19c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"></path>
-                <path d="m21 21-4.3-4.3"></path>
-                <path d="M8 11h6"></path>
-                <path d="M11 8v6"></path>
-              </svg>
+              <Add fontSize="small" />
             </button>
             <button className="image-action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <path d="m21 15-5-5L5 21"></path>
-              </svg>
+              <FavoriteBorder fontSize="small" />
             </button>
           </div>
         </div>
@@ -77,7 +59,6 @@ const PropertyCard = ({ property }) => {
 };
 
 const Properties = () => {
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -138,13 +119,13 @@ const Properties = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button className="search-button">
-            <SearchIcon />
+            <SearchIcon style={{ color: 'white' }} /> {/* Removed blue background */}
           </button>
         </div>
         
         {isMobile ? (
           <button className="mobile-menu-button" onClick={toggleMobileMenu}>
-            <MenuIcon />
+            <FilterIcon fontSize="small" />
             <span>Filters</span>
           </button>
         ) : (
@@ -213,7 +194,6 @@ const Properties = () => {
         </div>
       )}
 
-      {/* Rest of the content remains the same */}
       <div className="breadcrumb fade-in-delay-1">
         <a href="#">HOME</a>
         <span className="separator">&gt;</span>
@@ -232,7 +212,7 @@ const Properties = () => {
           <div key={key} className="filter-tag">
             <span className="filter-label">{key.toUpperCase()}: {value}</span>
             <button onClick={() => removeFilter(key)}>
-              <CloseIcon />
+              <CloseIcon fontSize="small" />
             </button>
           </div>
         ))}
