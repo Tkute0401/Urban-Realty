@@ -15,11 +15,15 @@ import {
   QuestionMarkCircleIcon,
   BellSlashIcon
 } from "@heroicons/react/24/outline";
-
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 
 // Account Sidebar Component
-const AccountSidebar = ({ isOpen, onClose, user }) => {
+const AccountSidebar = ({ isOpen, onClose }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
   const [activeTab, setActiveTab] = useState('viewed');
   
   // Mock data for recently viewed properties
@@ -88,25 +92,40 @@ const AccountSidebar = ({ isOpen, onClose, user }) => {
             {/* User Info Section */}
             <div className="p-4 border-b border-[#78cadc]/20">
               {user ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[#78cadc] flex items-center justify-center">
-                    <UserIcon className="w-6 h-6 text-[#0B1011]" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium font-poppins">{user.name}</h3>
-                    <p className="text-white/70 text-sm">{user.email}</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[#78cadc] flex items-center justify-center">
+                  <UserIcon className="w-6 h-6 text-[#0B1011]" />
                 </div>
-              ) : (
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center mx-auto mb-3">
-                    <UserIcon className="w-8 h-8 text-white" />
-                  </div>
-                  <button className="w-full bg-[#78cadc] text-[#0B1011] font-semibold py-2 px-4 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins">
-                    Login / Sign Up
-                  </button>
+                <div>
+                  <h3 className="text-white font-medium font-poppins">{user.name}</h3>
+                  <p className="text-white/70 text-sm">{user.email}</p>
                 </div>
-              )}
+                <button 
+                  onClick={() => {
+                    onClose();
+                    navigate('/profile');
+                  }}
+                  className="ml-auto bg-[#78cadc] text-[#0B1011] font-semibold py-1 px-3 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins text-sm"
+                >
+                  Profile
+                </button>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center mx-auto mb-3">
+                  <UserIcon className="w-8 h-8 text-white" />
+                </div>
+                <button 
+                  onClick={() => {
+                    onClose();
+                    navigate('/login');
+                  }}
+                  className="w-full bg-[#78cadc] text-[#0B1011] font-semibold py-2 px-4 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins"
+                >
+                  Login / Sign Up
+                </button>
+              </div>
+            )}
             </div>
 
             {/* My Activity Section */}
@@ -216,18 +235,18 @@ const HeroSection = () => {
   const localitiesContainerRef = useRef(null);
   
   const navigation = [
-    { 
-      name: 'BUY', 
-      items: ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Houston'] 
-    },
-    { 
-      name: 'RENT', 
-      items: ['Apartments', 'Villas', 'Condos', 'Townhouses', 'Commercial'] 
-    },
-    { 
-      name: 'SELL', 
-      items: ['Valuation', 'Property Management', 'Investment Consulting', 'Interior Design'] 
-    },
+    // { 
+    //   name: 'BUY', 
+    //   items: ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Houston'] 
+    // },
+    // { 
+    //   name: 'RENT', 
+    //   items: ['Apartments', 'Villas', 'Condos', 'Townhouses', 'Commercial'] 
+    // },
+    // { 
+    //   name: 'SELL', 
+    //   items: ['Valuation', 'Property Management', 'Investment Consulting', 'Interior Design'] 
+    // },
     { 
       name: 'SERVICES', 
       items: ['Agents', 'Support', 'Careers', 'Feedback'] 
@@ -321,7 +340,7 @@ const HeroSection = () => {
 
       {/* Main content container */}
       <div className="absolute inset-x-4 sm:inset-x-8 top-4 bottom-16 rounded-3xl sm:mx-4 md:mx-8 lg:mx-16 xl:mx-32 2xl:mx-40 overflow-hidden transition-all duration-300">
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm overflow-hidden border border-white/20"></div>
         
         <div className="relative w-full h-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col">
           {/* Navbar */}
