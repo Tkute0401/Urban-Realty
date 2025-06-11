@@ -76,51 +76,51 @@ const AccountSidebar = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed right-0 top-0 h-full w-80 sm:w-96 bg-[#0B1011] border-l border-[#78cadc]/20 z-[9999] overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-80 sm:w-96 bg-white/10 backdrop-blur-lg border-l border-[#78CADC]/30 z-[9999] overflow-y-auto"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-[#78cadc]/20">
+            <div className="flex items-center justify-between p-4 border-b border-white/20">
               <h2 className="text-lg font-semibold text-white font-poppins">Account</h2>
               <button
                 onClick={onClose}
-                className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 text-white hover:text-white hover:bg-white/20 rounded-md transition-colors"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
 
             {/* User Info Section */}
-            <div className="p-4 border-b border-[#78cadc]/20">
+            <div className="p-4 border-b border-white/20">
               {user ? (
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[#78cadc] flex items-center justify-center">
-                  <UserIcon className="w-6 h-6 text-[#0B1011]" />
+                  <UserIcon className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-white font-medium font-poppins">{user.name}</h3>
-                  <p className="text-white/70 text-sm">{user.email}</p>
+                  <p className="text-white text-sm">{user.email}</p>
                 </div>
                 <button 
                   onClick={() => {
                     onClose();
                     navigate('/profile');
                   }}
-                  className="ml-auto bg-[#78cadc] text-[#0B1011] font-semibold py-1 px-3 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins text-sm"
+                  className="ml-auto bg-[#08171A]/70 text-white border border-[#78CADC] py-1 px-3 rounded-lg hover:bg-[#78CADC] hover:text-black transition-colors font-poppins text-sm"
                 >
                   Profile
                 </button>
               </div>
             ) : (
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center mx-auto mb-3">
-                  <UserIcon className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3">
+                  <UserIcon className="w-8 h-8 text-gray-600" />
                 </div>
                 <button 
                   onClick={() => {
                     onClose();
                     navigate('/login');
                   }}
-                  className="w-full bg-[#78cadc] text-[#0B1011] font-semibold py-2 px-4 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins"
+                  className="w-full bg-[#78cadc] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins"
                 >
                   Login / Sign Up
                 </button>
@@ -129,7 +129,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
             </div>
 
             {/* My Activity Section */}
-            <div className="p-4 border-b border-[#78cadc]/20">
+            <div className="p-4 border-b border-white/20">
               <h3 className="text-white font-medium mb-3 font-poppins">My Activity</h3>
               
               {/* Activity Tabs */}
@@ -138,8 +138,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   onClick={() => setActiveTab('viewed')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors font-poppins ${
                     activeTab === 'viewed'
-                      ? 'bg-[#78cadc] text-[#0B1011]'
-                      : 'bg-white/10 text-white hover:bg-white/20'
+                      ? 'bg-[#78cadc] text-black'
+                      : 'bg-[#08171A]/70 text-white border border-[#78CADC]/90 hover:bg-[#78CADC] hover:text-black'
                   }`}
                 >
                   <EyeIcon className="w-4 h-4" />
@@ -149,8 +149,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   onClick={() => setActiveTab('favourites')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors font-poppins ${
                     activeTab === 'favourites'
-                      ? 'bg-[#78cadc] text-[#0B1011]'
-                      : 'bg-white/10 text-white hover:bg-white/20'
+                      ? 'bg-[#78cadc] text-black'
+                      : 'bg-[#08171A]/70 text-white border border-[#78CADC]/90 hover:bg-[#78CADC] hover:text-black'
                   }`}
                 >
                   <HeartIcon className="w-4 h-4" />
@@ -161,7 +161,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
               {/* Property Cards */}
               <div className="space-y-3">
                 {(activeTab === 'viewed' ? recentlyViewed : favouriteProperties).map((property) => (
-                  <div key={property.id} className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                  <div key={property.id} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors">
                     <div className="flex gap-3">
                       <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                         <img 
@@ -175,11 +175,11 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                           <div>
                             <p className="text-[#78cadc] font-semibold text-sm">{property.price}</p>
                             <p className="text-white text-sm font-medium truncate">{property.title}</p>
-                            <p className="text-white/70 text-xs">{property.location}</p>
-                            <p className="text-white/50 text-xs">by {property.seller}</p>
+                            <p className="text-white text-xs">{property.location}</p>
+                            <p className="text-white text-xs">by {property.seller}</p>
                           </div>
                         </div>
-                        <button className="mt-2 w-full bg-[#78cadc] text-[#0B1011] py-1 px-3 rounded text-xs font-medium hover:bg-[#5fb4c9] transition-colors font-poppins">
+                        <button className="mt-2 w-full bg-[#78cadc] text-black py-1 px-3 rounded text-xs font-medium transition-colors font-poppins">
                           Contact
                         </button>
                       </div>
@@ -191,15 +191,15 @@ const AccountSidebar = ({ isOpen, onClose }) => {
 
             {/* Bottom Actions */}
             <div className="p-4 space-y-2">
-              <button className="w-full flex items-center gap-3 py-3 px-4 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left font-poppins">
+              <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
                 <BellSlashIcon className="w-5 h-5" />
                 Unsubscribe Alerts
               </button>
-              <button className="w-full flex items-center gap-3 py-3 px-4 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left font-poppins">
+              <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
                 <ExclamationTriangleIcon className="w-5 h-5" />
                 Report a Fraud
               </button>
-              <button className="w-full flex items-center gap-3 py-3 px-4 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors text-left font-poppins">
+              <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
                 <QuestionMarkCircleIcon className="w-5 h-5" />
                 Help Center
               </button>
@@ -210,7 +210,6 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     </AnimatePresence>
   );
 };
-
 const HeroSection = () => {
   const [searchText, setSearchText] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -247,10 +246,10 @@ const HeroSection = () => {
     //   name: 'SELL', 
     //   items: ['Valuation', 'Property Management', 'Investment Consulting', 'Interior Design'] 
     // },
-    { 
-      name: 'SERVICES', 
-      items: ['Agents', 'Support', 'Careers', 'Feedback'] 
-    }
+    // { 
+    //   name: 'SERVICES', 
+    //   items: ['Agents', 'Support', 'Careers', 'Feedback'] 
+    // }
   ];
 
   // Dynamic city-based popular localities data
@@ -340,7 +339,7 @@ const HeroSection = () => {
 
       {/* Main content container */}
       <div className="absolute inset-x-4 sm:inset-x-8 top-4 bottom-16 rounded-3xl sm:mx-4 md:mx-8 lg:mx-16 xl:mx-32 2xl:mx-40 overflow-hidden transition-all duration-300">
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm overflow-hidden border border-white/20"></div>
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-sm overflow-hidden border border-white/30"></div>
         
         <div className="relative w-full h-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col">
           {/* Navbar */}
@@ -562,7 +561,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Main search container with fixed z-index */}
+        {/* Main search container */}
         <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
           {/* Property type tabs */}
           <div className="flex gap-0 mb-2 rounded-xl p-1">
@@ -592,7 +591,7 @@ const HeroSection = () => {
           {/* Search input section */}
           <div className="relative">
             <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20">
-              {/* City dropdown with fixed z-index */}
+              {/* City dropdown */}
               <div className="relative flex-shrink-0 border-r border-white/20" style={{ zIndex: 300 }}>
                 <button
                   type="button"
