@@ -76,7 +76,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed right-0 top-0 h-full w-80 sm:w-96 bg-white/10 backdrop-blur-lg border-l border-[#78CADC]/30 z-[9999] overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-80 sm:w-96 bg-white/10 backdrop-blur-lg border-l border-white/20 z-[9999] overflow-y-auto"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/20">
@@ -94,7 +94,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
               {user ? (
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[#78cadc] flex items-center justify-center">
-                  <UserIcon className="w-6 h-6 text-white" />
+                  <UserIcon className="w-6 h-6 text-black" />
                 </div>
                 <div>
                   <h3 className="text-white font-medium font-poppins">{user.name}</h3>
