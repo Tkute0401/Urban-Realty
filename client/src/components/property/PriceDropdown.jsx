@@ -1,4 +1,3 @@
-// PriceDropdown.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import './PriceDropdown.css';
 import './FilterDropdown.css';
@@ -13,7 +12,7 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
   const priceRanges = activeBtn === 'BUY' ? {
   min: 0,
   max: 100000000, // 10 Crore
-  step: 10000, // Smaller step for better granularity
+  step: 5000, // Smaller step for better granularity
   format: (value) => {
     if (value === 0) return '₹0';
     if (value < 1000) return `₹${value}`;

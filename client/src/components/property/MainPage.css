@@ -397,7 +397,6 @@ body {
 }
 
 .search-button {
-  background-color: #78CADC;
   border: none;
   border-radius: 0 4px 4px 0;
   padding: 0 16px;
@@ -409,7 +408,8 @@ body {
 }
 
 .search-button:hover {
-  background-color: #5fb3c8;
+  background-color: #ffffff1d;
+  border-radius: 10px;
 }
 
 .NavbarBtn {

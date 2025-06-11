@@ -119,7 +119,7 @@ const Properties = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button className="search-button">
-            <SearchIcon style={{ color: 'black' }} />
+            <SearchIcon style={{ color: 'white' }} />
           </button>
         </div>
         
