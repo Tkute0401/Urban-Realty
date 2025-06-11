@@ -25,7 +25,7 @@ const Footer = () => {
 
   const services = [
     "Buy a Home", "Sell a Home", "Rent a Home", "Pre-approval", 
-    "Loan Calculator", "Mortgage Rates", "Real Estate Agents", { name: "Interior Design", path: "/interior-design"}, { name: "Lawyer Consultancy", path: "/lawyer-consultancy" }, { name: "Packers and Movers", path: "/packers-and-movers" }
+    { name: "Loan Calculator", path: "/emi-calculator" }, "Mortgage Rates", "Real Estate Agents", { name: "Interior Design", path: "/interior-design"}, { name: "Lawyer Consultancy", path: "/lawyer-consultancy" }, { name: "Packers and Movers", path: "/packers-and-movers" }
   ];
 
   const partners = [
