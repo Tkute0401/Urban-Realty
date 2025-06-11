@@ -34,6 +34,7 @@ import HowWeWork from './components/common/footer/HowWeWork';
 import LawyerConsultancy from './components/common/footer/LaywerConsultancy';
 import PackersMovers from './components/common/footer/PackersMovers';
 import InteriorDesign from './components/common/footer/InteriorDesign';
+import EMICalculator from './components/common/footer/EMICalculator';
 import Footer from './components/common/footer/Footer';
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
                 <Route path="/lawyer-consultancy" element={<LawyerConsultancy />}/>
                 <Route path="/packers-and-movers" element={<PackersMovers />}/>
                 <Route path="/interior-design" element={<InteriorDesign />}/>
+                <Route path="/emi-calculator" element={<EMICalculator />}/>
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
