@@ -985,7 +985,7 @@ const EMICalculator = () => {
 
         {/* Information Sections */}
         <div className="flex flex-col md:flex-row gap-8 mt-8">
-        <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-8 md:w-2/3">
+        <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-8 md:w-full">
           <h2 className="text-2xl font-bold text-[#78CADC] mb-4">About {selectedUnitInfo.name}</h2>
           <p className="text-gray-300">
             {selectedUnitInfo.description}
