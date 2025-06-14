@@ -422,7 +422,7 @@ const HeroSection = () => {
                   Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
                 </h1><br/>
                 
-                <p className="text-gray-300 mb-2 sm:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-lg md:text-base">
+                <p className="text-white mb-2 sm:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-lg md:text-base">
                   Discover your dream property from our extensive collection of 
                   homes, apartments, and commercial spaces across the country.
                 </p>
