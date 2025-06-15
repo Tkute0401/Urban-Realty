@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Box, Typography, Grid, Divider, Chip, Button, Paper, 
   CircularProgress, Alert, Dialog, DialogActions, 
@@ -144,21 +144,25 @@ const PropertyDetails = () => {
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(true);
 
-  const handleScroll = (direction) => {
+  const handleScroll = useCallback((direction) => {
     if (tabsRef.current) {
       const scrollAmount = direction === 'left' ? -200 : 200;
-      tabsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      tabsRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+      
+      setTimeout(checkScrollButtons, 300);
     }
-  };
+  }, []);
 
-  const checkScrollButtons = () => {
+  const checkScrollButtons = useCallback(() => {
     if (tabsRef.current) {
-      setShowLeftScroll(tabsRef.current.scrollLeft > 0);
-      setShowRightScroll(
-        tabsRef.current.scrollLeft < tabsRef.current.scrollWidth - tabsRef.current.clientWidth
-      );
+      const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+      setShowLeftScroll(scrollLeft > 10);
+      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - 10);
     }
-  };
+  }, []);;
 
   useEffect(() => {
     const tabsElement = tabsRef.current;
@@ -208,6 +212,29 @@ const PropertyDetails = () => {
     
     return () => window.removeEventListener('resize', calculateHeaderHeight);
   }, []);
+
+  useEffect(() => {
+    const tabsElement = tabsRef.current;
+    if (!tabsElement) return;
+
+    const handleResize = () => {
+      checkScrollButtons();
+    };
+
+    checkScrollButtons();
+
+    tabsElement.addEventListener('scroll', checkScrollButtons);
+    window.addEventListener('resize', handleResize);
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(tabsElement);
+
+    return () => {
+      tabsElement.removeEventListener('scroll', checkScrollButtons);
+      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
+    };
+  }, [checkScrollButtons]);
 
   useEffect(() => {
     const calculateOriginalPosition = () => {
@@ -588,44 +615,47 @@ const PropertyDetails = () => {
           left: 0,
           right: 0,
           zIndex: 1000,
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'all 0.3s ease',
           boxShadow: isSticky ? '0 2px 20px rgba(0, 0, 0, 0.5)' : 'none',
           borderBottomLeftRadius: '16px',
-          borderBottomRightRadius: '16px',
-          transform: isSticky ? 'translateY(0)' : 'none',
-          width: '100%'
+          borderBottomRightRadius: '16px'
         }}
       >
-        <Container maxWidth="xl" sx={{ position: 'relative' }}>
-          {showLeftScroll && (
-            <IconButton
-              onClick={() => handleScroll('left')}
-              sx={{
-                position: 'absolute',
-                left: 0,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 1,
-                backgroundColor: 'rgba(120, 202, 220, 0.2)',
-                color: '#78CADC',
-                '&:hover': {
-                  backgroundColor: 'rgba(120, 202, 220, 0.4)'
-                }
-              }}
-            >
-              <ChevronLeft />
-            </IconButton>
-          )}
-          
+        <Container maxWidth="xl" sx={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          px: 0
+        }}>
+          {/* Left Scroll Button */}
+          <IconButton
+            onClick={() => handleScroll('left')}
+            sx={{
+              display: showLeftScroll ? 'inline-flex' : 'none',
+              backgroundColor: 'rgba(120, 202, 220, 0.2)',
+              color: '#78CADC',
+              mx: 1,
+              flexShrink: 0,
+              '&:hover': {
+                backgroundColor: 'rgba(120, 202, 220, 0.4)'
+              }
+            }}
+          >
+            <ChevronLeft />
+          </IconButton>
+
+          {/* Scrollable Tabs */}
           <Box
             ref={tabsRef}
             sx={{
-              display: 'flex',
+              flex: 1,
               overflowX: 'auto',
               scrollbarWidth: 'none',
               '&::-webkit-scrollbar': {
                 display: 'none'
-              }
+              },
+              display: 'flex',
+              justifyContent: 'center'
             }}
           >
             <Tabs
@@ -634,7 +664,6 @@ const PropertyDetails = () => {
               variant="scrollable"
               scrollButtons={false}
               sx={{
-                flex: 1,
                 '& .MuiTabs-indicator': {
                   backgroundColor: '#78CADC',
                   height: '4px'
@@ -675,26 +704,23 @@ const PropertyDetails = () => {
               />
             </Tabs>
           </Box>
-          
-          {showRightScroll && (
-            <IconButton
-              onClick={() => handleScroll('right')}
-              sx={{
-                position: 'absolute',
-                right: 0,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 1,
-                backgroundColor: 'rgba(120, 202, 220, 0.2)',
-                color: '#78CADC',
-                '&:hover': {
-                  backgroundColor: 'rgba(120, 202, 220, 0.4)'
-                }
-              }}
-            >
-              <ChevronRight />
-            </IconButton>
-          )}
+
+          {/* Right Scroll Button */}
+          <IconButton
+            onClick={() => handleScroll('right')}
+            sx={{
+              display: showRightScroll ? 'inline-flex' : 'none',
+              backgroundColor: 'rgba(120, 202, 220, 0.2)',
+              color: '#78CADC',
+              mx: 1,
+              flexShrink: 0,
+              '&:hover': {
+                backgroundColor: 'rgba(120, 202, 220, 0.4)'
+              }
+            }}
+          >
+            <ChevronRight />
+          </IconButton>
         </Container>
       </Box>
 
