@@ -163,7 +163,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                 {(activeTab === 'viewed' ? recentlyViewed : favouriteProperties).map((property) => (
                   <div key={property.id} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors">
                     <div className="flex gap-3">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 rounded-lg overflow-visible flex-shrink-0">
                         <img 
                           src={property.image} 
                           alt={property.title}
@@ -326,7 +326,7 @@ const HeroSection = () => {
   const visibleLocalities = currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount);
 
   return (
-    <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-hidden z-0">
+    <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-visible z-0">
       {/* Background image */}
       <div className="absolute inset-0">
         <img 
@@ -374,7 +374,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-2 w-40 sm:w-48 bg-white/90 backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-50"
+                        className="absolute left-0 top-full mt-2 w-40 sm:w-48 bg-white/90 backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-5000"
                       >
                         {item.items.map((subItem) => (
                           <a
@@ -590,9 +590,9 @@ const HeroSection = () => {
 
           {/* Search input section */}
           <div className="relative">
-            <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20">
+            <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
               {/* City dropdown */}
-              <div className="relative flex-shrink-0 border-r border-white/20" style={{ zIndex: 300 }}>
+              <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-12" style={{ zIndex: 9000 }}>
                 <button
                   type="button"
                   onClick={() => setShowCityDropdown(!showCityDropdown)}
@@ -610,7 +610,7 @@ const HeroSection = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden border border-gray-200 z-[9999]"
+                      className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-40 overflow-y-auto"
                     >
                       <div className="p-2 border-b border-gray-200">
                         <div className="relative">
