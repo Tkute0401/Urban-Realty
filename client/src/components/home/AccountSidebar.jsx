@@ -1,14 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
-  MagnifyingGlassIcon, 
   UserIcon, 
-  Bars3Icon, 
   XMarkIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  FunnelIcon,
-  MapPinIcon,
-  ChevronRightIcon,
   EyeIcon,
   HeartIcon,
   ExclamationTriangleIcon,
@@ -16,53 +9,109 @@ import {
   BellSlashIcon
 } from "@heroicons/react/24/outline";
 import { useAuth } from '../../context/AuthContext';
+import { useProperties } from '../../context/PropertiesContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 
 const AccountSidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
+  const { getProperty } = useProperties();
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('viewed');
-  
+  const [favoriteProperties, setFavoriteProperties] = useState([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
+
+  // Format address whether it's a string or object
+  const formatAddress = (address) => {
+    if (!address) return 'Address not available';
+    
+    if (typeof address === 'string') {
+      return address;
+    }
+    
+    // Handle address object
+    const parts = [
+      address.line1,
+      address.street,
+      address.city,
+      address.state,
+      address.zipCode
+    ].filter(Boolean);
+    
+    return parts.join(', ');
+  };
+
+  // Fetch favorite properties when user changes or sidebar opens
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (user?.favorites?.length > 0) {
+        setLoadingFavorites(true);
+        try {
+          const favoritesData = await Promise.all(
+            user.favorites.map(id => getProperty(id))
+          );
+          setFavoriteProperties(favoritesData.filter(Boolean));
+        } catch (error) {
+          console.error("Error fetching favorites:", error);
+        } finally {
+          setLoadingFavorites(false);
+        }
+      } else {
+        setFavoriteProperties([]);
+      }
+    };
+
+    if (isOpen && user) {
+      fetchFavorites();
+    }
+  }, [user, isOpen, getProperty]);
+
   // Mock data for recently viewed properties
   const recentlyViewed = [
     {
       id: 1,
       image: "/building_1.jpg",
-      price: "₹85.0 L",
+      price: "8500000",
       title: "3 BHK Apartment",
-      location: "Hinjewadi, Pune",
+      address: {
+        line1: "Flat 301",
+        street: "Skyline Tower",
+        city: "Hinjewadi",
+        state: "Maharashtra",
+        zipCode: "411057"
+      },
       seller: "XYZ Realty"
     },
     {
       id: 2,
       image: "/building_5.jpg",
-      price: "₹1.2 Cr",
+      price: "12000000",
       title: "4 BHK Villa",
-      location: "Baner, Pune",
+      address: "Baner Road, Pune, Maharashtra 411045",
       seller: "ABC Builders"
     }
   ];
 
-  const favouriteProperties = [
-    {
-      id: 1,
-      image: "/building_1.jpg",
-      price: "₹95.0 L",
-      title: "2 BHK Apartment",
-      location: "Wakad, Pune",
-      seller: "Dream Homes"
+  // Format price with Indian Rupee symbol
+  const formatPrice = (price) => {
+    if (!price) return 'Price not available';
+    if (typeof price === 'string') {
+      // If already formatted
+      if (price.startsWith('₹')) return price;
+      return `₹${price}`;
     }
-  ];
-  console.log(user);
-  //console.log(user.favorites);
+    return `₹${price.toLocaleString('en-IN')}`;
+  };
+
+  const handlePropertyClick = (property) => {
+    navigate(`/properties/${property._id}`);
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop with z-index below sidebar */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -71,7 +120,6 @@ const AccountSidebar = ({ isOpen, onClose }) => {
             onClick={onClose}
           />
           
-          {/* Sidebar with highest z-index */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -79,7 +127,6 @@ const AccountSidebar = ({ isOpen, onClose }) => {
             transition={{ type: 'tween', duration: 0.3 }}
             className="fixed right-0 top-0 h-full w-80 sm:w-96 bg-white/10 backdrop-blur-lg border-l border-white/20 z-[9999] overflow-y-auto"
           >
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/20">
               <h2 className="text-lg font-semibold text-white font-poppins">Account</h2>
               <button
@@ -90,7 +137,6 @@ const AccountSidebar = ({ isOpen, onClose }) => {
               </button>
             </div>
 
-            {/* User Info Section */}
             <div className="p-4 border-b border-white/20">
               {user ? (
                 <div className="flex items-center gap-3">
@@ -129,11 +175,9 @@ const AccountSidebar = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* My Activity Section */}
             <div className="p-4 border-b border-white/20">
               <h3 className="text-white font-medium mb-3 font-poppins">My Activity</h3>
               
-              {/* Activity Tabs */}
               <div className="flex gap-2 mb-4">
                 <button
                   onClick={() => setActiveTab('viewed')}
@@ -159,38 +203,55 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
-              {/* Property Cards */}
               <div className="space-y-3">
-                {(activeTab === 'viewed' ? recentlyViewed : favouriteProperties).map((property) => (
-                  <div key={property.id} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors">
-                    <div className="flex gap-3">
-                      <div className="w-16 h-16 rounded-lg overflow-visible flex-shrink-0">
-                        <img 
-                          src={property.image} 
-                          alt={property.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-[#78cadc] font-semibold text-sm">{property.price}</p>
-                            <p className="text-white text-sm font-medium truncate">{property.title}</p>
-                            <p className="text-white text-xs">{property.location}</p>
-                            <p className="text-white text-xs">by {property.seller}</p>
-                          </div>
+                {loadingFavorites && activeTab === 'favourites' ? (
+                  <div className="text-white text-center py-4">Loading favorites...</div>
+                ) : (
+                  (activeTab === 'viewed' ? recentlyViewed : favoriteProperties).map((property) => (
+                    console.log(property),
+                    <div key={property._id || property.id} onClick={() => handlePropertyClick(property)} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors overflow-hidden">
+                      <div className="flex gap-3">
+                        <div className="w-20 h-20 rounded-full border-2 border-[#78CADC] overflow-hidden  mt-7">
+                          {property.images ? (
+                            <img 
+                              src={property.images[0].url} 
+                              //alt={property.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-600 flex items-center justify-center">
+                              <UserIcon className="w-6 h-6 text-white" />
+                            </div>
+                          )}
                         </div>
-                        <button className="mt-2 w-full bg-[#78cadc] text-black py-1 px-3 rounded text-xs font-medium transition-colors font-poppins">
-                          Contact
-                        </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-[#78cadc] font-semibold text-sm">
+                                {formatPrice(property.price)}
+                              </p>
+                              <p className="text-white text-sm font-medium truncate mt-1">
+                                {property.title || 'Untitled Property'}
+                              </p>
+                              <p className="text-white text-xs mt-1">
+                                {formatAddress(property.address)}
+                              </p>
+                              <p className="text-white text-xs mt-1">
+                                by {property.agent?.name || property.agent || 'Unknown Seller'}
+                              </p>
+                            </div>
+                          </div>
+                          <button className="mt-2 w-full bg-[#78cadc] text-black py-1 px-3 rounded text-xs font-medium transition-colors font-poppins">
+                            View
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 
-            {/* Bottom Actions */}
             <div className="p-4 space-y-2">
               <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
                 <BellSlashIcon className="w-5 h-5" />
