@@ -56,7 +56,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     }
   ];
   console.log(user);
-  console.log(user.favorites);
+  //console.log(user.favorites);
 
   return (
     <AnimatePresence>
