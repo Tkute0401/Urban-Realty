@@ -74,7 +74,11 @@ export const AuthProvider = ({ children }) => {
           email: userData.email,
           id: userData._id || userData.id,
           name: userData.name,
-          role: userData.role
+          role: userData.role,
+          mobile: userData.mobile,
+          favorites: userData?.favorites,
+          occupation: userData?.occupation,
+          recentlyViewed: userData?.recentlyViewed
         });
       }
     } catch (err) {
