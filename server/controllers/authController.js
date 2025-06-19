@@ -201,6 +201,53 @@ exports.getFavorites = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+// @desc    Check if property is in favorites
+// @route   GET /api/v1/auth/favorites/:propertyId/status
+// @access  Private
+exports.checkFavoriteStatus = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  const isFavorite = user.favorites.includes(req.params.propertyId);
+  
+  res.status(200).json({
+    success: true,
+    isFavorite
+  });
+});
+
+// @desc    Add/remove property from favorites
+// @route   PUT /api/v1/auth/favorites/:propertyId
+// @access  Private
+exports.toggleFavorite = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  const propertyIndex = user.favorites.indexOf(req.params.propertyId);
+  
+  if (propertyIndex === -1) {
+    // Add to favorites
+    user.favorites.push(req.params.propertyId);
+  } else {
+    // Remove from favorites
+    user.favorites.splice(propertyIndex, 1);
+  }
+  
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    isFavorite: propertyIndex === -1,
+    favorites: user.favorites
+  });
+});
 // @desc    Add property to recently viewed
 // @route   POST /api/v1/users/recently-viewed/:propertyId
 // @access  Private
