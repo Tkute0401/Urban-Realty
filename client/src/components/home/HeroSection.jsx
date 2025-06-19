@@ -18,198 +18,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
+import AccountSidebar from './AccountSidebar';
 
-// Account Sidebar Component
-const AccountSidebar = ({ isOpen, onClose }) => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  
-  const [activeTab, setActiveTab] = useState('viewed');
-  
-  // Mock data for recently viewed properties
-  const recentlyViewed = [
-    {
-      id: 1,
-      image: "/building_1.jpg",
-      price: "₹85.0 L",
-      title: "3 BHK Apartment",
-      location: "Hinjewadi, Pune",
-      seller: "XYZ Realty"
-    },
-    {
-      id: 2,
-      image: "/building_5.jpg",
-      price: "₹1.2 Cr",
-      title: "4 BHK Villa",
-      location: "Baner, Pune",
-      seller: "ABC Builders"
-    }
-  ];
-
-  const favouriteProperties = [
-    {
-      id: 1,
-      image: "/building_1.jpg",
-      price: "₹95.0 L",
-      title: "2 BHK Apartment",
-      location: "Wakad, Pune",
-      seller: "Dream Homes"
-    }
-  ];
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998]"
-            onClick={onClose}
-          />
-          
-          {/* Sidebar */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed right-0 top-0 h-full w-80 sm:w-96 bg-white/10 backdrop-blur-lg border-l border-white/20 z-[9999] overflow-y-auto"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/20">
-              <h2 className="text-lg font-semibold text-white font-poppins">Account</h2>
-              <button
-                onClick={onClose}
-                className="p-2 text-white hover:text-white hover:bg-white/20 rounded-md transition-colors"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* User Info Section */}
-            <div className="p-4 border-b border-white/20">
-              {user ? (
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#78cadc] flex items-center justify-center">
-                  <UserIcon className="w-6 h-6 text-black" />
-                </div>
-                <div>
-                  <h3 className="text-white font-medium font-poppins">{user.name}</h3>
-                  <p className="text-white text-sm">{user.email}</p>
-                </div>
-                <button 
-                  onClick={() => {
-                    onClose();
-                    navigate('/profile');
-                  }}
-                  className="ml-auto bg-[#08171A]/70 text-white border border-[#78CADC] py-1 px-3 rounded-lg hover:bg-[#78CADC] hover:text-black transition-colors font-poppins text-sm"
-                >
-                  Profile
-                </button>
-              </div>
-            ) : (
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3">
-                  <UserIcon className="w-8 h-8 text-gray-600" />
-                </div>
-                <button 
-                  onClick={() => {
-                    onClose();
-                    navigate('/login');
-                  }}
-                  className="w-full bg-[#78cadc] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins"
-                >
-                  Login / Sign Up
-                </button>
-              </div>
-            )}
-            </div>
-
-            {/* My Activity Section */}
-            <div className="p-4 border-b border-white/20">
-              <h3 className="text-white font-medium mb-3 font-poppins">My Activity</h3>
-              
-              {/* Activity Tabs */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={() => setActiveTab('viewed')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors font-poppins ${
-                    activeTab === 'viewed'
-                      ? 'bg-[#78cadc] text-black'
-                      : 'bg-[#08171A]/70 text-white border border-[#78CADC]/90 hover:bg-[#78CADC] hover:text-black'
-                  }`}
-                >
-                  <EyeIcon className="w-4 h-4" />
-                  Recently Viewed
-                </button>
-                <button
-                  onClick={() => setActiveTab('favourites')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors font-poppins ${
-                    activeTab === 'favourites'
-                      ? 'bg-[#78cadc] text-black'
-                      : 'bg-[#08171A]/70 text-white border border-[#78CADC]/90 hover:bg-[#78CADC] hover:text-black'
-                  }`}
-                >
-                  <HeartIcon className="w-4 h-4" />
-                  Favourites
-                </button>
-              </div>
-
-              {/* Property Cards */}
-              <div className="space-y-3">
-                {(activeTab === 'viewed' ? recentlyViewed : favouriteProperties).map((property) => (
-                  <div key={property.id} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors">
-                    <div className="flex gap-3">
-                      <div className="w-16 h-16 rounded-lg overflow-visible flex-shrink-0">
-                        <img 
-                          src={property.image} 
-                          alt={property.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-[#78cadc] font-semibold text-sm">{property.price}</p>
-                            <p className="text-white text-sm font-medium truncate">{property.title}</p>
-                            <p className="text-white text-xs">{property.location}</p>
-                            <p className="text-white text-xs">by {property.seller}</p>
-                          </div>
-                        </div>
-                        <button className="mt-2 w-full bg-[#78cadc] text-black py-1 px-3 rounded text-xs font-medium transition-colors font-poppins">
-                          Contact
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom Actions */}
-            <div className="p-4 space-y-2">
-              <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
-                <BellSlashIcon className="w-5 h-5" />
-                Unsubscribe Alerts
-              </button>
-              <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
-                <ExclamationTriangleIcon className="w-5 h-5" />
-                Report a Fraud
-              </button>
-              <button className="w-full flex items-center gap-3 py-3 px-4 text-white hover:text-white hover:bg-gray-200/20 rounded-lg transition-colors text-left font-poppins">
-                <QuestionMarkCircleIcon className="w-5 h-5" />
-                Help Center
-              </button>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-};
 const HeroSection = () => {
   const [searchText, setSearchText] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -220,39 +30,12 @@ const HeroSection = () => {
   const [selectedCity, setSelectedCity] = useState("Pune");
   const [localityStartIndex, setLocalityStartIndex] = useState(0);
   const [isAccountSidebarOpen, setIsAccountSidebarOpen] = useState(false);
-  
-  // Mock user data - set to null to show login state
-  const [user, setUser] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com"
-  });
-  
-  const handleNavigate = (path) => {
-    console.log('Navigate to:', path);
-    // You can replace this with your actual navigation logic
-  };
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const localitiesContainerRef = useRef(null);
   
-  const navigation = [
-    // { 
-    //   name: 'BUY', 
-    //   items: ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Houston'] 
-    // },
-    // { 
-    //   name: 'RENT', 
-    //   items: ['Apartments', 'Villas', 'Condos', 'Townhouses', 'Commercial'] 
-    // },
-    // { 
-    //   name: 'SELL', 
-    //   items: ['Valuation', 'Property Management', 'Investment Consulting', 'Interior Design'] 
-    // },
-    // { 
-    //   name: 'SERVICES', 
-    //   items: ['Agents', 'Support', 'Careers', 'Feedback'] 
-    // }
-  ];
-
-  // Dynamic city-based popular localities data
+  const navigation = [];
+  
   const cityLocalitiesMap = {
     "Bengaluru": ["HSR Layout", "BTM Layout", "Whitefield", "Koramangala", "JP Nagar", "Indiranagar", "Electronic City", "Marathahalli", "Bannerghatta Road", "Sarjapur Road"],
     "Mumbai": ["Andheri", "Bandra", "Powai", "Thane", "Malad", "Borivali", "Vashi", "Panvel", "Goregaon", "Vikhroli"],
@@ -265,21 +48,19 @@ const HeroSection = () => {
 
   const cities = Object.keys(cityLocalitiesMap);
   const currentCityLocalities = cityLocalitiesMap[selectedCity] || [];
-  
-  // Calculate how many localities to show based on screen size
   const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
   const [selectedTab, setSelectedTab] = useState('COMMERCIAL');
 
   useEffect(() => {
     const updateVisibleCount = () => {
       if (window.innerWidth < 640) {
-        setVisibleLocalitiesCount(3); // Mobile
+        setVisibleLocalitiesCount(3);
       } else if (window.innerWidth < 768) {
-        setVisibleLocalitiesCount(4); // Small tablet
+        setVisibleLocalitiesCount(4);
       } else if (window.innerWidth < 1024) {
-        setVisibleLocalitiesCount(5); // Tablet
+        setVisibleLocalitiesCount(5);
       } else {
-        setVisibleLocalitiesCount(6); // Desktop
+        setVisibleLocalitiesCount(6);
       }
     };
 
@@ -288,7 +69,6 @@ const HeroSection = () => {
     return () => window.removeEventListener('resize', updateVisibleCount);
   }, []);
 
-  // Reset locality index when city changes
   useEffect(() => {
     setLocalityStartIndex(0);
   }, [selectedCity]);
@@ -296,7 +76,7 @@ const HeroSection = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchText.trim()) {
-      handleNavigate(`/properties?search=${searchText.trim()}`);
+      navigate(`/properties?search=${searchText.trim()}`);
     }
   };
 
@@ -318,7 +98,6 @@ const HeroSection = () => {
     if (localityStartIndex < maxStartIndex) {
       setLocalityStartIndex(prev => Math.min(prev + 1, maxStartIndex));
     } else {
-      // Loop back to beginning
       setLocalityStartIndex(0);
     }
   };
@@ -374,7 +153,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-2 w-40 sm:w-48 bg-white/90 backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-5000"
+                        className="absolute left-0 top-full mt-2 w-40 sm:w-48 bg-white/90 backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-50"
                       >
                         {item.items.map((subItem) => (
                           <a
@@ -455,7 +234,7 @@ const HeroSection = () => {
         </div>
       </div>
       
-      {/* Mobile menu */}
+      {/* Mobile menu - z-index set to 9997 (below sidebar) */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
@@ -463,7 +242,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-20 sm:top-24 left-4 right-4 z-40 bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
+            className="fixed top-20 sm:top-24 left-4 right-4 z-[9997] bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
           >
             <div className="flex flex-col p-3 sm:p-4">
               {navigation.map((item) => (
@@ -506,7 +285,10 @@ const HeroSection = () => {
                 </div>
               ))}
               <button 
-                onClick={() => setIsAccountSidebarOpen(true)} 
+                onClick={() => {
+                  setIsAccountSidebarOpen(true);
+                  setIsMenuOpen(false);
+                }} 
                 className="lg:hidden flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 mt-1 sm:mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-sm sm:text-base"
               >
                 <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -598,7 +380,7 @@ const HeroSection = () => {
                   onClick={() => setShowCityDropdown(!showCityDropdown)}
                   className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 text-white transition-colors min-w-[100px] sm:min-w-[120px]"
                 >
-                                    <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
+                  <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
                   <span className="text-xs sm:text-sm font-medium truncate">{selectedCity}</span>
                   <ChevronDownIcon className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 transition-transform flex-shrink-0 ${showCityDropdown ? 'rotate-180' : ''}`} />
                 </button>
@@ -667,7 +449,6 @@ const HeroSection = () => {
       <AccountSidebar 
         isOpen={isAccountSidebarOpen} 
         onClose={() => setIsAccountSidebarOpen(false)}
-        user={user}
       />
 
       {/* Gradient overlay at bottom */}
