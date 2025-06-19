@@ -7,6 +7,9 @@ import {
   TextField, RadioGroup, FormControlLabel, Radio, Collapse,
   Tabs, Tab, Container
 } from '@mui/material';
+import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
+
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
   Phone, Email, Edit, Delete, ArrowBack,
@@ -22,6 +25,7 @@ import PropertyMap from '../../components/property/PropertyMap';
 import { formatPrice } from '../../utils/format';
 import axios from '../../services/axios';
 import { styled, keyframes } from '@mui/material/styles';
+import { toast } from 'react-toastify';
 
 // Animation keyframes
 const fadeIn = keyframes`
@@ -125,6 +129,9 @@ const PropertyDetails = () => {
   const [headerHeight, setHeaderHeight] = useState(0);
   const [originalNavPosition, setOriginalNavPosition] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
+    const [loadingFavorite, setLoadingFavorite] = useState(false);
+  
   const [showBackToTop, setShowBackToTop] = useState(false);
   const isMobile = useMediaQuery('(max-width:900px)');
   
@@ -143,6 +150,50 @@ const PropertyDetails = () => {
   const tabsRef = useRef(null);
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(true);
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user && property?._id) {
+        try {
+          const response = await axios.get(`/auth/favorites/${property._id}/status`);
+          setIsFavorite(response.data.isFavorite);
+        } catch (err) {
+          console.error('Error checking favorite status:', err);
+        }
+      } else {
+        setIsFavorite(false);
+      }
+    };
+    
+    checkFavoriteStatus();
+  }, [user, property?._id]);
+
+  const handleFavoriteClick = async (e) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      navigate('/login', { state: { from: window.location.pathname } });
+      toast.info('Please login to save favorites');
+      return;
+    }
+
+    setLoadingFavorite(true);
+    try {
+      if (isFavorite) {
+        await axios.delete(`/auth/favorites/${property._id}`);
+        toast.success('Removed from favorites');
+      } else {
+        await axios.put(`/auth/favorites/${property._id}`);
+        toast.success('Added to favorites');
+      }
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error('Error updating favorite:', err);
+      toast.error(err.response?.data?.message || 'Failed to update favorites');
+    } finally {
+      setLoadingFavorite(false);
+    }
+  };
+
 
   const handleScroll = useCallback((direction) => {
   if (tabsRef.current) {
@@ -519,7 +570,7 @@ useEffect(() => {
       </Box>
     );
   }
-
+  
   const getAddressPart = (part) => property.address?.[part] || property.location?.[part] || '';
   const fullAddress = [
     getAddressPart('line1'),
@@ -552,7 +603,7 @@ useEffect(() => {
             mb: 2,
             fontSize: '1.1rem'
           }}>
-            By {property.developer?.name || 'N/A'}
+            By {property.agent.name || 'N/A'}
           </Typography>
           
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -586,15 +637,20 @@ useEffect(() => {
           }}>
             <Share />
           </IconButton>
-          <IconButton sx={{ 
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            color: '#fff',
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)'
-            }
-          }}>
-            <Bookmark />
-          </IconButton>
+            <button 
+          className="absolute top-1 mr-8 mb-8 sm:top-4 right-2 sm:right-4 p-1 sm:p-2 bg-[#0c0d0e]/80 rounded-full hover:bg-[#0c0d0e] transition-colors"
+          onClick={handleFavoriteClick}
+          disabled={loadingFavorite}
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          {loadingFavorite ? (
+            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-transparent border-t-white border-l-white rounded-full animate-spin" />
+          ) : isFavorite ? (
+            <HeartFilled className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+          ) : (
+            <HeartOutline className="w-4 h-4 sm:w-5 sm:h-5 text-white hover:text-red-500 transition-colors" />
+          )}
+        </button>
         </Box>
         
         {/* Property stats below image */}
