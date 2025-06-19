@@ -140,3 +140,119 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     data: {}
   });
 });
+
+// @desc    Add property to favorites
+// @route   PUT /api/v1/users/favorites/:propertyId
+// @access  Private
+exports.addToFavorites = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (!user.favorites) {
+    user.favorites = [];
+  }
+  // Check if property already in favorites
+  if (user.favorites.includes(req.params.propertyId)) {
+    return next(new ErrorResponse('Property already in favorites', 400));
+  }
+  
+  user.favorites.push(req.params.propertyId);
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    data: user.favorites
+  });
+});
+
+// @desc    Remove property from favorites
+// @route   DELETE /api/v1/users/favorites/:propertyId
+// @access  Private
+exports.removeFromFavorites = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  
+  // Check if property is in favorites
+  if (!user.favorites.includes(req.params.propertyId)) {
+    return next(new ErrorResponse('Property not in favorites', 400));
+  }
+  
+  user.favorites = user.favorites.filter(
+    id => id.toString() !== req.params.propertyId
+  );
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    data: user.favorites
+  });
+});
+
+// @desc    Get user favorites
+// @route   GET /api/v1/users/favorites
+// @access  Private
+exports.getFavorites = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).populate({
+    path: 'favorites',
+    select: 'title price type status bedrooms bathrooms area images address'
+  });
+  
+  res.status(200).json({
+    success: true,
+    count: user.favorites.length,
+    data: user.favorites
+  });
+});
+
+// @desc    Add property to recently viewed
+// @route   POST /api/v1/users/recently-viewed/:propertyId
+// @access  Private
+exports.addToRecentlyViewed = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  
+  // Check if property already in recently viewed
+  const existingIndex = user.recentlyViewed.findIndex(
+    item => item.property.toString() === req.params.propertyId
+  );
+  
+  if (existingIndex !== -1) {
+    // Update viewedAt if already exists
+    user.recentlyViewed[existingIndex].viewedAt = Date.now();
+  } else {
+    // Add new entry
+    user.recentlyViewed.push({
+      property: req.params.propertyId,
+      viewedAt: Date.now()
+    });
+    
+    // Keep only last 10 viewed properties
+    if (user.recentlyViewed.length > 10) {
+      user.recentlyViewed = user.recentlyViewed.slice(-10);
+    }
+  }
+  
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    data: user.recentlyViewed
+  });
+});
+
+// @desc    Get recently viewed properties
+// @route   GET /api/v1/users/recently-viewed
+// @access  Private
+exports.getRecentlyViewed = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).populate({
+    path: 'recentlyViewed.property',
+    select: 'title price type status bedrooms bathrooms area images address'
+  });
+  
+  // Sort by viewedAt (newest first)
+  const recentlyViewed = user.recentlyViewed
+    .sort((a, b) => b.viewedAt - a.viewedAt)
+    .map(item => item.property);
+  
+  res.status(200).json({
+    success: true,
+    count: recentlyViewed.length,
+    data: recentlyViewed
+  });
+});

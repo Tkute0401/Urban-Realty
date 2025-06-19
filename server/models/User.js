@@ -56,6 +56,27 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Occupation cannot be more than 100 characters']
   },
+  favorites: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Property'
+    }
+  ],
+  recentlyViewed: [
+    {
+      property: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Property'
+      },
+      viewedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ]
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Encrypt password using bcrypt

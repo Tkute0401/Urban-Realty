@@ -149,6 +149,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/properties/:id
 // @access  Public
 exports.getProperty = asyncHandler(async (req, res, next) => {
+  // Find property and populate agent details
   const property = await Property.findById(req.params.id)
     .populate('agent', 'name email phone mobile');
   
@@ -158,12 +159,55 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // If user is authenticated, track this view in their recently viewed
+  if (req.user) {
+    try {
+      const user = await User.findById(req.user.id);
+      
+      if (user) {
+        // Check if property already in recently viewed
+        const existingIndex = user.recentlyViewed.findIndex(
+          item => item.property.toString() === req.params.id
+        );
+        
+        if (existingIndex !== -1) {
+          // Update viewedAt if already exists
+          user.recentlyViewed[existingIndex].viewedAt = Date.now();
+        } else {
+          // Add new entry
+          user.recentlyViewed.push({
+            property: req.params.id,
+            viewedAt: Date.now()
+          });
+          
+          // Keep only last 10 viewed properties (remove oldest if over limit)
+          if (user.recentlyViewed.length > 10) {
+            user.recentlyViewed.shift(); // Remove the oldest item
+          }
+        }
+        
+        await user.save();
+      }
+    } catch (err) {
+      console.error('Error tracking recently viewed property:', err);
+      // Don't fail the request if tracking fails
+    }
+  }
+
+  // Increment view count for the property
+  try {
+    property.views = (property.views || 0) + 1;
+    await property.save();
+  } catch (err) {
+    console.error('Error incrementing property views:', err);
+    // Don't fail the request if view count fails
+  }
+
   res.status(200).json({ 
     success: true, 
     data: property 
   });
 });
-
 
 // @desc    Create new property
 // @route   POST /api/v1/properties
