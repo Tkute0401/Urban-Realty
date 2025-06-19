@@ -9,8 +9,106 @@ import {
   FormHelperText, InputAdornment, IconButton, Autocomplete, Avatar,
   FormLabel, Snackbar
 } from '@mui/material';
-import { CloudUpload, Delete, Star, Close } from '@mui/icons-material';
+import { 
+  CloudUpload, Delete, Star, Close,
+  Home, Apartment, Villa, Cottage, Factory, Landscape,
+  LocalParking, Pool, FitnessCenter, Security, Spa,
+  Balcony, Wifi, AcUnit, Chair, Pets, Elevator,
+  LocalLaundryService, Storage, MeetingRoom, Kitchen,
+  Bathtub, KingBed, SquareFoot
+} from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+// Styled components
+const PremiumPaper = styled(Paper)(({ theme }) => ({
+  backgroundColor: '#0B1011',
+  color: '#fff',
+  borderRadius: '16px',
+  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
+  border: `2px solid #78CADC`,
+  padding: theme.spacing(3),
+  fontFamily: '"Poppins", sans-serif',
+  position: 'relative',
+  overflow: 'hidden',
+  '&:before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '4px',
+    background: 'linear-gradient(90deg, #78CADC 0%, #0B1011 100%)',
+  }
+}));
+
+const PremiumButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#78CADC',
+  color: '#0B1011',
+  fontWeight: 600,
+  padding: theme.spacing(1.8, 4),
+  borderRadius: '12px',
+  fontFamily: '"Poppins", sans-serif',
+  textTransform: 'none',
+  fontSize: '1rem',
+  letterSpacing: '0.5px',
+  '&:hover': {
+    backgroundColor: '#5fb4c9',
+    transform: 'translateY(-3px)',
+    boxShadow: '0 6px 12px rgba(120, 202, 220, 0.4)',
+  },
+  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+  boxShadow: '0 4px 8px rgba(120, 202, 220, 0.2)',
+}));
+
+const SectionHeader = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  color: '#78CADC',
+  position: 'relative',
+  paddingBottom: theme.spacing(1),
+  marginBottom: theme.spacing(3),
+  fontFamily: '"Poppins", sans-serif',
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '60px',
+    height: '3px',
+    backgroundColor: '#78CADC',
+    borderRadius: '3px'
+  }
+}));
+
+// Amenities with icons mapping
+const amenitiesConfig = [
+  { name: 'Parking', icon: <LocalParking /> },
+  { name: 'Swimming Pool', icon: <Pool /> },
+  { name: 'Gym', icon: <FitnessCenter /> },
+  { name: 'Security', icon: <Security /> },
+  { name: 'Garden', icon: <Spa /> },
+  { name: 'Balcony', icon: <Balcony /> },
+  { name: 'WiFi', icon: <Wifi /> },
+  { name: 'Air Conditioning', icon: <AcUnit /> },
+  { name: 'Furnished', icon: <Chair /> },
+  { name: 'Pet Friendly', icon: <Pets /> },
+  { name: 'Elevator', icon: <Elevator /> },
+  { name: 'Laundry', icon: <LocalLaundryService /> },
+  { name: 'Storage', icon: <Storage /> },
+  { name: 'Conference Room', icon: <MeetingRoom /> },
+  { name: 'Kitchen', icon: <Kitchen /> }
+];
+
+// Property type icons mapping
+const propertyTypeIcons = {
+  'House': <Home />,
+  'Apartment': <Apartment />,
+  'Villa': <Villa />,
+  'Condo': <Cottage />,
+  'Townhouse': <Home />,
+  'Land': <Landscape />,
+  'Commercial': <Factory />
+};
 
 const AddPropertyPage = () => {
   const { createProperty, loading, error, clearErrors } = useProperties();
@@ -55,11 +153,6 @@ const AddPropertyPage = () => {
 
   const propertyTypes = ['House', 'Apartment', 'Villa', 'Condo', 'Townhouse', 'Land', 'Commercial'];
   const propertyStatuses = ['For Sale', 'For Rent'];
-  const amenitiesList = [
-    'Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 
-    'Balcony', 'WiFi', 'Air Conditioning', 'Furnished', 
-    'Pet Friendly', 'Elevator', 'Laundry', 'Storage'
-  ];
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -235,7 +328,11 @@ const AddPropertyPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
+    <Container maxWidth="lg" sx={{ 
+      py: { xs: 2, md: 3 },
+      background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+      minHeight: '100vh'
+    }}>
       <Box 
         component="form" 
         onSubmit={handleSubmit}
@@ -243,9 +340,10 @@ const AddPropertyPage = () => {
           maxWidth: 1200, 
           mx: 'auto',
           p: { xs: 1, sm: 2, md: 3 },
-          backgroundColor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 1
+          backgroundColor: '#0B1011',
+          borderRadius: '16px',
+          border: '2px solid #78CADC',
+          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)'
         }}
       >
         <Typography 
@@ -253,7 +351,10 @@ const AddPropertyPage = () => {
           gutterBottom 
           sx={{ 
             mb: { xs: 2, sm: 3 },
-            fontSize: { xs: '1.5rem', sm: '2rem' }
+            fontSize: { xs: '1.5rem', sm: '2rem' },
+            color: '#78CADC',
+            fontFamily: '"Poppins", sans-serif',
+            fontWeight: 700
           }}
         >
           Add New Property
@@ -263,239 +364,489 @@ const AddPropertyPage = () => {
           {/* Agent Selection (for admin only) */}
           {user?.role === 'admin' && (
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
+              <SectionHeader variant="h6">
                 Assign to Agent
-              </Typography>
-              <Autocomplete
-                options={agents}
-                getOptionLabel={(option) => `${option.name} (${option.email})`}
-                value={selectedAgent}
-                onChange={(e, newValue) => setSelectedAgent(newValue)}
-                renderInput={(params) => (
-                  <TextField 
-                    {...params} 
-                    label="Select Agent" 
-                    fullWidth 
-                    size={isMobile ? 'small' : 'medium'}
-                    required
-                    error={!!formErrors.agent}
-                    helperText={formErrors.agent}
-                  />
-                )}
-                isOptionEqualToValue={(option, value) => option._id === value._id}
-                renderOption={(props, option) => (
-                  <li {...props} key={option._id}>
-                    <Box display="flex" alignItems="center">
-                      <Avatar 
-                        src={option.photo} 
-                        sx={{ width: 24, height: 24, mr: 1 }}
-                      />
-                      <Box>
-                        <Typography variant="body1">{option.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {option.email}
-                        </Typography>
+              </SectionHeader>
+              <PremiumPaper>
+                <Autocomplete
+                  options={agents}
+                  getOptionLabel={(option) => `${option.name} (${option.email})`}
+                  value={selectedAgent}
+                  onChange={(e, newValue) => setSelectedAgent(newValue)}
+                  renderInput={(params) => (
+                    <TextField 
+                      {...params} 
+                      label="Select Agent" 
+                      fullWidth 
+                      size={isMobile ? 'small' : 'medium'}
+                      required
+                      error={!!formErrors.agent}
+                      helperText={formErrors.agent}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        }
+                      }}
+                    />
+                  )}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  renderOption={(props, option) => (
+                    <li {...props} key={option._id}>
+                      <Box display="flex" alignItems="center">
+                        <Avatar 
+                          src={option.photo} 
+                          sx={{ width: 24, height: 24, mr: 1 }}
+                        />
+                        <Box>
+                          <Typography variant="body1" sx={{ color: '#fff' }}>{option.name}</Typography>
+                          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                            {option.email}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  </li>
-                )}
-              />
+                    </li>
+                  )}
+                />
+              </PremiumPaper>
             </Grid>
           )}
 
           {/* Title */}
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Property Title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-              error={!!formErrors.title}
-              helperText={formErrors.title}
-            />
-          </Grid>
-
-          {/* Description */}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Description"
-              name="description"
-              multiline
-              rows={4}
-              value={formData.description}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-              error={!!formErrors.description}
-              helperText={formErrors.description}
-            />
-          </Grid>
-
-          {/* Property Type */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              select
-              fullWidth
-              label="Property Type"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-            >
-              {propertyTypes.map(type => (
-                <MenuItem key={type} value={type}>{type}</MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          {/* Status */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              select
-              fullWidth
-              label="Status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-            >
-              {propertyStatuses.map(status => (
-                <MenuItem key={status} value={status}>{status}</MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          {/* Featured Property */}
-          {(user?.role === 'admin' || user?.role === 'agent') && (
-            <Grid item xs={12} md={4}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.featured}
-                    onChange={(e) => setFormData({...formData, featured: e.target.checked})}
-                    name="featured"
-                    color="primary"
-                  />
-                }
-                label={
-                  <Box display="flex" alignItems="center">
-                    <Star color={formData.featured ? "primary" : "inherit"} sx={{ mr: 1 }} />
-                    Featured Property
-                  </Box>
-                }
+            <SectionHeader variant="h6">Basic Information</SectionHeader>
+            <PremiumPaper>
+              <TextField
+                fullWidth
+                label="Property Title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+                size={isMobile ? 'small' : 'medium'}
+                error={!!formErrors.title}
+                helperText={formErrors.title}
+                sx={{
+                  mb: 2,
+                  '& .MuiInputBase-root': {
+                    color: '#fff',
+                    fontFamily: '"Poppins", sans-serif'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#78CADC',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#78CADC',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#78CADC',
+                    },
+                  }
+                }}
               />
-            </Grid>
-          )}
 
-          {/* Price */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Price"
-              name="price"
-              type="number"
-              value={formData.price}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-              error={!!formErrors.price}
-              helperText={formErrors.price}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">₹</InputAdornment>
-                ),
-                inputProps: { min: 0 }
-              }}
-            />
+              {/* Description */}
+              <TextField
+                fullWidth
+                label="Description"
+                name="description"
+                multiline
+                rows={4}
+                value={formData.description}
+                onChange={handleChange}
+                required
+                size={isMobile ? 'small' : 'medium'}
+                error={!!formErrors.description}
+                helperText={formErrors.description}
+                sx={{
+                  mb: 2,
+                  '& .MuiInputBase-root': {
+                    color: '#fff',
+                    fontFamily: '"Poppins", sans-serif'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#78CADC',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#78CADC',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#78CADC',
+                    },
+                  }
+                }}
+              />
+
+              <Grid container spacing={2}>
+                {/* Property Type */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Property Type"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      },
+                      '& .MuiSelect-icon': {
+                        color: '#78CADC'
+                      }
+                    }}
+                  >
+                    {propertyTypes.map(type => (
+                      <MenuItem 
+                        key={type} 
+                        value={type}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          fontFamily: '"Poppins", sans-serif'
+                        }}
+                      >
+                        {propertyTypeIcons[type]}
+                        {type}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                {/* Status */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      },
+                      '& .MuiSelect-icon': {
+                        color: '#78CADC'
+                      }
+                    }}
+                  >
+                    {propertyStatuses.map(status => (
+                      <MenuItem 
+                        key={status} 
+                        value={status}
+                        sx={{ fontFamily: '"Poppins", sans-serif' }}
+                      >
+                        {status}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                {/* Featured Property */}
+                {(user?.role === 'admin' || user?.role === 'agent') && (
+                  <Grid item xs={12} md={4}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formData.featured}
+                          onChange={(e) => setFormData({...formData, featured: e.target.checked})}
+                          name="featured"
+                          sx={{
+                            color: '#78CADC',
+                            '&.Mui-checked': {
+                              color: '#78CADC',
+                            },
+                          }}
+                        />
+                      }
+                      label={
+                        <Box display="flex" alignItems="center" sx={{ color: '#fff' }}>
+                          <Star color={formData.featured ? "primary" : "inherit"} sx={{ mr: 1, color: formData.featured ? '#78CADC' : '#fff' }} />
+                          Featured Property
+                        </Box>
+                      }
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </PremiumPaper>
           </Grid>
 
-          {/* Bedrooms */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Bedrooms"
-              name="bedrooms"
-              type="number"
-              value={formData.bedrooms}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-              error={!!formErrors.bedrooms}
-              helperText={formErrors.bedrooms}
-              InputProps={{ inputProps: { min: 0 } }}
-            />
-          </Grid>
+          {/* Property Details */}
+          <Grid item xs={12}>
+            <SectionHeader variant="h6">Property Details</SectionHeader>
+            <PremiumPaper>
+              <Grid container spacing={2}>
+                {/* Price */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Price"
+                    name="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.price}
+                    helperText={formErrors.price}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>₹</InputAdornment>
+                      ),
+                      inputProps: { min: 0 }
+                    }}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
 
-          {/* Bathrooms */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Bathrooms"
-              name="bathrooms"
-              type="number"
-              value={formData.bathrooms}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-              error={!!formErrors.bathrooms}
-              helperText={formErrors.bathrooms}
-              InputProps={{ inputProps: { min: 0 } }}
-            />
-          </Grid>
+                {/* Bedrooms */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Bedrooms"
+                    name="bedrooms"
+                    type="number"
+                    value={formData.bedrooms}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.bedrooms}
+                    helperText={formErrors.bedrooms}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                          <KingBed />
+                        </InputAdornment>
+                      ),
+                      inputProps: { min: 0 }
+                    }}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
 
-          {/* Area */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Area (sqft)"
-              name="area"
-              type="number"
-              value={formData.area}
-              onChange={handleChange}
-              required
-              size={isMobile ? 'small' : 'medium'}
-              error={!!formErrors.area}
-              helperText={formErrors.area}
-              InputProps={{ inputProps: { min: 0 } }}
-            />
-          </Grid>
+                {/* Bathrooms */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Bathrooms"
+                    name="bathrooms"
+                    type="number"
+                    value={formData.bathrooms}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.bathrooms}
+                    helperText={formErrors.bathrooms}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                          <Bathtub />
+                        </InputAdornment>
+                      ),
+                      inputProps: { min: 0 }
+                    }}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
 
-          {/* Building Name */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Building Name (optional)"
-              name="buildingName"
-              value={formData.buildingName}
-              onChange={handleChange}
-              size={isMobile ? 'small' : 'medium'}
-            />
-          </Grid>
+                {/* Area */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Area (sqft)"
+                    name="area"
+                    type="number"
+                    value={formData.area}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.area}
+                    helperText={formErrors.area}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                          <SquareFoot />
+                        </InputAdornment>
+                      ),
+                      inputProps: { min: 0 }
+                    }}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
 
-          {/* Floor Number */}
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label="Floor Number (optional)"
-              name="floorNumber"
-              value={formData.floorNumber}
-              onChange={handleChange}
-              size={isMobile ? 'small' : 'medium'}
-            />
+                {/* Building Name */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Building Name (optional)"
+                    name="buildingName"
+                    value={formData.buildingName}
+                    onChange={handleChange}
+                    size={isMobile ? 'small' : 'medium'}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
+
+                {/* Floor Number */}
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Floor Number (optional)"
+                    name="floorNumber"
+                    value={formData.floorNumber}
+                    onChange={handleChange}
+                    size={isMobile ? 'small' : 'medium'}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </PremiumPaper>
           </Grid>
 
           {/* Address Section */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
-              Address Details
-            </Typography>
-            <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider' }}>
+            <SectionHeader variant="h6">Address Details</SectionHeader>
+            <PremiumPaper>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -505,6 +856,23 @@ const AddPropertyPage = () => {
                     value={formData.address.line1}
                     onChange={handleChange}
                     size={isMobile ? 'small' : 'medium'}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -518,6 +886,23 @@ const AddPropertyPage = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.street}
                     helperText={formErrors.street}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -531,6 +916,23 @@ const AddPropertyPage = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.city}
                     helperText={formErrors.city}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -544,6 +946,23 @@ const AddPropertyPage = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.state}
                     helperText={formErrors.state}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -557,6 +976,23 @@ const AddPropertyPage = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.zipCode}
                     helperText={formErrors.zipCode}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
@@ -570,110 +1006,156 @@ const AddPropertyPage = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.country}
                     helperText={formErrors.country}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
                   />
                 </Grid>
               </Grid>
-            </Paper>
+            </PremiumPaper>
           </Grid>
 
           {/* Amenities */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Amenities
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {amenitiesList.map(amenity => (
-                <Chip
-                  key={amenity}
-                  label={amenity}
-                  clickable
-                  size={isMobile ? 'small' : 'medium'}
-                  color={formData.amenities.includes(amenity) ? 'primary' : 'default'}
-                  onClick={() => handleAmenityToggle(amenity)}
-                />
-              ))}
-            </Box>
+            <SectionHeader variant="h6">Amenities</SectionHeader>
+            <PremiumPaper>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {amenitiesConfig.map(amenity => (
+                  <Chip
+                    key={amenity.name}
+                    label={amenity.name}
+                    icon={amenity.icon}
+                    clickable
+                    size={isMobile ? 'small' : 'medium'}
+                    color={formData.amenities.includes(amenity.name) ? 'primary' : 'default'}
+                    onClick={() => handleAmenityToggle(amenity.name)}
+                    sx={{
+                      fontFamily: '"Poppins", sans-serif',
+                      backgroundColor: formData.amenities.includes(amenity.name) 
+                        ? 'rgba(120, 202, 220, 0.2)' 
+                        : 'rgba(255, 255, 255, 0.1)',
+                      color: '#fff',
+                      border: formData.amenities.includes(amenity.name) 
+                        ? '1px solid #78CADC' 
+                        : '1px solid rgba(255, 255, 255, 0.2)',
+                      '& .MuiChip-icon': {
+                        color: formData.amenities.includes(amenity.name) ? '#78CADC' : '#fff'
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(120, 202, 220, 0.3)'
+                      }
+                    }}
+                  />
+                ))}
+              </Box>
+            </PremiumPaper>
           </Grid>
 
           {/* Images */}
           <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Property Images
-            </Typography>
-            <FormHelperText sx={{ mb: 1 }}>
-              Upload up to 10 images (5MB each). First image will be used as primary.
-            </FormHelperText>
-            
-            {formErrors.images && (
-              <FormHelperText error sx={{ mb: 1 }}>
-                {formErrors.images}
+            <SectionHeader variant="h6">Property Images</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Upload up to 10 images (5MB each). First image will be used as primary.
               </FormHelperText>
-            )}
-            
-            <Box sx={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              gap: 2, 
-              mb: 2,
-              maxHeight: 300,
-              overflowY: 'auto'
-            }}>
-              {imagePreviews.map((preview, index) => (
-                <Box key={index} sx={{ position: 'relative' }}>
-                  <Box
-                    component="img"
-                    src={preview}
-                    alt={`Preview ${index}`}
-                    sx={{ 
-                      width: 120, 
-                      height: 120,
-                      objectFit: 'cover',
-                      borderRadius: 1
-                    }}
-                  />
-                  <IconButton
-                    size="small"
-                    onClick={() => handleRemoveImage(index)}
-                    sx={{ 
-                      position: 'absolute', 
-                      top: 4, 
-                      right: 4, 
-                      color: 'white', 
-                      backgroundColor: 'rgba(0,0,0,0.5)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0,0,0,0.7)'
-                      }
-                    }}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </Box>
-              ))}
-            </Box>
+              
+              {formErrors.images && (
+                <FormHelperText error sx={{ mb: 1 }}>
+                  {formErrors.images}
+                </FormHelperText>
+              )}
+              
+              <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: 2, 
+                mb: 2,
+                maxHeight: 300,
+                overflowY: 'auto'
+              }}>
+                {imagePreviews.map((preview, index) => (
+                  <Box key={index} sx={{ position: 'relative' }}>
+                    <Box
+                      component="img"
+                      src={preview}
+                      alt={`Preview ${index}`}
+                      sx={{ 
+                        width: 120, 
+                        height: 120,
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '2px solid #78CADC'
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => handleRemoveImage(index)}
+                      sx={{ 
+                        position: 'absolute', 
+                        top: 4, 
+                        right: 4, 
+                        color: 'white', 
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(211, 47, 47, 0.7)'
+                        }
+                      }}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Box>
 
-            <Button
-              variant="contained"
-              component="label"
-              startIcon={<CloudUpload />}
-              size={isMobile ? 'small' : 'medium'}
-              disabled={imagePreviews.length >= 10}
-            >
-              Upload Images
-              <input
-                type="file"
-                hidden
-                multiple
-                accept="image/*"
-                onChange={handleImageChange}
-                ref={fileInputRef}
+              <Button
+                variant="contained"
+                component="label"
+                startIcon={<CloudUpload />}
+                size={isMobile ? 'small' : 'medium'}
                 disabled={imagePreviews.length >= 10}
-              />
-            </Button>
-            {uploadProgress.percent && (
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Uploading: {uploadProgress.percent}%
-              </Typography>
-            )}
+                sx={{
+                  backgroundColor: '#78CADC',
+                  color: '#0B1011',
+                  fontWeight: 600,
+                  '&:hover': {
+                    backgroundColor: '#5fb4c9'
+                  },
+                  '&:disabled': {
+                    backgroundColor: 'rgba(120, 202, 220, 0.5)'
+                  }
+                }}
+              >
+                Upload Images
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                  disabled={imagePreviews.length >= 10}
+                />
+              </Button>
+              {uploadProgress.percent && (
+                <Typography variant="body2" sx={{ mt: 1, color: '#78CADC' }}>
+                  Uploading: {uploadProgress.percent}%
+                </Typography>
+              )}
+            </PremiumPaper>
           </Grid>
 
           {/* Submit Buttons */}
@@ -683,26 +1165,35 @@ const AddPropertyPage = () => {
               flexDirection: { xs: 'column', sm: 'row' },
               gap: 2
             }}>
-              <Button
+              <PremiumButton
                 type="submit"
-                variant="contained"
                 size="large"
                 disabled={loading || isSubmitting}
-                startIcon={(loading || isSubmitting) ? <CircularProgress size={20} /> : null}
+                startIcon={(loading || isSubmitting) ? <CircularProgress size={20} sx={{ color: '#0B1011' }} /> : null}
                 sx={{ 
                   flex: 1,
-                  py: 1.5
+                  py: 1.5,
+                  '&:disabled': {
+                    backgroundColor: 'rgba(120, 202, 220, 0.5)'
+                  }
                 }}
               >
                 {(loading || isSubmitting) ? 'Adding Property...' : 'Add Property'}
-              </Button>
+              </PremiumButton>
               
               <Button
                 variant="outlined"
                 size="large"
                 sx={{ 
                   flex: 1,
-                  py: 1.5
+                  py: 1.5,
+                  color: '#78CADC',
+                  borderColor: '#78CADC',
+                  fontWeight: 600,
+                  '&:hover': {
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                    borderColor: '#78CADC'
+                  }
                 }}
                 onClick={() => navigate('/properties')}
               >
@@ -728,6 +1219,14 @@ const AddPropertyPage = () => {
             <Close fontSize="small" />
           </IconButton>
         }
+        sx={{
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: '#0B1011',
+            color: '#fff',
+            border: '2px solid #78CADC',
+            fontFamily: '"Poppins", sans-serif'
+          }
+        }}
       />
     </Container>
   );
