@@ -55,6 +55,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
       seller: "Dream Homes"
     }
   ];
+  console.log(user.favorites);
 
   return (
     <AnimatePresence>

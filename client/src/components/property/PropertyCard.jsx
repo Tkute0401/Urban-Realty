@@ -1,121 +1,181 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from "react";
+import { motion } from "framer-motion";
+import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
+import LocalHotelOutlinedIcon from '@mui/icons-material/LocalHotelOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Tooltip } from '@mui/material';
-import { formatPrice } from '../../utils/format';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useAuth } from '../../context/AuthContext';
+import axios from '../../services/axios';
+import { toast } from 'react-toastify';
 
-const PropertyCard = ({ property }) => {
+const PropertyCard = ({ property, index }) => {
   const navigate = useNavigate();
-  const [imageError, setImageError] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { user } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
 
-  const getImageUrl = (img) => {
-    try {
-      if (!img) return null;
-      if (typeof img === 'string') return img;
-      if (typeof img === 'object' && img.url) return img.url;
-      return null;
-    } catch (error) {
-      console.error('Error parsing image URL:', error);
-      return null;
-    }
-  };
-
-  const getPrimaryImage = () => {
-    if (imageError) return '/default-property.jpg';
+  // Check if property is in favorites when component mounts or user changes
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user && property?._id) {
+        try {
+          const response = await axios.get(`/auth/favorites/${property._id}/status`);
+          console.log(user, property._id);
+          setIsFavorite(response.data.isFavorite);
+        } catch (err) {
+          console.error('Error checking favorite status:', err);
+        }
+      } else {
+        setIsFavorite(false);
+      }
+    };
     
-    if (!property?.images || !Array.isArray(property.images) || property.images.length === 0) {
-      return '/default-property.jpg';
+    checkFavoriteStatus();
+  }, [user, property?._id]);
+
+  const handleClick = () => {
+    navigate(`/properties/${property._id}`);
+  };
+
+  const handleFavoriteClick = async (e) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      navigate('/login', { state: { from: window.location.pathname } });
+      toast.info('Please login to save favorites');
+      return;
     }
 
-    const primaryImg = property.images.find(img => img.isPrimary) || property.images[0];
-    return getImageUrl(primaryImg) || '/default-property.jpg';
-  };
-
-  const primaryImage = getPrimaryImage();
-
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
-  const handleCardClick = () => {
-    if (property?._id) {
-      navigate(`/properties/${property._id}`);
+    setLoadingFavorite(true);
+    try {
+      if (isFavorite) {
+        await axios.delete(`/auth/favorites/${property._id}`);
+        toast.success('Removed from favorites');
+      } else {
+        await axios.put(`/auth/favorites/${property._id}`);
+        console.log(property._id,user);
+        toast.success('Added to favorites');
+      }
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error('Error updating favorite:', err);
+      toast.error(err.response?.data?.message || 'Failed to update favorites');
+    } finally {
+      setLoadingFavorite(false);
     }
   };
 
-  const getAddressComponent = (component) => {
-    if (!property?.address) return '';
-    if (typeof property.address === 'string') return property.address;
-    return property.address[component] || '';
+  const formatPrice = (price) => {
+    if (!price) return 'Price not available';
+    if (price >= 10000000) {
+      return `₹ ${(price / 10000000).toFixed(2)} Cr`;
+    } else if (price >= 100000) {
+      return `₹ ${(price / 100000).toFixed(2)} Lac`;
+    }
+    return `₹ ${price.toLocaleString()}`;
   };
-
-  const city = getAddressComponent('city');
-  const state = getAddressComponent('state');
-  const locationText = city && state ? `${city}, ${state}` : city || state || 'Location not specified';
+  console.log(user);
 
   return (
-    <div
-      className="property-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleCardClick}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
+      className="bg-[#08171A] rounded-xl sm:rounded-3xl overflow-hidden border border-[#78CADC] cursor-pointer hover:shadow-lg hover:shadow-[#78CADC]/20 transition-shadow"
+      onClick={handleClick}
     >
-      <div className="property-image-container">
-        <img 
-          src={primaryImage} 
-          alt={property?.title || 'Property image'} 
-          className="property-image" 
-          onError={handleImageError}
-          style={{
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)'
-          }}
-        />
-        <div className="property-image-overlay">
-          <div className="property-image-actions">
-            <button className="image-action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 19c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"></path>
-                <path d="m21 21-4.3-4.3"></path>
-                <path d="M8 11h6"></path>
-                <path d="M11 8v6"></path>
-              </svg>
-            </button>
-            <button className="image-action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <path d="m21 15-5-5L5 21"></path>
-              </svg>
-            </button>
+      <div className="relative aspect-video">
+        {property.images?.length > 0 ? (
+          <img 
+            src={property.images[0].url} 
+            alt={property.title} 
+            className="w-full h-full object-cover" 
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+            <span className="text-gray-500">No Image</span>
           </div>
-        </div>
+        )}
+        <button 
+          className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1 sm:p-2 bg-[#0c0d0e]/80 rounded-full hover:bg-[#0c0d0e] transition-colors"
+          onClick={handleFavoriteClick}
+          disabled={loadingFavorite}
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          {loadingFavorite ? (
+            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-transparent border-t-white border-l-white rounded-full animate-spin" />
+          ) : isFavorite ? (
+            <HeartFilled className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+          ) : (
+            <HeartOutline className="w-4 h-4 sm:w-5 sm:h-5 text-white hover:text-red-500 transition-colors" />
+          )}
+        </button>
       </div>
 
-      <div className="property-details">
-        <div className="property-price">{formatPrice(property?.price || 0)}</div>
-        <div className="property-specs">
-          <div className="property-spec">
-            {property?.area ? `${property.area.toLocaleString()} Sqft` : 'N/A'}
+      <div className="p-3 sm:p-5">
+        <div className="flex mb-1 sm:mb-2">
+          {[...Array(5)].map((_, i) => (
+            <StarIcon key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+          ))}
+          <span className="text-xs sm:text-sm text-gray-400 ml-1">5.0 (??)</span>
+        </div>
+        
+        <h3 className="font-poppins text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2 line-clamp-1">
+          {property.buildingName || property.title}
+        </h3>
+        
+        <div className="flex items-center gap-1 sm:gap-2 text-red-500 mb-2 sm:mb-3">
+          <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="font-poppins text-xs sm:text-sm line-clamp-1">
+            {property.address?.city}, {property.address?.state}
+          </span>
+        </div>
+        
+        <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
+          {property.description}
+        </p>
+        
+        <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <HomeOutlinedIcon className="text-gray-400" style={{ fontSize: '1rem' }} />
+            <span className="text-gray-300 text-xs sm:text-sm">
+              {property.area ? `${property.area} sqft` : 'N/A'}
+            </span>
           </div>
-          <div className="property-spec-divider">|</div>
-          <div className="property-spec">
-            {property?.bedrooms || 'N/A'} Bed
+          <div className="flex items-center gap-1 sm:gap-2">
+            <LocalHotelOutlinedIcon className="text-gray-400" style={{ fontSize: '1rem' }} />
+            <span className="text-gray-300 text-xs sm:text-sm">
+              {property.bedrooms || '0'} Bed
+            </span>
           </div>
-          <div className="property-spec-divider">|</div>
-          <div className="property-spec">
-            {property?.bathrooms || 'N/A'} Bath
+          <div className="flex items-center gap-1 sm:gap-2">
+            <BathtubOutlinedIcon className="text-gray-400" style={{ fontSize: '1rem' }} />
+            <span className="text-gray-300 text-xs sm:text-sm">
+              {property.bathrooms || '0'} Bath
+            </span>
           </div>
         </div>
-        <Tooltip title={locationText} arrow>
-          <div className="property-location">
-            {locationText}
-          </div>
-        </Tooltip>
+        
+        <div className="pt-2 border-t border-gray-800">
+          <p className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3">
+            {formatPrice(property.price)}
+            {property.status === 'For Rent' && '/mo'}
+          </p>
+          <button 
+            className="w-full bg-transparent border border-[#78cadc] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#78cadc]/20 transition-all text-xs sm:text-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick();
+            }}
+          >
+            <span className="font-poppins">View Details</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
