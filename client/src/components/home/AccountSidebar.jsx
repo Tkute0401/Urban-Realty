@@ -208,7 +208,6 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   <div className="text-white text-center py-4">Loading favorites...</div>
                 ) : (
                   (activeTab === 'viewed' ? recentlyViewed : favoriteProperties).map((property) => (
-                    console.log(property),
                     <div key={property._id || property.id} onClick={() => handlePropertyClick(property)} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors overflow-hidden">
                       <div className="flex gap-3">
                         <div className="w-20 h-20 rounded-full border-2 border-[#78CADC] overflow-hidden  mt-7">
