@@ -159,6 +159,44 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
     );
   }
 
+  // Find similar properties within 20km radius
+  let similarProperties = [];
+  if (property.location?.coordinates && property.location.coordinates.length === 2) {
+    const radius = 20 / 6378.1; // Convert km to radians
+    
+    similarProperties = await Property.find({
+      _id: { $ne: property._id }, // Exclude current property
+      location: {
+        $geoWithin: { 
+          $centerSphere: [
+            property.location.coordinates, 
+            radius
+          ] 
+        }
+      },
+      type: property.type, // Same property type
+      bedrooms: property.bedrooms, // Same number of bedrooms
+      status: property.status // Same status (For Sale/For Rent)
+    })
+    .limit(3) // Limit to 3 similar properties
+    .select('title price bedrooms bathrooms area type images address status')
+    .lean(); // Convert to plain JS object
+    
+    // Calculate distance for each similar property
+    similarProperties = similarProperties.map(similarProp => {
+      if (similarProp.location?.coordinates) {
+        const distance = calculateDistance(
+          property.location.coordinates[1],
+          property.location.coordinates[0],
+          similarProp.location.coordinates[1],
+          similarProp.location.coordinates[0]
+        );
+        return { ...similarProp, distance };
+      }
+      return similarProp;
+    });
+  }
+
   // If user is authenticated, track this view in their recently viewed
   if (req.user) {
     try {
@@ -205,9 +243,31 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ 
     success: true, 
-    data: property 
+    data: {
+      ...property.toObject(),
+      similarProperties
+    }
   });
 });
+
+// Helper function to calculate distance between two coordinates in km
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1); 
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  const distance = R * c; // Distance in km
+  return distance;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180);
+}
 
 // @desc    Create new property
 // @route   POST /api/v1/properties
