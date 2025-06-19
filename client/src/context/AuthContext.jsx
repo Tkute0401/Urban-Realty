@@ -149,7 +149,11 @@ export const AuthProvider = ({ children }) => {
         email: userInfo.email,
         id: userInfo.id || userInfo._id,
         name: userInfo.name,
-        role: userInfo.role
+        role: userInfo.role,
+        mobile: userData.mobile,
+        favorites: userData?.favorites,
+        occupation: userData?.occupation,
+        recentlyViewed: userData?.recentlyViewed
       });
       navigate('/');
       return { success: true };
