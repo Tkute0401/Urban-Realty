@@ -174,9 +174,6 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
           ] 
         }
       },
-      type: property.type, // Same property type
-      bedrooms: property.bedrooms, // Same number of bedrooms
-      status: property.status // Same status (For Sale/For Rent)
     })
     .limit(3) // Limit to 3 similar properties
     .select('title price bedrooms bathrooms area type images address status')
