@@ -78,7 +78,6 @@ export const PropertiesProvider = ({ children }) => {
       setError(null);
       const response = await axios.get('/properties/featured');
       const data = response.data?.data ?? response.data;
-      console.log("data in context",data);
       
       if (!Array.isArray(data)) {
         throw new Error('Received invalid properties data format');

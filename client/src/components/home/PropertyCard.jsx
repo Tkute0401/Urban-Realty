@@ -15,8 +15,7 @@ const PropertyCard = ({ property, index }) => {
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
-  console.log(property);
-
+  
   // Check if property is in favorites when component mounts or user changes
   useEffect(() => {
     const checkFavoriteStatus = async () => {

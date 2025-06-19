@@ -1111,12 +1111,7 @@ useEffect(() => {
                   display: 'flex',
                   alignItems: 'center'
                 }}>
-                  <LocationOn sx={{ 
-                    color: '#78CADC', 
-                    fontSize: '1rem', 
-                    mr: 1 
-                  }} />
-                  {Math.round(similarProp.distance * 10) / 10} km away
+                  
                 </Typography>
               </Box>
             </Box>

@@ -22,7 +22,6 @@ const PropertyCard = ({ property, index }) => {
       if (user && property?._id) {
         try {
           const response = await axios.get(`/auth/favorites/${property._id}/status`);
-          console.log(user, property._id);
           setIsFavorite(response.data.isFavorite);
         } catch (err) {
           console.error('Error checking favorite status:', err);
@@ -55,7 +54,6 @@ const PropertyCard = ({ property, index }) => {
         toast.success('Removed from favorites');
       } else {
         await axios.put(`/auth/favorites/${property._id}`);
-        console.log(property._id,user);
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);
@@ -76,8 +74,7 @@ const PropertyCard = ({ property, index }) => {
     }
     return `₹ ${price.toLocaleString()}`;
   };
-  console.log(user);
-
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}

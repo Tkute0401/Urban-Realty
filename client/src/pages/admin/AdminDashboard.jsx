@@ -71,8 +71,7 @@ const AdminDashboard = () => {
       </Box>
     );
   }
-  console.log(stats);
-
+  
   return (
     <Box>
       <Typography variant="h4" gutterBottom>Admin Dashboard</Typography>
