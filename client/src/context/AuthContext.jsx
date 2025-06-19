@@ -109,7 +109,11 @@ export const AuthProvider = ({ children }) => {
         email: userData.email,
         id: userData.id || userData._id,
         name: userData.name,
-        role: userData.role
+        role: userData.role,
+        mobile: userData.mobile,
+        favorites: userData?.favorites,
+        occupation: userData?.occupation,
+        recentlyViewed: userData?.recentlyViewed
       });
       if (userData.role === 'admin') {
         navigate('/admin');
