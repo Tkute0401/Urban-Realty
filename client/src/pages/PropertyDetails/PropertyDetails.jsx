@@ -145,24 +145,67 @@ const PropertyDetails = () => {
   const [showRightScroll, setShowRightScroll] = useState(true);
 
   const handleScroll = useCallback((direction) => {
-    if (tabsRef.current) {
-      const scrollAmount = direction === 'left' ? -200 : 200;
-      tabsRef.current.scrollBy({
-        left: scrollAmount,
+  if (tabsRef.current) {
+    const scrollableElement = tabsRef.current.querySelector('.MuiTabs-scroller');
+    if (scrollableElement) {
+      const scrollAmount = 200; // Adjust this value to control how much to scroll
+      const currentScroll = scrollableElement.scrollLeft;
+      const newScroll = direction === 'left' 
+        ? Math.max(0, currentScroll - scrollAmount)
+        : currentScroll + scrollAmount;
+      
+      scrollableElement.scrollTo({
+        left: newScroll,
         behavior: 'smooth'
       });
-      
-      setTimeout(checkScrollButtons, 300);
-    }
-  }, []);
 
-  const checkScrollButtons = useCallback(() => {
-    if (tabsRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
-      setShowLeftScroll(scrollLeft > 10);
-      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - 10);
+      // Update button visibility after scroll completes
+      setTimeout(() => {
+        checkScrollButtons();
+      }, 300);
     }
-  }, []);;
+  }
+}, []);
+
+const checkScrollButtons = useCallback(() => {
+  if (tabsRef.current) {
+    const scrollableElement = tabsRef.current.querySelector('.MuiTabs-scroller');
+    if (scrollableElement) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollableElement;
+      const tolerance = 5;
+      
+      setShowLeftScroll(scrollLeft > tolerance);
+      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - tolerance);
+    }
+  }
+}, []);
+useEffect(() => {
+  const tabsElement = tabsRef.current;
+  let scrollableElement = null;
+  
+  if (tabsElement) {
+    scrollableElement = tabsElement.querySelector('.MuiTabs-scroller');
+  }
+  
+  if (scrollableElement) {
+    // Initial check
+    checkScrollButtons();
+    
+    // Add scroll event listener to the actual scrollable element
+    scrollableElement.addEventListener('scroll', checkScrollButtons);
+    
+    // Add resize observer for responsive behavior
+    const resizeObserver = new ResizeObserver(() => {
+      checkScrollButtons();
+    });
+    resizeObserver.observe(scrollableElement);
+    
+    return () => {
+      scrollableElement.removeEventListener('scroll', checkScrollButtons);
+      resizeObserver.disconnect();
+    };
+  }
+}, [checkScrollButtons]);
 
   useEffect(() => {
     const tabsElement = tabsRef.current;
@@ -627,43 +670,46 @@ const PropertyDetails = () => {
           alignItems: 'center',
           px: 0
         }}>
-          {/* Left Scroll Button */}
-          <IconButton
-            onClick={() => handleScroll('left')}
-            sx={{
-              display: showLeftScroll ? 'inline-flex' : 'none',
-              backgroundColor: 'rgba(120, 202, 220, 0.2)',
-              color: '#78CADC',
-              mx: 1,
-              flexShrink: 0,
-              '&:hover': {
-                backgroundColor: 'rgba(120, 202, 220, 0.4)'
-              }
-            }}
-          >
-            <ChevronLeft />
-          </IconButton>
 
           {/* Scrollable Tabs */}
           <Box
             ref={tabsRef}
             sx={{
               flex: 1,
-              overflowX: 'auto',
-              scrollbarWidth: 'none',
-              '&::-webkit-scrollbar': {
-                display: 'none'
-              },
-              display: 'flex',
-              justifyContent: 'center'
+              overflowX: 'hidden',
+              position: 'relative',
+              display: 'flex'
             }}
           >
             <Tabs
               value={activeTab}
-              onChange={(e, newValue) => setActiveTab(newValue)}
+              onChange={(e, newValue) => {
+                setActiveTab(newValue);
+                const refMap = {
+                  overview: overviewRef,
+                  highlights: highlightsRef,
+                  around: aroundRef,
+                  more: moreRef,
+                  floorplan: floorplanRef,
+                  amenities: amenitiesRef,
+                  developer: developerRef,
+                  similar: similarRef
+                };
+                if (refMap[newValue]) {
+                  scrollToSection(refMap[newValue]);
+                }
+              }}
               variant="scrollable"
               scrollButtons={false}
               sx={{
+                flex: 1,
+                '& .MuiTabs-scroller': {
+                  overflowX: 'auto !important',
+                  scrollbarWidth: 'none',
+                  '&::-webkit-scrollbar': {
+                    display: 'none'
+                  }
+                },
                 '& .MuiTabs-indicator': {
                   backgroundColor: '#78CADC',
                   height: '4px'
@@ -682,45 +728,16 @@ const PropertyDetails = () => {
                 }
               }}
             >
-              <Tab 
-                label="Overview" 
-                value="overview" 
-                onClick={() => scrollToSection(overviewRef)}
-              />
-              <Tab 
-                label="Highlights" 
-                value="highlights" 
-                onClick={() => scrollToSection(highlightsRef)}
-              />
-              <Tab 
-                label="Around This Project" 
-                value="around" 
-                onClick={() => scrollToSection(aroundRef)}
-              />
-              <Tab 
-                label="More About Project" 
-                value="more" 
-                onClick={() => scrollToSection(moreRef)}
-              />
+              <Tab label="Overview" value="overview" />
+              <Tab label="Highlights" value="highlights" />
+              <Tab label="Around This Project" value="around" />
+              <Tab label="More About Project" value="more" />
+              <Tab label="Floor Plan" value="floorplan" />
+              <Tab label="Amenities" value="amenities" />
+              <Tab label="About Developer" value="developer" />
+              <Tab label="Similar Projects" value="similar" />
             </Tabs>
           </Box>
-
-          {/* Right Scroll Button */}
-          <IconButton
-            onClick={() => handleScroll('right')}
-            sx={{
-              display: showRightScroll ? 'inline-flex' : 'none',
-              backgroundColor: 'rgba(120, 202, 220, 0.2)',
-              color: '#78CADC',
-              mx: 1,
-              flexShrink: 0,
-              '&:hover': {
-                backgroundColor: 'rgba(120, 202, 220, 0.4)'
-              }
-            }}
-          >
-            <ChevronRight />
-          </IconButton>
         </Container>
       </Box>
 
