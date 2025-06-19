@@ -162,7 +162,7 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
   // Find similar properties within 20km radius
   let similarProperties = [];
   if (property.location?.coordinates && property.location.coordinates.length === 2) {
-    const radius = 20 / 6378.1; // Convert km to radians
+    const radius = 80 / 6378.1; // Convert km to radians
     
     similarProperties = await Property.find({
       _id: { $ne: property._id }, // Exclude current property
