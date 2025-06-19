@@ -1202,7 +1202,7 @@ const PropertyDetails = () => {
               </PremiumPaper>
 
               {/* Location Map */}
-              <PremiumPaper>
+              {/* <PremiumPaper>
                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, color: '#78CADC' }}>
                   Location
                 </Typography>
@@ -1228,7 +1228,7 @@ const PropertyDetails = () => {
                   <LocationOn sx={{ color: '#78CADC', mr: 1.5 }} />
                   {fullAddress}
                 </Typography>
-              </PremiumPaper>
+              </PremiumPaper> */}
             </Box>
           </Grid>
         </Grid>
