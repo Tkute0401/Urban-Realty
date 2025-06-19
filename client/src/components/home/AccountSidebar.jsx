@@ -45,17 +45,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     }
   ];
 
-  const favouriteProperties = [
-    {
-      id: 1,
-      image: "/building_1.jpg",
-      price: "₹95.0 L",
-      title: "2 BHK Apartment",
-      location: "Wakad, Pune",
-      seller: "Dream Homes"
-    }
-  ];
-  console.log(user);
+  const favouriteProperties = user.favorites;
+    console.log(user);
   //console.log(user.favorites);
 
   return (
