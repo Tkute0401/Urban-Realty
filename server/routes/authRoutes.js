@@ -38,5 +38,17 @@ router.put(
   ],
   authController.updateUser
 );
+// Favorites routes
+router.route('/favorites/:propertyId')
+  .put(protect, authController.addToFavorites)
+  .delete(protect, authController.removeFromFavorites);
+
+router.get('/favorites', protect, authController.getFavorites);
+
+// Recently viewed routes
+router.route('/recently-viewed/:propertyId')
+  .post(protect, authController.addToRecentlyViewed);
+
+router.get('/recently-viewed', protect, authController.getRecentlyViewed);
 
 module.exports = router;
