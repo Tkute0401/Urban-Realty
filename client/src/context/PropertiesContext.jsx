@@ -127,37 +127,78 @@ export const PropertiesProvider = ({ children }) => {
   }, [cache]);
 
   const createProperty = useCallback(async (formData, config = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Ensure headers are set properly
-      const finalConfig = {
-        ...config,
-        headers: {
-          ...config.headers,
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      };
-  
-      const response = await axios.post('/properties', formData, finalConfig);
-      
-      const newProperty = response.data?.data ?? response.data;
-      setProperties(prev => [...prev, newProperty]);
-      setCache({});
-      return newProperty;
-    } catch (err) {
-      const errorMsg = err.response?.data?.error || 
-                      err.response?.data?.message || 
-                      err.message || 
-                      'Failed to create property';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    setError(null);
+    
+    // Ensure headers are set properly
+    const finalConfig = {
+      ...config,
+      headers: {
+        ...config.headers,
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    };
+
+    // Process form data to match backend expectations
+    const processedFormData = new FormData();
+    
+    // Append all simple fields
+    const simpleFields = [
+      'title', 'description', 'type', 'status', 'price', 
+      'bedrooms', 'bathrooms', 'area', 'buildingName', 
+      'floorNumber', 'featured', 'agent'
+    ];
+    
+    simpleFields.forEach(field => {
+      if (formData[field] !== undefined) {
+        processedFormData.append(field, formData[field]);
+      }
+    });
+
+    // Append nested objects
+    const nestedObjects = ['address', 'nearbyLocalities', 'projectDetails'];
+    nestedObjects.forEach(obj => {
+      if (formData[obj]) {
+        processedFormData.append(obj, JSON.stringify(formData[obj]));
+      }
+    });
+
+    // Append arrays
+    const arrayFields = ['amenities', 'highlights'];
+    arrayFields.forEach(field => {
+      if (formData[field] && Array.isArray(formData[field])) {
+        formData[field].forEach(item => {
+          processedFormData.append(`${field}[]`, item);
+        });
+      }
+    });
+
+    // Append images
+    if (formData.images && formData.images.length > 0) {
+      formData.images.forEach(file => {
+        processedFormData.append('images', file);
+      });
     }
-  }, []);
+
+    const response = await axios.post('/properties', processedFormData, finalConfig);
+    
+    const newProperty = response.data?.data ?? response.data;
+    setProperties(prev => [...prev, newProperty]);
+    setCache({});
+    return newProperty;
+  } catch (err) {
+    const errorMsg = err.response?.data?.error || 
+                    err.response?.data?.message || 
+                    err.message || 
+                    'Failed to create property';
+    setError(errorMsg);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   const updateProperty = useCallback(async (id, formData) => {
     try {
