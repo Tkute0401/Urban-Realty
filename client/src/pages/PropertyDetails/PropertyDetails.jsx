@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
-import { ChevronRight } from '@mui/icons-material';
+import { ChevronRight, ChevronLeft } from '@mui/icons-material';
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
   Phone, Email, Edit, Delete, ArrowBack,
@@ -1187,6 +1187,7 @@ const PropertyDetails = () => {
 
             {/* About Developer Section */}
             <Box ref={developerRef} sx={{ mb: 6 }}>
+            {console.log(property)}
               <SectionHeader variant="h4">About Developer</SectionHeader>
               <PremiumPaper>
                 {property.developer ? (
@@ -1223,6 +1224,111 @@ const PropertyDetails = () => {
                 ) : (
                   <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Developer information will be displayed here when available.
+                  </Typography>
+                )}
+              </PremiumPaper>
+            </Box>
+
+            {/* About Project Section */}
+            <Box ref={developerRef} sx={{ mb: 6 }}>
+              <SectionHeader variant="h4">About Project</SectionHeader>
+              <PremiumPaper>
+                {property.projectDetails ? (
+                  <>
+                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+                      Project Information
+                    </Typography>
+                    
+                    <Grid container spacing={3} sx={{ mb: 3 }}>
+                      {property.projectDetails.projectArea && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
+                          <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                            {property.projectDetails.projectArea} acres
+                          </Typography>
+                        </Grid>
+                      )}
+                      
+                      {property.projectDetails.totalUnits && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
+                          <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                            {property.projectDetails.totalUnits}
+                          </Typography>
+                        </Grid>
+                      )}
+                      
+                      {property.projectDetails.launchDate && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
+                          <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                            {new Date(property.projectDetails.launchDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </Typography>
+                        </Grid>
+                      )}
+                      
+                      {property.projectDetails.reraId && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
+                          <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                            {property.projectDetails.reraId}
+                          </Typography>
+                        </Grid>
+                      )}
+                      
+                      {property.projectDetails.configurations && (
+                        <Grid item xs={12} sm={6} md={4}>
+                          <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
+                          <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                            {property.projectDetails.configurations}
+                          </Typography>
+                        </Grid>
+                      )}
+                    </Grid>
+                    
+                    <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
+                    
+                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+                      Project Status
+                    </Typography>
+                    
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      p: 3,
+                      backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(120, 202, 220, 0.3)'
+                    }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 600 }}>
+                          {new Date(property.projectDetails.launchDate) > new Date() ? 
+                            'Under Construction' : 'Ready to Move'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          {new Date(property.projectDetails.launchDate) > new Date() ? 
+                            `Expected completion: ${new Date(property.projectDetails.launchDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}` : 
+                            'This project is completed and ready for possession'}
+                        </Typography>
+                      </Box>
+                      {new Date(property.projectDetails.launchDate) > new Date() ? (
+                        <CloudUpload sx={{ color: '#78CADC', fontSize: 40 }} />
+                      ) : (
+                        <Check sx={{ color: '#4CAF50', fontSize: 40 }} />
+                      )}
+                    </Box>
+                  </>
+                ) : (
+                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Project details are not available for this property.
                   </Typography>
                 )}
               </PremiumPaper>
