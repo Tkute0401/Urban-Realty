@@ -27,16 +27,14 @@ const PropertySchema = new mongoose.Schema({
       'Land',
       'Commercial'
     ],
-    default: 'Apartment'
+    default: 'House'
   },
   status: {
     type: String,
     required: [true, 'Please select a status'],
     enum: [
       'For Sale',
-      'For Rent',
-      'Sold',
-      'Rented'
+      'For Rent'
     ],
     default: 'For Sale'
   },
@@ -85,6 +83,11 @@ const PropertySchema = new mongoose.Schema({
       type: String,
       required: [true, 'Please add a city'],
       maxlength: [50, 'City name cannot be more than 50 characters']
+    },
+    locality: {
+      type: String,
+      required: [true, 'Please add a locality'],
+      maxlength: [50, 'Locality name cannot be more than 50 characters']
     },
     state: {
       type: String,
@@ -152,8 +155,34 @@ const PropertySchema = new mongoose.Schema({
       'Pet Friendly',
       'Elevator',
       'Laundry',
-      'Storage'
+      'Storage',
+      'Conference Room',
+      'Kitchen'
     ]
+  },
+  highlights: {
+    type: [String],
+    default: [],
+    maxlength: [100, 'Highlight cannot be more than 100 characters']
+  },
+  nearbyLocalities: {
+    hasSchool: { type: Boolean, default: false },
+    school: { type: String, default: '' },
+    hasHospital: { type: Boolean, default: false },
+    hospital: { type: String, default: '' },
+    hasMall: { type: Boolean, default: false },
+    mall: { type: String, default: '' },
+    hasPark: { type: Boolean, default: false },
+    park: { type: String, default: '' },
+    hasTransport: { type: Boolean, default: false },
+    transport: { type: String, default: '' }
+  },
+  projectDetails: {
+    projectArea: { type: String, default: '' },
+    totalUnits: { type: String, default: '' },
+    launchDate: { type: Date, default: null },
+    reraId: { type: String, default: '' },
+    configurations: { type: String, default: '' }
   },
   images: [
     {
@@ -181,6 +210,10 @@ const PropertySchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: true
+  },
+  views: {
+    type: Number,
+    default: 0
   },
   createdAt: {
     type: Date,

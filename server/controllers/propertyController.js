@@ -277,19 +277,6 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
     // Add user to req.body
     req.body.agent = req.user.id;
 
-    // Check for published property by same agent
-    const publishedProperty = await Property.findOne({ agent: req.user.id });
-
-    // If agent is not admin, they can only add one property
-    // if (publishedProperty && req.user.role !== 'admin') {
-    //   return next(
-    //     new ErrorResponse(
-    //       `Agent with ID ${req.user.id} has already published a property`,
-    //       400
-    //     )
-    //   );
-    // }
-
     // Process images
     const images = req.files?.length > 0 
       ? await uploadImagesToCloudinary(req.files)
@@ -300,12 +287,35 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       req.body.amenities = req.body.amenities.split(',');
     }
 
+    // Parse highlights if sent as string
+    if (req.body.highlights && typeof req.body.highlights === 'string') {
+      req.body.highlights = req.body.highlights.split(',');
+    }
+
     // Parse address if sent as string
     if (req.body.address && typeof req.body.address === 'string') {
       try {
         req.body.address = JSON.parse(req.body.address);
       } catch (err) {
         return next(new ErrorResponse('Invalid address format', 400));
+      }
+    }
+
+    // Parse nearbyLocalities if sent as string
+    if (req.body.nearbyLocalities && typeof req.body.nearbyLocalities === 'string') {
+      try {
+        req.body.nearbyLocalities = JSON.parse(req.body.nearbyLocalities);
+      } catch (err) {
+        return next(new ErrorResponse('Invalid nearby localities format', 400));
+      }
+    }
+
+    // Parse projectDetails if sent as string
+    if (req.body.projectDetails && typeof req.body.projectDetails === 'string') {
+      try {
+        req.body.projectDetails = JSON.parse(req.body.projectDetails);
+      } catch (err) {
+        return next(new ErrorResponse('Invalid project details format', 400));
       }
     }
 
