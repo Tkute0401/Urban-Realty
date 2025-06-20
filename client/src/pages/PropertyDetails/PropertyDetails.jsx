@@ -7,15 +7,13 @@ import {
   TextField, RadioGroup, FormControlLabel, Radio, Collapse,
   Tabs, Tab, Container
 } from '@mui/material';
-import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from "@heroicons/react/24/outline";
-import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
-
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
   Phone, Email, Edit, Delete, ArrowBack,
   WhatsApp, Apartment, MeetingRoom, Check, Close,
-  KeyboardArrowDown, KeyboardArrowUp,
-  Share, Bookmark, ChevronLeft, ChevronRight
+  KeyboardArrowDown, KeyboardArrowUp, School,
+  LocalHospital, ShoppingCart, Park, DirectionsBus,
+  CloudDownload, Bookmark, Share, CloudUpload
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -130,8 +128,7 @@ const PropertyDetails = () => {
   const [originalNavPosition, setOriginalNavPosition] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
-    const [loadingFavorite, setLoadingFavorite] = useState(false);
-  
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const isMobile = useMediaQuery('(max-width:900px)');
   
@@ -146,10 +143,10 @@ const PropertyDetails = () => {
   const similarRef = useRef(null);
   const galleryRef = useRef(null);
   const navRef = useRef(null);
-
   const tabsRef = useRef(null);
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(true);
+
   useEffect(() => {
     const checkFavoriteStatus = async () => {
       if (user && property?._id) {
@@ -194,77 +191,64 @@ const PropertyDetails = () => {
     }
   };
 
-
   const handleScroll = useCallback((direction) => {
-  if (tabsRef.current) {
-    const scrollableElement = tabsRef.current.querySelector('.MuiTabs-scroller');
-    if (scrollableElement) {
-      const scrollAmount = 200; // Adjust this value to control how much to scroll
-      const currentScroll = scrollableElement.scrollLeft;
-      const newScroll = direction === 'left' 
-        ? Math.max(0, currentScroll - scrollAmount)
-        : currentScroll + scrollAmount;
-      
-      scrollableElement.scrollTo({
-        left: newScroll,
-        behavior: 'smooth'
-      });
+    if (tabsRef.current) {
+      const scrollableElement = tabsRef.current.querySelector('.MuiTabs-scroller');
+      if (scrollableElement) {
+        const scrollAmount = 200;
+        const currentScroll = scrollableElement.scrollLeft;
+        const newScroll = direction === 'left' 
+          ? Math.max(0, currentScroll - scrollAmount)
+          : currentScroll + scrollAmount;
+        
+        scrollableElement.scrollTo({
+          left: newScroll,
+          behavior: 'smooth'
+        });
 
-      // Update button visibility after scroll completes
-      setTimeout(() => {
-        checkScrollButtons();
-      }, 300);
+        setTimeout(() => {
+          checkScrollButtons();
+        }, 300);
+      }
     }
-  }
-}, []);
+  }, []);
 
-const checkScrollButtons = useCallback(() => {
-  if (tabsRef.current) {
-    const scrollableElement = tabsRef.current.querySelector('.MuiTabs-scroller');
-    if (scrollableElement) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollableElement;
-      const tolerance = 5;
-      
-      setShowLeftScroll(scrollLeft > tolerance);
-      setShowRightScroll(scrollLeft < scrollWidth - clientWidth - tolerance);
+  const checkScrollButtons = useCallback(() => {
+    if (tabsRef.current) {
+      const scrollableElement = tabsRef.current.querySelector('.MuiTabs-scroller');
+      if (scrollableElement) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollableElement;
+        const tolerance = 5;
+        
+        setShowLeftScroll(scrollLeft > tolerance);
+        setShowRightScroll(scrollLeft < scrollWidth - clientWidth - tolerance);
+      }
     }
-  }
-}, []);
-useEffect(() => {
-  const tabsElement = tabsRef.current;
-  let scrollableElement = null;
-  
-  if (tabsElement) {
-    scrollableElement = tabsElement.querySelector('.MuiTabs-scroller');
-  }
-  
-  if (scrollableElement) {
-    // Initial check
-    checkScrollButtons();
-    
-    // Add scroll event listener to the actual scrollable element
-    scrollableElement.addEventListener('scroll', checkScrollButtons);
-    
-    // Add resize observer for responsive behavior
-    const resizeObserver = new ResizeObserver(() => {
-      checkScrollButtons();
-    });
-    resizeObserver.observe(scrollableElement);
-    
-    return () => {
-      scrollableElement.removeEventListener('scroll', checkScrollButtons);
-      resizeObserver.disconnect();
-    };
-  }
-}, [checkScrollButtons]);
+  }, []);
 
   useEffect(() => {
     const tabsElement = tabsRef.current;
+    let scrollableElement = null;
+    
     if (tabsElement) {
-      tabsElement.addEventListener('scroll', checkScrollButtons);
-      return () => tabsElement.removeEventListener('scroll', checkScrollButtons);
+      scrollableElement = tabsElement.querySelector('.MuiTabs-scroller');
     }
-  }, []);
+    
+    if (scrollableElement) {
+      checkScrollButtons();
+      scrollableElement.addEventListener('scroll', checkScrollButtons);
+      
+      const resizeObserver = new ResizeObserver(() => {
+        checkScrollButtons();
+      });
+      resizeObserver.observe(scrollableElement);
+      
+      return () => {
+        scrollableElement.removeEventListener('scroll', checkScrollButtons);
+        resizeObserver.disconnect();
+      };
+    }
+  }, [checkScrollButtons]);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -289,15 +273,13 @@ useEffect(() => {
     return () => clearProperty();
   }, [id, getProperty, location.state, clearProperty]);
 
-  // Calculate header height on mount and resize
   useEffect(() => {
     const calculateHeaderHeight = () => {
       const header = document.querySelector('.header') || document.querySelector('header');
       if (header) {
         setHeaderHeight(header.offsetHeight);
       } else {
-        // Fallback if header class isn't found
-        setHeaderHeight(70); // Approximate header height
+        setHeaderHeight(70);
       }
     };
 
@@ -308,29 +290,6 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    const tabsElement = tabsRef.current;
-    if (!tabsElement) return;
-
-    const handleResize = () => {
-      checkScrollButtons();
-    };
-
-    checkScrollButtons();
-
-    tabsElement.addEventListener('scroll', checkScrollButtons);
-    window.addEventListener('resize', handleResize);
-
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(tabsElement);
-
-    return () => {
-      tabsElement.removeEventListener('scroll', checkScrollButtons);
-      window.removeEventListener('resize', handleResize);
-      resizeObserver.disconnect();
-    };
-  }, [checkScrollButtons]);
-
-  useEffect(() => {
     const calculateOriginalPosition = () => {
       if (navRef.current && galleryRef.current) {
         const galleryBottom = galleryRef.current.offsetTop + galleryRef.current.offsetHeight;
@@ -338,7 +297,6 @@ useEffect(() => {
       }
     };
 
-    // Calculate on mount and window resize
     calculateOriginalPosition();
     window.addEventListener('resize', calculateOriginalPosition);
     
@@ -523,6 +481,140 @@ useEffect(() => {
     }
   };
 
+  const renderNearbyLocalities = () => {
+    if (!property.nearbyLocalities) return null;
+
+    const { hasSchool, school, hasHospital, hospital, hasMall, mall, hasPark, park, hasTransport, transport } = property.nearbyLocalities;
+
+    return (
+      <Box ref={aroundRef} sx={{ mb: 6 }}>
+        <SectionHeader variant="h4">Nearby Localities</SectionHeader>
+        <PremiumPaper>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+            What's Around This Property
+          </Typography>
+          
+          <Grid container spacing={3}>
+            {hasSchool && (
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  p: 2,
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(120, 202, 220, 0.3)'
+                }}>
+                  <School sx={{ color: '#78CADC', mr: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 600 }}>
+                      School Nearby
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      {school || 'School within walking distance'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            )}
+            
+            {hasHospital && (
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  p: 2,
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(120, 202, 220, 0.3)'
+                }}>
+                  <LocalHospital sx={{ color: '#78CADC', mr: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 600 }}>
+                      Hospital Nearby
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      {hospital || 'Hospital within 2km'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            )}
+            
+            {hasMall && (
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  p: 2,
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(120, 202, 220, 0.3)'
+                }}>
+                  <ShoppingCart sx={{ color: '#78CADC', mr: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 600 }}>
+                      Shopping Mall
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      {mall || 'Shopping mall nearby'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            )}
+            
+            {hasPark && (
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  p: 2,
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(120, 202, 220, 0.3)'
+                }}>
+                  <Park sx={{ color: '#78CADC', mr: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 600 }}>
+                      Park Nearby
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      {park || 'Public park in the vicinity'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            )}
+            
+            {hasTransport && (
+              <Grid item xs={12}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  p: 2,
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(120, 202, 220, 0.3)'
+                }}>
+                  <DirectionsBus sx={{ color: '#78CADC', mr: 2 }} />
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 600 }}>
+                      Public Transport
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      {transport || 'Public transport options available nearby'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            )}
+          </Grid>
+        </PremiumPaper>
+      </Box>
+    );
+  };
+
   if (loading) {
     return (
       <Box sx={{ 
@@ -637,20 +729,26 @@ useEffect(() => {
           }}>
             <Share />
           </IconButton>
-            <button 
-          className="absolute top-1 mr-8 mb-8 sm:top-4 right-2 sm:right-4 p-1 sm:p-2 bg-[#0c0d0e]/80 rounded-full hover:bg-[#0c0d0e] transition-colors"
-          onClick={handleFavoriteClick}
-          disabled={loadingFavorite}
-          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-        >
-          {loadingFavorite ? (
-            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-transparent border-t-white border-l-white rounded-full animate-spin" />
-          ) : isFavorite ? (
-            <HeartFilled className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-          ) : (
-            <HeartOutline className="w-4 h-4 sm:w-5 sm:h-5 text-white hover:text-red-500 transition-colors" />
-          )}
-        </button>
+          
+          <IconButton 
+            sx={{ 
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              color: isFavorite ? '#ff4081' : '#fff',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)'
+              }
+            }}
+            onClick={handleFavoriteClick}
+            disabled={loadingFavorite}
+          >
+            {loadingFavorite ? (
+              <CircularProgress size={24} sx={{ color: '#fff' }} />
+            ) : isFavorite ? (
+              <HeartFilled className="w-5 h-5" />
+            ) : (
+              <HeartOutline className="w-5 h-5" />
+            )}
+          </IconButton>
         </Box>
         
         {/* Property stats below image */}
@@ -671,7 +769,7 @@ useEffect(() => {
                 Configurations
               </Typography>
               <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
-                {property.bedrooms} BHK Apartments
+                {property.bedrooms} BHK {property.type || 'Property'}
               </Typography>
             </Box>
             <Box>
@@ -679,7 +777,8 @@ useEffect(() => {
                 Possession Starts
               </Typography>
               <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
-                {property.possessionStatus || 'Dec 2031'}
+                {property.projectDetails?.launchDate ? 
+                  new Date(property.projectDetails.launchDate).toLocaleDateString() : 'Ready to Move'}
               </Typography>
             </Box>
             <Box>
@@ -726,6 +825,23 @@ useEffect(() => {
           alignItems: 'center',
           px: 0
         }}>
+          {showLeftScroll && (
+            <IconButton
+              onClick={() => handleScroll('left')}
+              sx={{
+                position: 'absolute',
+                left: 0,
+                zIndex: 1,
+                backgroundColor: '#0B1011',
+                color: '#78CADC',
+                '&:hover': {
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                }
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+          )}
 
           {/* Scrollable Tabs */}
           <Box
@@ -794,6 +910,24 @@ useEffect(() => {
               <Tab label="Similar Projects" value="similar" />
             </Tabs>
           </Box>
+
+          {showRightScroll && (
+            <IconButton
+              onClick={() => handleScroll('right')}
+              sx={{
+                position: 'absolute',
+                right: 0,
+                zIndex: 1,
+                backgroundColor: '#0B1011',
+                color: '#78CADC',
+                '&:hover': {
+                  backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                }
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          )}
         </Container>
       </Box>
 
@@ -886,191 +1020,115 @@ useEffect(() => {
             </Box>
 
             {/* Highlights Section */}
-            {/* Highlights Section */}
-<Box ref={highlightsRef} sx={{ mb: 6 }}>
-  <SectionHeader variant="h4">Highlights</SectionHeader>
-  <PremiumPaper>
-    <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
-      Why {property.title}?
-    </Typography>
-    <Box component="ul" sx={{ pl: 3 }}>
-      {property.highlights?.length > 0 ? (
-        property.highlights.map((highlight, index) => (
-          highlight && (
-            <Typography 
-              key={index} 
-              component="li" 
-              sx={{ 
-                mb: 2, 
-                fontSize: '1.1rem', 
-                lineHeight: 1.7,
-                color: 'rgba(255, 255, 255, 0.85)'
-              }}
-            >
-              {highlight}
-            </Typography>
-          )
-        ))
-      ) : (
-        <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-          No highlights available
-        </Typography>
-      )}
-    </Box>
-  </PremiumPaper>
-</Box>
+            <Box ref={highlightsRef} sx={{ mb: 6 }}>
+              <SectionHeader variant="h4">Highlights</SectionHeader>
+              <PremiumPaper>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+                  Why {property.title}?
+                </Typography>
+                <Box component="ul" sx={{ pl: 3 }}>
+                  {property.highlights?.length > 0 ? (
+                    property.highlights.map((highlight, index) => (
+                      highlight && (
+                        <Typography 
+                          key={index} 
+                          component="li" 
+                          sx={{ 
+                            mb: 2, 
+                            fontSize: '1.1rem', 
+                            lineHeight: 1.7,
+                            color: 'rgba(255, 255, 255, 0.85)'
+                          }}
+                        >
+                          {highlight}
+                        </Typography>
+                      )
+                    ))
+                  ) : (
+                    <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      No highlights available
+                    </Typography>
+                  )}
+                </Box>
+              </PremiumPaper>
+            </Box>
 
-{/* More About Project Section */}
-<Box ref={moreRef} sx={{ mb: 6 }}>
-  <SectionHeader variant="h4">More About Project</SectionHeader>
-  <PremiumPaper>
-    {property.projectDetails ? (
-      <>
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-          {property.projectDetails.projectArea && (
-            <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                {property.projectDetails.projectArea} acres
-              </Typography>
-            </Grid>
-          )}
-          
-          {property.projectDetails.totalUnits && (
-            <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                {property.projectDetails.totalUnits}
-              </Typography>
-            </Grid>
-          )}
-          
-          {property.projectDetails.launchDate && (
-            <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                {new Date(property.projectDetails.launchDate).toLocaleDateString()}
-              </Typography>
-            </Grid>
-          )}
-          
-          {property.projectDetails.reraId && (
-            <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                {property.projectDetails.reraId}
-              </Typography>
-            </Grid>
-          )}
-          
-          {property.projectDetails.configurations && (
-            <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                {property.projectDetails.configurations}
-              </Typography>
-            </Grid>
-          )}
-        </Grid>
-        
-        <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
-        
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <PremiumButton startIcon={<Bookmark />}>
-            Save Project
-          </PremiumButton>
-          <PremiumButton startIcon={<Share />}>
-            Share Project
-          </PremiumButton>
-          <PremiumButton startIcon={<Email />} onClick={handleContactOpen}>
-            Ask for Details
-          </PremiumButton>
-          <PremiumButton startIcon={<CloudDownload />}>
-            Download Brochure
-          </PremiumButton>
-        </Box>
-      </>
-    ) : (
-      <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-        No additional project details available
-      </Typography>
-    )}
-  </PremiumPaper>
-</Box>
+            {/* Nearby Localities Section */}
+            {renderNearbyLocalities()}
 
             {/* More About Project Section */}
             <Box ref={moreRef} sx={{ mb: 6 }}>
-  <SectionHeader variant="h4">More About Project</SectionHeader>
-  <PremiumPaper>
-    {property.projectDetails && (
-      <>
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
-            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-              {property.projectDetails.projectArea || 'N/A'} acres
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
-            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-              {property.projectDetails.totalUnits || 'N/A'}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
-            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-              {property.projectDetails.launchDate ? 
-                new Date(property.projectDetails.launchDate).toLocaleDateString() : 'N/A'}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
-            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-              {property.projectDetails.reraId || 'N/A'}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
-            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-              {property.projectDetails.configurations || 'N/A'}
-            </Typography>
-          </Grid>
-        </Grid>
-        
-        <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
-        
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <PremiumButton startIcon={<Bookmark />}>
-            Save Project
-          </PremiumButton>
-          <PremiumButton startIcon={<Share />}>
-            Share Project
-          </PremiumButton>
-          <PremiumButton startIcon={<Email />} onClick={handleContactOpen}>
-            Ask for Details
-          </PremiumButton>
-          <PremiumButton startIcon={<CloudDownload />}>
-            Download Brochure
-          </PremiumButton>
-        </Box>
-      </>
-    )}
-    
-    <Typography 
-      variant="body1" 
-      sx={{ 
-        whiteSpace: 'pre-line',
-        fontSize: '1.1rem',
-        lineHeight: 1.8,
-        color: 'rgba(255, 255, 255, 0.85)',
-        mt: 3
-      }}
-    >
-      {property.description}
-    </Typography>
-  </PremiumPaper>
-</Box>
+              <SectionHeader variant="h4">More About Project</SectionHeader>
+              <PremiumPaper>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+                  Project Details
+                </Typography>
+                
+                <Grid container spacing={3} sx={{ mb: 3 }}>
+                  {property.projectDetails?.projectArea && (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
+                      <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                        {property.projectDetails.projectArea} acres
+                      </Typography>
+                    </Grid>
+                  )}
+                  
+                  {property.projectDetails?.totalUnits && (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
+                      <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                        {property.projectDetails.totalUnits}
+                      </Typography>
+                    </Grid>
+                  )}
+                  
+                  {property.projectDetails?.launchDate && (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
+                      <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                        {new Date(property.projectDetails.launchDate).toLocaleDateString()}
+                      </Typography>
+                    </Grid>
+                  )}
+                  
+                  {property.projectDetails?.reraId && (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
+                      <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                        {property.projectDetails.reraId}
+                      </Typography>
+                    </Grid>
+                  )}
+                  
+                  {property.projectDetails?.configurations && (
+                    <Grid item xs={12} sm={6} md={4}>
+                      <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
+                      <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                        {property.projectDetails.configurations}
+                      </Typography>
+                    </Grid>
+                  )}
+                </Grid>
+                
+                <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
+                
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+                  Property Description
+                </Typography>
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    whiteSpace: 'pre-line',
+                    fontSize: '1.1rem',
+                    lineHeight: 1.8,
+                    color: 'rgba(255, 255, 255, 0.85)'
+                  }}
+                >
+                  {property.description}
+                </Typography>
+              </PremiumPaper>
+            </Box>
 
             {/* Floor Plan Section */}
             <Box ref={floorplanRef} sx={{ mb: 6 }}>
@@ -1166,138 +1224,131 @@ useEffect(() => {
                 )}
               </PremiumPaper>
             </Box>
-{/* Similar Projects Section */}
-<Box ref={similarRef} sx={{ mb: 6 }}>
-  <SectionHeader variant="h4">Similar Projects Nearby</SectionHeader>
-  <PremiumPaper>
-    <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
-      Properties Similar to {property.title} within 20km
-    </Typography>
-    
-    {property.similarProperties?.length > 0 ? (
-      <Grid container spacing={3}>
-        {property.similarProperties.map((similarProp) => (
-          <Grid item xs={12} key={similarProp._id}>
-            <Box 
-              onClick={() => navigate(`/properties/${similarProp._id}`)}
-              sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                gap: 3,
-                p: 3,
-                backgroundColor: 'rgba(120, 202, 220, 0.1)',
-                border: '1px solid rgba(120, 202, 220, 0.3)',
-                borderRadius: '12px',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 10px 20px rgba(120, 202, 220, 0.2)',
-                  backgroundColor: 'rgba(120, 202, 220, 0.2)'
-                }
-              }}
-            >
-              <Box sx={{
-                width: { xs: '100%', sm: '200px' },
-                height: '150px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                flexShrink: 0
-              }}>
-                {similarProp.images?.[0]?.url ? (
-                  <img 
-                    src={similarProp.images[0].url} 
-                    alt={similarProp.title} 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover' 
-                    }}
-                  />
+
+            {/* Similar Projects Section */}
+            <Box ref={similarRef} sx={{ mb: 6 }}>
+              <SectionHeader variant="h4">Similar Projects Nearby</SectionHeader>
+              <PremiumPaper>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+                  Properties Similar to {property.title} within 20km
+                </Typography>
+                
+                {property.similarProperties?.length > 0 ? (
+                  <Grid container spacing={3}>
+                    {property.similarProperties.map((similarProp) => (
+                      <Grid item xs={12} key={similarProp._id}>
+                        <Box 
+                          onClick={() => navigate(`/properties/${similarProp._id}`)}
+                          sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            gap: 3,
+                            p: 3,
+                            backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                            border: '1px solid rgba(120, 202, 220, 0.3)',
+                            borderRadius: '12px',
+                            transition: 'all 0.3s ease',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              transform: 'translateY(-5px)',
+                              boxShadow: '0 10px 20px rgba(120, 202, 220, 0.2)',
+                              backgroundColor: 'rgba(120, 202, 220, 0.2)'
+                            }
+                          }}
+                        >
+                          <Box sx={{
+                            width: { xs: '100%', sm: '200px' },
+                            height: '150px',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            flexShrink: 0
+                          }}>
+                            {similarProp.images?.[0]?.url ? (
+                              <img 
+                                src={similarProp.images[0].url} 
+                                alt={similarProp.title} 
+                                style={{ 
+                                  width: '100%', 
+                                  height: '100%', 
+                                  objectFit: 'cover' 
+                                }}
+                              />
+                            ) : (
+                              <Box sx={{
+                                width: '100%',
+                                height: '100%',
+                                backgroundColor: 'rgba(120, 202, 220, 0.2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                <Apartment sx={{ fontSize: 60, color: 'rgba(120, 202, 220, 0.5)' }} />
+                              </Box>
+                            )}
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 700, color: '#78CADC', mb: 1 }}>
+                              {similarProp.title}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1 }}>
+                              <LocationOn sx={{ fontSize: '1rem', verticalAlign: 'middle', mr: 0.5 }} />
+                              {[
+                                similarProp.address?.line1,
+                                similarProp.address?.street,
+                                similarProp.address?.city,
+                                similarProp.address?.state,
+                                similarProp.address?.zipCode
+                              ].filter(Boolean).join(', ')}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
+                              <Chip 
+                                icon={<SquareFoot sx={{ color: '#78CADC' }} />}
+                                label={`${similarProp.area} sqft`}
+                                size="small"
+                                sx={{ 
+                                  backgroundColor: 'rgba(120, 202, 220, 0.15)',
+                                  color: '#fff',
+                                  fontFamily: '"Poppins", sans-serif'
+                                }}
+                              />
+                              <Chip 
+                                icon={<KingBed sx={{ color: '#78CADC' }} />}
+                                label={`${similarProp.bedrooms} BHK`}
+                                size="small"
+                                sx={{ 
+                                  backgroundColor: 'rgba(120, 202, 220, 0.15)',
+                                  color: '#fff',
+                                  fontFamily: '"Poppins", sans-serif'
+                                }}
+                              />
+                              {similarProp.type && (
+                                <Chip 
+                                  icon={<Apartment sx={{ color: '#78CADC' }} />}
+                                  label={similarProp.type}
+                                  size="small"
+                                  sx={{ 
+                                    backgroundColor: 'rgba(120, 202, 220, 0.15)',
+                                    color: '#fff',
+                                    fontFamily: '"Poppins", sans-serif'
+                                  }}
+                                />
+                              )}
+                            </Box>
+                            <Typography variant="h6" sx={{ fontWeight: 700, color: '#78CADC' }}>
+                              {formatPrice(similarProp.price)}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
                 ) : (
-                  <Box sx={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(120, 202, 220, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Apartment sx={{ fontSize: 60, color: 'rgba(120, 202, 220, 0.5)' }} />
-                  </Box>
+                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center', py: 4 }}>
+                    No similar properties found within 20km radius.
+                  </Typography>
                 )}
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#78CADC', mb: 1 }}>
-                  {similarProp.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1 }}>
-                  <LocationOn sx={{ fontSize: '1rem', verticalAlign: 'middle', mr: 0.5 }} />
-                  {[
-                    similarProp.address?.line1,
-                    similarProp.address?.street,
-                    similarProp.address?.city,
-                    similarProp.address?.state,
-                    similarProp.address?.zipCode
-                  ].filter(Boolean).join(', ')}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
-                  <Chip 
-                    icon={<SquareFoot sx={{ color: '#78CADC' }} />}
-                    label={`${similarProp.area} sqft`}
-                    size="small"
-                    sx={{ 
-                      backgroundColor: 'rgba(120, 202, 220, 0.15)',
-                      color: '#fff',
-                      fontFamily: '"Poppins", sans-serif'
-                    }}
-                  />
-                  <Chip 
-                    icon={<KingBed sx={{ color: '#78CADC' }} />}
-                    label={`${similarProp.bedrooms} BHK`}
-                    size="small"
-                    sx={{ 
-                      backgroundColor: 'rgba(120, 202, 220, 0.15)',
-                      color: '#fff',
-                      fontFamily: '"Poppins", sans-serif'
-                    }}
-                  />
-                  {similarProp.type && (
-                    <Chip 
-                      icon={<Apartment sx={{ color: '#78CADC' }} />}
-                      label={similarProp.type}
-                      size="small"
-                      sx={{ 
-                        backgroundColor: 'rgba(120, 202, 220, 0.15)',
-                        color: '#fff',
-                        fontFamily: '"Poppins", sans-serif'
-                      }}
-                    />
-                  )}
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#78CADC' }}>
-                  {formatPrice(similarProp.price)}
-                </Typography>
-                <Typography variant="body2" sx={{ 
-                  color: 'rgba(255, 255, 255, 0.7)', 
-                  mt: 1,
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  
-                </Typography>
-              </Box>
+              </PremiumPaper>
             </Box>
-          </Grid>
-        ))}
-      </Grid>
-    ) : (
-      <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center', py: 4 }}>
-        No similar properties found within 20km radius.
-      </Typography>
-    )}
-  </PremiumPaper>
-</Box>
           </Grid>
 
           {/* Right Column - Sidebar */}
@@ -1336,7 +1387,9 @@ useEffect(() => {
                     Possession Status
                   </Typography>
                   <Typography variant="h6" sx={{ fontWeight: 700, color: '#78CADC' }}>
-                    {property.possessionStatus || 'Ready to Move'}
+                    {property.projectDetails?.launchDate ? 
+                      `Ready by ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
+                      'Ready to Move'}
                   </Typography>
                 </Box>
                 
@@ -1438,7 +1491,7 @@ useEffect(() => {
               </PremiumPaper>
 
               {/* Location Map */}
-              {/* <PremiumPaper>
+              <PremiumPaper>
                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, color: '#78CADC' }}>
                   Location
                 </Typography>
@@ -1464,7 +1517,7 @@ useEffect(() => {
                   <LocationOn sx={{ color: '#78CADC', mr: 1.5 }} />
                   {fullAddress}
                 </Typography>
-              </PremiumPaper> */}
+              </PremiumPaper>
             </Box>
           </Grid>
         </Grid>
