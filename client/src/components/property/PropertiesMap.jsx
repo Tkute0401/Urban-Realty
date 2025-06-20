@@ -13,12 +13,13 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const mapRef = useRef(null);
   const [activeMarker, setActiveMarker] = useState(null);
   const [bounds, setBounds] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   
   // Use environment variable from Vite
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   useEffect(() => {
-    if (properties?.length > 0 && mapRef.current) {
+    if (isLoaded && properties?.length > 0 && mapRef.current) {
       // Calculate bounds to fit all markers
       const newBounds = new window.google.maps.LatLngBounds();
       properties.forEach(property => {
@@ -32,13 +33,23 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       setBounds(newBounds);
       mapRef.current.fitBounds(newBounds);
     }
-  }, [properties]);
+  }, [properties, isLoaded]);
 
   if (!properties || properties.length === 0) {
     return (
-      <Typography variant="body2" color="text.secondary">
-        No properties to display on map.
-      </Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        height: '500px',
+        backgroundColor: '#0B1011',
+        borderRadius: '8px',
+        border: '1px solid #78CADC'
+      }}>
+        <Typography variant="body2" color="text.secondary">
+          No properties to display on map.
+        </Typography>
+      </Box>
     );
   }
 
@@ -49,18 +60,26 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     setActiveMarker(marker);
   };
 
+  const onLoad = (map) => {
+    mapRef.current = map;
+    setIsLoaded(true);
+  };
+
+  const onUnmount = () => {
+    mapRef.current = null;
+    setIsLoaded(false);
+  };
+
   return (
-    <LoadScript googleMapsApiKey={googleMapsApiKey}>
+    <LoadScript 
+      googleMapsApiKey={googleMapsApiKey}
+      onLoad={() => setIsLoaded(true)}
+    >
       <GoogleMap
         mapContainerStyle={containerStyle}
         zoom={10}
-        onLoad={(map) => {
-          mapRef.current = map;
-          // Fit bounds after map loads
-          if (bounds) {
-            map.fitBounds(bounds);
-          }
-        }}
+        onLoad={onLoad}
+        onUnmount={onUnmount}
         options={{
           styles: [
             {
@@ -297,7 +316,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
           ]
         }}
       >
-        {properties.map((property, index) => {
+        {isLoaded && properties.map((property, index) => {
           if (!property.location?.coordinates || property.location.coordinates.length !== 2) {
             return null;
           }
