@@ -6,8 +6,14 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  FunnelIcon,
   MapPinIcon,
   ChevronRightIcon,
+  EyeIcon,
+  HeartIcon,
+  ExclamationTriangleIcon,
+  QuestionMarkCircleIcon,
+  BellSlashIcon
 } from "@heroicons/react/24/outline";
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -20,48 +26,62 @@ const HeroSection = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [selectedCity, setSelectedCity] = useState("");
   const [localityStartIndex, setLocalityStartIndex] = useState(0);
   const [isAccountSidebarOpen, setIsAccountSidebarOpen] = useState(false);
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const localitiesContainerRef = useRef(null);
   const { properties } = useProperties();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const localitiesContainerRef = useRef(null);
   
   const navigation = [];
   
   // Get unique cities from properties data
-  const cities = Array.from(new Set(
-    properties
-      .map(property => property.address?.city?.trim())
-      .filter(city => city && city.length > 0)
-  )).sort();
+  const citiesWithProperties = useMemo(() => {
+    const citySet = new Set();
+    properties.forEach(property => {
+      if (property.address?.city) {
+        citySet.add(property.address.city);
+      }
+    });
+    return Array.from(citySet).sort();
+  }, [properties]);
 
-  // Get localities for the selected city
-  const getLocalitiesForCity = (city) => {
-    if (!city) return [];
-    return Array.from(new Set(
-      properties
-        .filter(property => 
-          property.address?.city?.trim() === city && 
-          property.address?.street?.trim()
-        )
-        .map(property => property.address.street.trim())
-    )).sort();
-  };
+  // Get localities grouped by city from properties data
+  const cityLocalitiesMap = useMemo(() => {
+    const map = {};
+    properties.forEach(property => {
+      const city = property.address?.city;
+      const locality = property.address?.locality;
+      if (city && locality) {
+        if (!map[city]) {
+          map[city] = new Set();
+        }
+        map[city].add(locality);
+      }
+    });
+    
+    // Convert Sets to Arrays
+    const result = {};
+    Object.keys(map).forEach(city => {
+      result[city] = Array.from(map[city]);
+    });
+    return result;
+  }, [properties]);
 
-  const currentCityLocalities = selectedCity ? getLocalitiesForCity(selectedCity) : [];
-  const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
-  const [selectedTab, setSelectedTab] = useState('BUY');
-
-  // Initialize selected city with first available city
+  // Set initial city if there are properties
   useEffect(() => {
-    if (cities.length > 0 && !selectedCity) {
-      setSelectedCity(cities[0]);
+    if (citiesWithProperties.length > 0 && !selectedCity) {
+      setSelectedCity(citiesWithProperties[0]);
     }
-  }, [cities]);
+  }, [citiesWithProperties, selectedCity]);
+
+  const currentCityLocalities = selectedCity ? cityLocalitiesMap[selectedCity] || [] : [];
+  const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
+  const [selectedTab, setSelectedTab] = useState('COMMERCIAL');
 
   useEffect(() => {
     const updateVisibleCount = () => {
@@ -87,22 +107,34 @@ const HeroSection = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    const params = new URLSearchParams();
+    
     if (searchText.trim()) {
-      // Set search params similar to PropertyList
-      const params = {
-        search: searchText.trim(),
-        propertyType: selectedTab === 'BUY' ? 'BUY' : selectedTab === 'RENT' ? 'RENT' : 'ALL',
-        city: selectedCity || ''
-      };
-      
-      // Remove empty params
-      Object.keys(params).forEach(key => {
-        if (!params[key]) delete params[key];
-      });
-      
-      setSearchParams(params);
-      navigate(`/properties?${new URLSearchParams(params).toString()}`);
+      params.set('search', searchText.trim());
     }
+    
+    if (selectedCity) {
+      params.set('city', selectedCity);
+    }
+    
+    // Set property type based on selected tab
+    let propertyType = '';
+    switch(selectedTab) {
+      case 'BUY':
+        propertyType = 'BUY';
+        break;
+      case 'RENT':
+        propertyType = 'RENT';
+        break;
+      default:
+        propertyType = 'ALL';
+    }
+    
+    if (propertyType) {
+      params.set('propertyType', propertyType);
+    }
+    
+    navigate(`/properties?${params.toString()}`);
   };
 
   const toggleDropdown = (item) => {
@@ -127,10 +159,7 @@ const HeroSection = () => {
     }
   };
 
-  const visibleLocalities = currentCityLocalities.slice(
-    localityStartIndex, 
-    localityStartIndex + visibleLocalitiesCount
-  );
+  const visibleLocalities = currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount);
 
   return (
     <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-visible z-0">
@@ -262,6 +291,71 @@ const HeroSection = () => {
         </div>
       </div>
       
+      {/* Mobile menu - z-index set to 9997 (below sidebar) */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-20 sm:top-24 left-4 right-4 z-[9997] bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
+          >
+            <div className="flex flex-col p-3 sm:p-4">
+              {navigation.map((item) => (
+                <div key={item.name} className="mb-1 sm:mb-2 last:mb-0">
+                  <button
+                    onClick={() => toggleMobileDropdown(item.name)}
+                    className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 text-white hover:bg-white/10 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+                  >
+                    <span className="font-poppins font-medium">{item.name}</span>
+                    {mobileActiveDropdown === item.name ? (
+                      <ChevronUpIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ) : (
+                      <ChevronDownIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {mobileActiveDropdown === item.name && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pl-3 sm:pl-4 py-1 sm:py-2">
+                          {item.items.map((subItem) => (
+                            <a
+                              key={subItem}
+                              href="#"
+                              className="block px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200"
+                            >
+                              {subItem}
+                            </a>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+              <button 
+                onClick={() => {
+                  setIsAccountSidebarOpen(true);
+                  setIsMenuOpen(false);
+                }} 
+                className="lg:hidden flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 mt-1 sm:mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-sm sm:text-base"
+              >
+                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="font-poppins font-semibold">ACCOUNT</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       {/* Search and filter bar */}
       <div className="absolute bottom-32 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-4 transform translate-y-1/2">
         {/* Popular localities with scrolling */}
@@ -288,8 +382,10 @@ const HeroSection = () => {
                         }}
                         className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
                         onClick={() => {
-                          setSearchText(locality);
-                          handleSearch({ preventDefault: () => {} });
+                          const params = new URLSearchParams();
+                          params.set('city', selectedCity);
+                          params.set('search', locality);
+                          navigate(`/properties?${params.toString()}`);
                         }}
                       >
                         {locality}
@@ -343,7 +439,7 @@ const HeroSection = () => {
           <div className="relative">
             <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
               {/* City dropdown */}
-              {cities.length > 0 && (
+              {citiesWithProperties.length > 0 && (
                 <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-12" style={{ zIndex: 9000 }}>
                   <button
                     type="button"
@@ -352,7 +448,7 @@ const HeroSection = () => {
                   >
                     <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
                     <span className="text-xs sm:text-sm font-medium truncate">
-                      {selectedCity || (cities.length > 0 ? cities[0] : 'Select City')}
+                      {selectedCity || 'Select city'}
                     </span>
                     <ChevronDownIcon className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 transition-transform flex-shrink-0 ${showCityDropdown ? 'rotate-180' : ''}`} />
                   </button>
@@ -364,7 +460,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-60 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-40 overflow-y-auto"
                       >
                         <div className="p-2 border-b border-gray-200">
                           <div className="relative">
@@ -377,7 +473,7 @@ const HeroSection = () => {
                           </div>
                         </div>
                         <div className="max-h-60 overflow-y-auto">
-                          {cities.map((city) => (
+                          {citiesWithProperties.map((city) => (
                             <button
                               key={city}
                               type="button"
@@ -402,11 +498,6 @@ const HeroSection = () => {
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Search for locality, landmark, project, or builder"
                   className="w-full bg-transparent text-xs sm:text-sm outline-none border-none focus:outline-none focus:border-none focus:ring-0 text-white placeholder:text-white/50"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSearch(e);
-                    }
-                  }}
                 />
               </div>
 
