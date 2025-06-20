@@ -134,6 +134,7 @@ const AddPropertyPage = () => {
       line1: '',
       street: '',
       city: '',
+      locality: '',
       state: '',
       zipCode: '',
       country: 'India'
@@ -200,6 +201,7 @@ const AddPropertyPage = () => {
     // Address validation
     if (!formData.address.street.trim()) errors.street = 'Street address is required';
     if (!formData.address.city.trim()) errors.city = 'City is required';
+    if (!formData.address.locality.trim()) errors.locality = 'Locality is required';
     if (!formData.address.state.trim()) errors.state = 'State is required';
     if (!formData.address.zipCode.trim()) errors.zipCode = 'Zip code is required';
     if (!formData.address.country.trim()) errors.country = 'Country is required';
@@ -244,6 +246,23 @@ const AddPropertyPage = () => {
       formData.amenities.forEach(amenity => {
         formDataToSend.append('amenities[]', amenity);
       });
+
+      // Append highlights
+      formData.highlights
+      .filter(h => h.trim() !== '')
+      .forEach((highlight, index) => {
+        formDataToSend.append(`highlights[${index}]`, highlight);
+      });
+
+      // Append nearby localities
+    Object.entries(formData.nearbyLocalities).forEach(([key, value]) => {
+      formDataToSend.append(`nearbyLocalities[${key}]`, value);
+    });
+
+    // Append project details
+    Object.entries(formData.projectDetails).forEach(([key, value]) => {
+      formDataToSend.append(`projectDetails[${key}]`, value);
+    });
 
       // If admin is creating, add the selected agent
       if (user?.role === 'admin' && selectedAgent) {
@@ -936,6 +955,36 @@ const AddPropertyPage = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.city}
                     helperText={formErrors.city}
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        color: '#fff',
+                        fontFamily: '"Poppins", sans-serif'
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: '#78CADC',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#78CADC',
+                        },
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Locality"
+                    name="address.locality"
+                    value={formData.address.locality}
+                    onChange={handleChange}
+                    required
+                    size={isMobile ? 'small' : 'medium'}
+                    error={!!formErrors.locality}
+                    helperText={formErrors.locality}
                     sx={{
                       '& .MuiInputBase-root': {
                         color: '#fff',
