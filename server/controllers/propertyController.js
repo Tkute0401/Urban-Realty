@@ -292,14 +292,14 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       req.body.highlights = req.body.highlights.split(',');
     }
 
-    // Parse address if sent as string
-    if (req.body.address && typeof req.body.address === 'string') {
-      try {
-        req.body.address = JSON.parse(req.body.address);
-      } catch (err) {
-        return next(new ErrorResponse('Invalid address format', 400));
-      }
-    }
+    // // Parse address if sent as string
+    // if (req.body.address && typeof req.body.address === 'string') {
+    //   try {
+    //     req.body.address = JSON.parse(req.body.address);
+    //   } catch (err) {
+    //     return next(new ErrorResponse('Invalid address format', 400));
+    //   }
+    // }
 
     // Parse nearbyLocalities if sent as string
     if (req.body.nearbyLocalities && typeof req.body.nearbyLocalities === 'string') {
