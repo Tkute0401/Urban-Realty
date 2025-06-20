@@ -139,6 +139,26 @@ const AddPropertyPage = () => {
       country: 'India'
     },
     amenities: [],
+    highlights: ['', '', '', '', ''],
+    nearbyLocalities: {
+      hasSchool: false,
+      school: '',
+      hasHospital: false,
+      hospital: '',
+      hasMall: false,
+      mall: '',
+      hasPark: false,
+      park: '',
+      hasTransport: false,
+      transport: ''
+    },
+  projectDetails: {
+    projectArea: '',
+    totalUnits: '',
+    launchDate: '',
+    reraId: '',
+    configurations: ''
+  }
   });
   
   const [formErrors, setFormErrors] = useState({});
@@ -1064,6 +1084,534 @@ const AddPropertyPage = () => {
               </Box>
             </PremiumPaper>
           </Grid>
+
+          {/* Highlights Section */}
+<Grid item xs={12}>
+  <SectionHeader variant="h6">Property Highlights</SectionHeader>
+  <PremiumPaper>
+    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+      Add 5 key highlights of this property
+    </Typography>
+    {Array.from({ length: 5 }).map((_, index) => (
+      <TextField
+        key={index}
+        fullWidth
+        label={`Highlight ${index + 1}`}
+        value={formData.highlights[index] || ''}
+        onChange={(e) => {
+          const newHighlights = [...formData.highlights];
+          newHighlights[index] = e.target.value;
+          setFormData({...formData, highlights: newHighlights});
+        }}
+        size={isMobile ? 'small' : 'medium'}
+        sx={{
+          mb: 2,
+          '& .MuiInputBase-root': {
+            color: '#fff',
+            fontFamily: '"Poppins", sans-serif'
+          },
+          '& .MuiInputLabel-root': {
+            color: '#78CADC',
+          },
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: '#78CADC',
+            },
+            '&:hover fieldset': {
+              borderColor: '#78CADC',
+            },
+          }
+        }}
+      />
+    ))}
+  </PremiumPaper>
+</Grid>
+
+{/* Nearby Localities Section */}
+{/* Nearby Localities Section */}
+<Grid item xs={12}>
+  <SectionHeader variant="h6">Nearby Localities</SectionHeader>
+  <PremiumPaper>
+    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+      Check the facilities that are nearby and provide their names
+    </Typography>
+    
+    {/* School */}
+    <Box sx={{ mb: 2 }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.nearbyLocalities.hasSchool}
+            onChange={(e) => setFormData({
+              ...formData,
+              nearbyLocalities: {
+                ...formData.nearbyLocalities,
+                hasSchool: e.target.checked,
+                school: e.target.checked ? formData.nearbyLocalities.school : ''
+              }
+            })}
+            sx={{
+              color: '#78CADC',
+              '&.Mui-checked': {
+                color: '#78CADC',
+              },
+            }}
+          />
+        }
+        label="School Nearby"
+        sx={{ color: '#fff' }}
+      />
+      {formData.nearbyLocalities.hasSchool && (
+        <TextField
+          fullWidth
+          label="School Name"
+          value={formData.nearbyLocalities.school}
+          onChange={(e) => setFormData({
+            ...formData,
+            nearbyLocalities: {
+              ...formData.nearbyLocalities,
+              school: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            mt: 1,
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      )}
+    </Box>
+
+    {/* Hospital */}
+    <Box sx={{ mb: 2 }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.nearbyLocalities.hasHospital}
+            onChange={(e) => setFormData({
+              ...formData,
+              nearbyLocalities: {
+                ...formData.nearbyLocalities,
+                hasHospital: e.target.checked,
+                hospital: e.target.checked ? formData.nearbyLocalities.hospital : ''
+              }
+            })}
+            sx={{
+              color: '#78CADC',
+              '&.Mui-checked': {
+                color: '#78CADC',
+              },
+            }}
+          />
+        }
+        label="Hospital Nearby"
+        sx={{ color: '#fff' }}
+      />
+      {formData.nearbyLocalities.hasHospital && (
+        <TextField
+          fullWidth
+          label="Hospital Name"
+          value={formData.nearbyLocalities.hospital}
+          onChange={(e) => setFormData({
+            ...formData,
+            nearbyLocalities: {
+              ...formData.nearbyLocalities,
+              hospital: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            mt: 1,
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      )}
+    </Box>
+
+    {/* Mall */}
+    <Box sx={{ mb: 2 }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.nearbyLocalities.hasMall}
+            onChange={(e) => setFormData({
+              ...formData,
+              nearbyLocalities: {
+                ...formData.nearbyLocalities,
+                hasMall: e.target.checked,
+                mall: e.target.checked ? formData.nearbyLocalities.mall : ''
+              }
+            })}
+            sx={{
+              color: '#78CADC',
+              '&.Mui-checked': {
+                color: '#78CADC',
+              },
+            }}
+          />
+        }
+        label="Shopping Mall Nearby"
+        sx={{ color: '#fff' }}
+      />
+      {formData.nearbyLocalities.hasMall && (
+        <TextField
+          fullWidth
+          label="Mall Name"
+          value={formData.nearbyLocalities.mall}
+          onChange={(e) => setFormData({
+            ...formData,
+            nearbyLocalities: {
+              ...formData.nearbyLocalities,
+              mall: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            mt: 1,
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      )}
+    </Box>
+
+    {/* Park */}
+    <Box sx={{ mb: 2 }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.nearbyLocalities.hasPark}
+            onChange={(e) => setFormData({
+              ...formData,
+              nearbyLocalities: {
+                ...formData.nearbyLocalities,
+                hasPark: e.target.checked,
+                park: e.target.checked ? formData.nearbyLocalities.park : ''
+              }
+            })}
+            sx={{
+              color: '#78CADC',
+              '&.Mui-checked': {
+                color: '#78CADC',
+              },
+            }}
+          />
+        }
+        label="Park Nearby"
+        sx={{ color: '#fff' }}
+      />
+      {formData.nearbyLocalities.hasPark && (
+        <TextField
+          fullWidth
+          label="Park Name"
+          value={formData.nearbyLocalities.park}
+          onChange={(e) => setFormData({
+            ...formData,
+            nearbyLocalities: {
+              ...formData.nearbyLocalities,
+              park: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            mt: 1,
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      )}
+    </Box>
+
+    {/* Transport */}
+    <Box sx={{ mb: 2 }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={formData.nearbyLocalities.hasTransport}
+            onChange={(e) => setFormData({
+              ...formData,
+              nearbyLocalities: {
+                ...formData.nearbyLocalities,
+                hasTransport: e.target.checked,
+                transport: e.target.checked ? formData.nearbyLocalities.transport : ''
+              }
+            })}
+            sx={{
+              color: '#78CADC',
+              '&.Mui-checked': {
+                color: '#78CADC',
+              },
+            }}
+          />
+        }
+        label="Public Transport Nearby"
+        sx={{ color: '#fff' }}
+      />
+      {formData.nearbyLocalities.hasTransport && (
+        <TextField
+          fullWidth
+          label="Transport Details"
+          value={formData.nearbyLocalities.transport}
+          onChange={(e) => setFormData({
+            ...formData,
+            nearbyLocalities: {
+              ...formData.nearbyLocalities,
+              transport: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            mt: 1,
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      )}
+    </Box>
+  </PremiumPaper>
+</Grid>
+
+{/* Project Details Section */}
+<Grid item xs={12}>
+  <SectionHeader variant="h6">Project Details</SectionHeader>
+  <PremiumPaper>
+    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+      Additional project information
+    </Typography>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Total Project Area (acres)"
+          value={formData.projectDetails.projectArea}
+          onChange={(e) => setFormData({
+            ...formData, 
+            projectDetails: {
+              ...formData.projectDetails,
+              projectArea: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Total Units in Project"
+          value={formData.projectDetails.totalUnits}
+          onChange={(e) => setFormData({
+            ...formData, 
+            projectDetails: {
+              ...formData.projectDetails,
+              totalUnits: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="Project Launch Date"
+          type="date"
+          InputLabelProps={{ shrink: true }}
+          value={formData.projectDetails.launchDate}
+          onChange={(e) => setFormData({
+            ...formData, 
+            projectDetails: {
+              ...formData.projectDetails,
+              launchDate: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          label="RERA ID"
+          value={formData.projectDetails.reraId}
+          onChange={(e) => setFormData({
+            ...formData, 
+            projectDetails: {
+              ...formData.projectDetails,
+              reraId: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          fullWidth
+          label="Available Configurations"
+          value={formData.projectDetails.configurations}
+          onChange={(e) => setFormData({
+            ...formData, 
+            projectDetails: {
+              ...formData.projectDetails,
+              configurations: e.target.value
+            }
+          })}
+          size={isMobile ? 'small' : 'medium'}
+          helperText="List available configurations (e.g., 1BHK, 2BHK, 3BHK)"
+          sx={{
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      </Grid>
+    </Grid>
+  </PremiumPaper>
+</Grid>
 
           {/* Images */}
           <Grid item xs={12}>

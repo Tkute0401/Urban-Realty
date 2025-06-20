@@ -886,74 +886,191 @@ useEffect(() => {
             </Box>
 
             {/* Highlights Section */}
-            <Box ref={highlightsRef} sx={{ mb: 6 }}>
-              <SectionHeader variant="h4">Highlights</SectionHeader>
-              <PremiumPaper>
-                <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
-                  Why {property.title}?
-                </Typography>
-                <Box component="ul" sx={{ pl: 3 }}>
-                  {property.highlights?.map((highlight, index) => (
-                    <Typography 
-                      key={index} 
-                      component="li" 
-                      sx={{ 
-                        mb: 2, 
-                        fontSize: '1.1rem', 
-                        lineHeight: 1.7,
-                        color: 'rgba(255, 255, 255, 0.85)'
-                      }}
-                    >
-                      {highlight}
-                    </Typography>
-                  )) || (
-                    <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                      No highlights available
-                    </Typography>
-                  )}
-                </Box>
-              </PremiumPaper>
-            </Box>
+            {/* Highlights Section */}
+<Box ref={highlightsRef} sx={{ mb: 6 }}>
+  <SectionHeader variant="h4">Highlights</SectionHeader>
+  <PremiumPaper>
+    <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+      Why {property.title}?
+    </Typography>
+    <Box component="ul" sx={{ pl: 3 }}>
+      {property.highlights?.length > 0 ? (
+        property.highlights.map((highlight, index) => (
+          highlight && (
+            <Typography 
+              key={index} 
+              component="li" 
+              sx={{ 
+                mb: 2, 
+                fontSize: '1.1rem', 
+                lineHeight: 1.7,
+                color: 'rgba(255, 255, 255, 0.85)'
+              }}
+            >
+              {highlight}
+            </Typography>
+          )
+        ))
+      ) : (
+        <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          No highlights available
+        </Typography>
+      )}
+    </Box>
+  </PremiumPaper>
+</Box>
 
-            {/* Around This Project Section */}
-            <Box ref={aroundRef} sx={{ mb: 6 }}>
-              <SectionHeader variant="h4">Around This Project</SectionHeader>
-              <PremiumPaper>
-                <Typography variant="body1" sx={{ 
-                  color: 'rgba(255, 255, 255, 0.85)',
-                  mb: 3,
-                  fontSize: '1.1rem',
-                  lineHeight: 1.8
-                }}>
-                  {property.aroundProject || 'Information about the neighborhood and nearby amenities will be displayed here.'}
-                </Typography>
-                <PropertyMap 
-                  location={property.location} 
-                  address={property.address || {}} 
-                  height="400px"
-                  showNearby={true}
-                  darkMode={true}
-                />
-              </PremiumPaper>
-            </Box>
+{/* More About Project Section */}
+<Box ref={moreRef} sx={{ mb: 6 }}>
+  <SectionHeader variant="h4">More About Project</SectionHeader>
+  <PremiumPaper>
+    {property.projectDetails ? (
+      <>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          {property.projectDetails.projectArea && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                {property.projectDetails.projectArea} acres
+              </Typography>
+            </Grid>
+          )}
+          
+          {property.projectDetails.totalUnits && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                {property.projectDetails.totalUnits}
+              </Typography>
+            </Grid>
+          )}
+          
+          {property.projectDetails.launchDate && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                {new Date(property.projectDetails.launchDate).toLocaleDateString()}
+              </Typography>
+            </Grid>
+          )}
+          
+          {property.projectDetails.reraId && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                {property.projectDetails.reraId}
+              </Typography>
+            </Grid>
+          )}
+          
+          {property.projectDetails.configurations && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
+              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                {property.projectDetails.configurations}
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+        
+        <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
+        
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <PremiumButton startIcon={<Bookmark />}>
+            Save Project
+          </PremiumButton>
+          <PremiumButton startIcon={<Share />}>
+            Share Project
+          </PremiumButton>
+          <PremiumButton startIcon={<Email />} onClick={handleContactOpen}>
+            Ask for Details
+          </PremiumButton>
+          <PremiumButton startIcon={<CloudDownload />}>
+            Download Brochure
+          </PremiumButton>
+        </Box>
+      </>
+    ) : (
+      <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+        No additional project details available
+      </Typography>
+    )}
+  </PremiumPaper>
+</Box>
 
             {/* More About Project Section */}
             <Box ref={moreRef} sx={{ mb: 6 }}>
-              <SectionHeader variant="h4">More About Project</SectionHeader>
-              <PremiumPaper>
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    whiteSpace: 'pre-line',
-                    fontSize: '1.1rem',
-                    lineHeight: 1.8,
-                    color: 'rgba(255, 255, 255, 0.85)'
-                  }}
-                >
-                  {property.description}
-                </Typography>
-              </PremiumPaper>
-            </Box>
+  <SectionHeader variant="h4">More About Project</SectionHeader>
+  <PremiumPaper>
+    {property.projectDetails && (
+      <>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              {property.projectDetails.projectArea || 'N/A'} acres
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              {property.projectDetails.totalUnits || 'N/A'}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              {property.projectDetails.launchDate ? 
+                new Date(property.projectDetails.launchDate).toLocaleDateString() : 'N/A'}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              {property.projectDetails.reraId || 'N/A'}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              {property.projectDetails.configurations || 'N/A'}
+            </Typography>
+          </Grid>
+        </Grid>
+        
+        <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
+        
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <PremiumButton startIcon={<Bookmark />}>
+            Save Project
+          </PremiumButton>
+          <PremiumButton startIcon={<Share />}>
+            Share Project
+          </PremiumButton>
+          <PremiumButton startIcon={<Email />} onClick={handleContactOpen}>
+            Ask for Details
+          </PremiumButton>
+          <PremiumButton startIcon={<CloudDownload />}>
+            Download Brochure
+          </PremiumButton>
+        </Box>
+      </>
+    )}
+    
+    <Typography 
+      variant="body1" 
+      sx={{ 
+        whiteSpace: 'pre-line',
+        fontSize: '1.1rem',
+        lineHeight: 1.8,
+        color: 'rgba(255, 255, 255, 0.85)',
+        mt: 3
+      }}
+    >
+      {property.description}
+    </Typography>
+  </PremiumPaper>
+</Box>
 
             {/* Floor Plan Section */}
             <Box ref={floorplanRef} sx={{ mb: 6 }}>
