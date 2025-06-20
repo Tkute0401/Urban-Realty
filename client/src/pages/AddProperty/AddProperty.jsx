@@ -288,6 +288,7 @@ const AddPropertyPage = () => {
           setUploadProgress({ percent: percentCompleted });
         }
       };
+      console.log("sent data:",formDataToSend);
 
       await createProperty(formDataToSend, config);
       setSnackbarMessage('Property created successfully!');
