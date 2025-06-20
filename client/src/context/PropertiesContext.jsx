@@ -131,7 +131,6 @@ export const PropertiesProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     
-    // Ensure headers are set properly
     const finalConfig = {
       ...config,
       headers: {
@@ -141,14 +140,13 @@ export const PropertiesProvider = ({ children }) => {
       }
     };
 
-    // Process form data to match backend expectations
     const processedFormData = new FormData();
     
-    // Append all simple fields
+    // Append simple fields
     const simpleFields = [
       'title', 'description', 'type', 'status', 'price', 
       'bedrooms', 'bathrooms', 'area', 'buildingName', 
-      'floorNumber', 'featured', 'agent'
+      'floorNumber', 'featured'
     ];
     
     simpleFields.forEach(field => {
@@ -157,23 +155,45 @@ export const PropertiesProvider = ({ children }) => {
       }
     });
 
-    // Append nested objects
-    const nestedObjects = ['address', 'nearbyLocalities', 'projectDetails'];
-    nestedObjects.forEach(obj => {
-      if (formData[obj]) {
-        processedFormData.append(obj, JSON.stringify(formData[obj]));
-      }
-    });
+    // Append address fields individually
+    if (formData.address) {
+      Object.entries(formData.address).forEach(([key, value]) => {
+        processedFormData.append(`address[${key}]`, value);
+      });
+    }
 
-    // Append arrays
-    const arrayFields = ['amenities', 'highlights'];
-    arrayFields.forEach(field => {
-      if (formData[field] && Array.isArray(formData[field])) {
-        formData[field].forEach(item => {
-          processedFormData.append(`${field}[]`, item);
-        });
-      }
-    });
+    // Append amenities as array
+    if (formData.amenities && Array.isArray(formData.amenities)) {
+      formData.amenities.forEach(amenity => {
+        processedFormData.append('amenities[]', amenity);
+      });
+    }
+
+    // Append highlights as indexed array
+    if (formData.highlights && Array.isArray(formData.highlights)) {
+      formData.highlights.forEach((highlight, index) => {
+        if (highlight.trim()) {
+          processedFormData.append(`highlights[${index}]`, highlight);
+        }
+      });
+    }
+
+    // Append nearbyLocalities
+    if (formData.nearbyLocalities) {
+      Object.entries(formData.nearbyLocalities).forEach(([key, value]) => {
+        processedFormData.append(`nearbyLocalities[${key}]`, value);
+      });
+    }
+
+    // Append projectDetails
+    if (formData.projectDetails) {
+      Object.entries(formData.projectDetails).forEach(([key, value]) => {
+        if (value) processedFormData.append(`projectDetails[${key}]`, value);
+      });
+    }
+
+    // Append agent
+    processedFormData.append('agent', formData.agent || user.id);
 
     // Append images
     if (formData.images && formData.images.length > 0) {
@@ -189,12 +209,21 @@ export const PropertiesProvider = ({ children }) => {
     setCache({});
     return newProperty;
   } catch (err) {
-    const errorMsg = err.response?.data?.error || 
-                    err.response?.data?.message || 
-                    err.message || 
-                    'Failed to create property';
+    const errorData = err.response?.data;
+    let errorMsg = 'Failed to create property';
+    
+    if (errorData) {
+      if (errorData.error) {
+        errorMsg = errorData.error;
+      } else if (errorData.message) {
+        errorMsg = errorData.message;
+      } else if (errorData.errors) {
+        errorMsg = Object.values(errorData.errors).join(', ');
+      }
+    }
+    
     setError(errorMsg);
-    throw err;
+    throw new Error(errorMsg);
   } finally {
     setLoading(false);
   }
