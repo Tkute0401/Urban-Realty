@@ -7,6 +7,9 @@ import {
   TextField, RadioGroup, FormControlLabel, Radio, Collapse,
   Tabs, Tab, Container
 } from '@mui/material';
+import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
+
 import { 
   LocationOn, KingBed, Bathtub, SquareFoot, 
   Phone, Email, Edit, Delete, ArrowBack,
