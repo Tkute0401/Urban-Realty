@@ -189,119 +189,137 @@ const AddPropertyPage = () => {
   }, [error]);
 
   const validateForm = () => {
-    const errors = {};
-    
-    if (!formData.title.trim()) errors.title = 'Title is required';
-    if (!formData.description.trim()) errors.description = 'Description is required';
-    if (!formData.price) errors.price = 'Price is required';
-    if (!formData.bedrooms) errors.bedrooms = 'Bedrooms count is required';
-    if (!formData.bathrooms) errors.bathrooms = 'Bathrooms count is required';
-    if (!formData.area) errors.area = 'Area is required';
-    
-    // Address validation
-    if (!formData.address.street.trim()) errors.street = 'Street address is required';
-    if (!formData.address.city.trim()) errors.city = 'City is required';
-    if (!formData.address.locality.trim()) errors.locality = 'Locality is required';
-    if (!formData.address.state.trim()) errors.state = 'State is required';
-    if (!formData.address.zipCode.trim()) errors.zipCode = 'Zip code is required';
-    if (!formData.address.country.trim()) errors.country = 'Country is required';
-    
-    // Image validation
-    if (imagePreviews.length === 0) errors.images = 'At least one image is required';
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+  const errors = {};
+  
+  // Basic Information
+  if (!formData.title.trim()) errors.title = 'Title is required';
+  if (!formData.description.trim()) errors.description = 'Description is required';
+  if (!formData.type) errors.type = 'Property type is required';
+  if (!formData.status) errors.status = 'Status is required';
+  
+  // Property Details
+  if (!formData.price) errors.price = 'Price is required';
+  if (formData.price <= 0) errors.price = 'Price must be greater than 0';
+  if (!formData.bedrooms) errors.bedrooms = 'Bedrooms count is required';
+  if (formData.bedrooms < 0) errors.bedrooms = 'Bedrooms cannot be negative';
+  if (!formData.bathrooms) errors.bathrooms = 'Bathrooms count is required';
+  if (formData.bathrooms < 0) errors.bathrooms = 'Bathrooms cannot be negative';
+  if (!formData.area) errors.area = 'Area is required';
+  if (formData.area <= 0) errors.area = 'Area must be greater than 0';
+  
+  // Address Details
+  if (!formData.address.street.trim()) errors.street = 'Street address is required';
+  if (!formData.address.city.trim()) errors.city = 'City is required';
+  if (!formData.address.locality.trim()) errors.locality = 'Locality is required';
+  if (!formData.address.state.trim()) errors.state = 'State is required';
+  if (!formData.address.zipCode.trim()) errors.zipCode = 'Zip code is required';
+  if (!/^\d{5,6}(?:[-\s]\d{4})?$/.test(formData.address.zipCode)) {
+    errors.zipCode = 'Invalid zip code format';
+  }
+  if (!formData.address.country.trim()) errors.country = 'Country is required';
+  
+  // Images
+  if (imagePreviews.length === 0) errors.images = 'At least one image is required';
+  
+  // Highlights
+  if (formData.highlights.filter(h => h.trim() !== '').length < 3) {
+    errors.highlights = 'Please provide at least 3 highlights';
+  }
+  
+  setFormErrors(errors);
+  return Object.keys(errors).length === 0;
+};
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    clearErrors();
+  e.preventDefault();
+  clearErrors();
+  
+  if (!validateForm()) {
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const formDataToSend = new FormData();
     
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const formDataToSend = new FormData();
-      
-      // Append all form fields
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('type', formData.type);
-      formDataToSend.append('status', formData.status);
-      formDataToSend.append('price', formData.price);
-      formDataToSend.append('bedrooms', formData.bedrooms);
-      formDataToSend.append('bathrooms', formData.bathrooms);
-      formDataToSend.append('area', formData.area);
-      formDataToSend.append('buildingName', formData.buildingName);
-      formDataToSend.append('floorNumber', formData.floorNumber);
-      formDataToSend.append('featured', formData.featured);
-      
-      // Append address
-      formDataToSend.append('address', JSON.stringify(formData.address));
-      
-      // Append amenities
-      formData.amenities.forEach(amenity => {
-        formDataToSend.append('amenities[]', amenity);
-      });
-
-      // Append highlights
-      formData.highlights
+    // Basic Information
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('type', formData.type);
+    formDataToSend.append('status', formData.status);
+    formDataToSend.append('featured', formData.featured);
+    
+    // Property Details
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('bedrooms', formData.bedrooms);
+    formDataToSend.append('bathrooms', formData.bathrooms);
+    formDataToSend.append('area', formData.area);
+    if (formData.buildingName) formDataToSend.append('buildingName', formData.buildingName);
+    if (formData.floorNumber) formDataToSend.append('floorNumber', formData.floorNumber);
+    
+    // Address
+    formDataToSend.append('address', JSON.stringify(formData.address));
+    
+    // Amenities
+    formData.amenities.forEach(amenity => {
+      formDataToSend.append('amenities[]', amenity);
+    });
+    
+    // Highlights (filter out empty ones)
+    formData.highlights
       .filter(h => h.trim() !== '')
       .forEach((highlight, index) => {
         formDataToSend.append(`highlights[${index}]`, highlight);
       });
-
-      // Append nearby localities
+    
+    // Nearby Localities
     Object.entries(formData.nearbyLocalities).forEach(([key, value]) => {
       formDataToSend.append(`nearbyLocalities[${key}]`, value);
     });
-
-    // Append project details
+    
+    // Project Details
     Object.entries(formData.projectDetails).forEach(([key, value]) => {
-      formDataToSend.append(`projectDetails[${key}]`, value);
+      if (value) formDataToSend.append(`projectDetails[${key}]`, value);
     });
-
-      // If admin is creating, add the selected agent
-      if (user?.role === 'admin' && selectedAgent) {
-        formDataToSend.append('agent', selectedAgent._id);
-      } else {
-        formDataToSend.append('agent', user.id);
-      }
-
-      // Append images
-      images.forEach(file => {
-        formDataToSend.append('images', file);
-      });
-
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        onUploadProgress: progressEvent => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress({ percent: percentCompleted });
-        }
-      };
-      console.log("sent data:",formDataToSend);
-
-      await createProperty(formDataToSend, config);
-      setSnackbarMessage('Property created successfully!');
-      setSnackbarOpen(true);
-      setTimeout(() => navigate('/properties'), 1500);
-    } catch (err) {
-      console.error('Submission error:', err);
-      setSnackbarMessage(err.message || 'Failed to create property');
-      setSnackbarOpen(true);
-    } finally {
-      setIsSubmitting(false);
+    
+    // Agent
+    if (user?.role === 'admin' && selectedAgent) {
+      formDataToSend.append('agent', selectedAgent._id);
+    } else {
+      formDataToSend.append('agent', user.id);
     }
-  };
+    
+    // Images
+    images.forEach(file => {
+      formDataToSend.append('images', file);
+    });
+    
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      onUploadProgress: progressEvent => {
+        const percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
+        setUploadProgress({ percent: percentCompleted });
+      }
+    };
+    
+    await createProperty(formDataToSend, config);
+    setSnackbarMessage('Property created successfully!');
+    setSnackbarOpen(true);
+    setTimeout(() => navigate('/properties'), 1500);
+  } catch (err) {
+    console.error('Submission error:', err);
+    setSnackbarMessage(err.message || 'Failed to create property');
+    setSnackbarOpen(true);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 10); // Limit to 10 files
