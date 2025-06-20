@@ -140,69 +140,8 @@ export const PropertiesProvider = ({ children }) => {
       }
     };
 
-    const processedFormData = new FormData();
-    
-    // Append simple fields
-    const simpleFields = [
-      'title', 'description', 'type', 'status', 'price', 
-      'bedrooms', 'bathrooms', 'area', 'buildingName', 
-      'floorNumber', 'featured'
-    ];
-    
-    simpleFields.forEach(field => {
-      if (formData[field] !== undefined) {
-        processedFormData.append(field, formData[field]);
-      }
-    });
-
-    // Append address fields individually
-    if (formData.address) {
-      Object.entries(formData.address).forEach(([key, value]) => {
-        processedFormData.append(`address[${key}]`, value);
-      });
-    }
-
-    // Append amenities as array
-    if (formData.amenities && Array.isArray(formData.amenities)) {
-      formData.amenities.forEach(amenity => {
-        processedFormData.append('amenities[]', amenity);
-      });
-    }
-
-    // Append highlights as indexed array
-    if (formData.highlights && Array.isArray(formData.highlights)) {
-      formData.highlights.forEach((highlight, index) => {
-        if (highlight.trim()) {
-          processedFormData.append(`highlights[${index}]`, highlight);
-        }
-      });
-    }
-
-    // Append nearbyLocalities
-    if (formData.nearbyLocalities) {
-      Object.entries(formData.nearbyLocalities).forEach(([key, value]) => {
-        processedFormData.append(`nearbyLocalities[${key}]`, value);
-      });
-    }
-
-    // Append projectDetails
-    if (formData.projectDetails) {
-      Object.entries(formData.projectDetails).forEach(([key, value]) => {
-        if (value) processedFormData.append(`projectDetails[${key}]`, value);
-      });
-    }
-
-    // Append agent
-    processedFormData.append('agent', formData.agent || user.id);
-
-    // Append images
-    if (formData.images && formData.images.length > 0) {
-      formData.images.forEach(file => {
-        processedFormData.append('images', file);
-      });
-    }
-
-    const response = await axios.post('/properties', processedFormData, finalConfig);
+    // Just forward the FormData as-is
+    const response = await axios.post('/properties', formData, finalConfig);
     
     const newProperty = response.data?.data ?? response.data;
     setProperties(prev => [...prev, newProperty]);
