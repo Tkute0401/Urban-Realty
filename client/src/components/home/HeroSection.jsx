@@ -16,7 +16,7 @@ import {
   BellSlashIcon
 } from "@heroicons/react/24/outline";
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import AccountSidebar from './AccountSidebar';
 
@@ -30,8 +30,10 @@ const HeroSection = () => {
   const [selectedCity, setSelectedCity] = useState("Pune");
   const [localityStartIndex, setLocalityStartIndex] = useState(0);
   const [isAccountSidebarOpen, setIsAccountSidebarOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('ALL');
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const localitiesContainerRef = useRef(null);
   
   const navigation = [];
@@ -49,9 +51,16 @@ const HeroSection = () => {
   const cities = Object.keys(cityLocalitiesMap);
   const currentCityLocalities = cityLocalitiesMap[selectedCity] || [];
   const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
-  const [selectedTab, setSelectedTab] = useState('COMMERCIAL');
 
   useEffect(() => {
+    // Initialize from URL params if they exist
+    const params = Object.fromEntries(searchParams.entries());
+    if (params.search) setSearchText(params.search);
+    if (params.city) setSelectedCity(params.city);
+    if (params.propertyType) {
+      setSelectedTab(params.propertyType === 'BUY' ? 'BUY' : params.propertyType === 'RENT' ? 'RENT' : 'ALL');
+    }
+
     const updateVisibleCount = () => {
       if (window.innerWidth < 640) {
         setVisibleLocalitiesCount(3);
@@ -67,7 +76,7 @@ const HeroSection = () => {
     updateVisibleCount();
     window.addEventListener('resize', updateVisibleCount);
     return () => window.removeEventListener('resize', updateVisibleCount);
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     setLocalityStartIndex(0);
@@ -75,8 +84,13 @@ const HeroSection = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchText.trim()) {
-      navigate(`/properties?search=${searchText.trim()}`);
+    if (searchText.trim() || selectedCity) {
+      const newSearchParams = new URLSearchParams();
+      if (searchText.trim()) newSearchParams.set('search', searchText.trim());
+      if (selectedCity) newSearchParams.set('city', selectedCity);
+      if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+      
+      navigate(`/properties?${newSearchParams.toString()}`);
     }
   };
 
@@ -91,6 +105,13 @@ const HeroSection = () => {
   const handleCitySelect = (city) => {
     setSelectedCity(city);
     setShowCityDropdown(false);
+    
+    const newSearchParams = new URLSearchParams();
+    if (searchText.trim()) newSearchParams.set('search', searchText.trim());
+    newSearchParams.set('city', city);
+    if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+    
+    navigate(`/properties?${newSearchParams.toString()}`);
   };
 
   const handleNextLocalities = () => {
@@ -323,6 +344,13 @@ const HeroSection = () => {
                         ease: "easeOut"
                       }}
                       className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
+                      onClick={() => {
+                        const newSearchParams = new URLSearchParams();
+                        newSearchParams.set('city', selectedCity);
+                        newSearchParams.set('search', locality);
+                        if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+                        navigate(`/properties?${newSearchParams.toString()}`);
+                      }}
                     >
                       {locality}
                     </motion.button>
@@ -347,7 +375,7 @@ const HeroSection = () => {
         <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
           {/* Property type tabs */}
           <div className="flex gap-0 mb-2 rounded-xl p-1">
-            {['BUY', 'RENT', 'COMMERCIAL', 'PG/CO-LIVING', 'PLOTS'].map((tab) => (
+            {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
               <button
                 key={tab}
                 className={`relative flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 overflow-hidden ${
@@ -355,7 +383,15 @@ const HeroSection = () => {
                     ? 'text-white' 
                     : 'text-white/80 hover:text-white'
                 }`}
-                onClick={() => setSelectedTab(tab)}
+                onClick={() => {
+                  setSelectedTab(tab);
+                  const newSearchParams = new URLSearchParams();
+                  if (searchText.trim()) newSearchParams.set('search', searchText.trim());
+                  if (selectedCity) newSearchParams.set('city', selectedCity);
+                  if (tab !== 'ALL') newSearchParams.set('propertyType', tab);
+                  
+                  navigate(`/properties?${newSearchParams.toString()}`);
+                }}
               >
                 <span className="relative z-10">{tab}</span>
                 {selectedTab === tab && (
@@ -372,7 +408,7 @@ const HeroSection = () => {
 
           {/* Search input section */}
           <div className="relative">
-            <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
+            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
               {/* City dropdown */}
               <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-12" style={{ zIndex: 9000 }}>
                 <button
@@ -434,13 +470,12 @@ const HeroSection = () => {
 
               {/* Search button */}
               <button
-                type="button"
-                onClick={handleSearch}
+                type="submit"
                 className="flex-shrink-0 hover:bg-white/20 text-white p-2 sm:p-3 transition-colors rounded-lg mr-1"
               >
                 <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
