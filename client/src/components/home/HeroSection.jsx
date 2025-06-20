@@ -6,12 +6,17 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  FunnelIcon,
   MapPinIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  EyeIcon,
+  HeartIcon,
+  ExclamationTriangleIcon,
+  QuestionMarkCircleIcon,
+  BellSlashIcon
 } from "@heroicons/react/24/outline";
-import { useAuth} from '../../context/AuthContext';
-import { useProperties } from '../../context/PropertiesContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import AccountSidebar from './AccountSidebar';
 
@@ -20,72 +25,33 @@ const HeroSection = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
-  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCity, setSelectedCity] = useState("Pune");
   const [localityStartIndex, setLocalityStartIndex] = useState(0);
   const [isAccountSidebarOpen, setIsAccountSidebarOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('ALL');
-  const [citySearchQuery, setCitySearchQuery] = useState("");
   const { user } = useAuth();
-  const { properties, loading: propertiesLoading } = useProperties();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const localitiesContainerRef = useRef(null);
   
   const navigation = [];
+  
+  const cityLocalitiesMap = {
+    "Bengaluru": ["HSR Layout", "BTM Layout", "Whitefield", "Koramangala", "JP Nagar", "Indiranagar", "Electronic City", "Marathahalli", "Bannerghatta Road", "Sarjapur Road"],
+    "Mumbai": ["Andheri", "Bandra", "Powai", "Thane", "Malad", "Borivali", "Vashi", "Panvel", "Goregaon", "Vikhroli"],
+    "Delhi": ["Gurgaon", "Noida", "Dwarka", "Rohini", "Lajpat Nagar", "Karol Bagh", "Vasant Kunj", "Pitampura", "Janakpuri", "Mayur Vihar"],
+    "Hyderabad": ["Gachibowli", "Hitech City", "Kondapur", "Madhapur", "Banjara Hills", "Jubilee Hills", "Kukatpally", "Miyapur", "Secunderabad", "Begumpet"],
+    "Chennai": ["OMR", "Anna Nagar", "T Nagar", "Velachery", "Adyar", "Tambaram", "Porur", "Sholinganallur", "Perungudi", "Chromepet"],
+    "Pune": ["Hinjewadi", "Baner", "Wakad", "Kharadi", "Hadapsar", "Magarpatta", "Koregaon Park", "Viman Nagar", "Aundh", "Pimpri"],
+    "Kolkata": ["Salt Lake", "New Town", "Ballygunge", "Park Street", "Howrah", "Garia", "Rajarhat", "Behala", "Jadavpur", "Tollygunge"]
+  };
+
+  const cities = Object.keys(cityLocalitiesMap);
+  const currentCityLocalities = cityLocalitiesMap[selectedCity] || [];
   const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
-
-  // Get unique cities from properties data
-  const getAvailableCities = () => {
-    if (!properties || properties.length === 0) return [];
-    
-    const citiesSet = new Set();
-    properties.forEach(property => {
-      if (property.address?.city) {
-        citiesSet.add(property.address.city);
-      }
-    });
-    
-    return Array.from(citiesSet).sort();
-  };
-
-  const availableCities = getAvailableCities();
-
-  // Filter cities based on search query
-  const filteredCities = availableCities.filter(city =>
-    city.toLowerCase().includes(citySearchQuery.toLowerCase())
-  );
-
-  // Get localities for the selected city from properties
-  const getLocalitiesForCity = () => {
-    if (!properties || properties.length === 0 || !selectedCity) return [];
-    
-    const localitiesSet = new Set();
-    properties.forEach(property => {
-      if (property.address?.city === selectedCity && property.address?.locality) {
-        localitiesSet.add(property.address.locality);
-      }
-    });
-    
-    return Array.from(localitiesSet).sort();
-  };
-
-  const currentCityLocalities = getLocalitiesForCity();
+  const [selectedTab, setSelectedTab] = useState('COMMERCIAL');
 
   useEffect(() => {
-    // Initialize from URL params if they exist
-    const params = Object.fromEntries(searchParams.entries());
-    if (params.search) setSearchText(params.search);
-    if (params.city) {
-      // Only set city if it exists in available cities
-      if (availableCities.includes(params.city)) {
-        setSelectedCity(params.city);
-      }
-    }
-    if (params.propertyType) {
-      setSelectedTab(params.propertyType === 'BUY' ? 'BUY' : params.propertyType === 'RENT' ? 'RENT' : 'ALL');
-    }
-
     const updateVisibleCount = () => {
       if (window.innerWidth < 640) {
         setVisibleLocalitiesCount(3);
@@ -101,14 +67,7 @@ const HeroSection = () => {
     updateVisibleCount();
     window.addEventListener('resize', updateVisibleCount);
     return () => window.removeEventListener('resize', updateVisibleCount);
-  }, [searchParams, availableCities]);
-
-  // Set default city if none selected but cities are available
-  useEffect(() => {
-    if (!selectedCity && availableCities.length > 0) {
-      setSelectedCity(availableCities[0]);
-    }
-  }, [availableCities]);
+  }, []);
 
   useEffect(() => {
     setLocalityStartIndex(0);
@@ -116,13 +75,8 @@ const HeroSection = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchText.trim() || selectedCity) {
-      const newSearchParams = new URLSearchParams();
-      if (searchText.trim()) newSearchParams.set('search', searchText.trim());
-      if (selectedCity) newSearchParams.set('city', selectedCity);
-      if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
-      
-      navigate(`/properties?${newSearchParams.toString()}`);
+    if (searchText.trim()) {
+      navigate(`/properties?search=${searchText.trim()}`);
     }
   };
 
@@ -137,13 +91,6 @@ const HeroSection = () => {
   const handleCitySelect = (city) => {
     setSelectedCity(city);
     setShowCityDropdown(false);
-    setCitySearchQuery("");
-    
-    const newSearchParams = new URLSearchParams();
-    if (searchText.trim()) newSearchParams.set('search', searchText.trim());
-    newSearchParams.set('city', city);
-    if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
-    
   };
 
   const handleNextLocalities = () => {
@@ -287,7 +234,7 @@ const HeroSection = () => {
         </div>
       </div>
       
-      {/* Mobile menu */}
+      {/* Mobile menu - z-index set to 9997 (below sidebar) */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
@@ -355,61 +302,52 @@ const HeroSection = () => {
       {/* Search and filter bar */}
       <div className="absolute bottom-32 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-4 transform translate-y-1/2">
         {/* Popular localities with scrolling */}
-        {selectedCity && currentCityLocalities.length > 0 && (
-          <div className="w-full max-w-2xl">          
-            <div className="flex items-center justify-center gap-2 sm:gap-2 text-white/80 mb-3 flex-wrap">
-              <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Popular Localities in {selectedCity}:</span>
-              <div className="flex items-center gap-2 overflow-hidden">
-                <div 
-                  ref={localitiesContainerRef}
-                  className="flex gap-2 transition-transform duration-500 ease-in-out"
-                >
-                  <AnimatePresence mode="wait">
-                    {visibleLocalities.map((locality, index) => (
-                      <motion.button
-                        key={`${selectedCity}-${locality}-${localityStartIndex + index}`}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: index * 0.05,
-                          ease: "easeOut"
-                        }}
-                        className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
-                        onClick={() => {
-                          const newSearchParams = new URLSearchParams();
-                          newSearchParams.set('city', selectedCity);
-                          newSearchParams.set('search', locality);
-                          if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
-                          navigate(`/properties?${newSearchParams.toString()}`);
-                        }}
-                      >
-                        {locality}
-                      </motion.button>
-                    ))}
-                  </AnimatePresence>
-                </div>
-                {currentCityLocalities.length > visibleLocalitiesCount && (
-                  <motion.button
-                    onClick={handleNextLocalities}
-                    className="p-1 sm:p-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 flex-shrink-0"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <ChevronRightIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </motion.button>
-                )}
+        <div className="w-full max-w-2xl">          
+          <div className="flex items-center justify-center gap-2 sm:gap-2 text-white/80 mb-3 flex-wrap">
+            <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Popular Localities:</span>
+            <div className="flex items-center gap-2 overflow-hidden">
+              <div 
+                ref={localitiesContainerRef}
+                className="flex gap-2 transition-transform duration-500 ease-in-out"
+              >
+                <AnimatePresence mode="wait">
+                  {visibleLocalities.map((locality, index) => (
+                    <motion.button
+                      key={`${selectedCity}-${locality}-${localityStartIndex + index}`}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ 
+                        duration: 0.3, 
+                        delay: index * 0.05,
+                        ease: "easeOut"
+                      }}
+                      className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
+                    >
+                      {locality}
+                    </motion.button>
+                  ))}
+                </AnimatePresence>
               </div>
+              {currentCityLocalities.length > visibleLocalitiesCount && (
+                <motion.button
+                  onClick={handleNextLocalities}
+                  className="p-1 sm:p-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 flex-shrink-0"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ChevronRightIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                </motion.button>
+              )}
             </div>
           </div>
-        )}
+        </div>
 
         {/* Main search container */}
         <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
           {/* Property type tabs */}
           <div className="flex gap-0 mb-2 rounded-xl p-1">
-            {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
+            {['BUY', 'RENT', 'COMMERCIAL', 'PG/CO-LIVING', 'PLOTS'].map((tab) => (
               <button
                 key={tab}
                 className={`relative flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 overflow-hidden ${
@@ -417,13 +355,7 @@ const HeroSection = () => {
                     ? 'text-white' 
                     : 'text-white/80 hover:text-white'
                 }`}
-                onClick={() => {
-                  setSelectedTab(tab);
-                  const newSearchParams = new URLSearchParams();
-                  if (searchText.trim()) newSearchParams.set('search', searchText.trim());
-                  if (selectedCity) newSearchParams.set('city', selectedCity);
-                  if (tab !== 'ALL') newSearchParams.set('propertyType', tab);
-                }}
+                onClick={() => setSelectedTab(tab)}
               >
                 <span className="relative z-10">{tab}</span>
                 {selectedTab === tab && (
@@ -440,67 +372,54 @@ const HeroSection = () => {
 
           {/* Search input section */}
           <div className="relative">
-            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
+            <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
               {/* City dropdown */}
-              {availableCities.length > 0 && (
-                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-12" style={{ zIndex: 9000 }}>
-                  <button
-                    type="button"
-                    onClick={() => setShowCityDropdown(!showCityDropdown)}
-                    className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 text-white transition-colors min-w-[100px] sm:min-w-[120px]"
-                    disabled={propertiesLoading}
-                  >
-                    <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
-                    <span className="text-xs sm:text-sm font-medium truncate">
-                      {propertiesLoading ? 'Loading...' : selectedCity || 'Select city'}
-                    </span>
-                    <ChevronDownIcon className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 transition-transform flex-shrink-0 ${showCityDropdown ? 'rotate-180' : ''}`} />
-                  </button>
-                  
-                  <AnimatePresence>
-                    {showCityDropdown && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-60 overflow-y-auto"
-                      >
-                        <div className="p-2 border-b border-gray-200 sticky top-0 bg-white">
-                          <div className="relative">
-                            <MagnifyingGlassIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                              type="text"
-                              placeholder="Search city..."
-                              value={citySearchQuery}
-                              onChange={(e) => setCitySearchQuery(e.target.value)}
-                              className="w-full pl-8 pr-2 py-2 text-xs sm:text-sm border-none focus:outline-none focus:ring-0"
-                            />
-                          </div>
+              <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-12" style={{ zIndex: 9000 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCityDropdown(!showCityDropdown)}
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 text-white transition-colors min-w-[100px] sm:min-w-[120px]"
+                >
+                  <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
+                  <span className="text-xs sm:text-sm font-medium truncate">{selectedCity}</span>
+                  <ChevronDownIcon className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 transition-transform flex-shrink-0 ${showCityDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <AnimatePresence>
+                  {showCityDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-40 overflow-y-auto"
+                    >
+                      <div className="p-2 border-b border-gray-200">
+                        <div className="relative">
+                          <MagnifyingGlassIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            type="text"
+                            placeholder="Search city..."
+                            className="w-full pl-8 pr-2 py-2 text-xs sm:text-sm border-none focus:outline-none focus:ring-0"
+                          />
                         </div>
-                        <div className="max-h-[200px] overflow-y-auto">
-                          {filteredCities.length > 0 ? (
-                            filteredCities.map((city) => (
-                              <button
-                                key={city}
-                                type="button"
-                                onClick={() => handleCitySelect(city)}
-                                className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors ${selectedCity === city ? 'bg-[#78cadc]/10 text-[#78cadc] font-medium' : ''}`}
-                              >
-                                {city}
-                              </button>
-                            ))
-                          ) : (
-                            <div className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500 text-center">
-                              No cities found
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
+                      </div>
+                      <div className="max-h-60 overflow-y-auto">
+                        {cities.map((city) => (
+                          <button
+                            key={city}
+                            type="button"
+                            onClick={() => handleCitySelect(city)}
+                            className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors ${selectedCity === city ? 'bg-[#78cadc]/10 text-[#78cadc] font-medium' : ''}`}
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               
               {/* Search input */}
               <div className="flex-1 flex items-center px-3 sm:px-4 py-3 min-w-0">
@@ -508,23 +427,20 @@ const HeroSection = () => {
                   type="text"
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
-                  placeholder={selectedCity ? 
-                    `Search in ${selectedCity}...` : 
-                    "Search for properties..."}
+                  placeholder="Search for locality, landmark, project, or builder"
                   className="w-full bg-transparent text-xs sm:text-sm outline-none border-none focus:outline-none focus:border-none focus:ring-0 text-white placeholder:text-white/50"
-                  disabled={propertiesLoading}
                 />
               </div>
 
               {/* Search button */}
               <button
-                type="submit"
+                type="button"
+                onClick={handleSearch}
                 className="flex-shrink-0 hover:bg-white/20 text-white p-2 sm:p-3 transition-colors rounded-lg mr-1"
-                disabled={propertiesLoading}
               >
                 <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
