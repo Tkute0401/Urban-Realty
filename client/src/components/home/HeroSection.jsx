@@ -6,14 +6,8 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  FunnelIcon,
   MapPinIcon,
   ChevronRightIcon,
-  EyeIcon,
-  HeartIcon,
-  ExclamationTriangleIcon,
-  QuestionMarkCircleIcon,
-  BellSlashIcon
 } from "@heroicons/react/24/outline";
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -26,7 +20,6 @@ const HeroSection = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [selectedCity, setSelectedCity] = useState("");
   const [localityStartIndex, setLocalityStartIndex] = useState(0);
@@ -40,23 +33,28 @@ const HeroSection = () => {
   const navigation = [];
   
   // Get unique cities from properties data
-  const cities = Array.from(new Set(properties.map(property => 
-    property.address?.city?.trim()
-  ))).filter(Boolean).sort();
+  const cities = Array.from(new Set(
+    properties
+      .map(property => property.address?.city?.trim())
+      .filter(city => city && city.length > 0)
+  )).sort();
 
   // Get localities for the selected city
   const getLocalitiesForCity = (city) => {
     if (!city) return [];
     return Array.from(new Set(
       properties
-        .filter(property => property.address?.city?.trim() === city)
-        .map(property => property.address?.street?.trim())
-    )).filter(Boolean).sort();
+        .filter(property => 
+          property.address?.city?.trim() === city && 
+          property.address?.street?.trim()
+        )
+        .map(property => property.address.street.trim())
+    )).sort();
   };
 
-  const currentCityLocalities = getLocalitiesForCity(selectedCity);
+  const currentCityLocalities = selectedCity ? getLocalitiesForCity(selectedCity) : [];
   const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
-  const [selectedTab, setSelectedTab] = useState('COMMERCIAL');
+  const [selectedTab, setSelectedTab] = useState('BUY');
 
   // Initialize selected city with first available city
   useEffect(() => {
@@ -129,7 +127,10 @@ const HeroSection = () => {
     }
   };
 
-  const visibleLocalities = currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount);
+  const visibleLocalities = currentCityLocalities.slice(
+    localityStartIndex, 
+    localityStartIndex + visibleLocalitiesCount
+  );
 
   return (
     <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-visible z-0">
@@ -261,71 +262,6 @@ const HeroSection = () => {
         </div>
       </div>
       
-      {/* Mobile menu - z-index set to 9997 (below sidebar) */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed top-20 sm:top-24 left-4 right-4 z-[9997] bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
-          >
-            <div className="flex flex-col p-3 sm:p-4">
-              {navigation.map((item) => (
-                <div key={item.name} className="mb-1 sm:mb-2 last:mb-0">
-                  <button
-                    onClick={() => toggleMobileDropdown(item.name)}
-                    className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 text-white hover:bg-white/10 rounded-lg transition-colors duration-200 text-sm sm:text-base"
-                  >
-                    <span className="font-poppins font-medium">{item.name}</span>
-                    {mobileActiveDropdown === item.name ? (
-                      <ChevronUpIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    ) : (
-                      <ChevronDownIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    )}
-                  </button>
-
-                  <AnimatePresence>
-                    {mobileActiveDropdown === item.name && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pl-3 sm:pl-4 py-1 sm:py-2">
-                          {item.items.map((subItem) => (
-                            <a
-                              key={subItem}
-                              href="#"
-                              className="block px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200"
-                            >
-                              {subItem}
-                            </a>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-              <button 
-                onClick={() => {
-                  setIsAccountSidebarOpen(true);
-                  setIsMenuOpen(false);
-                }} 
-                className="lg:hidden flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 mt-1 sm:mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-sm sm:text-base"
-              >
-                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="font-poppins font-semibold">ACCOUNT</span>
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
       {/* Search and filter bar */}
       <div className="absolute bottom-32 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-4 transform translate-y-1/2">
         {/* Popular localities with scrolling */}
@@ -428,7 +364,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-40 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-60 overflow-y-auto"
                       >
                         <div className="p-2 border-b border-gray-200">
                           <div className="relative">
@@ -437,13 +373,6 @@ const HeroSection = () => {
                               type="text"
                               placeholder="Search city..."
                               className="w-full pl-8 pr-2 py-2 text-xs sm:text-sm border-none focus:outline-none focus:ring-0"
-                              onChange={(e) => {
-                                const searchTerm = e.target.value.toLowerCase();
-                                const filtered = cities.filter(city => 
-                                  city.toLowerCase().includes(searchTerm)
-                                );
-                                // Update the dropdown list
-                              }}
                             />
                           </div>
                         </div>
