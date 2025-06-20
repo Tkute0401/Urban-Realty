@@ -281,14 +281,14 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
     const publishedProperty = await Property.findOne({ agent: req.user.id });
 
     // If agent is not admin, they can only add one property
-    if (publishedProperty && req.user.role !== 'admin') {
-      return next(
-        new ErrorResponse(
-          `Agent with ID ${req.user.id} has already published a property`,
-          400
-        )
-      );
-    }
+    // if (publishedProperty && req.user.role !== 'admin') {
+    //   return next(
+    //     new ErrorResponse(
+    //       `Agent with ID ${req.user.id} has already published a property`,
+    //       400
+    //     )
+    //   );
+    // }
 
     // Process images
     const images = req.files?.length > 0 
