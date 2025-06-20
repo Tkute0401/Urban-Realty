@@ -231,95 +231,94 @@ const AddPropertyPage = () => {
 };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  clearErrors();
-  
-  if (!validateForm()) {
-    return;
-  }
+    e.preventDefault();
+    clearErrors();
+    
+    if (!validateForm()) {
+      return;
+    }
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  try {
-    const formDataToSend = new FormData();
-    
-    // Basic Information
-    formDataToSend.append('title', formData.title);
-    formDataToSend.append('description', formData.description);
-    formDataToSend.append('type', formData.type);
-    formDataToSend.append('status', formData.status);
-    formDataToSend.append('featured', formData.featured);
-    
-    // Property Details
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('bedrooms', formData.bedrooms);
-    formDataToSend.append('bathrooms', formData.bathrooms);
-    formDataToSend.append('area', formData.area);
-    if (formData.buildingName) formDataToSend.append('buildingName', formData.buildingName);
-    if (formData.floorNumber) formDataToSend.append('floorNumber', formData.floorNumber);
-    
-    // Address
-    formDataToSend.append('address', JSON.stringify(formData.address));
-    
-    // Amenities
-    formData.amenities.forEach(amenity => {
-      formDataToSend.append('amenities[]', amenity);
-    });
-    
-    // Highlights (filter out empty ones)
-    formData.highlights
+    try {
+      const formDataToSend = new FormData();
+      
+      // Append all form fields
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('type', formData.type);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('bedrooms', formData.bedrooms);
+      formDataToSend.append('bathrooms', formData.bathrooms);
+      formDataToSend.append('area', formData.area);
+      formDataToSend.append('buildingName', formData.buildingName);
+      formDataToSend.append('floorNumber', formData.floorNumber);
+      formDataToSend.append('featured', formData.featured);
+      
+      // Append address
+      formDataToSend.append('address', JSON.stringify(formData.address));
+      
+      // Append amenities
+      formData.amenities.forEach(amenity => {
+        formDataToSend.append('amenities[]', amenity);
+      });
+
+      // Append highlights
+      formData.highlights
       .filter(h => h.trim() !== '')
       .forEach((highlight, index) => {
         formDataToSend.append(`highlights[${index}]`, highlight);
       });
-    
-    // Nearby Localities
+
+      // Append nearby localities
     Object.entries(formData.nearbyLocalities).forEach(([key, value]) => {
       formDataToSend.append(`nearbyLocalities[${key}]`, value);
     });
-    
-    // Project Details
+
+    // Append project details
     Object.entries(formData.projectDetails).forEach(([key, value]) => {
-      if (value) formDataToSend.append(`projectDetails[${key}]`, value);
+      formDataToSend.append(`projectDetails[${key}]`, value);
     });
-    
-    // Agent
-    if (user?.role === 'admin' && selectedAgent) {
-      formDataToSend.append('agent', selectedAgent._id);
-    } else {
-      formDataToSend.append('agent', user.id);
-    }
-    
-    // Images
-    images.forEach(file => {
-      formDataToSend.append('images', file);
-    });
-    
-    const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      },
-      onUploadProgress: progressEvent => {
-        const percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
-        setUploadProgress({ percent: percentCompleted });
+
+      // If admin is creating, add the selected agent
+      if (user?.role === 'admin' && selectedAgent) {
+        formDataToSend.append('agent', selectedAgent._id);
+      } else {
+        formDataToSend.append('agent', user.id);
       }
-    };
-    
-    await createProperty(formDataToSend, config);
-    setSnackbarMessage('Property created successfully!');
-    setSnackbarOpen(true);
-    setTimeout(() => navigate('/properties'), 1500);
-  } catch (err) {
-    console.error('Submission error:', err);
-    setSnackbarMessage(err.message || 'Failed to create property');
-    setSnackbarOpen(true);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+
+      // Append images
+      images.forEach(file => {
+        formDataToSend.append('images', file);
+      });
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        onUploadProgress: progressEvent => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress({ percent: percentCompleted });
+        }
+      };
+      console.log("sent data:",formDataToSend);
+
+      await createProperty(formDataToSend, config);
+      setSnackbarMessage('Property created successfully!');
+      setSnackbarOpen(true);
+      setTimeout(() => navigate('/properties'), 1500);
+    } catch (err) {
+      console.error('Submission error:', err);
+      setSnackbarMessage(err.message || 'Failed to create property');
+      setSnackbarOpen(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 10); // Limit to 10 files
