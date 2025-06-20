@@ -1,6 +1,4 @@
-
-        
-        import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useProperties } from '../../context/PropertiesContext';
 import { useSearchParams } from 'react-router-dom';
 import { 
@@ -9,6 +7,7 @@ import {
   Drawer, IconButton, Collapse
 } from '@mui/material';
 import PropertyCard from './PropertyCard';
+import PropertiesMap from './PropertiesMap';
 import { 
   Add, Refresh, FilterAlt, KeyboardArrowDown, KeyboardArrowUp,
   ArrowBack, Close as CloseIcon, Search as SearchIcon, 
@@ -29,6 +28,7 @@ const PropertyList = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const [page, setPage] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState(null);
   const itemsPerPage = 12;
   
   // Mobile specific state
@@ -74,54 +74,59 @@ const PropertyList = () => {
   // Fetch properties when filters change
   useEffect(() => {
     const fetchData = async () => {
-      // Prepare API params (same as original)
       const apiParams = {
-        // Keep your existing apiParams logic
+        search: filters.search,
+        type: filters.type,
+        city: filters.city,
+        state: filters.state,
+        priceMin: filters.priceMin,
+        priceMax: filters.priceMax,
+        bedrooms: filters.bedrooms,
+        bathrooms: filters.bathrooms,
+        amenities: filters.amenities.join(','),
+        minArea: filters.minArea,
+        maxArea: filters.maxArea,
+        status: filters.propertyType === 'ALL' ? '' : 
+               filters.propertyType === 'BUY' ? 'For Sale' : 'For Rent'
       };
 
       await getProperties(apiParams);
       
-      // Update URL params to match current filters
       const newSearchParams = new URLSearchParams();
       Object.entries(apiParams).forEach(([key, value]) => {
         if (value) newSearchParams.set(key, value);
       });
       setSearchParams(newSearchParams);
 
-      // Short delay for animation
       setTimeout(() => setIsLoaded(true), 100);
-      
-      // No longer initial load
       initialLoad.current = false;
     };
 
     fetchData();
   }, [filters, getProperties, setSearchParams]);
 
-  // Handler for property type change
   const handlePropertyTypeChange = (newType) => {
     setFilters(prev => ({
       ...prev,
       propertyType: newType
     }));
     setPage(1);
+    setSelectedProperty(null);
     
-    // Close mobile drawer after selection
     if (isMobile && showFiltersDrawer) {
       setShowFiltersDrawer(false);
     }
   };
 
-  // Generic filter update handler
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({
       ...prev,
       ...newFilters
     }));
     setPage(1);
+    setSelectedProperty(null);
   };
 
-  // Clear all filters
   const clearAllFilters = () => {
     setFilters({
       search: '',
@@ -138,46 +143,39 @@ const PropertyList = () => {
       maxArea: ''
     });
     setPage(1);
+    setSelectedProperty(null);
     
-    // Close mobile drawer after clearing
     if (isMobile) {
       setShowFiltersDrawer(false);
     }
   };
 
-  // Remove specific filter
   const removeFilter = (filterKey) => {
-    // Create a new filters object without the removed filter
     const updatedFilters = {
       ...filters,
       [filterKey]: Array.isArray(filters[filterKey]) ? [] : ''
     };
     
-    // Update the filters state
     setFilters(updatedFilters);
     
-    // For specific filters that need dropdown synchronization:
     if (filterKey === 'type') {
-      // This will trigger HomeType to reset its internal state
       handleHomeTypeFilter('');
     } else if (filterKey === 'bedrooms' || filterKey === 'bathrooms') {
       handleBedBathFilter('', '');
     } else if (filterKey === 'priceMin' || filterKey === 'priceMax') {
       handlePriceFilter('', '');
     }
-    // Add similar cases for other dropdown filters if needed
     
     setPage(1);
+    setSelectedProperty(null);
   };
 
-  // Specialized filter handlers (unchanged)
   const handlePriceFilter = (min, max) => {
     handleFilterChange({ 
       priceMin: min ? min.toString() : '',
       priceMax: max ? max.toString() : '' 
     });
     
-    // Close mobile drawer after applying filter
     if (isMobile) {
       setShowFiltersDrawer(false);
     }
@@ -189,7 +187,6 @@ const PropertyList = () => {
       bathrooms: bathrooms ? bathrooms.toString() : '' 
     });
     
-    // Close mobile drawer after applying filter
     if (isMobile) {
       setShowFiltersDrawer(false);
     }
@@ -209,7 +206,6 @@ const PropertyList = () => {
     const dbType = typeMap[type] || type;
     handleFilterChange({ type: dbType });
     
-    // Close mobile drawer after applying filter
     if (isMobile) {
       setShowFiltersDrawer(false);
     }
@@ -219,17 +215,14 @@ const PropertyList = () => {
     e.preventDefault();
     handleFilterChange({ search: filters.search });
     
-    // Close expanded search on mobile after search
     if (isMobile && expandedSearch) {
       setExpandedSearch(false);
     }
   };
 
-  // Toggle mobile search input expanded state
   const toggleSearch = () => {
     setExpandedSearch(!expandedSearch);
     if (!expandedSearch) {
-      // Focus the search input when expanding
       setTimeout(() => {
         const searchInput = document.getElementById('mobile-search-input');
         if (searchInput) searchInput.focus();
@@ -237,10 +230,7 @@ const PropertyList = () => {
     }
   };
 
-  // Filter properties client-side
-  // This keeps your original filtering logic intact
   const filteredProperties = properties?.filter(property => {
-    // Filter by property type (BUY/RENT/ALL)
     if (filters.propertyType !== 'ALL') {
       const statusMatch = filters.propertyType === 'BUY' 
         ? property.status === 'For Sale' 
@@ -248,7 +238,6 @@ const PropertyList = () => {
       if (!statusMatch) return false;
     }
     
-    // Search term filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       const matchesSearch = 
@@ -260,10 +249,8 @@ const PropertyList = () => {
       if (!matchesSearch) return false;
     }
     
-    // Property type filter
     if (filters.type && property.type !== filters.type) return false;
     
-    // Location filters (city/state)
     if (filters.city && property.address?.city?.toLowerCase() !== filters.city.toLowerCase()) {
       return false;
     }
@@ -271,14 +258,11 @@ const PropertyList = () => {
       return false;
     }
     
-    // Price range filter
     if (filters.priceMin && property.price < parseInt(filters.priceMin)) return false;
     if (filters.priceMax && property.price > parseInt(filters.priceMax)) return false;
     
-    // Bedrooms filter
     if (filters.bedrooms) {
       if (filters.bedrooms === 'Any') {
-        // Any number of bedrooms is acceptable
       } else if (filters.bedrooms.endsWith('+')) {
         const minBedrooms = parseInt(filters.bedrooms);
         if (!property.bedrooms || property.bedrooms < minBedrooms) return false;
@@ -287,10 +271,8 @@ const PropertyList = () => {
       }
     }
     
-    // Bathrooms filter
     if (filters.bathrooms) {
       if (filters.bathrooms === 'Any') {
-        // Any number of bathrooms is acceptable
       } else if (filters.bathrooms.endsWith('+')) {
         const minBathrooms = parseFloat(filters.bathrooms);
         if (!property.bathrooms || property.bathrooms < minBathrooms) return false;
@@ -299,11 +281,9 @@ const PropertyList = () => {
       }
     }
     
-    // Area filter
     if (filters.minArea && (!property.area || property.area < parseInt(filters.minArea))) return false;
     if (filters.maxArea && (!property.area || property.area > parseInt(filters.maxArea))) return false;
     
-    // Amenities filter
     if (filters.amenities?.length > 0) {
       if (!property.amenities || property.amenities.length === 0) return false;
       const hasAllAmenities = filters.amenities.every(amenity => 
@@ -322,10 +302,10 @@ const PropertyList = () => {
 
   const handlePageChange = (event, value) => {
     setPage(value);
+    setSelectedProperty(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Count active filters for mobile badge
   const activeFilterCount = Object.entries(filters).filter(([key, value]) => 
     key !== 'propertyType' && key !== 'search' && value && 
     (Array.isArray(value) ? value.length > 0 : true)
@@ -653,12 +633,11 @@ const PropertyList = () => {
       {/* Active Filter Tags with responsive design */}
       {Object.entries(filters).filter(([key, value]) => 
         value && (Array.isArray(value) ? value.length > 0 : true) && 
-        key !== 'propertyType' // Don't show propertyType in filter tags
+        key !== 'propertyType'
       ).length > 0 && (
         <div className={`filter-tags fade-in-delay-3 ${isMobile ? 'mobile-filter-tags' : ''}`}>
           {isMobile && activeFilterCount > 3 && !expandedFilters ? (
             <>
-              {/* Show just a few filters on mobile when collapsed */}
               {Object.entries(filters)
                 .filter(([key, value]) => 
                   value && (Array.isArray(value) ? value.length > 0 : true) && 
@@ -702,7 +681,6 @@ const PropertyList = () => {
                   );
                 })}
                 
-                {/* Show count of remaining filters */}
                 <button 
                   className="show-more-filters"
                   onClick={() => setExpandedFilters(true)}
@@ -714,7 +692,6 @@ const PropertyList = () => {
               </>
             ) : (
               <>
-                {/* Show all filters when expanded or on desktop */}
                 {Object.entries(filters).map(([key, value]) => {
                   if (!value || (Array.isArray(value) && value.length === 0) || key === 'propertyType') return null;
                   
@@ -752,7 +729,6 @@ const PropertyList = () => {
                   );
                 })}
                 
-                {/* On mobile show collapse button when expanded */}
                 {isMobile && expandedFilters && (
                   <button 
                     className="show-less-filters"
@@ -766,7 +742,6 @@ const PropertyList = () => {
               </>
             )}
             
-            {/* Clear all filters button */}
             {!isMobile && activeFilterCount > 0 && (
               <button 
                 className="clear-all-filters"
@@ -776,6 +751,27 @@ const PropertyList = () => {
                 Clear all
               </button>
             )}
+        </div>
+      )}
+
+      {/* Properties Map - Hidden on mobile */}
+      {!isMobile && (
+        <div className="map-container">
+          <PropertiesMap 
+            properties={filteredProperties} 
+            selectedProperty={selectedProperty}
+            onMarkerClick={(property) => {
+              setSelectedProperty(property);
+              const cardElement = document.getElementById(`property-${property._id}`);
+              if (cardElement) {
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cardElement.classList.add('highlight-card');
+                setTimeout(() => {
+                  cardElement.classList.remove('highlight-card');
+                }, 2000);
+              }
+            }}
+          />
         </div>
       )}
 
@@ -822,73 +818,70 @@ const PropertyList = () => {
                 boxShadow: '0 6px 10px rgba(0,0,0,0.2)'
               },
               transition: 'all 0.3s ease'
-              }}
-              >
-              Add Property
-              </Button>
-              </Container>
-              ) : (
-              <>
-              <div className="property-listings fade-in-delay-4">
-              <div className="property-grid">
-              {paginatedProperties.map(property => (
-              <PropertyCard key={property._id} property={property} isMobile={isMobile} />
-              ))}
-              </div>
-
-              {/* Map container - hidden on mobile */}
-              {!isMobile && (
-                <div className="map-container">
-                  <div className="map-placeholder">
-                    <span>View larger map</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-      {/* Pagination with responsive design */}
-      {filteredProperties.length > itemsPerPage && (
-        <Stack spacing={1} className="pagination-container fade-in-delay-4">
-          <Pagination
-            count={Math.ceil(filteredProperties.length / itemsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            size={isMobile ? 'small' : 'medium'}
-            siblingCount={isMobile ? 0 : 1}
-            boundaryCount={isMobile ? 1 : 2}
-            className="custom-pagination"
-            sx={{
-              '& .MuiPaginationItem-root': { 
-                color: 'white',
-                fontSize: isMobile ? '0.75rem' : '0.875rem'
-              },
-              '& .MuiPaginationItem-root.Mui-selected': { 
-                backgroundColor: '#78CADC', 
-                color: '#08171A',
-                '&:hover': {
-                  backgroundColor: '#5cb3c5'
-                }
-              },
-              '& .MuiPaginationItem-root:hover': { 
-                backgroundColor: 'rgba(120, 202, 220, 0.2)' 
-              },
             }}
-          />
-          <Typography 
-            variant="caption" 
-            className="pagination-count"
-            sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}
           >
-            {paginatedProperties.length} of {filteredProperties.length} properties
-          </Typography>
-        </Stack>
-      )}
-    </>
-  )}
-</div>
+            Add Property
+          </Button>
+        </Container>
+      ) : (
+        <>
+          <div className="property-listings fade-in-delay-4">
+            <div className="property-grid">
+              {paginatedProperties.map(property => (
+                <PropertyCard 
+                  key={property._id} 
+                  id={`property-${property._id}`}
+                  property={property} 
+                  isMobile={isMobile}
+                  isSelected={selectedProperty?._id === property._id}
+                  onClick={() => setSelectedProperty(property)}
+                />
+              ))}
+            </div>
+          </div>
 
-);
+          {/* Pagination with responsive design */}
+          {filteredProperties.length > itemsPerPage && (
+            <Stack spacing={1} className="pagination-container fade-in-delay-4">
+              <Pagination
+                count={Math.ceil(filteredProperties.length / itemsPerPage)}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                size={isMobile ? 'small' : 'medium'}
+                siblingCount={isMobile ? 0 : 1}
+                boundaryCount={isMobile ? 1 : 2}
+                className="custom-pagination"
+                sx={{
+                  '& .MuiPaginationItem-root': { 
+                    color: 'white',
+                    fontSize: isMobile ? '0.75rem' : '0.875rem'
+                  },
+                  '& .MuiPaginationItem-root.Mui-selected': { 
+                    backgroundColor: '#78CADC', 
+                    color: '#08171A',
+                    '&:hover': {
+                      backgroundColor: '#5cb3c5'
+                    }
+                  },
+                  '& .MuiPaginationItem-root:hover': { 
+                    backgroundColor: 'rgba(120, 202, 220, 0.2)' 
+                  },
+                }}
+              />
+              <Typography 
+                variant="caption" 
+                className="pagination-count"
+                sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}
+              >
+                {paginatedProperties.length} of {filteredProperties.length} properties
+              </Typography>
+            </Stack>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
 
 export default PropertyList;
