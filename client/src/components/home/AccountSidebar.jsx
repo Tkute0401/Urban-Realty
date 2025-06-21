@@ -65,7 +65,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     if (isOpen && user) {
       fetchFavorites();
     }
-  }, [user.favorites, isOpen, getProperty]);
+  }, [user?.favorites, isOpen, getProperty]);
 
   // Mock data for recently viewed properties
   const recentlyViewed = [
