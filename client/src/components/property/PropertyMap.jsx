@@ -23,6 +23,10 @@ const PropertyMap = ({ location, address }) => {
     );
   }
 
+  const onLoad = (map) => {
+    mapRef.current = map;
+  };
+
   const center = {
     lat: location.coordinates[1],
     lng: location.coordinates[0]
@@ -36,12 +40,17 @@ const PropertyMap = ({ location, address }) => {
   };
 
   return (
-    <LoadScript googleMapsApiKey={googleMapsApiKey}>
+    <LoadScript 
+      googleMapsApiKey={googleMapsApiKey}
+      onLoad={() => {
+        setTimeout(() => {(map) => (mapRef.current = map)}, 100);
+      }}
+      >
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
         zoom={15}
-        onLoad={(map) => (mapRef.current = map)}
+        onLoad={onLoad}
       >
         <Marker
           position={center}
