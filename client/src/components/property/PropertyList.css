@@ -312,10 +312,6 @@ body {
   transition: width 0.6s ease;
 }
 
-.all-properties h1 {
-  margin: -50px;
-}
-
 .listings-count {
   font-size: 0.9rem;
   color: var(--text-muted);

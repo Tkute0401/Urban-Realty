@@ -294,43 +294,85 @@ const PropertyDetails = () => {
         <PropertyImageGallery images={property.images || []} />
         
         <Container maxWidth="xl">
-          <Box sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 3,
-            mt: 3,
-            mb: 4,
-            p: 3,
-            backgroundColor: 'rgba(120, 202, 220, 0.1)',
-            borderRadius: '12px',
-            border: '1px solid rgba(120, 202, 220, 0.3)'
-          }}>
-            <Box>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                Configurations
-              </Typography>
+        <Box sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 3,
+          mt: 3,
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(120, 202, 220, 0.1)',
+          borderRadius: '12px',
+          border: '1px solid rgba(120, 202, 220, 0.3)',
+          justifyContent: 'space-between'
+        }}>
+          {/* Configuration */}
+          <Box sx={{ minWidth: 180 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 0.5 }}>
+              Configuration
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <KingBed sx={{ color: '#78CADC' }} />
               <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
-                {property.bedrooms} BHK {property.type || 'Property'}
+                {property.bedrooms} BHK
               </Typography>
             </Box>
-            <Box>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              {property.type || 'Property'}
+            </Typography>
+          </Box>
+
+          {/* Price */}
+          <Box sx={{ minWidth: 180 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 0.5 }}>
+              Price
+            </Typography>
+            <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
+              {formatPrice(property.price)}
+            </Typography>
+            {property.status === 'For Rent' && (
               <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                Price
+                per month
               </Typography>
-              <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
-                {formatPrice(property.price)}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                Area
-              </Typography>
+            )}
+          </Box>
+
+          {/* Area */}
+          <Box sx={{ minWidth: 180 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 0.5 }}>
+              Area
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SquareFoot sx={{ color: '#78CADC' }} />
               <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
                 {property.area} sq.ft
               </Typography>
             </Box>
           </Box>
-        </Container>
+
+          {/* Possession Status */}
+          <Box sx={{ minWidth: 180 }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 0.5 }}>
+              Possession Status
+            </Typography>
+            <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
+              {property.possessionStatus || 'Ready to Move'}
+            </Typography>
+          </Box>
+
+          {/* Floor */}
+          {property.floorNumber && (
+            <Box sx={{ minWidth: 180 }}>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 0.5 }}>
+                Floor
+              </Typography>
+              <Typography variant="h6" sx={{ color: '#78CADC', fontWeight: 600 }}>
+                {property.floorNumber}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Container>
       </Box>
 
       <PropertyNavigation 
@@ -354,7 +396,7 @@ const PropertyDetails = () => {
       <Container maxWidth="xl" sx={{ py: 6, pt: isSticky ? `${headerHeight + 100}px` : '40px' }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            <PropertyOverview property={property} fullAddress={fullAddress} overviewRef={overviewRef} />
+            <PropertyOverview property={property} overviewRef={overviewRef} />
             <PropertyHighlights property={property} highlightsRef={highlightsRef} />
             <PropertyNearby property={property} aroundRef={aroundRef} />
             <PropertyMoreInfo property={property} moreRef={moreRef} />

@@ -130,6 +130,8 @@ const AddPropertyPage = () => {
     buildingName: '',
     floorNumber: '',
     featured: false,
+    floorPlan: null,
+    developer: null,
     address: {
       line1: '',
       street: '',
@@ -171,6 +173,33 @@ const AddPropertyPage = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const fileInputRef = useRef(null);
+  const [floorPlanPreview, setFloorPlanPreview] = useState(null);
+  const [floorPlanFile, setFloorPlanFile] = useState(null);
+
+  const mockDevelopers = [
+  {
+    _id: '1',
+    name: 'ABC Developers',
+    logo: 'https://via.placeholder.com/150',
+    description: 'Premium real estate developer since 1995',
+    details: 'Specializing in luxury apartments and commercial spaces. Over 50 completed projects across the country with excellent customer satisfaction ratings.'
+  },
+  {
+    _id: '2',
+    name: 'XYZ Constructions',
+    logo: 'https://via.placeholder.com/150',
+    description: 'Innovative housing solutions',
+    details: 'Focused on sustainable and affordable housing projects. Winner of multiple awards for green building initiatives.'
+  },
+  {
+    _id: '3',
+    name: 'PQR Properties',
+    logo: 'https://via.placeholder.com/150',
+    description: 'Your trusted real estate partner',
+    details: 'With over 20 years in the industry, we deliver quality homes with modern amenities at competitive prices.'
+  }
+];
+
 
   const propertyTypes = ['House', 'Apartment', 'Villa', 'Condo', 'Townhouse', 'Land', 'Commercial'];
   const propertyStatuses = ['For Sale', 'For Rent'];
@@ -330,6 +359,25 @@ const AddPropertyPage = () => {
       setFormErrors(prev => ({ ...prev, images: 'At least one image is required' }));
     }
   };
+
+    const handleFloorPlanChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setFloorPlanFile(file);
+        setFloorPlanPreview(URL.createObjectURL(file));
+        setFormData({ ...formData, floorPlan: file });
+      }
+    };
+
+    const handleRemoveFloorPlan = () => {
+      setFloorPlanFile(null);
+      setFloorPlanPreview(null);
+      setFormData({ ...formData, floorPlan: null });
+    };
+
+    if (floorPlanFile) {
+      formDataToSend.append('floorPlan', floorPlanFile);
+    }
 
   const handleAmenityToggle = (amenity) => {
     setFormData(prev => ({
@@ -1664,6 +1712,89 @@ const AddPropertyPage = () => {
   </PremiumPaper>
 </Grid>
 
+{/* Developer Information */}
+<Grid item xs={12}>
+  <SectionHeader variant="h6">Developer Information</SectionHeader>
+  <PremiumPaper>
+    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+      Select the property developer
+    </Typography>
+    
+    <Autocomplete
+      options={mockDevelopers}
+      getOptionLabel={(option) => option.name}
+      value={formData.developer}
+      onChange={(e, newValue) => setFormData({...formData, developer: newValue})}
+      renderInput={(params) => (
+        <TextField 
+          {...params} 
+          label="Select Developer" 
+          fullWidth 
+          size={isMobile ? 'small' : 'medium'}
+          sx={{
+            '& .MuiInputBase-root': {
+              color: '#fff',
+              fontFamily: '"Poppins", sans-serif'
+            },
+            '& .MuiInputLabel-root': {
+              color: '#78CADC',
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#78CADC',
+              },
+              '&:hover fieldset': {
+                borderColor: '#78CADC',
+              },
+            }
+          }}
+        />
+      )}
+      renderOption={(props, option) => (
+        <li {...props} key={option._id}>
+          <Box display="flex" alignItems="center">
+            <Avatar 
+              src={option.logo} 
+              sx={{ width: 24, height: 24, mr: 1 }}
+            />
+            <Box>
+              <Typography variant="body1" sx={{ color: '#fff' }}>{option.name}</Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                {option.description}
+              </Typography>
+            </Box>
+          </Box>
+        </li>
+      )}
+    />
+    
+    {formData.developer && (
+      <Box sx={{ mt: 3, p: 2, backgroundColor: 'rgba(120, 202, 220, 0.1)', borderRadius: '8px' }}>
+        <Typography variant="h6" sx={{ color: '#78CADC', mb: 1 }}>
+          Selected Developer
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Avatar 
+            src={formData.developer.logo}
+            sx={{ width: 48, height: 48, mr: 2 }}
+          />
+          <Box>
+            <Typography variant="body1" sx={{ fontWeight: 600, color: '#fff' }}>
+              {formData.developer.name}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              {formData.developer.description}
+            </Typography>
+          </Box>
+        </Box>
+        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+          {formData.developer.details}
+        </Typography>
+      </Box>
+    )}
+  </PremiumPaper>
+</Grid>
+
           {/* Images */}
           <Grid item xs={12}>
             <SectionHeader variant="h6">Property Images</SectionHeader>
@@ -1756,6 +1887,71 @@ const AddPropertyPage = () => {
               )}
             </PremiumPaper>
           </Grid>
+
+          <Grid item xs={12}>
+          <SectionHeader variant="h6">Floor Plan</SectionHeader>
+          <PremiumPaper>
+            <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+              Upload a floor plan image (5MB max)
+            </FormHelperText>
+            
+            {floorPlanPreview ? (
+              <Box sx={{ position: 'relative', mb: 2 }}>
+                <Box
+                  component="img"
+                  src={floorPlanPreview}
+                  alt="Floor Plan Preview"
+                  sx={{ 
+                    width: '100%', 
+                    maxHeight: 300,
+                    objectFit: 'contain',
+                    borderRadius: '8px',
+                    border: '2px solid #78CADC'
+                  }}
+                />
+                <IconButton
+                  size="small"
+                  onClick={handleRemoveFloorPlan}
+                  sx={{ 
+                    position: 'absolute', 
+                    top: 4, 
+                    right: 4, 
+                    color: 'white', 
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(211, 47, 47, 0.7)'
+                    }
+                  }}
+                >
+                  <Delete fontSize="small" />
+                </IconButton>
+              </Box>
+            ) : null}
+            
+            <Button
+              variant="contained"
+              component="label"
+              startIcon={<CloudUpload />}
+              size={isMobile ? 'small' : 'medium'}
+              sx={{
+                backgroundColor: '#78CADC',
+                color: '#0B1011',
+                fontWeight: 600,
+                '&:hover': {
+                  backgroundColor: '#5fb4c9'
+                }
+              }}
+            >
+              Upload Floor Plan
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleFloorPlanChange}
+              />
+            </Button>
+          </PremiumPaper>
+        </Grid>
 
           {/* Submit Buttons */}
           <Grid item xs={12} sx={{ mt: 2 }}>
