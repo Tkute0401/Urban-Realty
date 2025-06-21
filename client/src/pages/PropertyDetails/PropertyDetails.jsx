@@ -354,7 +354,7 @@ const PropertyDetails = () => {
       <Container maxWidth="xl" sx={{ py: 6, pt: isSticky ? `${headerHeight + 100}px` : '40px' }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            <PropertyOverview property={property} overviewRef={overviewRef} />
+            <PropertyOverview property={property} fullAddress={fullAddress} overviewRef={overviewRef} />
             <PropertyHighlights property={property} highlightsRef={highlightsRef} />
             <PropertyNearby property={property} aroundRef={aroundRef} />
             <PropertyMoreInfo property={property} moreRef={moreRef} />
