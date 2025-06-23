@@ -43,9 +43,6 @@ exports.createDeveloper = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Update developer
-// @route   PUT /api/v1/developers/:id
-// @access  Private (Admin/Agent)
 exports.updateDeveloper = asyncHandler(async (req, res, next) => {
   let developer = await Developer.findById(req.params.id);
 
@@ -55,68 +52,38 @@ exports.updateDeveloper = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Parse the form data
-  let updateData = {};
-  
-  try {
-    // Handle regular fields
-    if (req.body.data) {
-      updateData = JSON.parse(req.body.data);
-    }
-
-    // Handle file uploads if any
-    if (req.files && req.files.logo) {
-      const file = req.files.logo;
-      
-      // Make sure the image is a photo
-      if (!file.mimetype.startsWith('image')) {
-        return next(new ErrorResponse(`Please upload an image file`, 400));
-      }
-
-      // Check filesize
-      if (file.size > process.env.MAX_FILE_UPLOAD) {
-        return next(
-          new ErrorResponse(
-            `Please upload an image less than ${process.env.MAX_FILE_UPLOAD / 1000000}MB`,
-            400
-          )
-        );
-      }
-
-      // Upload to cloudinary
-      const result = await cloudinary.uploader.upload(file.tempFilePath, {
-        folder: 'real-estate/developers',
-        width: 500,
-        height: 500,
-        crop: 'fill'
-      });
-
-      // Delete old logo if exists
-      if (developer.logo?.publicId) {
-        await cloudinary.uploader.destroy(developer.logo.publicId);
-      }
-
-      updateData.logo = {
-        url: result.secure_url,
-        publicId: result.public_id
-      };
-    }
-
-    // Update the developer
-    developer = await Developer.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true
-    });
-
-    res.status(200).json({
-      success: true,
-      data: developer
-    });
-
-  } catch (error) {
-    console.error('Error updating developer:', error);
-    return next(new ErrorResponse('Error processing form data', 400));
+  // Parse JSON strings if they exist
+  if (req.body.headquarters) {
+    req.body.headquarters = JSON.parse(req.body.headquarters);
   }
+  if (req.body.flagshipProjects) {
+    req.body.flagshipProjects = JSON.parse(req.body.flagshipProjects);
+  }
+  if (req.body.team) {
+    req.body.team = JSON.parse(req.body.team);
+  }
+  if (req.body.specializations) {
+    req.body.specializations = JSON.parse(req.body.specializations);
+  }
+  if (req.body.contact) {
+    req.body.contact = JSON.parse(req.body.contact);
+  }
+  if (req.body.socialMedia) {
+    req.body.socialMedia = JSON.parse(req.body.socialMedia);
+  }
+  if (req.body.awards) {
+    req.body.awards = JSON.parse(req.body.awards);
+  }
+
+  developer = await Developer.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: developer
+  });
 });
 
 // @desc    Delete developer
