@@ -31,6 +31,18 @@ exports.getDeveloper = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Create developer
+// @route   POST /api/v1/developers
+// @access  Private (Admin/Agent)
+exports.createDeveloper = asyncHandler(async (req, res, next) => {
+  const developer = await Developer.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    data: developer
+  });
+});
+
 // @desc    Update developer
 // @route   PUT /api/v1/developers/:id
 // @access  Private (Admin/Agent)
@@ -105,29 +117,6 @@ exports.updateDeveloper = asyncHandler(async (req, res, next) => {
     console.error('Error updating developer:', error);
     return next(new ErrorResponse('Error processing form data', 400));
   }
-});
-
-// @desc    Update developer
-// @route   PUT /api/v1/developers/:id
-// @access  Private (Admin/Agent)
-exports.updateDeveloper = asyncHandler(async (req, res, next) => {
-  let developer = await Developer.findById(req.params.id);
-
-  if (!developer) {
-    return next(
-      new ErrorResponse(`Developer not found with id of ${req.params.id}`, 404)
-    );
-  }
-
-  developer = await Developer.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
-
-  res.status(200).json({
-    success: true,
-    data: developer
-  });
 });
 
 // @desc    Delete developer

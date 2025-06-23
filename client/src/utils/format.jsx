@@ -20,6 +20,8 @@ export const formatNumber = (num) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
+
+
 export const truncate = (str, length = 100) => {
   if (!str) return '';
   if (str.length <= length) return str;
