@@ -3,6 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Property = require('../models/Property');
 const User = require('../models/User');
+const Developer = require('../models/Developer');
 const geocoder = require('../utils/geocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
