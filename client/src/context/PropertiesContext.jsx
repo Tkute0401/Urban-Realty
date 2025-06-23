@@ -1,4 +1,3 @@
-// src/context/PropertiesContext.js
 import { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import axios from '../services/axios';
 
@@ -11,12 +10,15 @@ export const PropertiesProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cache, setCache] = useState({});
+  const [developers, setDevelopers] = useState([]);
+  const [pagination, setPagination] = useState({});
 
   const getProperties = useCallback(async (params = {}) => {
     const cacheKey = JSON.stringify(params);
     
     if (cache[cacheKey]) {
-      setProperties(cache[cacheKey]);
+      setProperties(cache[cacheKey].properties);
+      setPagination(cache[cacheKey].pagination);
       return;
     }
   
@@ -25,13 +27,16 @@ export const PropertiesProvider = ({ children }) => {
       setError(null);
       
       // Convert parameters to backend expected format
-      const backendParams = { ...params };
+      const backendParams = { 
+        ...params,
+        page: params.page || 1,
+        limit: params.limit || 12
+      };
       
-      // Handle status filter - ensure we don't send empty status
+      // Handle status filter
       if (params.status) {
         backendParams.status = params.status === 'BUY' ? 'For Sale' : 'For Rent';
       } else {
-        // Remove status if empty to avoid sending empty string
         delete backendParams.status;
       }
       
@@ -39,6 +44,11 @@ export const PropertiesProvider = ({ children }) => {
       if (params.type) {
         backendParams.propertyType = params.type;
         delete backendParams.type;
+      }
+      
+      // Handle developer filter
+      if (params.developer) {
+        backendParams.developer = params.developer;
       }
       
       // Remove empty filters
@@ -50,14 +60,21 @@ export const PropertiesProvider = ({ children }) => {
       });
       
       const response = await axios.get('/properties', { params: backendParams });
-      const data = response.data?.data ?? response.data;
+      const { data, pagination: paginationData } = response.data;
       
       if (!Array.isArray(data)) {
         throw new Error('Received invalid properties data format');
       }
       
       setProperties(data);
-      setCache(prev => ({ ...prev, [cacheKey]: data }));
+      setPagination(paginationData);
+      setCache(prev => ({ 
+        ...prev, 
+        [cacheKey]: {
+          properties: data,
+          pagination: paginationData
+        } 
+      }));
     } catch (err) {
       console.error('API Error:', {
         message: err.message,
@@ -67,6 +84,7 @@ export const PropertiesProvider = ({ children }) => {
       });
       setError(err.response?.data?.message || err.message || 'Failed to fetch properties');
       setProperties([]);
+      setPagination({});
     } finally {
       setLoading(false);
     }
@@ -106,7 +124,6 @@ export const PropertiesProvider = ({ children }) => {
         return cache[id];
       }
   
-      // Use relative URL here too
       const response = await axios.get(`/properties/${id}`);
       const propertyData = response.data?.data ?? response.data;
       
@@ -127,46 +144,71 @@ export const PropertiesProvider = ({ children }) => {
   }, [cache]);
 
   const createProperty = useCallback(async (formData, config = {}) => {
-  try {
-    setLoading(true);
-    setError(null);
-    
-    const finalConfig = {
-      ...config,
-      headers: {
-        ...config.headers,
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    };
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const finalConfig = {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      };
 
-    // Just forward the FormData as-is
-    const response = await axios.post('/properties', formData, finalConfig);
-    
-    const newProperty = response.data?.data ?? response.data;
-    setProperties(prev => [...prev, newProperty]);
-    setCache({});
-    return newProperty;
-  } catch (err) {
-    const errorData = err.response?.data;
-    let errorMsg = 'Failed to create property';
-    
-    if (errorData) {
-      if (errorData.error) {
-        errorMsg = errorData.error;
-      } else if (errorData.message) {
-        errorMsg = errorData.message;
-      } else if (errorData.errors) {
-        errorMsg = Object.values(errorData.errors).join(', ');
+      // Convert nested objects to JSON strings for FormData
+      if (formData.address) {
+        formData.address = JSON.stringify(formData.address);
       }
+      if (formData.nearbyLocalities) {
+        formData.nearbyLocalities = JSON.stringify(formData.nearbyLocalities);
+      }
+      if (formData.projectDetails) {
+        formData.projectDetails = JSON.stringify(formData.projectDetails);
+      }
+      if (formData.approvals) {
+        formData.approvals = JSON.stringify(formData.approvals);
+      }
+
+      // Create FormData and append all fields
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(item => formDataToSend.append(`${key}[]`, item));
+        } else if (value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (value !== null && value !== undefined) {
+          formDataToSend.append(key, value);
+        }
+      });
+
+      const response = await axios.post('/properties', formDataToSend, finalConfig);
+      
+      const newProperty = response.data?.data ?? response.data;
+      setProperties(prev => [...prev, newProperty]);
+      setCache({}); // Clear cache since we added a new property
+      return newProperty;
+    } catch (err) {
+      const errorData = err.response?.data;
+      let errorMsg = 'Failed to create property';
+      
+      if (errorData) {
+        if (errorData.error) {
+          errorMsg = errorData.error;
+        } else if (errorData.message) {
+          errorMsg = errorData.message;
+        } else if (errorData.errors) {
+          errorMsg = Object.values(errorData.errors).join(', ');
+        }
+      }
+      
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    } finally {
+      setLoading(false);
     }
-    
-    setError(errorMsg);
-    throw new Error(errorMsg);
-  } finally {
-    setLoading(false);
-  }
-}, []);
+  }, []);
 
   const updateProperty = useCallback(async (id, formData) => {
     try {
@@ -179,19 +221,43 @@ export const PropertiesProvider = ({ children }) => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       };
-  
-      // Use relative URL instead of absolute
-      const response = await axios.put(`/properties/${id}`, formData, config);
+
+      // Convert nested objects to JSON strings for FormData
+      if (formData.address) {
+        formData.address = JSON.stringify(formData.address);
+      }
+      if (formData.nearbyLocalities) {
+        formData.nearbyLocalities = JSON.stringify(formData.nearbyLocalities);
+      }
+      if (formData.projectDetails) {
+        formData.projectDetails = JSON.stringify(formData.projectDetails);
+      }
+      if (formData.approvals) {
+        formData.approvals = JSON.stringify(formData.approvals);
+      }
+
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(item => formDataToSend.append(`${key}[]`, item));
+        } else if (value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (value !== null && value !== undefined) {
+          formDataToSend.append(key, value);
+        }
+      });
+
+      const response = await axios.put(`/properties/${id}`, formDataToSend, config);
       const responseData = response.data?.data || response.data || response;
       
       if (!responseData) {
         throw new Error('No response data received');
       }
-  
+
       if (responseData.success !== undefined && !responseData.success) {
         throw new Error(responseData.message || 'Update failed');
       }
-  
+
       setProperty(responseData);
       setProperties(prev => prev.map(p => p._id === id ? responseData : p));
       setCache(prev => ({ ...prev, [id]: responseData }));
@@ -235,6 +301,28 @@ export const PropertiesProvider = ({ children }) => {
     }
   }, [property]);
 
+  const getDevelopers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get('/developers');
+      const data = response.data?.data ?? response.data;
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Received invalid developers data format');
+      }
+      
+      setDevelopers(data);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch developers');
+      setDevelopers([]);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const clearProperty = useCallback(() => setProperty(null), []);
   const clearErrors = useCallback(() => setError(null), []);
 
@@ -244,12 +332,15 @@ export const PropertiesProvider = ({ children }) => {
     property,
     loading,
     error,
+    pagination,
+    developers,
     getProperties,
     getFeaturedProperties,
     getProperty,
     createProperty,
     updateProperty,
     deleteProperty,
+    getDevelopers,
     clearProperty,
     clearErrors
   }), [
@@ -258,12 +349,15 @@ export const PropertiesProvider = ({ children }) => {
     property,
     loading,
     error,
+    pagination,
+    developers,
     getProperties,
     getFeaturedProperties,
     getProperty,
     createProperty,
     updateProperty,
     deleteProperty,
+    getDevelopers,
     clearProperty,
     clearErrors
   ]);
