@@ -48,6 +48,24 @@ const DeveloperSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  flagshipProjects: [{
+    name: String,
+    description: String
+  }]
+  ,
+  team: [{
+    name: String,
+    designation: String,
+    image: {
+      url: String,
+      publicId: String
+    }
+  }],
+  specializations: [{
+    name: String,
+    description: String
+  }]
+  ,
   contact: {
     email: {
       type: String,

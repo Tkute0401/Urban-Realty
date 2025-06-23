@@ -37,6 +37,9 @@ import InteriorDesign from './components/common/footer/InteriorDesign';
 import EMICalculator from './components/common/footer/EMICalculator';
 import Footer from './components/common/footer/Footer';
 import { DevelopersProvider } from './context/DevelopersContext';
+import DeveloperList from './pages/Developer/DeveloperList';
+import DeveloperDetails from './pages/Developer/DeveloperDetails';
+import AddDeveloperPage from './pages/Developer/AddDeveloperPage';
 
 function App() {
   const location = useLocation();
@@ -65,6 +68,9 @@ function App() {
                 <Route path="/terms" element={<TermsConditions />}/>
                 <Route path="/career" element={<Career />} />
                 <Route path="/trust" element={<TrustSafety />}/>
+                <Route path="/developers" element={<DeveloperList />}/>
+                <Route path="/developers/:id" element={<DeveloperDetails />} />
+                <Route path="/developers/add" element={<AddDeveloperPage/>}/>
                 <Route path="/how-we-work" element={<HowWeWork />}/>
                 <Route path="/lawyer-consultancy" element={<LawyerConsultancy />}/>
                 <Route path="/packers-and-movers" element={<PackersMovers />}/>

@@ -8,11 +8,14 @@ export const DevelopersProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const clearErrors = () => setError(null);
+
   const getDevelopers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/api/v1/developers');
+      const response = await axios.get('/developers');
+      console.log(response);
       setDevelopers(response.data.data || response.data);
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to fetch developers');
@@ -26,6 +29,7 @@ export const DevelopersProvider = ({ children }) => {
     developers,
     loading,
     error,
+    clearErrors,
     getDevelopers
   }), [developers, loading, error, getDevelopers]);
 

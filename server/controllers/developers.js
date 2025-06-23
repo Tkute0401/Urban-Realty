@@ -83,7 +83,8 @@ exports.deleteDeveloper = asyncHandler(async (req, res, next) => {
     await cloudinary.uploader.destroy(developer.logo.publicId);
   }
 
-  await developer.remove();
+  // Use deleteOne() instead of remove()
+  await Developer.deleteOne({ _id: req.params.id });
 
   res.status(200).json({
     success: true,
