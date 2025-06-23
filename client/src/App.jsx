@@ -36,6 +36,7 @@ import PackersMovers from './components/common/footer/PackersMovers';
 import InteriorDesign from './components/common/footer/InteriorDesign';
 import EMICalculator from './components/common/footer/EMICalculator';
 import Footer from './components/common/footer/Footer';
+import { DevelopersProvider } from './context/DevelopersContext';
 
 function App() {
   const location = useLocation();
@@ -46,6 +47,8 @@ function App() {
       <AuthProvider>
         <PropertiesProvider>
           <AgentsProvider>
+          <DevelopersProvider>
+          
             {/* Conditionally render Header based on current path */}
             {!isHomePage && <Header />}
             <Layout>
@@ -87,6 +90,7 @@ function App() {
               </Routes>
             </Layout>
             <Footer />
+            </DevelopersProvider>
           </AgentsProvider>
         </PropertiesProvider>
       </AuthProvider>
