@@ -238,18 +238,34 @@ const EditDeveloperPage = () => {
   try {
     const formDataToSend = new FormData();
     
-    // Stringify the main form data and append it
-    formDataToSend.append('data', JSON.stringify(formData));
+    // Append all simple fields
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('website', formData.website || '');
+    formDataToSend.append('foundedYear', formData.foundedYear || '');
+    
+    // Append headquarters as JSON string
+    formDataToSend.append('headquarters', JSON.stringify(formData.headquarters));
+    
+    // Append projects counts
+    formDataToSend.append('completedProjects', formData.completedProjects);
+    formDataToSend.append('ongoingProjects', formData.ongoingProjects);
+    formDataToSend.append('upcomingProjects', formData.upcomingProjects);
+    
+    // Append arrays as JSON strings
+    formDataToSend.append('flagshipProjects', JSON.stringify(formData.flagshipProjects));
+    formDataToSend.append('team', JSON.stringify(formData.team));
+    formDataToSend.append('specializations', JSON.stringify(formData.specializations));
+    
+    // Append contact and social media as JSON strings
+    formDataToSend.append('contact', JSON.stringify(formData.contact));
+    formDataToSend.append('socialMedia', JSON.stringify(formData.socialMedia));
+    formDataToSend.append('awards', JSON.stringify(formData.awards));
 
-    // Append logo file if exists
+    // Append logo if exists
     if (logoFile) {
       formDataToSend.append('logo', logoFile);
     }
-
-    // Append team photos if exist
-    teamPhotoFiles.forEach(file => {
-      formDataToSend.append('teamPhotos', file);
-    });
 
     const config = {
       headers: {
