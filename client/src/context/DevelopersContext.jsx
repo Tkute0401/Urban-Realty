@@ -10,6 +10,24 @@ export const DevelopersProvider = ({ children }) => {
 
   const clearErrors = () => setError(null);
 
+
+  const updateDeveloper = useCallback(async (id, formData, config) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(`/developers/${id}`, formData, config);
+      // Update your state accordingly
+      setDevelopers(prev => prev.map(dev => 
+        dev._id === id ? response.data : dev
+      ));
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to update developer');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const getDevelopers = useCallback(async () => {
     try {
       setLoading(true);
@@ -29,6 +47,7 @@ export const DevelopersProvider = ({ children }) => {
     developers,
     loading,
     error,
+    updateDeveloper,
     clearErrors,
     getDevelopers
   }), [developers, loading, error, getDevelopers]);
