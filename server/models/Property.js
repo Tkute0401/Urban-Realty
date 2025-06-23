@@ -3,6 +3,7 @@ const slugify = require('slugify');
 const geocoder = require('../utils/geocoder');
 
 const PropertySchema = new mongoose.Schema({
+  // Basic Information
   title: {
     type: String,
     required: [true, 'Please add a title'],
@@ -34,10 +35,14 @@ const PropertySchema = new mongoose.Schema({
     required: [true, 'Please select a status'],
     enum: [
       'For Sale',
-      'For Rent'
+      'For Rent',
+      'Sold',
+      'Rented'
     ],
     default: 'For Sale'
   },
+
+  // Pricing and Details
   price: {
     type: Number,
     required: [true, 'Please add a price'],
@@ -68,6 +73,34 @@ const PropertySchema = new mongoose.Schema({
     default: '',
     maxlength: [20, 'Floor number cannot be more than 20 characters']
   },
+
+  // Developer Information
+  developer: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Developer'
+  },
+  constructionStatus: {
+    type: String,
+    enum: [
+      'Under Construction',
+      'Ready to Move',
+      'New Launch',
+      'Almost Ready'
+    ],
+    default: 'Under Construction'
+  },
+  possessionDate: Date,
+  ageOfProperty: {
+    type: Number,
+    min: 0
+  },
+  approvals: [{
+    name: String,
+    number: String,
+    date: Date
+  }],
+
+  // Location Information
   address: {
     line1: {
       type: String,
@@ -139,6 +172,8 @@ const PropertySchema = new mongoose.Schema({
     zipCode: String,
     country: String
   },
+
+  // Features and Amenities
   amenities: {
     type: [String],
     default: [],
@@ -177,6 +212,8 @@ const PropertySchema = new mongoose.Schema({
     hasTransport: { type: Boolean, default: false },
     transport: { type: String, default: '' }
   },
+
+  // Project Details
   projectDetails: {
     projectArea: { type: String, default: '' },
     totalUnits: { type: String, default: '' },
@@ -184,24 +221,42 @@ const PropertySchema = new mongoose.Schema({
     reraId: { type: String, default: '' },
     configurations: { type: String, default: '' }
   },
-  images: [
-    {
-      url: {
-        type: String,
-        required: true
-      },
-      publicId: {
-        type: String,
-        required: true
-      },
-      width: Number,
-      height: Number,
-      uploadedAt: {
-        type: Date,
-        default: Date.now
-      }
+
+  // Media
+  images: [{
+    url: {
+      type: String,
+      required: true
+    },
+    publicId: {
+      type: String,
+      required: true
+    },
+    width: Number,
+    height: Number,
+    uploadedAt: {
+      type: Date,
+      default: Date.now
     }
-  ],
+  }],
+  floorPlanImages: [{
+    url: String,
+    publicId: String,
+    description: String
+  }],
+  brochure: {
+    url: String,
+    publicId: String
+  },
+  virtualTour: {
+    url: String,
+    type: {
+      type: String,
+      enum: ['video', '3d']
+    }
+  },
+
+  // Metadata
   featured: {
     type: Boolean,
     default: false
@@ -269,7 +324,39 @@ PropertySchema.pre('save', async function(next) {
   }
 });
 
+// Calculate age of property if possession date is provided
+PropertySchema.pre('save', function(next) {
+  if (this.possessionDate && !this.ageOfProperty) {
+    const ageInMilliseconds = Date.now() - new Date(this.possessionDate).getTime();
+    this.ageOfProperty = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24 * 365));
+  }
+  next();
+});
+
+// Reverse populate with virtuals
+PropertySchema.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'property',
+  justOne: false
+});
+
+// Cascade delete reviews when a property is deleted
+PropertySchema.pre('remove', async function(next) {
+  await this.model('Review').deleteMany({ property: this._id });
+  next();
+});
+
 // Index for geospatial queries
 PropertySchema.index({ location: '2dsphere' });
+
+// Index for text search
+PropertySchema.index({
+  title: 'text',
+  description: 'text',
+  'address.city': 'text',
+  'address.state': 'text',
+  buildingName: 'text'
+});
 
 module.exports = mongoose.model('Property', PropertySchema);

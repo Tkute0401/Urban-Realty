@@ -274,13 +274,38 @@ function deg2rad(deg) {
 // @access  Private (Agent/Admin)
 exports.createProperty = asyncHandler(async (req, res, next) => {
   try {
-    // Add user to req.body
+    // Add user to req.body as the agent
     req.body.agent = req.user.id;
 
-    // Process images
-    const images = req.files?.length > 0 
-      ? await uploadImagesToCloudinary(req.files)
+    // Check if developer exists if provided
+    if (req.body.developer) {
+      const developer = await Developer.findById(req.body.developer);
+      if (!developer) {
+        return next(new ErrorResponse(`Developer not found with id of ${req.body.developer}`, 404));
+      }
+    }
+
+    // Process main images
+    const images = req.files?.images?.length > 0 
+      ? await uploadImagesToCloudinary(req.files.images, 'properties')
       : [];
+
+    // Process floor plan images
+    const floorPlanImages = req.files?.floorPlans?.length > 0
+      ? await uploadImagesToCloudinary(req.files.floorPlans, 'properties/floor-plans')
+      : [];
+
+    // Process brochure if uploaded
+    let brochure = null;
+    if (req.files?.brochure?.length > 0) {
+      brochure = await uploadFileToCloudinary(req.files.brochure[0], 'properties/brochures');
+    }
+
+    // Process virtual tour if uploaded
+    let virtualTour = null;
+    if (req.files?.virtualTour?.length > 0) {
+      virtualTour = await uploadVideoToCloudinary(req.files.virtualTour[0], 'properties/virtual-tours');
+    }
 
     // Parse amenities if sent as string
     if (req.body.amenities && typeof req.body.amenities === 'string') {
@@ -291,15 +316,6 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
     if (req.body.highlights && typeof req.body.highlights === 'string') {
       req.body.highlights = req.body.highlights.split(',');
     }
-
-    // // Parse address if sent as string
-    // if (req.body.address && typeof req.body.address === 'string') {
-    //   try {
-    //     req.body.address = JSON.parse(req.body.address);
-    //   } catch (err) {
-    //     return next(new ErrorResponse('Invalid address format', 400));
-    //   }
-    // }
 
     // Parse nearbyLocalities if sent as string
     if (req.body.nearbyLocalities && typeof req.body.nearbyLocalities === 'string') {
@@ -319,10 +335,33 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       }
     }
 
+    // Parse approvals if sent as string
+    if (req.body.approvals && typeof req.body.approvals === 'string') {
+      try {
+        req.body.approvals = JSON.parse(req.body.approvals);
+      } catch (err) {
+        return next(new ErrorResponse('Invalid approvals format', 400));
+      }
+    }
+
+    // Convert possession date to Date object if provided
+    if (req.body.possessionDate) {
+      req.body.possessionDate = new Date(req.body.possessionDate);
+    }
+
     // Create property with default location
     const propertyData = {
       ...req.body,
       images,
+      floorPlanImages,
+      brochure: brochure ? {
+        url: brochure.secure_url,
+        publicId: brochure.public_id
+      } : null,
+      virtualTour: virtualTour ? {
+        url: virtualTour.secure_url,
+        type: 'video' // Default type, can be changed based on file analysis
+      } : null,
       location: {
         type: 'Point',
         coordinates: [0, 0], // Default coordinates
@@ -335,9 +374,10 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       }
     };
 
+    // Create property in database
     const property = await Property.create(propertyData);
 
-    // Try to geocode if we have address
+    // Try to geocode the address if provided
     if (req.body.address) {
       try {
         const addressString = [
@@ -366,17 +406,33 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
         }
       } catch (err) {
         console.error('Geocoding failed:', err);
+        // Continue even if geocoding fails
       }
     }
+
+    // Populate developer information in response
+    await property.populate('developer', 'name logo website');
+    await property.populate('agent', 'name email phone');
 
     res.status(201).json({ 
       success: true, 
       data: property 
     });
   } catch (err) {
+    // Clean up uploaded files if error occurs
+    if (req.files) {
+      for (const field in req.files) {
+        for (const file of req.files[field]) {
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        }
+      }
+    }
     next(err);
   }
 });
+
 
 
 // @desc    Update property
