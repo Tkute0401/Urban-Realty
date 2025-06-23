@@ -15,6 +15,11 @@ export const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-IN', options);
 };
 
+export const formatNumber = (num) => {
+  if (!num) return '0';
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 export const truncate = (str, length = 100) => {
   if (!str) return '';
   if (str.length <= length) return str;

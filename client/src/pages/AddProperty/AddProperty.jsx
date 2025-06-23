@@ -205,6 +205,7 @@ const AddPropertyPage = () => {
       getAgents();
     }
     getDevelopers();
+    console.log(developers);
   }, [user, getAgents, getDevelopers]);
 
   useEffect(() => {
