@@ -226,106 +226,51 @@ const EditDeveloperPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    clearErrors();
+  e.preventDefault();
+  clearErrors();
+  
+  if (!validateForm()) {
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const formDataToSend = new FormData();
     
-    if (!validateForm()) {
-      return;
+    // Stringify the main form data and append it
+    formDataToSend.append('data', JSON.stringify(formData));
+
+    // Append logo file if exists
+    if (logoFile) {
+      formDataToSend.append('logo', logoFile);
     }
 
-    setIsSubmitting(true);
+    // Append team photos if exist
+    teamPhotoFiles.forEach(file => {
+      formDataToSend.append('teamPhotos', file);
+    });
 
-    try {
-      const formDataToSend = new FormData();
-      
-      // Append all simple fields
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('website', formData.website || '');
-      formDataToSend.append('foundedYear', formData.foundedYear || '');
-      
-      // Append headquarters
-      Object.entries(formData.headquarters).forEach(([key, value]) => {
-        formDataToSend.append(`headquarters[${key}]`, value);
-      });
-      
-      // Append projects counts
-      formDataToSend.append('completedProjects', formData.completedProjects);
-      formDataToSend.append('ongoingProjects', formData.ongoingProjects);
-      formDataToSend.append('upcomingProjects', formData.upcomingProjects);
-      
-      // Append flagship projects
-      formData.flagshipProjects.forEach((project, index) => {
-        if (project.name.trim() || project.description.trim()) {
-          formDataToSend.append(`flagshipProjects[${index}][name]`, project.name);
-          formDataToSend.append(`flagshipProjects[${index}][description]`, project.description);
-        }
-      });
-      
-      // Append team members
-      formData.team.forEach((member, index) => {
-        if (member.name.trim() || member.designation.trim()) {
-          formDataToSend.append(`team[${index}][name]`, member.name);
-          formDataToSend.append(`team[${index}][designation]`, member.designation);
-        }
-      });
-      
-      // Append specializations
-      formData.specializations.forEach((spec, index) => {
-        if (spec.name.trim() || spec.description.trim()) {
-          formDataToSend.append(`specializations[${index}][name]`, spec.name);
-          formDataToSend.append(`specializations[${index}][description]`, spec.description);
-        }
-      });
-      
-      // Append contact info
-      Object.entries(formData.contact).forEach(([key, value]) => {
-        formDataToSend.append(`contact[${key}]`, value || '');
-      });
-      
-      // Append social media
-      Object.entries(formData.socialMedia).forEach(([key, value]) => {
-        formDataToSend.append(`socialMedia[${key}]`, value || '');
-      });
-      
-      // Append awards
-      formData.awards.forEach((award, index) => {
-        if (award.name.trim() || award.category.trim()) {
-          formDataToSend.append(`awards[${index}][name]`, award.name);
-          formDataToSend.append(`awards[${index}][year]`, award.year || '');
-          formDataToSend.append(`awards[${index}][category]`, award.category);
-        }
-      });
-
-      // Append logo if exists
-      if (logoFile) {
-        formDataToSend.append('logo', logoFile);
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
+    };
 
-      // Append team photos if exist
-      teamPhotoFiles.forEach(file => {
-        formDataToSend.append('teamPhotos', file);
-      });
-
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      };
-
-      await updateDeveloper(id, formDataToSend, config);
-      setSnackbarMessage('Developer updated successfully!');
-      setSnackbarOpen(true);
-      setTimeout(() => navigate('/developers'), 1500);
-    } catch (err) {
-      console.error('Submission error:', err);
-      setSnackbarMessage(err.message || 'Failed to update developer');
-      setSnackbarOpen(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const response = await axios.put(`/api/v1/developers/${id}`, formDataToSend, config);
+    
+    setSnackbarMessage('Developer updated successfully!');
+    setSnackbarOpen(true);
+    setTimeout(() => navigate('/developers'), 1500);
+  } catch (err) {
+    console.error('Submission error:', err);
+    setSnackbarMessage(err.response?.data?.message || 'Failed to update developer');
+    setSnackbarOpen(true);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
