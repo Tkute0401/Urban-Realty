@@ -8,6 +8,7 @@ const fs = require('fs');
 // @route   GET /api/v1/developers
 // @access  Public
 exports.getDevelopers = asyncHandler(async (req, res, next) => {
+  console.log('GET /api/v1/developers', res);  
   res.status(200).json(res.advancedResults);
 });
 
@@ -16,6 +17,7 @@ exports.getDevelopers = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getDeveloper = asyncHandler(async (req, res, next) => {
   const developer = await Developer.findById(req.params.id);
+  console.log('GET /api/v1/developers/:id', res);
 
   if (!developer) {
     return next(
