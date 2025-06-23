@@ -40,6 +40,7 @@ import { DevelopersProvider } from './context/DevelopersContext';
 import DeveloperList from './pages/Developer/DeveloperList';
 import DeveloperDetails from './pages/Developer/DeveloperDetails';
 import AddDeveloperPage from './pages/Developer/AddDeveloperPage';
+import EditDeveloperPage from './pages/Developer/EditDeveloperPage';
 
 function App() {
   const location = useLocation();
@@ -71,7 +72,7 @@ function App() {
                 <Route path="/developers" element={<DeveloperList />}/>
                 <Route path="/developers/:id" element={<DeveloperDetails />} />
                 <Route path="/developers/add" element={<AddDeveloperPage/>}/>
-                <Route path="/developers/:id/edit" element={<AddDeveloperPage/>}/>
+                <Route path="/developers/:id/edit" element={<EditDeveloperPage/>}/>
                 <Route path="/how-we-work" element={<HowWeWork />}/>
                 <Route path="/lawyer-consultancy" element={<LawyerConsultancy />}/>
                 <Route path="/packers-and-movers" element={<PackersMovers />}/>
