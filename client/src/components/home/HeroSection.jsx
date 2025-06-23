@@ -353,17 +353,19 @@ const HeroSection = () => {
         )}
       </AnimatePresence>
       
-      {/* Search and filter bar */}
-      <div className="absolute bottom-32 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-4 transform translate-y-1/2">
-        {/* Popular localities with scrolling */}
+      {/* Search and filter bar - Only size adjustments */}
+      <div className="absolute bottom-24 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-3 sm:gap-4 transform translate-y-1/2">
+        {/* Popular localities with scrolling - Only size adjusted */}
         {selectedCity && currentCityLocalities.length > 0 && (
           <div className="w-full max-w-2xl">          
-            <div className="flex items-center justify-center gap-2 sm:gap-2 text-white/80 mb-3 flex-wrap">
-              <span className="text-xs sm:text-sm font-medium whitespace-nowrap">Popular Localities in {selectedCity}:</span>
-              <div className="flex items-center gap-2 overflow-hidden">
+            <div className="flex items-center justify-center gap-1 sm:gap-2 text-white/80 mb-2 sm:mb-3 flex-wrap">
+              <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
+                Popular Localities in {selectedCity}:
+              </span>
+              <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
                 <div 
                   ref={localitiesContainerRef}
-                  className="flex gap-2 transition-transform duration-500 ease-in-out"
+                  className="flex gap-1 sm:gap-2 transition-transform duration-500 ease-in-out"
                 >
                   <AnimatePresence mode="wait">
                     {visibleLocalities.map((locality, index) => (
@@ -377,7 +379,7 @@ const HeroSection = () => {
                           delay: index * 0.05,
                           ease: "easeOut"
                         }}
-                        className="px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
+                        className="px-2 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
                         onClick={() => {
                           const newSearchParams = new URLSearchParams();
                           newSearchParams.set('city', selectedCity);
@@ -406,14 +408,14 @@ const HeroSection = () => {
           </div>
         )}
 
-        {/* Main search container */}
+        {/* Main search container - Only size adjustments */}
         <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
-          {/* Property type tabs */}
-          <div className="flex gap-0 mb-2 rounded-xl p-1">
+          {/* Property type tabs - Only size adjusted */}
+          <div className="flex gap-0 mb-1 sm:mb-2 rounded-xl p-1">
             {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
               <button
                 key={tab}
-                className={`relative flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 overflow-hidden ${
+                className={`relative flex-1 px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 overflow-hidden ${
                   selectedTab === tab 
                     ? 'text-white' 
                     : 'text-white/80 hover:text-white'
@@ -441,14 +443,14 @@ const HeroSection = () => {
 
           {/* Search input section */}
           <div className="relative">
-            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 maX-h-12">
+            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 max-h-10 sm:max-h-12">
               {/* City dropdown */}
               {availableCities.length > 0 && (
-                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-12" style={{ zIndex: 9000 }}>
+                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-10 sm:max-h-12" style={{ zIndex: 9000 }}>
                   <button
                     type="button"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}
-                    className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-3 text-white transition-colors min-w-[100px] sm:min-w-[120px]"
+                    className="flex items-center gap-1 px-2 sm:px-3 py-2 text-white transition-colors min-w-[90px] sm:min-w-[120px]"
                     disabled={propertiesLoading}
                   >
                     <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
@@ -465,7 +467,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-48 sm:w-56 bg-white backdrop-blur-lg rounded-xl shadow-2xl overflow-visible border border-gray-200 z-[9999] max-h-60 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-full sm:w-56 bg-black/90 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-[9999] max-h-60 overflow-y-auto"
                       >
                         <div className="max-h-[200px] overflow-y-auto">
                           {filteredCities.length > 0 ? (
@@ -474,13 +476,13 @@ const HeroSection = () => {
                                 key={city}
                                 type="button"
                                 onClick={() => handleCitySelect(city)}
-                                className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors ${selectedCity === city ? 'bg-[#78cadc]/10 text-[#78cadc] font-medium' : ''}`}
+                                className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white hover:bg-white/20 transition-colors ${selectedCity === city ? 'bg-[#78cadc]' : ''}`}
                               >
                                 {city}
                               </button>
                             ))
                           ) : (
-                            <div className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-500 text-center">
+                            <div className="px-3 py-2 text-xs sm:text-sm text-gray-500 text-center">
                               No cities found
                             </div>
                           )}
@@ -492,7 +494,7 @@ const HeroSection = () => {
               )}
               
               {/* Search input */}
-              <div className="flex-1 flex items-center px-3 sm:px-4 py-3 min-w-0">
+              <div className="flex-1 flex items-center px-2 sm:px-3 py-2 min-w-0">
                 <input
                   type="text"
                   value={searchText}
@@ -508,7 +510,7 @@ const HeroSection = () => {
               {/* Search button */}
               <button
                 type="submit"
-                className="flex-shrink-0 hover:bg-white/20 text-white p-2 sm:p-3 transition-colors rounded-lg mr-1"
+                className="flex-shrink-0 hover:bg-white/20 text-white p-1 sm:p-2 transition-colors rounded-lg mr-1"
                 disabled={propertiesLoading}
               >
                 <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5" />
