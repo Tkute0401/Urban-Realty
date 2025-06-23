@@ -49,7 +49,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
         setLoadingFavorites(true);
         try {
           const favoritesData = await Promise.all(
-            user.favorites.map(id => getProperty(id))
+            user?.favorites.map(id => getProperty(id))
           );
           setFavoriteProperties(favoritesData.filter(Boolean));
         } catch (error) {
@@ -65,7 +65,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     if (isOpen && user) {
       fetchFavorites();
     }
-  }, [user.favorites, isOpen, getProperty]);
+  }, [user?.favorites, isOpen, getProperty]);
 
   // Mock data for recently viewed properties
   const recentlyViewed = [
