@@ -273,6 +273,7 @@ const EditDeveloperPage = () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     };
+    console.log("formDataToSend",formDataToSend);
 
     const response = await axios.put(`/api/v1/developers/${id}`, formDataToSend, config);
     
