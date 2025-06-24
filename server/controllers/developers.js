@@ -52,30 +52,32 @@ exports.updateDeveloper = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Parse JSON strings if they exist
-  if (req.body.headquarters) {
-    req.body.headquarters = JSON.parse(req.body.headquarters);
-  }
-  if (req.body.flagshipProjects) {
-    req.body.flagshipProjects = JSON.parse(req.body.flagshipProjects);
-  }
-  if (req.body.team) {
-    req.body.team = JSON.parse(req.body.team);
-  }
-  if (req.body.specializations) {
-    req.body.specializations = JSON.parse(req.body.specializations);
-  }
-  if (req.body.contact) {
-    req.body.contact = JSON.parse(req.body.contact);
-  }
-  if (req.body.socialMedia) {
-    req.body.socialMedia = JSON.parse(req.body.socialMedia);
-  }
-  if (req.body.awards) {
-    req.body.awards = JSON.parse(req.body.awards);
-  }
+  // // Parse JSON strings if they exist
+  // if (req.body.headquarters) {
+  //   req.body.headquarters = JSON.parse(req.body.headquarters);
+  // }
+  // if (req.body.flagshipProjects) {
+  //   req.body.flagshipProjects = JSON.parse(req.body.flagshipProjects);
+  // }
+  // if (req.body.team) {
+  //   req.body.team = JSON.parse(req.body.team);
+  // }
+  // if (req.body.specializations) {
+  //   req.body.specializations = JSON.parse(req.body.specializations);
+  // }
+  // if (req.body.contact) {
+  //   req.body.contact = JSON.parse(req.body.contact);
+  // }
+  // if (req.body.socialMedia) {
+  //   req.body.socialMedia = JSON.parse(req.body.socialMedia);
+  // }
+  // if (req.body.awards) {
+  //   req.body.awards = JSON.parse(req.body.awards);
+  // }
 
-  developer = await Developer.findByIdAndUpdate(req.params.id, req.body, {
+  const fieldsToUpdate = JSON.parse(req.body.data);
+
+  developer = await Developer.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
     new: true,
     runValidators: true
   });
