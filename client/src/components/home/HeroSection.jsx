@@ -261,7 +261,7 @@ const HeroSection = () => {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between mb-8 sm:mt-20 md:mb-16 lg:mb-0">
+              <div className="flex items-center justify-between mb-30 sm:mt-20 md:mb-16 lg:mb-30">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
                   <img 
                     src="/building_1.jpg" 
@@ -354,7 +354,7 @@ const HeroSection = () => {
       </AnimatePresence>
       
       {/* Search and filter bar - Only size adjustments */}
-      <div className="absolute bottom-24 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-3 sm:gap-4 transform translate-y-1/2">
+      <div className="absolute bottom-20 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-3 sm:gap-4 transform translate-y-1/2">
         {/* Popular localities with scrolling - Only size adjusted */}
         {selectedCity && currentCityLocalities.length > 0 && (
           <div className="w-full max-w-2xl">          

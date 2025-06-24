@@ -9,6 +9,7 @@ const fs = require('fs');
 // @access  Public
 exports.getDevelopers = asyncHandler(async (req, res, next) => {
   console.log('GET /api/v1/developers', res);  
+  console.log("chutiya madarchod",res.advancedResults)
   res.status(200).json(res.advancedResults);
 });
 
@@ -44,6 +45,8 @@ exports.createDeveloper = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateDeveloper = asyncHandler(async (req, res, next) => {
+  console.log("req.body", req.body);
+  
   let developer = await Developer.findById(req.params.id);
 
   if (!developer) {
@@ -52,35 +55,26 @@ exports.updateDeveloper = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // // Parse JSON strings if they exist
-  // if (req.body.headquarters) {
-  //   req.body.headquarters = JSON.parse(req.body.headquarters);
-  // }
-  // if (req.body.flagshipProjects) {
-  //   req.body.flagshipProjects = JSON.parse(req.body.flagshipProjects);
-  // }
-  // if (req.body.team) {
-  //   req.body.team = JSON.parse(req.body.team);
-  // }
-  // if (req.body.specializations) {
-  //   req.body.specializations = JSON.parse(req.body.specializations);
-  // }
-  // if (req.body.contact) {
-  //   req.body.contact = JSON.parse(req.body.contact);
-  // }
-  // if (req.body.socialMedia) {
-  //   req.body.socialMedia = JSON.parse(req.body.socialMedia);
-  // }
-  // if (req.body.awards) {
-  //   req.body.awards = JSON.parse(req.body.awards);
-  // }
+  // Remove fields that shouldn't be updated
+  const fieldsToRemove = ['logo', 'teamPhotos', '_id', '__v'];
+  fieldsToRemove.forEach(field => delete req.body[field]);
 
-  const fieldsToUpdate = JSON.parse(req.body);
+  // Handle nested objects
+  const updateFields = {
+    ...req.body,
+    headquarters: req.body.headquarters || developer.headquarters,
+    contact: req.body.contact || developer.contact,
+    socialMedia: req.body.socialMedia || developer.socialMedia
+  };
 
-  developer = await Developer.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
-    new: true,
-    runValidators: true
-  });
+  developer = await Developer.findByIdAndUpdate(
+    req.params.id,
+    updateFields,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
   res.status(200).json({
     success: true,
@@ -118,58 +112,55 @@ exports.deleteDeveloper = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/developers/:id/logo
 // @access  Private (Admin/Agent)
 exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
+  if (!req.file) {
+    return next(new ErrorResponse('Please upload a file', 400));
+  }
+
   const developer = await Developer.findById(req.params.id);
-
   if (!developer) {
-    return next(
-      new ErrorResponse(`Developer not found with id of ${req.params.id}`, 404)
-    );
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+    return next(new ErrorResponse(`Developer not found with id of ${req.params.id}`, 404));
   }
 
-  if (!req.files) {
-    return next(new ErrorResponse(`Please upload a file`, 400));
+  try {
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'real-estate/developers',
+      width: 500,
+      height: 500,
+      crop: 'fill',
+      quality: 'auto:good'
+    });
+
+    // Delete old logo if exists
+    if (developer.logo?.publicId) {
+      try {
+        await cloudinary.uploader.destroy(developer.logo.publicId);
+      } catch (err) {
+        console.error('Error deleting old logo:', err);
+      }
+    }
+
+    // Update developer
+    developer.logo = {
+      url: result.secure_url,
+      publicId: result.public_id
+    };
+    await developer.save();
+
+    // Delete temp file
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({
+      success: true,
+      data: developer.logo.url
+    });
+  } catch (err) {
+    // Clean up temp file if error occurs
+    if (req.file?.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    next(new ErrorResponse('Logo upload failed', 500));
   }
-
-  const file = req.files.file;
-
-  // Make sure the image is a photo
-  if (!file.mimetype.startsWith('image')) {
-    return next(new ErrorResponse(`Please upload an image file`, 400));
-  }
-
-  // Check filesize
-  if (file.size > process.env.MAX_FILE_UPLOAD) {
-    return next(
-      new ErrorResponse(
-        `Please upload an image less than ${process.env.MAX_FILE_UPLOAD /
-          1000000}MB`,
-        400
-      )
-    );
-  }
-
-  // Upload to cloudinary
-  const result = await cloudinary.uploader.upload(file.tempFilePath, {
-    folder: 'real-estate/developers',
-    width: 500,
-    height: 500,
-    crop: 'fill'
-  });
-
-  // Delete old logo if exists
-  if (developer.logo?.publicId) {
-    await cloudinary.uploader.destroy(developer.logo.publicId);
-  }
-
-  developer.logo = {
-    url: result.secure_url,
-    publicId: result.public_id
-  };
-
-  await developer.save();
-
-  res.status(200).json({
-    success: true,
-    data: result.secure_url
-  });
 });

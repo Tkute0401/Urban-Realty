@@ -15,8 +15,9 @@ import {
   Add, Remove, DateRange
 } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
+
 import { styled } from '@mui/material/styles';
-import axios from 'axios';
+import axios from '../../services/axios';
 
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
@@ -126,16 +127,18 @@ const EditDeveloperPage = () => {
   const [isLoadingDeveloper, setIsLoadingDeveloper] = useState(true);
   const logoInputRef = useRef(null);
   const teamPhotoInputRef = useRef(null);
-
+  const { developers, getDevelopers, getDeveloper } = useDevelopers();
+    
   useEffect(() => {
     const fetchDeveloper = async () => {
       try {
-        const response = await axios.get(`/api/v1/developers/${id}`);
-        const developer = response.data.data || response.data;
+        getDeveloper(id);
+        const developer = developers.find(dev => dev._id === id);
+        console.log(developer);
         
         // Set form data with the fetched developer
         setFormData({
-          name: developer.name || '',
+          name: developer.name,
           description: developer.description || '',
           website: developer.website || '',
           foundedYear: developer.foundedYear || '',
@@ -236,49 +239,24 @@ const EditDeveloperPage = () => {
   setIsSubmitting(true);
 
   try {
-    const formDataToSend = new FormData();
-    formDataToSend.append('data', JSON.stringify(formData));
-    
-    // // Append all simple fields
-    // formDataToSend.append('name', formData.name);
-    // formDataToSend.append('description', formData.description);
-    // formDataToSend.append('website', formData.website || '');
-    // formDataToSend.append('foundedYear', formData.foundedYear || '');
-    
-    // // Append headquarters as JSON string
-    // formDataToSend.append('headquarters', JSON.stringify(formData.headquarters));
-    
-    // // Append projects counts
-    // formDataToSend.append('completedProjects', formData.completedProjects);
-    // formDataToSend.append('ongoingProjects', formData.ongoingProjects);
-    // formDataToSend.append('upcomingProjects', formData.upcomingProjects);
-    
-    // // Append arrays as JSON strings
-    // formDataToSend.append('flagshipProjects', JSON.stringify(formData.flagshipProjects));
-    // formDataToSend.append('team', JSON.stringify(formData.team));
-    // formDataToSend.append('specializations', JSON.stringify(formData.specializations));
-    
-    // // Append contact and social media as JSON strings
-    // formDataToSend.append('contact', JSON.stringify(formData.contact));
-    // formDataToSend.append('socialMedia', JSON.stringify(formData.socialMedia));
-    // formDataToSend.append('awards', JSON.stringify(formData.awards));
-
-    // // Append logo if exists
-    // if (logoFile) {
-    //   formDataToSend.append('logo', logoFile);
-    // }
-
     const config = {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     };
-    console.log("formdata",formData);
-    console.log("formDataToSend",JSON.stringify(formData));
 
-    const response = await axios.put(`/api/v1/developers/${id}`, JSON.stringify(formData), config);
-    
+    // Clean up data before sending
+    const dataToSend = {
+      ...formData,
+      // Ensure numbers are sent as numbers
+      completedProjects: Number(formData.completedProjects),
+      ongoingProjects: Number(formData.ongoingProjects),
+      upcomingProjects: Number(formData.upcomingProjects),
+      foundedYear: Number(formData.foundedYear)
+    };
+
+    await updateDeveloper(id, dataToSend, config);
     setSnackbarMessage('Developer updated successfully!');
     setSnackbarOpen(true);
     setTimeout(() => navigate('/developers'), 1500);
@@ -291,14 +269,44 @@ const EditDeveloperPage = () => {
   }
 };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLogoPreview(URL.createObjectURL(file));
-      setLogoFile(file);
-    }
+  const handleLogoChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Create preview
+  const previewUrl = URL.createObjectURL(file);
+  setLogoPreview(previewUrl);
+
+  try {
+    setIsSubmitting(true);
+    
+    const formData = new FormData();
+    formData.append('logo', file); // Must match the field name in uploadSingle()
+
+    const response = await axios.put(
+      `/developers/${id}/logo`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+
+    setLogoPreview(response.data.data);
+    setSnackbarMessage('Logo updated successfully!');
+    setSnackbarOpen(true);
+  } catch (err) {
+    console.error('Logo upload error:', err);
+    setSnackbarMessage(err.response?.data?.error || 'Failed to upload logo');
+    setSnackbarOpen(true);
+    setLogoPreview(null);
+  } finally {
+    setIsSubmitting(false);
     if (logoInputRef.current) logoInputRef.current.value = '';
-  };
+  }
+};
 
   const handleTeamPhotoChange = (e) => {
     const files = Array.from(e.target.files).slice(0, 5); // Limit to 5 files
@@ -513,6 +521,7 @@ const EditDeveloperPage = () => {
                     label="Developer Name"
                     name="name"
                     value={formData.name}
+                    
                     onChange={handleChange}
                     required
                     size={isMobile ? 'small' : 'medium'}
