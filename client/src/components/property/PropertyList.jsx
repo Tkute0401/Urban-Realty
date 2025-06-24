@@ -624,8 +624,8 @@ const PropertyList = () => {
       {/* Page Title */}
       <div className="page-title fade-in-delay-2">
         <h1>
-          {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All '} <span className='highlight-words'>Properties</span>
-          <span>{filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : ''}</span>
+          {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All '}
+          <span>{filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : 'Properties'}</span>
         </h1>
         <div className="listings-count">
           {filteredProperties.length} LISTING{filteredProperties.length !== 1 ? 'S' : ''}
