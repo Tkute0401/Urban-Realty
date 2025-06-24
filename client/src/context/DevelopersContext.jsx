@@ -14,6 +14,7 @@ export const DevelopersProvider = ({ children }) => {
   const updateDeveloper = useCallback(async (id, formData, config) => {
     try {
       setLoading(true);
+      console.log(formData);
       const response = await axios.put(`/developers/${id}`, formData, config);
       // Update your state accordingly
       setDevelopers(prev => prev.map(dev => 
