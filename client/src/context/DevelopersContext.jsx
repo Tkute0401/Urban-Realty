@@ -9,25 +9,27 @@ export const DevelopersProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const clearErrors = () => setError(null);
-
+  
 
   const updateDeveloper = useCallback(async (id, formData, config) => {
-    try {
-      setLoading(true);
-      console.log(formData);
-      const response = await axios.put(`/developers/${id}`, formData, config);
-      // Update your state accordingly
-      setDevelopers(prev => prev.map(dev => 
-        dev._id === id ? response.data : dev
-      ));
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to update developer');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  try {
+    setLoading(true);
+    const response = await axios.put(
+      `/developers/${id}`,
+      formData,
+      config
+    );
+    console.log(response);
+    
+    getDevelopers();
+    return response.data;
+  } catch (err) {
+    setError(err.response?.data?.message || err.message || 'Failed to update developer');
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   const getDevelopers = useCallback(async () => {
     try {
@@ -44,10 +46,28 @@ export const DevelopersProvider = ({ children }) => {
     }
   }, []);
 
+  const getDeveloper = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(`/developers/${id}`);
+      console.log(response);
+      
+      setDevelopers(response.data.data || response.data);
+      console.log("developers:",developers);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to fetch developer');
+      setDevelopers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const contextValue = useMemo(() => ({
     developers,
     loading,
     error,
+    getDeveloper,
     updateDeveloper,
     clearErrors,
     getDevelopers

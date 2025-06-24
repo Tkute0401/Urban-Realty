@@ -1,7 +1,6 @@
 const express = require('express');
+const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
-const advancedResults = require('../middleware/advancedResults'); // Add this line
-const Developer = require('../models/Developer'); // Add this line
 const {
   getDevelopers,
   getDeveloper,
@@ -10,19 +9,28 @@ const {
   deleteDeveloper,
   uploadDeveloperLogo
 } = require('../controllers/developers');
+const upload = require('../middleware/multer');
+const advancedResults = require('../middleware/advancedResults');
+const Developer = require('../models/Developer');
 
-const router = express.Router();
-
-router.route('/')
-  .get(advancedResults(Developer), getDevelopers) // Add advancedResults middleware
+router
+  .route('/')
+  .get(advancedResults(Developer), getDevelopers)
   .post(protect, authorize('admin', 'agent'), createDeveloper);
-
-router.route('/:id')
+router
+  .route('/:id')
   .get(getDeveloper)
   .put(protect, authorize('admin', 'agent'), updateDeveloper)
   .delete(protect, authorize('admin'), deleteDeveloper);
 
-router.route('/:id/logo')
-  .put(protect, authorize('admin', 'agent'), uploadDeveloperLogo);
+// Logo upload route
+router
+  .route('/:id/logo')
+  .put(
+    protect,
+    authorize('admin', 'agent'),
+    upload.single('logo'), // 'logo' should match the field name in FormData
+    uploadDeveloperLogo
+  );
 
 module.exports = router;

@@ -36,9 +36,11 @@ const upload = multer({
   }
 });
 
+
 // Helper function to get upload middleware based on media type
 exports.getUploadMiddleware = (fieldName, maxCount = 10) => {
   return upload.array(fieldName, maxCount);
 };
+
 
 module.exports = upload;

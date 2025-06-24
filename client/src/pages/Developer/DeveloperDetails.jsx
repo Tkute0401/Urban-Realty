@@ -244,7 +244,7 @@ const DeveloperDetails = () => {
               
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <LocationOn sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                <Typography variant="body1">
+                <Typography variant="body1" sx={{ color: '#78CADC' }}>
                   {getHeadquarters()}
                 </Typography>
               </Box>
@@ -252,7 +252,7 @@ const DeveloperDetails = () => {
               {developer.foundedYear && (
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <CalendarToday sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
                     Established in {developer.foundedYear}
                   </Typography>
                 </Box>
@@ -274,7 +274,7 @@ const DeveloperDetails = () => {
               
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Business sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                <Typography variant="body1">
+                <Typography variant="body1" sx={{ color: '#78CADC' }}>
                   {formatNumber(developer.completedProjects || 0)} Completed Projects •{' '}
                   {formatNumber(developer.ongoingProjects || 0)} Ongoing •{' '}
                   {formatNumber(developer.upcomingProjects || 0)} Upcoming
@@ -403,7 +403,7 @@ const DeveloperDetails = () => {
                     <Typography variant="h6" sx={{ color: '#78CADC' }}>
                       Completed
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: '#78CADC'}}>
                       {formatNumber(developer.completedProjects || 0)}
                     </Typography>
                   </Paper>
@@ -414,7 +414,7 @@ const DeveloperDetails = () => {
                     <Typography variant="h6" sx={{ color: '#78CADC' }}>
                       Ongoing
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: '#78CADC'}}>
                       {formatNumber(developer.ongoingProjects || 0)}
                     </Typography>
                   </Paper>
@@ -425,7 +425,7 @@ const DeveloperDetails = () => {
                     <Typography variant="h6" sx={{ color: '#78CADC' }}>
                       Upcoming
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: '#78CADC'}}>
                       {formatNumber(developer.upcomingProjects || 0)}
                     </Typography>
                   </Paper>
@@ -450,7 +450,7 @@ const DeveloperDetails = () => {
                           <Typography variant="h6" sx={{ mb: 1, color: '#78CADC' }}>
                             {project.name}
                           </Typography>
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{ color: '#78CADC' }}>
                             {project.description}
                           </Typography>
                         </Paper>
@@ -533,7 +533,7 @@ const DeveloperDetails = () => {
                         <Typography variant="h6" sx={{ mb: 1, color: '#78CADC' }}>
                           {spec.name}
                         </Typography>
-                        <Typography variant="body2">
+                        <Typography variant="body2" sx={{ color: '#78CADC' }}>
                           {spec.description}
                         </Typography>
                       </Paper>
@@ -610,10 +610,8 @@ const DeveloperDetails = () => {
                             variant="outlined" 
                             href={developer.socialMedia.facebook} 
                             target="_blank"
-                            startIcon={<img src="/icons/facebook.svg" alt="Facebook" width={20} />}
-                          >
-                            Facebook
-                          </Button>
+                            startIcon={<img src="/icons/facebook.svg" alt="Facebook" width={90} alignItems="center" />}
+                          />
                         )}
                         
                         {developer.socialMedia?.twitter && (
@@ -621,10 +619,8 @@ const DeveloperDetails = () => {
                             variant="outlined" 
                             href={developer.socialMedia.twitter} 
                             target="_blank"
-                            startIcon={<img src="/icons/twitter.svg" alt="Twitter" width={20} />}
-                          >
-                            Twitter
-                          </Button>
+                            startIcon={<img src="/icons/twitter.svg" alt="Twitter" width={90} alignItems="center" />}
+                          />
                         )}
                         
                         {developer.socialMedia?.linkedin && (
@@ -632,10 +628,8 @@ const DeveloperDetails = () => {
                             variant="outlined" 
                             href={developer.socialMedia.linkedin} 
                             target="_blank"
-                            startIcon={<img src="/icons/linkedin.svg" alt="LinkedIn" width={20} />}
-                          >
-                            LinkedIn
-                          </Button>
+                            startIcon={<img src="/icons/linkedin.svg" alt="LinkedIn" width={90} alignItems="center" />}
+                          />
                         )}
                         
                         {developer.socialMedia?.instagram && (
@@ -643,10 +637,8 @@ const DeveloperDetails = () => {
                             variant="outlined" 
                             href={developer.socialMedia.instagram} 
                             target="_blank"
-                            startIcon={<img src="/icons/instagram.svg" alt="Instagram" width={20} />}
-                          >
-                            Instagram
-                          </Button>
+                            startIcon={<img src="/icons/instagram.svg" alt="Instagram" width={90} alignItems="center" />}
+                          />
                         )}
                       </Box>
                     </Paper>
@@ -676,7 +668,7 @@ const DeveloperDetails = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Founded
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
                     {developer.foundedYear || 'Not specified'}
                   </Typography>
                 </Box>
@@ -685,7 +677,7 @@ const DeveloperDetails = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Headquarters
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
                     {getHeadquarters() || 'Not specified'}
                   </Typography>
                 </Box>
@@ -694,7 +686,7 @@ const DeveloperDetails = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Total Projects
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
                     {formatNumber((developer.completedProjects || 0) + 
                      (developer.ongoingProjects || 0) + 
                      (developer.upcomingProjects || 0))}
@@ -706,7 +698,7 @@ const DeveloperDetails = () => {
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                       Awards
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ color: '#78CADC' }}>
                       {developer.awards.length} awards received
                     </Typography>
                   </Box>
