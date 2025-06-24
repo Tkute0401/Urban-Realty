@@ -237,35 +237,36 @@ const EditDeveloperPage = () => {
 
   try {
     const formDataToSend = new FormData();
+    formDataToSend.append(formData);
     
-    // Append all simple fields
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('description', formData.description);
-    formDataToSend.append('website', formData.website || '');
-    formDataToSend.append('foundedYear', formData.foundedYear || '');
+    // // Append all simple fields
+    // formDataToSend.append('name', formData.name);
+    // formDataToSend.append('description', formData.description);
+    // formDataToSend.append('website', formData.website || '');
+    // formDataToSend.append('foundedYear', formData.foundedYear || '');
     
-    // Append headquarters as JSON string
-    formDataToSend.append('headquarters', JSON.stringify(formData.headquarters));
+    // // Append headquarters as JSON string
+    // formDataToSend.append('headquarters', JSON.stringify(formData.headquarters));
     
-    // Append projects counts
-    formDataToSend.append('completedProjects', formData.completedProjects);
-    formDataToSend.append('ongoingProjects', formData.ongoingProjects);
-    formDataToSend.append('upcomingProjects', formData.upcomingProjects);
+    // // Append projects counts
+    // formDataToSend.append('completedProjects', formData.completedProjects);
+    // formDataToSend.append('ongoingProjects', formData.ongoingProjects);
+    // formDataToSend.append('upcomingProjects', formData.upcomingProjects);
     
-    // Append arrays as JSON strings
-    formDataToSend.append('flagshipProjects', JSON.stringify(formData.flagshipProjects));
-    formDataToSend.append('team', JSON.stringify(formData.team));
-    formDataToSend.append('specializations', JSON.stringify(formData.specializations));
+    // // Append arrays as JSON strings
+    // formDataToSend.append('flagshipProjects', JSON.stringify(formData.flagshipProjects));
+    // formDataToSend.append('team', JSON.stringify(formData.team));
+    // formDataToSend.append('specializations', JSON.stringify(formData.specializations));
     
-    // Append contact and social media as JSON strings
-    formDataToSend.append('contact', JSON.stringify(formData.contact));
-    formDataToSend.append('socialMedia', JSON.stringify(formData.socialMedia));
-    formDataToSend.append('awards', JSON.stringify(formData.awards));
+    // // Append contact and social media as JSON strings
+    // formDataToSend.append('contact', JSON.stringify(formData.contact));
+    // formDataToSend.append('socialMedia', JSON.stringify(formData.socialMedia));
+    // formDataToSend.append('awards', JSON.stringify(formData.awards));
 
-    // Append logo if exists
-    if (logoFile) {
-      formDataToSend.append('logo', logoFile);
-    }
+    // // Append logo if exists
+    // if (logoFile) {
+    //   formDataToSend.append('logo', logoFile);
+    // }
 
     const config = {
       headers: {
