@@ -32,15 +32,6 @@ const Home = () => {
         propertyType="Land"
       />
       <OwnerServiceBlock />
-      <div className="bg-[#0c0d0e]">
-        <Button 
-          variant="contained" 
-          className="bg-[#78cadc] text-[#0c0d0e] font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-[#8DD9E5] transition-colors shadow-lg text-sm sm:text-base"
-          onClick={() => window.location.href = "/developers"}
-        >
-          Developers
-        </Button>
-      </div>
       <Reviews />
     </div>
   );

@@ -14,8 +14,7 @@ const Footer = () => {
   ];
 
   const resources = [
-    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy-policy"}, { name: "Terms & Conditions", path: "/terms"}, 
-    "Licenses", "Sitemap", "Ad Choices", "Accessibility"
+    "Blog", "Guides", "FAQ", { name: "Help Center", path: "/help"}, { name: "Privacy Policy", path: "/privacy-policy"}, { name: "Terms & Conditions", path: "/terms"}, {name: "Developers", path: "/developers"}, "Licenses", "Sitemap", "Ad Choices", "Accessibility"
   ];
 
   const about = [

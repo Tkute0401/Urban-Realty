@@ -15,6 +15,11 @@ import {
 import './DeveloperList.css';
 
 const DeveloperList = () => {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   const { developers, loading, error, getDevelopers } = useDevelopers();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialLoad = useRef(true);
