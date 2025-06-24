@@ -124,7 +124,7 @@ const Reviews = () => {
               className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[#0c2327] rounded-xl border border-[#78cadc]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
             >
               <div className="w-full md:w-1/3 flex justify-center">
-                <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[#78cadc]/30 mt-16">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[#78cadc]/30 mt-2">
                   <img 
                     src={testimonial.image} 
                     alt={testimonial.name}
