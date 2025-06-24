@@ -516,7 +516,8 @@ const PropertyList = () => {
       
       {/* Desktop Navbar with search */}
       {!isMobile && (
-        <div className="Navbar">
+      <div className="Navbar">
+        <div className="navbar-content">
           <form onSubmit={handleSearchSubmit} className="search-container slide-in-left">
             <input 
               type="searchbar" 
@@ -528,56 +529,57 @@ const PropertyList = () => {
               <SearchIcon />
             </button>
           </form>
-          <div className="NavbarBtn slide-in-right">
-            <div className="BuyRentToggle">
-              <button 
-                id="AllBtn" 
-                className={`${filters.propertyType === 'ALL' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
-                onClick={() => handlePropertyTypeChange('ALL')}
-              >
-                ALL
-              </button>
-              <button 
-                id="BuyBtn" 
-                className={`${filters.propertyType === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
-                onClick={() => handlePropertyTypeChange('BUY')}
-              >
-                BUY
-              </button>
-              <button 
-                id="RentBtn" 
-                className={`${filters.propertyType === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
-                onClick={() => handlePropertyTypeChange('RENT')}
-              >
-                RENT
-              </button>
-            </div>
-            <div className="OtherNavbarBtn">
-              <HomeType 
-                onApply={handleHomeTypeFilter}
-                currentType={filters.type}
-              />
-              <PriceDropdown 
-                activeBtn={filters.propertyType === 'RENT' ? 'RENT' : 'BUY'} 
-                onApply={handlePriceFilter}
-                currentMin={filters.priceMin}
-                currentMax={filters.priceMax}
-              />
-              <BedBath 
-                onApply={handleBedBathFilter}
-                currentBedrooms={filters.bedrooms}
-                currentBathrooms={filters.bathrooms}
-              />
-              <More 
-                onApply={(moreFilters) => handleFilterChange(moreFilters)}
-                currentFilters={filters}
-                amenityOptions={amenityOptions}
-              />
-              <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
-            </div>
+          
+          <div className="BuyRentToggle">
+            <button 
+              id="AllBtn" 
+              className={`${filters.propertyType === 'ALL' ? 'bg-[#78cadc] text-black' : 'bg-[#08171A] text-white'}`} 
+              onClick={() => handlePropertyTypeChange('ALL')}
+            >
+              ALL
+            </button>
+            <button 
+              id="BuyBtn" 
+              className={`${filters.propertyType === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
+              onClick={() => handlePropertyTypeChange('BUY')}
+            >
+              BUY
+            </button>
+            <button 
+              id="RentBtn" 
+              className={`${filters.propertyType === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
+              onClick={() => handlePropertyTypeChange('RENT')}
+            >
+              RENT
+            </button>
+          </div>
+          
+          <div className="OtherNavbarBtn">
+            <HomeType 
+              onApply={handleHomeTypeFilter}
+              currentType={filters.type}
+            />
+            <PriceDropdown 
+              activeBtn={filters.propertyType === 'RENT' ? 'RENT' : 'BUY'} 
+              onApply={handlePriceFilter}
+              currentMin={filters.priceMin}
+              currentMax={filters.priceMax}
+            />
+            <BedBath 
+              onApply={handleBedBathFilter}
+              currentBedrooms={filters.bedrooms}
+              currentBathrooms={filters.bathrooms}
+            />
+            <More 
+              onApply={(moreFilters) => handleFilterChange(moreFilters)}
+              currentFilters={filters}
+              amenityOptions={amenityOptions}
+            />
+            <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* Mobile Filter Drawer */}
       {isMobile && (
@@ -622,8 +624,8 @@ const PropertyList = () => {
       {/* Page Title */}
       <div className="page-title fade-in-delay-2">
         <h1>
-          {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All '} <span className='highlight-words'>Properties</span>
-          <span>{filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : ''}</span>
+          {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All '}
+          <span>{filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : 'Properties'}</span>
         </h1>
         <div className="listings-count">
           {filteredProperties.length} LISTING{filteredProperties.length !== 1 ? 'S' : ''}
