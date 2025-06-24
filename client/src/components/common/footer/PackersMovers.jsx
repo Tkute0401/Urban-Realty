@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TruckIcon, CubeIcon, ShieldCheckIcon, HomeIcon, ClockIcon } from '@heroicons/react/24/outline';
+import ComingSoonPopup from './ComingSoonPopup';
 
 const PackersMovers = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  const [showPopup, setShowPopup] = useState(true);
   const services = [
     {
       icon: <CubeIcon className="w-8 h-8 text-[#78cadc]" />,
@@ -71,6 +73,9 @@ const PackersMovers = () => {
 
   return (
     <div className="bg-[#08171A] text-white min-h-screen">
+      {/* Coming soon popup */}
+      <ComingSoonPopup isOpen={showPopup} onClose={() => setShowPopup(false)} />
+        
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/30 z-10" />

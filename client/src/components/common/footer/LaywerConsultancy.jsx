@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ScaleIcon, DocumentTextIcon, ShieldCheckIcon, HomeIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
+import ComingSoonPopup from './ComingSoonPopup';
 
 const LawyerConsultancy = () => {
   useEffect(() => {
@@ -8,6 +9,7 @@ const LawyerConsultancy = () => {
   }, []);
 
   const [showForm, setShowForm] = useState(false);
+  const [showPopup, setShowPopup] = useState(true);
 
   const services = [
     {
@@ -61,6 +63,9 @@ const LawyerConsultancy = () => {
 
   return (
     <div className="bg-[#08171A] text-white min-h-screen">
+      {/* Coming soon popup */}
+      <ComingSoonPopup isOpen={showPopup} onClose={() => setShowPopup(false)} />
+        
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/30 z-10" />
