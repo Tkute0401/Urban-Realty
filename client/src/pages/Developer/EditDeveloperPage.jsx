@@ -275,9 +275,9 @@ const EditDeveloperPage = () => {
       }
     };
     console.log("formdata",formData);
-    console.log("formDataToSend",formDataToSend);
+    console.log("formDataToSend",JSON.stringify(formData));
 
-    const response = await axios.put(`/api/v1/developers/${id}`, formDataToSend, config);
+    const response = await axios.put(`/api/v1/developers/${id}`, JSON.stringify(formData), config);
     
     setSnackbarMessage('Developer updated successfully!');
     setSnackbarOpen(true);
