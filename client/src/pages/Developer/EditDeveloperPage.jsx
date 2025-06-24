@@ -237,7 +237,7 @@ const EditDeveloperPage = () => {
 
   try {
     const formDataToSend = new FormData();
-    formDataToSend.append(formData);
+    formDataToSend.append('data', JSON.stringify(formData));
     
     // // Append all simple fields
     // formDataToSend.append('name', formData.name);
