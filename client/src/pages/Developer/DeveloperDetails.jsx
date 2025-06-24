@@ -403,7 +403,7 @@ const DeveloperDetails = () => {
                     <Typography variant="h6" sx={{ color: '#78CADC' }}>
                       Completed
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: '#78CADC'}}>
+                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: 'white'}}>
                       {formatNumber(developer.completedProjects || 0)}
                     </Typography>
                   </Paper>
@@ -414,7 +414,7 @@ const DeveloperDetails = () => {
                     <Typography variant="h6" sx={{ color: '#78CADC' }}>
                       Ongoing
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: '#78CADC'}}>
+                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: 'white'}}>
                       {formatNumber(developer.ongoingProjects || 0)}
                     </Typography>
                   </Paper>
@@ -425,7 +425,7 @@ const DeveloperDetails = () => {
                     <Typography variant="h6" sx={{ color: '#78CADC' }}>
                       Upcoming
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: '#78CADC'}}>
+                    <Typography variant="h3" sx={{ fontWeight: 700  ,color: 'white'}}>
                       {formatNumber(developer.upcomingProjects || 0)}
                     </Typography>
                   </Paper>
@@ -450,7 +450,7 @@ const DeveloperDetails = () => {
                           <Typography variant="h6" sx={{ mb: 1, color: '#78CADC' }}>
                             {project.name}
                           </Typography>
-                          <Typography variant="body2" sx={{ color: '#78CADC' }}>
+                          <Typography variant="body2" sx={{ color: 'white' }}>
                             {project.description}
                           </Typography>
                         </Paper>
@@ -501,7 +501,7 @@ const DeveloperDetails = () => {
                           </Avatar>
                         )}
                         
-                        <Typography variant="h6" sx={{ mb: 1 }}>
+                        <Typography variant="h6" sx={{ mb: 1, color: 'white' }}>
                           {member.name}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 2, color: '#78CADC' }}>
@@ -533,7 +533,7 @@ const DeveloperDetails = () => {
                         <Typography variant="h6" sx={{ mb: 1, color: '#78CADC' }}>
                           {spec.name}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#78CADC' }}>
+                        <Typography variant="body2" sx={{ color: 'white' }}>
                           {spec.description}
                         </Typography>
                       </Paper>

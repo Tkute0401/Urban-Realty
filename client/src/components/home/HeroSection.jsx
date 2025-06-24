@@ -467,7 +467,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-full sm:w-56 bg-black/90 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-[9999] max-h-60 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-full sm:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-[9999] max-h-60 overflow-y-auto"
                       >
                         <div className="max-h-[200px] overflow-y-auto">
                           {filteredCities.length > 0 ? (
@@ -476,7 +476,7 @@ const HeroSection = () => {
                                 key={city}
                                 type="button"
                                 onClick={() => handleCitySelect(city)}
-                                className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white hover:bg-white/20 transition-colors ${selectedCity === city ? 'bg-[#78cadc]' : ''}`}
+                                className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white hover:bg-white/25 transition-colors ${selectedCity === city ? 'bg-[#78CADC]/65' : ''}`}
                               >
                                 {city}
                               </button>
