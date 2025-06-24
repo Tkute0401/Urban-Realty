@@ -75,7 +75,7 @@ exports.updateDeveloper = asyncHandler(async (req, res, next) => {
   //   req.body.awards = JSON.parse(req.body.awards);
   // }
 
-  const fieldsToUpdate = JSON.parse(req.body.data);
+  const fieldsToUpdate = JSON.parse(req.body);
 
   developer = await Developer.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
     new: true,
