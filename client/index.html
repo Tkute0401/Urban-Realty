@@ -4,10 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image" href="/vite.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./index.css" />
     <title>URBAN REALTY 360</title>
   </head>
   <body>
+    <!-- Splash Screen (updated with your brand logo) -->
+    <div id="splash-screen">
+      <div class="splash-content">
+        <img src="/vite.png" alt="UrbanRealty360" width="180" /> 
+        <div class="loader"></div>
+        <p>Loading...</p>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Add this script right before </body> -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const splash = document.getElementById('splash-screen');
+          splash.style.opacity = '0';
+          setTimeout(() => splash.remove(), 500); // Remove after fade-out
+        }, 2000); // Adjust time as needed (2000ms = 2 seconds)
+      });
+    </script>
   </body>
 </html>
