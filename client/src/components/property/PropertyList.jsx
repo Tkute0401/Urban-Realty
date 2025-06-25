@@ -760,6 +760,7 @@ const PropertyList = () => {
       {!isMobile && (
         <div className="map-container">
           <PropertiesMap 
+            
             properties={filteredProperties} 
             selectedProperty={selectedProperty}
             onMarkerClick={(property) => {
