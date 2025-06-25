@@ -71,6 +71,10 @@ const Properties = () => {
   const [loading, setLoading] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const amenityOptions = [
+    'Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 
+    'Security', 'Furnished', 'Fireplace', 'Elevator'
+  ];
 
   useEffect(() => {
     const handleResize = () => {
@@ -105,6 +109,13 @@ const Properties = () => {
 
   const toggleMobileMenu = () => {
     setShowMobileMenu(!showMobileMenu);
+  };
+
+  const handleMoreFiltersApply = (newFilters) => {
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters
+    }));
   };
 
   return (
@@ -150,7 +161,11 @@ const Properties = () => {
               <HomeType />
               <PriceDropdown activeBtn={activeBtn} />
               <BedBath />
-              <More />
+              <More
+                onApply={handleMoreFiltersApply} 
+                amenityOptions={amenityOptions}
+                currentFilters={filters}
+              />
               <button id="SaveBtn" className="btn-animate">SAVE SEARCH</button>
             </div>
           </div>

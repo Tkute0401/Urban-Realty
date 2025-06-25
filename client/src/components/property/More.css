@@ -156,6 +156,30 @@
   margin-top: -7px; /* Center the thumb vertically */
 }
 
+.filter-btn {
+  background-color: transparent;
+  border: 1px solid #444;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: #78CADC;
+  color: #78CADC;
+}
+
+.filter-btn.active-dropdown {
+  background-color: rgba(120, 202, 220, 0.1);
+  border-color: #78CADC;
+  color: #78CADC;
+}
+
 .more-dropdown .apply-filter-btn {
   position: absolute;
   bottom: 0;
