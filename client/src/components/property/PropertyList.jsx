@@ -11,7 +11,7 @@ import PropertiesMap from './PropertiesMap';
 import { 
   Add, Refresh, FilterAlt, KeyboardArrowDown, KeyboardArrowUp,
   ArrowBack, Close as CloseIcon, Search as SearchIcon, 
-  Clear as ClearIcon, Tune as TuneIcon 
+  Clear as ClearIcon, Tune as TuneIcon, AddLocationOutlined as LocationOn
 } from '@mui/icons-material';
 import BedBath from './BedBath';
 import HomeType from './HomeType';
@@ -36,6 +36,8 @@ const PropertyList = () => {
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
 
+  const [activeBtn, setActiveBtn] = useState('BUY');
+
   // Initialize filters from URL or defaults
   const [filters, setFilters] = useState(() => {
     const params = Object.fromEntries(searchParams.entries());
@@ -55,6 +57,16 @@ const PropertyList = () => {
     };
   });
 
+  const [showCityModal, setShowCityModal] = useState(false);
+  const [citySearchTerm, setCitySearchTerm] = useState('');
+  const [selectedCity, setSelectedCity] = useState('Nashik');
+
+  const cities = [
+    'Nashik', 'Mumbai', 'Bengaluru', 'Pune', 'Delhi', 'Noida', 'Gurgaon',
+    'Nabarangpur', 'Nadia', 'Nadiad', 'Nagaon', 'Nagapattinam', 'Nagarkurnool',
+    'Nagaur', 'Nagercoil', 'Nagpur', 'Nainital', 'Nalanda', 'Nalbari', 'Nalgonda'
+  ];
+
   const amenityOptions = [
     'Parking',
     'Swimming Pool',
@@ -70,6 +82,16 @@ const PropertyList = () => {
     'Laundry',
     'Storage'
   ];
+
+  const formatPrice = (price) => {
+    if (!price) return '₹0';
+    const num = typeof price === 'string' ? parseInt(price) : price;
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(num).replace('₹', '₹');
+  };
 
   // Fetch properties when filters change
   useEffect(() => {
@@ -110,6 +132,7 @@ const PropertyList = () => {
       ...prev,
       propertyType: newType
     }));
+    setActiveBtn(newType === 'RENT' ? 'RENT' : 'BUY');
     setPage(1);
     setSelectedProperty(null);
     
@@ -125,6 +148,13 @@ const PropertyList = () => {
     }));
     setPage(1);
     setSelectedProperty(null);
+  };
+
+  const handleCitySelect = (city) => {
+    setSelectedCity(city);
+    setShowCityModal(false);
+    // Might need to update the filter here??
+    handleFilterChange({ city });
   };
 
   const clearAllFilters = () => {
@@ -436,61 +466,63 @@ const PropertyList = () => {
     <div className={`main-container ${isLoaded ? 'fade-in-delay-1' : ''}`}>
       {/* Mobile Search and Filter Bar */}
       {isMobile && (
-        <div className="mobile-top-bar slide-in-left">
-          <div className={`mobile-search-container ${expandedSearch ? 'expanded' : ''}`}>
-            {expandedSearch ? (
-              <form onSubmit={handleSearchSubmit} className="mobile-search-form">
+      <div className="mobile-top-bar slide-in-left">
+        {/* Search Button/Input */}
+        <div className={`mobile-search-container ${expandedSearch ? 'expanded' : ''}`}>
+          {expandedSearch ? (
+            <form onSubmit={handleSearchSubmit} className="mobile-search-form">
+              <IconButton 
+                className="mobile-search-back" 
+                onClick={toggleSearch}
+                aria-label="Back"
+                sx={{ color: '#78CADC' }}
+              >
+                <ArrowBack />
+              </IconButton>
+              <input 
+                id="mobile-search-input"
+                type="text" 
+                placeholder="Search location..." 
+                value={filters.search} 
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className="mobile-search-input"
+              />
+              {filters.search && (
                 <IconButton 
-                  className="mobile-search-back" 
-                  onClick={toggleSearch}
-                  aria-label="Back"
+                  className="mobile-search-clear" 
+                  onClick={() => setFilters(prev => ({ ...prev, search: '' }))}
+                  aria-label="Clear search"
+                  sx={{ color: '#78CADC', position: 'absolute', right: 10 }}
                 >
-                  <ArrowBack />
+                  <ClearIcon fontSize="small" />
                 </IconButton>
-                <input 
-                  id="mobile-search-input"
-                  type="text" 
-                  placeholder="Search by location" 
-                  value={filters.search} 
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  className="mobile-search-input"
-                />
-                {filters.search && (
-                  <IconButton 
-                    className="mobile-search-clear" 
-                    onClick={() => setFilters(prev => ({ ...prev, search: '' }))}
-                    aria-label="Clear search"
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                )}
-                <IconButton 
-                  type="submit" 
-                  className="mobile-search-submit"
-                  aria-label="Search"
-                >
-                  <SearchIcon />
-                </IconButton>
-              </form>
-            ) : (
-              <button className="mobile-search-button" onClick={toggleSearch}>
-                <SearchIcon />
-                <span>Search</span>
-              </button>
-            )}
-          </div>
-          
-          <button 
-            className="mobile-filter-button"
-            onClick={() => setShowFiltersDrawer(true)}
-          >
-            <FilterAlt />
-            <span>Filter</span>
-            {activeFilterCount > 0 && (
-              <span className="filter-badge">{activeFilterCount}</span>
-            )}
-          </button>
-          
+              )}
+            </form>
+          ) : (
+            <button 
+              className="mobile-search-button" 
+              onClick={toggleSearch}
+              aria-label="Search"
+            >
+              <SearchIcon />
+            </button>
+          )}
+        </div>
+        
+        {/* Filter Button */}
+        <button 
+        className="mobile-filter-button"
+        onClick={() => setShowFiltersDrawer(true)}
+      >
+        <FilterAlt />
+        <span className="filter-text">Filter</span>
+        {activeFilterCount > 0 && (
+          <span className="filter-badge">{activeFilterCount}</span>
+        )}
+      </button>
+        
+        {/* Buy/Rent Toggle - Only show when search is not expanded */}
+        {!expandedSearch && (
           <div className="mobile-toggle-container">
             <button 
               className={`mobile-toggle-button ${filters.propertyType === 'ALL' ? 'active' : ''}`}
@@ -511,8 +543,9 @@ const PropertyList = () => {
               Rent
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+    )}
       
       {/* Desktop Navbar with search */}
       {!isMobile && (
@@ -583,24 +616,271 @@ const PropertyList = () => {
 
       {/* Mobile Filter Drawer */}
       {isMobile && (
-        <Drawer
-          anchor="bottom"
-          open={showFiltersDrawer}
-          onClose={() => setShowFiltersDrawer(false)}
-          className="mobile-filter-drawer"
-          sx={{
-            '& .MuiPaper-root': {
-              maxHeight: '90vh',
-              borderTopLeftRadius: '16px',
-              borderTopRightRadius: '16px',
-              backgroundColor: '#0B1011',
-              color: 'white',
-            }
-          }}
-        >
-          {filterDrawerContent}
-        </Drawer>
-      )}
+      <Drawer
+        anchor="bottom"
+        open={showFiltersDrawer}
+        onClose={() => setShowFiltersDrawer(false)}
+        className="mobile-filter-drawer"
+        sx={{
+          '& .MuiPaper-root': {
+            maxHeight: '90vh',
+            borderTopLeftRadius: '16px',
+            borderTopRightRadius: '16px',
+            backgroundColor: '#0B1011',
+            color: 'white',
+          }
+        }}
+      >
+        {/* Header with Back Button and City */}
+        <div className="mobile-drawer-header">
+          <div className="header-left">
+            <IconButton 
+              className="back-button" 
+              onClick={() => setShowFiltersDrawer(false)}
+              sx={{ color: '#78CADC' }}
+            >
+              <ArrowBack />
+            </IconButton>
+            <div className="mobile-drawer-title">Filters</div>
+          </div>
+          <div 
+            className="change-city"
+            onClick={() => setShowCityModal(true)}
+          >
+            <LocationOn fontSize="small" />
+            <span>{selectedCity}</span>
+            <span className="change-text">Change</span>
+          </div>
+        </div>
+
+        {/* Current City and Clear All */}
+        <div className="filter-status-bar">
+          <div className="searching-in">
+            Searching in <span className="city-name">{selectedCity}</span>
+          </div>
+          {activeFilterCount > 0 && (
+            <button 
+              className="clear-all-filters"
+              onClick={clearAllFilters}
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+
+        {/* Filter Sections - No Dropdowns */}
+        <div className="mobile-drawer-content">
+          {/* Home Type - Checkbox Grid */}
+          <div className="mobile-filter-section">
+            <div className="mobile-filter-section-title">Home Type</div>
+            <div className="checkbox-grid">
+              {['Houses', 'Condos/Co-ops', 'Townhomes', 'Multi-family', 'Manufactured', 'Lots/Land', 'Apartments'].map(type => {
+                const isActive = filters.type === type || 
+                                (type === 'Condos/Co-ops' && filters.type === 'Condo') ||
+                                (type === 'Multi-family' && filters.type === 'Apartment');
+                return (
+                  <label key={type} className={`checkbox-option ${isActive ? 'active' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={isActive}
+                      onChange={() => handleHomeTypeFilter(isActive ? '' : type)}
+                      className="hidden-checkbox"
+                    />
+                    <span className="custom-checkbox"></span>
+                    <span className="option-label">{type}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price Range - Slider Only */}
+          <div className="mobile-filter-section">
+            <div className="mobile-filter-section-title">Price Range</div>
+            <div className="price-slider-container">
+              <div className="slider-values">
+                <span>{filters.priceMin ? formatPrice(filters.priceMin) : formatPrice(0)}</span>
+                <span>to</span>
+                <span>
+                  {filters.priceMax 
+                    ? formatPrice(filters.priceMax) 
+                    : formatPrice(filters.propertyType === 'RENT' ? 150000 : 100000000)
+                  }
+                </span>
+              </div>
+              <div className="range-slider">
+                <input
+                  type="range"
+                  min={0}
+                  max={filters.propertyType === 'RENT' ? 150000 : 100000000}
+                  step={filters.propertyType === 'RENT' ? 1000 : 5000}
+                  value={filters.priceMin || 0}
+                  onChange={(e) => handleFilterChange({ priceMin: e.target.value })}
+                  className="slider"
+                />
+                <input
+                  type="range"
+                  min={0}
+                  max={filters.propertyType === 'RENT' ? 150000 : 100000000}
+                  step={filters.propertyType === 'RENT' ? 1000 : 5000}
+                  value={filters.priceMax || (filters.propertyType === 'RENT' ? 150000 : 100000000)}
+                  onChange={(e) => handleFilterChange({ priceMax: e.target.value })}
+                  className="slider"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Beds & Baths - Checkbox Grid */}
+          <div className="mobile-filter-section">
+            <div className="mobile-filter-section-title">Beds & Baths</div>
+            <div className="dual-column-grid">
+              <div className="column">
+                <div className="column-title">Bedrooms</div>
+                {['Any', '1+', '2+', '3+', '4+', '5+'].map(option => (
+                  <label key={`bed-${option}`} className={`checkbox-option ${filters.bedrooms === option || (option === 'Any' && !filters.bedrooms) ? 'active' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={filters.bedrooms === option || (option === 'Any' && !filters.bedrooms)}
+                      onChange={() => handleBedBathFilter(
+                        option === 'Any' ? '' : option,
+                        filters.bathrooms
+                      )}
+                      className="hidden-checkbox"
+                    />
+                    <span className="custom-checkbox"></span>
+                    <span className="option-label">{option}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="column">
+                <div className="column-title">Bathrooms</div>
+                {['Any', '1+', '1.5+', '2+', '3+', '4+'].map(option => (
+                  <label key={`bath-${option}`} className={`checkbox-option ${filters.bathrooms === option || (option === 'Any' && !filters.bathrooms) ? 'active' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={filters.bathrooms === option || (option === 'Any' && !filters.bathrooms)}
+                      onChange={() => handleBedBathFilter(
+                        filters.bedrooms,
+                        option === 'Any' ? '' : option
+                      )}
+                      className="hidden-checkbox"
+                    />
+                    <span className="custom-checkbox"></span>
+                    <span className="option-label">{option}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Amenities - Checkbox Grid */}
+          <div className="mobile-filter-section">
+            <div className="mobile-filter-section-title">Amenities</div>
+            <div className="checkbox-grid">
+              {amenityOptions.map(amenity => (
+                <label key={amenity} className={`checkbox-option ${filters.amenities.includes(amenity) ? 'active' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={filters.amenities.includes(amenity)}
+                    onChange={() => {
+                      const newAmenities = filters.amenities.includes(amenity)
+                        ? filters.amenities.filter(a => a !== amenity)
+                        : [...filters.amenities, amenity];
+                      handleFilterChange({ amenities: newAmenities });
+                    }}
+                    className="hidden-checkbox"
+                  />
+                  <span className="custom-checkbox"></span>
+                  <span className="option-label">{amenity}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mobile-drawer-footer">
+          <button 
+            className="view-properties-btn"
+            onClick={() => setShowFiltersDrawer(false)}
+          >
+            View {filteredProperties.length} Properties
+          </button>
+        </div>
+      </Drawer>
+    )}
+
+    {/* City Selection Modal */}
+    {showCityModal && (
+      <div className="city-modal">
+        <div className="city-modal-content">
+          <div className="city-modal-header">
+            <IconButton 
+              className="back-button" 
+              onClick={() => setShowCityModal(false)}
+              sx={{ color: '#78CADC' }}
+            >
+              <ArrowBack />
+            </IconButton>
+            <h3>Select City</h3>
+          </div>
+
+          <div className="city-search-container">
+            <SearchIcon className="search-icon" />
+            <input 
+              type="text" 
+              placeholder="Search for city..." 
+              className="city-search-input"
+              value={citySearchTerm}
+              onChange={(e) => setCitySearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="locate-me">
+            <LocationOn fontSize="small" />
+            <span>Locate me</span>
+          </div>
+
+          <div className="popular-cities-section">
+            <h4>Popular cities</h4>
+            <div className="popular-cities">
+              {['Mumbai', 'Bengaluru', 'Pune', 'Delhi', 'Noida', 'Gurgaon'].map(city => (
+                <div 
+                  key={city}
+                  className="city-chip"
+                  onClick={() => handleCitySelect(city)}
+                >
+                  {city}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="all-cities-section">
+            <h4>All Cities</h4>
+            <div className="city-alphabet-grid">
+              {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map(letter => (
+                <div key={letter} className="alphabet-column">
+                  <div className="alphabet-header">{letter}</div>
+                  {cities
+                    .filter(city => city.startsWith(letter))
+                    .map(city => (
+                      <div 
+                        key={city}
+                        className="city-name"
+                        onClick={() => handleCitySelect(city)}
+                      >
+                        {city}
+                      </div>
+                    ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
 
       {/* Breadcrumb - Hidden on smallest screens */}
       <div className={`breadcrumb fade-in-delay-1 ${isMobile ? 'mobile-breadcrumb' : ''}`}>
