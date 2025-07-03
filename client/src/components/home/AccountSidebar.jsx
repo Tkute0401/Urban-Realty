@@ -41,6 +41,33 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     
     return parts.join(', ');
   };
+  
+  useEffect(() => {
+    if (isOpen) {
+      // scroll will be disable when sidebar is open
+      document.body.style.overflow = 'hidden';
+      // For older browsers
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${window.scrollY}px`;
+      document.body.style.width = '100%';
+    } else {
+      // Enable scroll when sidebar is closed
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+
+    // Cleanup function to reset styles when component unmounts
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
 
   // Fetch favorite properties when user changes or sidebar opens
   useEffect(() => {
