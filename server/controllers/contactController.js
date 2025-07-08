@@ -9,10 +9,20 @@ const User = require('../models/User');
 // @route   POST /api/v1/properties/:propertyId/contact
 // @access  Private
 exports.createContactRequest = asyncHandler(async (req, res, next) => {
-  console.log('POST /api/v1/properties/:propertyId/contact', req.params);
-  //console.log('User:', req);
-  const property = await Property.findById(req.params.id);
-  
+  const property = await Property.findById(req.params.propertyId);
+
+  if(ContactRequest.findByPropertyAndUser(property._id, req.user.id)) {
+    this.updateContactRequest = asyncHandler(async (req, res, next) => {
+      const contactRequest = await ContactRequest.findByPropertyAndUser(property._id, req.user.id);
+      contactRequest.message = req.body.message;
+      await contactRequest.save();
+      res.status(201).json({
+        success: true,
+        data: contactRequest
+      });
+    })
+  }
+  else{  
   if (!property) {
     return next(
       new ErrorResponse(`Property not found with id of ${req.params.propertyId}`, 404)
@@ -26,16 +36,15 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Invalid contact method. Must be one of: ${validMethods.join(', ')}`, 400)
     );
   }
-  
 
-  // Create contact request
-  
+  // Create contact request - duplicates allowed
   const contactRequest = await ContactRequest.create({
     property: property._id,
     agent: property.agent,
     user: req.user.id,
     message: req.body.message || `Contact request via ${req.body.contactMethod}`,
-    contactMethod: req.body.contactMethod
+    contactMethod: req.body.contactMethod,
+    status: 'pending'
   });
 
   // Populate the response
@@ -46,8 +55,10 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     data: contactRequest
-  });
+  });}
 });
+
+
 // @desc    Get contact requests for agent
 // @route   GET /api/v1/contacts
 // @access  Private/Agent
