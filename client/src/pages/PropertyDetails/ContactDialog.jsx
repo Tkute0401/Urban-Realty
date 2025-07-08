@@ -32,12 +32,12 @@ const ContactDialog = ({
 
     try {
       setContactLoading(true);
-      const response = await axios.post(`/api/v1/properties/${property._id}/contact`, {
+      const response = await axios.post(`/properties/${property._id}/contact`, {
         contactMethod,
         message
       });
 
-      setContactSuccess(true);
+      
       
       // Handle different contact methods
       if (contactMethod === 'whatsapp') {
@@ -45,6 +45,7 @@ const ContactDialog = ({
         const phoneNumber = property.agent?.mobile || property.agent?.phone;
         if (phoneNumber) {
           const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+          console.log('WhatsApp URL:', whatsappUrl);
           window.open(whatsappUrl, '_blank');
         }
       } else if (contactMethod === 'phone') {
@@ -54,6 +55,7 @@ const ContactDialog = ({
           window.open(`tel:${phoneNumber}`);
         }
       }
+      setContactSuccess(true);
       
       toast.success('Contact request sent successfully!');
     } catch (err) {

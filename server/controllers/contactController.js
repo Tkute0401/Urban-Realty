@@ -9,7 +9,9 @@ const User = require('../models/User');
 // @route   POST /api/v1/properties/:propertyId/contact
 // @access  Private
 exports.createContactRequest = asyncHandler(async (req, res, next) => {
-  const property = await Property.findById(req.params.propertyId);
+  console.log('POST /api/v1/properties/:propertyId/contact', req.params);
+  //console.log('User:', req);
+  const property = await Property.findById(req.params.id);
   
   if (!property) {
     return next(
@@ -24,8 +26,10 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`Invalid contact method. Must be one of: ${validMethods.join(', ')}`, 400)
     );
   }
+  
 
   // Create contact request
+  
   const contactRequest = await ContactRequest.create({
     property: property._id,
     agent: property.agent,
