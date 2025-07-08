@@ -75,7 +75,7 @@ const PropertyDetails = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
   const [contactOpen, setContactOpen] = useState(false);
-  const [contactMethod, setContactMethod] = useState('message');
+  const [contactMethod, setContactMethod] = useState('email');
   const [message, setMessage] = useState('');
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
@@ -402,15 +402,21 @@ const PropertyDetails = () => {
 
       <ContactDialog 
         open={contactOpen}
-        onClose={() => setContactOpen(false)}
+        onClose={() => {
+          setContactOpen(false);
+          setContactSuccess(false);
+          setContactMethod('email');
+        }}
         contactMethod={contactMethod}
         setContactMethod={setContactMethod}
         message={message}
         setMessage={setMessage}
         contactLoading={contactLoading}
+        setContactLoading={setContactLoading}
         contactSuccess={contactSuccess}
-        handleContactSubmit={handleContactSubmit}
+        setContactSuccess={setContactSuccess}
         property={property}
+        user={user}
       />
     </Box>
   );

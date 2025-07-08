@@ -2,6 +2,8 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Alert, TextF
 import { Phone, WhatsApp, Email } from '@mui/icons-material';
 import PremiumButton from './PremiumButton';
 import { CircularProgress } from '@mui/material';
+import axios from '../../services/axios';
+import { toast } from 'react-toastify';
 
 const ContactDialog = ({
   open,
@@ -11,9 +13,58 @@ const ContactDialog = ({
   message,
   setMessage,
   contactLoading,
+  setContactLoading,
   contactSuccess,
-  handleContactSubmit
+  setContactSuccess,
+  property,
+  user
 }) => {
+  const handleContactSubmit = async () => {
+    if (!property || !property._id) {
+      toast.error('Property information is missing');
+      return;
+    }
+
+    if ((contactMethod === 'email' || contactMethod === 'whatsapp') && !message.trim()) {
+      toast.error('Please enter a message');
+      return;
+    }
+
+    try {
+      setContactLoading(true);
+      
+      const response = await axios.post(`/api/v1/contacts/property/${property._id}`, {
+        contactMethod,
+        message
+      });
+
+      setContactSuccess(true);
+      
+      // Handle different contact methods
+      if (contactMethod === 'whatsapp') {
+        // Open WhatsApp with the message
+        const phoneNumber = property.agent?.mobile || property.agent?.phone;
+        if (phoneNumber) {
+          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+          window.open(whatsappUrl, '_blank');
+        }
+      } else if (contactMethod === 'phone') {
+        // Initiate phone call
+        const phoneNumber = property.agent?.mobile || property.agent?.phone;
+        if (phoneNumber) {
+          window.open(`tel:${phoneNumber}`);
+        }
+      }
+      
+      toast.success('Contact request sent successfully!');
+    } catch (err) {
+      console.error('Error sending contact request:', err);
+      toast.error(err.response?.data?.message || 'Failed to send contact request');
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -47,6 +98,14 @@ const ContactDialog = ({
             border: '1px solid rgba(46, 125, 50, 0.5)'
           }}>
             Your contact request has been sent successfully!
+          </Alert>
+        ) : !user ? (
+          <Alert severity="warning" sx={{ 
+            mb: 3,
+            backgroundColor: 'rgba(255, 152, 0, 0.2)',
+            border: '1px solid rgba(255, 152, 0, 0.5)'
+          }}>
+            Please login to contact the agent.
           </Alert>
         ) : (
           <>
@@ -163,7 +222,7 @@ const ContactDialog = ({
         >
           {contactSuccess ? 'Close' : 'Cancel'}
         </Button>
-        {!contactSuccess && (
+        {!contactSuccess && user && (
           <PremiumButton 
             onClick={handleContactSubmit} 
             disabled={contactLoading || ((contactMethod === 'email' || contactMethod === 'whatsapp') && !message.trim())}
