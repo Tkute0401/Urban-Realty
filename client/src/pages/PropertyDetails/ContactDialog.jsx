@@ -32,8 +32,7 @@ const ContactDialog = ({
 
     try {
       setContactLoading(true);
-      
-      const response = await axios.post(`/api/v1/contacts/property/${property._id}`, {
+      const response = await axios.post(`/api/v1/properties/${property._id}/contact`, {
         contactMethod,
         message
       });
