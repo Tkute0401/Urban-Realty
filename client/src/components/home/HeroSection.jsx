@@ -14,6 +14,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import AccountSidebar from './AccountSidebar';
 import { useProperties } from '../../context/PropertiesContext';
+
 const HeroSection = () => {
   const [searchText, setSearchText] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -37,7 +38,7 @@ const HeroSection = () => {
   useEffect(() => {
     getProperties();
   }, []);
-  // Get unique cities from properties data
+
   const getAvailableCities = () => {
     if (!properties || properties.length === 0) return [];
     
@@ -53,12 +54,10 @@ const HeroSection = () => {
 
   const availableCities = getAvailableCities();
 
-  // Filter cities based on search query
   const filteredCities = availableCities.filter(city =>
     city.toLowerCase().includes(citySearchQuery.toLowerCase())
   );
 
-  // Get localities for the selected city from properties
   const getLocalitiesForCity = () => {
     if (!properties || properties.length === 0 || !selectedCity) return [];
     
@@ -75,11 +74,9 @@ const HeroSection = () => {
   const currentCityLocalities = getLocalitiesForCity();
 
   useEffect(() => {
-    // Initialize from URL params if they exist
     const params = Object.fromEntries(searchParams.entries());
     if (params.search) setSearchText(params.search);
     if (params.city) {
-      // Only set city if it exists in available cities
       if (availableCities.includes(params.city)) {
         setSelectedCity(params.city);
       }
@@ -105,7 +102,6 @@ const HeroSection = () => {
     return () => window.removeEventListener('resize', updateVisibleCount);
   }, [searchParams, availableCities]);
 
-  // Set default city if none selected but cities are available
   useEffect(() => {
     if (!selectedCity && availableCities.length > 0) {
       setSelectedCity(availableCities[0]);
@@ -159,7 +155,7 @@ const HeroSection = () => {
   const visibleLocalities = currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount);
 
   return (
-    <section className="h-[70vh] sm:h-screen relative flex items-center justify-center overflow-visible z-0">
+    <section className="relative h-[70vh] sm:h-screen flex items-center justify-center overflow-visible z-0">
       {/* Background image */}
       <div className="absolute inset-0">
         <img 
@@ -171,32 +167,32 @@ const HeroSection = () => {
       </div>
 
       {/* Main content container */}
-      <div className="absolute inset-x-4 sm:inset-x-8 top-4 bottom-16 rounded-3xl sm:mx-4 md:mx-8 lg:mx-16 xl:mx-32 2xl:mx-40 overflow-hidden transition-all duration-300">
+      <div className="absolute inset-x-4 sm:inset-x-8 top-4 bottom-16 rounded-3xl sm:mx-4 md:mx-8 lg:mx-8 xl:mx-16 2xl:mx-20 overflow-hidden transition-all duration-300">
         <div className="absolute inset-0 bg-white/10 backdrop-blur-sm overflow-hidden border border-white/30"></div>
         
-        <div className="relative w-full h-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col">
+        <div className="relative w-full h-full max-w-7xl mx-auto px-4 sm:px-4 md:px-6 py-4 sm:py-6 flex flex-col">
           {/* Navbar */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
               <img 
                 src="/vite.png" 
                 alt="Logo" 
-                className="w-12 sm:w-16 md:w-20 h-12 sm:h-16 md:h-20 hover:scale-105 transition-transform duration-300" 
+                className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 hover:scale-105 transition-transform duration-300" 
               />
             </div>
 
-            <nav className="hidden lg:flex gap-4 xl:gap-6 2xl:gap-8">
+            <nav className="hidden lg:flex gap-2 xl:gap-4 2xl:gap-6">
               {navigation.map((item) => (
                 <div key={item.name} className="relative group">
                   <button
                     onClick={() => toggleDropdown(item.name)}
-                    className="flex items-center gap-1 font-poppins text-sm sm:text-base xl:text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-300"
+                    className="flex items-center gap-1 font-poppins text-sm sm:text-sm md:text-base xl:text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-300"
                   >
                     {item.name}
                     {activeDropdown === item.name ? (
-                      <ChevronUpIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <ChevronUpIcon className="w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4" />
                     ) : (
-                      <ChevronDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <ChevronDownIcon className="w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4" />
                     )}
                   </button>
 
@@ -207,13 +203,13 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-2 w-40 sm:w-48 bg-white/90 backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-50"
+                        className="absolute left-0 top-full mt-2 w-36 sm:w-40 md:w-48 bg-white/90 backdrop-blur-md rounded-xl shadow-xl overflow-hidden z-50"
                       >
                         {item.items.map((subItem) => (
                           <a
                             key={subItem}
                             href="#"
-                            className="block px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-gray-800 hover:bg-[#78cadc]/10 hover:text-[#08171A] transition-colors duration-200 border-b border-white/10 last:border-0"
+                            className="block px-3 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 text-xs sm:text-sm md:text-base text-gray-800 hover:bg-[#78cadc]/10 hover:text-[#08171A] transition-colors duration-200 border-b border-white/10 last:border-0"
                           >
                             {subItem}
                           </a>
@@ -225,23 +221,23 @@ const HeroSection = () => {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
               <button 
                 onClick={() => setIsAccountSidebarOpen(true)} 
-                className="hidden lg:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors duration-300 text-sm sm:text-base"
+                className="hidden lg:flex items-center gap-1 sm:gap-1 md:gap-2 px-2 sm:px-2 md:px-3 py-1 sm:py-1 md:py-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors duration-300 text-xs sm:text-sm md:text-base"
               >
-                <UserIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                <UserIcon className="w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4" />
                 <span className="font-poppins font-semibold">ACCOUNT</span>
               </button>
 
               <button 
-                className="lg:hidden p-1 sm:p-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-300"
+                className="lg:hidden p-1 sm:p-1.5 text-white hover:bg-white/10 rounded-lg transition-colors duration-300"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
-                  <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <XMarkIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <Bars3Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <Bars3Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </button>
             </div>
@@ -249,20 +245,21 @@ const HeroSection = () => {
 
           {/* Main content */}
           <div className="flex-1 flex flex-col justify-center">
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-              <div className="text-center mb-2 sm:mb-4 md:mb-6">
-                <h1 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight font-bold mb-1 sm:mb-8 text-white">
+            <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
+              <div className="text-center mb-2 sm:mb-3 md:mb-4 lg:mb-6">
+                <h1 className="font-poppins text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight font-bold mb-1 sm:mb-2 md:mb-4 lg:mb-6 text-white">
                   Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
-                </h1><br/>
+                </h1>
+                <br/>
                 
-                <p className="text-white mb-2 sm:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-lg md:text-base">
+                <p className="text-white mb-2 sm:mb-3 md:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-sm md:text-base">
                   Discover your dream property from our extensive collection of 
                   homes, apartments, and commercial spaces across the country.
                 </p>
               </div>
 
-              <div className="flex items-center justify-between mb-30 sm:mt-20 md:mb-16 lg:mb-30">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
+              <div className="flex items-center justify-between mb-4 sm:mb-8 md:mb-12 lg:mb-16">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
                   <img 
                     src="/building_1.jpg" 
                     alt="Map view" 
@@ -271,11 +268,11 @@ const HeroSection = () => {
                   />
                 </div>
 
-                <div className="bg-white/0 p-1 sm:p-2 rounded-xl">
+                <div className="bg-white/0 p-1 sm:p-1.5 rounded-xl">
                   <div className="flex flex-col items-end">
                     <div className="flex gap-1 items-center">
-                      <span className="text-yellow-400 text-lg sm:text-xl md:text-2xl lg:text-3xl">★</span>
-                      <span className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">4.9</span>
+                      <span className="text-yellow-400 text-base sm:text-lg md:text-xl lg:text-2xl">★</span>
+                      <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
                     </div>
                     <span className="text-[0.5rem] sm:text-xs font-poppins text-gray-300 text-right mt-0.5">
                       FROM 6,900+ CUSTOMERS
@@ -296,20 +293,20 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-20 sm:top-24 left-4 right-4 z-[9997] bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
+            className="fixed top-16 sm:top-20 left-4 right-4 z-[9997] bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
           >
-            <div className="flex flex-col p-3 sm:p-4">
+            <div className="flex flex-col p-2 sm:p-3 md:p-4">
               {navigation.map((item) => (
-                <div key={item.name} className="mb-1 sm:mb-2 last:mb-0">
+                <div key={item.name} className="mb-1 sm:mb-1.5 last:mb-0">
                   <button
                     onClick={() => toggleMobileDropdown(item.name)}
-                    className="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 text-white hover:bg-white/10 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+                    className="w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-200 text-xs sm:text-sm"
                   >
                     <span className="font-poppins font-medium">{item.name}</span>
                     {mobileActiveDropdown === item.name ? (
-                      <ChevronUpIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <ChevronUpIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                     ) : (
-                      <ChevronDownIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <ChevronDownIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
                   </button>
 
@@ -322,12 +319,12 @@ const HeroSection = () => {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="pl-3 sm:pl-4 py-1 sm:py-2">
+                        <div className="pl-2 sm:pl-3 py-1 sm:py-1.5">
                           {item.items.map((subItem) => (
                             <a
                               key={subItem}
                               href="#"
-                              className="block px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200"
+                              className="block px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200"
                             >
                               {subItem}
                             </a>
@@ -343,9 +340,9 @@ const HeroSection = () => {
                   setIsAccountSidebarOpen(true);
                   setIsMenuOpen(false);
                 }} 
-                className="lg:hidden flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-3 mt-1 sm:mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-sm sm:text-base"
+                className="lg:hidden flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 mt-1 sm:mt-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-xs sm:text-sm"
               >
-                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <UserIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="font-poppins font-semibold">ACCOUNT</span>
               </button>
             </div>
@@ -353,19 +350,19 @@ const HeroSection = () => {
         )}
       </AnimatePresence>
       
-      {/* Search and filter bar - Only size adjustments */}
-      <div className="absolute bottom-20 left-0 right-0 flex flex-col items-center z-[100] px-4 sm:px-6 lg:px-10 gap-3 sm:gap-4 transform translate-y-1/2">
-        {/* Popular localities with scrolling - Only size adjusted */}
+      {/* Search and filter bar */}
+      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center z-[100] px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2">
+        {/* Popular localities with scrolling */}
         {selectedCity && currentCityLocalities.length > 0 && (
           <div className="w-full max-w-2xl">          
-            <div className="flex items-center justify-center gap-1 sm:gap-2 text-white/80 mb-2 sm:mb-3 flex-wrap">
+            <div className="flex items-center justify-center gap-1 sm:gap-1.5 text-white/80 mb-1 sm:mb-2 md:mb-3 flex-wrap">
               <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
                 Popular Localities in {selectedCity}:
               </span>
-              <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
+              <div className="flex items-center gap-1 sm:gap-1.5 overflow-hidden">
                 <div 
                   ref={localitiesContainerRef}
-                  className="flex gap-1 sm:gap-2 transition-transform duration-500 ease-in-out"
+                  className="flex gap-1 sm:gap-1.5 transition-transform duration-500 ease-in-out"
                 >
                   <AnimatePresence mode="wait">
                     {visibleLocalities.map((locality, index) => (
@@ -396,11 +393,11 @@ const HeroSection = () => {
                 {currentCityLocalities.length > visibleLocalitiesCount && (
                   <motion.button
                     onClick={handleNextLocalities}
-                    className="p-1 sm:p-1.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 flex-shrink-0"
+                    className="p-1 sm:p-1 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 flex-shrink-0"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <ChevronRightIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <ChevronRightIcon className="w-3 h-3 sm:w-3 sm:h-3" />
                   </motion.button>
                 )}
               </div>
@@ -408,14 +405,14 @@ const HeroSection = () => {
           </div>
         )}
 
-        {/* Main search container - Only size adjustments */}
-        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
-          {/* Property type tabs - Only size adjusted */}
-          <div className="flex gap-0 mb-1 sm:mb-2 rounded-xl p-1">
+        {/* Main search container */}
+        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
+          {/* Property type tabs */}
+          <div className="flex gap-0 mb-1 sm:mb-1.5 rounded-lg sm:rounded-xl p-1">
             {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
               <button
                 key={tab}
-                className={`relative flex-1 px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-300 overflow-hidden ${
+                className={`relative flex-1 px-1 sm:px-2 py-1 text-xs sm:text-sm font-medium rounded-md sm:rounded-lg transition-all duration-300 overflow-hidden ${
                   selectedTab === tab 
                     ? 'text-white' 
                     : 'text-white/80 hover:text-white'
@@ -443,21 +440,21 @@ const HeroSection = () => {
 
           {/* Search input section */}
           <div className="relative">
-            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-xl overflow-visible border border-white/20 max-h-10 sm:max-h-12">
+            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-visible border border-white/20 max-h-8 sm:max-h-10 md:max-h-12">
               {/* City dropdown */}
               {availableCities.length > 0 && (
-                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-10 sm:max-h-12" style={{ zIndex: 9000 }}>
+                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12" style={{ zIndex: 9000 }}>
                   <button
                     type="button"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}
-                    className="flex items-center gap-1 px-2 sm:px-3 py-2 text-white transition-colors min-w-[90px] sm:min-w-[120px]"
+                    className="flex items-center gap-1 px-1 sm:px-2 py-1 text-white transition-colors min-w-[80px] sm:min-w-[100px] md:min-w-[120px]"
                     disabled={propertiesLoading}
                   >
-                    <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
+                    <MapPinIcon className="w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4 text-white/70" />
                     <span className="text-xs sm:text-sm font-medium truncate">
                       {propertiesLoading ? 'Loading...' : selectedCity || 'Select city'}
                     </span>
-                    <ChevronDownIcon className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 transition-transform flex-shrink-0 ${showCityDropdown ? 'rotate-180' : ''}`} />
+                    <ChevronDownIcon className={`w-3 h-3 sm:w-3 sm:h-3 md:w-4 md:h-4 text-white/70 transition-transform flex-shrink-0 ${showCityDropdown ? 'rotate-180' : ''}`} />
                   </button>
                   
                   <AnimatePresence>
@@ -467,7 +464,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-full sm:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-[9999] max-h-60 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-full sm:w-48 md:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-[9999] max-h-48 md:max-h-60 overflow-y-auto"
                       >
                         <div className="max-h-[200px] overflow-y-auto">
                           {filteredCities.length > 0 ? (
@@ -476,13 +473,13 @@ const HeroSection = () => {
                                 key={city}
                                 type="button"
                                 onClick={() => handleCitySelect(city)}
-                                className={`block w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-white hover:bg-white/25 transition-colors ${selectedCity === city ? 'bg-[#78CADC]/65' : ''}`}
+                                className={`block w-full text-left px-2 sm:px-3 py-1 sm:py-1.5 md:py-2 text-xs sm:text-sm text-white hover:bg-white/25 transition-colors ${selectedCity === city ? 'bg-[#78CADC]/65' : ''}`}
                               >
                                 {city}
                               </button>
                             ))
                           ) : (
-                            <div className="px-3 py-2 text-xs sm:text-sm text-gray-500 text-center">
+                            <div className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-gray-500 text-center">
                               No cities found
                             </div>
                           )}
@@ -494,7 +491,7 @@ const HeroSection = () => {
               )}
               
               {/* Search input */}
-              <div className="flex-1 flex items-center px-2 sm:px-3 py-2 min-w-0">
+              <div className="flex-1 flex items-center px-1 sm:px-2 py-1 min-w-0">
                 <input
                   type="text"
                   value={searchText}
@@ -510,10 +507,10 @@ const HeroSection = () => {
               {/* Search button */}
               <button
                 type="submit"
-                className="flex-shrink-0 hover:bg-white/20 text-white p-1 sm:p-2 transition-colors rounded-lg mr-1"
+                className="flex-shrink-0 hover:bg-white/20 text-white p-1 sm:p-1.5 transition-colors rounded-lg mr-0.5 sm:mr-1"
                 disabled={propertiesLoading}
               >
-                <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <MagnifyingGlassIcon className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </form>
           </div>
@@ -527,7 +524,7 @@ const HeroSection = () => {
       />
 
       {/* Gradient overlay at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-b from-transparent to-[#08171A] pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-full h-8 sm:h-10 bg-gradient-to-b from-transparent to-[#08171A] pointer-events-none"></div>
     </section>
   );
 };
