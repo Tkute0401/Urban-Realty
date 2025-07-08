@@ -9,23 +9,22 @@ const User = require('../models/User');
 // @route   POST /api/v1/properties/:propertyId/contact
 // @access  Private
 exports.createContactRequest = asyncHandler(async (req, res, next) => {
-  const property = await Property.findById(req.params.propertyId);
+  const property = await Property.findById(req.params.id);
 
-  if(ContactRequest.findByPropertyAndUser(property._id, req.user.id)) {
-    this.updateContactRequest = asyncHandler(async (req, res, next) => {
-      const contactRequest = await ContactRequest.findByPropertyAndUser(property._id, req.user.id);
-      contactRequest.message = req.body.message;
-      await contactRequest.save();
-      res.status(201).json({
-        success: true,
-        data: contactRequest
-      });
-    })
-  }
-  else{  
   if (!property) {
     return next(
-      new ErrorResponse(`Property not found with id of ${req.params.propertyId}`, 404)
+      new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
+    );
+  }
+   const duplicateCriteria = {
+    property: property._id,
+    agent: property.agent,
+    user: req.user.id,
+    // optionally add: message
+  };
+  if(ContactRequest.find(duplicateCriteria)){
+    return next(
+      new ErrorResponse(`You have already made a contact request for this property`, 400)
     );
   }
 
@@ -55,7 +54,7 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     data: contactRequest
-  });}
+  });
 });
 
 
@@ -94,6 +93,7 @@ exports.getAgentContactRequests = asyncHandler(async (req, res, next) => {
 // @access  Private/Agent
 exports.updateContactRequest = asyncHandler(async (req, res, next) => {
   let contactRequest = await ContactRequest.findById(req.params.id);
+  console.log("Doin it here",contactRequest);
 
   if (!contactRequest) {
     return next(
