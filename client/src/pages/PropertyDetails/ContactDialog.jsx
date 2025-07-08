@@ -20,51 +20,71 @@ const ContactDialog = ({
   user
 }) => {
   const handleContactSubmit = async () => {
-    if (!property || !property._id) {
-      toast.error('Property information is missing');
-      return;
-    }
+  if (!property || !property._id) {
+    toast.error('Property information is missing');
+    return;
+  }
 
-    if ((contactMethod === 'email' || contactMethod === 'whatsapp') && !message.trim()) {
-      toast.error('Please enter a message');
-      return;
-    }
+  if ((contactMethod === 'email' || contactMethod === 'whatsapp') && !message.trim()) {
+    toast.error('Please enter a message');
+    return;
+  }
 
-    try {
-      setContactLoading(true);
-      const response = await axios.post(`/properties/${property._id}/contact`, {
-        contactMethod,
-        message
-      });
+  try {
+    setContactLoading(true);
+    
+    // First make the API request
+    const response = await axios.post(`/properties/${property._id}/contact`, {
+      contactMethod,
+      message
+    });
 
-      
-      
-      // Handle different contact methods
-      if (contactMethod === 'whatsapp') {
-        // Open WhatsApp with the message
-        const phoneNumber = property.agent?.mobile || property.agent?.phone;
-        if (phoneNumber) {
-          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-          console.log('WhatsApp URL:', whatsappUrl);
-          window.open(whatsappUrl, '_blank');
-        }
-      } else if (contactMethod === 'phone') {
-        // Initiate phone call
-        const phoneNumber = property.agent?.mobile || property.agent?.phone;
-        if (phoneNumber) {
-          window.open(`tel:${phoneNumber}`);
-        }
+    // Then handle the contact method
+    if (contactMethod === 'whatsapp') {
+      const phoneNumber = property.agent?.mobile || property.agent?.phone;
+      if (phoneNumber) {
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
       }
-      setContactSuccess(true);
-      
-      toast.success('Contact request sent successfully!');
-    } catch (err) {
-      console.error('Error sending contact request:', err);
-      toast.error(err.response?.data?.message || 'Failed to send contact request');
-    } finally {
-      setContactLoading(false);
+    } else if (contactMethod === 'phone') {
+      const phoneNumber = property.agent?.mobile || property.agent?.phone;
+      if (phoneNumber) {
+        window.open(`tel:${phoneNumber}`);
+      }
     }
-  };
+    
+    setContactSuccess(true);
+    toast.success('Contact request sent successfully!');
+  } catch (err) {
+    console.error('Error sending contact request:', err);
+    
+    // More specific error handling
+    if (err.response) {
+      if (err.response.status === 400 && err.response.data.error === 'Duplicate field value entered') {
+        // Even if it's a "duplicate", proceed with the contact method
+        if (contactMethod === 'whatsapp') {
+          const phoneNumber = property.agent?.mobile || property.agent?.phone;
+          if (phoneNumber) {
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+          }
+        } else if (contactMethod === 'phone') {
+          const phoneNumber = property.agent?.mobile || property.agent?.phone;
+          if (phoneNumber) {
+            window.open(`tel:${phoneNumber}`);
+          }
+        }
+        setContactSuccess(true);
+        toast.success('Contact initiated successfully!');
+        return;
+      }
+    }
+    
+    toast.error(err.response?.data?.message || 'Failed to send contact request');
+  } finally {
+    setContactLoading(false);
+  }
+};
 
   return (
     <Dialog 

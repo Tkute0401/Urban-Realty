@@ -46,7 +46,12 @@ const ContactRequestSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  reason: {
+  type: String,
+  enum: ['initial', 'followup', 'question', 'viewing', 'other'],
+  default: 'initial'
+},
 });
 
 // Remove the unique index to allow multiple requests
