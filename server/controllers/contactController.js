@@ -8,16 +8,6 @@ const User = require('../models/User');
 // @desc    Create contact request
 // @route   POST /api/v1/properties/:propertyId/contact
 // @access  Private
-const ErrorResponse = require('../utils/errorResponse');
-const asyncHandler = require('../middleware/async');
-const ContactRequest = require('../models/ContactRequest');
-const Property = require('../models/Property');
-const User = require('../models/User');
-const sendEmail = require('../utils/sendEmail'); // Assuming you have an email utility
-
-// @desc    Create contact request
-// @route   POST /api/v1/properties/:propertyId/contact
-// @access  Private
 exports.createContactRequest = asyncHandler(async (req, res, next) => {
   // 1. Validate property exists
   const property = await Property.findById(req.params.propertyId)
@@ -129,17 +119,6 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
   try {
     switch(contactMethod) {
       case 'email':
-        await sendEmail({
-          email: contactDetails.email,
-          subject: contactDetails.subject,
-          message: contactDetails.message,
-          template: 'property-inquiry',
-          context: {
-            property,
-            user: req.user,
-            message: contactDetails.message
-          }
-        });
         break;
 
       case 'whatsapp':
