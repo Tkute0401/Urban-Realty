@@ -29,7 +29,7 @@ router.get('/:id', propertyController.getProperty);
 // @desc    Get agent properties
 // @route   GET /api/v1/properties/agent
 // @access  Public
-router.get('/agent', propertyController.getAgents);
+router.get('/agent', propertyController.getAgentProperties);
 
 // @desc    Create contact request for property
 // @route   POST /api/v1/properties/:id/contact
