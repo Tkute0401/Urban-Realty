@@ -67,7 +67,7 @@ const Profile = () => {
   const { properties, getAgentProperties,agentProperties } = useProperties();
 
   useEffect(() => {
-    getAgentProperties();
+    getAgentProperties(user);
   },[])
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);

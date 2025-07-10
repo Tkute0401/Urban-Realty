@@ -147,10 +147,15 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get featured properties
-// @route   GET /api/v1/properties/agent
+// @route   GET /api/v1/properties/agent/:agentId
 // @access  Public
 exports.getAgentProperties = asyncHandler(async (req, res, next) => {
-  const properties = await Property.find({ agent: req.user.id }).populate('agent');
+  console.log('GET /api/v1/properties/agent',req.params.id);
+  console.log('GET /api/v1/properties/agent', req.params);
+  console.log('User ID:', req.params.id);
+  console.error('User ID:', req.params.id);
+  const userid = req.params.id;
+  const properties = await Property.find({ agent: userid }).populate('agent');
   res.status(200).json({
     success: true,
     count: properties.length,
