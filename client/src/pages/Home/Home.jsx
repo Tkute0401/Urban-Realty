@@ -9,7 +9,7 @@ import { Button } from "@mui/material";
 const Home = () => {
   return (
     <div className="font-poppins bg-[#0c0d0e] text-white">
-      <HeroSection className="h-80%" />
+      <HeroSection/>
       <PropertiesSection
       />
       <ServiceBlock 
