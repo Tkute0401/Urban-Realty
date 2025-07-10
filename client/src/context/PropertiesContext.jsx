@@ -323,12 +323,35 @@ export const PropertiesProvider = ({ children }) => {
     }
   }, []);
 
+  const getAgentProperties = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get('/properties/agent');
+      const data = response.data?.data ?? response.data;
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Received invalid properties data format');
+      }
+      
+      setProperties(data);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch properties');
+      setProperties([]);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  })
+
   const clearProperty = useCallback(() => setProperty(null), []);
   const clearErrors = useCallback(() => setError(null), []);
 
   const contextValue = useMemo(() => ({
     properties,
     featuredProperties,
+    getAgentProperties,
     property,
     loading,
     error,
@@ -346,6 +369,7 @@ export const PropertiesProvider = ({ children }) => {
   }), [
     properties,
     featuredProperties,
+    getAgentProperties,
     property,
     loading,
     error,
