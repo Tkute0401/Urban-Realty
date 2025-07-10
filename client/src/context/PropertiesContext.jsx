@@ -324,11 +324,14 @@ export const PropertiesProvider = ({ children }) => {
     }
   }, []);
 
-  const getAgentProperties = useCallback(async () => {
+  const getAgentProperties = useCallback(async (user) => {
     try {
+      console.log("User in context:=",user);
       setLoading(true);
       setError(null);
-      const response = await axios.get('/properties/agent');
+  
+      const response = await axios.get(`/properties/agent/${user.id}`);
+      console.log("Response in context:=",response);
       const data = response.data?.data ?? response.data;
       
       if (!Array.isArray(data)) {
@@ -340,7 +343,7 @@ export const PropertiesProvider = ({ children }) => {
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch properties');
       setProperties([]);
-      throw err;
+      //throw err;
     } finally {
       setLoading(false);
     }
