@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -7,6 +7,9 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings } from '@mui/icons-material';
+import { useProperties } from '../../context/PropertiesContext';
+import PropertyCard from '../../components/home/PropertyCard';
+  
 
 // Mock data for favorites
 const favoriteProperties = [
@@ -61,7 +64,11 @@ const Profile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
+  const { properties, getAgentProperties } = useProperties();
 
+  useEffect(() => {
+    getAgentProperties();
+  },[])
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
@@ -231,6 +238,21 @@ const Profile = () => {
                       </Button>
                     </CardActions>
                   </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+        {user?.role === 'agent' && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h5" sx={{ mb: 3, color: '#78CADC' }}>
+              Your Properties
+            </Typography>
+            
+            <Grid container spacing={3}>
+              {properties.map((property) => (
+                <Grid item xs={12} sm={6} key={property._id}>
+                  <PropertyCard property={property} />
                 </Grid>
               ))}
             </Grid>
