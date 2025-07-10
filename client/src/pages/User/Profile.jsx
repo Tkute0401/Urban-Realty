@@ -64,7 +64,7 @@ const Profile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
-  const { properties, getAgentProperties } = useProperties();
+  const { properties, getAgentProperties,agentProperties } = useProperties();
 
   useEffect(() => {
     getAgentProperties();
@@ -250,7 +250,7 @@ const Profile = () => {
             </Typography>
             
             <Grid container spacing={3}>
-              {properties.map((property) => (
+              {agentProperties.map((property) => (
                 <Grid item xs={12} sm={6} key={property._id}>
                   <PropertyCard property={property} />
                 </Grid>

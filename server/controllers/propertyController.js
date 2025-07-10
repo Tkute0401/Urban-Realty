@@ -146,6 +146,19 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Get featured properties
+// @route   GET /api/v1/properties/agent
+// @access  Public
+exports.getAgentProperties = asyncHandler(async (req, res, next) => {
+  const properties = await Property.find({ agent: req.user.id }).populate('agent');
+  res.status(200).json({
+    success: true,
+    count: properties.length,
+    data: properties
+  });
+});
+
+
 // @desc    Get single property
 // @route   GET /api/v1/properties/:id
 // @access  Public
@@ -794,14 +807,3 @@ const uploadVideosToCloudinary = async (files) => {
   return videos;
 };
 
-// @desc    Get featured properties
-// @route   GET /api/v1/properties/agent
-// @access  Public
-expoerts.getAgentProperties = asyncHandler(async (req, res, next) => {
-  const properties = await Property.find({ agent: req.user.id }).populate('agent');
-  res.status(200).json({
-    success: true,
-    count: properties.length,
-    data: properties
-  });
-});
