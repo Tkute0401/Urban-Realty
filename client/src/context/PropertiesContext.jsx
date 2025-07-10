@@ -12,6 +12,7 @@ export const PropertiesProvider = ({ children }) => {
   const [cache, setCache] = useState({});
   const [developers, setDevelopers] = useState([]);
   const [pagination, setPagination] = useState({});
+  const [agentProperties, setAgentProperties] = useState([]);
 
   const getProperties = useCallback(async (params = {}) => {
     const cacheKey = JSON.stringify(params);
@@ -334,7 +335,7 @@ export const PropertiesProvider = ({ children }) => {
         throw new Error('Received invalid properties data format');
       }
       
-      setProperties(data);
+      setAgentProperties(data);
       return data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch properties');
@@ -351,7 +352,7 @@ export const PropertiesProvider = ({ children }) => {
   const contextValue = useMemo(() => ({
     properties,
     featuredProperties,
-    getAgentProperties,
+    agentProperties,
     property,
     loading,
     error,
@@ -359,6 +360,7 @@ export const PropertiesProvider = ({ children }) => {
     developers,
     getProperties,
     getFeaturedProperties,
+    getAgentProperties,
     getProperty,
     createProperty,
     updateProperty,
@@ -369,7 +371,7 @@ export const PropertiesProvider = ({ children }) => {
   }), [
     properties,
     featuredProperties,
-    getAgentProperties,
+    agentProperties,
     property,
     loading,
     error,
@@ -377,6 +379,7 @@ export const PropertiesProvider = ({ children }) => {
     developers,
     getProperties,
     getFeaturedProperties,
+    getAgentProperties,
     getProperty,
     createProperty,
     updateProperty,
