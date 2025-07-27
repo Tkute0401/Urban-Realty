@@ -813,74 +813,94 @@ const PropertyList = () => {
 
     {/* City Selection Modal */}
     {showCityModal && (
-      <div className="city-modal">
-        <div className="city-modal-content">
-          <div className="city-modal-header">
-            <IconButton 
-              className="back-button" 
-              onClick={() => setShowCityModal(false)}
-              sx={{ color: '#78CADC' }}
-            >
-              <ArrowBack />
-            </IconButton>
-            <h3>Select City</h3>
-          </div>
+    <div className="city-modal">
+      <div className="city-modal-content">
+        <div className="city-modal-header">
+          <h3>Select Location</h3>
+          <button 
+            className="close-modal-btn"
+            onClick={() => setShowCityModal(false)}
+            aria-label="Close modal"
+          >
+            <CloseIcon />
+          </button>
+        </div>
 
-          <div className="city-search-container">
-            <SearchIcon className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search for city..." 
-              className="city-search-input"
-              value={citySearchTerm}
-              onChange={(e) => setCitySearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="city-search-container">
+          <SearchIcon className="search-icon" />
+          <input 
+            type="text" 
+            placeholder="Search for city or location..." 
+            className="city-search-input"
+            value={citySearchTerm}
+            onChange={(e) => setCitySearchTerm(e.target.value)}
+          />
+        </div>
 
-          <div className="locate-me">
-            <LocationOn fontSize="small" />
-            <span>Locate me</span>
-          </div>
+        <div 
+          className="locate-me"
+          onClick={() => {
+            // Add your geolocation logic here
+            alert("Locating your position...");
+          }}
+        >
+          <LocationOn fontSize="small" />
+          <span>Use my current location</span>
+        </div>
 
+        <div className="city-sections-container">
           <div className="popular-cities-section">
-            <h4>Popular cities</h4>
+            <div className="section-title">Popular Locations</div>
             <div className="popular-cities">
-              {['Mumbai', 'Bengaluru', 'Pune', 'Delhi', 'Noida', 'Gurgaon'].map(city => (
-                <div 
-                  key={city}
-                  className="city-chip"
-                  onClick={() => handleCitySelect(city)}
-                >
-                  {city}
-                </div>
-              ))}
+              {['Mumbai', 'Bengaluru', 'Pune', 'Delhi', 'Noida', 'Gurgaon', 'Hyderabad', 'Chennai']
+                .filter(city => city.toLowerCase().includes(citySearchTerm.toLowerCase()))
+                .map(city => (
+                  <div 
+                    key={city}
+                    className={`city-chip ${selectedCity === city ? 'selected' : ''}`}
+                    onClick={() => handleCitySelect(city)}
+                  >
+                    {city}
+                  </div>
+                ))}
             </div>
           </div>
 
-          <div className="all-cities-section">
-            <h4>All Cities</h4>
+          {/* <div className="all-cities-section">
+            <div className="section-title">All Locations</div>
             <div className="city-alphabet-grid">
-              {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map(letter => (
-                <div key={letter} className="alphabet-column">
-                  <div className="alphabet-header">{letter}</div>
-                  {cities
-                    .filter(city => city.startsWith(letter))
-                    .map(city => (
-                      <div 
-                        key={city}
-                        className="city-name"
-                        onClick={() => handleCitySelect(city)}
-                      >
-                        {city}
-                      </div>
-                    ))}
-                </div>
-              ))}
+              {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+                .map(letter => {
+                  const citiesForLetter = cities
+                    .filter(city => 
+                      city.startsWith(letter) && 
+                      city.toLowerCase().includes(citySearchTerm.toLowerCase())
+                    );
+                  
+                  if (citiesForLetter.length === 0) return null;
+                  
+                  return (
+                    <div key={letter} className="alphabet-column">
+                      <div className="alphabet-header">{letter}</div>
+                      {citiesForLetter.map(city => (
+                        <div 
+                          key={city}
+                          className={`city-name ${selectedCity === city ? 'selected' : ''}`}
+                          onClick={() => handleCitySelect(city)}
+                        >
+                          {city}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
-    )}
+    </div>
+  )}
 
       {/* Breadcrumb - Hidden on smallest screens */}
       <div className={`breadcrumb fade-in-delay-1 ${isMobile ? 'mobile-breadcrumb' : ''}`}>

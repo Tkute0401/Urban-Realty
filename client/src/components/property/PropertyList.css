@@ -254,6 +254,7 @@ body {
   gap: 0.5rem;
   transition: all 0.3s ease;
   margin-bottom: 0.25rem;
+  z-index: 10;
 }
 
 .filter-tag:hover {
@@ -381,7 +382,7 @@ body {
   .mobile-search-container {
     flex: 2;
     position: relative;
-  min-width: 60%;
+    min-width: 60%;
   }
 
   .mobile-search-container.expanded {
@@ -389,7 +390,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    background-color: var(--background);
+    background-color: var(--background) !important;
     padding: 0.5rem;
     z-index: 1100;
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
@@ -445,6 +446,10 @@ body {
   .mobile-filter-button:hover {
     background-color: rgba(120, 202, 220, 0.1);
   }
+
+  .mobile-filter-drawer {
+  z-index: 2000;
+}
 
   .filter-text {
     font-size: 14px;
@@ -728,7 +733,7 @@ body {
   right: 0;
   bottom: 0;
   background-color: rgba(0,0,0,0.8);
-  z-index: 2000;
+  z-index: 3000;
   display: flex;
   justify-content: center;
   align-items: center;

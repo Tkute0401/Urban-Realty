@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const ComingSoonPopup = ({ isOpen, onClose }) => {
+
   // Disable scrolling when popup is open
   useEffect(() => {
     if (isOpen) {
@@ -15,6 +16,19 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
       document.body.style.overflow = 'auto';
     };
   }, [isOpen]);
+
+  // Handle closing popup and redirecting to previous page
+  const handleClose = () => {
+    onClose(); // Call the original onClose function
+    
+    // Use browser's back functionality
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback: redirect to home page if no history
+      window.location.href = '/';
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -29,7 +43,7 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
           {/* Blurred background overlay */}
           <motion.div
             className="fixed inset-0 bg-black/30 backdrop-blur-md"
-            onClick={onClose}
+            onClick={handleClose} // Updated to use handleClose
           />
           
           {/* Creative coming soon card */}
@@ -43,7 +57,7 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
             >
               {/* Close button */}
               <button
-                onClick={onClose}
+                onClick={handleClose} // Updated to use handleClose
                 className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
               >
                 <XMarkIcon className="h-6 w-6" />
@@ -78,7 +92,7 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
                 </div>
                 <div className="mt-6 flex justify-center">
                   <button
-                    onClick={onClose}
+                    onClick={handleClose} // Updated to use handleClose
                     className="inline-flex items-center rounded-md bg-[#78cadc] px-4 py-2 text-sm font-medium text-[#08171A] hover:bg-[#8DD9E5] transition-colors"
                   >
                     Got it!
