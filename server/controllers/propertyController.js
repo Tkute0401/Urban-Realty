@@ -146,6 +146,24 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Get featured properties
+// @route   GET /api/v1/properties/agent/:agentId
+// @access  Public
+exports.getAgentProperties = asyncHandler(async (req, res, next) => {
+  console.log('GET /api/v1/properties/agent',req.params.id);
+  console.log('GET /api/v1/properties/agent', req.params);
+  console.log('User ID:', req.params.id);
+  console.error('User ID:', req.params.id);
+  const userid = req.params.id;
+  const properties = await Property.find({ agent: userid }).populate('agent');
+  res.status(200).json({
+    success: true,
+    count: properties.length,
+    data: properties
+  });
+});
+
+
 // @desc    Get single property
 // @route   GET /api/v1/properties/:id
 // @access  Public

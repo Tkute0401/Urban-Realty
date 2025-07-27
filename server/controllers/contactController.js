@@ -9,11 +9,22 @@ const User = require('../models/User');
 // @route   POST /api/v1/properties/:propertyId/contact
 // @access  Private
 exports.createContactRequest = asyncHandler(async (req, res, next) => {
-  const property = await Property.findById(req.params.propertyId);
-  
+  const property = await Property.findById(req.params.id);
+
   if (!property) {
     return next(
-      new ErrorResponse(`Property not found with id of ${req.params.propertyId}`, 404)
+      new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
+    );
+  }
+   const duplicateCriteria = {
+    property: property._id,
+    agent: property.agent,
+    user: req.user.id,
+    // optionally add: message
+  };
+  if(ContactRequest.find(duplicateCriteria)){
+    return next(
+      new ErrorResponse(`You have already made a contact request for this property`, 400)
     );
   }
 
@@ -25,49 +36,27 @@ exports.createContactRequest = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Set default message if not provided
-  const message = req.body.message || `Contact request via ${req.body.contactMethod}`;
-
-  // Check for existing request
-  const existingRequest = await ContactRequest.findOne({
+  // Create contact request - duplicates allowed
+  const contactRequest = await ContactRequest.create({
     property: property._id,
+    agent: property.agent,
     user: req.user.id,
-    isCurrent: true
+    message: req.body.message || `Contact request via ${req.body.contactMethod}`,
+    contactMethod: req.body.contactMethod,
+    status: 'pending'
   });
 
-  let contactRequest;
-
-  if (existingRequest) {
-    // Create a new version
-    contactRequest = await ContactRequest.create({
-      property: property._id,
-      agent: property.agent,
-      user: req.user.id,
-      message: message,
-      contactMethod: req.body.contactMethod,
-      version: existingRequest.version + 1,
-      previousVersions: [...existingRequest.previousVersions, existingRequest._id]
-    });
-
-    // Mark the old one as not current
-    existingRequest.isCurrent = false;
-    await existingRequest.save();
-  } else {
-    // Create first request
-    contactRequest = await ContactRequest.create({
-      property: property._id,
-      agent: property.agent,
-      user: req.user.id,
-      message: message,
-      contactMethod: req.body.contactMethod
-    });
-  }
+  // Populate the response
+  await contactRequest.populate('property', 'title price');
+  await contactRequest.populate('agent', 'name email mobile');
+  await contactRequest.populate('user', 'name email mobile');
 
   res.status(201).json({
     success: true,
     data: contactRequest
   });
 });
+
 
 // @desc    Get contact requests for agent
 // @route   GET /api/v1/contacts
@@ -104,6 +93,7 @@ exports.getAgentContactRequests = asyncHandler(async (req, res, next) => {
 // @access  Private/Agent
 exports.updateContactRequest = asyncHandler(async (req, res, next) => {
   let contactRequest = await ContactRequest.findById(req.params.id);
+  console.log("Doin it here",contactRequest);
 
   if (!contactRequest) {
     return next(
