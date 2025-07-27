@@ -17,7 +17,6 @@ const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('Decoded token:', decoded); // Add this line
     req.user = await User.findById(decoded.id);
-    console.log('User found:', req.user); // Add this line
     next();
   } catch (err) {
     console.error('JWT Error:', err); // Add this line
