@@ -6,7 +6,7 @@
 //     {
 //       title: "Acceptance of Terms",
 //       content: [
-//         "By accessing or using Urban Realty 360's services, you agree to be bound by these Terms. If you disagree with any part, you may not access our services.",
+//         "By accessing or using SQUAREFOOT's services, you agree to be bound by these Terms. If you disagree with any part, you may not access our services.",
 //         "We reserve the right to modify these terms at any time. Continued use after changes constitutes acceptance."
 //       ]
 //     },
@@ -25,7 +25,7 @@
 //       title: "Property Listings",
 //       content: [
 //         "All property information is provided by third parties. While we verify data, we cannot guarantee its accuracy.",
-//         "Urban Realty 360 is not responsible for:",
+//         "SQUAREFOOT is not responsible for:",
 //         "- Misrepresented property conditions",
 //         "- Changes made after publication",
 //         "- Transactions between buyers and sellers",
@@ -35,7 +35,7 @@
 //     {
 //       title: "Intellectual Property",
 //       content: [
-//         "All platform content (logos, text, graphics, interfaces) is owned by Urban Realty 360 and protected by copyright.",
+//         "All platform content (logos, text, graphics, interfaces) is owned by SQUAREFOOT and protected by copyright.",
 //         "You may not:",
 //         "- Reproduce, modify, or distribute our content",
 //         "- Use our branding without written permission",
@@ -45,7 +45,7 @@
 //     {
 //       title: "Limitation of Liability",
 //       content: [
-//         "Urban Realty 360 shall not be liable for:",
+//         "SQUAREFOOT shall not be liable for:",
 //         "- Any direct/indirect damages from service use",
 //         "- Errors or interruptions in service",
 //         "- Unauthorized access to user data",
@@ -92,7 +92,7 @@
 //           className="mb-12 text-center"
 //         >
 //           <p className="text-gray-400">
-//             These Terms govern your use of Urban Realty 360's platform and services. 
+//             These Terms govern your use of SQUAREFOOT's platform and services. 
 //             Please read them carefully before accessing our resources or engaging with our professionals.
 //           </p>
 //         </motion.div>
@@ -182,7 +182,7 @@ const TermsConditions = () => {
       title: "Acceptance of Terms",
       icon: <ShieldCheckIcon className="w-5 h-5 text-[#08171A]" />,
       content: [
-        "By accessing or using Urban Realty 360's services, you agree to be bound by these Terms and Conditions. If you do not agree with any part, you must not use our services.",
+        "By accessing or using SQUAREFOOT's services, you agree to be bound by these Terms and Conditions. If you do not agree with any part, you must not use our services.",
         "We reserve the right to modify these terms at any time. Your continued use after changes constitutes acceptance of the modified terms."
       ]
     },
@@ -205,7 +205,7 @@ const TermsConditions = () => {
       icon: <HomeIcon className="w-5 h-5 text-[#08171A]" />,
       content: [
         "All property information is provided by third parties. While we verify data, we cannot guarantee its accuracy or completeness.",
-        "Urban Realty 360 is not responsible for:",
+        "SQUAREFOOT is not responsible for:",
         "- Misrepresented property conditions or details",
         "- Changes made to listings after publication",
         "- Transactions between buyers and sellers",
@@ -221,7 +221,7 @@ const TermsConditions = () => {
       title: "Intellectual Property Rights",
       icon: <DocumentTextIcon className="w-5 h-5 text-[#08171A]" />,
       content: [
-        "All platform content (logos, text, graphics, interfaces, software) is owned by Urban Realty 360 and protected by copyright and trademark laws.",
+        "All platform content (logos, text, graphics, interfaces, software) is owned by SQUAREFOOT and protected by copyright and trademark laws.",
         "You may not:",
         "- Reproduce, modify, or distribute our content without permission",
         "- Use our branding or trademarks without written consent",
@@ -253,7 +253,7 @@ const TermsConditions = () => {
       title: "Limitation of Liability",
       icon: <ScaleIcon className="w-5 h-5 text-[#08171A]" />,
       content: [
-        "Urban Realty 360 shall not be liable for:",
+        "SQUAREFOOT shall not be liable for:",
         "- Any direct, indirect, incidental, or consequential damages",
         "- Errors, interruptions, or delays in service",
         "- Unauthorized access to or alteration of your data",
@@ -315,7 +315,7 @@ const TermsConditions = () => {
           className="mb-16 text-center"
         >
           <p className="text-gray-400 max-w-4xl mx-auto text-lg leading-relaxed">
-            These Terms of Service govern your use of Urban Realty 360's website, mobile applications, 
+            These Terms of Service govern your use of SQUAREFOOT's website, mobile applications, 
             and related services. By accessing our platform, you agree to comply with these terms, 
             our Privacy Policy, and all applicable laws and regulations.
           </p>
@@ -382,7 +382,7 @@ const TermsConditions = () => {
             <h2 className="text-2xl font-bold mb-6">General Provisions</h2>
             <div className="space-y-4 text-gray-300">
               <p>
-                These Terms constitute the entire agreement between you and Urban Realty 360 regarding our services, 
+                These Terms constitute the entire agreement between you and SQUAREFOOT regarding our services, 
                 superseding any prior agreements.
               </p>
               <p>

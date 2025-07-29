@@ -65,7 +65,7 @@ const Career = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/30 z-10" />
         <img 
           src="/career.jpg" 
-          alt="Urban Realty 360 Team" 
+          alt="SQUAREFOOT Team" 
           className="absolute inset-0 w-full h-full object-cover"
         />
         <motion.div 
@@ -111,7 +111,7 @@ const Career = () => {
             Our <span className="text-[#78cadc]">Culture</span>
           </h2>
           <p className="text-gray-400 max-w-4xl mx-auto text-lg">
-            At Urban Realty 360, we foster an environment where creativity meets professionalism. 
+            At SQUAREFOOT, we foster an environment where creativity meets professionalism. 
             Our team thrives on collaboration, innovation, and a shared passion for transforming real estate experiences.
           </p>
         </motion.div>

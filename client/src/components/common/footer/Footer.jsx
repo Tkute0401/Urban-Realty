@@ -159,15 +159,15 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <img src="/vite.png" alt="Logo" className="w-8 h-8" />
-            <span className="font-poppins text-white font-bold">URBAN REALTY 360</span>
+            <span className="font-poppins text-white font-bold">SQUAREFOOT</span>
           </div>
           
           <div className="text-center md:text-right">
             <p className="font-poppins text-xs">
-              © {new Date().getFullYear()} Urban Realty 360, Inc. All rights reserved.
+              © {new Date().getFullYear()} SQUAREFOOT, Inc. All rights reserved.
             </p>
             <p className="font-poppins text-xs mt-1">
-              Urban Realty 360® is a registered trademark of Urban Realty 360, Inc.
+              SQUAREFOOT® is a registered trademark of SQUAREFOOT, Inc.
             </p>
           </div>
         </div>

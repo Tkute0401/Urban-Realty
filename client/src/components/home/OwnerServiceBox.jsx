@@ -52,7 +52,7 @@ const OwnerServiceBlock = () => {
             </span>
             <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold text-white leading-tight mt-2 sm:mt-3 md:mt-4">
               Sell or Rent <span className="text-[#78cadc]">Your Property</span> Faster with
-              <br className="hidden sm:block" />Urban Realty 360
+              <br className="hidden sm:block" />SQUAREFOOT
             </h2>
             <p className="font-poppins text-gray-300 mt-3 sm:mt-4 tracking-wide text-xs sm:text-sm md:text-base mb-6 sm:mb-8 md:mb-10">
               SELL OR RENT YOUR RESIDENTIAL/COMMERCIAL PROPERTY.
