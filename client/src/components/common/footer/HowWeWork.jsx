@@ -121,7 +121,7 @@ const HowWeWork = () => {
             Our <span className="text-[#78cadc]">Process</span>
           </h2>
           <p className="text-gray-400 max-w-4xl mx-auto text-lg">
-            Urban Realty 360 has reimagined the real estate experience with a streamlined, technology-enhanced approach 
+            SQUAREFOOT has reimagined the real estate experience with a streamlined, technology-enhanced approach 
             that removes friction while maintaining the human touch that makes all the difference.
           </p>
         </motion.div>
@@ -196,7 +196,7 @@ const HowWeWork = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-[#78cadc] to-[#8DD9E5] opacity-90"></div>
           <div className="relative z-10 p-8 sm:p-12 text-[#08171A] text-center">
             <h3 className="text-2xl sm:text-3xl font-bold mb-6">
-              Ready to Experience the Urban Realty 360 Difference?
+              Ready to Experience the SQUAREFOOT Difference?
             </h3>
             <p className="mb-8 max-w-2xl mx-auto">
               Whether you're buying, selling, or investing, our proven process delivers better results with less stress.

@@ -40,7 +40,7 @@ const AboutUs = () => {
             Redefining <span className="text-[#78cadc]">Real Estate</span>
           </h1>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
-            Urban Realty 360 combines cutting-edge technology with unparalleled market expertise to transform your property journey.
+            SQUAREFOOT combines cutting-edge technology with unparalleled market expertise to transform your property journey.
           </p>
         </motion.div>
       </section>
@@ -59,7 +59,7 @@ const AboutUs = () => {
               Our <span className="text-[#78cadc]">Story</span>
             </h2>
             <p className="text-gray-300 mb-4">
-              Founded in 2015, Urban Realty 360 began as a boutique real estate firm with a vision to revolutionize property transactions through transparency and innovation.
+              Founded in 2015, SQUAREFOOT began as a boutique real estate firm with a vision to revolutionize property transactions through transparency and innovation.
             </p>
             <p className="text-gray-300 mb-6">
               Today, we're a market leader with a national presence, recognized for our client-first approach and data-driven solutions that simplify buying, selling, and renting properties.
@@ -103,7 +103,7 @@ const AboutUs = () => {
               Meet Our <span className="text-[#78cadc]">Leadership</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              The brilliant minds behind Urban Realty 360's success, combining decades of experience with fresh perspectives.
+              The brilliant minds behind SQUAREFOOT's success, combining decades of experience with fresh perspectives.
             </p>
           </motion.div>
 

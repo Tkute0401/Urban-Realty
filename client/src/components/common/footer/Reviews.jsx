@@ -13,7 +13,7 @@ const Reviews = () => {
       name: 'Rahul Sharma',
       role: 'Property Buyer',
       rating: 5,
-      content: 'Urban Realty 360 made my home buying experience seamless. Their team was knowledgeable and helped me find exactly what I was looking for within my budget. The entire process was transparent and stress-free!',
+      content: 'SQUAREFOOT made my home buying experience seamless. Their team was knowledgeable and helped me find exactly what I was looking for within my budget. The entire process was transparent and stress-free!',
       image: '/m-01.png'
     },
     {
@@ -37,7 +37,7 @@ const Reviews = () => {
       name: 'Ananya Gupta',
       role: 'NRI Client',
       rating: 5,
-      content: 'Being overseas, I was worried about purchasing property in India. Urban Realty 360 handled everything remotely with regular video updates. Their digital documentation process was incredibly convenient.',
+      content: 'Being overseas, I was worried about purchasing property in India. SQUAREFOOT handled everything remotely with regular video updates. Their digital documentation process was incredibly convenient.',
       image: '/fm-02.png'
     },
     {
@@ -238,7 +238,7 @@ const Reviews = () => {
             Ready to Share Your Experience?
           </h2>
           <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
-            We'd love to hear about your journey with Urban Realty 360. Your feedback helps us improve and serve you better.
+            We'd love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
           </p>
           <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
             Write a Review

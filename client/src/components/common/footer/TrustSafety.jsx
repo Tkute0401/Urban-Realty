@@ -101,7 +101,7 @@ const TrustSafety = () => {
             Our <span className="text-[#78cadc]">Commitment</span> to You
           </h2>
           <p className="text-gray-400 max-w-4xl mx-auto text-lg">
-            At Urban Realty 360, we've built our reputation on trust and integrity. We go beyond industry standards to 
+            At SQUAREFOOT, we've built our reputation on trust and integrity. We go beyond industry standards to 
             create the safest real estate marketplace, combining cutting-edge technology with human expertise to protect 
             your transactions and personal information.
           </p>

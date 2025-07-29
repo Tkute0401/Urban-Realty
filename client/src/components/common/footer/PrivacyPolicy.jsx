@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
           className="mb-12 text-center"
         >
           <p className="text-gray-400 mb-6">
-            At Urban Realty 360, we are committed to protecting your privacy and ensuring the security of your personal information. 
+            At SQUAREFOOT, we are committed to protecting your privacy and ensuring the security of your personal information. 
             This policy outlines how we collect, use, and safeguard your data.
           </p>
           <div className="inline-flex items-center text-[#78cadc]">
