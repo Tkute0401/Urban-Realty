@@ -5,10 +5,9 @@
 }
 
 .more-content {
-  position: fixed;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
+  position: absolute;
+  top: 100%;
+  right: 0;
   background-color: #0B1011;
   border: 1px solid #333;
   border-radius: 8px;
@@ -18,8 +17,8 @@
   padding: 0;
   display: flex;
   height: 400px;
+  margin-top: 10px;
 }
-
 .more-sidebar {
   width: 180px;
   background-color: #0A1517;
