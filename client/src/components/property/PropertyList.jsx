@@ -443,10 +443,9 @@ const PropertyList = () => {
         <div className="mobile-filter-section">
           <div className="mobile-filter-section-title">More Filters</div>
           <More 
-            onApply={(moreFilters) => handleFilterChange(moreFilters)}
-            currentFilters={filters}
-            amenityOptions={amenityOptions}
-            isMobile={true}
+          onApply={(moreFilters) => handleFilterChange(moreFilters)}
+          currentFilters={filters}
+          amenityOptions={amenityOptions}
           />
         </div>
       </div>
