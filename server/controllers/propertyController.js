@@ -27,7 +27,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   const reqQuery = { ...req.query };
 
   // Fields to exclude
-  const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
+  const removeFields = ['select', 'sort', 'page', 'limit', 'search', 'minArea', 'maxArea'];
   removeFields.forEach(param => delete reqQuery[param]);
 
   // Search functionality
@@ -41,9 +41,8 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     ];
   }
 
-  // Status filtering - fix the issue with empty strings
+  // Status filtering
   if (req.query.status) {
-    // Ensure status is a valid value
     const validStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
     if (validStatuses.includes(req.query.status)) {
       reqQuery.status = req.query.status;
@@ -89,15 +88,22 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     reqQuery.amenities = { $all: Array.isArray(req.query.amenities) ? req.query.amenities : [req.query.amenities] };
   }
 
-  // Area filtering
-  if (req.query.minArea || req.query.maxArea) {
-    reqQuery.area = {};
-    if (req.query.minArea) reqQuery.area.$gte = parseInt(req.query.minArea);
-    if (reqQuery.maxArea) reqQuery.area.$lte = parseInt(req.query.maxArea);
+  // Area filtering - COMPLETE FIXED IMPLEMENTATION
+  const areaQuery = {};
+  if (req.query.minArea) {
+    areaQuery.$gte = parseInt(req.query.minArea);
+  }
+  if (req.query.maxArea) {
+    areaQuery.$lte = parseInt(req.query.maxArea);
+  }
+  if (Object.keys(areaQuery).length > 0) {
+    reqQuery.area = areaQuery;
   }
 
   // Create query string
   let queryStr = JSON.stringify(reqQuery);
+  
+  // Replace operators in the query string
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
   // Finding resource
