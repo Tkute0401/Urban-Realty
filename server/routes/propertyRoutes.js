@@ -21,11 +21,6 @@ router.get('/featured', propertyController.getFeaturedProperties);
 // @access  Public
 router.get('/radius/:zipcode/:distance', propertyController.getPropertiesInRadius);
 
-// @desc    Get single property
-// @route   GET /api/v1/properties/:id
-// @access  Public
-router.get('/:id', propertyController.getProperty);
-
 // @desc    Get agent properties
 // @route   GET /api/v1/properties/agent
 // @access  Public
@@ -108,5 +103,12 @@ router.put(
   [protect, authorize('agent', 'admin'), upload.single('file')],
   propertyController.uploadPropertyPhoto
 );
+
+
+// @desc    Get single property
+// @route   GET /api/v1/properties/:id
+// @access  Public
+router.get('/:id', propertyController.getProperty);
+
 
 module.exports = router;

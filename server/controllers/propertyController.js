@@ -16,140 +16,100 @@ cloudinary.config({
   secure: true
 });
 
-// @desc    Get all properties
+// @desc    Get all properties with filtering, sorting, and pagination
 // @route   GET /api/v1/properties
 // @access  Public
 exports.getProperties = asyncHandler(async (req, res, next) => {
-  // Advanced filtering, sorting, pagination
-  let query;
+  try {
+    // 1. FILTERING
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search'];
+    excludedFields.forEach(el => delete queryObj[el]);
 
-  // Copy req.query
-  const reqQuery = { ...req.query };
-
-  // Fields to exclude
-  const removeFields = ['select', 'sort', 'page', 'limit', 'search', 'minArea', 'maxArea'];
-  removeFields.forEach(param => delete reqQuery[param]);
-
-  // Search functionality
-  if (req.query.search) {
-    reqQuery.$or = [
-      { title: { $regex: req.query.search, $options: 'i' } },
-      { description: { $regex: req.query.search, $options: 'i' } },
-      { 'address.city': { $regex: req.query.search, $options: 'i' } },
-      { 'address.state': { $regex: req.query.search, $options: 'i' } },
-      { buildingName: { $regex: req.query.search, $options: 'i' } }
-    ];
-  }
-
-  // Status filtering
-  if (req.query.status) {
-    const validStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
-    if (validStatuses.includes(req.query.status)) {
-      reqQuery.status = req.query.status;
-    } else {
-      return next(new ErrorResponse('Invalid status value', 400));
+    // 1a. Handle special numeric filters
+    const numericFilters = ['price', 'area', 'bedrooms', 'bathrooms'];
+    let queryStr = JSON.stringify(queryObj);
+    
+    // Convert query operators (gt, gte, etc)
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    
+    // 1b. Handle area filtering separately
+    if (req.query.minArea || req.query.maxArea) {
+      const areaQuery = JSON.parse(queryStr).area || {};
+      if (req.query.minArea) areaQuery.$gte = Number(req.query.minArea);
+      if (req.query.maxArea) areaQuery.$lte = Number(req.query.maxArea);
+      queryStr = JSON.stringify({ ...JSON.parse(queryStr), area: areaQuery });
     }
-  }
 
-  // Price range filtering
-  if (req.query.priceMin || req.query.priceMax) {
-    reqQuery.price = {};
-    if (req.query.priceMin) reqQuery.price.$gte = parseInt(req.query.priceMin);
-    if (req.query.priceMax) reqQuery.price.$lte = parseInt(req.query.priceMax);
-  }
-
-  // Property type filtering
-  if (req.query.propertyType) {
-    reqQuery.type = req.query.propertyType;
-  }
-
-  // Bedrooms filtering
-  if (req.query.bedrooms) {
-    if (req.query.bedrooms.endsWith('+')) {
-      const minBedrooms = parseInt(req.query.bedrooms);
-      reqQuery.bedrooms = { $gte: minBedrooms };
-    } else {
-      reqQuery.bedrooms = parseInt(req.query.bedrooms);
+    // 1c. Handle search
+    if (req.query.search) {
+      const searchQuery = {
+        $or: [
+          { title: { $regex: req.query.search, $options: 'i' } },
+          { description: { $regex: req.query.search, $options: 'i' } },
+          { 'address.city': { $regex: req.query.search, $options: 'i' } },
+          { 'address.state': { $regex: req.query.search, $options: 'i' } }
+        ]
+      };
+      queryStr = JSON.stringify({ ...JSON.parse(queryStr), ...searchQuery });
     }
-  }
 
-  // Bathrooms filtering
-  if (req.query.bathrooms) {
-    if (req.query.bathrooms.endsWith('+')) {
-      const minBathrooms = parseFloat(req.query.bathrooms);
-      reqQuery.bathrooms = { $gte: minBathrooms };
-    } else {
-      reqQuery.bathrooms = parseFloat(req.query.bathrooms);
+    // 1d. Handle status filtering
+    if (req.query.status) {
+      const validStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
+      if (!validStatuses.includes(req.query.status)) {
+        return next(new ErrorResponse(`Invalid status value. Must be one of: ${validStatuses.join(', ')}`, 400));
+      }
     }
+
+    // 2. BUILD QUERY
+    let query = Property.find(JSON.parse(queryStr))
+      .populate('agent', 'name email phone')
+      .populate('developer', 'name logo');
+
+    // 3. SORTING
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt'); // Default sort
+    }
+
+    // 4. FIELD LIMITING (Projection)
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v'); // Exclude version key by default
+    }
+
+    // 5. PAGINATION
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 25;
+    const skip = (page - 1) * limit;
+    const total = await Property.countDocuments(JSON.parse(queryStr));
+
+    query = query.skip(skip).limit(limit);
+
+    // 6. EXECUTE QUERY
+    const properties = await query;
+
+    // 7. SEND RESPONSE
+    res.status(200).json({
+      success: true,
+      count: properties.length,
+      pagination: {
+        currentPage: page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        totalResults: total
+      },
+      data: properties
+    });
+
+  } catch (err) {
+    next(err);
   }
-
-  // Amenities filtering
-  if (req.query.amenities) {
-    reqQuery.amenities = { $all: Array.isArray(req.query.amenities) ? req.query.amenities : [req.query.amenities] };
-  }
-
-  // Area filtering - COMPLETE FIXED IMPLEMENTATION
-  const areaQuery = {};
-  if (req.query.minArea) {
-    areaQuery.$gte = parseInt(req.query.minArea);
-  }
-  if (req.query.maxArea) {
-    areaQuery.$lte = parseInt(req.query.maxArea);
-  }
-  if (Object.keys(areaQuery).length > 0) {
-    reqQuery.area = areaQuery;
-  }
-
-  // Create query string
-  let queryStr = JSON.stringify(reqQuery);
-  
-  // Replace operators in the query string
-  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-  // Finding resource
-  query = Property.find(JSON.parse(queryStr)).populate('agent', 'name email phone mobile');
-
-  // Select fields
-  if (req.query.select) {
-    const fields = req.query.select.split(',').join(' ');
-    query = query.select(fields);
-  }
-
-  // Sort
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(',').join(' ');
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort('-createdAt');
-  }
-
-  // Pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 25;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const total = await Property.countDocuments(JSON.parse(queryStr));
-
-  query = query.skip(startIndex).limit(limit);
-
-  // Executing query
-  const properties = await query;
-
-  // Pagination result
-  const pagination = {};
-  if (endIndex < total) {
-    pagination.next = { page: page + 1, limit };
-  }
-  if (startIndex > 0) {
-    pagination.prev = { page: page - 1, limit };
-  }
-
-  res.status(200).json({
-    success: true,
-    count: properties.length,
-    pagination,
-    data: properties
-  });
 });
 
 // @desc    Get featured properties
