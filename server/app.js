@@ -6,15 +6,19 @@ const app = express();
 
 // Middleware
 // Replace the current app.use(cors()) with:
+// app.use(cors({
+//   origin: [
+//     'https://urban-realty-production.up.railway.app',
+//     'http://localhost:5173',
+//     'https://www.squarefooot.com',
+//     'https://www.squarefooot.online'
+//   ],
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true // If you're using cookies/sessions
+// }));
 app.use(cors({
-  origin: [
-    'https://urban-realty-production.up.railway.app',
-    'http://localhost:5173',
-    'https://www.squarefooot.com',
-    'https://www.squarefooot.online'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: true,
   credentials: true // If you're using cookies/sessions
 }));
 app.use(express.json());
