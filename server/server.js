@@ -36,8 +36,6 @@ app.use(cors({
     'https://www.squarefooot.com',
     'https://www.squarefooot.online'
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // If you're using cookies/sessions
 }));
 app.use(express.json({ limit: '50mb' }));
