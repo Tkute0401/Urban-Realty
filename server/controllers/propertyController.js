@@ -16,45 +16,42 @@ cloudinary.config({
   secure: true
 });
 
-// @desc    Get all properties with filtering, sorting, and pagination
+// @desc    Get all properties with filtering
 // @route   GET /api/v1/properties
 // @access  Public
 exports.getProperties = asyncHandler(async (req, res, next) => {
   try {
-    // 1. FILTERING
+    // 1. Initial query setup
     const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search'];
+    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minArea', 'maxArea'];
     excludedFields.forEach(el => delete queryObj[el]);
 
-    // 1a. Handle special numeric filters
-    const numericFilters = ['price', 'area', 'bedrooms', 'bathrooms'];
+    // 2. Handle numeric filters (price, bedrooms, bathrooms)
     let queryStr = JSON.stringify(queryObj);
-    
-    // Convert query operators (gt, gte, etc)
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
     
-    // 1b. Handle area filtering separately
+    // 3. Parse the base query
+    let query = Property.find(JSON.parse(queryStr));
+
+    // 4. Handle area filtering separately
     if (req.query.minArea || req.query.maxArea) {
-      const areaQuery = JSON.parse(queryStr).area || {};
-      if (req.query.minArea) areaQuery.$gte = Number(req.query.minArea);
-      if (req.query.maxArea) areaQuery.$lte = Number(req.query.maxArea);
-      queryStr = JSON.stringify({ ...JSON.parse(queryStr), area: areaQuery });
+      const areaFilter = {};
+      if (req.query.minArea) areaFilter.$gte = Number(req.query.minArea);
+      if (req.query.maxArea) areaFilter.$lte = Number(req.query.maxArea);
+      query = query.where('area', areaFilter);
     }
 
-    // 1c. Handle search
+    // 5. Handle search
     if (req.query.search) {
-      const searchQuery = {
-        $or: [
-          { title: { $regex: req.query.search, $options: 'i' } },
-          { description: { $regex: req.query.search, $options: 'i' } },
-          { 'address.city': { $regex: req.query.search, $options: 'i' } },
-          { 'address.state': { $regex: req.query.search, $options: 'i' } }
-        ]
-      };
-      queryStr = JSON.stringify({ ...JSON.parse(queryStr), ...searchQuery });
+      query = query.or([
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } },
+        { 'address.city': { $regex: req.query.search, $options: 'i' } },
+        { 'address.state': { $regex: req.query.search, $options: 'i' } }
+      ]);
     }
 
-    // 1d. Handle status filtering
+    // 6. Handle status filtering
     if (req.query.status) {
       const validStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
       if (!validStatuses.includes(req.query.status)) {
@@ -62,28 +59,27 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       }
     }
 
-    // 2. BUILD QUERY
-    let query = Property.find(JSON.parse(queryStr))
-      .populate('agent', 'name email phone')
-      .populate('developer', 'name logo');
+    // 7. Populate related data
+    query = query.populate('agent', 'name email phone')
+                .populate('developer', 'name logo');
 
-    // 3. SORTING
+    // 8. Sorting
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
     } else {
-      query = query.sort('-createdAt'); // Default sort
+      query = query.sort('-createdAt');
     }
 
-    // 4. FIELD LIMITING (Projection)
+    // 9. Field limiting
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
     } else {
-      query = query.select('-__v'); // Exclude version key by default
+      query = query.select('-__v');
     }
 
-    // 5. PAGINATION
+    // 10. Pagination
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 25;
     const skip = (page - 1) * limit;
@@ -91,10 +87,10 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
 
     query = query.skip(skip).limit(limit);
 
-    // 6. EXECUTE QUERY
+    // 11. Execute query
     const properties = await query;
 
-    // 7. SEND RESPONSE
+    // 12. Send response
     res.status(200).json({
       success: true,
       count: properties.length,
