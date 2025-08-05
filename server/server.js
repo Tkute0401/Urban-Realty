@@ -30,7 +30,14 @@ const clientDistDir = path.join('/app/client/dist'); // Updated path
 
 // Middleware
 app.use(cors({
-  origin: true,
+  origin: [
+    'https://urban-realty-production.up.railway.app',
+    'http://localhost:5173',
+    'https://www.squarefooot.com',
+    'https://www.squarefooot.online'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // If you're using cookies/sessions
 }));
 app.use(express.json({ limit: '50mb' }));
