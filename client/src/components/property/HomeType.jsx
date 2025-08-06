@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './HomeType.css';
 import './FilterDropdown.css';
 
@@ -15,7 +15,48 @@ const HomeType = ({ onApply, currentType = '' }) => {
     manufactured: false
   });
   const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
+  // Home type options with icons and descriptions
+  const homeTypeOptions = {
+    houses: { 
+      label: 'Houses', 
+      icon: '🏠',
+      description: 'Single-family homes'
+    },
+    townhomes: { 
+      label: 'Townhomes', 
+      icon: '🏘️',
+      description: 'Connected homes'
+    },
+    multifamily: { 
+      label: 'Multi-family', 
+      icon: '🏢',
+      description: '2+ unit properties'
+    },
+    condos: { 
+      label: 'Condos/Co-ops', 
+      icon: '🏬',
+      description: 'Shared ownership'
+    },
+    lots: { 
+      label: 'Lots/Land', 
+      icon: '🌾',
+      description: 'Vacant land'
+    },
+    apartments: { 
+      label: 'Apartments', 
+      icon: '🏨',
+      description: 'Rental units'
+    },
+    manufactured: { 
+      label: 'Manufactured', 
+      icon: '🚐',
+      description: 'Mobile homes'
+    }
+  };
+
+  // Initialize selected types based on current filter
   useEffect(() => {
     if (!currentType) {
       setSelectAll(true);
@@ -61,6 +102,7 @@ const HomeType = ({ onApply, currentType = '' }) => {
     }
   }, [currentType]);
 
+  // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -68,17 +110,62 @@ const HomeType = ({ onApply, currentType = '' }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isOpen]);
+
+  // Handle ESC key to close dropdown
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      }
     };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscKey);
+      return () => {
+        document.removeEventListener('keydown', handleEscKey);
+      };
+    }
+  }, [isOpen]);
+
+  // Adjust dropdown position to prevent overflow
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const dropdown = dropdownRef.current.querySelector('.dropdown-content');
+      const rect = dropdown.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      
+      // Reset positioning
+      dropdown.style.left = '0';
+      dropdown.style.right = 'auto';
+      dropdown.style.transform = 'none';
+      
+      // Check if dropdown overflows on the right
+      if (rect.right > viewportWidth - 16) {
+        dropdown.style.left = 'auto';
+        dropdown.style.right = '0';
+      }
+      
+      // Check if dropdown overflows on the left
+      if (rect.left < 16) {
+        dropdown.style.left = '16px';
+        dropdown.style.right = 'auto';
+      }
+    }
+  }, [isOpen]);
+
+  const toggleDropdown = useCallback(() => {
+    setIsOpen(prev => !prev);
   }, []);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     const newState = !selectAll;
     setSelectAll(newState);
     setSelectedTypes({
@@ -91,9 +178,9 @@ const HomeType = ({ onApply, currentType = '' }) => {
       manufactured: false
     });
     onApply('');
-  };
+  }, [selectAll, onApply]);
 
-  const handleTypeChange = (type) => {
+  const handleTypeChange = useCallback((type) => {
     const updatedTypes = {
       ...selectedTypes,
       [type]: !selectedTypes[type]
@@ -102,65 +189,134 @@ const HomeType = ({ onApply, currentType = '' }) => {
     setSelectedTypes(updatedTypes);
     setSelectAll(false);
     
-    const displayType = type === 'condos' ? 'Condos/Co-ops' : 
-                     type === 'townhomes' ? 'Townhomes' :
-                     type === 'multifamily' ? 'Multi-family' :
-                     type === 'manufactured' ? 'Manufactured' :
-                     type === 'houses' ? 'Houses' :
-                     type === 'apartments' ? 'Apartments' :
-                     type === 'lots' ? 'Lots/Land' : '';
-    
+    const displayType = homeTypeOptions[type]?.label || '';
     onApply(updatedTypes[type] ? displayType : '');
-  };
+  }, [selectedTypes, onApply]);
 
   const hasActiveFilter = currentType && currentType !== '';
+  const selectedCount = Object.values(selectedTypes).filter(Boolean).length;
 
   return (
     <div className="filter-dropdown" ref={dropdownRef}>
       <button 
+        ref={buttonRef}
         className={`filter-btn ${isOpen ? 'active-dropdown' : ''}`}
         onClick={toggleDropdown}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        aria-label={`Home type filter${hasActiveFilter ? ` (${currentType} selected)` : ''}`}
       >
         Home Type {isOpen ? '▲' : '▼'}
         {hasActiveFilter && (
-          <span style={{ marginLeft: '4px', color: '#78CADC' }}>•</span>
+          <span style={{ 
+            marginLeft: '6px', 
+            color: '#78CADC',
+            fontSize: '12px',
+            fontWeight: '600'
+          }}>
+            •
+          </span>
         )}
       </button>
       
       {isOpen && (
-        <div className="dropdown-content fade-in">
-          <h3 className="dropdown-subtitle">Home Type</h3>
-          <div className="type-options">
-            <div className="type-option">
+        <div className="dropdown-content fade-in" role="dialog" aria-modal="true">
+          <h3 className="dropdown-subtitle">
+            🏠 Select Home Type
+          </h3>
+          <div className="type-options" role="group" aria-label="Home type options">
+            {/* Select All Option */}
+            <div 
+              className="type-option"
+              onClick={handleSelectAll}
+              role="option"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelectAll();
+                }
+              }}
+            >
               <input 
                 type="checkbox" 
                 id="selectAll" 
                 checked={selectAll}
                 onChange={handleSelectAll}
+                aria-label="Select all home types"
               />
-              <label htmlFor="selectAll">Select All</label>
+              <label htmlFor="selectAll">
+                <span style={{ fontWeight: '700', marginRight: '8px' }}>✨</span>
+                All Home Types
+              </label>
             </div>
             
-            {Object.entries({
-              houses: 'Houses',
-              townhomes: 'Townhomes',
-              multifamily: 'Multi-family',
-              condos: 'Condos/Co-ops',
-              lots: 'Lots/Land',
-              apartments: 'Apartments',
-              manufactured: 'Manufactured'
-            }).map(([key, label]) => (
-              <div key={key} className="type-option">
+            {/* Individual Home Type Options */}
+            {Object.entries(homeTypeOptions).map(([key, option]) => (
+              <div 
+                key={key} 
+                className="type-option"
+                onClick={() => handleTypeChange(key)}
+                role="option"
+                tabIndex={0}
+                aria-selected={selectedTypes[key]}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleTypeChange(key);
+                  }
+                }}
+              >
                 <input 
                   type="checkbox" 
                   id={key} 
                   checked={selectedTypes[key] || false}
                   onChange={() => handleTypeChange(key)}
+                  aria-label={`Select ${option.label}`}
                 />
-                <label htmlFor={key}>{label}</label>
+                <label htmlFor={key}>
+                  <span style={{ 
+                    marginRight: '8px', 
+                    fontSize: '16px',
+                    filter: selectedTypes[key] ? 'brightness(1.2)' : 'brightness(0.8)'
+                  }}>
+                    {option.icon}
+                  </span>
+                  <span style={{ fontWeight: selectedTypes[key] ? '600' : '500' }}>
+                    {option.label}
+                  </span>
+                  <span style={{ 
+                    fontSize: '11px', 
+                    color: selectedTypes[key] ? '#78CADC' : 'rgba(184, 196, 200, 0.7)',
+                    marginLeft: '4px',
+                    fontStyle: 'italic'
+                  }}>
+                    • {option.description}
+                  </span>
+                </label>
               </div>
             ))}
           </div>
+          
+          {/* Summary footer */}
+          {(selectedCount > 0 || selectAll) && (
+            <div style={{
+              marginTop: '16px',
+              padding: '12px 16px',
+              background: 'linear-gradient(145deg, rgba(120, 202, 220, 0.08) 0%, rgba(120, 202, 220, 0.03) 100%)',
+              borderRadius: '8px',
+              border: '1px solid rgba(120, 202, 220, 0.2)',
+              fontSize: '12px',
+              color: '#78CADC',
+              textAlign: 'center',
+              fontWeight: '500'
+            }}>
+              {selectAll 
+                ? '🌟 Showing all property types' 
+                : `📋 ${selectedCount} type${selectedCount !== 1 ? 's' : ''} selected`
+              }
+            </div>
+          )}
         </div>
       )}
     </div>
