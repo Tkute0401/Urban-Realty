@@ -22,6 +22,8 @@ router.get('/my-subscription', subscriptionController.getMySubscription);
 router.put('/cancel', subscriptionController.cancelSubscription);
 router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
 router.get('/listing-limit', subscriptionController.checkListingLimit);
+router.get('/billing-history', subscriptionController.getBillingHistory);
+router.put('/payment-method', subscriptionController.updatePaymentMethod);
 
 // Admin only routes
 router.use(authorize('admin'));
