@@ -135,9 +135,26 @@ const SubscriptionPlans = () => {
         Choose Your Plan
       </Typography>
       
-      <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 6 }}>
+      <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 4 }}>
         Select the perfect plan for your real estate needs
       </Typography>
+      
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Button
+          variant="outlined"
+          href="/subscription-comparison"
+          sx={{ 
+            borderColor: '#78CADC',
+            color: '#78CADC',
+            '&:hover': {
+              borderColor: '#5BA3B3',
+              backgroundColor: 'rgba(120, 202, 220, 0.1)'
+            }
+          }}
+        >
+          Compare All Plans
+        </Button>
+      </Box>
 
       <Grid container spacing={4}>
         {plans.map((plan) => (

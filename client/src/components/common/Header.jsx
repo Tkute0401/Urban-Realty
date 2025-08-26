@@ -105,6 +105,16 @@ const Header = () => {
                   <span>Browse Properties</span>
                 </Link>
                 
+                <Link to="/subscriptions" className="menu-item" onClick={handleMenuClose}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="menu-item-icon">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M12 11v6"></path>
+                    <path d="M9 14l3 3 3-3"></path>
+                  </svg>
+                  <span>Subscription Plans</span>
+                </Link>
+                
                 {user?.role === 'agent' && (
                   <Link to="/add-property" className="menu-item" onClick={handleMenuClose}>
                     <AddIcon className="menu-item-icon" />
@@ -149,6 +159,16 @@ const Header = () => {
             <Link to="/properties" className="nav-item">
               <ListIcon />
               <span>Browse</span>
+            </Link>
+
+            <Link to="/subscriptions" className="nav-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M12 11v6"></path>
+                <path d="M9 14l3 3 3-3"></path>
+              </svg>
+              <span>Plans</span>
             </Link>
 
             {user?.role === 'agent' && (
