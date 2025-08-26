@@ -45,6 +45,7 @@ import EditDeveloperPage from './pages/Developer/EditDeveloperPage';
 import SubscriptionPlans from './components/Subscription/SubscriptionPlans';
 import SubscriptionManagement from './components/Subscription/SubscriptionManagement';
 import SubscriptionComparison from './components/Subscription/SubscriptionComparison';
+import BillingDashboard from './components/Subscription/BillingDashboard';
 
 function App() {
   const location = useLocation();
@@ -82,9 +83,10 @@ function App() {
                 <Route path="/packers-and-movers" element={<PackersMovers />}/>
                 <Route path="/interior-design" element={<InteriorDesign />}/>
                 <Route path="/emi-calculator" element={<EMICalculator />}/>
-                <Route path="/subscriptions" element={<SubscriptionPlans />} />
-                <Route path="/subscription-management" element={<SubscriptionManagement />} />
-                <Route path="/subscription-comparison" element={<SubscriptionComparison />} />
+                        <Route path="/subscriptions" element={<SubscriptionPlans />} />
+        <Route path="/subscription-management" element={<SubscriptionManagement />} />
+        <Route path="/subscription-comparison" element={<SubscriptionComparison />} />
+        <Route path="/billing-dashboard" element={<BillingDashboard />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
