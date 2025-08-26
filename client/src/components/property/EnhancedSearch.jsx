@@ -93,7 +93,7 @@ const EnhancedSearch = ({
 
       setLoading(true);
       try {
-        const response = await fetch(`/api/v1/properties/search-suggestions?query=${encodeURIComponent(query)}`);
+        const response = await fetch(`/properties/search-suggestions?query=${encodeURIComponent(query)}`);
         const data = await response.json();
         
         if (data.success) {
