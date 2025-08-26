@@ -27,7 +27,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['buyer', 'agent', 'admin'],
+    enum: ['buyer', 'agent', 'admin', 'painter', 'interior_designer', 'lawyer'],
     default: 'buyer'
   },
   password: {
@@ -73,7 +73,56 @@ const UserSchema = new mongoose.Schema({
         default: Date.now
       }
     }
-  ]
+  ],
+  // Subscription related fields
+  currentSubscription: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'UserSubscription'
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ['free', 'basic', 'premium', 'enterprise'],
+    default: 'free'
+  },
+  subscriptionExpiry: {
+    type: Date
+  },
+  // Professional fields for new roles
+  professionalInfo: {
+    licenseNumber: {
+      type: String,
+      trim: true
+    },
+    yearsOfExperience: {
+      type: Number,
+      min: 0
+    },
+    specializations: [{
+      type: String,
+      trim: true
+    }],
+    certifications: [{
+      type: String,
+      trim: true
+    }],
+    businessName: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Business name cannot be more than 100 characters']
+    },
+    businessAddress: {
+      type: String,
+      trim: true
+    },
+    businessPhone: {
+      type: String,
+      trim: true
+    },
+    businessWebsite: {
+      type: String,
+      trim: true
+    }
+  }
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
