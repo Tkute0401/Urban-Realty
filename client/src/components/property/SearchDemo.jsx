@@ -247,7 +247,7 @@ const SearchDemo = () => {
           fontFamily: 'monospace',
           fontSize: '0.9rem'
         }}>
-          GET /api/v1/properties/search-suggestions?query={'{searchTerm}'}
+          GET /properties/search-suggestions?query={'{searchTerm}'}
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
           This endpoint returns categorized suggestions including cities, states, property types, and amenities,
