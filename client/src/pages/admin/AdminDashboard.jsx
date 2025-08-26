@@ -82,7 +82,6 @@ import {
   Upload as UploadIcon,
   Backup as BackupIcon,
   Restore as RestoreIcon,
-  Security as SecurityIcon,
   VpnKey as KeyIcon,
   Storage as StorageIcon,
   CloudUpload as CloudIcon,

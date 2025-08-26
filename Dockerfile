@@ -3,7 +3,7 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/client
 COPY client/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 COPY client .
 ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_MAPS_API_KEY

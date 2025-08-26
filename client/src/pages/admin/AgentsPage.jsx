@@ -406,7 +406,7 @@ const AgentsPage = () => {
                   <MenuItem value="all">All Levels</MenuItem>
                   <MenuItem value="high">High (80%+)</MenuItem>
                   <MenuItem value="medium">Medium (60-79%)</MenuItem>
-                  <MenuItem value="low">Low (<60%)</MenuItem>
+                  <MenuItem value="low">Low (&lt;60%)</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -663,7 +663,7 @@ const AgentsPage = () => {
                           <Avatar sx={{ bgcolor: 'info.main' }}>
                             <CalendarIcon />
                           </Avatar>
-                        </ListItemText>
+                        </ListItemAvatar>
                         <ListItemText
                           primary={new Date(selectedAgent.createdAt).toLocaleDateString()}
                           secondary="Member Since"

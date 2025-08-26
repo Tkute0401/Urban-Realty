@@ -102,7 +102,6 @@ import {
   Update as UpdateIcon,
   Restore as RestoreIcon,
   Backup as BackupIcon,
-  Security as SecurityIcon,
   Shield as ShieldIcon,
   VerifiedUser as VerifiedIcon,
   GppBad as BadIcon,
