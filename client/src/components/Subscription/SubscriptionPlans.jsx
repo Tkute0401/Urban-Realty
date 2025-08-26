@@ -19,19 +19,24 @@ import {
   DialogActions,
   TextField,
   MenuItem,
-  Alert
+  Alert,
+  Badge
 } from '@mui/material';
 import {
   Check as CheckIcon,
   Close as CloseIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  CheckCircle as CheckCircleIcon,
+  Schedule as ScheduleIcon
 } from '@mui/icons-material';
 import axios from '../../services/axios';
 import { useAuth } from '../../context/AuthContext';
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
+  const [currentSubscription, setCurrentSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
@@ -45,6 +50,7 @@ const SubscriptionPlans = () => {
 
   useEffect(() => {
     fetchPlans();
+    fetchCurrentSubscription();
   }, []);
 
   const fetchPlans = async () => {
@@ -58,6 +64,22 @@ const SubscriptionPlans = () => {
       console.error('Error fetching plans:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCurrentSubscription = async () => {
+    try {
+      setSubscriptionLoading(true);
+      if (user) {
+        const response = await axios.get('/subscriptions/my-subscription');
+        console.log('Fetched current subscription:', response.data);
+        setCurrentSubscription(response.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching current subscription:', err);
+      // Don't set error here as it's not critical for the plans page
+    } finally {
+      setSubscriptionLoading(false);
     }
   };
 
@@ -83,8 +105,8 @@ const SubscriptionPlans = () => {
       setTimeout(() => {
         setSubscribeDialog(false);
         setSubscribeSuccess(false);
-        // Refresh user data or redirect
-        window.location.reload();
+        // Refresh subscription data
+        fetchCurrentSubscription();
       }, 2000);
     } catch (err) {
       setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
@@ -114,6 +136,95 @@ const SubscriptionPlans = () => {
     return null;
   };
 
+  const isCurrentPlan = (plan) => {
+    if (!currentSubscription?.currentSubscription) return false;
+    return currentSubscription.currentSubscription.subscription?._id === plan._id;
+  };
+
+  const getCurrentPlanBadge = (plan) => {
+    if (!isCurrentPlan(plan)) return null;
+
+    const subscription = currentSubscription.currentSubscription;
+    const isActive = subscription.status === 'active';
+    const isPending = subscription.status === 'pending';
+    const isExpired = subscription.status === 'expired' || subscription.status === 'cancelled';
+
+    let badgeColor = 'success';
+    let badgeText = 'Current Plan';
+    let badgeIcon = <CheckCircleIcon />;
+
+    if (isPending) {
+      badgeColor = 'warning';
+      badgeText = 'Pending';
+      badgeIcon = <ScheduleIcon />;
+    } else if (isExpired) {
+      badgeColor = 'error';
+      badgeText = 'Expired';
+      badgeIcon = <CloseIcon />;
+    }
+
+    return (
+      <Chip
+        icon={badgeIcon}
+        label={badgeText}
+        color={badgeColor}
+        variant="filled"
+        size="small"
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 1,
+          fontWeight: 'bold'
+        }}
+      />
+    );
+  };
+
+  const getPlanCardStyle = (plan) => {
+    const isCurrent = isCurrentPlan(plan);
+    const baseStyle = {
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        transition: 'transform 0.3s ease-in-out'
+      }
+    };
+
+    if (isCurrent) {
+      return {
+        ...baseStyle,
+        border: '3px solid #4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.05)',
+        boxShadow: '0 8px 32px rgba(76, 175, 80, 0.3)',
+        '&:hover': {
+          ...baseStyle['&:hover'],
+          boxShadow: '0 12px 40px rgba(76, 175, 80, 0.4)'
+        }
+      };
+    }
+
+    if (plan.type === 'premium') {
+      return {
+        ...baseStyle,
+        border: '2px solid #FFD700',
+        boxShadow: '0 8px 32px rgba(255, 215, 0, 0.3)',
+        '&:hover': {
+          ...baseStyle['&:hover'],
+          boxShadow: '0 12px 40px rgba(255, 215, 0, 0.4)'
+        }
+      };
+    }
+
+    return {
+      ...baseStyle,
+      border: '1px solid #e0e0e0'
+    };
+  };
+
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -140,6 +251,51 @@ const SubscriptionPlans = () => {
         Select the perfect plan for your real estate needs
       </Typography>
       
+      {/* Current Subscription Summary */}
+      {user && (
+        <Box sx={{ mb: 4, p: 3, bgcolor: 'rgba(76, 175, 80, 0.1)', borderRadius: 2, border: '1px solid #4CAF50' }}>
+          <Typography variant="h6" sx={{ color: '#4CAF50', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CheckCircleIcon />
+            Current Subscription
+          </Typography>
+          
+          {subscriptionLoading ? (
+            <Typography variant="body2" color="text.secondary">
+              Loading subscription details...
+            </Typography>
+          ) : currentSubscription?.currentSubscription ? (
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                  {currentSubscription.currentSubscription.subscription?.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {currentSubscription.currentSubscription.billingCycle} billing • ${currentSubscription.currentSubscription.amount}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Status: <Chip 
+                    label={currentSubscription.currentSubscription.status} 
+                    color={currentSubscription.currentSubscription.status === 'active' ? 'success' : 'warning'}
+                    size="small"
+                  />
+                </Typography>
+                {currentSubscription.currentSubscription.endDate && (
+                  <Typography variant="body2" color="text.secondary">
+                    Expires: {new Date(currentSubscription.currentSubscription.endDate).toLocaleDateString()}
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No active subscription found. Choose a plan below to get started.
+            </Typography>
+          )}
+        </Box>
+      )}
+
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Button
           variant="outlined"
@@ -161,20 +317,14 @@ const SubscriptionPlans = () => {
         {plans.map((plan) => (
           <Grid item xs={12} md={6} lg={3} key={plan._id}>
             <Card 
-              elevation={plan.type === 'premium' ? 8 : 2}
-              sx={{ 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                border: plan.type === 'premium' ? '2px solid #FFD700' : '1px solid #e0e0e0',
-                position: 'relative',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  transition: 'transform 0.3s ease-in-out'
-                }
-              }}
+              elevation={isCurrentPlan(plan) ? 12 : plan.type === 'premium' ? 8 : 2}
+              sx={getPlanCardStyle(plan)}
             >
-              {plan.type === 'premium' && (
+              {/* Current Plan Badge */}
+              {getCurrentPlanBadge(plan)}
+
+              {/* Premium Badge */}
+              {plan.type === 'premium' && !isCurrentPlan(plan) && (
                 <Box
                   sx={{
                     position: 'absolute',
@@ -187,27 +337,52 @@ const SubscriptionPlans = () => {
                     py: 0.5,
                     borderRadius: 1,
                     fontSize: '0.875rem',
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    zIndex: 1
                   }}
                 >
                   MOST POPULAR
                 </Box>
               )}
 
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
+              <CardContent sx={{ flexGrow: 1, textAlign: 'center', pt: isCurrentPlan(plan) ? 4 : 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                   {getPlanIcon(plan.type)}
-                  <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
+                  <Typography 
+                    variant="h5" 
+                    component="h2" 
+                    sx={{ 
+                      fontWeight: 'bold',
+                      color: isCurrentPlan(plan) ? '#4CAF50' : 'inherit'
+                    }}
+                  >
                     {plan.name}
                   </Typography>
                 </Box>
                 
-                <Typography variant="h4" component="div" sx={{ mb: 2, color: '#78CADC' }}>
+                <Typography variant="h4" component="div" sx={{ mb: 2, color: isCurrentPlan(plan) ? '#4CAF50' : '#78CADC' }}>
                   ${plan.price}
                   <Typography variant="body2" component="span" color="text.secondary">
                     /{plan.billingCycle}
                   </Typography>
                 </Typography>
+
+                {/* Current Plan Details */}
+                {isCurrentPlan(plan) && currentSubscription?.currentSubscription && (
+                  <Box sx={{ mb: 2, p: 1, bgcolor: 'rgba(76, 175, 80, 0.1)', borderRadius: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Billing Cycle: {currentSubscription.currentSubscription.billingCycle}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Status: {currentSubscription.currentSubscription.status}
+                    </Typography>
+                    {currentSubscription.currentSubscription.endDate && (
+                      <Typography variant="body2" color="text.secondary">
+                        Expires: {new Date(currentSubscription.currentSubscription.endDate).toLocaleDateString()}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
 
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   {plan.description}
@@ -261,10 +436,36 @@ const SubscriptionPlans = () => {
               </CardContent>
 
               <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-                {plan.type === 'free' ? (
+                {isCurrentPlan(plan) ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
+                    <Chip 
+                      icon={<CheckCircleIcon />}
+                      label="Current Plan" 
+                      color="success" 
+                      variant="filled"
+                      size="large"
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                    <Button
+                      variant="outlined"
+                      size="medium"
+                      onClick={() => window.location.href = '/subscription-change'}
+                      sx={{ 
+                        borderColor: '#4CAF50',
+                        color: '#4CAF50',
+                        '&:hover': {
+                          borderColor: '#45a049',
+                          backgroundColor: 'rgba(76, 175, 80, 0.1)'
+                        }
+                      }}
+                    >
+                      Change Plan
+                    </Button>
+                  </Box>
+                ) : plan.type === 'free' ? (
                   <Chip 
-                    label="Current Plan" 
-                    color="success" 
+                    label="Free Plan" 
+                    color="default" 
                     variant="outlined"
                     size="large"
                   />
@@ -273,7 +474,7 @@ const SubscriptionPlans = () => {
                     variant="contained"
                     size="large"
                     onClick={() => handleSubscribe(plan)}
-                    disabled={user?.subscriptionStatus === plan.type}
+                    disabled={!user}
                     sx={{ 
                       bgcolor: plan.type === 'premium' ? '#FFD700' : '#78CADC',
                       color: plan.type === 'premium' ? '#000' : '#fff',
@@ -282,7 +483,7 @@ const SubscriptionPlans = () => {
                       }
                     }}
                   >
-                    {user?.subscriptionStatus === plan.type ? 'Current Plan' : 'Subscribe'}
+                    {!user ? 'Login to Subscribe' : 'Subscribe'}
                   </Button>
                 )}
               </CardActions>
