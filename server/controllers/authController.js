@@ -3,7 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role, mobile, occupation } = req.body;
+  const { name, email, password, role, mobile, occupation, professionalInfo } = req.body;
 
   // Validate required fields
   if (!name || !email || !password) {
@@ -19,15 +19,23 @@ exports.register = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Email already in use', 400));
   }
 
-  // Create user
-  const user = await User.create({
+  // Prepare user data
+  const userData = {
     name,
     email,
     password,
     role: role || 'buyer',
     mobile: mobile || '',
     occupation: occupation || ''
-  });
+  };
+
+  // Add professional info for professional roles
+  if (['painter', 'interior_designer', 'lawyer', 'agent'].includes(role) && professionalInfo) {
+    userData.professionalInfo = professionalInfo;
+  }
+
+  // Create user
+  const user = await User.create(userData);
 
   // Create token
   const token = user.getSignedJwtToken();
@@ -41,7 +49,8 @@ exports.register = asyncHandler(async (req, res, next) => {
       email: user.email,
       mobile: user.mobile,
       role: user.role,
-      occupation: user.occupation
+      occupation: user.occupation,
+      professionalInfo: user.professionalInfo
     }
   });
 });
@@ -77,7 +86,9 @@ exports.login = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       mobile: user.mobile,
-      role: user.role
+      role: user.role,
+      occupation: user.occupation,
+      professionalInfo: user.professionalInfo
     }
   });
 });
