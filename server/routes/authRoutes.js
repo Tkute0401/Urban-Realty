@@ -3,6 +3,11 @@ const router = express.Router();
 const { check } = require('express-validator');
 const authController = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const {
+  requireFavoritesAccess,
+  requireRecentlyViewedAccess,
+  requireProfileAccess
+} = require('../middleware/subscriptionAccess');
 
 router.post(
   '/register',
@@ -29,7 +34,7 @@ router.get('/me', protect, authController.getMe);
 
 router.put(
   '/update',
-  protect,
+  [protect, requireProfileAccess],
   [
     check('name', 'Name is required').optional().not().isEmpty(),
     check('email', 'Please include a valid email').optional().isEmail(),
@@ -40,22 +45,22 @@ router.put(
 );
 // Favorites routes
 router.route('/favorites/:propertyId')
-  .put(protect, authController.addToFavorites)
-  .delete(protect, authController.removeFromFavorites);
+  .put([protect, requireFavoritesAccess], authController.addToFavorites)
+  .delete([protect, requireFavoritesAccess], authController.removeFromFavorites);
 
 // Add these routes to your auth routes file
 router.route('/favorites/:propertyId/status')
-  .get(protect, authController.checkFavoriteStatus);
+  .get([protect, requireFavoritesAccess], authController.checkFavoriteStatus);
 
 router.route('/favorites/:propertyId')
-  .put(protect, authController.toggleFavorite);  
+  .put([protect, requireFavoritesAccess], authController.toggleFavorite);  
 
-router.get('/favorites', protect, authController.getFavorites);
+router.get('/favorites', [protect, requireFavoritesAccess], authController.getFavorites);
 
 // Recently viewed routes
 router.route('/recently-viewed/:propertyId')
-  .post(protect, authController.addToRecentlyViewed);
+  .post([protect, requireRecentlyViewedAccess], authController.addToRecentlyViewed);
 
-router.get('/recently-viewed', protect, authController.getRecentlyViewed);
+router.get('/recently-viewed', [protect, requireRecentlyViewedAccess], authController.getRecentlyViewed);
 
 module.exports = router;

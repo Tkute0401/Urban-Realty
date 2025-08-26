@@ -276,6 +276,80 @@ exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getStats = asyncHandler(async (req, res, next) => {
   try {
+    // Get UserSubscription model
+    const UserSubscription = require('../models/UserSubscription');
+    const Subscription = require('../models/Subscription');
+    
+    // Calculate subscription breakdown
+    const subscriptionBreakdown = await User.aggregate([
+      {
+        $group: {
+          _id: '$subscriptionStatus',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const subscriptionCounts = {
+      free: 0,
+      basic: 0,
+      premium: 0,
+      enterprise: 0
+    };
+
+    subscriptionBreakdown.forEach(item => {
+      subscriptionCounts[item._id] = item.count;
+    });
+
+    // Calculate revenue (simplified - you might want to integrate with actual payment system)
+    const activeSubscriptions = await UserSubscription.find({ status: 'active' })
+      .populate('subscription');
+    
+    let monthlyRevenue = 0;
+    activeSubscriptions.forEach(sub => {
+      if (sub.subscription) {
+        monthlyRevenue += sub.subscription.price;
+      }
+    });
+
+    // Get recent subscription changes (you might want to create a separate model for this)
+    const recentSubscriptionChanges = await User.find({
+      subscriptionStatus: { $exists: true, $ne: 'free' }
+    })
+    .sort('-updatedAt')
+    .limit(5)
+    .select('name subscriptionStatus updatedAt');
+
+    // Mock access control data (you might want to create a separate model for this)
+    const accessControlData = {
+      totalChecks: Math.floor(Math.random() * 1000) + 500,
+      deniedAccess: Math.floor(Math.random() * 100) + 20,
+      upgradePrompts: Math.floor(Math.random() * 50) + 10,
+      successfulUpgrades: Math.floor(Math.random() * 30) + 5
+    };
+
+    // Mock access violations (you might want to create a separate model for this)
+    const mockAccessViolations = [
+      {
+        id: '1',
+        userName: 'John Doe',
+        feature: 'Advanced Analytics',
+        requiredPlan: 'premium',
+        currentPlan: 'basic',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        ipAddress: '192.168.1.100'
+      },
+      {
+        id: '2',
+        userName: 'Jane Smith',
+        feature: 'API Access',
+        requiredPlan: 'enterprise',
+        currentPlan: 'premium',
+        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
+        ipAddress: '192.168.1.101'
+      }
+    ];
+
     const [usersCount, agentsCount, propertiesCount, contactsCount, recentUsers, recentProperties, recentContacts] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ role: 'agent' }),
@@ -295,17 +369,226 @@ exports.getStats = asyncHandler(async (req, res, next) => {
           users: usersCount,
           agents: agentsCount,
           properties: propertiesCount,
-          contacts: contactsCount
+          contacts: contactsCount,
+          subscriptions: activeSubscriptions.length,
+          revenue: monthlyRevenue,
+          accessViolations: mockAccessViolations.length,
+          pendingUpgrades: Math.floor(Math.random() * 20) + 5
         },
         recent: {
           users: recentUsers,
           properties: recentProperties,
-          contacts: recentContacts
-        }
+          contacts: recentContacts,
+          accessViolations: mockAccessViolations,
+          subscriptionChanges: recentSubscriptionChanges.map(user => ({
+            userName: user.name,
+            action: `upgraded to ${user.subscriptionStatus}`,
+            timestamp: user.updatedAt
+          }))
+        },
+        subscriptionBreakdown: subscriptionCounts,
+        accessControl: accessControlData
       }
     });
   } catch (err) {
     console.error('Error fetching stats:', err);
     next(new ErrorResponse('Failed to fetch dashboard statistics', 500));
   }
+});
+
+// @desc    Get access violations
+// @route   GET /api/v1/admin/access-violations
+// @access  Private/Admin
+exports.getAccessViolations = asyncHandler(async (req, res, next) => {
+  // This would typically query a separate AccessViolation model
+  // For now, returning mock data
+  const violations = [
+    {
+      id: '1',
+      userName: 'John Doe',
+      userEmail: 'john@example.com',
+      feature: 'Advanced Analytics',
+      requiredPlan: 'premium',
+      currentPlan: 'basic',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      ipAddress: '192.168.1.100',
+      status: 'pending'
+    },
+    {
+      id: '2',
+      userName: 'Jane Smith',
+      userEmail: 'jane@example.com',
+      feature: 'API Access',
+      requiredPlan: 'enterprise',
+      currentPlan: 'premium',
+      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
+      ipAddress: '192.168.1.101',
+      status: 'warned'
+    }
+  ];
+
+  res.status(200).json({
+    success: true,
+    count: violations.length,
+    data: violations
+  });
+});
+
+// @desc    Handle access violation
+// @route   PUT /api/v1/admin/access-violations/:id
+// @access  Private/Admin
+exports.handleAccessViolation = asyncHandler(async (req, res, next) => {
+  const { action } = req.body;
+  const violationId = req.params.id;
+
+  // This would typically update a separate AccessViolation model
+  // For now, just returning success
+  res.status(200).json({
+    success: true,
+    message: `Violation ${violationId} handled with action: ${action}`,
+    data: {
+      id: violationId,
+      action: action,
+      handledAt: new Date()
+    }
+  });
+});
+
+// @desc    Get subscription analytics
+// @route   GET /api/v1/admin/subscription-analytics
+// @access  Private/Admin
+exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
+  try {
+    const UserSubscription = require('../models/UserSubscription');
+    
+    // Get subscription analytics
+    const analytics = await UserSubscription.aggregate([
+      {
+        $lookup: {
+          from: 'subscriptions',
+          localField: 'subscription',
+          foreignField: '_id',
+          as: 'subscriptionDetails'
+        }
+      },
+      {
+        $unwind: '$subscriptionDetails'
+      },
+      {
+        $group: {
+          _id: '$subscriptionDetails.type',
+          count: { $sum: 1 },
+          totalRevenue: { $sum: '$subscriptionDetails.price' }
+        }
+      }
+    ]);
+
+    // Get monthly trends
+    const monthlyTrends = await UserSubscription.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { '_id.year': 1, '_id.month': 1 }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        analytics,
+        monthlyTrends
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching subscription analytics:', err);
+    next(new ErrorResponse('Failed to fetch subscription analytics', 500));
+  }
+});
+
+// @desc    Update user subscription
+// @route   PUT /api/v1/admin/users/:id/subscription
+// @access  Private/Admin
+exports.updateUserSubscription = asyncHandler(async (req, res, next) => {
+  const { subscriptionStatus, reason } = req.body;
+  const userId = req.params.id;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { 
+      subscriptionStatus,
+      subscriptionUpdatedAt: new Date(),
+      subscriptionUpdateReason: reason
+    },
+    { new: true, runValidators: true }
+  ).select('-password');
+
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `User subscription updated to ${subscriptionStatus}`,
+    data: user
+  });
+});
+
+// @desc    Get user subscription history
+// @route   GET /api/v1/admin/users/:id/subscription-history
+// @access  Private/Admin
+exports.getUserSubscriptionHistory = asyncHandler(async (req, res, next) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  // This would typically query a separate SubscriptionHistory model
+  // For now, returning mock data
+  const history = [
+    {
+      id: '1',
+      action: 'upgraded',
+      fromPlan: 'free',
+      toPlan: 'basic',
+      timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      reason: 'User requested upgrade'
+    },
+    {
+      id: '2',
+      action: 'upgraded',
+      fromPlan: 'basic',
+      toPlan: 'premium',
+      timestamp: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+      reason: 'Automatic upgrade'
+    }
+  ];
+
+  res.status(200).json({
+    success: true,
+    data: {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        currentSubscription: user.subscriptionStatus
+      },
+      history
+    }
+  });
 });

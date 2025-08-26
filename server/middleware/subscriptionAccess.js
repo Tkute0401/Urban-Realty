@@ -199,19 +199,19 @@ const requireWhiteLabelAccess = requireSubscription.bind(null, 'enterprise', 'Wh
 const requireMultiUserAccess = requireSubscription.bind(null, 'enterprise', 'Multi-user features');
 
 /**
- * Middleware to check if user can access advanced analytics
+ * Middleware to check if user can access lead management features
  */
-const requireAdvancedAnalytics = requireSubscription.bind(null, 'enterprise', 'Advanced analytics');
+const requireLeadManagement = requireSubscription.bind(null, 'basic', 'Lead management features');
 
 /**
- * Middleware to check if user can access priority listing features
+ * Middleware to check if user can access CRM features
  */
-const requirePriorityListing = requireSubscription.bind(null, 'premium', 'Priority listing features');
+const requireCRM = requireSubscription.bind(null, 'premium', 'CRM features');
 
 /**
- * Middleware to check if user can access featured property features
+ * Middleware to check if user can access team management features
  */
-const requireFeaturedProperty = requireSubscription.bind(null, 'premium', 'Featured property features');
+const requireTeamManagement = requireSubscription.bind(null, 'enterprise', 'Team management features');
 
 /**
  * Middleware to check if user can access property promotion features
@@ -219,29 +219,24 @@ const requireFeaturedProperty = requireSubscription.bind(null, 'premium', 'Featu
 const requirePropertyPromotion = requireSubscription.bind(null, 'premium', 'Property promotion features');
 
 /**
- * Middleware to check if user can access lead management features
+ * Middleware to check if user can access featured property features
  */
-const requireLeadManagement = requireSubscription.bind(null, 'premium', 'Lead management features');
+const requireFeaturedProperty = requireSubscription.bind(null, 'premium', 'Featured property features');
 
 /**
- * Middleware to check if user can access customer relationship management
+ * Middleware to check if user can access priority listing features
  */
-const requireCRM = requireSubscription.bind(null, 'enterprise', 'Customer relationship management');
+const requirePriorityListing = requireSubscription.bind(null, 'premium', 'Priority listing features');
 
 /**
- * Middleware to check if user can access workflow automation
+ * Middleware to check if user can access favorites features
  */
-const requireWorkflowAutomation = requireSubscription.bind(null, 'enterprise', 'Workflow automation');
+const requireFavoritesAccess = requireSubscription.bind(null, 'basic', 'Favorites and saved searches');
 
 /**
- * Middleware to check if user can access advanced search filters
+ * Middleware to check if user can access recently viewed features
  */
-const requireAdvancedFilters = requireSubscription.bind(null, 'basic', 'Advanced search filters');
-
-/**
- * Middleware to check if user can access saved searches
- */
-const requireSavedSearches = requireSubscription.bind(null, 'basic', 'Saved searches');
+const requireRecentlyViewedAccess = requireSubscription.bind(null, 'basic', 'Recently viewed properties');
 
 /**
  * Middleware to check if user can access property alerts
@@ -254,19 +249,9 @@ const requirePropertyAlerts = requireSubscription.bind(null, 'basic', 'Property 
 const requireMarketInsights = requireSubscription.bind(null, 'premium', 'Market insights');
 
 /**
- * Middleware to check if user can access comparative market analysis
- */
-const requireCMA = requireSubscription.bind(null, 'premium', 'Comparative market analysis');
-
-/**
  * Middleware to check if user can access investment analysis
  */
 const requireInvestmentAnalysis = requireSubscription.bind(null, 'premium', 'Investment analysis');
-
-/**
- * Middleware to check if user can access property valuation tools
- */
-const requireValuationTools = requireSubscription.bind(null, 'premium', 'Property valuation tools');
 
 /**
  * Middleware to check if user can access document management
@@ -274,24 +259,9 @@ const requireValuationTools = requireSubscription.bind(null, 'premium', 'Propert
 const requireDocumentManagement = requireSubscription.bind(null, 'premium', 'Document management');
 
 /**
- * Middleware to check if user can access e-signature features
- */
-const requireESignature = requireSubscription.bind(null, 'enterprise', 'E-signature features');
-
-/**
- * Middleware to check if user can access transaction management
- */
-const requireTransactionManagement = requireSubscription.bind(null, 'enterprise', 'Transaction management');
-
-/**
  * Middleware to check if user can access commission tracking
  */
 const requireCommissionTracking = requireSubscription.bind(null, 'premium', 'Commission tracking');
-
-/**
- * Middleware to check if user can access team management
- */
-const requireTeamManagement = requireSubscription.bind(null, 'enterprise', 'Team management');
 
 /**
  * Middleware to check if user can access performance analytics
@@ -304,34 +274,9 @@ const requirePerformanceAnalytics = requireSubscription.bind(null, 'premium', 'P
 const requireMarketingTools = requireSubscription.bind(null, 'premium', 'Marketing tools');
 
 /**
- * Middleware to check if user can access social media integration
- */
-const requireSocialMediaIntegration = requireSubscription.bind(null, 'premium', 'Social media integration');
-
-/**
- * Middleware to check if user can access email marketing
- */
-const requireEmailMarketing = requireSubscription.bind(null, 'premium', 'Email marketing');
-
-/**
- * Middleware to check if user can access SMS marketing
- */
-const requireSMSMarketing = requireSubscription.bind(null, 'enterprise', 'SMS marketing');
-
-/**
  * Middleware to check if user can access virtual tour features
  */
-const requireVirtualTour = requireSubscription.bind(null, 'premium', 'Virtual tour features');
-
-/**
- * Middleware to check if user can access 3D property visualization
- */
-const require3DVisualization = requireSubscription.bind(null, 'enterprise', '3D property visualization');
-
-/**
- * Middleware to check if user can access drone photography
- */
-const requireDronePhotography = requireSubscription.bind(null, 'premium', 'Drone photography');
+const requireVirtualTourFeatures = requireSubscription.bind(null, 'premium', 'Virtual tour features');
 
 /**
  * Middleware to check if user can access professional photography
@@ -346,7 +291,7 @@ const requireStagingServices = requireSubscription.bind(null, 'premium', 'Stagin
 /**
  * Middleware to check if user can access home inspection services
  */
-const requireHomeInspection = requireSubscription.bind(null, 'premium', 'Home inspection services');
+const requireHomeInspectionServices = requireSubscription.bind(null, 'premium', 'Home inspection services');
 
 /**
  * Middleware to check if user can access legal services
@@ -364,26 +309,6 @@ const requireInsuranceServices = requireSubscription.bind(null, 'premium', 'Insu
 const requireFinancingServices = requireSubscription.bind(null, 'premium', 'Financing services');
 
 /**
- * Middleware to check if user can access moving services
- */
-const requireMovingServices = requireSubscription.bind(null, 'basic', 'Moving services');
-
-/**
- * Middleware to check if user can access cleaning services
- */
-const requireCleaningServices = requireSubscription.bind(null, 'basic', 'Cleaning services');
-
-/**
- * Middleware to check if user can access maintenance services
- */
-const requireMaintenanceServices = requireSubscription.bind(null, 'basic', 'Maintenance services');
-
-/**
- * Middleware to check if user can access landscaping services
- */
-const requireLandscapingServices = requireSubscription.bind(null, 'basic', 'Landscaping services');
-
-/**
  * Middleware to check if user can access security services
  */
 const requireSecurityServices = requireSubscription.bind(null, 'premium', 'Security services');
@@ -396,7 +321,7 @@ const requireSmartHomeFeatures = requireSubscription.bind(null, 'premium', 'Smar
 /**
  * Middleware to check if user can access energy efficiency tools
  */
-const requireEnergyEfficiency = requireSubscription.bind(null, 'premium', 'Energy efficiency tools');
+const requireEnergyEfficiencyTools = requireSubscription.bind(null, 'premium', 'Energy efficiency tools');
 
 /**
  * Middleware to check if user can access sustainability features
@@ -404,29 +329,9 @@ const requireEnergyEfficiency = requireSubscription.bind(null, 'premium', 'Energ
 const requireSustainabilityFeatures = requireSubscription.bind(null, 'premium', 'Sustainability features');
 
 /**
- * Middleware to check if user can access neighborhood insights
- */
-const requireNeighborhoodInsights = requireSubscription.bind(null, 'basic', 'Neighborhood insights');
-
-/**
- * Middleware to check if user can access school ratings
- */
-const requireSchoolRatings = requireSubscription.bind(null, 'basic', 'School ratings');
-
-/**
  * Middleware to check if user can access crime statistics
  */
 const requireCrimeStatistics = requireSubscription.bind(null, 'premium', 'Crime statistics');
-
-/**
- * Middleware to check if user can access transportation data
- */
-const requireTransportationData = requireSubscription.bind(null, 'basic', 'Transportation data');
-
-/**
- * Middleware to check if user can access walkability scores
- */
-const requireWalkabilityScores = requireSubscription.bind(null, 'basic', 'Walkability scores');
 
 /**
  * Middleware to check if user can access air quality data
@@ -444,24 +349,9 @@ const requireFloodRiskData = requireSubscription.bind(null, 'premium', 'Flood ri
 const requireEarthquakeRiskData = requireSubscription.bind(null, 'premium', 'Earthquake risk data');
 
 /**
- * Middleware to check if user can access property history
- */
-const requirePropertyHistory = requireSubscription.bind(null, 'basic', 'Property history');
-
-/**
  * Middleware to check if user can access tax information
  */
 const requireTaxInformation = requireSubscription.bind(null, 'premium', 'Tax information');
-
-/**
- * Middleware to check if user can access HOA information
- */
-const requireHOAInformation = requireSubscription.bind(null, 'basic', 'HOA information');
-
-/**
- * Middleware to check if user can access utility information
- */
-const requireUtilityInformation = requireSubscription.bind(null, 'basic', 'Utility information');
 
 /**
  * Middleware to check if user can access permit information
@@ -484,11 +374,6 @@ const requireDevelopmentPlans = requireSubscription.bind(null, 'premium', 'Devel
 const requireMarketTrends = requireSubscription.bind(null, 'premium', 'Market trends');
 
 /**
- * Middleware to check if user can access price predictions
- */
-const requirePricePredictions = requireSubscription.bind(null, 'enterprise', 'Price predictions');
-
-/**
  * Middleware to check if user can access investment opportunities
  */
 const requireInvestmentOpportunities = requireSubscription.bind(null, 'premium', 'Investment opportunities');
@@ -509,439 +394,89 @@ const requireROICalculations = requireSubscription.bind(null, 'premium', 'ROI ca
 const requireCashFlowAnalysis = requireSubscription.bind(null, 'premium', 'Cash flow analysis');
 
 /**
- * Middleware to check if user can access mortgage calculator
+ * Middleware to check if user can access advanced cost estimators
  */
-const requireMortgageCalculator = requireSubscription.bind(null, 'basic', 'Mortgage calculator');
+const requireAdvancedCostEstimators = requireSubscription.bind(null, 'premium', 'Advanced cost estimators');
 
 /**
- * Middleware to check if user can access refinance calculator
+ * Middleware to check if user can access custom branding
  */
-const requireRefinanceCalculator = requireSubscription.bind(null, 'basic', 'Refinance calculator');
+const requireCustomBrandingAccess = requireSubscription.bind(null, 'enterprise', 'Custom branding');
 
 /**
- * Middleware to check if user can access affordability calculator
+ * Middleware to check if user can access API access
  */
-const requireAffordabilityCalculator = requireSubscription.bind(null, 'basic', 'Affordability calculator');
+const requireApiAccessControl = requireSubscription.bind(null, 'enterprise', 'API access');
 
 /**
- * Middleware to check if user can access rent vs buy calculator
+ * Middleware to check if user can access multi-user support
  */
-const requireRentVsBuyCalculator = requireSubscription.bind(null, 'basic', 'Rent vs buy calculator');
+const requireMultiUserSupport = requireSubscription.bind(null, 'enterprise', 'Multi-user support');
 
 /**
- * Middleware to check if user can access closing cost calculator
+ * Middleware to check if user can access advanced analytics
  */
-const requireClosingCostCalculator = requireSubscription.bind(null, 'basic', 'Closing cost calculator');
+const requireAdvancedAnalytics = requireSubscription.bind(null, 'enterprise', 'Advanced analytics');
 
 /**
- * Middleware to check if user can access property tax calculator
+ * Middleware to check if user can access white-label features
  */
-const requirePropertyTaxCalculator = requireSubscription.bind(null, 'basic', 'Property tax calculator');
+const requireWhiteLabelFeatures = requireSubscription.bind(null, 'enterprise', 'White-label features');
 
 /**
- * Middleware to check if user can access insurance calculator
+ * Middleware to check if user can access integration features
  */
-const requireInsuranceCalculator = requireSubscription.bind(null, 'basic', 'Insurance calculator');
+const requireIntegrationFeatures = requireSubscription.bind(null, 'enterprise', 'Integration features');
 
 /**
- * Middleware to check if user can access HOA fee calculator
+ * Middleware to check if user can access workflow automation
  */
-const requireHOAFeeCalculator = requireSubscription.bind(null, 'basic', 'HOA fee calculator');
+const requireWorkflowAutomation = requireSubscription.bind(null, 'enterprise', 'Workflow automation');
 
 /**
- * Middleware to check if user can access utility cost estimator
+ * Middleware to check if user can access customer relationship management
  */
-const requireUtilityCostEstimator = requireSubscription.bind(null, 'basic', 'Utility cost estimator');
+const requireCustomerRelationshipManagement = requireSubscription.bind(null, 'enterprise', 'Customer relationship management');
 
 /**
- * Middleware to check if user can access maintenance cost estimator
+ * Middleware to check if user can access SMS marketing
  */
-const requireMaintenanceCostEstimator = requireSubscription.bind(null, 'premium', 'Maintenance cost estimator');
+const requireSMSMarketing = requireSubscription.bind(null, 'enterprise', 'SMS marketing');
 
 /**
- * Middleware to check if user can access renovation cost estimator
+ * Middleware to check if user can access 3D property visualization
  */
-const requireRenovationCostEstimator = requireSubscription.bind(null, 'premium', 'Renovation cost estimator');
+const require3DPropertyVisualization = requireSubscription.bind(null, 'enterprise', '3D property visualization');
 
 /**
- * Middleware to check if user can access landscaping cost estimator
+ * Middleware to check if user can access e-signature features
  */
-const requireLandscapingCostEstimator = requireSubscription.bind(null, 'premium', 'Landscaping cost estimator');
+const requireESignatureFeatures = requireSubscription.bind(null, 'enterprise', 'E-signature features');
 
 /**
- * Middleware to check if user can access pool cost estimator
+ * Middleware to check if user can access transaction management
  */
-const requirePoolCostEstimator = requireSubscription.bind(null, 'premium', 'Pool cost estimator');
+const requireTransactionManagement = requireSubscription.bind(null, 'enterprise', 'Transaction management');
 
 /**
- * Middleware to check if user can access solar panel cost estimator
+ * Middleware to check if user can access team management
  */
-const requireSolarPanelCostEstimator = requireSubscription.bind(null, 'premium', 'Solar panel cost estimator');
+const requireTeamManagementAccess = requireSubscription.bind(null, 'enterprise', 'Team management');
 
 /**
- * Middleware to check if user can access smart home cost estimator
+ * Middleware to check if user can access bulk operations
  */
-const requireSmartHomeCostEstimator = requireSubscription.bind(null, 'premium', 'Smart home cost estimator');
+const requireBulkOperationsAccess = requireSubscription.bind(null, 'enterprise', 'Bulk operations');
 
 /**
- * Middleware to check if user can access security system cost estimator
+ * Middleware to check if user can access import features
  */
-const requireSecuritySystemCostEstimator = requireSubscription.bind(null, 'premium', 'Security system cost estimator');
+const requireImportFeatures = requireSubscription.bind(null, 'enterprise', 'Import features');
 
 /**
- * Middleware to check if user can access home theater cost estimator
+ * Middleware to check if user can access price predictions
  */
-const requireHomeTheaterCostEstimator = requireSubscription.bind(null, 'premium', 'Home theater cost estimator');
-
-/**
- * Middleware to check if user can access wine cellar cost estimator
- */
-const requireWineCellarCostEstimator = requireSubscription.bind(null, 'premium', 'Wine cellar cost estimator');
-
-/**
- * Middleware to check if user can access home gym cost estimator
- */
-const requireHomeGymCostEstimator = requireSubscription.bind(null, 'premium', 'Home gym cost estimator');
-
-/**
- * Middleware to check if user can access home office cost estimator
- */
-const requireHomeOfficeCostEstimator = requireSubscription.bind(null, 'premium', 'Home office cost estimator');
-
-/**
- * Middleware to check if user can access guest house cost estimator
- */
-const requireGuestHouseCostEstimator = requireSubscription.bind(null, 'premium', 'Guest house cost estimator');
-
-/**
- * Middleware to check if user can access garage cost estimator
- */
-const requireGarageCostEstimator = requireSubscription.bind(null, 'premium', 'Garage cost estimator');
-
-/**
- * Middleware to check if user can access shed cost estimator
- */
-const requireShedCostEstimator = requireSubscription.bind(null, 'premium', 'Shed cost estimator');
-
-/**
- * Middleware to check if user can access deck cost estimator
- */
-const requireDeckCostEstimator = requireSubscription.bind(null, 'premium', 'Deck cost estimator');
-
-/**
- * Middleware to check if user can access patio cost estimator
- */
-const requirePatioCostEstimator = requireSubscription.bind(null, 'premium', 'Patio cost estimator');
-
-/**
- * Middleware to check if user can access fence cost estimator
- */
-const requireFenceCostEstimator = requireSubscription.bind(null, 'premium', 'Fence cost estimator');
-
-/**
- * Middleware to check if user can access driveway cost estimator
- */
-const requireDrivewayCostEstimator = requireSubscription.bind(null, 'premium', 'Driveway cost estimator');
-
-/**
- * Middleware to check if user can access walkway cost estimator
- */
-const requireWalkwayCostEstimator = requireSubscription.bind(null, 'premium', 'Walkway cost estimator');
-
-/**
- * Middleware to check if user can access retaining wall cost estimator
- */
-const requireRetainingWallCostEstimator = requireSubscription.bind(null, 'premium', 'Retaining wall cost estimator');
-
-/**
- * Middleware to check if user can access irrigation system cost estimator
- */
-const requireIrrigationSystemCostEstimator = requireSubscription.bind(null, 'premium', 'Irrigation system cost estimator');
-
-/**
- * Middleware to check if user can access outdoor kitchen cost estimator
- */
-const requireOutdoorKitchenCostEstimator = requireSubscription.bind(null, 'premium', 'Outdoor kitchen cost estimator');
-
-/**
- * Middleware to check if user can access fire pit cost estimator
- */
-const requireFirePitCostEstimator = requireSubscription.bind(null, 'premium', 'Fire pit cost estimator');
-
-/**
- * Middleware to check if user can access hot tub cost estimator
- */
-const requireHotTubCostEstimator = requireSubscription.bind(null, 'premium', 'Hot tub cost estimator');
-
-/**
- * Middleware to check if user can access sauna cost estimator
- */
-const requireSaunaCostEstimator = requireSubscription.bind(null, 'premium', 'Sauna cost estimator');
-
-/**
- * Middleware to check if user can access steam room cost estimator
- */
-const requireSteamRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Steam room cost estimator');
-
-/**
- * Middleware to check if user can access massage room cost estimator
- */
-const requireMassageRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Massage room cost estimator');
-
-/**
- * Middleware to check if user can access meditation room cost estimator
- */
-const requireMeditationRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Meditation room cost estimator');
-
-/**
- * Middleware to check if user can access yoga room cost estimator
- */
-const requireYogaRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Yoga room cost estimator');
-
-/**
- * Middleware to check if user can access art studio cost estimator
- */
-const requireArtStudioCostEstimator = requireSubscription.bind(null, 'premium', 'Art studio cost estimator');
-
-/**
- * Middleware to check if user can access music room cost estimator
- */
-const requireMusicRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Music room cost estimator');
-
-/**
- * Middleware to check if user can access library cost estimator
- */
-const requireLibraryCostEstimator = requireSubscription.bind(null, 'premium', 'Library cost estimator');
-
-/**
- * Middleware to check if user can access game room cost estimator
- */
-const requireGameRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Game room cost estimator');
-
-/**
- * Middleware to check if user can access billiard room cost estimator
- */
-const requireBilliardRoomCostEstimator = requireSubscription.bind(null, 'premium', 'Billiard room cost estimator');
-
-/**
- * Middleware to check if user can access bowling alley cost estimator
- */
-const requireBowlingAlleyCostEstimator = requireSubscription.bind(null, 'premium', 'Bowling alley cost estimator');
-
-/**
- * Middleware to check if user can access indoor basketball court cost estimator
- */
-const requireIndoorBasketballCourtCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor basketball court cost estimator');
-
-/**
- * Middleware to check if user can access indoor tennis court cost estimator
- */
-const requireIndoorTennisCourtCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor tennis court cost estimator');
-
-/**
- * Middleware to check if user can access indoor swimming pool cost estimator
- */
-const requireIndoorSwimmingPoolCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor swimming pool cost estimator');
-
-/**
- * Middleware to check if user can access indoor golf simulator cost estimator
- */
-const requireIndoorGolfSimulatorCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor golf simulator cost estimator');
-
-/**
- * Middleware to check if user can access indoor climbing wall cost estimator
- */
-const requireIndoorClimbingWallCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor climbing wall cost estimator');
-
-/**
- * Middleware to check if user can access indoor rock climbing cost estimator
- */
-const requireIndoorRockClimbingCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor rock climbing cost estimator');
-
-/**
- * Middleware to check if user can access indoor zip line cost estimator
- */
-const requireIndoorZipLineCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor zip line cost estimator');
-
-/**
- * Middleware to check if user can access indoor trampoline cost estimator
- */
-const requireIndoorTrampolineCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor trampoline cost estimator');
-
-/**
- * Middleware to check if user can access indoor playground cost estimator
- */
-const requireIndoorPlaygroundCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor playground cost estimator');
-
-/**
- * Middleware to check if user can access indoor pet park cost estimator
- */
-const requireIndoorPetParkCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor pet park cost estimator');
-
-/**
- * Middleware to check if user can access indoor dog training area cost estimator
- */
-const requireIndoorDogTrainingAreaCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor dog training area cost estimator');
-
-/**
- * Middleware to check if user can access indoor cat playground cost estimator
- */
-const requireIndoorCatPlaygroundCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor cat playground cost estimator');
-
-/**
- * Middleware to check if user can access indoor bird aviary cost estimator
- */
-const requireIndoorBirdAviaryCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor bird aviary cost estimator');
-
-/**
- * Middleware to check if user can access indoor fish tank cost estimator
- */
-const requireIndoorFishTankCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor fish tank cost estimator');
-
-/**
- * Middleware to check if user can access indoor reptile habitat cost estimator
- */
-const requireIndoorReptileHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor reptile habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor hamster maze cost estimator
- */
-const requireIndoorHamsterMazeCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor hamster maze cost estimator');
-
-/**
- * Middleware to check if user can access indoor rabbit hutch cost estimator
- */
-const requireIndoorRabbitHutchCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor rabbit hutch cost estimator');
-
-/**
- * Middleware to check if user can access indoor guinea pig habitat cost estimator
- */
-const requireIndoorGuineaPigHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor guinea pig habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor ferret playground cost estimator
- */
-const requireIndoorFerretPlaygroundCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor ferret playground cost estimator');
-
-/**
- * Middleware to check if user can access indoor hedgehog habitat cost estimator
- */
-const requireIndoorHedgehogHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor hedgehog habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor chinchilla habitat cost estimator
- */
-const requireIndoorChinchillaHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor chinchilla habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor sugar glider habitat cost estimator
- */
-const requireIndoorSugarGliderHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor sugar glider habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor degu habitat cost estimator
- */
-const requireIndoorDeguHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor degu habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor gerbil habitat cost estimator
- */
-const requireIndoorGerbilHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor gerbil habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor mouse habitat cost estimator
- */
-const requireIndoorMouseHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor mouse habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor rat habitat cost estimator
- */
-const requireIndoorRatHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor rat habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor hamster habitat cost estimator
- */
-const requireIndoorHamsterHabitatCostEstimator = requireSubscription.bind(null, 'premium', 'Indoor hamster habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor gerbil habitat cost estimator
- */
-const requireIndoorGerbilHabitatCostEstimator2 = requireSubscription.bind(null, 'premium', 'Indoor gerbil habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor mouse habitat cost estimator
- */
-const requireIndoorMouseHabitatCostEstimator2 = requireSubscription.bind(null, 'premium', 'Indoor mouse habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor rat habitat cost estimator
- */
-const requireIndoorRatHabitatCostEstimator2 = requireSubscription.bind(null, 'premium', 'Indoor rat habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor hamster habitat cost estimator
- */
-const requireIndoorHamsterHabitatCostEstimator2 = requireSubscription.bind(null, 'premium', 'Indoor hamster habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor gerbil habitat cost estimator
- */
-const requireIndoorGerbilHabitatCostEstimator3 = requireSubscription.bind(null, 'premium', 'Indoor gerbil habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor mouse habitat cost estimator
- */
-const requireIndoorMouseHabitatCostEstimator3 = requireSubscription.bind(null, 'premium', 'Indoor mouse habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor rat habitat cost estimator
- */
-const requireIndoorRatHabitatCostEstimator3 = requireSubscription.bind(null, 'premium', 'Indoor rat habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor hamster habitat cost estimator
- */
-const requireIndoorHamsterHabitatCostEstimator3 = requireSubscription.bind(null, 'premium', 'Indoor hamster habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor gerbil habitat cost estimator
- */
-const requireIndoorGerbilHabitatCostEstimator4 = requireSubscription.bind(null, 'premium', 'Indoor gerbil habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor mouse habitat cost estimator
- */
-const requireIndoorMouseHabitatCostEstimator4 = requireSubscription.bind(null, 'premium', 'Indoor mouse habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor rat habitat cost estimator
- */
-const requireIndoorRatHabitatCostEstimator4 = requireSubscription.bind(null, 'premium', 'Indoor rat habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor hamster habitat cost estimator
- */
-const requireIndoorHamsterHabitatCostEstimator4 = requireSubscription.bind(null, 'premium', 'Indoor hamster habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor gerbil habitat cost estimator
- */
-const requireIndoorGerbilHabitatCostEstimator5 = requireSubscription.bind(null, 'premium', 'Indoor gerbil habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor mouse habitat cost estimator
- */
-const requireIndoorMouseHabitatCostEstimator5 = requireSubscription.bind(null, 'premium', 'Indoor mouse habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor rat habitat cost estimator
- */
-const requireIndoorRatHabitatCostEstimator5 = requireSubscription.bind(null, 'premium', 'Indoor rat habitat cost estimator');
-
-/**
- * Middleware to check if user can access indoor hamster habitat cost estimator
- */
-const requireIndoorHamsterHabitatCostEstimator5 = requireSubscription.bind(null, 'premium', 'Indoor hamster habitat cost estimator');
+const requirePricePredictions = requireSubscription.bind(null, 'enterprise', 'Price predictions');
 
 module.exports = {
   requireSubscription,
@@ -967,153 +502,60 @@ module.exports = {
   requireIntegrationAccess,
   requireWhiteLabelAccess,
   requireMultiUserAccess,
-  requireAdvancedAnalytics,
-  requirePriorityListing,
-  requireFeaturedProperty,
-  requirePropertyPromotion,
   requireLeadManagement,
   requireCRM,
-  requireWorkflowAutomation,
-  requireAdvancedFilters,
-  requireSavedSearches,
+  requireTeamManagement,
+  requirePropertyPromotion,
+  requireFeaturedProperty,
+  requirePriorityListing,
+  requireFavoritesAccess,
+  requireRecentlyViewedAccess,
   requirePropertyAlerts,
   requireMarketInsights,
-  requireCMA,
   requireInvestmentAnalysis,
-  requireValuationTools,
   requireDocumentManagement,
-  requireESignature,
-  requireTransactionManagement,
   requireCommissionTracking,
-  requireTeamManagement,
   requirePerformanceAnalytics,
   requireMarketingTools,
-  requireSocialMediaIntegration,
-  requireEmailMarketing,
-  requireSMSMarketing,
-  requireVirtualTour,
-  require3DVisualization,
-  requireDronePhotography,
+  requireVirtualTourFeatures,
   requireProfessionalPhotography,
   requireStagingServices,
-  requireHomeInspection,
+  requireHomeInspectionServices,
   requireLegalServices,
   requireInsuranceServices,
   requireFinancingServices,
-  requireMovingServices,
-  requireCleaningServices,
-  requireMaintenanceServices,
-  requireLandscapingServices,
   requireSecurityServices,
   requireSmartHomeFeatures,
-  requireEnergyEfficiency,
+  requireEnergyEfficiencyTools,
   requireSustainabilityFeatures,
-  requireNeighborhoodInsights,
-  requireSchoolRatings,
   requireCrimeStatistics,
-  requireTransportationData,
-  requireWalkabilityScores,
   requireAirQualityData,
   requireFloodRiskData,
   requireEarthquakeRiskData,
-  requirePropertyHistory,
   requireTaxInformation,
-  requireHOAInformation,
-  requireUtilityInformation,
   requirePermitInformation,
   requireZoningInformation,
   requireDevelopmentPlans,
   requireMarketTrends,
-  requirePricePredictions,
   requireInvestmentOpportunities,
   requireRentalYieldAnalysis,
   requireROICalculations,
   requireCashFlowAnalysis,
-  requireMortgageCalculator,
-  requireRefinanceCalculator,
-  requireAffordabilityCalculator,
-  requireRentVsBuyCalculator,
-  requireClosingCostCalculator,
-  requirePropertyTaxCalculator,
-  requireInsuranceCalculator,
-  requireHOAFeeCalculator,
-  requireUtilityCostEstimator,
-  requireMaintenanceCostEstimator,
-  requireRenovationCostEstimator,
-  requireLandscapingCostEstimator,
-  requirePoolCostEstimator,
-  requireSolarPanelCostEstimator,
-  requireSmartHomeCostEstimator,
-  requireSecuritySystemCostEstimator,
-  requireHomeTheaterCostEstimator,
-  requireWineCellarCostEstimator,
-  requireHomeGymCostEstimator,
-  requireHomeOfficeCostEstimator,
-  requireGuestHouseCostEstimator,
-  requireGarageCostEstimator,
-  requireShedCostEstimator,
-  requireDeckCostEstimator,
-  requirePatioCostEstimator,
-  requireFenceCostEstimator,
-  requireDrivewayCostEstimator,
-  requireWalkwayCostEstimator,
-  requireRetainingWallCostEstimator,
-  requireIrrigationSystemCostEstimator,
-  requireOutdoorKitchenCostEstimator,
-  requireFirePitCostEstimator,
-  requireHotTubCostEstimator,
-  requireSaunaCostEstimator,
-  requireSteamRoomCostEstimator,
-  requireMassageRoomCostEstimator,
-  requireMeditationRoomCostEstimator,
-  requireYogaRoomCostEstimator,
-  requireArtStudioCostEstimator,
-  requireMusicRoomCostEstimator,
-  requireLibraryCostEstimator,
-  requireGameRoomCostEstimator,
-  requireBilliardRoomCostEstimator,
-  requireBowlingAlleyCostEstimator,
-  requireIndoorBasketballCourtCostEstimator,
-  requireIndoorTennisCourtCostEstimator,
-  requireIndoorSwimmingPoolCostEstimator,
-  requireIndoorGolfSimulatorCostEstimator,
-  requireIndoorClimbingWallCostEstimator,
-  requireIndoorRockClimbingCostEstimator,
-  requireIndoorZipLineCostEstimator,
-  requireIndoorTrampolineCostEstimator,
-  requireIndoorPlaygroundCostEstimator,
-  requireIndoorPetParkCostEstimator,
-  requireIndoorDogTrainingAreaCostEstimator,
-  requireIndoorCatPlaygroundCostEstimator,
-  requireIndoorBirdAviaryCostEstimator,
-  requireIndoorFishTankCostEstimator,
-  requireIndoorReptileHabitatCostEstimator,
-  requireIndoorHamsterMazeCostEstimator,
-  requireIndoorRabbitHutchCostEstimator,
-  requireIndoorGuineaPigHabitatCostEstimator,
-  requireIndoorFerretPlaygroundCostEstimator,
-  requireIndoorHedgehogHabitatCostEstimator,
-  requireIndoorChinchillaHabitatCostEstimator,
-  requireIndoorSugarGliderHabitatCostEstimator,
-  requireIndoorDeguHabitatCostEstimator,
-  requireIndoorGerbilHabitatCostEstimator,
-  requireIndoorMouseHabitatCostEstimator,
-  requireIndoorRatHabitatCostEstimator,
-  requireIndoorHamsterHabitatCostEstimator,
-  requireIndoorGerbilHabitatCostEstimator2,
-  requireIndoorMouseHabitatCostEstimator2,
-  requireIndoorRatHabitatCostEstimator2,
-  requireIndoorHamsterHabitatCostEstimator2,
-  requireIndoorGerbilHabitatCostEstimator3,
-  requireIndoorMouseHabitatCostEstimator3,
-  requireIndoorRatHabitatCostEstimator3,
-  requireIndoorHamsterHabitatCostEstimator3,
-  requireIndoorGerbilHabitatCostEstimator4,
-  requireIndoorMouseHabitatCostEstimator4,
-  requireIndoorRatHabitatCostEstimator4,
-  requireIndoorHamsterHabitatCostEstimator4,
-  requireIndoorGerbilHabitatCostEstimator5,
-  requireIndoorMouseHabitatCostEstimator5,
-  requireIndoorRatHabitatCostEstimator5,
-  requireIndoorHamsterHabitatCostEstimator5
+  requireAdvancedCostEstimators,
+  requireCustomBrandingAccess,
+  requireApiAccessControl,
+  requireMultiUserSupport,
+  requireAdvancedAnalytics,
+  requireWhiteLabelFeatures,
+  requireIntegrationFeatures,
+  requireWorkflowAutomation,
+  requireCustomerRelationshipManagement,
+  requireSMSMarketing,
+  require3DPropertyVisualization,
+  requireESignatureFeatures,
+  requireTransactionManagement,
+  requireTeamManagementAccess,
+  requireBulkOperationsAccess,
+  requireImportFeatures,
+  requirePricePredictions
 };
