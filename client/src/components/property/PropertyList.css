@@ -149,9 +149,6 @@ body {
 .search-container .MuiTextField-root .MuiIconButton-root:hover {
   color: var(--primary-dark);
 }
-  outline: none;
-  transition: all 0.3s ease;
-}
 
 .search-container ::placeholder {
   color: var(--primary-color);
