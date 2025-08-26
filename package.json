@@ -7,11 +7,13 @@
     "run": "node server/server.js",
     "server": "nodemon server/server.js",
     "client": "npm run dev --prefix client",
-    "build": "cd client && npm install && npm run build",
+    "build": "./scripts/build.sh",
+    "build:client": "cd client && npm install && npm run build",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && npm install --prefix client",
     "test": "cd client && npm run test",
-    "heroku-postbuild": "npm run build --prefix client && npm install --prefix server"
+    "heroku-postbuild": "npm run build --prefix client && npm install --prefix server",
+    "setup": "./scripts/build.sh"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
