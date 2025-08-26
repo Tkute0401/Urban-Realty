@@ -76,7 +76,10 @@ instance.interceptors.response.use(
         'requires',
         'basic',
         'premium',
-        'enterprise'
+        'enterprise',
+        'listing limit',
+        'feature',
+        'subscription or higher'
       ];
 
       const isSubscriptionError = subscriptionKeywords.some(keyword => 
@@ -84,11 +87,17 @@ instance.interceptors.response.use(
       );
 
       if (isSubscriptionError) {
+        // Extract feature and required plan from error message
+        const featureMatch = errorMessage.match(/requires a (\w+) subscription/);
+        const feature = featureMatch ? featureMatch[1] : 'this feature';
+        
         return Promise.reject({
           message: errorMessage,
           status,
           data,
           isSubscriptionError: true,
+          requiredPlan: feature,
+          feature: data?.feature || 'this feature'
         });
       }
 

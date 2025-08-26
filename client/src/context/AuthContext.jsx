@@ -78,7 +78,8 @@ export const AuthProvider = ({ children }) => {
           mobile: userData.mobile,
           favorites: userData?.favorites,
           occupation: userData?.occupation,
-          recentlyViewed: userData?.recentlyViewed
+          recentlyViewed: userData?.recentlyViewed,
+          subscriptionStatus: userData?.subscriptionStatus || 'free'
         });
       }
     } catch (err) {
@@ -117,7 +118,8 @@ export const AuthProvider = ({ children }) => {
         mobile: userData.mobile,
         favorites: userData?.favorites,
         occupation: userData?.occupation,
-        recentlyViewed: userData?.recentlyViewed
+        recentlyViewed: userData?.recentlyViewed,
+        subscriptionStatus: userData?.subscriptionStatus || 'free'
       });
       if (userData.role === 'admin') {
         navigate('/admin');
@@ -153,7 +155,8 @@ export const AuthProvider = ({ children }) => {
         mobile: userData.mobile,
         favorites: userData?.favorites,
         occupation: userData?.occupation,
-        recentlyViewed: userData?.recentlyViewed
+        recentlyViewed: userData?.recentlyViewed,
+        subscriptionStatus: userInfo?.subscriptionStatus || 'free'
       });
       navigate('/');
       return { success: true };
