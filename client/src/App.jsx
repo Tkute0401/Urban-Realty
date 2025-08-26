@@ -22,6 +22,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 import AdminContacts from './pages/admin/AdminContacts';
 import AgentsPage from './pages/admin/AgentsPage';
+import AdminSubscriptionManagement from './components/admin/SubscriptionManagement';
 import MainPage from './components/property/MainPage';
 import AboutUs from './components/common/footer/AboutUs';
 import ContactUs from './components/common/footer/ContactUs';
@@ -41,6 +42,9 @@ import DeveloperList from './pages/Developer/DeveloperList';
 import DeveloperDetails from './pages/Developer/DeveloperDetails';
 import AddDeveloperPage from './pages/Developer/AddDeveloperPage';
 import EditDeveloperPage from './pages/Developer/EditDeveloperPage';
+import SubscriptionPlans from './components/Subscription/SubscriptionPlans';
+import SubscriptionManagement from './components/Subscription/SubscriptionManagement';
+import SubscriptionComparison from './components/Subscription/SubscriptionComparison';
 
 function App() {
   const location = useLocation();
@@ -78,6 +82,9 @@ function App() {
                 <Route path="/packers-and-movers" element={<PackersMovers />}/>
                 <Route path="/interior-design" element={<InteriorDesign />}/>
                 <Route path="/emi-calculator" element={<EMICalculator />}/>
+                <Route path="/subscriptions" element={<SubscriptionPlans />} />
+                <Route path="/subscription-management" element={<SubscriptionManagement />} />
+                <Route path="/subscription-comparison" element={<SubscriptionComparison />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
@@ -87,6 +94,7 @@ function App() {
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="properties" element={<AdminProperties />} />
                     <Route path="contacts" element={<AdminContacts />} />
+                    <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
                   </Route>
                 </Route>
                 {/* Protected Routes */}
