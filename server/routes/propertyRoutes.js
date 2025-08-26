@@ -11,6 +11,11 @@ const upload = require('../middleware/multer');
 // @access  Public
 router.get('/', propertyController.getProperties);
 
+// @desc    Get search suggestions and autocomplete
+// @route   GET /api/v1/properties/search-suggestions
+// @access  Public
+router.get('/search-suggestions', propertyController.getSearchSuggestions);
+
 // @desc    Get featured properties
 // @route   GET /api/v1/properties/featured
 // @access  Public
