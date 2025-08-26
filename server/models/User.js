@@ -82,7 +82,8 @@ const UserSchema = new mongoose.Schema({
   subscriptionStatus: {
     type: String,
     enum: ['free', 'basic', 'premium', 'enterprise'],
-    default: 'free'
+    default: 'free',
+    required: true
   },
   subscriptionExpiry: {
     type: Date
@@ -147,6 +148,46 @@ UserSchema.methods.getSignedJwtToken = function() {
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Check if user has required subscription level
+UserSchema.methods.hasSubscription = function(requiredPlan) {
+  const subscriptionLevels = {
+    'free': 0,
+    'basic': 1,
+    'premium': 2,
+    'enterprise': 3
+  };
+  
+  const userLevel = subscriptionLevels[this.subscriptionStatus] || 0;
+  const requiredLevel = subscriptionLevels[requiredPlan] || 0;
+  
+  return userLevel >= requiredLevel;
+};
+
+// Check if user can access a specific feature
+UserSchema.methods.canAccessFeature = function(feature) {
+  const featureAccess = {
+    'advancedSearch': 'basic',
+    'analytics': 'premium',
+    'customBranding': 'enterprise',
+    'apiAccess': 'enterprise',
+    'prioritySupport': 'premium'
+  };
+  
+  const requiredPlan = featureAccess[feature];
+  if (!requiredPlan) return true; // Feature doesn't require subscription
+  
+  return this.hasSubscription(requiredPlan);
+};
+
+// Get subscription info for display
+UserSchema.methods.getSubscriptionInfo = function() {
+  return {
+    status: this.subscriptionStatus,
+    expiry: this.subscriptionExpiry,
+    currentSubscription: this.currentSubscription
+  };
 };
 
 module.exports = mongoose.model('User', UserSchema);

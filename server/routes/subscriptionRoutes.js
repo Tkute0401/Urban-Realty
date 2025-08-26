@@ -20,6 +20,8 @@ router.post('/subscribe', [
 
 router.get('/my-subscription', subscriptionController.getMySubscription);
 router.put('/cancel', subscriptionController.cancelSubscription);
+router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
+router.get('/listing-limit', subscriptionController.checkListingLimit);
 
 // Admin only routes
 router.use(authorize('admin'));
