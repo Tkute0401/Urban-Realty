@@ -50,7 +50,8 @@ const SubscriptionPlans = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/subscriptions');
+      const response = await axios.get('/subscriptions');
+      console.log('Fetched subscription plans:', response.data);
       setPlans(response.data.data);
     } catch (err) {
       setError('Failed to load subscription plans');
@@ -72,7 +73,7 @@ const SubscriptionPlans = () => {
       setSubscribing(true);
       setSubscribeError(null);
 
-      const response = await axios.post('/api/subscriptions/subscribe', {
+      const response = await axios.post('/subscribe', {
         subscriptionId: selectedPlan._id,
         billingCycle,
         paymentMethod

@@ -66,8 +66,8 @@ const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const [subscriptionRes, billingRes] = await Promise.all([
-        axios.get('/api/subscriptions/my-subscription'),
-        axios.get('/api/subscriptions/billing-history')
+        axios.get('/subscriptions/my-subscription'),
+        axios.get('/subscriptions/billing-history')
       ]);
       
       setSubscription(subscriptionRes.data.data);
@@ -83,7 +83,7 @@ const SubscriptionManagement = () => {
   const handleUpdatePaymentMethod = async () => {
     try {
       setUpdating(true);
-      await axios.put('/api/subscriptions/payment-method', {
+      await axios.put('/subscriptions/payment-method', {
         paymentMethod,
         cardNumber,
         expiryDate,
@@ -107,7 +107,7 @@ const SubscriptionManagement = () => {
   const handleCancelSubscription = async () => {
     try {
       setUpdating(true);
-      await axios.put('/api/subscriptions/cancel');
+      await axios.put('/subscriptions/cancel');
       setCancelDialog(false);
       fetchSubscriptionData();
     } catch (err) {

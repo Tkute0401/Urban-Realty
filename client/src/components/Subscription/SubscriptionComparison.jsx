@@ -46,7 +46,7 @@ const SubscriptionComparison = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/subscriptions');
+      const response = await axios.get('/subscriptions');
       setPlans(response.data.data);
     } catch (err) {
       setError('Failed to load subscription plans');
