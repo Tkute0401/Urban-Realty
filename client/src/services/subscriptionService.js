@@ -78,6 +78,66 @@ const subscriptionService = {
     }
   },
 
+  // Get comprehensive billing details
+  getBillingDetails: async () => {
+    try {
+      const response = await axios.get('/subscriptions/billing-details');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching billing details:', error);
+      throw error;
+    }
+  },
+
+  // Get user invoices
+  getInvoices: async (page = 1, limit = 10) => {
+    try {
+      const response = await axios.get(`/subscriptions/invoices?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching invoices:', error);
+      throw error;
+    }
+  },
+
+  // Get specific invoice
+  getInvoice: async (invoiceId) => {
+    try {
+      const response = await axios.get(`/subscriptions/invoices/${invoiceId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching invoice:', error);
+      throw error;
+    }
+  },
+
+  // Mark invoice as paid
+  markInvoiceAsPaid: async (invoiceId, transactionId) => {
+    try {
+      const response = await axios.put(`/subscriptions/invoices/${invoiceId}/mark-paid`, {
+        transactionId
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error marking invoice as paid:', error);
+      throw error;
+    }
+  },
+
+  // Change subscription plan
+  changePlan: async (subscriptionId, billingCycle) => {
+    try {
+      const response = await axios.put('/subscriptions/change-plan', {
+        subscriptionId,
+        billingCycle
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error changing subscription plan:', error);
+      throw error;
+    }
+  },
+
   // Check listing limit
   checkListingLimit: async () => {
     try {

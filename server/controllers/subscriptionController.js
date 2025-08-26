@@ -1,8 +1,10 @@
 const Subscription = require('../models/Subscription');
 const UserSubscription = require('../models/UserSubscription');
 const User = require('../models/User');
+const Invoice = require('../models/Invoice');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const invoiceService = require('../utils/invoiceService');
 
 // @desc    Get all subscriptions
 // @route   GET /api/v1/subscriptions
@@ -107,18 +109,48 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
     status: { $in: ['active', 'pending'] }
   }).populate('subscription');
 
-  // If user has an active/pending subscription, allow plan change when different
+  let invoice = null;
+  let subscriptionChangeType = 'initial';
+
+  // If user has an active/pending subscription, handle plan change
   if (existingSubscription) {
     const isSamePlan = String(existingSubscription.subscription?._id || existingSubscription.subscription) === String(subscriptionId);
     if (isSamePlan) {
       return next(new ErrorResponse('You are already subscribed to this plan', 400));
     }
 
-    // Cancel the existing subscription before creating a new one (plan change)
-    existingSubscription.status = 'cancelled';
-    existingSubscription.autoRenew = false;
-    existingSubscription.endDate = new Date();
-    await existingSubscription.save();
+    // Determine if this is an upgrade or downgrade
+    const subscriptionLevels = { free: 0, basic: 1, premium: 2, enterprise: 3 };
+    const currentLevel = subscriptionLevels[existingSubscription.subscription.type] || 0;
+    const newLevel = subscriptionLevels[subscription.type] || 0;
+    
+    subscriptionChangeType = newLevel > currentLevel ? 'upgrade' : 'downgrade';
+
+    // Handle subscription change based on type
+    if (subscriptionChangeType === 'upgrade') {
+      const result = await invoiceService.handleSubscriptionUpgrade(userId, subscriptionId, billingCycle);
+      return res.status(201).json({
+        success: true,
+        data: {
+          userSubscription: result.newSubscription,
+          invoice: result.invoice,
+          prorationCredit: result.prorationCredit,
+          finalAmount: result.finalAmount,
+          changeType: 'upgrade'
+        }
+      });
+    } else {
+      const result = await invoiceService.handleSubscriptionDowngrade(userId, subscriptionId, billingCycle);
+      return res.status(201).json({
+        success: true,
+        data: {
+          userSubscription: result.newSubscription,
+          invoice: result.invoice,
+          effectiveDate: result.effectiveDate,
+          changeType: 'downgrade'
+        }
+      });
+    }
   }
 
   // Calculate end date based on billing cycle
@@ -148,6 +180,9 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
     status: 'pending'
   });
 
+  // Generate invoice for new subscription
+  invoice = await invoiceService.generateInvoice(userSubscription, 'initial');
+
   // Update user subscription status
   await User.findByIdAndUpdate(userId, {
     currentSubscription: userSubscription._id,
@@ -157,7 +192,11 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    data: userSubscription
+    data: {
+      userSubscription,
+      invoice,
+      changeType: 'initial'
+    }
   });
 });
 
@@ -390,6 +429,155 @@ exports.updatePaymentMethod = asyncHandler(async (req, res, next) => {
     data: {
       message: 'Payment method updated successfully',
       paymentMethod
+    }
+  });
+});
+
+// @desc    Get comprehensive billing details
+// @route   GET /api/v1/subscriptions/billing-details
+// @access  Private
+exports.getBillingDetails = asyncHandler(async (req, res, next) => {
+  try {
+    const billingDetails = await invoiceService.getBillingDetails(req.user.id);
+    
+    res.status(200).json({
+      success: true,
+      data: billingDetails
+    });
+  } catch (error) {
+    return next(new ErrorResponse(`Error fetching billing details: ${error.message}`, 500));
+  }
+});
+
+// @desc    Get specific invoice
+// @route   GET /api/v1/subscriptions/invoices/:id
+// @access  Private
+exports.getInvoice = asyncHandler(async (req, res, next) => {
+  const invoice = await Invoice.findById(req.params.id)
+    .populate('subscription')
+    .populate('userSubscription');
+
+  if (!invoice) {
+    return next(new ErrorResponse('Invoice not found', 404));
+  }
+
+  // Ensure user can only access their own invoices
+  if (invoice.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse('Not authorized to access this invoice', 403));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: invoice
+  });
+});
+
+// @desc    Get all user invoices
+// @route   GET /api/v1/subscriptions/invoices
+// @access  Private
+exports.getUserInvoices = asyncHandler(async (req, res, next) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const startIndex = (page - 1) * limit;
+
+  const invoices = await Invoice.find({ user: req.user.id })
+    .populate('subscription')
+    .sort({ createdAt: -1 })
+    .skip(startIndex)
+    .limit(limit);
+
+  const total = await Invoice.countDocuments({ user: req.user.id });
+
+  res.status(200).json({
+    success: true,
+    count: invoices.length,
+    pagination: {
+      current: page,
+      pages: Math.ceil(total / limit),
+      total
+    },
+    data: invoices
+  });
+});
+
+// @desc    Mark invoice as paid (for testing/demo purposes)
+// @route   PUT /api/v1/subscriptions/invoices/:id/mark-paid
+// @access  Private
+exports.markInvoiceAsPaid = asyncHandler(async (req, res, next) => {
+  const { transactionId } = req.body;
+  
+  const invoice = await Invoice.findById(req.params.id);
+  if (!invoice) {
+    return next(new ErrorResponse('Invoice not found', 404));
+  }
+
+  // Ensure user can only access their own invoices
+  if (invoice.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse('Not authorized to access this invoice', 403));
+  }
+
+  const updatedInvoice = await invoiceService.markInvoiceAsPaid(invoice._id, transactionId);
+
+  res.status(200).json({
+    success: true,
+    data: updatedInvoice
+  });
+});
+
+// @desc    Change subscription plan
+// @route   PUT /api/v1/subscriptions/change-plan
+// @access  Private
+exports.changeSubscriptionPlan = asyncHandler(async (req, res, next) => {
+  const { subscriptionId, billingCycle } = req.body;
+  const userId = req.user.id;
+
+  // Get current subscription
+  const currentSubscription = await UserSubscription.findOne({
+    user: userId,
+    status: 'active'
+  }).populate('subscription');
+
+  if (!currentSubscription) {
+    return next(new ErrorResponse('No active subscription found', 404));
+  }
+
+  // Get new subscription
+  const newSubscription = await Subscription.findById(subscriptionId);
+  if (!newSubscription) {
+    return next(new ErrorResponse('New subscription not found', 404));
+  }
+
+  // Check if it's the same plan
+  if (String(currentSubscription.subscription._id) === String(subscriptionId)) {
+    return next(new ErrorResponse('You are already subscribed to this plan', 400));
+  }
+
+  // Determine if this is an upgrade or downgrade
+  const subscriptionLevels = { free: 0, basic: 1, premium: 2, enterprise: 3 };
+  const currentLevel = subscriptionLevels[currentSubscription.subscription.type] || 0;
+  const newLevel = subscriptionLevels[newSubscription.type] || 0;
+  
+  let result;
+  if (newLevel > currentLevel) {
+    // Upgrade
+    result = await invoiceService.handleSubscriptionUpgrade(userId, subscriptionId, billingCycle);
+  } else {
+    // Downgrade
+    result = await invoiceService.handleSubscriptionDowngrade(userId, subscriptionId, billingCycle);
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      userSubscription: result.newSubscription,
+      invoice: result.invoice,
+      changeType: newLevel > currentLevel ? 'upgrade' : 'downgrade',
+      ...(newLevel > currentLevel ? {
+        prorationCredit: result.prorationCredit,
+        finalAmount: result.finalAmount
+      } : {
+        effectiveDate: result.effectiveDate
+      })
     }
   });
 });
