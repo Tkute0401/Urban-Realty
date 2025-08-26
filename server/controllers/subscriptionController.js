@@ -24,6 +24,10 @@ exports.getSubscription = asyncHandler(async (req, res, next) => {
   const subscription = await Subscription.findById(req.params.id);
 
   if (!subscription) {
+    // Check if the ID might be a route name that was caught by the parameterized route
+    if (req.params.id === 'billing-history') {
+      return next(new ErrorResponse('Billing history endpoint requires authentication. Please include your authorization token.', 401));
+    }
     return next(new ErrorResponse(`Subscription not found with id of ${req.params.id}`, 404));
   }
 
@@ -285,34 +289,81 @@ exports.checkListingLimit = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/subscriptions/billing-history
 // @access  Private
 exports.getBillingHistory = asyncHandler(async (req, res, next) => {
-  const userSubscription = await UserSubscription.findOne({
-    user: req.user.id,
-    status: { $in: ['active', 'cancelled', 'expired'] }
-  }).populate('subscription');
+  try {
+    console.log('Billing history request for user:', req.user.id);
+    
+    // Get all user subscriptions (active, cancelled, expired)
+    const userSubscriptions = await UserSubscription.find({
+      user: req.user.id,
+      status: { $in: ['active', 'cancelled', 'expired', 'pending'] }
+    }).populate('subscription').sort({ createdAt: -1 });
 
-  if (!userSubscription) {
-    return res.status(200).json({
-      success: true,
-      data: []
-    });
-  }
+    console.log('Found subscriptions:', userSubscriptions.length);
 
-  // Mock billing history for now - in production, this would come from a billing system
-  const billingHistory = [
-    {
-      _id: '1',
-      date: userSubscription.startDate,
-      description: `${userSubscription.subscription.name} - ${userSubscription.billingCycle} subscription`,
-      amount: userSubscription.amount,
-      currency: userSubscription.currency,
-      status: userSubscription.paymentStatus
+    if (!userSubscriptions || userSubscriptions.length === 0) {
+      console.log('No subscriptions found for user:', req.user.id);
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: 'No billing history found',
+        userId: req.user.id
+      });
     }
-  ];
 
-  res.status(200).json({
-    success: true,
-    data: billingHistory
-  });
+    // Build comprehensive billing history
+    const billingHistory = userSubscriptions.map(subscription => {
+      const billingEntry = {
+        _id: subscription._id,
+        date: subscription.startDate,
+        description: `${subscription.subscription?.name || 'Subscription'} - ${subscription.billingCycle} subscription`,
+        amount: subscription.amount,
+        currency: subscription.currency || 'USD',
+        status: subscription.paymentStatus || 'pending',
+        subscriptionType: subscription.subscription?.type || 'unknown',
+        billingCycle: subscription.billingCycle,
+        startDate: subscription.startDate,
+        endDate: subscription.endDate,
+        subscriptionStatus: subscription.status,
+        paymentMethod: subscription.paymentMethod
+      };
+
+      // Add next billing date if subscription is active
+      if (subscription.status === 'active' && subscription.nextBillingDate) {
+        billingEntry.nextBillingDate = subscription.nextBillingDate;
+      }
+
+      return billingEntry;
+    });
+
+    // Add additional billing entries for recurring payments (if any)
+    const activeSubscription = userSubscriptions.find(sub => sub.status === 'active');
+    if (activeSubscription && activeSubscription.lastBillingDate) {
+      // Add the last billing entry
+      billingHistory.unshift({
+        _id: `billing-${activeSubscription._id}`,
+        date: activeSubscription.lastBillingDate,
+        description: `${activeSubscription.subscription?.name || 'Subscription'} - ${activeSubscription.billingCycle} renewal`,
+        amount: activeSubscription.amount,
+        currency: activeSubscription.currency || 'USD',
+        status: 'paid',
+        subscriptionType: activeSubscription.subscription?.type || 'unknown',
+        billingCycle: activeSubscription.billingCycle,
+        paymentMethod: activeSubscription.paymentMethod
+      });
+    }
+
+    console.log('Returning billing history with', billingHistory.length, 'entries');
+
+    res.status(200).json({
+      success: true,
+      data: billingHistory,
+      count: billingHistory.length,
+      userId: req.user.id
+    });
+  } catch (error) {
+    console.error('Error fetching billing history for user:', req.user.id, error);
+    return next(new ErrorResponse(`Error fetching billing history: ${error.message}`, 500));
+  }
 });
 
 // @desc    Update user's payment method

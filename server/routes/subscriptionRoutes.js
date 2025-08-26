@@ -21,10 +21,10 @@ router.post('/subscribe', [
   check('paymentMethod', 'Payment method is required').not().isEmpty()
 ], subscriptionController.subscribeUser);
 router.put('/cancel', subscriptionController.cancelSubscription);
+router.put('/payment-method', subscriptionController.updatePaymentMethod);
 
 // Parameterized routes - must come after specific routes
 router.get('/:id', subscriptionController.getSubscription);
-router.put('/payment-method', subscriptionController.updatePaymentMethod);
 
 // Admin only routes
 router.use(authorize('admin'));
