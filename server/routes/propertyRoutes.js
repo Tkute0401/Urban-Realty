@@ -5,6 +5,16 @@ const propertyController = require('../controllers/propertyController');
 const contactController = require('../controllers/contactController');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/multer');
+const {
+  requirePropertyManagement,
+  requireContactAccess,
+  requireAdvancedSearch,
+  requirePropertyPromotion,
+  requireFeaturedProperty,
+  requirePriorityListing,
+  requireAdvancedPropertyFeatures,
+  checkListingLimit
+} = require('../middleware/subscriptionAccess');
 
 // @desc    Get all properties
 // @route   GET /api/v1/properties
@@ -36,7 +46,7 @@ router.get('/agent/:id', propertyController.getAgentProperties);
 // @access  Private
 router.post(
   '/:id/contact',
-  protect,
+  [protect, requireContactAccess],
   [
     check('message', 'Message is required').not().isEmpty(),
     check('contactMethod', 'Valid contact method is required').isIn(['message', 'email', 'whatsapp', 'call'])
@@ -52,6 +62,8 @@ router.post(
   [
     protect,
     authorize('agent', 'admin'),
+    requirePropertyManagement,
+    checkListingLimit(1),
     upload.array('images', 10),
     [
       check('title', 'Title is required').not().isEmpty(),
@@ -76,6 +88,7 @@ router.put(
   [
     protect,
     authorize('agent', 'admin'),
+    requirePropertyManagement,
     upload.array('images', 10),
     [
       check('title', 'Title is required').optional().not().isEmpty(),
@@ -96,7 +109,7 @@ router.put(
 // @access  Private (Agent/Admin)
 router.delete(
   '/:id',
-  [protect, authorize('agent', 'admin')],
+  [protect, authorize('agent', 'admin'), requirePropertyManagement],
   propertyController.deleteProperty
 );
 
@@ -105,7 +118,7 @@ router.delete(
 // @access  Private (Agent/Admin)
 router.put(
   '/:id/photo',
-  [protect, authorize('agent', 'admin'), upload.single('file')],
+  [protect, authorize('agent', 'admin'), requirePropertyManagement, upload.single('file')],
   propertyController.uploadPropertyPhoto
 );
 

@@ -3,13 +3,18 @@ const router = express.Router();
 const { check } = require('express-validator');
 const contactController = require('../controllers/contactController');
 const { protect, authorize } = require('../middleware/auth');
+const {
+  requireContactAccess,
+  requireLeadManagement,
+  requireCRM
+} = require('../middleware/subscriptionAccess');
 
 // @desc    Create contact request
 // @route   POST /api/v1/contacts/property/:propertyId
 // @access  Private
 router.post(
   '/property/:propertyId',
-  protect,
+  [protect, requireContactAccess],
   [
     check('message', 'Message is required').not().isEmpty(),
     check('contactMethod', 'Valid contact method is required').isIn(['message', 'email', 'whatsapp', 'call'])
@@ -22,8 +27,7 @@ router.post(
 // @access  Private/Agent
 router.get(
   '/agent',
-  protect,
-  authorize('agent'),
+  [protect, authorize('agent'), requireLeadManagement],
   contactController.getAgentContactRequests
 );
 
@@ -32,8 +36,7 @@ router.get(
 // @access  Private/Agent
 router.put(
   '/:id',
-  protect,
-  authorize('agent'),
+  [protect, authorize('agent'), requireLeadManagement],
   [
     check('status', 'Valid status is required').isIn(['pending', 'contacted', 'followup', 'closed'])
   ],
@@ -45,8 +48,7 @@ router.put(
 // @access  Private/Admin
 router.get(
   '/',
-  protect,
-  authorize('admin'),
+  [protect, authorize('admin'), requireCRM],
   contactController.getContactRequests
 );
 
@@ -55,8 +57,7 @@ router.get(
 // @access  Private/Admin
 router.delete(
   '/:id',
-  protect,
-  authorize('admin'),
+  [protect, authorize('admin'), requireCRM],
   contactController.deleteContactRequest
 );
 

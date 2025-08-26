@@ -63,10 +63,37 @@ instance.interceptors.response.use(
       });
     }
 
-    // Forbidden
+    // Forbidden - check if it's a subscription error
     if (status === 403) {
+      const errorMessage = data?.message || 'You are not authorized to perform this action';
+      
+      // Check if it's a subscription-related error
+      const subscriptionKeywords = [
+        'subscription',
+        'plan',
+        'upgrade',
+        'access denied',
+        'requires',
+        'basic',
+        'premium',
+        'enterprise'
+      ];
+
+      const isSubscriptionError = subscriptionKeywords.some(keyword => 
+        errorMessage.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (isSubscriptionError) {
+        return Promise.reject({
+          message: errorMessage,
+          status,
+          data,
+          isSubscriptionError: true,
+        });
+      }
+
       return Promise.reject({
-        message: data?.message || 'You are not authorized to perform this action',
+        message: errorMessage,
         status,
         data,
       });
