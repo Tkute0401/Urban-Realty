@@ -1,6 +1,54 @@
+# Dependencies
 node_modules
 client/node_modules
-.git
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+client/.env
+server/.env
+
+# Git
+.git
+.gitignore
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# IDE
+.vscode
+.idea
+
+# Temporary folders
+tmp
+temp
+
+# Build artifacts (we'll build these in the container)
+client/dist
 dist
+
+# Test files
+test
+tests
+*.test.js
+*.spec.js

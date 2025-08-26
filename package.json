@@ -13,7 +13,9 @@
     "install-all": "npm install && npm install --prefix client",
     "test": "cd client && npm run test",
     "heroku-postbuild": "npm run build --prefix client && npm install --prefix server",
-    "setup": "./scripts/build.sh"
+    "setup": "./scripts/build.sh",
+    "railway-build": "./scripts/railway-build.sh",
+    "railway-start": "node server/server.js"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",

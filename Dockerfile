@@ -1,41 +1,39 @@
-# Stage 1: Frontend build
-FROM node:20-alpine AS frontend-builder
-
-WORKDIR /app/client
-COPY client/package*.json client/.yarnrc* ./
-RUN yarn cache clean && \
-    yarn install
-COPY client .
-ARG VITE_API_BASE_URL
-ARG VITE_GOOGLE_MAPS_API_KEY
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
-    VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
-RUN npm run build
-
-# Stage 2: Backend build
-FROM node:18-alpine AS backend-builder
-
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY server .
-
-# Final stage
+# Use Node.js 18 for consistency
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy built frontend
-COPY --from=frontend-builder /app/client/dist ./client/dist
+# Copy package files
+COPY package*.json ./
+COPY client/package*.json ./client/
 
-# Copy backend
-COPY --from=backend-builder /app ./
+# Install dependencies
+RUN npm install
+RUN cd client && npm install
 
-# Create uploads directory
-RUN mkdir -p /app/uploads
+# Copy source code
+COPY . .
 
-# Verification
-RUN ls -la /app/client/dist
+# Build frontend or extract from zip
+RUN cd client && \
+    if [ -f "dist.zip" ]; then \
+        echo "Extracting existing build from dist.zip..." && \
+        unzip -o dist.zip; \
+    else \
+        echo "Building frontend..." && \
+        npm run build; \
+    fi
 
+# Create necessary directories
+RUN mkdir -p server/uploads
+RUN mkdir -p logs
+
+# Verify frontend build
+RUN ls -la client/dist/ && \
+    echo "Frontend build verification complete"
+
+# Expose port
 EXPOSE 5000
-CMD ["node", "server.js"]
+
+# Start the server
+CMD ["node", "server/server.js"]
