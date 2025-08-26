@@ -15,13 +15,21 @@ router.get('/my-subscription', subscriptionController.getMySubscription);
 router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
 router.get('/listing-limit', subscriptionController.checkListingLimit);
 router.get('/billing-history', subscriptionController.getBillingHistory);
+router.get('/billing-details', subscriptionController.getBillingDetails);
+router.get('/invoices', subscriptionController.getUserInvoices);
+router.get('/invoices/:id', subscriptionController.getInvoice);
 router.post('/subscribe', [
   check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
   check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly']),
   check('paymentMethod', 'Payment method is required').not().isEmpty()
 ], subscriptionController.subscribeUser);
 router.put('/cancel', subscriptionController.cancelSubscription);
+router.put('/change-plan', [
+  check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
+  check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly'])
+], subscriptionController.changeSubscriptionPlan);
 router.put('/payment-method', subscriptionController.updatePaymentMethod);
+router.put('/invoices/:id/mark-paid', subscriptionController.markInvoiceAsPaid);
 
 // Parameterized routes - must come after specific routes
 router.get('/:id', subscriptionController.getSubscription);
