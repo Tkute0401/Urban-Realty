@@ -23,10 +23,10 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join('/app/client/dist'); // Updated path
+const clientDistDir = path.join(__dirname, '..', 'client', 'dist'); // Updated path
 
 // Create directories
-[uploadsDir, clientDistDir].forEach(dir => {
+[uploadsDir].forEach(dir => {
   try {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -37,6 +37,16 @@ const clientDistDir = path.join('/app/client/dist'); // Updated path
     process.exit(1);
   }
 });
+
+// Create client dist directory if it doesn't exist (optional)
+try {
+  if (!fs.existsSync(clientDistDir)) {
+    fs.mkdirSync(clientDistDir, { recursive: true });
+    console.log(`Directory created: ${clientDistDir}`);
+  }
+} catch (err) {
+  console.warn(`Warning: Could not create client dist directory ${clientDistDir}:`, err.message);
+}
 
 // Middleware
 app.use(cors({
