@@ -73,7 +73,7 @@ const SubscriptionPlans = () => {
       setSubscribing(true);
       setSubscribeError(null);
 
-      const response = await axios.post('/subscribe', {
+      const response = await axios.post('/subscriptions/subscribe', {
         subscriptionId: selectedPlan._id,
         billingCycle,
         paymentMethod

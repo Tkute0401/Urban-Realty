@@ -270,3 +270,65 @@ exports.checkListingLimit = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Error checking listing limit', 500));
   }
 });
+
+// @desc    Get user's billing history
+// @route   GET /api/v1/subscriptions/billing-history
+// @access  Private
+exports.getBillingHistory = asyncHandler(async (req, res, next) => {
+  const userSubscription = await UserSubscription.findOne({
+    user: req.user.id,
+    status: { $in: ['active', 'cancelled', 'expired'] }
+  }).populate('subscription');
+
+  if (!userSubscription) {
+    return res.status(200).json({
+      success: true,
+      data: []
+    });
+  }
+
+  // Mock billing history for now - in production, this would come from a billing system
+  const billingHistory = [
+    {
+      _id: '1',
+      date: userSubscription.startDate,
+      description: `${userSubscription.subscription.name} - ${userSubscription.billingCycle} subscription`,
+      amount: userSubscription.amount,
+      currency: userSubscription.currency,
+      status: userSubscription.paymentStatus
+    }
+  ];
+
+  res.status(200).json({
+    success: true,
+    data: billingHistory
+  });
+});
+
+// @desc    Update user's payment method
+// @route   PUT /api/v1/subscriptions/payment-method
+// @access  Private
+exports.updatePaymentMethod = asyncHandler(async (req, res, next) => {
+  const { paymentMethod, cardNumber, expiryDate, cvv } = req.body;
+  
+  const userSubscription = await UserSubscription.findOne({
+    user: req.user.id,
+    status: 'active'
+  });
+
+  if (!userSubscription) {
+    return next(new ErrorResponse('No active subscription found', 404));
+  }
+
+  // Update payment method (in production, this would integrate with payment processor)
+  userSubscription.paymentMethod = paymentMethod;
+  await userSubscription.save();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      message: 'Payment method updated successfully',
+      paymentMethod
+    }
+  });
+});
