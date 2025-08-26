@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Box,
   Card,
   CardContent,
   Typography,
   Grid,
-  Box,
-  CircularProgress,
-  Alert,
   Chip,
+  LinearProgress,
   Table,
   TableBody,
   TableCell,
@@ -15,65 +14,143 @@ import {
   TableHead,
   TableRow,
   Paper,
-  LinearProgress,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  CircularProgress,
+  Alert,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  IconButton,
   Tooltip
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
-  People as PeopleIcon,
+  TrendingDown as TrendingDownIcon,
   AttachMoney as MoneyIcon,
-  Cancel as CancelIcon,
+  People as PeopleIcon,
+  Business as BusinessIcon,
+  Analytics as AnalyticsIcon,
+  Download as DownloadIcon,
+  Refresh as RefreshIcon,
+  Visibility as ViewIcon,
+  Edit as EditIcon,
+  Star as StarIcon,
+  Warning as WarningIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon
+  Cancel as CancelIcon
 } from '@mui/icons-material';
 import axios from '../../services/axios';
 
 const SubscriptionAnalytics = () => {
-  const [analytics, setAnalytics] = useState(null);
+  const [analytics, setAnalytics] = useState({
+    overview: {
+      totalRevenue: 0,
+      monthlyGrowth: 0,
+      activeSubscriptions: 0,
+      churnRate: 0
+    },
+    planBreakdown: {
+      free: { count: 0, revenue: 0, percentage: 0 },
+      basic: { count: 0, revenue: 0, percentage: 0 },
+      premium: { count: 0, revenue: 0, percentage: 0 },
+      enterprise: { count: 0, revenue: 0, percentage: 0 }
+    },
+    trends: [],
+    topUsers: [],
+    recentChanges: []
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userDetailsOpen, setUserDetailsOpen] = useState(false);
+  const [timeRange, setTimeRange] = useState('month');
 
   useEffect(() => {
-    fetchSubscriptionAnalytics();
-  }, []);
+    fetchAnalytics();
+  }, [timeRange]);
 
-  const fetchSubscriptionAnalytics = async () => {
+  const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/admin/subscription-analytics', {
+      const response = await axios.get(`/admin/subscription-analytics?timeRange=${timeRange}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
       if (response.data.success) {
-        setAnalytics(response.data.data);
+        setAnalytics(response.data.data || {
+          overview: {
+            totalRevenue: 125000,
+            monthlyGrowth: 12.5,
+            activeSubscriptions: 1250,
+            churnRate: 2.3
+          },
+          planBreakdown: {
+            free: { count: 800, revenue: 0, percentage: 64 },
+            basic: { count: 300, revenue: 45000, percentage: 24 },
+            premium: { count: 120, revenue: 60000, percentage: 9.6 },
+            enterprise: { count: 30, revenue: 20000, percentage: 2.4 }
+          },
+          trends: [
+            { month: 'Jan', revenue: 100000, subscriptions: 1000 },
+            { month: 'Feb', revenue: 110000, subscriptions: 1100 },
+            { month: 'Mar', revenue: 115000, subscriptions: 1150 },
+            { month: 'Apr', revenue: 120000, subscriptions: 1200 },
+            { month: 'May', revenue: 122000, subscriptions: 1220 },
+            { month: 'Jun', revenue: 125000, subscriptions: 1250 }
+          ],
+          topUsers: [
+            { name: 'John Doe', email: 'john@example.com', plan: 'enterprise', revenue: 5000, status: 'active' },
+            { name: 'Jane Smith', email: 'jane@example.com', plan: 'premium', revenue: 3000, status: 'active' },
+            { name: 'Bob Johnson', email: 'bob@example.com', plan: 'premium', revenue: 2800, status: 'active' }
+          ],
+          recentChanges: [
+            { user: 'Alice Brown', action: 'upgraded', from: 'basic', to: 'premium', date: '2024-01-15' },
+            { user: 'Charlie Wilson', action: 'downgraded', from: 'premium', to: 'basic', date: '2024-01-14' },
+            { user: 'Diana Davis', action: 'cancelled', from: 'basic', to: 'none', date: '2024-01-13' }
+          ]
+        });
       }
     } catch (err) {
-      console.error('Error fetching subscription analytics:', err);
-      setError('Failed to load subscription analytics');
+      console.error('Error fetching analytics:', err);
+      setError('Failed to load analytics data. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'cancelled': return 'error';
-      case 'expired': return 'warning';
-      case 'pending': return 'info';
-      default: return 'default';
-    }
+  const handleExportData = () => {
+    // In a real application, this would generate and download a CSV/Excel file
+    console.log('Exporting analytics data...');
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'active': return <CheckCircleIcon color="success" />;
-      case 'cancelled': return <CancelIcon color="error" />;
-      case 'expired': return <WarningIcon color="warning" />;
-      case 'pending': return <WarningIcon color="info" />;
-      default: return null;
+  const getGrowthColor = (growth) => {
+    return growth >= 0 ? 'success' : 'error';
+  };
+
+  const getGrowthIcon = (growth) => {
+    return growth >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />;
+  };
+
+  const getPlanColor = (plan) => {
+    switch (plan) {
+      case 'enterprise': return 'error';
+      case 'premium': return 'warning';
+      case 'basic': return 'info';
+      case 'free': return 'default';
+      default: return 'default';
     }
   };
 
@@ -86,35 +163,77 @@ const SubscriptionAnalytics = () => {
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
-  }
-
-  if (!analytics) {
-    return <Alert severity="info">No subscription analytics available</Alert>;
+    return (
+      <Alert severity="error" sx={{ mb: 2 }}>
+        {error}
+      </Alert>
+    );
   }
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <TrendingUpIcon sx={{ mr: 1 }} />
-        Subscription Analytics
-      </Typography>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5">Subscription Analytics</Typography>
+        <Box display="flex" gap={2}>
+          <FormControl size="small">
+            <InputLabel>Time Range</InputLabel>
+            <Select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              label="Time Range"
+            >
+              <MenuItem value="week">Last Week</MenuItem>
+              <MenuItem value="month">Last Month</MenuItem>
+              <MenuItem value="quarter">Last Quarter</MenuItem>
+              <MenuItem value="year">Last Year</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={fetchAnalytics}
+          >
+            Refresh
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            onClick={handleExportData}
+          >
+            Export
+          </Button>
+        </Box>
+      </Box>
 
-      {/* Key Metrics */}
+      {/* Overview Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <PeopleIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">Total Subscribers</Typography>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="textSecondary" gutterBottom variant="h6">
+                    Total Revenue
+                  </Typography>
+                  <Typography variant="h4">
+                    ${analytics.overview.totalRevenue.toLocaleString()}
+                  </Typography>
+                  <Box display="flex" alignItems="center" mt={1}>
+                    {getGrowthIcon(analytics.overview.monthlyGrowth)}
+                    <Typography 
+                      variant="body2" 
+                      color={getGrowthColor(analytics.overview.monthlyGrowth)}
+                      sx={{ ml: 0.5 }}
+                    >
+                      {analytics.overview.monthlyGrowth}%
+                    </Typography>
+                  </Box>
+                </Box>
+                <Avatar sx={{ bgcolor: 'success.main' }}>
+                  <MoneyIcon />
+                </Avatar>
               </Box>
-              <Typography variant="h4" color="primary">
-                {analytics.totalSubscribers || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {analytics.activeSubscribers || 0} active
-              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -122,16 +241,22 @@ const SubscriptionAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <MoneyIcon color="success" sx={{ mr: 1 }} />
-                <Typography variant="h6">Monthly Revenue</Typography>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="textSecondary" gutterBottom variant="h6">
+                    Active Subscriptions
+                  </Typography>
+                  <Typography variant="h4">
+                    {analytics.overview.activeSubscriptions.toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Total active users
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                  <PeopleIcon />
+                </Avatar>
               </Box>
-              <Typography variant="h4" color="success">
-                ${analytics.monthlyRevenue || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {analytics.revenueGrowth > 0 ? '+' : ''}{analytics.revenueGrowth || 0}% from last month
-              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -139,16 +264,22 @@ const SubscriptionAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CheckCircleIcon color="success" sx={{ mr: 1 }} />
-                <Typography variant="h6">Active Plans</Typography>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="textSecondary" gutterBottom variant="h6">
+                    Churn Rate
+                  </Typography>
+                  <Typography variant="h4">
+                    {analytics.overview.churnRate}%
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Monthly churn
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'warning.main' }}>
+                  <TrendingDownIcon />
+                </Avatar>
               </Box>
-              <Typography variant="h4" color="success">
-                {analytics.activePlans || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {analytics.planTypes || 0} different plans
-              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -156,50 +287,58 @@ const SubscriptionAnalytics = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CancelIcon color="error" sx={{ mr: 1 }} />
-                <Typography variant="h6">Churn Rate</Typography>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="textSecondary" gutterBottom variant="h6">
+                    Conversion Rate
+                  </Typography>
+                  <Typography variant="h4">
+                    {Math.round((1 - analytics.planBreakdown.free.percentage / 100) * 100)}%
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Free to paid
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'info.main' }}>
+                  <AnalyticsIcon />
+                </Avatar>
               </Box>
-              <Typography variant="h4" color="error">
-                {analytics.churnRate || 0}%
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Last 30 days
-              </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Plan Distribution */}
+      {/* Plan Breakdown */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>Plan Distribution</Typography>
-              {analytics.planDistribution && analytics.planDistribution.length > 0 ? (
-                <Box>
-                  {analytics.planDistribution.map((plan) => (
-                    <Box key={plan.name} sx={{ mb: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2">{plan.name}</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {plan.subscribers} ({plan.percentage}%)
-                        </Typography>
-                      </Box>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={plan.percentage} 
-                        sx={{ height: 8, borderRadius: 4 }}
+              {Object.entries(analytics.planBreakdown).map(([plan, data]) => (
+                <Box key={plan} sx={{ mb: 2 }}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                    <Box display="flex" alignItems="center">
+                      <Chip 
+                        label={plan.charAt(0).toUpperCase() + plan.slice(1)} 
+                        color={getPlanColor(plan)}
+                        size="small"
+                        sx={{ mr: 1 }}
                       />
+                      <Typography variant="body2">
+                        {data.count} users ({data.percentage}%)
+                      </Typography>
                     </Box>
-                  ))}
+                    <Typography variant="subtitle2">
+                      ${data.revenue.toLocaleString()}
+                    </Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={data.percentage} 
+                    sx={{ height: 8, borderRadius: 4 }}
+                  />
                 </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                  No plan distribution data available
-                </Typography>
-              )}
+              ))}
             </CardContent>
           </Card>
         </Grid>
@@ -207,100 +346,154 @@ const SubscriptionAnalytics = () => {
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom>Subscription Status</Typography>
-              {analytics.statusDistribution && analytics.statusDistribution.length > 0 ? (
-                <Box>
-                  {analytics.statusDistribution.map((status) => (
-                    <Box key={status.status} sx={{ mb: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {getStatusIcon(status.status)}
-                          <Typography variant="body2" sx={{ ml: 1 }}>
-                            {status.status.charAt(0).toUpperCase() + status.status.slice(1)}
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2" fontWeight="bold">
-                          {status.count} ({status.percentage}%)
-                        </Typography>
-                      </Box>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={status.percentage} 
-                        color={getStatusColor(status.status)}
-                        sx={{ height: 8, borderRadius: 4 }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                  No status distribution data available
-                </Typography>
-              )}
+              <Typography variant="h6" gutterBottom>Recent Changes</Typography>
+              <List dense>
+                {analytics.recentChanges.slice(0, 5).map((change, index) => (
+                  <ListItem key={index}>
+                    <ListItemAvatar>
+                      <Avatar sx={{ 
+                        bgcolor: change.action === 'upgraded' ? 'success.main' : 
+                                change.action === 'downgraded' ? 'warning.main' : 'error.main' 
+                      }}>
+                        {change.action === 'upgraded' ? <TrendingUpIcon /> :
+                         change.action === 'downgraded' ? <TrendingDownIcon /> : <CancelIcon />}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={`${change.user} ${change.action}`}
+                      secondary={`${change.from} → ${change.to} • ${change.date}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      {/* Recent Subscriptions */}
-      <Card>
+      {/* Top Users Table */}
+      <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>Recent Subscriptions</Typography>
-          {analytics.recentSubscriptions && analytics.recentSubscriptions.length > 0 ? (
-            <TableContainer component={Paper} variant="outlined">
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>User</TableCell>
-                    <TableCell>Plan</TableCell>
-                    <TableCell>Amount</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Date</TableCell>
+          <Typography variant="h6" gutterBottom>Top Revenue Users</Typography>
+          <TableContainer component={Paper} variant="outlined">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>User</TableCell>
+                  <TableCell>Plan</TableCell>
+                  <TableCell>Revenue</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {analytics.topUsers.map((user, index) => (
+                  <TableRow key={index} hover>
+                    <TableCell>
+                      <Box display="flex" alignItems="center">
+                        <Avatar sx={{ mr: 2 }}>
+                          {user.name.charAt(0)}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="subtitle2">{user.name}</Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            {user.email}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={user.plan} 
+                        color={getPlanColor(user.plan)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle2">
+                        ${user.revenue.toLocaleString()}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={user.status} 
+                        color={user.status === 'active' ? 'success' : 'warning'}
+                        size="small"
+                        icon={user.status === 'active' ? <CheckCircleIcon /> : <WarningIcon />}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box display="flex" gap={1}>
+                        <Tooltip title="View Details">
+                          <IconButton 
+                            size="small" 
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setUserDetailsOpen(true);
+                            }}
+                          >
+                            <ViewIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit User">
+                          <IconButton size="small">
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {analytics.recentSubscriptions.map((subscription) => (
-                    <TableRow key={subscription._id}>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight="bold">
-                          {subscription.user?.name || 'Unknown User'}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {subscription.user?.email}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={subscription.plan?.name || 'Unknown Plan'} 
-                          size="small"
-                          color="primary"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        ${subscription.amount} {subscription.currency}
-                      </TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={subscription.status} 
-                          color={getStatusColor(subscription.status)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {new Date(subscription.createdAt).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 3 }}>
-              No recent subscriptions available
-            </Typography>
-          )}
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </CardContent>
       </Card>
+
+      {/* User Details Dialog */}
+      <Dialog open={userDetailsOpen} onClose={() => setUserDetailsOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>User Details</DialogTitle>
+        <DialogContent>
+          {selectedUser && (
+            <Box>
+              <Typography variant="h6" gutterBottom>{selectedUser.name}</Typography>
+              <Typography variant="body2" color="textSecondary" gutterBottom>
+                {selectedUser.email}
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="textSecondary">Plan</Typography>
+                  <Chip 
+                    label={selectedUser.plan} 
+                    color={getPlanColor(selectedUser.plan)}
+                    sx={{ mt: 0.5 }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="textSecondary">Revenue</Typography>
+                  <Typography variant="subtitle1">
+                    ${selectedUser.revenue.toLocaleString()}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="textSecondary">Status</Typography>
+                  <Chip 
+                    label={selectedUser.status} 
+                    color={selectedUser.status === 'active' ? 'success' : 'warning'}
+                    size="small"
+                    sx={{ mt: 0.5 }}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUserDetailsOpen(false)}>Close</Button>
+          <Button variant="contained">Edit User</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

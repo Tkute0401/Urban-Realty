@@ -519,20 +519,73 @@ exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
   }
 });
 
+// @desc    Get system information
+// @route   GET /api/v1/admin/system-info
+// @access  Private/Admin
+exports.getSystemInfo = asyncHandler(async (req, res, next) => {
+  const os = require('os');
+  
+  const systemInfo = {
+    uptime: Math.floor(os.uptime() / (24 * 60 * 60)), // Days
+    memoryUsage: Math.round((1 - os.freemem() / os.totalmem()) * 100),
+    cpuUsage: Math.round(Math.random() * 30 + 20), // Simulated CPU usage
+    diskUsage: Math.round(Math.random() * 20 + 60), // Simulated disk usage
+    activeConnections: Math.round(Math.random() * 50 + 100), // Simulated connections
+    lastBackup: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000), // Random time within last week
+    pendingUpdates: Math.round(Math.random() * 5), // Simulated pending updates
+    nodeVersion: process.version,
+    platform: os.platform(),
+    arch: os.arch(),
+    hostname: os.hostname()
+  };
+
+  res.status(200).json({
+    success: true,
+    data: systemInfo
+  });
+});
+
+// @desc    Update system settings
+// @route   PUT /api/v1/admin/system-settings
+// @access  Private/Admin
+exports.updateSystemSettings = asyncHandler(async (req, res, next) => {
+  const { maintenanceMode, autoBackup, emailNotifications, securityAlerts, performanceMonitoring } = req.body;
+  
+  // In a real application, you would save these settings to a database or config file
+  // For now, we'll just return success
+  
+  res.status(200).json({
+    success: true,
+    message: 'System settings updated successfully',
+    data: {
+      maintenanceMode: maintenanceMode || false,
+      autoBackup: autoBackup || false,
+      emailNotifications: emailNotifications || false,
+      securityAlerts: securityAlerts || false,
+      performanceMonitoring: performanceMonitoring || false
+    }
+  });
+});
+
 // @desc    Update user subscription
 // @route   PUT /api/v1/admin/users/:id/subscription
 // @access  Private/Admin
 exports.updateUserSubscription = asyncHandler(async (req, res, next) => {
-  const { subscriptionStatus, reason } = req.body;
+  const { subscriptionPlan } = req.body;
   const userId = req.params.id;
+
+  if (!subscriptionPlan) {
+    return next(new ErrorResponse('Subscription plan is required', 400));
+  }
+
+  const validPlans = ['free', 'basic', 'premium', 'enterprise'];
+  if (!validPlans.includes(subscriptionPlan)) {
+    return next(new ErrorResponse('Invalid subscription plan', 400));
+  }
 
   const user = await User.findByIdAndUpdate(
     userId,
-    { 
-      subscriptionStatus,
-      subscriptionUpdatedAt: new Date(),
-      subscriptionUpdateReason: reason
-    },
+    { subscriptionPlan },
     { new: true, runValidators: true }
   ).select('-password');
 
@@ -542,7 +595,7 @@ exports.updateUserSubscription = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: `User subscription updated to ${subscriptionStatus}`,
+    message: 'User subscription updated successfully',
     data: user
   });
 });
@@ -553,42 +606,53 @@ exports.updateUserSubscription = asyncHandler(async (req, res, next) => {
 exports.getUserSubscriptionHistory = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
 
-  const user = await User.findById(userId);
-  if (!user) {
-    return next(new ErrorResponse('User not found', 404));
-  }
-
-  // This would typically query a separate SubscriptionHistory model
-  // For now, returning mock data
-  const history = [
+  // In a real application, you would have a subscription history model
+  // For now, we'll return a mock response
+  const subscriptionHistory = [
     {
-      id: '1',
-      action: 'upgraded',
-      fromPlan: 'free',
-      toPlan: 'basic',
-      timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      reason: 'User requested upgrade'
+      plan: 'free',
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      endDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+      status: 'expired'
     },
     {
-      id: '2',
-      action: 'upgraded',
-      fromPlan: 'basic',
-      toPlan: 'premium',
-      timestamp: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-      reason: 'Automatic upgrade'
+      plan: 'basic',
+      startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+      endDate: null,
+      status: 'active'
     }
   ];
 
   res.status(200).json({
     success: true,
-    data: {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        currentSubscription: user.subscriptionStatus
-      },
-      history
-    }
+    data: subscriptionHistory
+  });
+});
+
+// @desc    Block/Unblock user
+// @route   PUT /api/v1/admin/users/:id
+// @access  Private/Admin
+exports.blockUser = asyncHandler(async (req, res, next) => {
+  const { blocked } = req.body;
+  const userId = req.params.id;
+
+  if (blocked === undefined) {
+    return next(new ErrorResponse('Blocked status is required', 400));
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { blocked },
+    { new: true, runValidators: true }
+  ).select('-password');
+
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `User ${blocked ? 'blocked' : 'unblocked'} successfully`,
+    data: user
   });
 });

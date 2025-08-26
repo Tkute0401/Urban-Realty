@@ -66,4 +66,11 @@ router.get('/subscription-analytics', [protect, authorize('admin'), requireAdvan
 router.put('/users/:id/subscription', [protect, authorize('admin'), requireAdminAccess], adminController.updateUserSubscription);
 router.get('/users/:id/subscription-history', [protect, authorize('admin'), requireAdminAccess], adminController.getUserSubscriptionHistory);
 
+// System Management
+router.get('/system-info', [protect, authorize('admin'), requireAdminAccess], adminController.getSystemInfo);
+router.put('/system-settings', [protect, authorize('admin'), requireAdminAccess], adminController.updateSystemSettings);
+
+// Enhanced User Management
+router.put('/users/:id/block', [protect, authorize('admin'), requireAdminAccess], adminController.blockUser);
+
 module.exports = router;

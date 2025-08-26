@@ -8,10 +8,14 @@
     "server": "nodemon server/server.js",
     "client": "npm run dev --prefix client",
     "build": "cd client && npm install && npm run build",
+    "build:client": "cd client && npm run build",
+    "build:server": "npm install",
+    "build:all": "npm run build:server && npm run build:client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && npm install --prefix client",
     "test": "cd client && npm run test",
-    "heroku-postbuild": "npm run build --prefix client && npm install --prefix server"
+    "heroku-postbuild": "npm run build:all",
+    "railway-postbuild": "npm run build:all"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",

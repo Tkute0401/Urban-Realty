@@ -2,9 +2,8 @@
 FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/client
-COPY client/package*.json client/.yarnrc* ./
-RUN yarn cache clean && \
-    yarn install
+COPY client/package*.json ./
+RUN npm ci --only=production
 COPY client .
 ARG VITE_API_BASE_URL
 ARG VITE_GOOGLE_MAPS_API_KEY
@@ -17,7 +16,7 @@ FROM node:18-alpine AS backend-builder
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production
 COPY server .
 
 # Final stage
@@ -38,4 +37,4 @@ RUN mkdir -p /app/uploads
 RUN ls -la /app/client/dist
 
 EXPOSE 5000
-CMD ["node", "server.js"]
+CMD ["node", "server/server.js"]

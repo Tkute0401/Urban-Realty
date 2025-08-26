@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -8,122 +8,175 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Menu,
-  MenuItem,
-  Typography,
   Chip,
-  Box,
-  CircularProgress,
-  TablePagination,
-  TextField,
-  InputAdornment,
   Avatar,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Box,
+  Typography,
+  Alert,
+  CircularProgress,
   Tooltip,
-  Button
+  Grid,
+  Card,
+  CardContent,
+  InputAdornment,
+  Pagination,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
-import { MoreVert, Delete, Visibility, Edit, Search, Add } from '@mui/icons-material';
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as ViewIcon,
+  Home as HomeIcon,
+  LocationOn as LocationIcon,
+  AttachMoney as MoneyIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
+  Download as DownloadIcon,
+  Refresh as RefreshIcon,
+  Add as AddIcon,
+  CheckCircle as VerifiedIcon,
+  Warning as PendingIcon
+} from '@mui/icons-material';
 import axios from '../../services/axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-
-const formatPrice = (price) => {
-  if (!price) return '$0';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price);
-};
 
 const PropertiesTable = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
-  const { user } = useAuth();
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterPrice, setFilterPrice] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
+  const [editingProperty, setEditingProperty] = useState({});
 
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const endpoint = user?.role === 'admin' ? '/admin/properties' : '/properties';
-        const response = await axios.get(endpoint);
-        if (response.data.success) {
-          setProperties(response.data.data || []);
-        } else {
-          setError('Failed to fetch properties');
-        }
-      } catch (err) {
-        console.error('Error fetching properties:', err);
-        setError('Failed to load properties. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchProperties();
-  }, [user]);
+  }, []);
 
-  const handleMenuOpen = (event, property) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedProperty(property);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedProperty(null);
-  };
-
-  const handleDelete = async () => {
+  const fetchProperties = async () => {
     try {
-      await axios.delete(`/admin/properties/${selectedProperty._id}`);
-      setProperties(properties.filter(property => property._id !== selectedProperty._id));
+      setLoading(true);
+      const response = await axios.get('/admin/properties', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.data.success) {
+        setProperties(response.data.data || []);
+      }
     } catch (err) {
-      console.error('Error deleting property:', err);
-      setError('Failed to delete property');
+      console.error('Error fetching properties:', err);
+      setError('Failed to load properties. Please try again later.');
     } finally {
-      handleMenuClose();
+      setLoading(false);
     }
   };
 
-  const handleView = () => {
-    navigate(`/properties/${selectedProperty._id}`);
-    handleMenuClose();
+  const handleEditProperty = async () => {
+    try {
+      await axios.put(`/admin/properties/${editingProperty._id}`, editingProperty, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      fetchProperties();
+      setEditDialogOpen(false);
+      setEditingProperty({});
+    } catch (err) {
+      console.error('Error updating property:', err);
+      setError('Failed to update property. Please try again.');
+    }
   };
 
-  const handleEdit = () => {
-    navigate(`/properties/${selectedProperty._id}/edit`);
-    handleMenuClose();
+  const handleDeleteProperty = async () => {
+    try {
+      await axios.delete(`/admin/properties/${selectedProperty._id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      fetchProperties();
+      setDeleteDialogOpen(false);
+      setSelectedProperty(null);
+    } catch (err) {
+      console.error('Error deleting property:', err);
+      setError('Failed to delete property. Please try again.');
+    }
   };
 
-  const handleAddProperty = () => {
-    navigate('/add-property');
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleStatusChange = async (propertyId, status) => {
+    try {
+      await axios.put(`/admin/properties/${propertyId}`, { status }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      fetchProperties();
+    } catch (err) {
+      console.error('Error updating property status:', err);
+      setError('Failed to update property status. Please try again.');
+    }
   };
 
   const filteredProperties = properties.filter(property => {
-    if (!property) return false;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      (property.title?.toLowerCase() || '').includes(searchLower) ||
-      (property.agent?.name?.toLowerCase() || '').includes(searchLower) ||
-      (property.address?.city?.toLowerCase() || '').includes(searchLower) ||
-      (property.type?.toLowerCase() || '').includes(searchLower)
-    );
+    const matchesSearch = property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.location?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === 'all' || property.type === filterType;
+    const matchesStatus = filterStatus === 'all' || property.status === filterStatus;
+    const matchesPrice = filterPrice === 'all' || 
+                        (filterPrice === 'low' && property.price < 500000) ||
+                        (filterPrice === 'medium' && property.price >= 500000 && property.price < 1000000) ||
+                        (filterPrice === 'high' && property.price >= 1000000);
+    
+    return matchesSearch && matchesType && matchesStatus && matchesPrice;
   });
+
+  const indexOfLastProperty = currentPage * usersPerPage;
+  const indexOfFirstProperty = indexOfLastProperty - usersPerPage;
+  const currentProperties = filteredProperties.slice(indexOfFirstProperty, indexOfLastProperty);
+
+  const getTypeColor = (type) => {
+    switch (type) {
+      case 'house': return 'primary';
+      case 'apartment': return 'secondary';
+      case 'condo': return 'success';
+      case 'land': return 'warning';
+      default: return 'default';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active': return 'success';
+      case 'pending': return 'warning';
+      case 'sold': return 'info';
+      case 'inactive': return 'error';
+      default: return 'default';
+    }
+  };
+
+  const getPriceRange = (price) => {
+    if (price < 500000) return 'low';
+    if (price < 1000000) return 'medium';
+    return 'high';
+  };
 
   if (loading) {
     return (
@@ -135,140 +188,386 @@ const PropertiesTable = () => {
 
   if (error) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <Typography color="error">{error}</Typography>
-      </Box>
+      <Alert severity="error" sx={{ mb: 2 }}>
+        {error}
+      </Alert>
     );
   }
 
   return (
-    <Paper>
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <TextField
-          variant="outlined"
-          placeholder="Search properties..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ width: '50%' }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<Add />}
-          onClick={handleAddProperty}
-        >
-          Add Property
-        </Button>
-      </Box>
+    <Box>
+      {/* Filters and Search */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                placeholder="Search properties..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  label="Type"
+                >
+                  <MenuItem value="all">All Types</MenuItem>
+                  <MenuItem value="house">House</MenuItem>
+                  <MenuItem value="apartment">Apartment</MenuItem>
+                  <MenuItem value="condo">Condo</MenuItem>
+                  <MenuItem value="land">Land</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  label="Status"
+                >
+                  <MenuItem value="all">All Status</MenuItem>
+                  <MenuItem value="active">Active</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="sold">Sold</MenuItem>
+                  <MenuItem value="inactive">Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Price Range</InputLabel>
+                <Select
+                  value={filterPrice}
+                  onChange={(e) => setFilterPrice(e.target.value)}
+                  label="Price Range"
+                >
+                  <MenuItem value="all">All Prices</MenuItem>
+                  <MenuItem value="low">Under $500K</MenuItem>
+                  <MenuItem value="medium">$500K - $1M</MenuItem>
+                  <MenuItem value="high">Over $1M</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<RefreshIcon />}
+                onClick={fetchProperties}
+              >
+                Refresh
+              </Button>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
-      <TableContainer>
+      {/* Properties Table */}
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Title</TableCell>
-              {user?.role === 'admin' && <TableCell>Agent</TableCell>}
+              <TableCell>Property</TableCell>
               <TableCell>Type</TableCell>
-              <TableCell>Location</TableCell>
               <TableCell>Price</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Agent</TableCell>
+              <TableCell>Created</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredProperties.length > 0 ? (
-              filteredProperties
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(property => (
-                  <TableRow key={property._id}>
-                    <TableCell>
-                      <Typography fontWeight="medium">{property.title}</Typography>
-                    </TableCell>
-                    {user?.role === 'admin' && (
-                      <TableCell>
-                        <Box display="flex" alignItems="center">
-                          <Avatar 
-                            src={property.agent?.photo} 
-                            sx={{ width: 24, height: 24, mr: 1 }}
-                          />
-                          <Typography variant="body2">
-                            {property.agent?.name}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <Chip label={property.type} color="primary" size="small" />
-                    </TableCell>
-                    <TableCell>
-                      {property.address?.city}, {property.address?.state}
-                    </TableCell>
-                    <TableCell>
-                      {formatPrice(property.price)}
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={property.status} 
-                        color={
-                          property.status === 'For Sale' ? 'primary' : 
-                          property.status === 'For Rent' ? 'secondary' : 'default'
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={(e) => handleMenuOpen(e, property)}>
-                        <MoreVert />
+            {currentProperties.map((property) => (
+              <TableRow key={property._id} hover>
+                <TableCell>
+                  <Box display="flex" alignItems="center">
+                    <Avatar sx={{ mr: 2, bgcolor: 'primary.main' }}>
+                      <HomeIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="subtitle2">{property.title || 'Untitled Property'}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {property.location || 'No location'}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Chip 
+                    label={property.type} 
+                    color={getTypeColor(property.type)}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle2">
+                    ${property.price?.toLocaleString() || '0'}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {getPriceRange(property.price)}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Chip 
+                    label={property.status} 
+                    color={getStatusColor(property.status)}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {property.agent?.name || 'No Agent'}
+                  </Typography>
+                  <Chip 
+                    label={property.agent?.verified ? 'Verified' : 'Pending'} 
+                    color={property.agent?.verified ? 'success' : 'warning'}
+                    size="small"
+                    icon={property.agent?.verified ? <VerifiedIcon /> : <PendingIcon />}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {new Date(property.createdAt).toLocaleDateString()}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Box display="flex" gap={1}>
+                    <Tooltip title="View Details">
+                      <IconButton 
+                        size="small" 
+                        onClick={() => {
+                          setSelectedProperty(property);
+                          setViewDialogOpen(true);
+                        }}
+                      >
+                        <ViewIcon />
                       </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={user?.role === 'admin' ? 7 : 6} align="center">
-                  <Typography>No properties found</Typography>
+                    </Tooltip>
+                    <Tooltip title="Edit Property">
+                      <IconButton 
+                        size="small" 
+                        onClick={() => {
+                          setEditingProperty(property);
+                          setEditDialogOpen(true);
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Property">
+                      <IconButton 
+                        size="small" 
+                        color="error"
+                        onClick={() => {
+                          setSelectedProperty(property);
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      {filteredProperties.length > 0 && (
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredProperties.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+      {/* Pagination */}
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Pagination
+          count={Math.ceil(filteredProperties.length / usersPerPage)}
+          page={currentPage}
+          onChange={(e, page) => setCurrentPage(page)}
+          color="primary"
         />
-      )}
+      </Box>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleView}>
-          <Visibility fontSize="small" sx={{ mr: 1 }} /> View
-        </MenuItem>
-        <MenuItem onClick={handleEdit}>
-          <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
-        </MenuItem>
-        {user?.role === 'admin' && (
-          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-            <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
-          </MenuItem>
-        )}
-      </Menu>
-    </Paper>
+      {/* View Property Dialog */}
+      <Dialog open={viewDialogOpen} onClose={() => setViewDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Property Details</DialogTitle>
+        <DialogContent>
+          {selectedProperty && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>Basic Information</Typography>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle1">{selectedProperty.title}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {selectedProperty.description}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">Type:</Typography>
+                      <Chip label={selectedProperty.type} color={getTypeColor(selectedProperty.type)} />
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">Price:</Typography>
+                      <Typography variant="subtitle2">${selectedProperty.price?.toLocaleString()}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">Status:</Typography>
+                      <Chip label={selectedProperty.status} color={getStatusColor(selectedProperty.status)} />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>Location & Details</Typography>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="textSecondary">
+                        {selectedProperty.location}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">Bedrooms:</Typography>
+                      <Typography variant="body2">{selectedProperty.bedrooms || 'N/A'}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">Bathrooms:</Typography>
+                      <Typography variant="body2">{selectedProperty.bathrooms || 'N/A'}</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">Area:</Typography>
+                      <Typography variant="body2">{selectedProperty.area || 'N/A'} sq ft</Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setViewDialogOpen(false)}>Close</Button>
+          <Button 
+            variant="contained" 
+            onClick={() => {
+              setViewDialogOpen(false);
+              setEditingProperty(selectedProperty);
+              setEditDialogOpen(true);
+            }}
+          >
+            Edit Property
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Property Dialog */}
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Property</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Title"
+                value={editingProperty.title || ''}
+                onChange={(e) => setEditingProperty({ ...editingProperty, title: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Description"
+                multiline
+                rows={3}
+                value={editingProperty.description || ''}
+                onChange={(e) => setEditingProperty({ ...editingProperty, description: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Price"
+                type="number"
+                value={editingProperty.price || ''}
+                onChange={(e) => setEditingProperty({ ...editingProperty, price: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={editingProperty.type || 'house'}
+                  onChange={(e) => setEditingProperty({ ...editingProperty, type: e.target.value })}
+                  label="Type"
+                >
+                  <MenuItem value="house">House</MenuItem>
+                  <MenuItem value="apartment">Apartment</MenuItem>
+                  <MenuItem value="condo">Condo</MenuItem>
+                  <MenuItem value="land">Land</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={editingProperty.status || 'active'}
+                  onChange={(e) => setEditingProperty({ ...editingProperty, status: e.target.value })}
+                  label="Status"
+                >
+                  <MenuItem value="active">Active</MenuItem>
+                  <MenuItem value="pending">Pending</MenuItem>
+                  <MenuItem value="sold">Sold</MenuItem>
+                  <MenuItem value="inactive">Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Location"
+                value={editingProperty.location || ''}
+                onChange={(e) => setEditingProperty({ ...editingProperty, location: e.target.value })}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleEditProperty}>
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete property "{selectedProperty?.title}"? 
+            This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleDeleteProperty}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
