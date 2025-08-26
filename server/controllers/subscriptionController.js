@@ -103,8 +103,18 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
     status: { $in: ['active', 'pending'] }
   });
 
+  // If user has an existing subscription, cancel it first (plan change)
   if (existingSubscription) {
-    return next(new ErrorResponse('User already has an active subscription', 400));
+    // Cancel the existing subscription
+    existingSubscription.status = 'cancelled';
+    existingSubscription.autoRenew = false;
+    await existingSubscription.save();
+    
+    // Update user's subscription status to free temporarily
+    await User.findByIdAndUpdate(userId, {
+      subscriptionStatus: 'free',
+      subscriptionExpiry: null
+    });
   }
 
   // Calculate end date based on billing cycle
@@ -329,6 +339,77 @@ exports.updatePaymentMethod = asyncHandler(async (req, res, next) => {
     data: {
       message: 'Payment method updated successfully',
       paymentMethod
+    }
+  });
+});
+
+// @desc    Change user's subscription plan
+// @route   PUT /api/v1/subscriptions/change-plan
+// @access  Private
+exports.changePlan = asyncHandler(async (req, res, next) => {
+  const { subscriptionId, billingCycle, paymentMethod } = req.body;
+  const userId = req.user.id;
+
+  // Get subscription details
+  const subscription = await Subscription.findById(subscriptionId);
+  if (!subscription) {
+    return next(new ErrorResponse('Subscription not found', 404));
+  }
+
+  // Check if user already has an active subscription
+  const existingSubscription = await UserSubscription.findOne({
+    user: userId,
+    status: { $in: ['active', 'pending'] }
+  });
+
+  if (!existingSubscription) {
+    return next(new ErrorResponse('No active subscription found to change', 404));
+  }
+
+  // Cancel the existing subscription
+  existingSubscription.status = 'cancelled';
+  existingSubscription.autoRenew = false;
+  await existingSubscription.save();
+
+  // Calculate end date based on billing cycle
+  const startDate = new Date();
+  const endDate = new Date();
+  if (billingCycle === 'monthly') {
+    endDate.setMonth(endDate.getMonth() + 1);
+  } else if (billingCycle === 'yearly') {
+    endDate.setFullYear(endDate.getFullYear() + 1);
+  }
+
+  // Calculate amount based on billing cycle
+  let amount = subscription.price;
+  if (billingCycle === 'yearly') {
+    amount = subscription.price * 12 * 0.8; // 20% discount for yearly
+  }
+
+  // Create new user subscription
+  const userSubscription = await UserSubscription.create({
+    user: userId,
+    subscription: subscriptionId,
+    billingCycle,
+    startDate,
+    endDate,
+    amount,
+    paymentMethod,
+    status: 'pending'
+  });
+
+  // Update user subscription status
+  await User.findByIdAndUpdate(userId, {
+    currentSubscription: userSubscription._id,
+    subscriptionStatus: subscription.type,
+    subscriptionExpiry: endDate
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {
+      message: 'Plan changed successfully',
+      subscription: userSubscription
     }
   });
 });

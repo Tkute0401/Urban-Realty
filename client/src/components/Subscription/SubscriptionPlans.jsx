@@ -73,7 +73,12 @@ const SubscriptionPlans = () => {
       setSubscribing(true);
       setSubscribeError(null);
 
-      const response = await axios.post('/subscriptions/subscribe', {
+      // Determine if this is a plan change or new subscription
+      const isPlanChange = user?.subscriptionStatus && user.subscriptionStatus !== 'free';
+      const endpoint = isPlanChange ? '/subscriptions/change-plan' : '/subscriptions/subscribe';
+      const method = isPlanChange ? 'put' : 'post';
+
+      const response = await axios[method](endpoint, {
         subscriptionId: selectedPlan._id,
         billingCycle,
         paymentMethod
@@ -85,7 +90,7 @@ const SubscriptionPlans = () => {
         setSubscribeSuccess(false);
         // Refresh user data or redirect
         window.location.reload();
-      }, 2000);
+      }, 3000);
     } catch (err) {
       setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
     } finally {
@@ -273,7 +278,6 @@ const SubscriptionPlans = () => {
                     variant="contained"
                     size="large"
                     onClick={() => handleSubscribe(plan)}
-                    disabled={user?.subscriptionStatus === plan.type}
                     sx={{ 
                       bgcolor: plan.type === 'premium' ? '#FFD700' : '#78CADC',
                       color: plan.type === 'premium' ? '#000' : '#fff',
@@ -282,7 +286,12 @@ const SubscriptionPlans = () => {
                       }
                     }}
                   >
-                    {user?.subscriptionStatus === plan.type ? 'Current Plan' : 'Subscribe'}
+                    {user?.subscriptionStatus === plan.type 
+                      ? 'Current Plan' 
+                      : user?.subscriptionStatus && user.subscriptionStatus !== 'free'
+                        ? 'Change Plan'
+                        : 'Subscribe'
+                    }
                   </Button>
                 )}
               </CardActions>
@@ -294,17 +303,26 @@ const SubscriptionPlans = () => {
       {/* Subscribe Dialog */}
       <Dialog open={subscribeDialog} onClose={() => setSubscribeDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Subscribe to {selectedPlan?.name}
+          {user?.subscriptionStatus && user.subscriptionStatus !== 'free' 
+            ? `Change to ${selectedPlan?.name}` 
+            : `Subscribe to ${selectedPlan?.name}`
+          }
         </DialogTitle>
         <DialogContent>
           {subscribeSuccess ? (
             <Alert severity="success" sx={{ mt: 2 }}>
-              Subscription successful! You will be redirected shortly.
+              {user?.subscriptionStatus && user.subscriptionStatus !== 'free' 
+                ? 'Plan changed successfully! You will be redirected shortly.'
+                : 'Subscription successful! You will be redirected shortly.'
+              }
             </Alert>
           ) : (
             <>
               <Typography variant="body1" sx={{ mb: 3 }}>
-                Complete your subscription to {selectedPlan?.name} for ${selectedPlan?.price}/{billingCycle}
+                {user?.subscriptionStatus && user.subscriptionStatus !== 'free' 
+                  ? `Change your plan to ${selectedPlan?.name} for $${selectedPlan?.price}/${billingCycle}`
+                  : `Complete your subscription to ${selectedPlan?.name} for $${selectedPlan?.price}/${billingCycle}`
+                }
               </Typography>
 
               <Grid container spacing={2}>
@@ -354,7 +372,12 @@ const SubscriptionPlans = () => {
               variant="contained"
               disabled={subscribing}
             >
-              {subscribing ? 'Processing...' : 'Subscribe'}
+              {subscribing 
+                ? 'Processing...' 
+                : user?.subscriptionStatus && user.subscriptionStatus !== 'free'
+                  ? 'Change Plan'
+                  : 'Subscribe'
+              }
             </Button>
           )}
         </DialogActions>

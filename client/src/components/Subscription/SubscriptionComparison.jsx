@@ -224,7 +224,6 @@ const SubscriptionComparison = () => {
                   variant="contained"
                   size="large"
                   onClick={() => handleSubscribe(plan)}
-                  disabled={user?.subscriptionStatus === plan.type}
                   sx={{ 
                     bgcolor: plan.type === 'premium' ? '#FFD700' : '#78CADC',
                     color: plan.type === 'premium' ? '#000' : '#fff',
@@ -234,7 +233,12 @@ const SubscriptionComparison = () => {
                     mb: 2
                   }}
                 >
-                  {user?.subscriptionStatus === plan.type ? 'Current Plan' : 'Choose Plan'}
+                  {user?.subscriptionStatus === plan.type 
+                    ? 'Current Plan' 
+                    : user?.subscriptionStatus && user.subscriptionStatus !== 'free'
+                      ? 'Change Plan'
+                      : 'Choose Plan'
+                  }
                 </Button>
               </CardContent>
             </Card>
