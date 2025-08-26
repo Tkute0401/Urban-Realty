@@ -56,7 +56,7 @@ const UserProfile = () => {
 
   const fetchSubscription = async () => {
     try {
-      const response = await axios.get('/api/subscriptions/my-subscription');
+      const response = await axios.get('/subscriptions/my-subscription');
       setSubscription(response.data.data);
     } catch (err) {
       if (err.response?.status !== 404) {
@@ -96,7 +96,7 @@ const UserProfile = () => {
   const handleCancelSubscription = async () => {
     if (window.confirm('Are you sure you want to cancel your subscription?')) {
       try {
-        await axios.put('/api/subscriptions/cancel');
+        await axios.put('/subscriptions/cancel');
         fetchSubscription();
         // Refresh user data
         window.location.reload();
