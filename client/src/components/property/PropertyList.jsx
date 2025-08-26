@@ -17,6 +17,8 @@ import BedBath from './BedBath';
 import HomeType from './HomeType';
 import More from './More';
 import PriceDropdown from './PriceDropdown';
+import EnhancedSearch from './EnhancedSearch';
+import MobileEnhancedSearch from './MobileEnhancedSearch';
 import './PropertyList.css';
 
 const PropertyList = () => {
@@ -466,46 +468,19 @@ const PropertyList = () => {
       {/* Mobile Search and Filter Bar */}
       {isMobile && (
       <div className="mobile-top-bar slide-in-left">
-        {/* Search Button/Input */}
+        {/* Enhanced Mobile Search */}
         <div className={`mobile-search-container ${expandedSearch ? 'expanded' : ''}`}>
-          {expandedSearch ? (
-            <form onSubmit={handleSearchSubmit} className="mobile-search-form">
-              <IconButton 
-                className="mobile-search-back" 
-                onClick={toggleSearch}
-                aria-label="Back"
-                sx={{ color: '#78CADC' }}
-              >
-                <ArrowBack />
-              </IconButton>
-              <input 
-                id="mobile-search-input"
-                type="text" 
-                placeholder="Search location..." 
-                value={filters.search} 
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                className="mobile-search-input"
-              />
-              {filters.search && (
-                <IconButton 
-                  className="mobile-search-clear" 
-                  onClick={() => setFilters(prev => ({ ...prev, search: '' }))}
-                  aria-label="Clear search"
-                  sx={{ color: '#78CADC', position: 'absolute', right: 10 }}
-                >
-                  <ClearIcon fontSize="small" />
-                </IconButton>
-              )}
-            </form>
-          ) : (
-            <button 
-              className="mobile-search-button" 
-              onClick={toggleSearch}
-              aria-label="Search"
-            >
-              <SearchIcon />
-            </button>
-          )}
+          <MobileEnhancedSearch
+            value={filters.search}
+            onChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
+            onSubmit={(value) => {
+              handleFilterChange({ search: value });
+              setExpandedSearch(false);
+            }}
+            expanded={expandedSearch}
+            onToggle={setExpandedSearch}
+            placeholder="Search location, property type, or amenities..."
+          />
         </div>
         
         {/* Filter Button */}
@@ -550,17 +525,18 @@ const PropertyList = () => {
       {!isMobile && (
       <div className="Navbar">
         <div className="navbar-content">
-          <form onSubmit={handleSearchSubmit} className="search-container slide-in-left">
-            <input 
-              type="searchbar" 
-              placeholder="SEARCH BY LOCATION (STATE OR CITY)" 
-              value={filters.search} 
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+          <div className="search-container slide-in-left">
+            <EnhancedSearch
+              value={filters.search}
+              onChange={(value) => setFilters(prev => ({ ...prev, search: value }))}
+              onSubmit={(value) => handleFilterChange({ search: value })}
+              placeholder="Search by location, property type, or amenities..."
+              variant="outlined"
+              size="medium"
+              fullWidth={true}
+              showSuggestions={true}
             />
-            <button type="submit" className="search-button">
-              <SearchIcon />
-            </button>
-          </form>
+          </div>
           
           <div className="BuyRentToggle">
             <button 

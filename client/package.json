@@ -23,6 +23,7 @@
     "formik": "^2.4.6",
     "framer-motion": "^12.7.3",
     "leaflet": "^1.9.4",
+    "lodash": "^4.17.21",
     "node-geocoder": "^4.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

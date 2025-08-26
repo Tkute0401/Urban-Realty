@@ -774,3 +774,96 @@ const uploadVideosToCloudinary = async (files) => {
   return videos;
 };
 
+// @desc    Get search suggestions and autocomplete
+// @route   GET /api/v1/properties/search-suggestions
+// @access  Public
+exports.getSearchSuggestions = asyncHandler(async (req, res, next) => {
+  try {
+    const { query, type } = req.query;
+    
+    if (!query || query.length < 2) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          cities: [],
+          states: [],
+          propertyTypes: [],
+          amenities: [],
+          recentSearches: []
+        }
+      });
+    }
+
+    const searchRegex = new RegExp(query, 'i');
+    let suggestions = {};
+
+    // Get city suggestions
+    const cities = await Property.distinct('address.city', {
+      'address.city': searchRegex
+    }).limit(10);
+
+    // Get state suggestions
+    const states = await Property.distinct('address.state', {
+      'address.state': searchRegex
+    }).limit(10);
+
+    // Get property type suggestions
+    const propertyTypes = await Property.distinct('type', {
+      type: searchRegex
+    }).limit(5);
+
+    // Get amenity suggestions
+    const amenities = await Property.distinct('amenities', {
+      amenities: searchRegex
+    }).limit(8);
+
+    // Get recent popular searches (based on property titles and descriptions)
+    const recentSearches = await Property.aggregate([
+      {
+        $match: {
+          $or: [
+            { title: searchRegex },
+            { description: searchRegex },
+            { 'address.city': searchRegex },
+            { 'address.state': searchRegex }
+          ]
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          uniqueCities: { $addToSet: '$address.city' },
+          uniqueStates: { $addToSet: '$address.state' },
+          uniqueTypes: { $addToSet: '$type' }
+        }
+      },
+      {
+        $project: {
+          cities: { $slice: ['$uniqueCities', 5] },
+          states: { $slice: ['$uniqueStates', 5] },
+          types: { $slice: ['$uniqueTypes', 5] }
+        }
+      }
+    ]);
+
+    suggestions = {
+      cities: cities.filter(city => city && city.trim()),
+      states: states.filter(state => state && state.trim()),
+      propertyTypes: propertyTypes.filter(type => type && type.trim()),
+      amenities: amenities.filter(amenity => amenity && amenity.trim()),
+      recentSearches: recentSearches.length > 0 ? recentSearches[0] : { cities: [], states: [], types: [] }
+    };
+
+    res.status(200).json({
+      success: true,
+      data: suggestions
+    });
+  } catch (error) {
+    console.error('Error getting search suggestions:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get search suggestions'
+    });
+  }
+});
+
