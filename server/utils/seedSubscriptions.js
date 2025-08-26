@@ -96,7 +96,7 @@ if (require.main === module) {
   // Connect to MongoDB (you'll need to set up your connection string)
   const connectDB = async () => {
     try {
-      await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/urban-realty');
+      await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://tanmay:1234@urbanrealty.rbqbb.mongodb.net/?retryWrites=true&w=majority&appName=UrbanRealty');
       console.log('MongoDB Connected');
       
       await seedSubscriptions();
