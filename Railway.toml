@@ -3,8 +3,8 @@ builder = "docker"
 
 [deploy]
 startCommand = "npm start"
-healthcheckPath = "/"
-healthcheckTimeout = 100
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 300
 
 [environments]
 NODE_ENV = "production"
