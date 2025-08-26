@@ -5,11 +5,21 @@ const path = require('path');
 const fs = require('fs');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
+const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
 
 const app = express();
 
 // Connect to database
 connectDB();
+
+// Migrate existing users to ensure subscription status
+setTimeout(async () => {
+  try {
+    await migrateExistingUsers();
+  } catch (error) {
+    console.error('Migration failed:', error);
+  }
+}, 5000); // Wait 5 seconds for DB connection to stabilize
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -45,6 +55,7 @@ app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/properties', require('./routes/propertyRoutes'));
 app.use('/api/v1/contacts', require('./routes/contactRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
+app.use('/api/v1/subscriptions', require('./routes/subscriptionRoutes'));
 app.use('/media', require('./routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./routes/developerRoutes'))
 

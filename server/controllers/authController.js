@@ -50,7 +50,8 @@ exports.register = asyncHandler(async (req, res, next) => {
       mobile: user.mobile,
       role: user.role,
       occupation: user.occupation,
-      professionalInfo: user.professionalInfo
+      professionalInfo: user.professionalInfo,
+      subscriptionStatus: user.subscriptionStatus
     }
   });
 });
@@ -76,6 +77,12 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
+  // Ensure user has subscription status (migrate if needed)
+  if (!user.subscriptionStatus) {
+    user.subscriptionStatus = 'free';
+    await user.save();
+  }
+
   const token = user.getSignedJwtToken();
 
   res.status(200).json({
@@ -88,7 +95,8 @@ exports.login = asyncHandler(async (req, res, next) => {
       mobile: user.mobile,
       role: user.role,
       occupation: user.occupation,
-      professionalInfo: user.professionalInfo
+      professionalInfo: user.professionalInfo,
+      subscriptionStatus: user.subscriptionStatus
     }
   });
 });

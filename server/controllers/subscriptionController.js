@@ -151,22 +151,18 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/subscriptions/my-subscription
 // @access  Private
 exports.getMySubscription = asyncHandler(async (req, res, next) => {
-  const userSubscription = await UserSubscription.findOne({
-    user: req.user.id,
-    status: { $in: ['active', 'pending'] }
-  }).populate('subscription');
-
-  if (!userSubscription) {
-    return res.status(200).json({
+  const { getUserSubscriptionInfo } = require('../utils/subscriptionUtils');
+  
+  try {
+    const subscriptionInfo = await getUserSubscriptionInfo(req.user.id);
+    
+    res.status(200).json({
       success: true,
-      data: null
+      data: subscriptionInfo
     });
+  } catch (error) {
+    return next(new ErrorResponse('Error fetching subscription information', 500));
   }
-
-  res.status(200).json({
-    success: true,
-    data: userSubscription
-  });
 });
 
 // @desc    Cancel user subscription
@@ -232,4 +228,45 @@ exports.updatePaymentStatus = asyncHandler(async (req, res, next) => {
     success: true,
     data: userSubscription
   });
+});
+
+// @desc    Check if user can access a specific feature
+// @route   GET /api/v1/subscriptions/check-feature/:feature
+// @access  Private
+exports.checkFeatureAccess = asyncHandler(async (req, res, next) => {
+  const { canAccessFeature } = require('../utils/subscriptionUtils');
+  const { feature } = req.params;
+  
+  try {
+    const hasAccess = await canAccessFeature(req.user.id, feature);
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        feature,
+        hasAccess,
+        message: hasAccess ? 'Access granted' : 'Access denied'
+      }
+    });
+  } catch (error) {
+    return next(new ErrorResponse('Error checking feature access', 500));
+  }
+});
+
+// @desc    Check user's listing limit
+// @route   GET /api/v1/subscriptions/listing-limit
+// @access  Private
+exports.checkListingLimit = asyncHandler(async (req, res, next) => {
+  const { checkListingLimit } = require('../utils/subscriptionUtils');
+  
+  try {
+    const limitInfo = await checkListingLimit(req.user.id);
+    
+    res.status(200).json({
+      success: true,
+      data: limitInfo
+    });
+  } catch (error) {
+    return next(new ErrorResponse('Error checking listing limit', 500));
+  }
 });
