@@ -63,6 +63,7 @@ const SubscriptionPlans = () => {
       setError('Failed to load subscription plans');
       console.error('Error fetching plans:', err);
     } finally {
+      
       setLoading(false);
     }
   };
