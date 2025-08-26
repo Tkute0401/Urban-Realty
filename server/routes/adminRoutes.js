@@ -57,4 +57,13 @@ router.delete('/user-types/:id', [protect, authorize('admin'), requireCustomizat
 // Media Management (Admin can delete any media)
 router.delete('/media/:id', [protect, authorize('admin'), requireAdminAccess], mediaController.deleteMedia);
 
+// Access Control Management
+router.get('/access-violations', [protect, authorize('admin'), requireAdminAccess], adminController.getAccessViolations);
+router.put('/access-violations/:id', [protect, authorize('admin'), requireAdminAccess], adminController.handleAccessViolation);
+router.get('/subscription-analytics', [protect, authorize('admin'), requireAdvancedAnalytics], adminController.getSubscriptionAnalytics);
+
+// User Management with Subscription Control
+router.put('/users/:id/subscription', [protect, authorize('admin'), requireAdminAccess], adminController.updateUserSubscription);
+router.get('/users/:id/subscription-history', [protect, authorize('admin'), requireAdminAccess], adminController.getUserSubscriptionHistory);
+
 module.exports = router;
