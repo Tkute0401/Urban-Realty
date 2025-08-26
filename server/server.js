@@ -1,8 +1,17 @@
-require('dotenv').config({ path: `${__dirname}/.env` });
-const express = require('express');
-const cors = require('cors');
+// Load environment variables from .env file if it exists (for local development)
+// In Railway, environment variables are injected directly by the platform
 const path = require('path');
 const fs = require('fs');
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+} else {
+  // For Railway deployment, dotenv will use process.env directly
+  require('dotenv').config();
+}
+
+const express = require('express');
+const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
