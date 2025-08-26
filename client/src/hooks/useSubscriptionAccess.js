@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import SubscriptionPrompt from '../components/Subscription/SubscriptionPrompt';
 
@@ -51,16 +52,15 @@ const useSubscriptionAccess = () => {
     window.location.href = '/subscriptions';
   }, []);
 
-  const SubscriptionPromptComponent = () => (
-    <SubscriptionPrompt
-      open={showPrompt}
-      onClose={closePrompt}
-      feature={promptConfig.feature}
-      requiredPlan={promptConfig.requiredPlan}
-      currentPlan={promptConfig.currentPlan}
-      onUpgrade={handleUpgrade}
-    />
-  );
+  const SubscriptionPromptComponent = () => 
+    React.createElement(SubscriptionPrompt, {
+      open: showPrompt,
+      onClose: closePrompt,
+      feature: promptConfig.feature,
+      requiredPlan: promptConfig.requiredPlan,
+      currentPlan: promptConfig.currentPlan,
+      onUpgrade: handleUpgrade
+    });
 
   return {
     checkAccess,
