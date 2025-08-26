@@ -261,7 +261,7 @@ const SubscriptionPlans = () => {
               </CardContent>
 
               <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-                {plan.type === 'free' ? (
+                {user?.subscriptionStatus === plan.type ? (
                   <Chip 
                     label="Current Plan" 
                     color="success" 
@@ -273,7 +273,7 @@ const SubscriptionPlans = () => {
                     variant="contained"
                     size="large"
                     onClick={() => handleSubscribe(plan)}
-                    disabled={user?.subscriptionStatus === plan.type}
+                    disabled={plan.type === 'free' && user?.subscriptionStatus === 'free'}
                     sx={{ 
                       bgcolor: plan.type === 'premium' ? '#FFD700' : '#78CADC',
                       color: plan.type === 'premium' ? '#000' : '#fff',
@@ -282,7 +282,7 @@ const SubscriptionPlans = () => {
                       }
                     }}
                   >
-                    {user?.subscriptionStatus === plan.type ? 'Current Plan' : 'Subscribe'}
+                    {plan.type === 'free' ? 'Current Plan' : 'Subscribe'}
                   </Button>
                 )}
               </CardActions>

@@ -28,7 +28,10 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Tooltip
+  Tooltip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   CreditCard as CreditCardIcon,
@@ -38,7 +41,10 @@ import {
   Edit as EditIcon,
   Cancel as CancelIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  ExpandMore as ExpandMoreIcon,
+  CalendarToday as CalendarIcon,
+  Payment as PaymentIcon
 } from '@mui/icons-material';
 import axios from '../../services/axios';
 import { useAuth } from '../../context/AuthContext';
@@ -55,6 +61,7 @@ const SubscriptionManagement = () => {
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
+  const [upcomingBilling, setUpcomingBilling] = useState(null);
 
   const { user } = useAuth();
 
@@ -65,13 +72,15 @@ const SubscriptionManagement = () => {
   const fetchSubscriptionData = async () => {
     try {
       setLoading(true);
-      const [subscriptionRes, billingRes] = await Promise.all([
+      const [subscriptionRes, billingRes, upcomingRes] = await Promise.all([
         axios.get('/subscriptions/my-subscription'),
-        axios.get('/subscriptions/billing-history')
+        axios.get('/subscriptions/billing-history'),
+        axios.get('/subscriptions/upcoming-billing')
       ]);
       
       setSubscription(subscriptionRes.data.data);
       setBillingHistory(billingRes.data.data || []);
+      setUpcomingBilling(upcomingRes.data.data);
     } catch (err) {
       setError('Failed to load subscription data');
       console.error('Error fetching subscription data:', err);
@@ -117,6 +126,25 @@ const SubscriptionManagement = () => {
     }
   };
 
+  const handleDownloadInvoice = async (subscriptionId) => {
+    try {
+      const response = await axios.get(`/subscriptions/invoice/${subscriptionId}/download`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice-${subscriptionId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError('Failed to download invoice');
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'active': return 'success';
@@ -157,9 +185,18 @@ const SubscriptionManagement = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ color: '#78CADC', mb: 4 }}>
-        Subscription Management
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" sx={{ color: '#78CADC' }}>
+          Subscription Management
+        </Typography>
+        <Button
+          variant="outlined"
+          href="/billing-dashboard"
+          sx={{ borderColor: '#4CAF50', color: '#4CAF50' }}
+        >
+          View Billing Dashboard
+        </Button>
+      </Box>
 
       {subscription ? (
         <>
@@ -230,6 +267,56 @@ const SubscriptionManagement = () => {
             </CardContent>
           </Card>
 
+          {/* Upcoming Billing */}
+          {upcomingBilling && (
+            <Card sx={{ mb: 4, border: '2px solid #4CAF50' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', color: '#4CAF50' }}>
+                  <CalendarIcon sx={{ mr: 1 }} />
+                  Upcoming Billing
+                </Typography>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={3}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Next Billing Date</Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {new Date(upcomingBilling.nextBillingDate).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={3}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Days Until Billing</Typography>
+                      <Typography variant="body1" fontWeight="bold" color={upcomingBilling.daysUntilBilling <= 7 ? 'error' : 'inherit'}>
+                        {upcomingBilling.daysUntilBilling} days
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={3}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Amount</Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        ${upcomingBilling.amount} {upcomingBilling.currency}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={3}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">Auto-Renew</Typography>
+                      <Typography variant="body1" fontWeight="bold">
+                        {upcomingBilling.autoRenew ? 'Enabled' : 'Disabled'}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Billing History */}
           <Card sx={{ mb: 4 }}>
             <CardContent>
@@ -247,6 +334,7 @@ const SubscriptionManagement = () => {
                         <TableCell>Description</TableCell>
                         <TableCell>Amount</TableCell>
                         <TableCell>Status</TableCell>
+                        <TableCell>Billing Cycle</TableCell>
                         <TableCell>Invoice</TableCell>
                       </TableRow>
                     </TableHead>
@@ -263,9 +351,14 @@ const SubscriptionManagement = () => {
                               size="small"
                             />
                           </TableCell>
+                          <TableCell>{bill.billingCycle}</TableCell>
                           <TableCell>
                             <Tooltip title="Download Invoice">
-                              <IconButton size="small">
+                              <IconButton 
+                                size="small"
+                                onClick={() => handleDownloadInvoice(bill._id)}
+                                disabled={bill.status === 'pending'}
+                              >
                                 <DownloadIcon />
                               </IconButton>
                             </Tooltip>

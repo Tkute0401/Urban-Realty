@@ -11,7 +11,13 @@ router.get('/:id', subscriptionController.getSubscription);
 // Protected routes
 router.use(protect);
 
-// User subscription routes
+// User subscription routes - specific routes must come before parameterized routes
+router.get('/my-subscription', subscriptionController.getMySubscription);
+router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
+router.get('/listing-limit', subscriptionController.checkListingLimit);
+router.get('/billing-history', subscriptionController.getBillingHistory);
+router.get('/invoice/:subscriptionId/download', subscriptionController.downloadInvoice);
+router.get('/upcoming-billing', subscriptionController.getUpcomingBilling);
 router.post('/subscribe', [
   check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
   check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly']),

@@ -285,34 +285,17 @@ exports.checkListingLimit = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/subscriptions/billing-history
 // @access  Private
 exports.getBillingHistory = asyncHandler(async (req, res, next) => {
-  const userSubscription = await UserSubscription.findOne({
-    user: req.user.id,
-    status: { $in: ['active', 'cancelled', 'expired'] }
-  }).populate('subscription');
-
-  if (!userSubscription) {
-    return res.status(200).json({
+  try {
+    const billingService = require('../services/billingService');
+    const billingHistory = await billingService.getBillingHistory(req.user.id);
+    
+    res.status(200).json({
       success: true,
-      data: []
+      data: billingHistory
     });
+  } catch (error) {
+    return next(new ErrorResponse('Error fetching billing history', 500));
   }
-
-  // Mock billing history for now - in production, this would come from a billing system
-  const billingHistory = [
-    {
-      _id: '1',
-      date: userSubscription.startDate,
-      description: `${userSubscription.subscription.name} - ${userSubscription.billingCycle} subscription`,
-      amount: userSubscription.amount,
-      currency: userSubscription.currency,
-      status: userSubscription.paymentStatus
-    }
-  ];
-
-  res.status(200).json({
-    success: true,
-    data: billingHistory
-  });
 });
 
 // @desc    Update user's payment method
@@ -341,4 +324,49 @@ exports.updatePaymentMethod = asyncHandler(async (req, res, next) => {
       paymentMethod
     }
   });
+});
+
+// @desc    Download invoice for a subscription
+// @route   GET /api/v1/subscriptions/invoice/:subscriptionId/download
+// @access  Private
+exports.downloadInvoice = asyncHandler(async (req, res, next) => {
+  try {
+    const billingService = require('../services/billingService');
+    const { subscriptionId } = req.params;
+    
+    // Verify user owns this subscription
+    const userSubscription = await UserSubscription.findOne({
+      _id: subscriptionId,
+      user: req.user.id
+    });
+
+    if (!userSubscription) {
+      return next(new ErrorResponse('Subscription not found or access denied', 404));
+    }
+
+    const pdfData = await billingService.generatePDFInvoice(subscriptionId);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${pdfData.filename}"`);
+    res.send(pdfData.buffer);
+  } catch (error) {
+    return next(new ErrorResponse('Error generating invoice', 500));
+  }
+});
+
+// @desc    Get upcoming billing information
+// @route   GET /api/v1/subscriptions/upcoming-billing
+// @access  Private
+exports.getUpcomingBilling = asyncHandler(async (req, res, next) => {
+  try {
+    const billingService = require('../services/billingService');
+    const upcomingBilling = await billingService.getUpcomingBilling(req.user.id);
+    
+    res.status(200).json({
+      success: true,
+      data: upcomingBilling
+    });
+  } catch (error) {
+    return next(new ErrorResponse('Error fetching upcoming billing', 500));
+  }
 });
