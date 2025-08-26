@@ -6,24 +6,23 @@ const { protect, authorize } = require('../middleware/auth');
 
 // Public routes
 router.get('/', subscriptionController.getSubscriptions);
+router.get('/:id', subscriptionController.getSubscription);
 
 // Protected routes
 router.use(protect);
 
-// User subscription routes - specific routes must come before parameterized routes
-router.get('/my-subscription', subscriptionController.getMySubscription);
-router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
-router.get('/listing-limit', subscriptionController.checkListingLimit);
-router.get('/billing-history', subscriptionController.getBillingHistory);
+// User subscription routes
 router.post('/subscribe', [
   check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
   check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly']),
   check('paymentMethod', 'Payment method is required').not().isEmpty()
 ], subscriptionController.subscribeUser);
-router.put('/cancel', subscriptionController.cancelSubscription);
 
-// Parameterized routes - must come after specific routes
-router.get('/:id', subscriptionController.getSubscription);
+router.get('/my-subscription', subscriptionController.getMySubscription);
+router.put('/cancel', subscriptionController.cancelSubscription);
+router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
+router.get('/listing-limit', subscriptionController.checkListingLimit);
+router.get('/billing-history', subscriptionController.getBillingHistory);
 router.put('/payment-method', subscriptionController.updatePaymentMethod);
 
 // Admin only routes
