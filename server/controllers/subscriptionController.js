@@ -101,10 +101,20 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
   const existingSubscription = await UserSubscription.findOne({
     user: userId,
     status: { $in: ['active', 'pending'] }
-  });
+  }).populate('subscription');
 
+  // If user has an active/pending subscription, allow plan change when different
   if (existingSubscription) {
-    return next(new ErrorResponse('User already has an active subscription', 400));
+    const isSamePlan = String(existingSubscription.subscription?._id || existingSubscription.subscription) === String(subscriptionId);
+    if (isSamePlan) {
+      return next(new ErrorResponse('You are already subscribed to this plan', 400));
+    }
+
+    // Cancel the existing subscription before creating a new one (plan change)
+    existingSubscription.status = 'cancelled';
+    existingSubscription.autoRenew = false;
+    existingSubscription.endDate = new Date();
+    await existingSubscription.save();
   }
 
   // Calculate end date based on billing cycle
