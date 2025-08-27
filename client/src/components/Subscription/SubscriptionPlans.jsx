@@ -73,19 +73,46 @@ const SubscriptionPlans = () => {
     try {
       setSubscribing(true);
       setSubscribeError(null);
-      // Create Stripe Checkout session via backend
+      if (!selectedPlan?._id) {
+        throw new Error('No plan selected');
+      }
+
+      // Ask backend to create a Checkout session
       const { data } = await axios.post('/payments/checkout', {
         subscriptionId: selectedPlan._id,
         billingCycle
       });
+
+      const sessionId = data?.data?.id;
+      const checkoutUrl = data?.data?.url;
+
+      // Prefer server-provided URL if present (works even if Stripe.js fails)
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+
+      // Fallback to Stripe.js redirect with sessionId
+      if (!sessionId) {
+        throw new Error('Checkout session not created');
+      }
+
       const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
       if (!publishableKey) {
         throw new Error('Stripe publishable key missing');
       }
       const stripe = await loadStripe(publishableKey);
-      await stripe.redirectToCheckout({ sessionId: data.data.id });
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+      if (error) {
+        throw error;
+      }
     } catch (err) {
-      setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
+      const message =
+        err?.message ||
+        err?.response?.data?.message ||
+        'Failed to subscribe. Please try again.';
+      setSubscribeError(message);
+      console.error('Subscribe error:', err);
     } finally {
       setSubscribing(false);
     }
