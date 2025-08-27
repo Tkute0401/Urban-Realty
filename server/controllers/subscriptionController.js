@@ -169,11 +169,39 @@ exports.getUpcomingBilling = asyncHandler(async (req, res, next) => {
   try {
     console.log('Upcoming billing request for user:', req.user.id);
     
+    // Ensure user has a subscription first
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+
+    // If user doesn't have a current subscription, create a free one
+    if (!user.currentSubscription) {
+      const freePlan = await Subscription.findOne({ type: 'free' });
+      if (freePlan) {
+        const freeSubscription = await UserSubscription.create({
+          user: user._id,
+          subscription: freePlan._id,
+          billingCycle: 'monthly',
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+          amount: 0,
+          currency: 'USD',
+          status: 'active',
+          paymentStatus: 'paid',
+          paymentMethod: 'free'
+        });
+        
+        user.currentSubscription = freeSubscription._id;
+        user.subscriptionStatus = 'free';
+        await user.save();
+      }
+    }
+    
     // Find active subscription for the user
     const activeSubscription = await UserSubscription.findOne({
       user: req.user.id,
-      status: 'active',
-      autoRenew: true
+      status: 'active'
     }).populate('subscription');
 
     if (!activeSubscription) {
@@ -181,7 +209,7 @@ exports.getUpcomingBilling = asyncHandler(async (req, res, next) => {
       return res.status(200).json({
         success: true,
         data: null,
-        message: 'No active subscription with auto-renewal found'
+        message: 'No active subscription found'
       });
     }
 
@@ -210,7 +238,7 @@ exports.getUpcomingBilling = asyncHandler(async (req, res, next) => {
       nextBillingDate: nextBillingDate,
       daysUntilBilling: Math.max(0, daysUntilBilling),
       paymentMethod: activeSubscription.paymentMethod,
-      autoRenew: activeSubscription.autoRenew,
+      autoRenew: activeSubscription.autoRenew !== false, // Default to true for free plans
       currentPeriodStart: activeSubscription.startDate,
       currentPeriodEnd: activeSubscription.endDate
     };
@@ -231,16 +259,72 @@ exports.getUpcomingBilling = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/subscriptions/my-subscription
 // @access  Private
 exports.getMySubscription = asyncHandler(async (req, res, next) => {
-  const { getUserSubscriptionInfo } = require('../utils/subscriptionUtils');
-  
   try {
-    const subscriptionInfo = await getUserSubscriptionInfo(req.user.id);
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+
+    // Ensure user has subscription status
+    if (!user.subscriptionStatus) {
+      user.subscriptionStatus = 'free';
+      await user.save();
+    }
+
+    let userSubscription = null;
+    let subscriptionDetails = null;
+
+    // Get current subscription if exists
+    if (user.currentSubscription) {
+      userSubscription = await UserSubscription.findById(user.currentSubscription)
+        .populate('subscription');
+      
+      if (userSubscription && userSubscription.subscription) {
+        subscriptionDetails = userSubscription.subscription;
+      }
+    }
+
+    // If no active subscription found, get free plan details
+    if (!subscriptionDetails) {
+      subscriptionDetails = await Subscription.findOne({ type: 'free' });
+      
+      // Create a free subscription for the user if they don't have one
+      if (!userSubscription) {
+        const freeSubscription = await UserSubscription.create({
+          user: user._id,
+          subscription: subscriptionDetails._id,
+          billingCycle: 'monthly',
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365), // 1 year
+          amount: 0,
+          currency: 'USD',
+          status: 'active',
+          paymentStatus: 'paid',
+          paymentMethod: 'free'
+        });
+        
+        user.currentSubscription = freeSubscription._id;
+        await user.save();
+        
+        userSubscription = freeSubscription;
+      }
+    }
+
+    const subscriptionInfo = {
+      status: user.subscriptionStatus,
+      expiry: user.subscriptionExpiry,
+      currentSubscription: userSubscription,
+      subscription: subscriptionDetails,
+      isActive: userSubscription ? userSubscription.status === 'active' : true,
+      daysRemaining: userSubscription ? userSubscription.daysRemaining : 999999
+    };
     
     res.status(200).json({
       success: true,
       data: subscriptionInfo
     });
   } catch (error) {
+    console.error('Error fetching subscription info:', error);
     return next(new ErrorResponse('Error fetching subscription information', 500));
   }
 });
@@ -358,7 +442,36 @@ exports.getBillingHistory = asyncHandler(async (req, res, next) => {
   try {
     console.log('Billing history request for user:', req.user.id);
     
-    // Get all user subscriptions (active, cancelled, expired)
+    // Ensure user has a subscription first
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+
+    // If user doesn't have a current subscription, create a free one
+    if (!user.currentSubscription) {
+      const freePlan = await Subscription.findOne({ type: 'free' });
+      if (freePlan) {
+        const freeSubscription = await UserSubscription.create({
+          user: user._id,
+          subscription: freePlan._id,
+          billingCycle: 'monthly',
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+          amount: 0,
+          currency: 'USD',
+          status: 'active',
+          paymentStatus: 'paid',
+          paymentMethod: 'free'
+        });
+        
+        user.currentSubscription = freeSubscription._id;
+        user.subscriptionStatus = 'free';
+        await user.save();
+      }
+    }
+    
+    // Get all user subscriptions (active, cancelled, expired, pending)
     const userSubscriptions = await UserSubscription.find({
       user: req.user.id,
       status: { $in: ['active', 'cancelled', 'expired', 'pending'] }
