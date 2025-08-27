@@ -15,6 +15,7 @@ router.get('/my-subscription', subscriptionController.getMySubscription);
 router.get('/check-feature/:feature', subscriptionController.checkFeatureAccess);
 router.get('/listing-limit', subscriptionController.checkListingLimit);
 router.get('/billing-history', subscriptionController.getBillingHistory);
+router.get('/upcoming-billing', subscriptionController.getUpcomingBilling); // Add this line
 router.post('/subscribe', [
   check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
   check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly']),
