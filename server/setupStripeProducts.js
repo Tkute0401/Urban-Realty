@@ -12,9 +12,9 @@
 const Stripe = require('stripe');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Subscription = require('../models/Subscription');
+const Subscription = require('./models/Subscription');
 
-dotenv.config({ path: process.env.DOTENV_PATH || undefined });
+dotenv.config({ path: `${__dirname}/.env` });
 
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error('❌ STRIPE_SECRET_KEY is not set. Aborting.');

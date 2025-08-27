@@ -1,6 +1,9 @@
 [phases.setup]
 nixPkgs = ['nodejs-22.13.0', 'nodePackages.npm']
 
+[phases.setup]
+cmds = 'npm run setup:stripe'
+
 [phases.install]
 cmds = ['npm install', 'cd client && npm install']
 
