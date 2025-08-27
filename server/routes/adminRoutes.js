@@ -35,6 +35,7 @@ router.get('/stats', protect, authorize('admin'), adminController.getStats);
 
 // Analytics
 router.get('/analytics', protect, authorize('admin'), adminController.getAnalytics);
+router.get('/subscription-analytics', protect, authorize('admin'), adminController.getSubscriptionAnalytics);
 
 // Reports
 router.get('/reports', protect, authorize('admin'), adminController.getReports);

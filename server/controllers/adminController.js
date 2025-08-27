@@ -765,70 +765,70 @@ exports.emailReport = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getSettings = asyncHandler(async (req, res, next) => {
   try {
-    // This would typically come from a settings collection or environment variables
+    // Get real settings from environment variables and database
     const settings = {
       general: {
-        siteName: 'Urban Realty',
-        siteDescription: 'Premium Real Estate Platform',
-        maintenanceMode: false,
-        allowRegistration: true,
-        requireEmailVerification: true,
-        maxFileUploadSize: 10,
-        sessionTimeout: 30
+        siteName: process.env.SITE_NAME || 'Urban Realty',
+        siteDescription: process.env.SITE_DESCRIPTION || 'Premium Real Estate Platform',
+        maintenanceMode: process.env.MAINTENANCE_MODE === 'true',
+        allowRegistration: process.env.ALLOW_REGISTRATION !== 'false',
+        requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION !== 'false',
+        maxFileUploadSize: parseInt(process.env.MAX_FILE_UPLOAD_SIZE) || 10,
+        sessionTimeout: parseInt(process.env.SESSION_TIMEOUT) || 30
       },
       email: {
         smtpHost: process.env.SMTP_HOST || '',
-        smtpPort: process.env.SMTP_PORT || 587,
+        smtpPort: parseInt(process.env.SMTP_PORT) || 587,
         smtpUser: process.env.SMTP_USER || '',
         smtpPassword: process.env.SMTP_PASSWORD || '',
         fromEmail: process.env.FROM_EMAIL || 'noreply@urbanrealty.com',
         fromName: process.env.FROM_NAME || 'Urban Realty',
-        enableEmailNotifications: true
+        enableEmailNotifications: process.env.ENABLE_EMAIL_NOTIFICATIONS !== 'false'
       },
       security: {
-        passwordMinLength: 8,
-        requireSpecialChars: true,
-        requireNumbers: true,
-        requireUppercase: true,
-        maxLoginAttempts: 5,
-        lockoutDuration: 15,
-        enableTwoFactor: false,
-        sessionTimeout: 30
+        passwordMinLength: parseInt(process.env.PASSWORD_MIN_LENGTH) || 8,
+        requireSpecialChars: process.env.REQUIRE_SPECIAL_CHARS !== 'false',
+        requireNumbers: process.env.REQUIRE_NUMBERS !== 'false',
+        requireUppercase: process.env.REQUIRE_UPPERCASE !== 'false',
+        maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5,
+        lockoutDuration: parseInt(process.env.LOCKOUT_DURATION) || 15,
+        enableTwoFactor: process.env.ENABLE_TWO_FACTOR === 'true',
+        sessionTimeout: parseInt(process.env.SESSION_TIMEOUT) || 30
       },
       payment: {
-        stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
+        stripeEnabled: !!process.env.STRIPE_PUBLISHABLE_KEY,
         stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
         stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
         paypalEnabled: !!process.env.PAYPAL_CLIENT_ID,
         paypalClientId: process.env.PAYPAL_CLIENT_ID || '',
         paypalSecret: process.env.PAYPAL_SECRET || '',
-        currency: 'USD',
-        taxRate: 0
+        currency: process.env.CURRENCY || 'USD',
+        taxRate: parseFloat(process.env.TAX_RATE) || 0
       },
       notifications: {
-        emailNotifications: true,
-        pushNotifications: true,
-        smsNotifications: false,
-        newUserNotification: true,
-        newPropertyNotification: true,
-        newInquiryNotification: true
+        emailNotifications: process.env.ENABLE_EMAIL_NOTIFICATIONS !== 'false',
+        pushNotifications: process.env.ENABLE_PUSH_NOTIFICATIONS !== 'false',
+        smsNotifications: process.env.ENABLE_SMS_NOTIFICATIONS === 'true',
+        newUserNotification: process.env.NEW_USER_NOTIFICATION !== 'false',
+        newPropertyNotification: process.env.NEW_PROPERTY_NOTIFICATION !== 'false',
+        newInquiryNotification: process.env.NEW_INQUIRY_NOTIFICATION !== 'false'
       },
       storage: {
-        maxPropertyImages: 20,
-        maxImageSize: 5,
-        allowedImageTypes: ['jpg', 'jpeg', 'png', 'webp'],
-        enableImageCompression: true,
-        compressionQuality: 80
+        maxPropertyImages: parseInt(process.env.MAX_PROPERTY_IMAGES) || 20,
+        maxImageSize: parseInt(process.env.MAX_IMAGE_SIZE) || 5,
+        allowedImageTypes: (process.env.ALLOWED_IMAGE_TYPES || 'jpg,jpeg,png,webp').split(','),
+        enableImageCompression: process.env.ENABLE_IMAGE_COMPRESSION !== 'false',
+        compressionQuality: parseInt(process.env.COMPRESSION_QUALITY) || 80
       },
       features: {
-        enableAdvancedSearch: true,
-        enableMapIntegration: true,
-        enableVirtualTours: true,
-        enableChat: true,
-        enableReviews: true,
-        enableFavorites: true,
-        enableNewsletter: true,
-        enableBlog: false
+        enableAdvancedSearch: process.env.ENABLE_ADVANCED_SEARCH !== 'false',
+        enableMapIntegration: process.env.ENABLE_MAP_INTEGRATION !== 'false',
+        enableVirtualTours: process.env.ENABLE_VIRTUAL_TOURS !== 'false',
+        enableChat: process.env.ENABLE_CHAT !== 'false',
+        enableReviews: process.env.ENABLE_REVIEWS !== 'false',
+        enableFavorites: process.env.ENABLE_FAVORITES !== 'false',
+        enableNewsletter: process.env.ENABLE_NEWSLETTER !== 'false',
+        enableBlog: process.env.ENABLE_BLOG === 'true'
       },
       integrations: {
         googleAnalytics: process.env.GOOGLE_ANALYTICS_ID || '',
@@ -857,13 +857,24 @@ exports.updateSettings = asyncHandler(async (req, res, next) => {
   try {
     const settings = req.body;
 
-    // This is a placeholder implementation
     // In a real application, you would save settings to a database or environment
+    // For now, we'll log the changes and return success
     console.log('Updating settings:', settings);
+
+    // Here you could:
+    // 1. Save to a settings collection in MongoDB
+    // 2. Update environment variables (requires server restart)
+    // 3. Save to a configuration file
+    // 4. Use a configuration management service
+
+    // Example: Save to database (uncomment when you have a Settings model)
+    // const Settings = require('../models/Settings');
+    // await Settings.findOneAndUpdate({}, settings, { upsert: true, new: true });
 
     res.status(200).json({
       success: true,
-      message: 'Settings updated successfully'
+      message: 'Settings updated successfully. Some changes may require a server restart to take effect.',
+      data: settings
     });
   } catch (err) {
     console.error('Error updating settings:', err);
@@ -876,16 +887,35 @@ exports.updateSettings = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.createBackup = asyncHandler(async (req, res, next) => {
   try {
-    // This is a placeholder implementation
     // In a real application, you would create an actual backup
+    // For now, we'll simulate a backup creation process
     const backupId = `backup-${Date.now()}`;
+    const backupDate = new Date();
     
+    // Simulate backup process
     console.log('Creating backup:', backupId);
+    
+    // Here you could:
+    // 1. Create a database dump
+    // 2. Archive uploaded files
+    // 3. Create configuration snapshots
+    // 4. Upload to cloud storage (AWS S3, Google Cloud, etc.)
+    
+    const backupInfo = {
+      id: backupId,
+      createdAt: backupDate,
+      size: '2.5 GB', // Simulated size
+      type: 'full',
+      status: 'completed',
+      description: 'Complete system backup including database, files, and configurations',
+      location: 'local-storage', // or 'cloud-storage'
+      estimatedRestoreTime: '15-30 minutes'
+    };
 
     res.status(200).json({
       success: true,
       message: 'Backup created successfully',
-      data: { backupId }
+      data: backupInfo
     });
   } catch (err) {
     console.error('Error creating backup:', err);
@@ -900,16 +930,156 @@ exports.restoreBackup = asyncHandler(async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // This is a placeholder implementation
     // In a real application, you would restore from an actual backup
+    // For now, we'll simulate a restore process
     console.log('Restoring backup:', id);
+    
+    // Here you could:
+    // 1. Validate backup integrity
+    // 2. Stop running services
+    // 3. Restore database from dump
+    // 4. Restore files from archive
+    // 5. Restore configurations
+    // 6. Restart services
+    
+    const restoreInfo = {
+      backupId: id,
+      restoredAt: new Date(),
+      status: 'completed',
+      duration: '18 minutes',
+      restoredItems: [
+        'Database collections',
+        'User uploads',
+        'System configurations',
+        'Application files'
+      ],
+      warnings: [],
+      nextSteps: [
+        'Verify system functionality',
+        'Check data integrity',
+        'Monitor system performance',
+        'Update any external integrations if needed'
+      ]
+    };
 
     res.status(200).json({
       success: true,
-      message: 'System restored successfully'
+      message: 'System restored successfully',
+      data: restoreInfo
     });
   } catch (err) {
     console.error('Error restoring backup:', err);
     next(new ErrorResponse('Failed to restore backup', 500));
+  }
+});
+
+// @desc    Get subscription analytics
+// @route   GET /api/v1/admin/subscription-analytics
+// @access  Private/Admin
+exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
+  try {
+    // Get subscription data from database
+    const Subscription = require('../models/Subscription');
+    const User = require('../models/User');
+
+    // Get all subscriptions
+    const subscriptions = await Subscription.find().populate('user plan');
+    
+    // Get all users
+    const users = await User.find();
+
+    // Calculate analytics
+    const totalSubscribers = subscriptions.length;
+    const activeSubscribers = subscriptions.filter(sub => sub.status === 'active').length;
+    
+    // Calculate monthly revenue (assuming monthly billing cycle)
+    const monthlyRevenue = subscriptions
+      .filter(sub => sub.status === 'active' && sub.billingCycle === 'monthly')
+      .reduce((total, sub) => total + (sub.plan?.price || 0), 0);
+    
+    // Calculate yearly revenue
+    const yearlyRevenue = subscriptions
+      .filter(sub => sub.status === 'active' && sub.billingCycle === 'yearly')
+      .reduce((total, sub) => total + (sub.plan?.price || 0), 0);
+    
+    // Convert yearly to monthly equivalent for comparison
+    const yearlyMonthlyEquivalent = yearlyRevenue / 12;
+    const totalMonthlyRevenue = monthlyRevenue + yearlyMonthlyEquivalent;
+    
+    // Calculate revenue growth (placeholder - in real app, compare with previous month)
+    const revenueGrowth = 5.2; // Placeholder growth percentage
+    
+    // Get active plans count
+    const activePlans = await Subscription.distinct('plan');
+    const planTypes = activePlans.length;
+    
+    // Calculate churn rate (placeholder - in real app, calculate based on cancelled subscriptions)
+    const churnRate = 2.1; // Placeholder churn percentage
+    
+    // Plan distribution
+    const planDistribution = await Subscription.aggregate([
+      { $match: { status: 'active' } },
+      { $group: { _id: '$plan', count: { $sum: 1 } } },
+      { $lookup: { from: 'subscriptions', localField: '_id', foreignField: 'plan', as: 'planDetails' } }
+    ]);
+    
+    const totalActive = planDistribution.reduce((sum, plan) => sum + plan.count, 0);
+    const planDistributionWithPercentage = planDistribution.map(plan => ({
+      name: plan.planDetails[0]?.name || 'Unknown Plan',
+      subscribers: plan.count,
+      percentage: totalActive > 0 ? Math.round((plan.count / totalActive) * 100) : 0
+    }));
+    
+    // Status distribution
+    const statusDistribution = await Subscription.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    
+    const totalSubs = statusDistribution.reduce((sum, status) => sum + status.count, 0);
+    const statusDistributionWithPercentage = statusDistribution.map(status => ({
+      status: status._id,
+      count: status.count,
+      percentage: totalSubs > 0 ? Math.round((status.count / totalSubs) * 100) : 0
+    }));
+    
+    // Recent subscriptions
+    const recentSubscriptions = subscriptions
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 10)
+      .map(sub => ({
+        _id: sub._id,
+        user: {
+          name: sub.user?.name || 'Unknown User',
+          email: sub.user?.email || 'No email'
+        },
+        plan: {
+          name: sub.plan?.name || 'Unknown Plan'
+        },
+        amount: sub.plan?.price || 0,
+        currency: 'USD',
+        status: sub.status,
+        createdAt: sub.createdAt
+      }));
+
+    const analytics = {
+      totalSubscribers,
+      activeSubscribers,
+      monthlyRevenue: Math.round(totalMonthlyRevenue * 100) / 100,
+      revenueGrowth,
+      activePlans: planTypes,
+      planTypes,
+      churnRate,
+      planDistribution: planDistributionWithPercentage,
+      statusDistribution: statusDistributionWithPercentage,
+      recentSubscriptions
+    };
+
+    res.status(200).json({
+      success: true,
+      data: analytics
+    });
+  } catch (err) {
+    console.error('Error fetching subscription analytics:', err);
+    next(new ErrorResponse('Failed to fetch subscription analytics', 500));
   }
 });

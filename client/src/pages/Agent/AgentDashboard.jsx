@@ -840,6 +840,9 @@ const AgentDashboard = () => {
                               </Typography>
                             </Box>
                           }
+                          components={{
+                            secondary: 'div'
+                          }}
                         />
                         <IconButton size="small">
                           <MoreVertIcon />
