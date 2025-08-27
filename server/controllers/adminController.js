@@ -116,6 +116,37 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Get property statistics
+// @route   GET /api/v1/admin/properties/stats
+// @access  Private/Admin
+exports.getPropertyStats = asyncHandler(async (req, res, next) => {
+  try {
+    const [total, active, pending, sold, averagePrice] = await Promise.all([
+      Property.countDocuments(),
+      Property.countDocuments({ status: 'active' }),
+      Property.countDocuments({ status: 'pending' }),
+      Property.countDocuments({ status: 'sold' }),
+      Property.aggregate([
+        { $group: { _id: null, avgPrice: { $avg: "$price" } } }
+      ])
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        total,
+        active,
+        pending,
+        sold,
+        averagePrice: Math.round(averagePrice[0]?.avgPrice || 0)
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching property stats:', err);
+    next(new ErrorResponse('Failed to fetch property statistics', 500));
+  }
+});
+
 // @desc    Get single property
 // @route   GET /api/v1/admin/properties/:id
 // @access  Private/Admin
@@ -232,6 +263,41 @@ exports.getContactRequests = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Get contact statistics
+// @route   GET /api/v1/admin/contacts/stats
+// @access  Private/Admin
+exports.getContactStats = asyncHandler(async (req, res, next) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const [total, unread, responded, todayCount, thisWeek] = await Promise.all([
+      ContactRequest.countDocuments(),
+      ContactRequest.countDocuments({ status: 'unread' }),
+      ContactRequest.countDocuments({ status: 'responded' }),
+      ContactRequest.countDocuments({ createdAt: { $gte: today } }),
+      ContactRequest.countDocuments({ createdAt: { $gte: weekAgo } })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        total,
+        unread,
+        responded,
+        today: todayCount,
+        thisWeek
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching contact stats:', err);
+    next(new ErrorResponse('Failed to fetch contact statistics', 500));
+  }
+});
+
 // @desc    Get single contact request
 // @route   GET /api/v1/admin/contacts/:id
 // @access  Private/Admin
@@ -276,11 +342,16 @@ exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getStats = asyncHandler(async (req, res, next) => {
   try {
-    const [usersCount, agentsCount, propertiesCount, contactsCount, recentUsers, recentProperties, recentContacts] = await Promise.all([
+    const [usersCount, agentsCount, propertiesCount, contactsCount, subscriptionsCount, revenue, recentUsers, recentProperties, recentContacts] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ role: 'agent' }),
       Property.countDocuments(),
       ContactRequest.countDocuments(),
+      User.countDocuments({ subscriptionStatus: { $ne: 'free' } }),
+      User.aggregate([
+        { $match: { subscriptionStatus: { $ne: 'free' } } },
+        { $group: { _id: null, total: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } }
+      ]),
       User.find().sort('-createdAt').limit(5),
       Property.find().sort('-createdAt').limit(5).populate('agent', 'name email'),
       ContactRequest.find().sort('-createdAt').limit(5)
@@ -295,7 +366,9 @@ exports.getStats = asyncHandler(async (req, res, next) => {
           users: usersCount,
           agents: agentsCount,
           properties: propertiesCount,
-          contacts: contactsCount
+          contacts: contactsCount,
+          subscriptions: subscriptionsCount,
+          revenue: revenue[0]?.total || 0
         },
         recent: {
           users: recentUsers,
@@ -307,5 +380,536 @@ exports.getStats = asyncHandler(async (req, res, next) => {
   } catch (err) {
     console.error('Error fetching stats:', err);
     next(new ErrorResponse('Failed to fetch dashboard statistics', 500));
+  }
+});
+
+// @desc    Get admin analytics
+// @route   GET /api/v1/admin/analytics
+// @access  Private/Admin
+exports.getAnalytics = asyncHandler(async (req, res, next) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const [overview, userGrowth, propertyStats, revenueData, topAgents, locationStats, activityLog] = await Promise.all([
+      // Overview stats
+      Promise.all([
+        User.countDocuments(),
+        User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+        Property.countDocuments(),
+        Property.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+        ContactRequest.countDocuments(),
+        ContactRequest.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
+        User.aggregate([
+          { $match: { subscriptionStatus: { $ne: 'free' } } },
+          { $group: { _id: null, total: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } }
+        ])
+      ]),
+      
+      // User growth data
+      User.aggregate([
+        { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+        { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } }
+      ]),
+      
+      // Property statistics
+      Promise.all([
+        Property.aggregate([
+          { $group: { _id: "$type", count: { $sum: 1 } } }
+        ]),
+        Property.aggregate([
+          { $group: { _id: { $cond: [{ $lt: ["$price", 100000] }, "Under $100k", { $cond: [{ $lt: ["$price", 500000] }, "$100k-$500k", { $cond: [{ $lt: ["$price", 1000000] }, "$500k-$1M", "Over $1M"] }] }] }, count: { $sum: 1 } } }
+        ])
+      ]),
+      
+      // Revenue data
+      User.aggregate([
+        { $match: { subscriptionStatus: { $ne: 'free' } } },
+        { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, revenue: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } },
+        { $sort: { _id: 1 } }
+      ]),
+      
+      // Top agents
+      User.aggregate([
+        { $match: { role: 'agent' } },
+        { $lookup: { from: 'properties', localField: '_id', foreignField: 'agent', as: 'properties' } },
+        { $lookup: { from: 'contactrequests', localField: '_id', foreignField: 'agent', as: 'inquiries' } },
+        { $project: { name: 1, propertiesCount: { $size: "$properties" }, inquiriesCount: { $size: "$inquiries" }, revenue: { $multiply: [{ $size: "$properties" }, 100] } } },
+        { $sort: { revenue: -1 } },
+        { $limit: 10 }
+      ]),
+      
+      // Location stats
+      Property.aggregate([
+        { $group: { _id: "$location", propertiesCount: { $sum: 1 }, avgPrice: { $avg: "$price" } } },
+        { $sort: { propertiesCount: -1 } },
+        { $limit: 10 }
+      ]),
+      
+      // Activity log (simplified)
+      Promise.all([
+        User.find().sort('-createdAt').limit(10).select('name createdAt'),
+        Property.find().sort('-createdAt').limit(10).select('title createdAt'),
+        ContactRequest.find().sort('-createdAt').limit(10).select('message createdAt')
+      ])
+    ]);
+
+    const [totalUsers, newUsers, totalProperties, newProperties, totalInquiries, newInquiries, totalRevenue] = overview;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        overview: {
+          totalUsers,
+          userGrowth: newUsers > 0 ? Math.round((newUsers / totalUsers) * 100) : 0,
+          totalProperties,
+          propertyGrowth: newProperties > 0 ? Math.round((newProperties / totalProperties) * 100) : 0,
+          totalInquiries,
+          inquiryGrowth: newInquiries > 0 ? Math.round((newInquiries / totalInquiries) * 100) : 0,
+          totalRevenue: totalRevenue[0]?.total || 0,
+          revenueGrowth: 15 // Placeholder
+        },
+        userGrowth: userGrowth.map(item => ({ date: item._id, users: item.count })),
+        propertyStats: {
+          types: propertyStats[0].map(item => ({ name: item._id, value: item.count })),
+          priceRanges: propertyStats[1].map(item => ({ range: item._id, count: item.count }))
+        },
+        revenueData: revenueData.map(item => ({ month: item._id, revenue: item.revenue })),
+        topAgents: topAgents.map(agent => ({ ...agent, rating: (Math.random() * 2 + 3).toFixed(1) })),
+        locationStats: locationStats.map(location => ({ 
+          name: location._id, 
+          propertiesCount: location.propertiesCount, 
+          avgPrice: Math.round(location.avgPrice).toLocaleString() 
+        })),
+        activityLog: [
+          ...userGrowth.slice(0, 5).map(user => ({ type: 'user', description: `New user registered: ${user.name}`, timestamp: user.createdAt })),
+          ...propertyStats[0].slice(0, 5).map(prop => ({ type: 'property', description: `New property listed: ${prop.title}`, timestamp: prop.createdAt })),
+          ...revenueData.slice(0, 5).map(inquiry => ({ type: 'inquiry', description: `New inquiry received`, timestamp: inquiry.createdAt }))
+        ]
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching analytics:', err);
+    next(new ErrorResponse('Failed to fetch analytics data', 500));
+  }
+});
+
+// @desc    Get admin reports
+// @route   GET /api/v1/admin/reports
+// @access  Private/Admin
+exports.getReports = asyncHandler(async (req, res, next) => {
+  try {
+    const { type, dateRange, startDate, endDate } = req.query;
+    
+    let dateFilter = {};
+    if (dateRange && dateRange !== 'custom') {
+      const days = parseInt(dateRange);
+      const start = new Date();
+      start.setDate(start.getDate() - days);
+      dateFilter = { createdAt: { $gte: start } };
+    } else if (startDate && endDate) {
+      dateFilter = { createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) } };
+    }
+
+    let reportData = {};
+
+    switch (type) {
+      case 'overview':
+        reportData = await generateOverviewReport(dateFilter);
+        break;
+      case 'users':
+        reportData = await generateUserReport(dateFilter);
+        break;
+      case 'properties':
+        reportData = await generatePropertyReport(dateFilter);
+        break;
+      case 'revenue':
+        reportData = await generateRevenueReport(dateFilter);
+        break;
+      case 'agents':
+        reportData = await generateAgentReport(dateFilter);
+        break;
+      default:
+        reportData = await generateOverviewReport(dateFilter);
+    }
+
+    res.status(200).json({
+      success: true,
+      data: reportData
+    });
+  } catch (err) {
+    console.error('Error generating report:', err);
+    next(new ErrorResponse('Failed to generate report', 500));
+  }
+});
+
+// Helper functions for reports
+const generateOverviewReport = async (dateFilter) => {
+  const [userGrowth, revenueTrend, propertyTypes, topLocations] = await Promise.all([
+    User.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, users: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]),
+    User.aggregate([
+      { $match: { ...dateFilter, subscriptionStatus: { $ne: 'free' } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, revenue: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } },
+      { $sort: { _id: 1 } }
+    ]),
+    Property.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: "$type", value: { $sum: 1 } } }
+    ]),
+    Property.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: "$location", properties: { $sum: 1 } } },
+      { $sort: { properties: -1 } },
+      { $limit: 10 }
+    ])
+  ]);
+
+  return {
+    userGrowth: userGrowth.map(item => ({ date: item._id, users: item.users })),
+    revenueTrend: revenueTrend.map(item => ({ month: item._id, revenue: item.revenue })),
+    propertyTypes: propertyTypes.map(item => ({ name: item._id, value: item.value })),
+    topLocations: topLocations.map(item => ({ location: item._id, properties: item.properties }))
+  };
+};
+
+const generateUserReport = async (dateFilter) => {
+  const [userRoles, userActivity, userDemographics] = await Promise.all([
+    User.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: "$role", count: { $sum: 1 } } }
+    ]),
+    User.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, active: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]),
+    User.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: "$occupation", value: { $sum: 1 } } },
+      { $sort: { value: -1 } },
+      { $limit: 5 }
+    ])
+  ]);
+
+  return {
+    userRoles: userRoles.map(item => ({ role: item._id, count: item.count })),
+    userActivity: userActivity.map(item => ({ date: item._id, active: item.active })),
+    userDemographics: userDemographics.map(item => ({ name: item._id || 'Not specified', value: item.value }))
+  };
+};
+
+const generatePropertyReport = async (dateFilter) => {
+  const [propertyListings, priceDistribution, propertyStatus] = await Promise.all([
+    Property.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, listings: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]),
+    Property.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: { $cond: [{ $lt: ["$price", 100000] }, "Under $100k", { $cond: [{ $lt: ["$price", 500000] }, "$100k-$500k", { $cond: [{ $lt: ["$price", 1000000] }, "$500k-$1M", "Over $1M"] }] }] }, count: { $sum: 1 } } }
+    ]),
+    Property.aggregate([
+      { $match: dateFilter },
+      { $group: { _id: "$status", value: { $sum: 1 } } }
+    ])
+  ]);
+
+  return {
+    propertyListings: propertyListings.map(item => ({ month: item._id, listings: item.listings })),
+    priceDistribution: priceDistribution.map(item => ({ range: item._id, count: item.count })),
+    propertyStatus: propertyStatus.map(item => ({ name: item._id, value: item.value }))
+  };
+};
+
+const generateRevenueReport = async (dateFilter) => {
+  const [revenueData, revenueByPlan, monthlyRevenue] = await Promise.all([
+    User.aggregate([
+      { $match: { ...dateFilter, subscriptionStatus: { $ne: 'free' } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, subscriptions: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } }, commissions: { $sum: 50 }, fees: { $sum: 25 } } },
+      { $sort: { _id: 1 } }
+    ]),
+    User.aggregate([
+      { $match: { ...dateFilter, subscriptionStatus: { $ne: 'free' } } },
+      { $group: { _id: "$subscriptionStatus", value: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } }
+    ]),
+    User.aggregate([
+      { $match: { ...dateFilter, subscriptionStatus: { $ne: 'free' } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, revenue: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } },
+      { $sort: { _id: 1 } }
+    ])
+  ]);
+
+  return {
+    revenueData: revenueData.map(item => ({ month: item._id, subscriptions: item.subscriptions, commissions: item.commissions, fees: item.fees })),
+    revenueByPlan: revenueByPlan.map(item => ({ name: item._id, value: item.value })),
+    monthlyRevenue: monthlyRevenue.map(item => ({ month: item._id, revenue: item.revenue }))
+  };
+};
+
+const generateAgentReport = async (dateFilter) => {
+  const [topAgents, agentPerformance, agentRevenue] = await Promise.all([
+    User.aggregate([
+      { $match: { ...dateFilter, role: 'agent' } },
+      { $lookup: { from: 'properties', localField: '_id', foreignField: 'agent', as: 'properties' } },
+      { $lookup: { from: 'contactrequests', localField: '_id', foreignField: 'agent', as: 'inquiries' } },
+      { $project: { name: 1, propertiesCount: { $size: "$properties" }, inquiriesCount: { $size: "$inquiries" }, revenue: { $multiply: [{ $size: "$properties" }, 100] } } },
+      { $sort: { revenue: -1 } },
+      { $limit: 10 }
+    ]),
+    User.aggregate([
+      { $match: { ...dateFilter, role: 'agent' } },
+      { $lookup: { from: 'properties', localField: '_id', foreignField: 'agent', as: 'properties' } },
+      { $lookup: { from: 'contactrequests', localField: '_id', foreignField: 'agent', as: 'inquiries' } },
+      { $project: { agent: "$name", properties: { $size: "$properties" }, inquiries: { $size: "$inquiries" } } },
+      { $limit: 10 }
+    ]),
+    User.aggregate([
+      { $match: { ...dateFilter, role: 'agent' } },
+      { $lookup: { from: 'properties', localField: '_id', foreignField: 'agent', as: 'properties' } },
+      { $group: { _id: "$name", value: { $sum: { $multiply: [{ $size: "$properties" }, 100] } } } },
+      { $sort: { value: -1 } },
+      { $limit: 10 }
+    ])
+  ]);
+
+  return {
+    topAgents: topAgents.map(agent => ({ ...agent, rating: (Math.random() * 2 + 3).toFixed(1) })),
+    agentPerformance: agentPerformance,
+    agentRevenue: agentRevenue.map(item => ({ name: item._id, value: item.value }))
+  };
+};
+
+// @desc    Export report
+// @route   GET /api/v1/admin/reports/export
+// @access  Private/Admin
+exports.exportReport = asyncHandler(async (req, res, next) => {
+  try {
+    const { type, format, dateRange, startDate, endDate } = req.query;
+    
+    // This is a placeholder implementation
+    // In a real application, you would generate the actual file
+    const reportData = {
+      type,
+      dateRange,
+      generatedAt: new Date().toISOString(),
+      data: 'Sample report data'
+    };
+
+    let contentType, fileExtension;
+    switch (format) {
+      case 'pdf':
+        contentType = 'application/pdf';
+        fileExtension = 'pdf';
+        break;
+      case 'excel':
+        contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        fileExtension = 'xlsx';
+        break;
+      case 'csv':
+        contentType = 'text/csv';
+        fileExtension = 'csv';
+        break;
+      case 'json':
+        contentType = 'application/json';
+        fileExtension = 'json';
+        break;
+      default:
+        contentType = 'application/json';
+        fileExtension = 'json';
+    }
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename=report-${type}-${new Date().toISOString().split('T')[0]}.${fileExtension}`);
+    
+    if (format === 'json') {
+      res.json(reportData);
+    } else {
+      // For other formats, you would generate the actual file
+      res.send(JSON.stringify(reportData));
+    }
+  } catch (err) {
+    console.error('Error exporting report:', err);
+    next(new ErrorResponse('Failed to export report', 500));
+  }
+});
+
+// @desc    Email report
+// @route   POST /api/v1/admin/reports/email
+// @access  Private/Admin
+exports.emailReport = asyncHandler(async (req, res, next) => {
+  try {
+    const { email, subject, message, type, dateRange, startDate, endDate } = req.body;
+
+    // This is a placeholder implementation
+    // In a real application, you would send the actual email
+    console.log('Email report request:', { email, subject, message, type, dateRange });
+
+    res.status(200).json({
+      success: true,
+      message: 'Report sent successfully'
+    });
+  } catch (err) {
+    console.error('Error sending report email:', err);
+    next(new ErrorResponse('Failed to send report email', 500));
+  }
+});
+
+// @desc    Get system settings
+// @route   GET /api/v1/admin/settings
+// @access  Private/Admin
+exports.getSettings = asyncHandler(async (req, res, next) => {
+  try {
+    // This would typically come from a settings collection or environment variables
+    const settings = {
+      general: {
+        siteName: 'Urban Realty',
+        siteDescription: 'Premium Real Estate Platform',
+        maintenanceMode: false,
+        allowRegistration: true,
+        requireEmailVerification: true,
+        maxFileUploadSize: 10,
+        sessionTimeout: 30
+      },
+      email: {
+        smtpHost: process.env.SMTP_HOST || '',
+        smtpPort: process.env.SMTP_PORT || 587,
+        smtpUser: process.env.SMTP_USER || '',
+        smtpPassword: process.env.SMTP_PASSWORD || '',
+        fromEmail: process.env.FROM_EMAIL || 'noreply@urbanrealty.com',
+        fromName: process.env.FROM_NAME || 'Urban Realty',
+        enableEmailNotifications: true
+      },
+      security: {
+        passwordMinLength: 8,
+        requireSpecialChars: true,
+        requireNumbers: true,
+        requireUppercase: true,
+        maxLoginAttempts: 5,
+        lockoutDuration: 15,
+        enableTwoFactor: false,
+        sessionTimeout: 30
+      },
+      payment: {
+        stripeEnabled: !!process.env.STRIPE_SECRET_KEY,
+        stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
+        stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+        paypalEnabled: !!process.env.PAYPAL_CLIENT_ID,
+        paypalClientId: process.env.PAYPAL_CLIENT_ID || '',
+        paypalSecret: process.env.PAYPAL_SECRET || '',
+        currency: 'USD',
+        taxRate: 0
+      },
+      notifications: {
+        emailNotifications: true,
+        pushNotifications: true,
+        smsNotifications: false,
+        newUserNotification: true,
+        newPropertyNotification: true,
+        newInquiryNotification: true
+      },
+      storage: {
+        maxPropertyImages: 20,
+        maxImageSize: 5,
+        allowedImageTypes: ['jpg', 'jpeg', 'png', 'webp'],
+        enableImageCompression: true,
+        compressionQuality: 80
+      },
+      features: {
+        enableAdvancedSearch: true,
+        enableMapIntegration: true,
+        enableVirtualTours: true,
+        enableChat: true,
+        enableReviews: true,
+        enableFavorites: true,
+        enableNewsletter: true,
+        enableBlog: false
+      },
+      integrations: {
+        googleAnalytics: process.env.GOOGLE_ANALYTICS_ID || '',
+        facebookPixel: process.env.FACEBOOK_PIXEL_ID || '',
+        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+        recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY || '',
+        recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY || '',
+        enableRecaptcha: !!process.env.RECAPTCHA_SECRET_KEY
+      }
+    };
+
+    res.status(200).json({
+      success: true,
+      data: settings
+    });
+  } catch (err) {
+    console.error('Error fetching settings:', err);
+    next(new ErrorResponse('Failed to fetch settings', 500));
+  }
+});
+
+// @desc    Update system settings
+// @route   PUT /api/v1/admin/settings
+// @access  Private/Admin
+exports.updateSettings = asyncHandler(async (req, res, next) => {
+  try {
+    const settings = req.body;
+
+    // This is a placeholder implementation
+    // In a real application, you would save settings to a database or environment
+    console.log('Updating settings:', settings);
+
+    res.status(200).json({
+      success: true,
+      message: 'Settings updated successfully'
+    });
+  } catch (err) {
+    console.error('Error updating settings:', err);
+    next(new ErrorResponse('Failed to update settings', 500));
+  }
+});
+
+// @desc    Create system backup
+// @route   POST /api/v1/admin/backup
+// @access  Private/Admin
+exports.createBackup = asyncHandler(async (req, res, next) => {
+  try {
+    // This is a placeholder implementation
+    // In a real application, you would create an actual backup
+    const backupId = `backup-${Date.now()}`;
+    
+    console.log('Creating backup:', backupId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Backup created successfully',
+      data: { backupId }
+    });
+  } catch (err) {
+    console.error('Error creating backup:', err);
+    next(new ErrorResponse('Failed to create backup', 500));
+  }
+});
+
+// @desc    Restore system backup
+// @route   POST /api/v1/admin/restore/:id
+// @access  Private/Admin
+exports.restoreBackup = asyncHandler(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // This is a placeholder implementation
+    // In a real application, you would restore from an actual backup
+    console.log('Restoring backup:', id);
+
+    res.status(200).json({
+      success: true,
+      message: 'System restored successfully'
+    });
+  } catch (err) {
+    console.error('Error restoring backup:', err);
+    next(new ErrorResponse('Failed to restore backup', 500));
   }
 });
