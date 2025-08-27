@@ -62,6 +62,7 @@ const SubscriptionManagement = () => {
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [upcomingBilling, setUpcomingBilling] = useState(null);
+  const [paymentMethodInfo, setPaymentMethodInfo] = useState(null);
 
   const { user } = useAuth();
 
@@ -72,15 +73,17 @@ const SubscriptionManagement = () => {
   const fetchSubscriptionData = async () => {
     try {
       setLoading(true);
-      const [subscriptionRes, billingRes, upcomingRes] = await Promise.all([
+      const [subscriptionRes, billingRes, upcomingRes, pmRes] = await Promise.all([
         axios.get('/subscriptions/my-subscription'),
         axios.get('/subscriptions/billing-history'),
-        axios.get('/subscriptions/upcoming-billing')
+        axios.get('/subscriptions/upcoming-billing'),
+        axios.get('/payments/payment-method')
       ]);
       
       setSubscription(subscriptionRes.data.data);
       setBillingHistory(billingRes.data.data || []);
       setUpcomingBilling(upcomingRes.data.data);
+      setPaymentMethodInfo(pmRes.data.data || null);
     } catch (err) {
       setError('Failed to load subscription data');
       console.error('Error fetching subscription data:', err);
@@ -258,6 +261,24 @@ const SubscriptionManagement = () => {
                 </Grid>
                 
                 <Grid item xs={12} md={4} sx={{ textAlign: 'right' }}>
+                  {/* Current Payment Method */}
+                  <Box sx={{
+                    textAlign: 'left',
+                    mb: 2,
+                    p: 2,
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 1,
+                    bgcolor: '#fafafa'
+                  }}>
+                    <Typography variant="body2" color="text.secondary">Current Payment Method</Typography>
+                    {paymentMethodInfo ? (
+                      <Typography variant="body1" fontWeight="bold">
+                        {paymentMethodInfo.brand?.toUpperCase()} •••• {paymentMethodInfo.last4} — exp {paymentMethodInfo.expMonth}/{paymentMethodInfo.expYear}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body1">No card on file</Typography>
+                    )}
+                  </Box>
                   <Button
                     variant="outlined"
                     startIcon={<SettingsIcon />}
