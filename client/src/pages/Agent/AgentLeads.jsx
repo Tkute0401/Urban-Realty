@@ -76,11 +76,15 @@ const AgentLeads = () => {
   const [statusUpdateDialog, setStatusUpdateDialog] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedLeads, setSelectedLeads] = useState([]);
+  const [bulkActionDialog, setBulkActionDialog] = useState(false);
+  const [bulkStatus, setBulkStatus] = useState('');
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
 
   // Fetch agent's contact requests
-  const { data: leads, isLoading, error } = useQuery(
-    ['agentLeads', user?.id, page, rowsPerPage, searchTerm, statusFilter, contactMethodFilter],
-    async () => {
+  const { data: leads, isLoading, error } = useQuery({
+    queryKey: ['agentLeads', user?.id, page, rowsPerPage, searchTerm, statusFilter, contactMethodFilter],
+    queryFn: async () => {
       const res = await axios.get('/contacts/agent', {
         params: {
           page: page + 1,
@@ -92,22 +96,20 @@ const AgentLeads = () => {
       });
       return res.data;
     },
-    { enabled: !!user?.id }
-  );
+    enabled: !!user?.id
+  });
 
   // Update lead status mutation
-  const updateLeadStatusMutation = useMutation(
-    async ({ leadId, status }) => {
+  const updateLeadStatusMutation = useMutation({
+    mutationFn: async ({ leadId, status }) => {
       await axios.put(`/contacts/${leadId}`, { status });
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['agentLeads']);
-        setStatusUpdateDialog(false);
-        setNewStatus('');
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agentLeads'] });
+      setStatusUpdateDialog(false);
+      setNewStatus('');
     }
-  );
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -124,6 +126,37 @@ const AgentLeads = () => {
         leadId: selectedLead._id,
         status: newStatus
       });
+    }
+  };
+
+  const handleBulkStatusUpdate = () => {
+    if (selectedLeads.length > 0 && bulkStatus) {
+      // Update all selected leads
+      Promise.all(
+        selectedLeads.map(leadId =>
+          updateLeadStatusMutation.mutateAsync({ leadId, status: bulkStatus })
+        )
+      ).then(() => {
+        setBulkActionDialog(false);
+        setBulkStatus('');
+        setSelectedLeads([]);
+      });
+    }
+  };
+
+  const handleSelectLead = (leadId) => {
+    setSelectedLeads(prev => 
+      prev.includes(leadId) 
+        ? prev.filter(id => id !== leadId)
+        : [...prev, leadId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedLeads.length === filteredLeads.length) {
+      setSelectedLeads([]);
+    } else {
+      setSelectedLeads(filteredLeads.map(lead => lead._id));
     }
   };
 
@@ -212,11 +245,21 @@ const AgentLeads = () => {
             Track and manage all your property inquiries
           </Typography>
         </Box>
-        <Box display="flex" gap={2}>
+        <Box display="flex" gap={2} alignItems="center">
+          {selectedLeads.length > 0 && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setBulkActionDialog(true)}
+              startIcon={<EditIcon />}
+            >
+              Bulk Update ({selectedLeads.length})
+            </Button>
+          )}
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
-            onClick={() => queryClient.invalidateQueries(['agentLeads'])}
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['agentLeads'] })}
           >
             Refresh
           </Button>
@@ -657,6 +700,39 @@ const AgentLeads = () => {
             disabled={updateLeadStatusMutation.isLoading}
           >
             {updateLeadStatusMutation.isLoading ? 'Updating...' : 'Update'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Action Dialog */}
+      <Dialog open={bulkActionDialog} onClose={() => setBulkActionDialog(false)}>
+        <DialogTitle>Bulk Update Status</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Update status for {selectedLeads.length} selected leads
+          </Typography>
+          <FormControl fullWidth>
+            <InputLabel>New Status</InputLabel>
+            <Select
+              value={bulkStatus}
+              label="New Status"
+              onChange={(e) => setBulkStatus(e.target.value)}
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="contacted">Contacted</MenuItem>
+              <MenuItem value="followup">Follow Up</MenuItem>
+              <MenuItem value="closed">Closed</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkActionDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleBulkStatusUpdate}
+            variant="contained"
+            disabled={updateLeadStatusMutation.isLoading || !bulkStatus}
+          >
+            {updateLeadStatusMutation.isLoading ? 'Updating...' : 'Update All'}
           </Button>
         </DialogActions>
       </Dialog>
