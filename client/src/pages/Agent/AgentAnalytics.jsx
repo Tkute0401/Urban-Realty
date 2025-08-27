@@ -1,0 +1,470 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Avatar,
+  Button,
+  CircularProgress,
+  Alert,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Badge,
+  Tabs,
+  Tab,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
+} from '@mui/material';
+import {
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  Visibility as VisibilityIcon,
+  People as PeopleIcon,
+  Home as HomeIcon,
+  AttachMoney as MoneyIcon,
+  CalendarToday as CalendarIcon,
+  LocationOn as LocationIcon,
+  Phone as PhoneIcon,
+  Email as EmailIcon,
+  WhatsApp as WhatsAppIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
+import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import axios from '../../services/axios';
+import { useAuth } from '../../context/AuthContext';
+import { formatDate } from '../../utils/format';
+
+const AgentAnalytics = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [timeRange, setTimeRange] = useState('30');
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Fetch agent's properties
+  const { data: properties, isLoading: propertiesLoading } = useQuery(
+    ['agentProperties', user?.id],
+    async () => {
+      const res = await axios.get(`/properties/agent/${user?.id}`);
+      return res.data;
+    },
+    { enabled: !!user?.id }
+  );
+
+  // Fetch agent's contact requests
+  const { data: contacts, isLoading: contactsLoading } = useQuery(
+    ['agentContacts', user?.id],
+    async () => {
+      const res = await axios.get('/contacts/agent');
+      return res.data;
+    },
+    { enabled: !!user?.id }
+  );
+
+  // Calculate analytics data
+  const [analytics, setAnalytics] = useState({
+    totalProperties: 0,
+    activeProperties: 0,
+    totalLeads: 0,
+    conversionRate: 0,
+    avgResponseTime: 0,
+    topPerformingProperties: [],
+    leadSources: {},
+    monthlyTrends: {}
+  });
+
+  useEffect(() => {
+    if (properties?.data && contacts?.data) {
+      const totalProperties = properties.data.length;
+      const activeProperties = properties.data.filter(p => p.status === 'active').length;
+      const totalLeads = contacts.data.length;
+      
+      // Calculate conversion rate (leads to closed deals)
+      const closedLeads = contacts.data.filter(c => c.status === 'closed').length;
+      const conversionRate = totalLeads > 0 ? (closedLeads / totalLeads) * 100 : 0;
+
+      // Calculate average response time (simplified)
+      const responseTimes = contacts.data
+        .filter(c => c.status !== 'pending')
+        .map(c => {
+          const createdAt = new Date(c.createdAt);
+          const updatedAt = new Date(c.updatedAt);
+          return (updatedAt - createdAt) / (1000 * 60 * 60); // hours
+        });
+      const avgResponseTime = responseTimes.length > 0 
+        ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
+        : 0;
+
+      // Top performing properties (by views)
+      const topPerformingProperties = properties.data
+        .sort((a, b) => (b.views || 0) - (a.views || 0))
+        .slice(0, 5);
+
+      // Lead sources breakdown
+      const leadSources = contacts.data.reduce((acc, contact) => {
+        const method = contact.contactMethod || 'email';
+        acc[method] = (acc[method] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Monthly trends (simplified)
+      const monthlyTrends = contacts.data.reduce((acc, contact) => {
+        const month = new Date(contact.createdAt).toLocaleDateString('en-US', { month: 'short' });
+        acc[month] = (acc[month] || 0) + 1;
+        return acc;
+      }, {});
+
+      setAnalytics({
+        totalProperties,
+        activeProperties,
+        totalLeads,
+        conversionRate,
+        avgResponseTime,
+        topPerformingProperties,
+        leadSources,
+        monthlyTrends
+      });
+    }
+  }, [properties, contacts]);
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending': return 'warning';
+      case 'contacted': return 'info';
+      case 'followup': return 'primary';
+      case 'closed': return 'success';
+      default: return 'default';
+    }
+  };
+
+  const getContactMethodIcon = (method) => {
+    switch (method) {
+      case 'email': return <EmailIcon />;
+      case 'phone': return <PhoneIcon />;
+      case 'whatsapp': return <WhatsAppIcon />;
+      default: return <EmailIcon />;
+    }
+  };
+
+  if (propertiesLoading || contactsLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Box>
+          <Typography variant="h4" gutterBottom>
+            Analytics & Insights
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Track your performance and property insights
+          </Typography>
+        </Box>
+        <Box display="flex" gap={2}>
+          <FormControl size="small">
+            <InputLabel>Time Range</InputLabel>
+            <Select
+              value={timeRange}
+              label="Time Range"
+              onChange={(e) => setTimeRange(e.target.value)}
+            >
+              <MenuItem value="7">Last 7 days</MenuItem>
+              <MenuItem value="30">Last 30 days</MenuItem>
+              <MenuItem value="90">Last 90 days</MenuItem>
+              <MenuItem value="365">Last year</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={() => window.location.reload()}
+          >
+            Refresh
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Key Metrics */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="text.secondary" gutterBottom>
+                    Total Properties
+                  </Typography>
+                  <Typography variant="h4">
+                    {analytics.totalProperties}
+                  </Typography>
+                  <Typography variant="body2" color="success.main">
+                    {analytics.activeProperties} active
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                  <HomeIcon />
+                </Avatar>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="text.secondary" gutterBottom>
+                    Total Leads
+                  </Typography>
+                  <Typography variant="h4">
+                    {analytics.totalLeads}
+                  </Typography>
+                  <Typography variant="body2" color="primary.main">
+                    +12% this month
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'success.main' }}>
+                  <PeopleIcon />
+                </Avatar>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="text.secondary" gutterBottom>
+                    Conversion Rate
+                  </Typography>
+                  <Typography variant="h4">
+                    {analytics.conversionRate.toFixed(1)}%
+                  </Typography>
+                  <Typography variant="body2" color="success.main">
+                    <TrendingUpIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                    +2.5% vs last month
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'warning.main' }}>
+                  <TrendingUpIcon />
+                </Avatar>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography color="text.secondary" gutterBottom>
+                    Avg Response Time
+                  </Typography>
+                  <Typography variant="h4">
+                    {analytics.avgResponseTime.toFixed(1)}h
+                  </Typography>
+                  <Typography variant="body2" color="success.main">
+                    <TrendingDownIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                    -1.2h vs last month
+                  </Typography>
+                </Box>
+                <Avatar sx={{ bgcolor: 'info.main' }}>
+                  <CalendarIcon />
+                </Avatar>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3}>
+        {/* Top Performing Properties */}
+        <Grid item xs={12} lg={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Top Performing Properties
+              </Typography>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Property</TableCell>
+                      <TableCell>Views</TableCell>
+                      <TableCell>Leads</TableCell>
+                      <TableCell>Status</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {analytics.topPerformingProperties.map((property) => (
+                      <TableRow key={property._id} hover>
+                        <TableCell>
+                          <Box display="flex" alignItems="center" gap={2}>
+                            <Avatar
+                              src={property.images?.[0]}
+                              variant="rounded"
+                              sx={{ width: 50, height: 50 }}
+                            >
+                              <HomeIcon />
+                            </Avatar>
+                            <Box>
+                              <Typography fontWeight="500">
+                                {property.title}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                <LocationIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                                {property.location}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography fontWeight="500">
+                            {property.views || 0}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography>
+                            {contacts?.data?.filter(c => c.property?._id === property._id).length || 0}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={property.status || 'active'}
+                            color={getStatusColor(property.status)}
+                            size="small"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Lead Sources */}
+        <Grid item xs={12} lg={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Lead Sources
+              </Typography>
+              <List>
+                {Object.entries(analytics.leadSources).map(([method, count]) => (
+                  <ListItem key={method}>
+                    <ListItemAvatar>
+                      <Avatar sx={{ bgcolor: 'primary.main' }}>
+                        {getContactMethodIcon(method)}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={method.charAt(0).toUpperCase() + method.slice(1)}
+                      secondary={`${count} leads`}
+                    />
+                    <Typography variant="h6" color="primary">
+                      {((count / analytics.totalLeads) * 100).toFixed(1)}%
+                    </Typography>
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Lead Status Breakdown */}
+        <Grid item xs={12} lg={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Lead Status Breakdown
+              </Typography>
+              <List>
+                {['pending', 'contacted', 'followup', 'closed'].map((status) => {
+                  const count = contacts?.data?.filter(c => c.status === status).length || 0;
+                  const percentage = analytics.totalLeads > 0 ? (count / analytics.totalLeads) * 100 : 0;
+                  
+                  return (
+                    <ListItem key={status}>
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: `${getStatusColor(status)}.main` }}>
+                          {status.charAt(0).toUpperCase()}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={status.charAt(0).toUpperCase() + status.slice(1)}
+                        secondary={`${count} leads`}
+                      />
+                      <Typography variant="h6" color="primary">
+                        {percentage.toFixed(1)}%
+                      </Typography>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Recent Activity */}
+        <Grid item xs={12} lg={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Recent Activity
+              </Typography>
+              <List>
+                {contacts?.data?.slice(0, 5).map((contact) => (
+                  <ListItem key={contact._id}>
+                    <ListItemAvatar>
+                      <Avatar>
+                        {contact.user?.name?.charAt(0) || 'U'}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={`${contact.user?.name || 'Unknown'} inquired about ${contact.property?.title || 'property'}`}
+                      secondary={formatDate(contact.createdAt)}
+                    />
+                    <Chip
+                      label={contact.status}
+                      color={getStatusColor(contact.status)}
+                      size="small"
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default AgentAnalytics;
