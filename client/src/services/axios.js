@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-const baseURL =
-  import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ||
-  (typeof window !== 'undefined' && window.__API_BASE_URL__
-    ? String(window.__API_BASE_URL__).replace(/\/$/, '')
-    : 'https://urban-realty-production.up.railway.app');
+  // const baseURL =
+  //   import.meta?.env?.VITE_API_BASE_URL?.replace(/\/$/, '') ||
+  //   (typeof window !== 'undefined' && window.__API_BASE_URL__
+  //     ? String(window.__API_BASE_URL__).replace(/\/$/, '')
+  //     : 'https://urban-realty-production.up.railway.app');
+const baseURL = 'http://localhost:5000';
 
 const instance = axios.create({
   baseURL: `${baseURL}/api/v1`,

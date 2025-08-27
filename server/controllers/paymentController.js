@@ -1,23 +1,26 @@
-const Stripe = require('stripe');
-const asyncHandler = require('../middleware/async');
-const ErrorResponse = require('../utils/errorResponse');
-const Subscription = require('../models/Subscription');
-const UserSubscription = require('../models/UserSubscription');
-const User = require('../models/User');
+import Stripe from 'stripe';
+import asyncHandler from '../middleware/async.js';
+import ErrorResponse from '../utils/errorResponse.js';
+import Subscription from '../models/Subscription.js';
+import UserSubscription from '../models/UserSubscription.js';
+import User from '../models/User.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51QKhz3P6UrSiZfgp1cfdipouTmf8eKUgcUBkkN77T8bDhuV4xmtdNSzFMcBjVPwqFSlrjokxnrApgC2XqlpCQ0jR00d8K5jrbZ', {
   apiVersion: '2024-06-20'
 });
 
+console.log("stripe:", stripe);
+console.log("process.env.STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
+
 // Create Stripe Checkout Session for a subscription
-exports.createCheckoutSession = asyncHandler(async (req, res, next) => {
+export const createCheckoutSession = asyncHandler(async (req, res, next) => {
   const { subscriptionId, billingCycle } = req.body;
   const userId = req.user.id;
 
   const plan = await Subscription.findById(subscriptionId);
   if (!plan) return next(new ErrorResponse('Subscription plan not found', 404));
 
-  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PUBLISHABLE_KEY) {
+  if (!process.env.STRIPE_SECRET_KEY) {
     return next(new ErrorResponse('Stripe keys are not configured', 500));
   }
 
@@ -58,7 +61,8 @@ exports.createCheckoutSession = asyncHandler(async (req, res, next) => {
   // Create a pending record (optional, can be created after webhook)
   const startDate = new Date();
   const endDate = new Date(startDate);
-  if (billingCycle === 'yearly') endDate.setFullYear(endDate.getFullYear() + 1); else endDate.setMonth(endDate.getMonth() + 1);
+  if (billingCycle === 'yearly') endDate.setFullYear(endDate.getFullYear() + 1); 
+  else endDate.setMonth(endDate.getMonth() + 1);
 
   const pending = await UserSubscription.create({
     user: userId,
@@ -78,7 +82,7 @@ exports.createCheckoutSession = asyncHandler(async (req, res, next) => {
 });
 
 // Create Stripe customer portal session
-exports.createPortalSession = asyncHandler(async (req, res, next) => {
+export const createPortalSession = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   if (!user || !user.stripeCustomerId) return next(new ErrorResponse('Stripe customer not found', 404));
 
@@ -91,7 +95,7 @@ exports.createPortalSession = asyncHandler(async (req, res, next) => {
 });
 
 // Stripe webhook handler
-exports.webhook = async (req, res) => {
+export const webhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
   try {
@@ -152,4 +156,3 @@ exports.webhook = async (req, res) => {
 
   res.json({ received: true });
 };
-
