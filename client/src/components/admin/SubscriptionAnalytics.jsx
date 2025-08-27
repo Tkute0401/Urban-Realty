@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -16,7 +16,8 @@ import {
   TableRow,
   Paper,
   LinearProgress,
-  Tooltip
+  Tooltip,
+  Button
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -24,38 +25,48 @@ import {
   AttachMoney as MoneyIcon,
   Cancel as CancelIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  Refresh as RefreshIcon,
+  Error as ErrorIcon
 } from '@mui/icons-material';
+import { useQuery } from '@tanstack/react-query';
 import axios from '../../services/axios';
 
 const SubscriptionAnalytics = () => {
-  const [analytics, setAnalytics] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchSubscriptionAnalytics();
-  }, []);
-
-  const fetchSubscriptionAnalytics = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('/admin/subscription-analytics', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+  // Enhanced query with TanStack Query v5 object syntax and better error handling
+  const { 
+    data: analytics, 
+    isLoading, 
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['subscriptionAnalytics'],
+    queryFn: async () => {
+      try {
+        const response = await axios.get('/admin/subscription-analytics', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.data.success) {
+          return response.data.data;
+        } else {
+          throw new Error(response.data.message || 'Failed to fetch subscription analytics');
         }
-      });
-      
-      if (response.data.success) {
-        setAnalytics(response.data.data);
+      } catch (error) {
+        console.error('Error fetching subscription analytics:', error);
+        throw new Error(error.response?.data?.message || 'Failed to load subscription analytics');
       }
-    } catch (err) {
-      console.error('Error fetching subscription analytics:', err);
-      setError('Failed to load subscription analytics');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      if (failureCount >= 2) return false;
+      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      return true;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -77,20 +88,75 @@ const SubscriptionAnalytics = () => {
     }
   };
 
-  if (loading) {
+  // Enhanced loading state
+  if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
-      </Box>
+      <Card>
+        <CardContent>
+          <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="200px">
+            <CircularProgress size={40} />
+            <Typography variant="h6" mt={2} color="text.secondary">
+              Loading subscription analytics...
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mt={1}>
+              This may take a few moments
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
     );
   }
 
+  // Enhanced error handling
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return (
+      <Card>
+        <CardContent>
+          <Alert 
+            severity="error" 
+            sx={{ mb: 2 }}
+            icon={<ErrorIcon />}
+            action={
+              <Button 
+                color="inherit" 
+                size="small" 
+                onClick={() => refetch()}
+                startIcon={<RefreshIcon />}
+              >
+                Retry
+              </Button>
+            }
+          >
+            <Typography variant="h6" gutterBottom>
+              Subscription Analytics Error
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              {error.message}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Please try again or contact support if the problem persists
+            </Typography>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (!analytics) {
-    return <Alert severity="info">No subscription analytics available</Alert>;
+    return (
+      <Card>
+        <CardContent>
+          <Alert severity="info">
+            <Typography variant="h6" gutterBottom>
+              No Data Available
+            </Typography>
+            <Typography variant="body2">
+              No subscription analytics data is currently available.
+            </Typography>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
