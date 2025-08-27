@@ -12,6 +12,7 @@
     "install-all": "npm install && npm install --prefix client",
     "test": "cd client && npm run test",
     "migrate:subscriptions": "node server/utils/migrateSubscriptions.js",
+    "setup:stripe": "node server/utils/setupStripeProducts.js",
     "heroku-postbuild": "npm run build --prefix client && npm install --prefix server"
   },
   "dependencies": {
