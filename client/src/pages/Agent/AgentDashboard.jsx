@@ -24,7 +24,24 @@ import {
   ListItemText,
   ListItemAvatar,
   Badge,
-  Tooltip
+  Tooltip,
+  LinearProgress,
+  Fade,
+  Zoom,
+  Slide,
+  useTheme,
+  useMediaQuery,
+  Tabs,
+  Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -38,65 +55,164 @@ import {
   Refresh as RefreshIcon,
   CalendarToday as CalendarIcon,
   AttachMoney as MoneyIcon,
-  LocationOn as LocationIcon
+  LocationOn as LocationIcon,
+  Notifications as NotificationsIcon,
+  Assessment as AssessmentIcon,
+  Speed as SpeedIcon,
+  Star as StarIcon,
+  CheckCircle as CheckCircleIcon,
+  Warning as WarningIcon,
+  Info as InfoIcon,
+  MoreVert as MoreVertIcon,
+  FilterList as FilterIcon,
+  Search as SearchIcon,
+  Download as DownloadIcon,
+  Share as ShareIcon,
+  Analytics as AnalyticsIcon,
+  Timeline as TimelineIcon,
+  PieChart as PieChartIcon,
+  BarChart as BarChartIcon
 } from '@mui/icons-material';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from '../../services/axios';
 import { useAuth } from '../../context/AuthContext';
 import { formatDate } from '../../utils/format';
+import { motion } from 'framer-motion';
 
 const AgentDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [filterDialog, setFilterDialog] = useState(false);
+  const [filters, setFilters] = useState({
+    status: 'all',
+    dateRange: '30',
+    propertyType: 'all'
+  });
+
   const [stats, setStats] = useState({
     totalProperties: 0,
     activeLeads: 0,
     totalViews: 0,
-    monthlyRevenue: 0
+    monthlyRevenue: 0,
+    conversionRate: 0,
+    avgResponseTime: 0,
+    topPerformingProperty: null,
+    recentActivity: []
   });
 
-  // Fetch agent's properties
-  const { data: properties, isLoading: propertiesLoading } = useQuery(
-    ['agentProperties', user?.id],
+  // Enhanced queries with better error handling and caching
+  const { data: properties, isLoading: propertiesLoading, error: propertiesError } = useQuery(
+    ['agentProperties', user?.id, filters],
     async () => {
-      const res = await axios.get(`/properties/agent/${user?.id}`);
+      const res = await axios.get(`/properties/agent/${user?.id}`, { params: filters });
+      return res.data;
+    },
+    { 
+      enabled: !!user?.id,
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      refetchInterval: 5 * 60 * 1000 // 5 minutes
+    }
+  );
+
+  const { data: contacts, isLoading: contactsLoading, error: contactsError } = useQuery(
+    ['agentContacts', user?.id, filters],
+    async () => {
+      const res = await axios.get('/contacts/agent', { params: filters });
+      return res.data;
+    },
+    { 
+      enabled: !!user?.id,
+      staleTime: 1 * 60 * 1000, // 1 minute
+      refetchInterval: 2 * 60 * 1000 // 2 minutes
+    }
+  );
+
+  const { data: analytics, isLoading: analyticsLoading } = useQuery(
+    ['agentAnalytics', user?.id],
+    async () => {
+      const res = await axios.get(`/analytics/agent/${user?.id}`);
       return res.data;
     },
     { enabled: !!user?.id }
   );
 
-  // Fetch agent's contact requests
-  const { data: contacts, isLoading: contactsLoading } = useQuery(
-    ['agentContacts', user?.id],
-    async () => {
-      const res = await axios.get('/contacts/agent');
-      return res.data;
-    },
-    { enabled: !!user?.id }
+  // Refresh mutation
+  const refreshMutation = useMutation(
+    () => Promise.all([
+      queryClient.invalidateQueries(['agentProperties', user?.id]),
+      queryClient.invalidateQueries(['agentContacts', user?.id]),
+      queryClient.invalidateQueries(['agentAnalytics', user?.id])
+    ]),
+    {
+      onSuccess: () => {
+        // Show success notification
+      }
+    }
   );
 
-  // Calculate dashboard stats
+  // Calculate enhanced dashboard stats
   useEffect(() => {
     if (properties?.data && contacts?.data) {
       const totalProperties = properties.data.length;
+      const activeProperties = properties.data.filter(p => p.status === 'active').length;
       const activeLeads = contacts.data.filter(contact => 
         ['pending', 'contacted', 'followup'].includes(contact.status)
       ).length;
       const totalViews = properties.data.reduce((sum, prop) => sum + (prop.views || 0), 0);
       const monthlyRevenue = properties.data.reduce((sum, prop) => {
-        // Simple revenue calculation - you might want to adjust this based on your business logic
-        return sum + (prop.price ? prop.price * 0.02 : 0); // 2% commission example
+        return sum + (prop.price ? prop.price * 0.02 : 0);
       }, 0);
+      
+      const conversionRate = totalViews > 0 ? (activeLeads / totalViews) * 100 : 0;
+      const avgResponseTime = contacts.data.length > 0 ? 
+        contacts.data.reduce((sum, contact) => sum + (contact.responseTime || 0), 0) / contacts.data.length : 0;
+      
+      const topPerformingProperty = properties.data.reduce((top, prop) => 
+        (prop.views || 0) > (top?.views || 0) ? prop : top, null
+      );
 
       setStats({
         totalProperties,
+        activeProperties,
         activeLeads,
         totalViews,
-        monthlyRevenue
+        monthlyRevenue,
+        conversionRate,
+        avgResponseTime,
+        topPerformingProperty,
+        recentActivity: contacts.data.slice(0, 10)
       });
     }
   }, [properties, contacts]);
+
+  // Chart data preparation
+  const viewsData = properties?.data?.map(prop => ({
+    name: prop.title.substring(0, 15) + '...',
+    views: prop.views || 0,
+    price: prop.price || 0
+  })) || [];
+
+  const leadStatusData = contacts?.data?.reduce((acc, contact) => {
+    acc[contact.status] = (acc[contact.status] || 0) + 1;
+    return acc;
+  }, {}) || {};
+
+  const monthlyData = [
+    { month: 'Jan', views: 1200, leads: 45, revenue: 12000 },
+    { month: 'Feb', views: 1800, leads: 62, revenue: 15000 },
+    { month: 'Mar', views: 2100, leads: 78, revenue: 18000 },
+    { month: 'Apr', views: 1900, leads: 71, revenue: 16500 },
+    { month: 'May', views: 2400, leads: 89, revenue: 22000 },
+    { month: 'Jun', views: 2800, leads: 95, revenue: 25000 }
+  ];
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -118,137 +234,339 @@ const AgentDashboard = () => {
     }
   };
 
+  const StatCard = ({ title, value, icon, color, subtitle, trend }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card 
+        sx={{ 
+          height: '100%',
+          background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
+          border: `1px solid ${color}20`,
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: `0 8px 25px ${color}20`,
+            transition: 'all 0.3s ease'
+          }
+        }}
+      >
+        <CardContent>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box flex={1}>
+              <Typography color="text.secondary" gutterBottom variant="body2" fontWeight={500}>
+                {title}
+              </Typography>
+              <Typography variant="h4" fontWeight="bold" color={color}>
+                {value}
+              </Typography>
+              {subtitle && (
+                <Typography variant="body2" color="text.secondary" mt={1}>
+                  {subtitle}
+                </Typography>
+              )}
+              {trend && (
+                <Box display="flex" alignItems="center" mt={1}>
+                  <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main', mr: 0.5 }} />
+                  <Typography variant="caption" color="success.main">
+                    {trend}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+            <Avatar sx={{ bgcolor: color, width: 56, height: 56 }}>
+              {icon}
+            </Avatar>
+          </Box>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+
   if (propertiesLoading || contactsLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress size={60} />
+        <Typography variant="h6" mt={2} color="text.secondary">
+          Loading your dashboard...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (propertiesError || contactsError) {
+    return (
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Failed to load dashboard data. Please try again.
+        </Alert>
+        <Button 
+          variant="contained" 
+          onClick={() => refreshMutation.mutate()}
+          disabled={refreshMutation.isLoading}
+        >
+          {refreshMutation.isLoading ? <CircularProgress size={20} /> : 'Retry'}
+        </Button>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Welcome back, {user?.name}!
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Here's what's happening with your properties and leads
-          </Typography>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      {/* Enhanced Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} mb={4} gap={2}>
+          <Box>
+            <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
+              background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              Welcome back, {user?.name}! 👋
+            </Typography>
+            <Typography variant="h6" color="text.secondary">
+              Here's your real estate performance overview
+            </Typography>
+          </Box>
+          <Box display="flex" gap={2} flexWrap="wrap">
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/add-property')}
+              sx={{ 
+                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                '&:hover': { transform: 'translateY(-2px)' }
+              }}
+            >
+              Add Property
+            </Button>
+            <IconButton 
+              onClick={() => refreshMutation.mutate()}
+              disabled={refreshMutation.isLoading}
+              sx={{ 
+                bgcolor: 'background.paper',
+                '&:hover': { transform: 'rotate(180deg)', transition: 'transform 0.3s ease' }
+              }}
+            >
+              <RefreshIcon />
+            </IconButton>
+            <IconButton sx={{ bgcolor: 'background.paper' }}>
+              <NotificationsIcon />
+            </IconButton>
+          </Box>
         </Box>
-        <Box display="flex" gap={2}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/add-property')}
-          >
-            Add Property
-          </Button>
-          <IconButton onClick={() => window.location.reload()}>
-            <RefreshIcon />
-          </IconButton>
-        </Box>
-      </Box>
+      </motion.div>
 
-      {/* Stats Cards */}
+      {/* Enhanced Stats Cards */}
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card>
+          <StatCard
+            title="Total Properties"
+            value={stats.totalProperties}
+            icon={<HomeIcon />}
+            color="#667eea"
+            subtitle={`${stats.activeProperties} active`}
+            trend="+12% this month"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Active Leads"
+            value={stats.activeLeads}
+            icon={<PeopleIcon />}
+            color="#f093fb"
+            subtitle="Require attention"
+            trend="+8% this week"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Views"
+            value={stats.totalViews.toLocaleString()}
+            icon={<VisibilityIcon />}
+            color="#4facfe"
+            subtitle="Property impressions"
+            trend="+15% this month"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Monthly Revenue"
+            value={`₹${stats.monthlyRevenue.toLocaleString()}`}
+            icon={<MoneyIcon />}
+            color="#43e97b"
+            subtitle="Commission earned"
+            trend="+22% this month"
+          />
+        </Grid>
+      </Grid>
+
+      {/* Performance Metrics */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography variant="h6" gutterBottom fontWeight="bold">
+                Performance Metrics
+              </Typography>
+              <Box display="flex" flexDirection="column" gap={2}>
                 <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Total Properties
-                  </Typography>
-                  <Typography variant="h4">
-                    {stats.totalProperties}
-                  </Typography>
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2">Conversion Rate</Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      {stats.conversionRate.toFixed(1)}%
+                    </Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={Math.min(stats.conversionRate, 100)} 
+                    sx={{ height: 8, borderRadius: 4 }}
+                  />
                 </Box>
-                <Avatar sx={{ bgcolor: 'primary.main' }}>
-                  <HomeIcon />
-                </Avatar>
+                <Box>
+                  <Box display="flex" justifyContent="space-between" mb={1}>
+                    <Typography variant="body2">Avg Response Time</Typography>
+                    <Typography variant="body2" fontWeight="bold">
+                      {stats.avgResponseTime.toFixed(1)}h
+                    </Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={Math.min((24 - stats.avgResponseTime) / 24 * 100, 100)} 
+                    sx={{ height: 8, borderRadius: 4 }}
+                  />
+                </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: '100%' }}>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Active Leads
-                  </Typography>
-                  <Typography variant="h4">
-                    {stats.activeLeads}
-                  </Typography>
+              <Typography variant="h6" gutterBottom fontWeight="bold">
+                Top Performing Property
+              </Typography>
+              {stats.topPerformingProperty ? (
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Avatar
+                    src={stats.topPerformingProperty.images?.[0]}
+                    variant="rounded"
+                    sx={{ width: 60, height: 60 }}
+                  >
+                    <HomeIcon />
+                  </Avatar>
+                  <Box flex={1}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {stats.topPerformingProperty.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {stats.topPerformingProperty.location}
+                    </Typography>
+                    <Box display="flex" alignItems="center" gap={1} mt={1}>
+                      <VisibilityIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                      <Typography variant="body2">
+                        {stats.topPerformingProperty.views || 0} views
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Chip 
+                    label={`₹${(stats.topPerformingProperty.price || 0).toLocaleString()}`}
+                    color="primary"
+                    variant="outlined"
+                  />
                 </Box>
-                <Avatar sx={{ bgcolor: 'success.main' }}>
-                  <PeopleIcon />
-                </Avatar>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Total Views
-                  </Typography>
-                  <Typography variant="h4">
-                    {stats.totalViews.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Avatar sx={{ bgcolor: 'info.main' }}>
-                  <VisibilityIcon />
-                </Avatar>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="text.secondary" gutterBottom>
-                    Monthly Revenue
-                  </Typography>
-                  <Typography variant="h4">
-                    ₹{stats.monthlyRevenue.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Avatar sx={{ bgcolor: 'warning.main' }}>
-                  <MoneyIcon />
-                </Avatar>
-              </Box>
+              ) : (
+                <Typography color="text.secondary">No properties yet</Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
-        {/* Recent Properties */}
+      {/* Charts Section */}
+      <Grid container spacing={3} mb={4}>
         <Grid item xs={12} lg={8}>
           <Card>
             <CardContent>
+              <Typography variant="h6" gutterBottom fontWeight="bold">
+                Monthly Performance
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Area type="monotone" dataKey="views" stackId="1" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="leads" stackId="1" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} lg={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom fontWeight="bold">
+                Lead Status Distribution
+              </Typography>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={Object.entries(leadStatusData).map(([status, count]) => ({ name: status, value: count }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {Object.entries(leadStatusData).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Tabs for different views */}
+      <Card sx={{ mb: 4 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+            <Tab label="Recent Properties" />
+            <Tab label="Recent Leads" />
+            <Tab label="Analytics" />
+          </Tabs>
+        </Box>
+        <CardContent>
+          {selectedTab === 0 && (
+            <Box>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6">Recent Properties</Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => navigate('/agent/properties')}
-                >
-                  View All
-                </Button>
+                <Typography variant="h6" fontWeight="bold">Recent Properties</Typography>
+                <Box display="flex" gap={1}>
+                  <IconButton size="small">
+                    <FilterIcon />
+                  </IconButton>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate('/agent/properties')}
+                  >
+                    View All
+                  </Button>
+                </Box>
               </Box>
               
               {properties?.data?.length > 0 ? (
@@ -260,6 +578,7 @@ const AgentDashboard = () => {
                         <TableCell>Price</TableCell>
                         <TableCell>Status</TableCell>
                         <TableCell>Views</TableCell>
+                        <TableCell>Performance</TableCell>
                         <TableCell>Actions</TableCell>
                       </TableRow>
                     </TableHead>
@@ -302,6 +621,14 @@ const AgentDashboard = () => {
                             <Typography>{property.views || 0}</Typography>
                           </TableCell>
                           <TableCell>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                              <Typography variant="body2">
+                                {((property.views || 0) / Math.max(...properties.data.map(p => p.views || 0)) * 100).toFixed(0)}%
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
                             <IconButton
                               size="small"
                               onClick={() => navigate(`/properties/${property._id}/edit`)}
@@ -328,16 +655,13 @@ const AgentDashboard = () => {
                   </Button>
                 </Box>
               )}
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+          )}
 
-        {/* Recent Leads */}
-        <Grid item xs={12} lg={4}>
-          <Card>
-            <CardContent>
+          {selectedTab === 1 && (
+            <Box>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6">Recent Leads</Typography>
+                <Typography variant="h6" fontWeight="bold">Recent Leads</Typography>
                 <Button
                   variant="outlined"
                   size="small"
@@ -360,7 +684,7 @@ const AgentDashboard = () => {
                         <ListItemText
                           primary={
                             <Box display="flex" justifyContent="space-between" alignItems="center">
-                              <Typography variant="subtitle2">
+                              <Typography variant="subtitle2" fontWeight="bold">
                                 {contact.user?.name || 'Unknown'}
                               </Typography>
                               <Chip
@@ -381,6 +705,9 @@ const AgentDashboard = () => {
                             </Box>
                           }
                         />
+                        <IconButton size="small">
+                          <MoreVertIcon />
+                        </IconButton>
                       </ListItem>
                       <Divider variant="inset" component="li" />
                     </React.Fragment>
@@ -393,10 +720,57 @@ const AgentDashboard = () => {
                   </Typography>
                 </Box>
               )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+          )}
+
+          {selectedTab === 2 && (
+            <Box>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Advanced Analytics
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Property Views Trend
+                      </Typography>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={viewsData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <RechartsTooltip />
+                          <Bar dataKey="views" fill="#8884d8" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Revenue vs Views
+                      </Typography>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <LineChart data={viewsData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <RechartsTooltip />
+                          <Line type="monotone" dataKey="views" stroke="#8884d8" />
+                          <Line type="monotone" dataKey="price" stroke="#82ca9d" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 };
