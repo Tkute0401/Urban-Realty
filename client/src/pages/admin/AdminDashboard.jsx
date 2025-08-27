@@ -99,6 +99,15 @@ const AdminDashboard = () => {
     userType: 'all',
     status: 'all'
   });
+  const [quickActions, setQuickActions] = useState([
+    { id: 1, title: 'Manage Users', icon: <PeopleIcon />, action: () => navigate('/admin/users'), color: 'primary' },
+    { id: 2, title: 'View Properties', icon: <HomeIcon />, action: () => navigate('/admin/properties'), color: 'success' },
+    { id: 3, title: 'Analytics', icon: <AnalyticsIcon />, action: () => navigate('/admin/analytics'), color: 'info' },
+    { id: 4, title: 'Settings', icon: <SettingsIcon />, action: () => navigate('/admin/settings'), color: 'warning' },
+    { id: 5, title: 'Reports', icon: <AssessmentIcon />, action: () => navigate('/admin/reports'), color: 'secondary' },
+    { id: 6, title: 'Media', icon: <StorageIcon />, action: () => navigate('/admin/media'), color: 'error' }
+  ]);
+  });
 
   const [stats, setStats] = useState({
     counts: {
@@ -523,6 +532,56 @@ const AdminDashboard = () => {
           />
         </Grid>
       </Grid>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <Card sx={{ mb: 4, background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)' }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
+              Quick Actions
+            </Typography>
+            <Grid container spacing={2}>
+              {quickActions.map((action, index) => (
+                <Grid item xs={6} sm={4} md={2} key={action.id}>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      startIcon={action.icon}
+                      onClick={action.action}
+                      sx={{
+                        height: 80,
+                        flexDirection: 'column',
+                        gap: 1,
+                        borderColor: `${action.color}.main`,
+                        color: `${action.color}.main`,
+                        '&:hover': {
+                          backgroundColor: `${action.color}.main`,
+                          color: 'white',
+                          transform: 'translateY(-2px)',
+                          boxShadow: `0 4px 12px ${action.color}40`
+                        }
+                      }}
+                    >
+                      <Typography variant="body2" fontWeight="bold">
+                        {action.title}
+                      </Typography>
+                    </Button>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* System Health & Performance */}
       <Grid container spacing={3} mb={4}>

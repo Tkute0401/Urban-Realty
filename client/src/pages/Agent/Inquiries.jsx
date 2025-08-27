@@ -41,15 +41,15 @@ const AgentInquiries = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const { user } = useAuth();
 
-  const { data, isLoading } = useQuery(
-    ['agentInquiries', page, rowsPerPage, searchTerm], 
-    async () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['agentInquiries', page, rowsPerPage, searchTerm],
+    queryFn: async () => {
       const res = await axios.get(
         `/inquiries/my-inquiries?page=${page + 1}&limit=${rowsPerPage}&search=${searchTerm}`
       );
       return res.data;
     }
-  );
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

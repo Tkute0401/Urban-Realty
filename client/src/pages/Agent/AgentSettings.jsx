@@ -44,18 +44,16 @@ const AgentSettings = () => {
     propertyUpdates: true
   });
 
-  const updateProfileMutation = useMutation(
-    async (data) => {
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data) => {
       const res = await axios.put('/auth/profile', data);
       return res.data;
     },
-    {
-      onSuccess: (data) => {
-        updateUser(data.data);
-        setIsEditing(false);
-      }
+    onSuccess: (data) => {
+      updateUser(data.data);
+      setIsEditing(false);
     }
-  );
+  });
 
   const handleInputChange = (e) => {
     setFormData({
