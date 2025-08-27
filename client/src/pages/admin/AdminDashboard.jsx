@@ -39,7 +39,8 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  Snackbar
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon, 
@@ -70,7 +71,6 @@ import {
   Timeline as TimelineIcon,
   PieChart as PieChartIcon,
   BarChart as BarChartIcon,
-  Timeline as TimelineIcon,
   Dashboard as DashboardIcon,
   Settings as SettingsIcon,
   Security as SecurityIcon,
@@ -83,6 +83,8 @@ import axios from '../../services/axios';
 import { motion } from 'framer-motion';
 import { formatDate } from '../../utils/format';
 import { useNavigate } from 'react-router-dom';
+import SubscriptionAnalytics from '../../components/admin/SubscriptionAnalytics';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 
 const AdminDashboard = () => {
   const queryClient = useQueryClient();
@@ -91,6 +93,7 @@ const AdminDashboard = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTab, setSelectedTab] = useState(0);
   const [filterDialog, setFilterDialog] = useState(false);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   const [filters, setFilters] = useState({
     dateRange: '30',
     userType: 'all',
@@ -125,46 +128,84 @@ const AdminDashboard = () => {
     }
   });
 
-  // Enhanced queries with react-query
-  const { data: dashboardData, isLoading, error } = useQuery(
-    ['adminDashboard', filters],
-    async () => {
-      const response = await axios.get('/admin/stats', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        params: filters
-      });
-      return response.data;
-    },
-    {
-      staleTime: 2 * 60 * 1000, // 2 minutes
-      refetchInterval: 5 * 60 * 1000, // 5 minutes
-      retry: 2
-    }
-  );
-
-  const { data: analyticsData, isLoading: analyticsLoading } = useQuery(
-    ['adminAnalytics'],
-    async () => {
-      const response = await axios.get('/admin/analytics');
-      return response.data;
-    },
-    { staleTime: 5 * 60 * 1000 }
-  );
-
-  // Refresh mutation
-  const refreshMutation = useMutation(
-    () => Promise.all([
-      queryClient.invalidateQueries(['adminDashboard']),
-      queryClient.invalidateQueries(['adminAnalytics'])
-    ]),
-    {
-      onSuccess: () => {
-        // Show success notification
+  // Enhanced queries with TanStack Query v5 object syntax and better error handling
+  const { 
+    data: dashboardData, 
+    isLoading, 
+    error,
+    refetch: refetchDashboard
+  } = useQuery({
+    queryKey: ['adminDashboard', filters],
+    queryFn: async () => {
+      try {
+        const response = await axios.get('/admin/stats', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+          params: filters
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching admin dashboard data:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch dashboard data');
       }
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      if (failureCount >= 3) return false;
+      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      return true;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
+  const { 
+    data: analyticsData, 
+    isLoading: analyticsLoading,
+    error: analyticsError
+  } = useQuery({
+    queryKey: ['adminAnalytics'],
+    queryFn: async () => {
+      try {
+        const response = await axios.get('/admin/analytics');
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching admin analytics:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch analytics');
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: (failureCount, error) => {
+      if (failureCount >= 2) return false;
+      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      return true;
+    },
+  });
+
+  // Refresh mutation with better error handling
+  const refreshMutation = useMutation({
+    mutationFn: async () => {
+      await Promise.all([
+        refetchDashboard(),
+        queryClient.invalidateQueries({ queryKey: ['adminAnalytics'] })
+      ]);
+    },
+    onSuccess: () => {
+      setNotification({
+        open: true,
+        message: 'Dashboard data refreshed successfully!',
+        severity: 'success'
+      });
+    },
+    onError: (error) => {
+      setNotification({
+        open: true,
+        message: error.message || 'Failed to refresh data',
+        severity: 'error'
+      });
     }
-  );
+  });
 
   useEffect(() => {
     if (dashboardData?.success) {
@@ -311,30 +352,51 @@ const AdminDashboard = () => {
     </Card>
   );
 
+  // Enhanced loading state with skeleton
   if (isLoading) {
-    return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress size={60} />
-        <Typography variant="h6" mt={2} color="text.secondary">
-          Loading admin dashboard...
-        </Typography>
-      </Box>
-    );
+    return <LoadingSkeleton.Dashboard />;
   }
 
+  // Enhanced error handling with retry options
   if (error) {
+    const errorMessage = error?.message || 'Failed to load dashboard data';
+    
     return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
-        <Alert severity="error" sx={{ mb: 2 }}>
-          Failed to load dashboard data. Please try again.
-        </Alert>
-        <Button 
-          variant="contained" 
-          onClick={() => refreshMutation.mutate()}
-          disabled={refreshMutation.isLoading}
-        >
-          {refreshMutation.isLoading ? <CircularProgress size={20} /> : 'Retry'}
-        </Button>
+      <Box sx={{ p: { xs: 2, md: 3 } }}>
+        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
+          <Alert 
+            severity="error" 
+            sx={{ mb: 3, maxWidth: 500 }}
+            icon={<ErrorIcon />}
+          >
+            <Typography variant="h6" gutterBottom>
+              Admin Dashboard Error
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              {errorMessage}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Please check your internet connection and try again
+            </Typography>
+          </Alert>
+          
+          <Box display="flex" gap={2} flexWrap="wrap">
+            <Button 
+              variant="contained" 
+              onClick={() => refreshMutation.mutate()}
+              disabled={refreshMutation.isLoading}
+              startIcon={refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+            >
+              {refreshMutation.isLoading ? 'Retrying...' : 'Retry'}
+            </Button>
+            <Button 
+              variant="outlined"
+              onClick={() => window.location.reload()}
+            >
+              Reload Page
+            </Button>
+          </Box>
+        </Box>
       </Box>
     );
   }
@@ -380,7 +442,7 @@ const AdminDashboard = () => {
                 '&:hover': { transform: 'rotate(180deg)', transition: 'transform 0.3s ease' }
               }}
             >
-              <RefreshIcon />
+              {refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
             </IconButton>
             <IconButton sx={{ bgcolor: 'background.paper' }}>
               <NotificationsIcon />
@@ -961,6 +1023,22 @@ const AdminDashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setNotification({ ...notification, open: false })} 
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
