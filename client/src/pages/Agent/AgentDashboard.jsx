@@ -41,7 +41,8 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel
+  InputLabel,
+  Snackbar
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -71,7 +72,8 @@ import {
   Analytics as AnalyticsIcon,
   Timeline as TimelineIcon,
   PieChart as PieChartIcon,
-  BarChart as BarChartIcon
+  BarChart as BarChartIcon,
+  Error as ErrorIcon
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -80,6 +82,7 @@ import axios from '../../services/axios';
 import { useAuth } from '../../context/AuthContext';
 import { formatDate } from '../../utils/format';
 import { motion } from 'framer-motion';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 
 const AgentDashboard = () => {
   const { user } = useAuth();
@@ -89,6 +92,7 @@ const AgentDashboard = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTab, setSelectedTab] = useState(0);
   const [filterDialog, setFilterDialog] = useState(false);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: '30',
@@ -106,55 +110,110 @@ const AgentDashboard = () => {
     recentActivity: []
   });
 
-  // Enhanced queries with better error handling and caching
-  const { data: properties, isLoading: propertiesLoading, error: propertiesError } = useQuery(
-    ['agentProperties', user?.id, filters],
-    async () => {
-      const res = await axios.get(`/properties/agent/${user?.id}`, { params: filters });
-      return res.data;
-    },
-    { 
-      enabled: !!user?.id,
-      staleTime: 2 * 60 * 1000, // 2 minutes
-      refetchInterval: 5 * 60 * 1000 // 5 minutes
-    }
-  );
-
-  const { data: contacts, isLoading: contactsLoading, error: contactsError } = useQuery(
-    ['agentContacts', user?.id, filters],
-    async () => {
-      const res = await axios.get('/contacts/agent', { params: filters });
-      return res.data;
-    },
-    { 
-      enabled: !!user?.id,
-      staleTime: 1 * 60 * 1000, // 1 minute
-      refetchInterval: 2 * 60 * 1000 // 2 minutes
-    }
-  );
-
-  const { data: analytics, isLoading: analyticsLoading } = useQuery(
-    ['agentAnalytics', user?.id],
-    async () => {
-      const res = await axios.get(`/analytics/agent/${user?.id}`);
-      return res.data;
-    },
-    { enabled: !!user?.id }
-  );
-
-  // Refresh mutation
-  const refreshMutation = useMutation(
-    () => Promise.all([
-      queryClient.invalidateQueries(['agentProperties', user?.id]),
-      queryClient.invalidateQueries(['agentContacts', user?.id]),
-      queryClient.invalidateQueries(['agentAnalytics', user?.id])
-    ]),
-    {
-      onSuccess: () => {
-        // Show success notification
+  // Enhanced queries with TanStack Query v5 object syntax and better error handling
+  const { 
+    data: properties, 
+    isLoading: propertiesLoading, 
+    error: propertiesError,
+    refetch: refetchProperties
+  } = useQuery({
+    queryKey: ['agentProperties', user?.id, filters],
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`/properties/agent/${user?.id}`, { params: filters });
+        return res.data;
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch properties');
       }
+    },
+    enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      // Retry up to 3 times, but not for 4xx errors
+      if (failureCount >= 3) return false;
+      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      return true;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
+  const { 
+    data: contacts, 
+    isLoading: contactsLoading, 
+    error: contactsError,
+    refetch: refetchContacts
+  } = useQuery({
+    queryKey: ['agentContacts', user?.id, filters],
+    queryFn: async () => {
+      try {
+        const res = await axios.get('/contacts/agent', { params: filters });
+        return res.data;
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch contacts');
+      }
+    },
+    enabled: !!user?.id,
+    staleTime: 1 * 60 * 1000, // 1 minute
+    refetchInterval: 2 * 60 * 1000, // 2 minutes
+    retry: (failureCount, error) => {
+      if (failureCount >= 3) return false;
+      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      return true;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+
+  const { 
+    data: analytics, 
+    isLoading: analyticsLoading,
+    error: analyticsError
+  } = useQuery({
+    queryKey: ['agentAnalytics', user?.id],
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`/analytics/agent/${user?.id}`);
+        return res.data;
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+        throw new Error(error.response?.data?.message || 'Failed to fetch analytics');
+      }
+    },
+    enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      if (failureCount >= 2) return false;
+      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      return true;
+    },
+  });
+
+  // Refresh mutation with better error handling
+  const refreshMutation = useMutation({
+    mutationFn: async () => {
+      await Promise.all([
+        refetchProperties(),
+        refetchContacts(),
+        queryClient.invalidateQueries({ queryKey: ['agentAnalytics', user?.id] })
+      ]);
+    },
+    onSuccess: () => {
+      setNotification({
+        open: true,
+        message: 'Dashboard data refreshed successfully!',
+        severity: 'success'
+      });
+    },
+    onError: (error) => {
+      setNotification({
+        open: true,
+        message: error.message || 'Failed to refresh data',
+        severity: 'error'
+      });
     }
-  );
+  });
 
   // Calculate enhanced dashboard stats
   useEffect(() => {
@@ -284,30 +343,51 @@ const AgentDashboard = () => {
     </motion.div>
   );
 
+  // Enhanced loading state with skeleton
   if (propertiesLoading || contactsLoading) {
-    return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress size={60} />
-        <Typography variant="h6" mt={2} color="text.secondary">
-          Loading your dashboard...
-        </Typography>
-      </Box>
-    );
+    return <LoadingSkeleton.Dashboard />;
   }
 
+  // Enhanced error handling with retry options
   if (propertiesError || contactsError) {
+    const errorMessage = propertiesError?.message || contactsError?.message || 'Failed to load dashboard data';
+    
     return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
-        <Alert severity="error" sx={{ mb: 2 }}>
-          Failed to load dashboard data. Please try again.
-        </Alert>
-        <Button 
-          variant="contained" 
-          onClick={() => refreshMutation.mutate()}
-          disabled={refreshMutation.isLoading}
-        >
-          {refreshMutation.isLoading ? <CircularProgress size={20} /> : 'Retry'}
-        </Button>
+      <Box sx={{ p: { xs: 2, md: 3 } }}>
+        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
+          <Alert 
+            severity="error" 
+            sx={{ mb: 3, maxWidth: 500 }}
+            icon={<ErrorIcon />}
+          >
+            <Typography variant="h6" gutterBottom>
+              Dashboard Error
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              {errorMessage}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Please check your internet connection and try again
+            </Typography>
+          </Alert>
+          
+          <Box display="flex" gap={2} flexWrap="wrap">
+            <Button 
+              variant="contained" 
+              onClick={() => refreshMutation.mutate()}
+              disabled={refreshMutation.isLoading}
+              startIcon={refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+            >
+              {refreshMutation.isLoading ? 'Retrying...' : 'Retry'}
+            </Button>
+            <Button 
+              variant="outlined"
+              onClick={() => window.location.reload()}
+            >
+              Reload Page
+            </Button>
+          </Box>
+        </Box>
       </Box>
     );
   }
@@ -354,7 +434,7 @@ const AgentDashboard = () => {
                 '&:hover': { transform: 'rotate(180deg)', transition: 'transform 0.3s ease' }
               }}
             >
-              <RefreshIcon />
+              {refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
             </IconButton>
             <IconButton sx={{ bgcolor: 'background.paper' }}>
               <NotificationsIcon />
@@ -771,6 +851,22 @@ const AgentDashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setNotification({ ...notification, open: false })} 
+          severity={notification.severity}
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
