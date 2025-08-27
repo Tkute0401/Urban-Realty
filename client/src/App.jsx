@@ -18,9 +18,13 @@ import { ThemeProvider } from '@mui/material';
 import { urbanRealtyTheme } from './Theme/NewTheme';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminProperties from './pages/admin/AdminProperties';
 import AdminContacts from './pages/admin/AdminContacts';
+import AdminMedia from './pages/admin/AdminMedia';
+import AdminReports from './pages/admin/AdminReports';
+import AdminSettings from './pages/admin/AdminSettings';
 import AgentsPage from './pages/admin/AgentsPage';
 import AdminSubscriptionManagement from './components/admin/SubscriptionManagement';
 import MainPage from './components/property/MainPage';
@@ -92,10 +96,14 @@ function App() {
                 <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
                   <Route element={<AdminLayout />}>
                     <Route index element={<AdminDashboard />} />
+                    <Route path="analytics" element={<AdminAnalytics />} />
                     <Route path="agents" element={<AgentsPage />} />
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="properties" element={<AdminProperties />} />
                     <Route path="contacts" element={<AdminContacts />} />
+                    <Route path="media" element={<AdminMedia />} />
+                    <Route path="reports" element={<AdminReports />} />
+                    <Route path="settings" element={<AdminSettings />} />
                     <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
                   </Route>
                 </Route>
