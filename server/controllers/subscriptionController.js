@@ -161,6 +161,72 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+// @desc    Get user's upcoming billing information
+// @route   GET /api/v1/subscriptions/upcoming-billing
+// @access  Private
+exports.getUpcomingBilling = asyncHandler(async (req, res, next) => {
+  try {
+    console.log('Upcoming billing request for user:', req.user.id);
+    
+    // Find active subscription for the user
+    const activeSubscription = await UserSubscription.findOne({
+      user: req.user.id,
+      status: 'active',
+      autoRenew: true
+    }).populate('subscription');
+
+    if (!activeSubscription) {
+      console.log('No active subscription found for user:', req.user.id);
+      return res.status(200).json({
+        success: true,
+        data: null,
+        message: 'No active subscription with auto-renewal found'
+      });
+    }
+
+    // Calculate next billing date if not set
+    let nextBillingDate = activeSubscription.nextBillingDate;
+    if (!nextBillingDate) {
+      nextBillingDate = new Date(activeSubscription.endDate);
+      if (activeSubscription.billingCycle === 'monthly') {
+        nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+      } else if (activeSubscription.billingCycle === 'yearly') {
+        nextBillingDate.setFullYear(nextBillingDate.getFullYear() + 1);
+      }
+    }
+
+    // Calculate days until next billing
+    const today = new Date();
+    const daysUntilBilling = Math.ceil((nextBillingDate - today) / (1000 * 60 * 60 * 24));
+
+    const upcomingBilling = {
+      subscriptionId: activeSubscription._id,
+      subscriptionName: activeSubscription.subscription?.name || 'Subscription',
+      subscriptionType: activeSubscription.subscription?.type || 'unknown',
+      billingCycle: activeSubscription.billingCycle,
+      amount: activeSubscription.amount,
+      currency: activeSubscription.currency || 'USD',
+      nextBillingDate: nextBillingDate,
+      daysUntilBilling: Math.max(0, daysUntilBilling),
+      paymentMethod: activeSubscription.paymentMethod,
+      autoRenew: activeSubscription.autoRenew,
+      currentPeriodStart: activeSubscription.startDate,
+      currentPeriodEnd: activeSubscription.endDate
+    };
+
+    console.log('Returning upcoming billing info for user:', req.user.id);
+
+    res.status(200).json({
+      success: true,
+      data: upcomingBilling
+    });
+  } catch (error) {
+    console.error('Error fetching upcoming billing for user:', req.user.id, error);
+    return next(new ErrorResponse(`Error fetching upcoming billing: ${error.message}`, 500));
+  }
+});
+
 // @desc    Get user's current subscription
 // @route   GET /api/v1/subscriptions/my-subscription
 // @access  Private
