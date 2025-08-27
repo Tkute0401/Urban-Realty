@@ -7,6 +7,7 @@ const fs = require('fs');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
+const Subscription = require('./models/Subscription');
 
 const app = express();
 
@@ -21,6 +22,35 @@ setTimeout(async () => {
     console.error('Migration failed:', error);
   }
 }, 5000); // Wait 5 seconds for DB connection to stabilize
+
+// Startup data checks (Stripe + Frontend URLs)
+setTimeout(async () => {
+  try {
+    if (!process.env.FRONTEND_URL) {
+      console.warn('FRONTEND_URL is not set. Success/cancel redirects may be broken.');
+    } else {
+      const successUrl = `${process.env.FRONTEND_URL}/billing-dashboard?success=true`;
+      const cancelUrl = `${process.env.FRONTEND_URL}/subscriptions?canceled=true`;
+      console.log('Checkout success URL:', successUrl);
+      console.log('Checkout cancel URL:', cancelUrl);
+    }
+
+    // Verify each Subscription has Stripe price IDs configured
+    try {
+      const subs = await Subscription.find({}, 'name stripePriceIdMonthly stripePriceIdYearly').lean();
+      const missing = subs.filter(s => !s.stripePriceIdMonthly || !s.stripePriceIdYearly);
+      if (missing.length > 0) {
+        console.warn('Subscriptions missing Stripe price IDs:', missing.map(s => s.name));
+      } else {
+        console.log('All subscriptions have Stripe price IDs configured.');
+      }
+    } catch (e) {
+      console.warn('Could not verify Subscription Stripe price IDs:', e.message);
+    }
+  } catch (e) {
+    console.warn('Startup checks encountered an error:', e.message);
+  }
+}, 7000);
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
