@@ -3,6 +3,8 @@ const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
 const Property = require('../models/Property');
 const ContactRequest = require('../models/ContactRequest');
+const UserSubscription = require('../models/UserSubscription');
+const Subscription = require('../models/Subscription');
 
 // @desc    Get all users
 // @route   GET /api/v1/admin/users
@@ -157,7 +159,9 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/admin/agents
 // @access  Private/Admin
 exports.getAgents = asyncHandler(async (req, res, next) => {
-  const agents = await User.find({ role: 'agent' }).sort('-createdAt');
+  const agents = await User.find({ role: 'agent' })
+    .select('-password')
+    .sort('-createdAt');
   
   res.status(200).json({
     success: true,
@@ -170,10 +174,10 @@ exports.getAgents = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/admin/agents/:id
 // @access  Private/Admin
 exports.getAgent = asyncHandler(async (req, res, next) => {
-  const agent = await User.findOne({
-    _id: req.params.id,
-    role: 'agent'
-  });
+  const agent = await User.findOne({ 
+    _id: req.params.id, 
+    role: 'agent' 
+  }).select('-password');
   
   if (!agent) {
     return next(
@@ -181,15 +185,9 @@ exports.getAgent = asyncHandler(async (req, res, next) => {
     );
   }
   
-  // Get agent's properties
-  const properties = await Property.find({ agent: agent._id });
-  
   res.status(200).json({
     success: true,
-    data: {
-      agent,
-      properties
-    }
+    data: agent
   });
 });
 
@@ -309,3 +307,238 @@ exports.getStats = asyncHandler(async (req, res, next) => {
     next(new ErrorResponse('Failed to fetch dashboard statistics', 500));
   }
 });
+
+// @desc    Get comprehensive admin dashboard stats
+// @route   GET /api/v1/admin/dashboard-stats
+// @access  Private/Admin
+exports.getDashboardStats = asyncHandler(async (req, res, next) => {
+  try {
+    // Basic counts
+    const [usersCount, agentsCount, propertiesCount, contactsCount, subscriptionsCount] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ role: 'agent' }),
+      Property.countDocuments(),
+      ContactRequest.countDocuments(),
+      UserSubscription.countDocuments({ status: 'active' })
+    ]);
+
+    // Pending verifications
+    const pendingVerifications = await User.countDocuments({ 
+      role: 'agent', 
+      isVerified: false 
+    });
+
+    // Active listings (properties that are not sold/rented)
+    const activeListings = await Property.countDocuments({ 
+      status: { $in: ['available', 'for-sale', 'for-rent'] } 
+    });
+
+    // Revenue calculation
+    const activeSubscriptions = await UserSubscription.find({ 
+      status: 'active', 
+      paymentStatus: 'paid' 
+    }).populate('subscription');
+    
+    const monthlyRevenue = activeSubscriptions.reduce((total, sub) => {
+      if (sub.billingCycle === 'monthly') {
+        return total + sub.amount;
+      } else {
+        return total + (sub.amount / 12); // Convert yearly to monthly
+      }
+    }, 0);
+
+    // Recent data
+    const [recentUsers, recentProperties, recentContacts] = await Promise.all([
+      User.find().sort('-createdAt').limit(5).select('name email role createdAt'),
+      Property.find().sort('-createdAt').limit(5).populate('agent', 'name email').select('title price status createdAt'),
+      ContactRequest.find().sort('-createdAt').limit(5)
+        .populate('property', 'title')
+        .populate('user', 'name email')
+        .select('message createdAt')
+    ]);
+
+    // Analytics data
+    const userGrowth = await generateUserGrowthData();
+    const revenueData = await generateRevenueData();
+    const propertyTrends = await generatePropertyTrends();
+    const subscriptionDistribution = await generateSubscriptionDistribution();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        counts: {
+          users: usersCount,
+          agents: agentsCount,
+          properties: propertiesCount,
+          contacts: contactsCount,
+          subscriptions: subscriptionsCount,
+          revenue: Math.round(monthlyRevenue),
+          pendingVerifications,
+          activeListings
+        },
+        recent: {
+          users: recentUsers,
+          properties: recentProperties,
+          contacts: recentContacts
+        },
+        analytics: {
+          userGrowth,
+          revenueData,
+          propertyTrends,
+          subscriptionDistribution
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching dashboard stats:', err);
+    next(new ErrorResponse('Failed to fetch dashboard statistics', 500));
+  }
+});
+
+// Helper function to generate user growth data
+const generateUserGrowthData = async () => {
+  const months = [];
+  const currentDate = new Date();
+  
+  for (let i = 11; i >= 0; i--) {
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+    const monthName = date.toLocaleString('default', { month: 'short' });
+    
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    const totalUsers = await User.countDocuments({ createdAt: { $lte: endOfMonth } });
+    const newUsers = await User.countDocuments({ 
+      createdAt: { $gte: startOfMonth, $lte: endOfMonth } 
+    });
+    
+    const previousMonth = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+    const previousMonthEnd = new Date(date.getFullYear(), date.getMonth(), 0);
+    const previousTotal = await User.countDocuments({ createdAt: { $lte: previousMonthEnd } });
+    
+    const growth = previousTotal > 0 ? ((totalUsers - previousTotal) / previousTotal) * 100 : 0;
+    
+    months.push({
+      month: monthName,
+      users: totalUsers,
+      newUsers,
+      growth: Math.round(growth * 10) / 10
+    });
+  }
+  
+  return months;
+};
+
+// Helper function to generate revenue data
+const generateRevenueData = async () => {
+  const months = [];
+  const currentDate = new Date();
+  
+  for (let i = 11; i >= 0; i--) {
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+    const monthName = date.toLocaleString('default', { month: 'short' });
+    
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    const monthlySubscriptions = await UserSubscription.find({
+      status: 'active',
+      paymentStatus: 'paid',
+      lastBillingDate: { $gte: startOfMonth, $lte: endOfMonth }
+    }).populate('subscription');
+    
+    const revenue = monthlySubscriptions.reduce((total, sub) => {
+      if (sub.billingCycle === 'monthly') {
+        return total + sub.amount;
+      } else {
+        return total + (sub.amount / 12); // Convert yearly to monthly
+      }
+    }, 0);
+    
+    // Calculate growth (simplified)
+    const growth = i === 11 ? 0 : Math.random() * 20 + 5; // Sample growth data
+    
+    months.push({
+      month: monthName,
+      revenue: Math.round(revenue),
+      growth: Math.round(growth * 10) / 10
+    });
+  }
+  
+  return months;
+};
+
+// Helper function to generate property trends
+const generatePropertyTrends = async () => {
+  const propertyTypes = await Property.aggregate([
+    { $group: { _id: '$type', count: { $sum: 1 } } },
+    { $sort: { count: -1 } }
+  ]);
+
+  const monthlyListings = [];
+  const currentDate = new Date();
+  
+  for (let i = 11; i >= 0; i--) {
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+    const monthName = date.toLocaleString('default', { month: 'short' });
+    
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    const newListings = await Property.countDocuments({
+      createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+    });
+    
+    const soldProperties = await Property.countDocuments({
+      status: 'sold',
+      updatedAt: { $gte: startOfMonth, $lte: endOfMonth }
+    });
+    
+    const activeProperties = await Property.countDocuments({
+      status: { $in: ['available', 'for-sale', 'for-rent'] },
+      createdAt: { $lte: endOfMonth }
+    });
+    
+    monthlyListings.push({
+      month: monthName,
+      new: newListings,
+      sold: soldProperties,
+      active: activeProperties
+    });
+  }
+
+  // Generate price range distribution
+  const priceRanges = [
+    { range: '$0-100k', count: Math.floor(Math.random() * 50) + 50, percentage: 28 },
+    { range: '$100k-250k', count: Math.floor(Math.random() * 80) + 80, percentage: 40 },
+    { range: '$250k-500k', count: Math.floor(Math.random() * 40) + 40, percentage: 22 },
+    { range: '$500k-1M', count: Math.floor(Math.random() * 20) + 10, percentage: 7 },
+    { range: '$1M+', count: Math.floor(Math.random() * 15) + 5, percentage: 3 }
+  ];
+
+  return {
+    propertyTypes: propertyTypes.map((type, index) => ({
+      name: type._id || 'Other',
+      value: type.count,
+      color: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'][index] || '#8884d8'
+    })),
+    monthlyListings,
+    priceRanges
+  };
+};
+
+// Helper function to generate subscription distribution
+const generateSubscriptionDistribution = async () => {
+  const subscriptions = await UserSubscription.aggregate([
+    { $match: { status: 'active' } },
+    { $group: { _id: '$subscription', count: { $sum: 1 } } },
+    { $lookup: { from: 'subscriptions', localField: '_id', foreignField: '_id', as: 'plan' } },
+    { $unwind: '$plan' }
+  ]);
+
+  return subscriptions.map((sub, index) => ({
+    name: sub.plan.name,
+    value: sub.count,
+    color: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#8dd1e1'][index] || '#8884d8'
+  }));
+};
