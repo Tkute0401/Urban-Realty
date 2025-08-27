@@ -37,7 +37,7 @@ const SubscriptionPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
+  // Payment method collection happens in Stripe Checkout; no manual input needed here
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
@@ -165,7 +165,7 @@ const SubscriptionPlans = () => {
         Select the perfect plan for your real estate needs
       </Typography>
       
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 6, flexWrap: 'wrap' }}>
         <Button
           variant="outlined"
           href="/subscription-comparison"
@@ -179,6 +179,28 @@ const SubscriptionPlans = () => {
           }}
         >
           Compare All Plans
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={async () => {
+            try {
+              const { data } = await axios.get('/payments/portal');
+              const url = data?.data?.url;
+              if (url) window.location.href = url;
+            } catch (e) {
+              setError('Unable to open billing portal');
+            }
+          }}
+          sx={{ 
+            borderColor: '#4CAF50',
+            color: '#4CAF50',
+            '&:hover': {
+              borderColor: '#3d8b40',
+              backgroundColor: 'rgba(76, 175, 80, 0.08)'
+            }
+          }}
+        >
+          Add/Update Card
         </Button>
       </Box>
 
@@ -343,20 +365,6 @@ const SubscriptionPlans = () => {
                   >
                     <MenuItem value="monthly">Monthly</MenuItem>
                     <MenuItem value="yearly">Yearly (20% discount)</MenuItem>
-                  </TextField>
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    fullWidth
-                    label="Payment Method"
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
-                    <MenuItem value="credit_card">Credit Card</MenuItem>
-                    <MenuItem value="debit_card">Debit Card</MenuItem>
-                    <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
                   </TextField>
                 </Grid>
               </Grid>
