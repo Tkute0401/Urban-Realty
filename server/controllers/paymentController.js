@@ -1,19 +1,23 @@
-import Stripe from 'stripe';
-import asyncHandler from '../middleware/async.js';
-import ErrorResponse from '../utils/errorResponse.js';
-import Subscription from '../models/Subscription.js';
-import UserSubscription from '../models/UserSubscription.js';
-import User from '../models/User.js';
+const Stripe = require('stripe');
+const asyncHandler = require('../middleware/async');
+const ErrorResponse = require('../utils/errorResponse');
+const Subscription = require('../models/Subscription');
+const UserSubscription = require('../models/UserSubscription');
+const User = require('../models/User');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51QKhz3P6UrSiZfgp1cfdipouTmf8eKUgcUBkkN77T8bDhuV4xmtdNSzFMcBjVPwqFSlrjokxnrApgC2XqlpCQ0jR00d8K5jrbZ', {
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.warn('Stripe: STRIPE_SECRET_KEY is missing. Set it in your environment.');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20'
 });
 
-console.log("stripe:", stripe);
-console.log("process.env.STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
+// Avoid logging secrets; log minimal diagnostics
+console.log('Stripe initialized:', Boolean(process.env.STRIPE_SECRET_KEY));
 
 // Create Stripe Checkout Session for a subscription
-export const createCheckoutSession = asyncHandler(async (req, res, next) => {
+const createCheckoutSession = asyncHandler(async (req, res, next) => {
   const { subscriptionId, billingCycle } = req.body;
   const userId = req.user.id;
 
@@ -82,7 +86,7 @@ export const createCheckoutSession = asyncHandler(async (req, res, next) => {
 });
 
 // Create Stripe customer portal session
-export const createPortalSession = asyncHandler(async (req, res, next) => {
+const createPortalSession = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   if (!user || !user.stripeCustomerId) return next(new ErrorResponse('Stripe customer not found', 404));
 
@@ -95,7 +99,7 @@ export const createPortalSession = asyncHandler(async (req, res, next) => {
 });
 
 // Stripe webhook handler
-export const webhook = async (req, res) => {
+const webhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
   try {
@@ -155,4 +159,10 @@ export const webhook = async (req, res) => {
   }
 
   res.json({ received: true });
+};
+
+module.exports = {
+  createCheckoutSession,
+  createPortalSession,
+  webhook
 };
