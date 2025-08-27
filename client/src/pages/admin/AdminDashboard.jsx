@@ -107,7 +107,6 @@ const AdminDashboard = () => {
     { id: 5, title: 'Reports', icon: <AssessmentIcon />, action: () => navigate('/admin/reports'), color: 'secondary' },
     { id: 6, title: 'Media', icon: <StorageIcon />, action: () => navigate('/admin/media'), color: 'error' }
   ]);
-  });
 
   const [stats, setStats] = useState({
     counts: {
