@@ -254,7 +254,9 @@ const SubscriptionManagement = () => {
                     <Box>
                       <Typography variant="body2" color="text.secondary">Next Billing</Typography>
                       <Typography variant="body1" fontWeight="bold">
-                        {new Date(subscription.endDate).toLocaleDateString()}
+                        {(subscription?.currentSubscription?.endDate || subscription?.expiry)
+                          ? new Date(subscription?.currentSubscription?.endDate || subscription?.expiry).toLocaleDateString()
+                          : '—'}
                       </Typography>
                     </Box>
                   </Box>
@@ -283,6 +285,7 @@ const SubscriptionManagement = () => {
                     variant="outlined"
                     startIcon={<SettingsIcon />}
                     onClick={() => setEditDialog(true)}
+                    disabled={!subscription?.currentSubscription || subscription?.currentSubscription?.status !== 'active'}
                     sx={{ mb: 2, width: '100%' }}
                   >
                     Update Payment Method

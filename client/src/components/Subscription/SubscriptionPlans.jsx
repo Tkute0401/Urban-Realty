@@ -36,16 +36,19 @@ const SubscriptionPlans = () => {
   const [error, setError] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
+  // Global billing cycle toggle for the page
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
+  // Payment method collection happens in Stripe Checkout; no manual input needed here
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+  const [paymentMethodInfo, setPaymentMethodInfo] = useState(null);
 
   const { user } = useAuth();
 
   useEffect(() => {
     fetchPlans();
+    fetchPaymentMethod();
   }, []);
 
   const fetchPlans = async () => {
@@ -59,6 +62,15 @@ const SubscriptionPlans = () => {
       console.error('Error fetching plans:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPaymentMethod = async () => {
+    try {
+      const { data } = await axios.get('/payments/payment-method');
+      setPaymentMethodInfo(data?.data || null);
+    } catch (e) {
+      // Non-fatal
     }
   };
 
@@ -132,6 +144,21 @@ const SubscriptionPlans = () => {
     }
   };
 
+  const getPriceForCycle = (plan) => {
+    if (!plan) return 0;
+    return billingCycle === 'yearly' ? Math.round(plan.price * 12 * 0.8 * 100) / 100 : plan.price;
+  };
+
+  const getRenewDate = () => {
+    const d = new Date();
+    if (billingCycle === 'yearly') {
+      d.setFullYear(d.getFullYear() + 1);
+    } else {
+      d.setMonth(d.getMonth() + 1);
+    }
+    return d.toLocaleDateString();
+  };
+
   const getPlanIcon = (type) => {
     if (type === 'premium' || type === 'enterprise') {
       return <StarIcon sx={{ color: '#FFD700', mr: 1 }} />;
@@ -165,7 +192,34 @@ const SubscriptionPlans = () => {
         Select the perfect plan for your real estate needs
       </Typography>
       
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Button
+            variant={billingCycle === 'monthly' ? 'contained' : 'outlined'}
+            size="small"
+            onClick={() => setBillingCycle('monthly')}
+            sx={{ bgcolor: billingCycle === 'monthly' ? '#78CADC' : 'transparent' }}
+          >
+            Monthly
+          </Button>
+          <Button
+            variant={billingCycle === 'yearly' ? 'contained' : 'outlined'}
+            size="small"
+            onClick={() => setBillingCycle('yearly')}
+            sx={{ bgcolor: billingCycle === 'yearly' ? '#78CADC' : 'transparent' }}
+          >
+            Yearly
+          </Button>
+        </Box>
+      </Box>
+
+      {paymentMethodInfo && (
+        <Box sx={{ textAlign: 'center', mb: 4, color: 'text.secondary' }}>
+          Using card: <b>{String(paymentMethodInfo.brand).toUpperCase()} •••• {paymentMethodInfo.last4}</b> (exp {paymentMethodInfo.expMonth}/{paymentMethodInfo.expYear})
+        </Box>
+      )}
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 6, flexWrap: 'wrap' }}>
         <Button
           variant="outlined"
           href="/subscription-comparison"
@@ -179,6 +233,28 @@ const SubscriptionPlans = () => {
           }}
         >
           Compare All Plans
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={async () => {
+            try {
+              const { data } = await axios.get('/payments/portal');
+              const url = data?.data?.url;
+              if (url) window.location.href = url;
+            } catch (e) {
+              setError('Unable to open billing portal');
+            }
+          }}
+          sx={{ 
+            borderColor: '#4CAF50',
+            color: '#4CAF50',
+            '&:hover': {
+              borderColor: '#3d8b40',
+              backgroundColor: 'rgba(76, 175, 80, 0.08)'
+            }
+          }}
+        >
+          Add/Update Card
         </Button>
       </Box>
 
@@ -228,9 +304,9 @@ const SubscriptionPlans = () => {
                 </Box>
                 
                 <Typography variant="h4" component="div" sx={{ mb: 2, color: '#78CADC' }}>
-                  ${plan.price}
+                  ${getPriceForCycle(plan)}
                   <Typography variant="body2" component="span" color="text.secondary">
-                    /{plan.billingCycle}
+                    /{billingCycle === 'yearly' ? 'year' : 'month'}
                   </Typography>
                 </Typography>
 
@@ -345,21 +421,15 @@ const SubscriptionPlans = () => {
                     <MenuItem value="yearly">Yearly (20% discount)</MenuItem>
                   </TextField>
                 </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    fullWidth
-                    label="Payment Method"
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
-                    <MenuItem value="credit_card">Credit Card</MenuItem>
-                    <MenuItem value="debit_card">Debit Card</MenuItem>
-                    <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
-                  </TextField>
-                </Grid>
               </Grid>
+
+              {selectedPlan && (
+                <Box sx={{ mt: 2, p: 2, bgcolor: '#fafafa', border: '1px solid #eee', borderRadius: 1 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>Summary</Typography>
+                  <Typography variant="body2">You'll pay <b>${getPriceForCycle(selectedPlan)}</b> today.</Typography>
+                  <Typography variant="body2">Renews on <b>{getRenewDate()}</b> unless cancelled.</Typography>
+                </Box>
+              )}
 
               {subscribeError && (
                 <Alert severity="error" sx={{ mt: 2 }}>
