@@ -19,7 +19,9 @@ import {
   Home,
   Mail,
   VerifiedUser,
-  Settings
+  Settings,
+  Assessment,
+  Image
 } from '@mui/icons-material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
@@ -28,10 +30,13 @@ const drawerWidth = 240;
 
 const menuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
+  { text: 'Analytics', icon: <Assessment />, path: '/admin/analytics' },
   { text: 'Users', icon: <People />, path: '/admin/users' },
   { text: 'Agents', icon: <VerifiedUser />, path: '/admin/agents' },
   { text: 'Properties', icon: <Home />, path: '/admin/properties' },
   { text: 'Contacts', icon: <Mail />, path: '/admin/contacts' },
+  { text: 'Media', icon: <Image />, path: '/admin/media' },
+  { text: 'Reports', icon: <Assessment />, path: '/admin/reports' },
   { text: 'Settings', icon: <Settings />, path: '/admin/settings' },
 ];
 
