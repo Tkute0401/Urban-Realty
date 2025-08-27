@@ -30,7 +30,8 @@ import {
   VerifiedUser, 
   Phone, 
   Close, 
-  Save 
+  Save,
+  CreditCard 
 } from '@mui/icons-material';
 import axios from '../../services/axios';
 
@@ -184,6 +185,7 @@ const UsersTable = () => {
               <TableCell>Role</TableCell>
               <TableCell>Occupation</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Subscription</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -222,6 +224,13 @@ const UsersTable = () => {
                         color={user.isVerified ? 'success' : 'warning'}
                       />
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={(user.subscriptionStatus || 'free').toUpperCase()}
+                      color={user.subscriptionStatus === 'free' ? 'default' : 'success'}
+                      variant={user.subscriptionStatus === 'free' ? 'outlined' : 'filled'}
+                    />
                   </TableCell>
                   <TableCell>
                     <IconButton onClick={(e) => handleMenuOpen(e, user)}>

@@ -1,5 +1,6 @@
 require('dotenv').config({ path: `${__dirname}/.env` });
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
@@ -43,6 +44,8 @@ app.use(cors({
   origin: true,
   credentials: true // If you're using cookies/sessions
 }));
+// Stripe webhook requires raw body
+app.use('/api/v1/payments/webhook', bodyParser.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -56,6 +59,7 @@ app.use('/api/v1/properties', require('./routes/propertyRoutes'));
 app.use('/api/v1/contacts', require('./routes/contactRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
 app.use('/api/v1/subscriptions', require('./routes/subscriptionRoutes'));
+app.use('/api/v1/payments', require('./routes/paymentRoutes'));
 app.use('/media', require('./routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./routes/developerRoutes'))
 

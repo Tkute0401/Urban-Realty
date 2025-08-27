@@ -136,7 +136,7 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
     amount = subscription.price * 12 * 0.8; // 20% discount for yearly
   }
 
-  // Create user subscription
+  // Create user subscription (pending until Stripe payment succeeds)
   const userSubscription = await UserSubscription.create({
     user: userId,
     subscription: subscriptionId,
