@@ -44,7 +44,7 @@ import {
   WhatsApp as WhatsAppIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../services/axios';
 import { useAuth } from '../../context/AuthContext';
