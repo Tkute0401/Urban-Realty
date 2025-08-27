@@ -28,7 +28,7 @@ import {
   Phone as PhoneIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import axios from '../../services/axios';
 import { formatDate } from '../../utils/format';
 import { useAuth } from '../../context/AuthContext';
