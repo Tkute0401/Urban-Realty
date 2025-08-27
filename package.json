@@ -11,6 +11,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && npm install --prefix client",
     "test": "cd client && npm run test",
+    "migrate:subscriptions": "node server/utils/migrateSubscriptions.js",
     "heroku-postbuild": "npm run build --prefix client && npm install --prefix server"
   },
   "dependencies": {
