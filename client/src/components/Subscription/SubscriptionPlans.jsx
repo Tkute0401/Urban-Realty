@@ -27,6 +27,7 @@ import {
   Star as StarIcon
 } from '@mui/icons-material';
 import axios from '../../services/axios';
+import { loadStripe } from '@stripe/stripe-js';
 import { useAuth } from '../../context/AuthContext';
 
 const SubscriptionPlans = () => {
@@ -72,20 +73,17 @@ const SubscriptionPlans = () => {
     try {
       setSubscribing(true);
       setSubscribeError(null);
-
-      const response = await axios.post('/subscriptions/subscribe', {
+      // Create Stripe Checkout session via backend
+      const { data } = await axios.post('/payments/checkout', {
         subscriptionId: selectedPlan._id,
-        billingCycle,
-        paymentMethod
+        billingCycle
       });
-
-      setSubscribeSuccess(true);
-      setTimeout(() => {
-        setSubscribeDialog(false);
-        setSubscribeSuccess(false);
-        // Refresh user data or redirect
-        window.location.reload();
-      }, 2000);
+      const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+      if (!publishableKey) {
+        throw new Error('Stripe publishable key missing');
+      }
+      const stripe = await loadStripe(publishableKey);
+      await stripe.redirectToCheckout({ sessionId: data.data.id });
     } catch (err) {
       setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
     } finally {

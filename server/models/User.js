@@ -88,6 +88,10 @@ const UserSchema = new mongoose.Schema({
   subscriptionExpiry: {
     type: Date
   },
+  stripeCustomerId: {
+    type: String,
+    trim: true
+  },
   // Professional fields for new roles
   professionalInfo: {
     licenseNumber: {

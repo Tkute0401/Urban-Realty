@@ -6,6 +6,7 @@ const dynamicFieldController = require('../controllers/dynamicFieldController');
 const userTypeController = require('../controllers/userTypeController');
 const mediaController = require('../controllers/mediaController');
 const upload = require('../middleware/multer');
+const subscriptionAdminController = require('../controllers/subscriptionAdminController');
 
 // User management
 router.get('/users', protect, authorize('admin'), adminController.getUsers);
@@ -66,5 +67,15 @@ router.delete('/user-types/:id', protect, authorize('admin'), userTypeController
 
 // Media Management (Admin can delete any media)
 router.delete('/media/:id', protect, authorize('admin'), mediaController.deleteMedia);
+
+// Subscription Plans Management
+router.get('/subscription-plans', protect, authorize('admin'), subscriptionAdminController.getPlans);
+router.post('/subscription-plans', protect, authorize('admin'), subscriptionAdminController.createPlan);
+router.put('/subscription-plans/:id', protect, authorize('admin'), subscriptionAdminController.updatePlan);
+router.delete('/subscription-plans/:id', protect, authorize('admin'), subscriptionAdminController.deletePlan);
+
+// Subscriptions Management
+router.get('/subscriptions', protect, authorize('admin'), subscriptionAdminController.getAllSubscriptions);
+router.put('/subscriptions/:id/status', protect, authorize('admin'), subscriptionAdminController.updateSubscriptionStatus);
 
 module.exports = router;

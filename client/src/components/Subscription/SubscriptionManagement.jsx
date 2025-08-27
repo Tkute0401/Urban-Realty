@@ -189,13 +189,29 @@ const SubscriptionManagement = () => {
         <Typography variant="h3" component="h1" sx={{ color: '#78CADC' }}>
           Subscription Management
         </Typography>
-        <Button
-          variant="outlined"
-          href="/billing-dashboard"
-          sx={{ borderColor: '#4CAF50', color: '#4CAF50' }}
-        >
-          View Billing Dashboard
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant="outlined"
+            href="/billing-dashboard"
+            sx={{ borderColor: '#4CAF50', color: '#4CAF50' }}
+          >
+            View Billing Dashboard
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<PaymentIcon />}
+            onClick={async () => {
+              try {
+                const { data } = await axios.get('/payments/portal');
+                window.location.href = data.data.url;
+              } catch (e) {
+                setError('Failed to open billing portal');
+              }
+            }}
+          >
+            Manage Billing
+          </Button>
+        </Box>
       </Box>
 
       {subscription ? (

@@ -75,6 +75,26 @@ const UserSubscriptionSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+// Stripe integration fields
+UserSubscriptionSchema.add({
+  stripeCustomerId: {
+    type: String,
+    trim: true
+  },
+  stripeSubscriptionId: {
+    type: String,
+    trim: true
+  },
+  stripeCheckoutSessionId: {
+    type: String,
+    trim: true
+  },
+  stripePaymentIntentId: {
+    type: String,
+    trim: true
+  }
+});
+
 // Update the updatedAt field before saving
 UserSubscriptionSchema.pre('save', function(next) {
   this.updatedAt = Date.now();

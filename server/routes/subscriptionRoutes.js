@@ -3,6 +3,7 @@ const router = express.Router();
 const { check } = require('express-validator');
 const subscriptionController = require('../controllers/subscriptionController');
 const { protect, authorize } = require('../middleware/auth');
+const paymentController = require('../controllers/paymentController');
 
 // Public routes
 router.get('/', subscriptionController.getSubscriptions);
@@ -23,6 +24,10 @@ router.post('/subscribe', [
 ], subscriptionController.subscribeUser);
 router.put('/cancel', subscriptionController.cancelSubscription);
 router.put('/payment-method', subscriptionController.updatePaymentMethod);
+
+// Stripe payment routes
+router.post('/create-checkout-session', paymentController.createCheckoutSession);
+router.get('/create-portal-session', paymentController.createPortalSession);
 
 // Parameterized routes - must come after specific routes
 router.get('/:id', subscriptionController.getSubscription);
