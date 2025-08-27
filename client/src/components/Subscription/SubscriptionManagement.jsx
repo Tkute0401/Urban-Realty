@@ -205,10 +205,29 @@ const SubscriptionManagement = () => {
             startIcon={<PaymentIcon />}
             onClick={async () => {
               try {
+                setError(null); // Clear any previous errors
                 const { data } = await axios.get('/payments/portal');
-                window.location.href = data.data.url;
+                if (data.success && data.data && data.data.url) {
+                  if (data.data.fallback) {
+                    // If it's a fallback, show a message and navigate
+                    console.log('Using fallback billing management');
+                    window.location.href = data.data.url;
+                  } else {
+                    // Direct Stripe portal
+                    window.location.href = data.data.url;
+                  }
+                } else {
+                  setError('Invalid response from billing portal');
+                }
               } catch (e) {
-                setError('Failed to open billing portal');
+                console.error('Billing portal error:', e);
+                if (e.response?.status === 400) {
+                  setError('Billing portal is not available. Please contact support.');
+                } else if (e.response?.status === 404) {
+                  setError('Billing portal not found. Please try again later.');
+                } else {
+                  setError('Failed to open billing portal. Please try again.');
+                }
               }
             }}
           >

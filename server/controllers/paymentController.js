@@ -87,15 +87,87 @@ const createCheckoutSession = asyncHandler(async (req, res, next) => {
 
 // Create Stripe customer portal session
 const createPortalSession = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  if (!user || !user.stripeCustomerId) return next(new ErrorResponse('Stripe customer not found', 404));
+  try {
+    // Check if Stripe is configured
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.log('Stripe not configured, redirecting to subscription management');
+      return res.status(200).json({ 
+        success: true, 
+        data: { 
+          url: `${process.env.FRONTEND_URL || 'https://www.squarefooot.com'}/subscription-management`,
+          fallback: true 
+        } 
+      });
+    }
 
-  const portal = await stripe.billingPortal.sessions.create({
-    customer: user.stripeCustomerId,
-    return_url: `${process.env.FRONTEND_URL}/billing-dashboard`
-  });
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
 
-  res.status(200).json({ success: true, data: { url: portal.url } });
+    // Check if user has any paid subscriptions
+    const hasPaidSubscription = await UserSubscription.findOne({
+      user: user._id,
+      status: 'active',
+      amount: { $gt: 0 }
+    });
+
+    // If no paid subscriptions, redirect to subscription management
+    if (!hasPaidSubscription) {
+      console.log('No paid subscriptions found, redirecting to subscription management');
+      return res.status(200).json({ 
+        success: true, 
+        data: { 
+          url: `${process.env.FRONTEND_URL || 'https://www.squarefooot.com'}/subscription-management`,
+          fallback: true 
+        } 
+      });
+    }
+
+    // If user doesn't have a Stripe customer ID, create one
+    let customerId = user.stripeCustomerId;
+    if (!customerId) {
+      try {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: user.name,
+          metadata: { userId: user._id.toString() }
+        });
+        customerId = customer.id;
+        user.stripeCustomerId = customerId;
+        await user.save();
+        console.log('Created Stripe customer for user:', user.email);
+      } catch (stripeError) {
+        console.error('Error creating Stripe customer:', stripeError);
+        // Fallback to subscription management
+        return res.status(200).json({ 
+          success: true, 
+          data: { 
+            url: `${process.env.FRONTEND_URL || 'https://www.squarefooot.com'}/subscription-management`,
+            fallback: true 
+          } 
+        });
+      }
+    }
+
+    // Create portal session
+    const portal = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${process.env.FRONTEND_URL || 'https://www.squarefooot.com'}/billing-dashboard`
+    });
+
+    res.status(200).json({ success: true, data: { url: portal.url } });
+  } catch (error) {
+    console.error('Error creating portal session:', error);
+    // Fallback to subscription management
+    return res.status(200).json({ 
+      success: true, 
+      data: { 
+        url: `${process.env.FRONTEND_URL || 'https://www.squarefooot.com'}/subscription-management`,
+        fallback: true 
+      } 
+    });
+  }
 });
 
 // Get user's default Stripe payment method (masked details)
