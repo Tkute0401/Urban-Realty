@@ -63,9 +63,9 @@ const AgentProperties = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Fetch agent's properties
-  const { data: properties, isLoading, error } = useQuery(
-    ['agentProperties', user?.id, page, rowsPerPage, searchTerm, statusFilter, priceRange],
-    async () => {
+  const { data: properties, isLoading, error } = useQuery({
+    queryKey: ['agentProperties', user?.id, page, rowsPerPage, searchTerm, statusFilter, priceRange],
+    queryFn: async () => {
       const res = await axios.get(`/properties/agent/${user?.id}`, {
         params: {
           page: page + 1,
@@ -77,22 +77,20 @@ const AgentProperties = () => {
       });
       return res.data;
     },
-    { enabled: !!user?.id }
-  );
+    enabled: !!user?.id
+  });
 
   // Delete property mutation
-  const deletePropertyMutation = useMutation(
-    async (propertyId) => {
+  const deletePropertyMutation = useMutation({
+    mutationFn: async (propertyId) => {
       await axios.delete(`/properties/${propertyId}`);
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['agentProperties']);
-        setDeleteDialogOpen(false);
-        setSelectedProperty(null);
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agentProperties'] });
+      setDeleteDialogOpen(false);
+      setSelectedProperty(null);
     }
-  );
+  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -159,7 +157,7 @@ const AgentProperties = () => {
           >
             Add Property
           </Button>
-          <IconButton onClick={() => queryClient.invalidateQueries(['agentProperties'])}>
+          <IconButton onClick={() => queryClient.invalidateQueries({ queryKey: ['agentProperties'] })}>
             <RefreshIcon />
           </IconButton>
         </Box>

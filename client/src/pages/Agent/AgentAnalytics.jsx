@@ -57,24 +57,24 @@ const AgentAnalytics = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   // Fetch agent's properties
-  const { data: properties, isLoading: propertiesLoading } = useQuery(
-    ['agentProperties', user?.id],
-    async () => {
+  const { data: properties, isLoading: propertiesLoading } = useQuery({
+    queryKey: ['agentProperties', user?.id],
+    queryFn: async () => {
       const res = await axios.get(`/properties/agent/${user?.id}`);
       return res.data;
     },
-    { enabled: !!user?.id }
-  );
+    enabled: !!user?.id
+  });
 
   // Fetch agent's contact requests
-  const { data: contacts, isLoading: contactsLoading } = useQuery(
-    ['agentContacts', user?.id],
-    async () => {
+  const { data: contacts, isLoading: contactsLoading } = useQuery({
+    queryKey: ['agentContacts', user?.id],
+    queryFn: async () => {
       const res = await axios.get('/contacts/agent');
       return res.data;
     },
-    { enabled: !!user?.id }
-  );
+    enabled: !!user?.id
+  });
 
   // Calculate analytics data
   const [analytics, setAnalytics] = useState({
