@@ -98,6 +98,49 @@ const createPortalSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: { url: portal.url } });
 });
 
+// Get user's default Stripe payment method (masked details)
+const getDefaultPaymentMethod = asyncHandler(async (req, res, next) => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return next(new ErrorResponse('Stripe keys are not configured', 500));
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user || !user.stripeCustomerId) {
+    return res.status(200).json({ success: true, data: null });
+  }
+
+  // Try to get the default payment method from invoice settings
+  const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+  let paymentMethodId = customer?.invoice_settings?.default_payment_method || null;
+
+  // Fallback: list card payment methods and pick the first one
+  if (!paymentMethodId) {
+    const pms = await stripe.paymentMethods.list({
+      customer: user.stripeCustomerId,
+      type: 'card',
+      limit: 1
+    });
+    paymentMethodId = pms?.data?.[0]?.id || null;
+  }
+
+  if (!paymentMethodId) {
+    return res.status(200).json({ success: true, data: null });
+  }
+
+  const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+  const card = pm?.card;
+  const response = card
+    ? {
+        brand: card.brand,
+        last4: card.last4,
+        expMonth: card.exp_month,
+        expYear: card.exp_year
+      }
+    : null;
+
+  res.status(200).json({ success: true, data: response });
+});
+
 // Stripe webhook handler
 const webhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
@@ -241,5 +284,6 @@ const webhook = async (req, res) => {
 module.exports = {
   createCheckoutSession,
   createPortalSession,
-  webhook
+  webhook,
+  getDefaultPaymentMethod
 };
