@@ -27,6 +27,13 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminSettings from './pages/admin/AdminSettings';
 import AgentsPage from './pages/admin/AgentsPage';
 import AdminSubscriptionManagement from './components/admin/SubscriptionManagement';
+import AgentLayout from './components/agent/AgentLayout';
+import AgentDashboard from './pages/Agent/AgentDashboard';
+import AgentProperties from './pages/Agent/AgentProperties';
+import AgentLeads from './pages/Agent/AgentLeads';
+import AgentAnalytics from './pages/Agent/AgentAnalytics';
+import AgentInquiries from './pages/Agent/Inquiries';
+import AgentSettings from './pages/Agent/AgentSettings';
 import MainPage from './components/property/MainPage';
 import AboutUs from './components/common/footer/AboutUs';
 import ContactUs from './components/common/footer/ContactUs';
@@ -105,6 +112,19 @@ function App() {
                     <Route path="reports" element={<AdminReports />} />
                     <Route path="settings" element={<AdminSettings />} />
                     <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
+                  </Route>
+                </Route>
+
+                {/* Agent Routes */}
+                <Route path="/agent" element={<ProtectedRoute allowedRoles={['agent']} />}>
+                  <Route element={<AgentLayout />}>
+                    <Route index element={<AgentDashboard />} />
+                    <Route path="dashboard" element={<AgentDashboard />} />
+                    <Route path="properties" element={<AgentProperties />} />
+                    <Route path="leads" element={<AgentLeads />} />
+                    <Route path="analytics" element={<AgentAnalytics />} />
+                    <Route path="inquiries" element={<AgentInquiries />} />
+                    <Route path="settings" element={<AgentSettings />} />
                   </Route>
                 </Route>
                 {/* Protected Routes */}
