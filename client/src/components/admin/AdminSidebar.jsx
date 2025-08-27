@@ -21,24 +21,32 @@ import {
   VerifiedUser,
   Settings,
   Assessment,
-  Image
+  Image,
+  Monitor,
+  Api,
+  Storage,
+  Security
 } from '@mui/icons-material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const menuItems = [
-  { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
-  { text: 'Analytics', icon: <Assessment />, path: '/admin/analytics' },
-  { text: 'Users', icon: <People />, path: '/admin/users' },
-  { text: 'Agents', icon: <VerifiedUser />, path: '/admin/agents' },
-  { text: 'Properties', icon: <Home />, path: '/admin/properties' },
-  { text: 'Contacts', icon: <Mail />, path: '/admin/contacts' },
-  { text: 'Media', icon: <Image />, path: '/admin/media' },
-  { text: 'Reports', icon: <Assessment />, path: '/admin/reports' },
-  { text: 'Settings', icon: <Settings />, path: '/admin/settings' },
-];
+  const menuItems = [
+    { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
+    { text: 'Analytics', icon: <Assessment />, path: '/admin/analytics' },
+    { text: 'Users', icon: <People />, path: '/admin/users' },
+    { text: 'Agents', icon: <VerifiedUser />, path: '/admin/agents' },
+    { text: 'Properties', icon: <Home />, path: '/admin/properties' },
+    { text: 'Contacts', icon: <Mail />, path: '/admin/contacts' },
+    { text: 'Media', icon: <Image />, path: '/admin/media' },
+    { text: 'Reports', icon: <Assessment />, path: '/admin/reports' },
+    { text: 'System Health', icon: <Monitor />, path: '/admin/system-health' },
+    { text: 'API Management', icon: <Api />, path: '/admin/api-management' },
+    { text: 'Database', icon: <Storage />, path: '/admin/database' },
+    { text: 'Security', icon: <Security />, path: '/admin/security' },
+    { text: 'Settings', icon: <Settings />, path: '/admin/settings' },
+  ];
 
 const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse }) => {
   const theme = useTheme();

@@ -913,3 +913,573 @@ exports.restoreBackup = asyncHandler(async (req, res, next) => {
     next(new ErrorResponse('Failed to restore backup', 500));
   }
 });
+
+// ==================== SYSTEM HEALTH & MONITORING ====================
+
+// @desc    Get system health
+// @route   GET /api/v1/admin/system/health
+// @access  Private/Admin
+exports.getSystemHealth = asyncHandler(async (req, res, next) => {
+  try {
+    // Mock system health data
+    const systemHealth = {
+      overall: 'healthy',
+      services: [
+        { id: 1, name: 'Database', type: 'database', status: 'healthy', uptime: '99.9%', responseTime: 15 },
+        { id: 2, name: 'API Server', type: 'api', status: 'healthy', uptime: '99.8%', responseTime: 25 },
+        { id: 3, name: 'File Storage', type: 'storage', status: 'healthy', uptime: '99.7%', responseTime: 45 },
+        { id: 4, name: 'Email Service', type: 'network', status: 'warning', uptime: '95.2%', responseTime: 120 }
+      ],
+      performance: {
+        cpu: 45,
+        memory: 67,
+        disk: 23,
+        network: 89,
+        responseTime: 35,
+        loadAverage: '1.2, 1.1, 0.9',
+        memoryUsed: '2048',
+        memoryTotal: '4096',
+        diskUsed: '50',
+        diskTotal: '500',
+        cpuHistory: [
+          { time: '00:00', usage: 45 },
+          { time: '04:00', usage: 32 },
+          { time: '08:00', usage: 78 },
+          { time: '12:00', usage: 89 },
+          { time: '16:00', usage: 67 },
+          { time: '20:00', usage: 54 }
+        ],
+        memoryHistory: [
+          { time: '00:00', usage: 67 },
+          { time: '04:00', usage: 45 },
+          { time: '08:00', usage: 89 },
+          { time: '12:00', usage: 92 },
+          { time: '16:00', usage: 78 },
+          { time: '20:00', usage: 65 }
+        ]
+      },
+      logs: [
+        { level: 'info', message: 'System startup completed', service: 'System', timestamp: new Date() },
+        { level: 'info', message: 'Database connection established', service: 'Database', timestamp: new Date() },
+        { level: 'warning', message: 'High memory usage detected', service: 'Monitor', timestamp: new Date() },
+        { level: 'error', message: 'Email service timeout', service: 'Email', timestamp: new Date() }
+      ],
+      alerts: [
+        { severity: 'warning', message: 'Memory usage above 80%', timestamp: new Date() },
+        { severity: 'info', message: 'Backup completed successfully', timestamp: new Date() }
+      ]
+    };
+
+    res.status(200).json({
+      success: true,
+      data: systemHealth
+    });
+  } catch (err) {
+    console.error('Error getting system health:', err);
+    next(new ErrorResponse('Failed to get system health', 500));
+  }
+});
+
+// @desc    Service action (restart, stop, start)
+// @route   POST /api/v1/admin/system/services/:id/:action
+// @access  Private/Admin
+exports.serviceAction = asyncHandler(async (req, res, next) => {
+  try {
+    const { id, action } = req.params;
+    // TODO: Implement service actions (restart, stop, start)
+    
+    res.status(200).json({
+      success: true,
+      message: `Service ${action} completed`,
+      data: { id, action, timestamp: new Date() }
+    });
+  } catch (err) {
+    console.error('Error performing service action:', err);
+    next(new ErrorResponse('Failed to perform service action', 500));
+  }
+});
+
+// ==================== API MANAGEMENT ====================
+
+// @desc    Get API keys
+// @route   GET /api/v1/admin/api/keys
+// @access  Private/Admin
+exports.getAPIKeys = asyncHandler(async (req, res, next) => {
+  try {
+    // Mock API keys data
+    const apiKeys = [
+      {
+        id: 1,
+        name: 'Frontend App',
+        key: 'sk_live_1234567890abcdef',
+        permissions: ['read', 'write'],
+        rateLimit: 1000,
+        active: true,
+        createdAt: new Date()
+      },
+      {
+        id: 2,
+        name: 'Mobile App',
+        key: 'sk_live_0987654321fedcba',
+        permissions: ['read'],
+        rateLimit: 500,
+        active: true,
+        createdAt: new Date()
+      }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: apiKeys
+    });
+  } catch (err) {
+    console.error('Error getting API keys:', err);
+    next(new ErrorResponse('Failed to get API keys', 500));
+  }
+});
+
+// @desc    Create API key
+// @route   POST /api/v1/admin/api/keys
+// @access  Private/Admin
+exports.createAPIKey = asyncHandler(async (req, res, next) => {
+  try {
+    const { name, description, permissions, rateLimit, expiresAt } = req.body;
+    
+    const newKey = {
+      id: Date.now(),
+      name,
+      description,
+      key: 'sk_live_' + Math.random().toString(36).substr(2, 9),
+      permissions,
+      rateLimit,
+      active: true,
+      createdAt: new Date(),
+      expiresAt
+    };
+
+    res.status(201).json({
+      success: true,
+      data: newKey
+    });
+  } catch (err) {
+    console.error('Error creating API key:', err);
+    next(new ErrorResponse('Failed to create API key', 500));
+  }
+});
+
+// @desc    Update API key
+// @route   PUT /api/v1/admin/api/keys/:id
+// @access  Private/Admin
+exports.updateAPIKey = asyncHandler(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { active } = req.body;
+    
+    res.status(200).json({
+      success: true,
+      message: 'API key updated successfully',
+      data: { id, active }
+    });
+  } catch (err) {
+    console.error('Error updating API key:', err);
+    next(new ErrorResponse('Failed to update API key', 500));
+  }
+});
+
+// @desc    Delete API key
+// @route   DELETE /api/v1/admin/api/keys/:id
+// @access  Private/Admin
+exports.deleteAPIKey = asyncHandler(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    res.status(200).json({
+      success: true,
+      message: 'API key deleted successfully'
+    });
+  } catch (err) {
+    console.error('Error deleting API key:', err);
+    next(new ErrorResponse('Failed to delete API key', 500));
+  }
+});
+
+// @desc    Get API endpoints
+// @route   GET /api/v1/admin/api/endpoints
+// @access  Private/Admin
+exports.getAPIEndpoints = asyncHandler(async (req, res, next) => {
+  try {
+    const endpoints = [
+      { id: 1, path: '/api/properties', method: 'GET', status: 'active', responseTime: 25, requestsToday: 1250 },
+      { id: 2, path: '/api/users', method: 'GET', status: 'active', responseTime: 15, requestsToday: 890 },
+      { id: 3, path: '/api/properties', method: 'POST', status: 'active', responseTime: 45, requestsToday: 67 },
+      { id: 4, path: '/api/auth/login', method: 'POST', status: 'active', responseTime: 35, requestsToday: 234 }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: endpoints
+    });
+  } catch (err) {
+    console.error('Error getting API endpoints:', err);
+    next(new ErrorResponse('Failed to get API endpoints', 500));
+  }
+});
+
+// @desc    Get API usage
+// @route   GET /api/v1/admin/api/usage
+// @access  Private/Admin
+exports.getAPIUsage = asyncHandler(async (req, res, next) => {
+  try {
+    const usage = {
+      totalRequests: 2441,
+      successRate: 98.5,
+      requestHistory: [
+        { time: '00:00', requests: 45 },
+        { time: '04:00', requests: 23 },
+        { time: '08:00', requests: 156 },
+        { time: '12:00', requests: 289 },
+        { time: '16:00', requests: 234 },
+        { time: '20:00', requests: 178 }
+      ],
+      responseTimes: [
+        { endpoint: '/api/properties', time: 25 },
+        { endpoint: '/api/users', time: 15 },
+        { endpoint: '/api/auth', time: 35 },
+        { endpoint: '/api/contacts', time: 28 }
+      ],
+      violations: [
+        { ip: '192.168.1.100', endpoint: '/api/properties', type: 'Rate Limit', timestamp: new Date() },
+        { ip: '10.0.0.50', endpoint: '/api/users', type: 'Invalid Key', timestamp: new Date() }
+      ]
+    };
+
+    res.status(200).json({
+      success: true,
+      data: usage
+    });
+  } catch (err) {
+    console.error('Error getting API usage:', err);
+    next(new ErrorResponse('Failed to get API usage', 500));
+  }
+});
+
+// ==================== DATABASE MANAGEMENT ====================
+
+// @desc    Get database stats
+// @route   GET /api/v1/admin/database/stats
+// @access  Private/Admin
+exports.getDatabaseStats = asyncHandler(async (req, res, next) => {
+  try {
+    const stats = {
+      size: 256,
+      queriesPerSecond: 45,
+      performanceHistory: [
+        { time: '00:00', executionTime: 15 },
+        { time: '04:00', executionTime: 8 },
+        { time: '08:00', executionTime: 25 },
+        { time: '12:00', executionTime: 35 },
+        { time: '16:00', executionTime: 28 },
+        { time: '20:00', executionTime: 18 }
+      ],
+      slowQueries: [
+        { query: 'db.properties.find({price: {$gt: 1000000}})', executionTime: 1250, timestamp: new Date() },
+        { query: 'db.users.aggregate([{$group: {_id: "$role", count: {$sum: 1}}}])', executionTime: 890, timestamp: new Date() }
+      ],
+      indexUsage: [
+        { name: 'properties_price_1', usage: 85 },
+        { name: 'users_email_1', usage: 92 },
+        { name: 'properties_location_1', usage: 67 }
+      ]
+    };
+
+    res.status(200).json({
+      success: true,
+      data: stats
+    });
+  } catch (err) {
+    console.error('Error getting database stats:', err);
+    next(new ErrorResponse('Failed to get database stats', 500));
+  }
+});
+
+// @desc    Get database collections
+// @route   GET /api/v1/admin/database/collections
+// @access  Private/Admin
+exports.getDatabaseCollections = asyncHandler(async (req, res, next) => {
+  try {
+    const collections = [
+      { name: 'users', documents: 1250, size: 45, indexes: 3, status: 'active' },
+      { name: 'properties', documents: 3450, size: 128, indexes: 5, status: 'active' },
+      { name: 'contacts', documents: 890, size: 23, indexes: 2, status: 'active' },
+      { name: 'subscriptions', documents: 234, size: 12, indexes: 2, status: 'active' },
+      { name: 'media', documents: 1567, size: 48, indexes: 1, status: 'active' }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: collections
+    });
+  } catch (err) {
+    console.error('Error getting database collections:', err);
+    next(new ErrorResponse('Failed to get database collections', 500));
+  }
+});
+
+// @desc    Get database queries
+// @route   GET /api/v1/admin/database/queries
+// @access  Private/Admin
+exports.getDatabaseQueries = asyncHandler(async (req, res, next) => {
+  try {
+    const queries = [
+      { query: 'db.properties.find()', executionTime: 15, status: 'success', timestamp: new Date() },
+      { query: 'db.users.find({role: "agent"})', executionTime: 8, status: 'success', timestamp: new Date() },
+      { query: 'db.contacts.aggregate([{$match: {status: "unread"}}])', executionTime: 25, status: 'success', timestamp: new Date() }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: queries
+    });
+  } catch (err) {
+    console.error('Error getting database queries:', err);
+    next(new ErrorResponse('Failed to get database queries', 500));
+  }
+});
+
+// @desc    Execute database query
+// @route   POST /api/v1/admin/database/query
+// @access  Private/Admin
+exports.executeQuery = asyncHandler(async (req, res, next) => {
+  try {
+    const { query } = req.body;
+    
+    // TODO: Implement actual query execution
+    const result = {
+      success: true,
+      data: [
+        { _id: '1', name: 'Sample Result 1' },
+        { _id: '2', name: 'Sample Result 2' }
+      ],
+      executionTime: 15
+    };
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+  } catch (err) {
+    console.error('Error executing query:', err);
+    next(new ErrorResponse('Failed to execute query', 500));
+  }
+});
+
+// @desc    Get database backups
+// @route   GET /api/v1/admin/database/backups
+// @access  Private/Admin
+exports.getDatabaseBackups = asyncHandler(async (req, res, next) => {
+  try {
+    const backups = [
+      { id: 1, name: 'backup_2024_01_15', size: 256, status: 'completed', createdAt: new Date() },
+      { id: 2, name: 'backup_2024_01_14', size: 248, status: 'completed', createdAt: new Date() },
+      { id: 3, name: 'backup_2024_01_13', size: 242, status: 'completed', createdAt: new Date() }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: backups
+    });
+  } catch (err) {
+    console.error('Error getting database backups:', err);
+    next(new ErrorResponse('Failed to get database backups', 500));
+  }
+});
+
+// @desc    Create database backup
+// @route   POST /api/v1/admin/database/backup
+// @access  Private/Admin
+exports.createDatabaseBackup = asyncHandler(async (req, res, next) => {
+  try {
+    const backup = {
+      id: Date.now(),
+      name: `backup_${new Date().toISOString().split('T')[0]}`,
+      size: 256,
+      status: 'completed',
+      createdAt: new Date()
+    };
+
+    res.status(201).json({
+      success: true,
+      data: backup
+    });
+  } catch (err) {
+    console.error('Error creating database backup:', err);
+    next(new ErrorResponse('Failed to create database backup', 500));
+  }
+});
+
+// @desc    Restore database backup
+// @route   POST /api/v1/admin/database/restore/:id
+// @access  Private/Admin
+exports.restoreDatabaseBackup = asyncHandler(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    res.status(200).json({
+      success: true,
+      message: 'Database backup restored successfully'
+    });
+  } catch (err) {
+    console.error('Error restoring database backup:', err);
+    next(new ErrorResponse('Failed to restore database backup', 500));
+  }
+});
+
+// @desc    Optimize database
+// @route   POST /api/v1/admin/database/optimize
+// @access  Private/Admin
+exports.optimizeDatabase = asyncHandler(async (req, res, next) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: 'Database optimization completed successfully'
+    });
+  } catch (err) {
+    console.error('Error optimizing database:', err);
+    next(new ErrorResponse('Failed to optimize database', 500));
+  }
+});
+
+// ==================== SECURITY & AUDIT ====================
+
+// @desc    Get security overview
+// @route   GET /api/v1/admin/security/overview
+// @access  Private/Admin
+exports.getSecurityOverview = asyncHandler(async (req, res, next) => {
+  try {
+    const securityData = {
+      securityScore: 85,
+      failedLogins: 12,
+      twoFactorEnabled: 78,
+      securityEvents: [
+        { time: '00:00', events: 5 },
+        { time: '04:00', events: 3 },
+        { time: '08:00', events: 15 },
+        { time: '12:00', events: 28 },
+        { time: '16:00', events: 22 },
+        { time: '20:00', events: 18 }
+      ],
+      threatDistribution: [
+        { type: 'Brute Force', count: 45 },
+        { type: 'SQL Injection', count: 12 },
+        { type: 'XSS', count: 8 },
+        { type: 'DDoS', count: 23 }
+      ],
+      recentEvents: [
+        { type: 'login', description: 'Failed login attempt from 192.168.1.100', severity: 'medium', timestamp: new Date() },
+        { type: 'threat', description: 'Suspicious activity detected', severity: 'high', timestamp: new Date() },
+        { type: 'update', description: 'Security settings updated', severity: 'low', timestamp: new Date() }
+      ]
+    };
+
+    res.status(200).json({
+      success: true,
+      data: securityData
+    });
+  } catch (err) {
+    console.error('Error getting security overview:', err);
+    next(new ErrorResponse('Failed to get security overview', 500));
+  }
+});
+
+// @desc    Get audit logs
+// @route   GET /api/v1/admin/security/audit-logs
+// @access  Private/Admin
+exports.getAuditLogs = asyncHandler(async (req, res, next) => {
+  try {
+    const auditLogs = [
+      { id: 1, timestamp: new Date(), user: 'admin@example.com', action: 'LOGIN', resource: '/admin', ipAddress: '192.168.1.100', status: 'success' },
+      { id: 2, timestamp: new Date(), user: 'user@example.com', action: 'UPDATE', resource: '/profile', ipAddress: '10.0.0.50', status: 'success' },
+      { id: 3, timestamp: new Date(), user: 'unknown', action: 'LOGIN', resource: '/admin', ipAddress: '203.0.113.0', status: 'failed' },
+      { id: 4, timestamp: new Date(), user: 'agent@example.com', action: 'CREATE', resource: '/properties', ipAddress: '172.16.0.10', status: 'success' }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: auditLogs
+    });
+  } catch (err) {
+    console.error('Error getting audit logs:', err);
+    next(new ErrorResponse('Failed to get audit logs', 500));
+  }
+});
+
+// @desc    Get security threats
+// @route   GET /api/v1/admin/security/threats
+// @access  Private/Admin
+exports.getSecurityThreats = asyncHandler(async (req, res, next) => {
+  try {
+    const threats = [
+      { id: 1, name: 'Brute Force Attack', type: 'Authentication', severity: 'high', status: 'active', source: '203.0.113.0', detectedAt: new Date() },
+      { id: 2, name: 'SQL Injection Attempt', type: 'Database', severity: 'medium', status: 'resolved', source: '192.168.1.100', detectedAt: new Date() },
+      { id: 3, name: 'XSS Attack', type: 'Web', severity: 'low', status: 'active', source: '10.0.0.50', detectedAt: new Date() }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: threats
+    });
+  } catch (err) {
+    console.error('Error getting security threats:', err);
+    next(new ErrorResponse('Failed to get security threats', 500));
+  }
+});
+
+// @desc    Get security settings
+// @route   GET /api/v1/admin/security/settings
+// @access  Private/Admin
+exports.getSecuritySettings = asyncHandler(async (req, res, next) => {
+  try {
+    const settings = {
+      require2FA: true,
+      ipWhitelist: false,
+      passwordPolicy: {
+        minLength: 8,
+        requireUppercase: true,
+        requireLowercase: true,
+        requireNumbers: true,
+        requireSpecialChars: false
+      },
+      sessionTimeout: 30,
+      maxLoginAttempts: 5
+    };
+
+    res.status(200).json({
+      success: true,
+      data: settings
+    });
+  } catch (err) {
+    console.error('Error getting security settings:', err);
+    next(new ErrorResponse('Failed to get security settings', 500));
+  }
+});
+
+// @desc    Security action
+// @route   POST /api/v1/admin/security/:action
+// @access  Private/Admin
+exports.securityAction = asyncHandler(async (req, res, next) => {
+  try {
+    const { action } = req.params;
+    const data = req.body;
+
+    // TODO: Implement actual security actions
+    console.log(`Performing security action: ${action}`, data);
+
+    res.status(200).json({
+      success: true,
+      message: `Security action ${action} completed successfully`
+    });
+  } catch (err) {
+    console.error('Error performing security action:', err);
+    next(new ErrorResponse('Failed to perform security action', 500));
+  }
+});

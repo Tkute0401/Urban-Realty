@@ -49,6 +49,35 @@ router.put('/settings', protect, authorize('admin'), adminController.updateSetti
 router.post('/backup', protect, authorize('admin'), adminController.createBackup);
 router.post('/restore/:id', protect, authorize('admin'), adminController.restoreBackup);
 
+// System Health & Monitoring
+router.get('/system/health', protect, authorize('admin'), adminController.getSystemHealth);
+router.post('/system/services/:id/:action', protect, authorize('admin'), adminController.serviceAction);
+
+// API Management
+router.get('/api/keys', protect, authorize('admin'), adminController.getAPIKeys);
+router.post('/api/keys', protect, authorize('admin'), adminController.createAPIKey);
+router.put('/api/keys/:id', protect, authorize('admin'), adminController.updateAPIKey);
+router.delete('/api/keys/:id', protect, authorize('admin'), adminController.deleteAPIKey);
+router.get('/api/endpoints', protect, authorize('admin'), adminController.getAPIEndpoints);
+router.get('/api/usage', protect, authorize('admin'), adminController.getAPIUsage);
+
+// Database Management
+router.get('/database/stats', protect, authorize('admin'), adminController.getDatabaseStats);
+router.get('/database/collections', protect, authorize('admin'), adminController.getDatabaseCollections);
+router.get('/database/queries', protect, authorize('admin'), adminController.getDatabaseQueries);
+router.post('/database/query', protect, authorize('admin'), adminController.executeQuery);
+router.get('/database/backups', protect, authorize('admin'), adminController.getDatabaseBackups);
+router.post('/database/backup', protect, authorize('admin'), adminController.createDatabaseBackup);
+router.post('/database/restore/:id', protect, authorize('admin'), adminController.restoreDatabaseBackup);
+router.post('/database/optimize', protect, authorize('admin'), adminController.optimizeDatabase);
+
+// Security & Audit
+router.get('/security/overview', protect, authorize('admin'), adminController.getSecurityOverview);
+router.get('/security/audit-logs', protect, authorize('admin'), adminController.getAuditLogs);
+router.get('/security/threats', protect, authorize('admin'), adminController.getSecurityThreats);
+router.get('/security/settings', protect, authorize('admin'), adminController.getSecuritySettings);
+router.post('/security/:action', protect, authorize('admin'), adminController.securityAction);
+
 // Dynamic Fields Management
 router.get('/fields', protect, authorize('admin'), dynamicFieldController.getFields);
 router.get('/fields/:entityType', protect, authorize('admin'), dynamicFieldController.getFieldsByEntity);

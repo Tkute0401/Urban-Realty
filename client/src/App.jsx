@@ -24,6 +24,10 @@ import AdminProperties from './pages/admin/AdminProperties';
 import AdminContacts from './pages/admin/AdminContacts';
 import AdminMedia from './pages/admin/AdminMedia';
 import AdminReports from './pages/admin/AdminReports';
+import AdminSystemHealth from './pages/admin/AdminSystemHealth';
+import AdminAPIManagement from './pages/admin/AdminAPIManagement';
+import AdminDatabase from './pages/admin/AdminDatabase';
+import AdminSecurity from './pages/admin/AdminSecurity';
 import AdminSettings from './pages/admin/AdminSettings';
 import AgentsPage from './pages/admin/AgentsPage';
 import AdminSubscriptionManagement from './components/admin/SubscriptionManagement';
@@ -93,20 +97,24 @@ function App() {
         <Route path="/billing-dashboard" element={<BillingDashboard />} />
 
                 {/* Admin Routes */}
-                <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
-                  <Route element={<AdminLayout />}>
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="analytics" element={<AdminAnalytics />} />
-                    <Route path="agents" element={<AgentsPage />} />
-                    <Route path="users" element={<AdminUsers />} />
-                    <Route path="properties" element={<AdminProperties />} />
-                    <Route path="contacts" element={<AdminContacts />} />
-                    <Route path="media" element={<AdminMedia />} />
-                    <Route path="reports" element={<AdminReports />} />
-                    <Route path="settings" element={<AdminSettings />} />
-                    <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
-                  </Route>
-                </Route>
+                                      <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']} />}>
+                        <Route element={<AdminLayout />}>
+                          <Route index element={<AdminDashboard />} />
+                          <Route path="analytics" element={<AdminAnalytics />} />
+                          <Route path="agents" element={<AgentsPage />} />
+                          <Route path="users" element={<AdminUsers />} />
+                          <Route path="properties" element={<AdminProperties />} />
+                          <Route path="contacts" element={<AdminContacts />} />
+                          <Route path="media" element={<AdminMedia />} />
+                          <Route path="reports" element={<AdminReports />} />
+                          <Route path="system-health" element={<AdminSystemHealth />} />
+                          <Route path="api-management" element={<AdminAPIManagement />} />
+                          <Route path="database" element={<AdminDatabase />} />
+                          <Route path="security" element={<AdminSecurity />} />
+                          <Route path="settings" element={<AdminSettings />} />
+                          <Route path="subscriptions" element={<AdminSubscriptionManagement />} />
+                        </Route>
+                      </Route>
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/properties/:id/edit" element={<EditProperty />} />
