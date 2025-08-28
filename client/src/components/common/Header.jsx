@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useThemeContext } from '../../context/ThemeContext';
 import './Header.css';
 
 // Icon components
@@ -57,6 +58,7 @@ const PersonIcon = () => (
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const { mode, toggleColorMode } = useThemeContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = window.innerWidth <= 768;
 
@@ -100,6 +102,12 @@ const Header = () => {
             {/* Mobile Menu */}
             {mobileMenuOpen && (
               <div className="mobile-menu" style={{ position: 'absolute', right: '1rem', top: '4rem' }}>
+                <button className="menu-item" onClick={() => { toggleColorMode(); handleMenuClose(); }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="menu-item-icon">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                  </svg>
+                  <span>{mode === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
                 <Link to="/properties" className="menu-item" onClick={handleMenuClose}>
                   <ListIcon className="menu-item-icon" />
                   <span>Browse Properties</span>
@@ -184,6 +192,13 @@ const Header = () => {
                   {user.name.charAt(0).toUpperCase()}
                 </Link>
                 <button 
+                  onClick={toggleColorMode}
+                  className="nav-item nav-item-outlined"
+                  style={{ borderColor: 'var(--color-accent)' }}
+                >
+                  {mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </button>
+                <button 
                   onClick={logout} 
                   className="nav-item"
                   style={{ 
@@ -198,6 +213,13 @@ const Header = () => {
               </>
             ) : (
               <>
+                <button 
+                  onClick={toggleColorMode}
+                  className="nav-item nav-item-outlined"
+                  style={{ borderColor: 'var(--color-accent)' }}
+                >
+                  {mode === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </button>
                 <Link to="/login" className="nav-item">
                   <LoginIcon />
                   <span>Login</span>
