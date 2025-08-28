@@ -30,6 +30,7 @@ const propertyRoutes = require('./routes/propertyRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -37,6 +38,7 @@ app.use('/api/properties', propertyRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Simple test route
 app.get('/api/test', (req, res) => {

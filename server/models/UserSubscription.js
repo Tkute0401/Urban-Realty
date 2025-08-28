@@ -57,6 +57,24 @@ const UserSubscriptionSchema = new mongoose.Schema({
     enum: ['paid', 'pending', 'failed', 'refunded'],
     default: 'pending'
   },
+  // Razorpay payment details
+  razorpayOrderId: {
+    type: String,
+    trim: true
+  },
+  razorpayPaymentId: {
+    type: String,
+    trim: true
+  },
+  razorpaySignature: {
+    type: String,
+    trim: true
+  },
+  paymentGateway: {
+    type: String,
+    default: 'razorpay',
+    enum: ['razorpay', 'manual', 'other']
+  },
   notes: {
     type: String,
     trim: true,
