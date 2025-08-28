@@ -979,28 +979,31 @@ exports.restoreBackup = asyncHandler(async (req, res, next) => {
 exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
   try {
     // Get subscription data from database
+    const UserSubscription = require('../models/UserSubscription');
     const Subscription = require('../models/Subscription');
     const User = require('../models/User');
 
-    // Get all subscriptions
-    const subscriptions = await Subscription.find().populate('user plan');
+    // Get all user subscriptions with populated user and subscription plan details
+    const userSubscriptions = await UserSubscription.find()
+      .populate('user', 'name email')
+      .populate('subscription', 'name price type');
     
-    // Get all users
-    const users = await User.find();
+    // Get all subscription plans
+    const subscriptionPlans = await Subscription.find({ isActive: true });
 
     // Calculate analytics
-    const totalSubscribers = subscriptions.length;
-    const activeSubscribers = subscriptions.filter(sub => sub.status === 'active').length;
+    const totalSubscribers = userSubscriptions.length;
+    const activeSubscribers = userSubscriptions.filter(sub => sub.status === 'active').length;
     
-    // Calculate monthly revenue (assuming monthly billing cycle)
-    const monthlyRevenue = subscriptions
+    // Calculate monthly revenue
+    const monthlyRevenue = userSubscriptions
       .filter(sub => sub.status === 'active' && sub.billingCycle === 'monthly')
-      .reduce((total, sub) => total + (sub.plan?.price || 0), 0);
+      .reduce((total, sub) => total + (sub.amount || 0), 0);
     
     // Calculate yearly revenue
-    const yearlyRevenue = subscriptions
+    const yearlyRevenue = userSubscriptions
       .filter(sub => sub.status === 'active' && sub.billingCycle === 'yearly')
-      .reduce((total, sub) => total + (sub.plan?.price || 0), 0);
+      .reduce((total, sub) => total + (sub.amount || 0), 0);
     
     // Convert yearly to monthly equivalent for comparison
     const yearlyMonthlyEquivalent = yearlyRevenue / 12;
@@ -1010,40 +1013,42 @@ exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
     const revenueGrowth = 5.2; // Placeholder growth percentage
     
     // Get active plans count
-    const activePlans = await Subscription.distinct('plan');
-    const planTypes = activePlans.length;
+    const activePlans = subscriptionPlans.length;
     
     // Calculate churn rate (placeholder - in real app, calculate based on cancelled subscriptions)
     const churnRate = 2.1; // Placeholder churn percentage
     
     // Plan distribution
-    const planDistribution = await Subscription.aggregate([
+    const planDistribution = await UserSubscription.aggregate([
       { $match: { status: 'active' } },
-      { $group: { _id: '$plan', count: { $sum: 1 } } },
-      { $lookup: { from: 'subscriptions', localField: '_id', foreignField: 'plan', as: 'planDetails' } }
+      { $group: { _id: '$subscription', count: { $sum: 1 } } }
     ]);
     
-    const totalActive = planDistribution.reduce((sum, plan) => sum + plan.count, 0);
-    const planDistributionWithPercentage = planDistribution.map(plan => ({
-      name: plan.planDetails[0]?.name || 'Unknown Plan',
-      subscribers: plan.count,
-      percentage: totalActive > 0 ? Math.round((plan.count / totalActive) * 100) : 0
-    }));
+    // Map plan distribution with plan names
+    const planDistributionWithDetails = await Promise.all(
+      planDistribution.map(async (plan) => {
+        const planDetails = await Subscription.findById(plan._id);
+        return {
+          name: planDetails?.name || 'Unknown Plan',
+          subscribers: plan.count,
+          percentage: activeSubscribers > 0 ? Math.round((plan.count / activeSubscribers) * 100) : 0
+        };
+      })
+    );
     
     // Status distribution
-    const statusDistribution = await Subscription.aggregate([
+    const statusDistribution = await UserSubscription.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } }
     ]);
     
-    const totalSubs = statusDistribution.reduce((sum, status) => sum + status.count, 0);
     const statusDistributionWithPercentage = statusDistribution.map(status => ({
       status: status._id,
       count: status.count,
-      percentage: totalSubs > 0 ? Math.round((status.count / totalSubs) * 100) : 0
+      percentage: totalSubscribers > 0 ? Math.round((status.count / totalSubscribers) * 100) : 0
     }));
     
     // Recent subscriptions
-    const recentSubscriptions = subscriptions
+    const recentSubscriptions = userSubscriptions
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 10)
       .map(sub => ({
@@ -1053,10 +1058,10 @@ exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
           email: sub.user?.email || 'No email'
         },
         plan: {
-          name: sub.plan?.name || 'Unknown Plan'
+          name: sub.subscription?.name || 'Unknown Plan'
         },
-        amount: sub.plan?.price || 0,
-        currency: 'USD',
+        amount: sub.amount || 0,
+        currency: sub.currency || 'USD',
         status: sub.status,
         createdAt: sub.createdAt
       }));
@@ -1066,10 +1071,10 @@ exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
       activeSubscribers,
       monthlyRevenue: Math.round(totalMonthlyRevenue * 100) / 100,
       revenueGrowth,
-      activePlans: planTypes,
-      planTypes,
+      activePlans,
+      planTypes: activePlans,
       churnRate,
-      planDistribution: planDistributionWithPercentage,
+      planDistribution: planDistributionWithDetails,
       statusDistribution: statusDistributionWithPercentage,
       recentSubscriptions
     };

@@ -1,0 +1,10 @@
+nohup: ignoring input
+Server running in development mode on port 5000
+Serving static files from: /workspace/client/dist
+Uploads directory: /workspace/server/uploads
+Frontend files: [ 'assets', 'index.html', 'vite.svg' ]
+MongoDB Connected
+🔄 Starting migration of existing users...
+📊 Found 0 users to migrate
+✅ No users need migration
+undefined

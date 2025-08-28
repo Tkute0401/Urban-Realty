@@ -88,7 +88,7 @@ exports.deleteSubscription = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Subscribe user to a plan
+// @desc    Subscribe user to a plan (now redirects to payment flow)
 // @route   POST /api/v1/subscriptions/subscribe
 // @access  Private
 exports.subscribeUser = asyncHandler(async (req, res, next) => {
@@ -121,43 +121,16 @@ exports.subscribeUser = asyncHandler(async (req, res, next) => {
     await existingSubscription.save();
   }
 
-  // Calculate end date based on billing cycle
-  const startDate = new Date();
-  const endDate = new Date();
-  if (billingCycle === 'monthly') {
-    endDate.setMonth(endDate.getMonth() + 1);
-  } else if (billingCycle === 'yearly') {
-    endDate.setFullYear(endDate.getFullYear() + 1);
-  }
-
-  // Calculate amount based on billing cycle
-  let amount = subscription.price;
-  if (billingCycle === 'yearly') {
-    amount = subscription.price * 12 * 0.8; // 20% discount for yearly
-  }
-
-  // Create user subscription
-  const userSubscription = await UserSubscription.create({
-    user: userId,
-    subscription: subscriptionId,
-    billingCycle,
-    startDate,
-    endDate,
-    amount,
-    paymentMethod,
-    status: 'pending'
-  });
-
-  // Update user subscription status
-  await User.findByIdAndUpdate(userId, {
-    currentSubscription: userSubscription._id,
-    subscriptionStatus: subscription.type,
-    subscriptionExpiry: endDate
-  });
-
-  res.status(201).json({
+  // Redirect to payment flow instead of creating subscription directly
+  res.status(200).json({
     success: true,
-    data: userSubscription
+    message: 'Please proceed to payment to complete your subscription',
+    data: {
+      subscriptionId,
+      billingCycle,
+      subscription: subscription,
+      nextStep: 'payment'
+    }
   });
 });
 

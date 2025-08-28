@@ -23,7 +23,7 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join('/app/client/dist'); // Updated path
+const clientDistDir = path.join(__dirname, '..', 'client', 'dist'); // Use relative path
 
 // Create directories
 [uploadsDir, clientDistDir].forEach(dir => {

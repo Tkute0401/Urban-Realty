@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import axios from '../../services/axios';
 import { useAuth } from '../../context/AuthContext';
+import RazorpayPayment from './RazorpayPayment';
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
@@ -40,6 +41,7 @@ const SubscriptionPlans = () => {
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const { user } = useAuth();
 
@@ -79,18 +81,34 @@ const SubscriptionPlans = () => {
         paymentMethod
       });
 
-      setSubscribeSuccess(true);
-      setTimeout(() => {
+      if (response.data.success && response.data.data.nextStep === 'payment') {
         setSubscribeDialog(false);
-        setSubscribeSuccess(false);
-        // Refresh user data or redirect
-        window.location.reload();
-      }, 2000);
+        setShowPayment(true);
+      } else {
+        setSubscribeSuccess(true);
+        setTimeout(() => {
+          setSubscribeDialog(false);
+          setSubscribeSuccess(false);
+          // Refresh user data or redirect
+          window.location.reload();
+        }, 2000);
+      }
     } catch (err) {
       setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
     } finally {
       setSubscribing(false);
     }
+  };
+
+  const handlePaymentSuccess = (data) => {
+    console.log('Payment successful:', data);
+    // Refresh user data or redirect
+    window.location.reload();
+  };
+
+  const handlePaymentError = (error) => {
+    console.error('Payment error:', error);
+    setSubscribeError(error);
   };
 
   const getFeatureIcon = (feature) => {
@@ -358,9 +376,19 @@ const SubscriptionPlans = () => {
             </Button>
           )}
         </DialogActions>
-      </Dialog>
-    </Container>
-  );
-};
+              </Dialog>
+      </Container>
 
-export default SubscriptionPlans;
+      {/* Razorpay Payment Component */}
+      <RazorpayPayment
+        open={showPayment}
+        onClose={() => setShowPayment(false)}
+        subscription={selectedPlan}
+        billingCycle={billingCycle}
+        onSuccess={handlePaymentSuccess}
+        onError={handlePaymentError}
+      />
+    );
+  };
+  
+  export default SubscriptionPlans;
