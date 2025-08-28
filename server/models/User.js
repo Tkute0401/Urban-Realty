@@ -27,8 +27,14 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['buyer', 'agent', 'admin', 'painter', 'interior_designer', 'lawyer'],
+    enum: ['buyer', 'individual_seller', 'agent', 'developer', 'admin'],
     default: 'buyer'
+  },
+  // RERA ID for agent/developer users (India-specific)
+  reraId: {
+    type: String,
+    trim: true,
+    default: ''
   },
   password: {
     type: String,
@@ -88,7 +94,7 @@ const UserSchema = new mongoose.Schema({
   subscriptionExpiry: {
     type: Date
   },
-  // Professional fields for new roles
+  // Professional fields for professional roles
   professionalInfo: {
     licenseNumber: {
       type: String,
