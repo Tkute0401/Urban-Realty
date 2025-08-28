@@ -227,8 +227,7 @@ const BillingDashboard = () => {
         >
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <WarningIcon sx={{ mr: 1 }} />
-            Your next billing date is in {getUpcomingBillingDays()} days. 
-            Please ensure your payment method is up to date.
+            Your next billing date is in {getUpcomingBillingDays()} days. You will complete payment on Razorpay at checkout.
           </Box>
         </Alert>
       )}

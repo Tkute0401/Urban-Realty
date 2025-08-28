@@ -54,13 +54,8 @@ const SubscriptionManagement = () => {
   const [billingHistory, setBillingHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editDialog, setEditDialog] = useState(false);
   const [cancelDialog, setCancelDialog] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
   const [upcomingBilling, setUpcomingBilling] = useState(null);
 
   const { user } = useAuth();
@@ -89,29 +84,7 @@ const SubscriptionManagement = () => {
     }
   };
 
-  const handleUpdatePaymentMethod = async () => {
-    try {
-      setUpdating(true);
-      await axios.put('/subscriptions/payment-method', {
-        paymentMethod,
-        cardNumber,
-        expiryDate,
-        cvv
-      });
-      
-      setEditDialog(false);
-      fetchSubscriptionData();
-      // Reset form
-      setPaymentMethod('');
-      setCardNumber('');
-      setExpiryDate('');
-      setCvv('');
-    } catch (err) {
-      setError('Failed to update payment method');
-    } finally {
-      setUpdating(false);
-    }
-  };
+  // Payment method is handled on Razorpay. No manual update UI.
 
   const handleCancelSubscription = async () => {
     try {
@@ -248,15 +221,9 @@ const SubscriptionManagement = () => {
                 </Grid>
                 
                 <Grid item xs={12} md={4} sx={{ textAlign: 'right' }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<SettingsIcon />}
-                    onClick={() => setEditDialog(true)}
-                    sx={{ mb: 2, width: '100%' }}
-                  >
-                    Update Payment Method
-                  </Button>
-                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Payments are processed via Razorpay. You can choose method at checkout.
+                  </Typography>
                   {subscription.status === 'active' && (
                     <Button
                       variant="outlined"
@@ -400,67 +367,7 @@ const SubscriptionManagement = () => {
         </Card>
       )}
 
-      {/* Update Payment Method Dialog */}
-      <Dialog open={editDialog} onClose={() => setEditDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Update Payment Method</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField
-                select
-                fullWidth
-                label="Payment Method"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              >
-                <MenuItem value="credit_card">Credit Card</MenuItem>
-                <MenuItem value="debit_card">Debit Card</MenuItem>
-                <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
-              </TextField>
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Card Number"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-                placeholder="1234 5678 9012 3456"
-              />
-            </Grid>
-            
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Expiry Date"
-                value={expiryDate}
-                onChange={(e) => setExpiryDate(e.target.value)}
-                placeholder="MM/YY"
-              />
-            </Grid>
-            
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="CVV"
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value)}
-                placeholder="123"
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialog(false)}>Cancel</Button>
-          <Button 
-            onClick={handleUpdatePaymentMethod}
-            variant="contained"
-            disabled={updating || !paymentMethod || !cardNumber || !expiryDate || !cvv}
-          >
-            {updating ? 'Updating...' : 'Update'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Manual payment method update removed; handled on Razorpay checkout. */}
 
       {/* Cancel Subscription Dialog */}
       <Dialog open={cancelDialog} onClose={() => setCancelDialog(false)} maxWidth="sm" fullWidth>
