@@ -36,7 +36,6 @@ const SubscriptionPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [paymentMethod, setPaymentMethod] = useState('credit_card');
   const [subscribing, setSubscribing] = useState(false);
   const [subscribeError, setSubscribeError] = useState(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
@@ -392,19 +391,10 @@ const SubscriptionPlans = () => {
                     <MenuItem value="yearly">Yearly (20% discount)</MenuItem>
                   </TextField>
                 </Grid>
-                
                 <Grid item xs={12}>
-                  <TextField
-                    select
-                    fullWidth
-                    label="Payment Method"
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
-                    <MenuItem value="credit_card">Credit Card</MenuItem>
-                    <MenuItem value="debit_card">Debit Card</MenuItem>
-                    <MenuItem value="bank_transfer">Bank Transfer</MenuItem>
-                  </TextField>
+                  <Alert severity="info">
+                    You will be redirected to Razorpay to complete your payment and choose your preferred payment method there.
+                  </Alert>
                 </Grid>
               </Grid>
 
