@@ -26,7 +26,8 @@ const PropertySchema = new mongoose.Schema({
       'Condo',
       'Townhouse',
       'Land',
-      'Commercial'
+      'Commercial',
+      'PG'
     ],
     default: 'House'
   },

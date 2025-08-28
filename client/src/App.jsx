@@ -77,6 +77,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/properties" element={<PropertyList />} />
+                <Route path="/pg" element={<PropertyList />} />
                 <Route path="/properties/:id" element={<PropertyDetails />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />

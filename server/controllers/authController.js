@@ -3,7 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role, mobile, occupation, professionalInfo } = req.body;
+  const { name, email, password, role, mobile, occupation, professionalInfo, reraId } = req.body;
 
   // Validate required fields
   if (!name || !email || !password) {
@@ -30,8 +30,13 @@ exports.register = asyncHandler(async (req, res, next) => {
   };
 
   // Add professional info for professional roles
-  if (['painter', 'interior_designer', 'lawyer', 'agent'].includes(role) && professionalInfo) {
+  if (['agent', 'developer'].includes(role) && professionalInfo) {
     userData.professionalInfo = professionalInfo;
+  }
+
+  // Add RERA ID for agent/developer
+  if (['agent', 'developer'].includes(role) && reraId) {
+    userData.reraId = reraId;
   }
 
   // Create user
@@ -51,6 +56,7 @@ exports.register = asyncHandler(async (req, res, next) => {
       role: user.role,
       occupation: user.occupation,
       professionalInfo: user.professionalInfo,
+      reraId: user.reraId,
       subscriptionStatus: user.subscriptionStatus
     }
   });
@@ -96,6 +102,7 @@ exports.login = asyncHandler(async (req, res, next) => {
       role: user.role,
       occupation: user.occupation,
       professionalInfo: user.professionalInfo,
+      reraId: user.reraId,
       subscriptionStatus: user.subscriptionStatus
     }
   });
@@ -111,7 +118,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  const { name, email, mobile, role } = req.body;
+  const { name, email, mobile, role, reraId, professionalInfo } = req.body;
   const userId = req.user.id;
 
   const updateFields = {};
@@ -119,6 +126,8 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (email) updateFields.email = email;
   if (mobile) updateFields.mobile = mobile;
   if (role) updateFields.role = role;
+  if (reraId !== undefined) updateFields.reraId = reraId;
+  if (professionalInfo) updateFields.professionalInfo = professionalInfo;
 
   if (email) {
     const existingUser = await User.findOne({ 

@@ -46,7 +46,7 @@ const PropertyList = () => {
     return {
       search: params.search || '',
       propertyType: params.propertyType || 'ALL',
-      type: params.type || '',
+      type: params.type || (window.location.pathname === '/pg' ? 'PG' : ''),
       city: params.city || '',
       state: params.state || '',
       priceMin: params.priceMin || '',
