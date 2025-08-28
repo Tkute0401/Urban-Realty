@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/property_service.dart';
 import '../services/favorites_service.dart';
+import '../config/api_config.dart';
 
 class PropertiesScreen extends StatefulWidget {
   const PropertiesScreen({super.key});
@@ -14,6 +15,25 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   bool _loading = true;
   String? _error;
   List<dynamic> _properties = const [];
+
+  String? _pickPrimaryImage(Map<String, dynamic> p) {
+    final dynamic images = p['images'] ?? p['photos'] ?? p['gallery'];
+    String? url;
+    if (p['coverImage'] is String && (p['coverImage'] as String).isNotEmpty) {
+      url = p['coverImage'] as String;
+    } else if (images is List && images.isNotEmpty) {
+      final first = images.first;
+      if (first is String) url = first;
+      if (first is Map && first['url'] is String) url = first['url'] as String;
+    } else if (p['image'] is String) {
+      url = p['image'] as String;
+    }
+    if (url == null || url.isEmpty) return null;
+    if (url.startsWith('http')) return url;
+    final base = ApiConfig.baseUrl.replaceFirst(RegExp(r"/api/.*$"), '');
+    if (!url.startsWith('/')) url = '/$url';
+    return '$base$url';
+  }
 
   @override
   void initState() {
@@ -66,9 +86,24 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                       final String title = p['title']?.toString() ?? 'Untitled';
                       final String address = p['address']?.toString() ?? '';
                       final String price = (p['price']?.toString() ?? '').isEmpty ? '' : '₹${p['price']}';
+                      final String? imageUrl = _pickPrimaryImage(p);
                       return ListTile(
-                        title: Text(title),
-                        subtitle: Text(address),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: SizedBox(
+                            width: 64,
+                            height: 64,
+                            child: imageUrl == null
+                                ? Container(color: Colors.grey.shade300, child: const Icon(Icons.home_outlined))
+                                : Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300, child: const Icon(Icons.broken_image)),
+                                  ),
+                          ),
+                        ),
+                        title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        subtitle: Text(address, maxLines: 1, overflow: TextOverflow.ellipsis),
                         trailing: Text(price),
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -100,6 +135,31 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   bool _isFavorite = false;
   final TextEditingController _messageController = TextEditingController();
   String _contactMethod = 'message';
+  int _imageIndex = 0;
+
+  List<String> _extractImages(Map<String, dynamic> p) {
+    final List<String> result = [];
+    final dynamic images = p['images'] ?? p['photos'] ?? p['gallery'];
+    void addUrl(String? u) {
+      if (u == null || u.isEmpty) return;
+      if (u.startsWith('http')) {
+        result.add(u);
+      } else {
+        final base = ApiConfig.baseUrl.replaceFirst(RegExp(r"/api/.*$"), '');
+        final path = u.startsWith('/') ? u : '/$u';
+        result.add('$base$path');
+      }
+    }
+    if (p['coverImage'] is String) addUrl(p['coverImage'] as String);
+    if (images is List) {
+      for (final item in images) {
+        if (item is String) addUrl(item);
+        if (item is Map && item['url'] is String) addUrl(item['url'] as String);
+      }
+    }
+    if (result.isEmpty && p['image'] is String) addUrl(p['image'] as String);
+    return result;
+  }
 
   @override
   void initState() {
@@ -168,6 +228,52 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       padding: const EdgeInsets.all(16.0),
                       child: ListView(
                         children: [
+                          // Images carousel
+                          Builder(builder: (context) {
+                            final images = _extractImages(_property!);
+                            if (images.isEmpty) {
+                              return AspectRatio(
+                                aspectRatio: 16/9,
+                                child: Container(
+                                  decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(8)),
+                                  child: const Icon(Icons.image_not_supported),
+                                ),
+                              );
+                            }
+                            return Column(
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 16/9,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: PageView.builder(
+                                      itemCount: images.length,
+                                      onPageChanged: (i) => setState(() => _imageIndex = i),
+                                      itemBuilder: (_, i) => Image.network(
+                                        images[i],
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300, child: const Icon(Icons.broken_image)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(images.length, (i) => Container(
+                                    width: 8,
+                                    height: 8,
+                                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: i == _imageIndex ? Colors.indigo : Colors.grey.shade400,
+                                    ),
+                                  )),
+                                )
+                              ],
+                            );
+                          }),
+                          const SizedBox(height: 16),
                           Text(_property!['title']?.toString() ?? '', style: Theme.of(context).textTheme.headlineSmall),
                           const SizedBox(height: 8),
                           Text(_property!['address']?.toString() ?? ''),
