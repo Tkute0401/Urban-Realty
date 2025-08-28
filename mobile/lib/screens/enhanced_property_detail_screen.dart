@@ -29,7 +29,6 @@ class EnhancedPropertyDetailScreen extends StatefulWidget {
 
 class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScreen>
     with TickerProviderStateMixin {
-  late TabController _tabController;
   late PageController _imagePageController;
   late AnimationController _fadeController;
   late AnimationController _slideController;
@@ -49,7 +48,6 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
     _imagePageController = PageController();
     _fadeController = AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
     _slideController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
@@ -154,7 +152,6 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
 
   @override
   void dispose() {
-    _tabController.dispose();
     _imagePageController.dispose();
     _fadeController.dispose();
     _slideController.dispose();
@@ -184,9 +181,25 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
                   ),
                   children: [
                     _buildPropertyInfo(),
+                    const SizedBox(height: 8),
                     _buildQuickActions(),
-                    _buildTabBar(),
-                    _buildTabBarView(),
+                    const SizedBox(height: 16),
+                    _buildPhotosSection(),
+                    _buildSectionDivider(),
+                    _buildOverviewSection(),
+                    _buildSectionDivider(),
+                    _buildPropertyDetailsSection(),
+                    _buildSectionDivider(),
+                    _buildAmenitiesSection(),
+                    _buildSectionDivider(),
+                    _buildLocationSection(),
+                    _buildSectionDivider(),
+                    _buildMarketSection(),
+                    _buildSectionDivider(),
+                    _buildNeighborhoodSection(),
+                    _buildSectionDivider(),
+                    _buildContactSection(),
+                    const SizedBox(height: 100), // Bottom padding for bottom bar
                   ],
                 ),
               ),
@@ -195,6 +208,13 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
         ],
       ),
       bottomNavigationBar: _buildBottomBar(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _handleContactOpen,
+        icon: const Icon(Icons.contact_phone),
+        label: const Text('Contact'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
     );
   }
 
@@ -375,8 +395,23 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
   }
 
   Widget _buildPropertyInfo() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -388,6 +423,7 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
                   _property['title'],
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -402,12 +438,13 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.w600,
+                    fontSize: 12,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             children: [
               Icon(Icons.location_on, size: 16, color: Theme.of(context).colorScheme.primary),
@@ -422,33 +459,65 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(
-                NumberFormat.currency(symbol: '\$').format(_property['price']),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
               ),
-              const Spacer(),
-              _buildPropertyFeature(Icons.bed, '${_property['bedrooms']} Beds'),
-              const SizedBox(width: 16),
-              _buildPropertyFeature(Icons.bathtub_outlined, '${_property['bathrooms']} Baths'),
-              const SizedBox(width: 16),
-              _buildPropertyFeature(Icons.square_foot, '${_property['area']} sq ft'),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildPropertyFeature(Icons.apartment, 'Floor ${_property['floor']}'),
-              const SizedBox(width: 16),
-              _buildPropertyFeature(Icons.eco, _property['energyRating']),
-              const SizedBox(width: 16),
-              _buildPropertyFeature(Icons.parking, '${_property['parkingSpaces']} spaces'),
-            ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      NumberFormat.currency(symbol: '\$').format(_property['price']),
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'For Sale',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildPropertyFeature(Icons.bed, '${_property['bedrooms']} Beds'),
+                    _buildPropertyFeature(Icons.bathtub_outlined, '${_property['bathrooms']} Baths'),
+                    _buildPropertyFeature(Icons.square_foot, '${_property['area']} sq ft'),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildPropertyFeature(Icons.apartment, 'Floor ${_property['floor']}'),
+                    _buildPropertyFeature(Icons.eco, _property['energyRating']),
+                    _buildPropertyFeature(Icons.parking, '${_property['parkingSpaces']} spaces'),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -456,8 +525,16 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
   }
 
   Widget _buildQuickActions() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        ),
+      ),
       child: Row(
         children: [
           Expanded(
@@ -504,7 +581,7 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
@@ -512,8 +589,8 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
         ),
         child: Column(
           children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
@@ -521,6 +598,7 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -529,175 +607,179 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
   }
 
   Widget _buildPropertyFeature(IconData icon, String text) {
-    return Row(
+    return Column(
       children: [
-        Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
-        const SizedBox(width: 4),
+        Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(height: 4),
         Text(
           text,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
+            fontSize: 12,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildTabBar() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        labelColor: Theme.of(context).colorScheme.onPrimary,
-        unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
-        isScrollable: true,
-        tabs: const [
-          Tab(text: 'Overview'),
-          Tab(text: 'Photos'),
-          Tab(text: 'Location'),
-          Tab(text: 'Market'),
-          Tab(text: 'Neighborhood'),
-          Tab(text: 'Contact'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabBarView() {
-    return SizedBox(
-      height: 500,
-      child: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildOverviewTab(),
-          _buildPhotosTab(),
-          _buildLocationTab(),
-          _buildMarketTab(),
-          _buildNeighborhoodTab(),
-          _buildContactTab(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOverviewTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Description',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _property['description'],
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Property Details',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildDetailRow('Property Type', _property['propertyType']),
-          _buildDetailRow('Year Built', _property['yearBuilt'].toString()),
-          _buildDetailRow('Floor', '${_property['floor']} of ${_property['totalFloors']}'),
-          _buildDetailRow('Parking Spaces', '${_property['parkingSpaces']} spaces'),
-          _buildDetailRow('Furnished', _property['furnished'] ? 'Yes' : 'No'),
-          _buildDetailRow('Energy Rating', _property['energyRating']),
-          const SizedBox(height: 24),
-          Text(
-            'Amenities',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _property['amenities'].map<Widget>((amenity) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  amenity,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontSize: 12,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPhotosTab() {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: _property['images'].length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () => _openFullScreenGallery(initialIndex: index),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: CachedNetworkImage(
-              imageUrl: _property['images'][index],
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(color: Colors.white),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildLocationTab() {
+  Widget _buildPhotosSection() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Location',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          _buildSectionHeader('Photos'),
+          const SizedBox(height: 16),
+          Container(
+            height: 150,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _property['images'].length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: GestureDetector(
+                    onTap: () => _openFullScreenGallery(initialIndex: index),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: CachedNetworkImage(
+                        imageUrl: _property['images'][index],
+                        fit: BoxFit.cover,
+                        width: 120,
+                        height: 150,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(color: Colors.white),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverviewSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Overview'),
+          const SizedBox(height: 16),
+          Text(
+            _property['description'],
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              height: 1.6,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPropertyDetailsSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Property Details'),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
+            ),
+            child: Column(
+              children: [
+                _buildDetailRow('Property Type', _property['propertyType']),
+                _buildDetailRow('Year Built', _property['yearBuilt'].toString()),
+                _buildDetailRow('Floor', '${_property['floor']} of ${_property['totalFloors']}'),
+                _buildDetailRow('Parking Spaces', '${_property['parkingSpaces']} spaces'),
+                _buildDetailRow('Furnished', _property['furnished'] ? 'Yes' : 'No'),
+                _buildDetailRow('Energy Rating', _property['energyRating']),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAmenitiesSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Amenities'),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _property['amenities'].map<Widget>((amenity) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    amenity,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Location'),
+          const SizedBox(height: 16),
           Text(
             _property['location'],
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 16),
           Container(
@@ -743,207 +825,248 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
     );
   }
 
-  Widget _buildMarketTab() {
+  Widget _buildMarketSection() {
     final marketData = _property['marketData'];
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Market Analysis',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          _buildSectionHeader('Market Analysis'),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
+            ),
+            child: Column(
+              children: [
+                _buildMarketCard('Price per Sq Ft', '\$${marketData['pricePerSqFt']}'),
+                _buildMarketCard('Days on Market', '${marketData['avgDaysOnMarket']} days'),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          _buildMarketCard('Price per Sq Ft', '\$${marketData['pricePerSqFt']}'),
-          _buildMarketCard('Days on Market', '${marketData['avgDaysOnMarket']} days'),
           const SizedBox(height: 24),
-          Text(
-            'Price History',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          _buildSectionHeader('Price History'),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 200,
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: marketData['priceHistory'].asMap().entries.map((entry) {
-                      return FlSpot(entry.key.toDouble(), entry.value['price'] / 1000000);
-                    }).toList(),
-                    isCurved: true,
-                    color: Theme.of(context).colorScheme.primary,
-                    barWidth: 3,
-                    dotData: FlDotData(show: true),
-                  ),
-                ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
+            ),
+            child: SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: false),
+                  titlesData: FlTitlesData(show: false),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: marketData['priceHistory'].asMap().entries.map((entry) {
+                        return FlSpot(entry.key.toDouble(), entry.value['price'] / 1000000);
+                      }).toList(),
+                      isCurved: true,
+                      color: Theme.of(context).colorScheme.primary,
+                      barWidth: 3,
+                      dotData: FlDotData(show: true),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
           const SizedBox(height: 24),
-          Text(
-            'Comparable Properties',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          _buildSectionHeader('Comparable Properties'),
           const SizedBox(height: 16),
-          ...marketData['comparableProperties'].map<Widget>((comp) => 
-            _buildComparableProperty(comp)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
+            ),
+            child: Column(
+              children: marketData['comparableProperties'].map<Widget>((comp) => 
+                _buildComparableProperty(comp)
+              ).toList(),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNeighborhoodTab() {
+  Widget _buildNeighborhoodSection() {
     final neighborhood = _property['neighborhood'];
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Neighborhood Insights',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          _buildSectionHeader('Neighborhood Insights'),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: _buildScoreCard('Walk Score', '${neighborhood['walkScore']}', Icons.directions_walk)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildScoreCard('Transit Score', '${neighborhood['transitScore']}', Icons.directions_bus)),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildScoreCard('Bike Score', '${neighborhood['bikeScore']}', Icons.directions_bike)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                _buildNeighborhoodCard('Crime Rate', neighborhood['crimeRate'], Icons.security),
+                _buildNeighborhoodCard('Restaurants', '${neighborhood['restaurants']} nearby', Icons.restaurant),
+                _buildNeighborhoodCard('Shopping', '${neighborhood['shopping']} options', Icons.shopping_bag),
+                _buildNeighborhoodCard('Entertainment', '${neighborhood['entertainment']} venues', Icons.movie),
+              ],
             ),
           ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('Nearby Schools'),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: _buildScoreCard('Walk Score', '${neighborhood['walkScore']}', Icons.directions_walk)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildScoreCard('Transit Score', '${neighborhood['transitScore']}', Icons.directions_bus)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildScoreCard('Bike Score', '${neighborhood['bikeScore']}', Icons.directions_bike)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildNeighborhoodCard('Crime Rate', neighborhood['crimeRate'], Icons.security),
-          _buildNeighborhoodCard('Restaurants', '${neighborhood['restaurants']} nearby', Icons.restaurant),
-          _buildNeighborhoodCard('Shopping', '${neighborhood['shopping']} options', Icons.shopping_bag),
-          _buildNeighborhoodCard('Entertainment', '${neighborhood['entertainment']} venues', Icons.movie),
-          const SizedBox(height: 24),
-          Text(
-            'Nearby Schools',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ...neighborhood['schools'].map<Widget>((school) => 
-            _buildSchoolCard(school)
+            child: Column(
+              children: neighborhood['schools'].map<Widget>((school) => 
+                _buildSchoolCard(school)
+              ).toList(),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContactTab() {
+  Widget _buildContactSection() {
     final agent = _property['agent'];
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Contact Agent',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          _buildSectionHeader('Contact Agent'),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: CachedNetworkImageProvider(agent['avatar']),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          agent['name'],
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Real Estate Agent • ${agent['experience']} experience',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            Text(' ${agent['rating']} (${agent['reviews']} reviews)'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: agent['specializations'].map<Widget>((spec) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(12),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: CachedNetworkImageProvider(agent['avatar']),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            agent['name'],
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Real Estate Agent • ${agent['experience']} experience',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.star, color: Colors.amber, size: 16),
+                              Text(' ${agent['rating']} (${agent['reviews']} reviews)'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                child: Text(
-                  spec,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    fontSize: 12,
-                  ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: agent['specializations'].map<Widget>((spec) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        spec,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          fontSize: 12,
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 24),
-          _buildContactButton(
-            Icons.phone,
-            'Call Agent',
-            agent['phone'],
-            _callAgent,
-          ),
-          const SizedBox(height: 8),
-          _buildContactButton(
-            Icons.email,
-            'Email Agent',
-            agent['email'],
-            _emailAgent,
-          ),
-          const SizedBox(height: 8),
-          _buildContactButton(
-            Icons.message,
-            'Send Message',
-            'Open chat',
-            _sendMessage,
+                const SizedBox(height: 24),
+                _buildContactButton(
+                  Icons.phone,
+                  'Call Agent',
+                  agent['phone'],
+                  _callAgent,
+                ),
+                const SizedBox(height: 8),
+                _buildContactButton(
+                  Icons.email,
+                  'Email Agent',
+                  agent['email'],
+                  _emailAgent,
+                ),
+                const SizedBox(height: 8),
+                _buildContactButton(
+                  Icons.message,
+                  'Send Message',
+                  'Open chat',
+                  _sendMessage,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -952,7 +1075,7 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -960,11 +1083,15 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
             label,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -972,110 +1099,255 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
   }
 
   Widget _buildMarketCard(String title, String value) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title, 
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildComparableProperty(Map<String, dynamic> comp) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
-        title: Text(comp['address']),
-        subtitle: Text('${comp['sqft']} sq ft'),
-        trailing: Text(
-          NumberFormat.currency(symbol: '\$').format(comp['price']),
-          style: const TextStyle(fontWeight: FontWeight.bold),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
         ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.home, 
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  comp['address'],
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  '${comp['sqft']} sq ft',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            NumberFormat.currency(symbol: '\$').format(comp['price']),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildScoreCard(String title, String score, IconData icon) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              score,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
         ),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            score,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildNeighborhoodCard(String title, String value, IconData icon) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(title),
-        subtitle: Text(value),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSchoolCard(Map<String, dynamic> school) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(Icons.school, color: Theme.of(context).colorScheme.primary),
-        title: Text(school['name']),
-        subtitle: Text('${school['distance']} away'),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.school, color: Theme.of(context).colorScheme.primary, size: 20),
           ),
-          child: Text(
-            '${school['rating']}/10',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  school['name'],
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  '${school['distance']} away',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '${school['rating']}/10',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildContactButton(IconData icon, String title, String subtitle, VoidCallback onTap) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
       child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+        ),
         title: Text(title),
         subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: Icon(
+          Icons.arrow_forward_ios, 
+          size: 16,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
         onTap: onTap,
       ),
     );
@@ -1280,6 +1552,91 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     }
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: 60,
+          height: 3,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildSectionDivider() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      height: 1,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(1),
+      ),
+    );
+  }
+
+  void _handleContactOpen() {
+    // Show contact options
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Contact Agent',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.phone, color: Theme.of(context).colorScheme.primary),
+              title: const Text('Call Agent'),
+              subtitle: Text(_property['agent']['phone']),
+              onTap: () {
+                Navigator.pop(context);
+                _callAgent();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.email, color: Theme.of(context).colorScheme.primary),
+              title: const Text('Email Agent'),
+              subtitle: Text(_property['agent']['email']),
+              onTap: () {
+                Navigator.pop(context);
+                _emailAgent();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.message, color: Theme.of(context).colorScheme.primary),
+              title: const Text('Send Message'),
+              subtitle: const Text('Open chat'),
+              onTap: () {
+                Navigator.pop(context);
+                _sendMessage();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
