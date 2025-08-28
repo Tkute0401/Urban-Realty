@@ -9,9 +9,9 @@
 
 .filter-btn {
   background-color: transparent;
-  border: 1px solid #444;
+  border: 1px solid var(--color-header-border);
   border-radius: 4px;
-  color: white;
+  color: var(--color-text);
   padding: 8px 12px;
   font-size: 14px;
   cursor: pointer;
@@ -23,25 +23,25 @@
 }
 
 .filter-btn:hover {
-  border-color: #78CADC;
+  border-color: var(--color-accent);
 }
 
 .filter-btn.active-dropdown {
-  border-color: #78CADC;
-  background-color: rgba(120, 202, 220, 0.1);
+  border-color: var(--color-accent);
+  background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .dropdown-content {
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
-  background-color: #0B1011;
-  border: 1px solid #333;
+  background-color: var(--color-header-bg);
+  border: 1px solid var(--color-header-border);
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   z-index: 1100;
   padding: 20px;
-  color: white;
+  color: var(--color-text);
   width: 400px;
   max-height: 80vh;
   overflow-y: auto;
@@ -50,7 +50,7 @@
 .dropdown-subtitle {
   font-size: 16px;
   font-weight: 500;
-  color: white;
+  color: var(--color-text);
   margin: 0 0 16px 0;
 }
 
@@ -62,8 +62,8 @@
 
 /* Apply button styles */
 .apply-filter-btn {
-  background-color: #78CADC;
-  color: #08171A;
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
   border: none;
   border-radius: 6px;
   font-weight: 600;
@@ -77,7 +77,7 @@
 }
 
 .apply-filter-btn:hover {
-  background-color: #5fb3c8;
+  background-color: color-mix(in srgb, var(--color-accent) 85%, transparent);
 }
 
 /* Animation */
