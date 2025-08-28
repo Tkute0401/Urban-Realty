@@ -40,7 +40,7 @@
 }
 
 .logo-icon {
-  color: #78CADC;
+  color: var(--color-accent);
   font-size: 1.8rem;
 }
 
@@ -84,7 +84,7 @@
 }
 
 .nav-item-active:hover {
-  background-color: #5cb3c5;
+  background-color: color-mix(in srgb, var(--color-accent) 85%, transparent);
 }
 
 .nav-item-outlined {

@@ -205,7 +205,7 @@ const Header = () => {
                     border: 'none', 
                     cursor: 'pointer', 
                     backgroundColor: 'transparent',
-                    color: '#ff6b6b'
+                    color: 'var(--color-danger)'
                   }}
                 >
                   Logout
