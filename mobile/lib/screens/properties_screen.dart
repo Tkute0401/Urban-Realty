@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/property_service.dart';
+import '../services/favorites_service.dart';
 
 class PropertiesScreen extends StatefulWidget {
   const PropertiesScreen({super.key});
@@ -92,9 +93,13 @@ class PropertyDetailScreen extends StatefulWidget {
 
 class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   final PropertyService _service = PropertyService();
+  final FavoritesService _favorites = FavoritesService();
   bool _loading = true;
   String? _error;
   Map<String, dynamic>? _property;
+  bool _isFavorite = false;
+  final TextEditingController _messageController = TextEditingController();
+  String _contactMethod = 'message';
 
   @override
   void initState() {
@@ -112,6 +117,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       setState(() {
         _property = (res['data'] ?? res) as Map<String, dynamic>;
       });
+      try {
+        final status = await _favorites.status(widget.id);
+        if (mounted) setState(() => _isFavorite = status);
+      } catch (_) {}
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -123,10 +132,32 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     }
   }
 
+  Future<void> _toggleFavorite() async {
+    try {
+      setState(() => _isFavorite = !_isFavorite);
+      await _favorites.toggle(widget.id);
+    } catch (e) {
+      setState(() => _isFavorite = !_isFavorite);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update favorite: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Property Detail')),
+      appBar: AppBar(
+        title: const Text('Property Detail'),
+        actions: [
+          IconButton(
+            icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border),
+            onPressed: _toggleFavorite,
+          )
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -142,6 +173,54 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           Text(_property!['address']?.toString() ?? ''),
                           const SizedBox(height: 12),
                           Text((_property!['description']?.toString() ?? '')), 
+                          const SizedBox(height: 24),
+                          TextField(
+                            controller: _messageController,
+                            decoration: const InputDecoration(
+                              labelText: 'Message to agent',
+                              border: OutlineInputBorder(),
+                            ),
+                            maxLines: 3,
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            value: _contactMethod,
+                            items: const [
+                              DropdownMenuItem(value: 'message', child: Text('Message')),
+                              DropdownMenuItem(value: 'email', child: Text('Email')),
+                              DropdownMenuItem(value: 'whatsapp', child: Text('WhatsApp')),
+                              DropdownMenuItem(value: 'call', child: Text('Call')),
+                            ],
+                            onChanged: (v) => setState(() => _contactMethod = v ?? 'message'),
+                            decoration: const InputDecoration(labelText: 'Preferred contact method'),
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              try {
+                                await _service.contact(
+                                  id: widget.id,
+                                  message: _messageController.text.trim().isEmpty
+                                      ? 'Interested in this property'
+                                      : _messageController.text.trim(),
+                                  contactMethod: _contactMethod,
+                                );
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Contact request sent')),
+                                  );
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to contact: $e')),
+                                  );
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.send),
+                            label: const Text('Contact Agent'),
+                          ),
                         ],
                       ),
                     ),
