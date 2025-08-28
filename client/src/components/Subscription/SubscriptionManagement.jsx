@@ -155,6 +155,11 @@ const SubscriptionManagement = () => {
     }
   };
 
+  const getPaymentStatusChip = (paymentStatus) => {
+    const color = paymentStatus === 'paid' ? 'success' : paymentStatus === 'failed' ? 'error' : 'warning';
+    return <Chip label={`Payment: ${paymentStatus}`} color={color} size="small" sx={{ ml: 1 }} />
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'active': return <CheckCircleIcon color="success" />;
@@ -215,6 +220,7 @@ const SubscriptionManagement = () => {
                       color={getStatusColor(subscription.status)}
                       sx={{ ml: 2 }}
                     />
+                    {getPaymentStatusChip(subscription.paymentStatus || 'pending')}
                   </Box>
                   
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>

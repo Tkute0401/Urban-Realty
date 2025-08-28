@@ -3,6 +3,7 @@ const router = express.Router();
 const { check } = require('express-validator');
 const subscriptionController = require('../controllers/subscriptionController');
 const { protect, authorize } = require('../middleware/auth');
+const paymentController = require('../controllers/paymentController');
 
 // Public routes
 router.get('/', subscriptionController.getSubscriptions);
@@ -23,6 +24,14 @@ router.post('/subscribe', [
 ], subscriptionController.subscribeUser);
 router.put('/cancel', subscriptionController.cancelSubscription);
 router.put('/payment-method', subscriptionController.updatePaymentMethod);
+
+// Razorpay payment routes
+router.get('/razorpay/key', paymentController.getRazorpayKey);
+router.post('/razorpay/order', [
+  check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
+  check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly'])
+], paymentController.createRazorpayOrder);
+router.post('/razorpay/verify', paymentController.verifyRazorpayPayment);
 
 // Parameterized routes - must come after specific routes
 router.get('/:id', subscriptionController.getSubscription);

@@ -68,24 +68,96 @@ const SubscriptionPlans = () => {
     setSubscribeSuccess(false);
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (document.getElementById('razorpay-sdk')) return resolve(true);
+      const script = document.createElement('script');
+      script.id = 'razorpay-sdk';
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handleSubscribeConfirm = async () => {
     try {
       setSubscribing(true);
       setSubscribeError(null);
 
-      const response = await axios.post('/subscriptions/subscribe', {
-        subscriptionId: selectedPlan._id,
-        billingCycle,
-        paymentMethod
-      });
+      // Always use Razorpay for paid plans
+      const isFree = selectedPlan.type === 'free';
+      if (isFree) {
+        // Fallback to existing endpoint for free plan activation
+        await axios.post('/subscriptions/subscribe', {
+          subscriptionId: selectedPlan._id,
+          billingCycle,
+          paymentMethod: 'free'
+        });
+        setSubscribeSuccess(true);
+        setTimeout(() => {
+          setSubscribeDialog(false);
+          setSubscribeSuccess(false);
+          window.location.reload();
+        }, 1200);
+        return;
+      }
 
-      setSubscribeSuccess(true);
-      setTimeout(() => {
-        setSubscribeDialog(false);
-        setSubscribeSuccess(false);
-        // Refresh user data or redirect
-        window.location.reload();
-      }, 2000);
+      const sdkLoaded = await loadRazorpayScript();
+      if (!sdkLoaded) {
+        setSubscribeError('Failed to load Razorpay. Please try again.');
+        return;
+      }
+
+      const [{ data: keyRes }, { data: orderRes }] = await Promise.all([
+        axios.get('/subscriptions/razorpay/key'),
+        axios.post('/subscriptions/razorpay/order', {
+          subscriptionId: selectedPlan._id,
+          billingCycle
+        })
+      ]);
+
+      const { key } = keyRes;
+      const { order, subscription } = orderRes;
+
+      const options = {
+        key,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Urban Realty',
+        description: `${selectedPlan.name} - ${billingCycle} subscription`,
+        order_id: order.id,
+        prefill: {
+          name: user?.name || '',
+          email: user?.email || ''
+        },
+        theme: { color: '#78CADC' },
+        handler: async function (response) {
+          try {
+            await axios.post('/subscriptions/razorpay/verify', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+            setSubscribeSuccess(true);
+            setTimeout(() => {
+              setSubscribeDialog(false);
+              setSubscribeSuccess(false);
+              window.location.reload();
+            }, 1200);
+          } catch (err) {
+            setSubscribeError(err.response?.data?.message || 'Payment verification failed');
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setSubscribing(false);
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (err) {
       setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
     } finally {
