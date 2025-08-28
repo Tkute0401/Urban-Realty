@@ -777,6 +777,9 @@ const AdminDashboard = () => {
                             </Typography>
                           </Box>
                         }
+                        components={{
+                          secondary: 'div'
+                        }}
                       />
                     </ListItem>
                     {index < stats.analytics.topPerformingAgents.length - 1 && (
