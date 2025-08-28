@@ -16,11 +16,11 @@ const Developer = require('../models/Developer');
 router
   .route('/')
   .get(advancedResults(Developer), getDevelopers)
-  .post(protect, authorize('admin', 'agent'), createDeveloper);
+  .post(protect, authorize('admin', 'agent', 'developer'), createDeveloper);
 router
   .route('/:id')
   .get(getDeveloper)
-  .put(protect, authorize('admin', 'agent'), updateDeveloper)
+  .put(protect, authorize('admin', 'agent', 'developer'), updateDeveloper)
   .delete(protect, authorize('admin'), deleteDeveloper);
 
 // Logo upload route
@@ -28,7 +28,7 @@ router
   .route('/:id/logo')
   .put(
     protect,
-    authorize('admin', 'agent'),
+    authorize('admin', 'agent', 'developer'),
     upload.single('logo'), // 'logo' should match the field name in FormData
     uploadDeveloperLogo
   );

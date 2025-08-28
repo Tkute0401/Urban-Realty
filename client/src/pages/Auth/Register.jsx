@@ -174,6 +174,7 @@ const Register = () => {
     role: 'buyer',
     mobile: '',
     occupation: '',
+    reraId: '',
     professionalInfo: {
       licenseNumber: '',
       yearsOfExperience: '',
@@ -273,7 +274,7 @@ const Register = () => {
             Create Account
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Join Urban Realty as a buyer or agent
+            Join Urban Realty as buyer, individual seller, agent, or developer
           </Typography>
         </Box>
 
@@ -354,20 +355,31 @@ const Register = () => {
                 sx={textFieldStyles}
               >
                 <MenuItem value="buyer">Buyer</MenuItem>
-                <MenuItem value="agent">Real Estate Agent</MenuItem>
-                <MenuItem value="painter">Painter</MenuItem>
-                <MenuItem value="interior_designer">Interior Designer</MenuItem>
-                <MenuItem value="lawyer">Lawyer</MenuItem>
+                <MenuItem value="individual_seller">Individual Seller</MenuItem>
+                <MenuItem value="agent">Agent</MenuItem>
+                <MenuItem value="developer">Developer</MenuItem>
               </TextField>
             </Grid>
 
-            {/* Professional Information Fields - Only show for professional roles */}
-            {['painter', 'interior_designer', 'lawyer', 'agent'].includes(formData.role) && (
+            {/* Professional Information + RERA - for agent/developer */}
+            {['agent', 'developer'].includes(formData.role) && (
               <>
                 <Grid item xs={12}>
                   <Typography variant="h6" sx={{ mt: 2, mb: 2, color: '#78CADC' }}>
-                    Professional Information
+                    Professional Information (RERA for India)
                   </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="RERA ID"
+                    name="reraId"
+                    value={formData.reraId}
+                    onChange={handleChange}
+                    required
+                    helperText="Required for Agents and Developers"
+                    sx={textFieldStyles}
+                  />
                 </Grid>
                 
                 <Grid item xs={12} sm={6}>

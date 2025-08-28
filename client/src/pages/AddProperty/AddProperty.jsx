@@ -197,7 +197,7 @@ const AddPropertyPage = () => {
   const brochureInputRef = useRef(null);
   const virtualTourInputRef = useRef(null);
 
-  const propertyTypes = Object.keys(propertyTypeIcons);
+  const propertyTypes = [...Object.keys(propertyTypeIcons), 'PG'];
   const propertyStatuses = ['For Sale', 'For Rent'];
 
   useEffect(() => {
@@ -599,7 +599,8 @@ const AddPropertyPage = () => {
             </Grid>
           )}
 
-          {/* Developer Selection */}
+          {/* Developer Selection (hidden for individual sellers) */}
+          {(user?.role !== 'individual_seller') && (
           <Grid item xs={12}>
             <SectionHeader variant="h6">Developer Information</SectionHeader>
             <PremiumPaper>
@@ -657,6 +658,7 @@ const AddPropertyPage = () => {
               />
             </PremiumPaper>
           </Grid>
+          )}
 
           {/* Basic Information Section */}
           <Grid item xs={12}>

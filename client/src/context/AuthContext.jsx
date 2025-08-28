@@ -76,6 +76,7 @@ export const AuthProvider = ({ children }) => {
           name: userData.name,
           role: userData.role,
           mobile: userData.mobile,
+          reraId: userData.reraId,
           favorites: userData?.favorites,
           occupation: userData?.occupation,
           recentlyViewed: userData?.recentlyViewed
@@ -115,6 +116,7 @@ export const AuthProvider = ({ children }) => {
         name: userData.name,
         role: userData.role,
         mobile: userData.mobile,
+        reraId: userData.reraId,
         favorites: userData?.favorites,
         occupation: userData?.occupation,
         recentlyViewed: userData?.recentlyViewed
@@ -151,6 +153,7 @@ export const AuthProvider = ({ children }) => {
         name: userInfo.name,
         role: userInfo.role,
         mobile: userData.mobile,
+        reraId: userInfo.reraId,
         favorites: userData?.favorites,
         occupation: userData?.occupation,
         recentlyViewed: userData?.recentlyViewed
