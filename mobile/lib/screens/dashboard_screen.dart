@@ -15,11 +15,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _error;
   List<dynamic> _featuredProperties = const [];
   List<dynamic> _recentProperties = const [];
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedPropertyType = 'ALL';
+
+  final List<Map<String, dynamic>> _propertyCategories = [
+    {'type': 'ALL', 'title': 'All Properties', 'icon': Icons.home, 'color': Color(0xFFF75B00)},
+    {'type': 'House', 'title': 'Houses', 'icon': Icons.house, 'color': Color(0xFF1A00FF)},
+    {'type': 'Apartment', 'title': 'Apartments', 'icon': Icons.apartment, 'color': Color(0xFF059669)},
+    {'type': 'Villa', 'title': 'Villas', 'icon': Icons.villa, 'color': Color(0xFFFF6600)},
+    {'type': 'Land', 'title': 'Land', 'icon': Icons.landscape, 'color': Color(0xFF8B5CF6)},
+    {'type': 'Commercial', 'title': 'Commercial', 'icon': Icons.business, 'color': Color(0xFFDC2626)},
+  ];
 
   @override
   void initState() {
     super.initState();
     _fetchDashboardData();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchDashboardData() async {
@@ -114,16 +131,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onRefresh: _fetchDashboardData,
                   child: CustomScrollView(
                     slivers: [
-                      // App Bar
+                      // Enhanced App Bar with Hero Section
                       SliverAppBar(
-                        expandedHeight: 120,
+                        expandedHeight: 200,
                         floating: false,
                         pinned: true,
                         backgroundColor: theme.colorScheme.surface,
                         surfaceTintColor: Colors.transparent,
                         flexibleSpace: FlexibleSpaceBar(
                           title: Text(
-                            'Welcome back!',
+                            'SQUARE FOOOT',
                             style: theme.textTheme.headlineSmall?.copyWith(
                               color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
@@ -137,8 +154,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 colors: [
                                   theme.colorScheme.primary.withOpacity(0.1),
                                   theme.colorScheme.primaryContainer.withOpacity(0.1),
+                                  theme.colorScheme.secondary.withOpacity(0.05),
                                 ],
                               ),
+                            ),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 60,
+                                  left: 20,
+                                  child: Text(
+                                    'Find Your Dream\nProperty',
+                                    style: theme.textTheme.headlineMedium?.copyWith(
+                                      color: theme.colorScheme.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 20,
+                                  right: 20,
+                                  child: Icon(
+                                    Icons.home_rounded,
+                                    size: 80,
+                                    color: theme.colorScheme.primary.withOpacity(0.3),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -156,6 +198,126 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             },
                           ),
                         ],
+                      ),
+                      
+                      // Search Bar
+                      SliverToBoxAdapter(
+                        child: Container(
+                          margin: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.colorScheme.shadow.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    hintText: 'Search properties, locations...',
+                                    prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  ),
+                                  onSubmitted: (value) {
+                                    if (value.isNotEmpty) {
+                                      Navigator.of(context).pushNamed('/search', arguments: {'query': value});
+                                    }
+                                  },
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.tune, color: theme.colorScheme.primary),
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed('/search');
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      // Property Categories
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Property Types',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                height: 100,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _propertyCategories.length,
+                                  itemBuilder: (context, index) {
+                                    final category = _propertyCategories[index];
+                                    final isSelected = _selectedPropertyType == category['type'];
+                                    
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedPropertyType = category['type'];
+                                        });
+                                        Navigator.of(context).pushNamed('/search', arguments: {
+                                          'propertyType': category['type']
+                                        });
+                                      },
+                                      child: Container(
+                                        width: 100,
+                                        margin: const EdgeInsets.only(right: 12),
+                                        decoration: BoxDecoration(
+                                          color: isSelected 
+                                              ? category['color'].withOpacity(0.1)
+                                              : theme.colorScheme.surfaceVariant,
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: isSelected 
+                                              ? Border.all(color: category['color'], width: 2)
+                                              : null,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              category['icon'],
+                                              color: isSelected ? category['color'] : theme.colorScheme.onSurfaceVariant,
+                                              size: 32,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              category['title'],
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: isSelected ? category['color'] : theme.colorScheme.onSurfaceVariant,
+                                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                       
                       // Quick Actions
@@ -257,7 +419,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 SizedBox(
-                                  height: 280,
+                                  height: 320,
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: _featuredProperties.length,
@@ -372,11 +534,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final address = property['address']?.toString() ?? '';
     final price = (property['price']?.toString() ?? '').isEmpty ? '' : '₹${property['price']}';
     final imageUrl = _pickPrimaryImage(property);
+    final propertyType = property['type']?.toString() ?? '';
+    final bedrooms = property['bedrooms']?.toString() ?? '';
+    final bathrooms = property['bathrooms']?.toString() ?? '';
+    final area = property['area']?.toString() ?? '';
     
     return Container(
-      width: 280,
+      width: 300,
       margin: const EdgeInsets.only(right: 16),
       child: Card(
+        elevation: 4,
         child: InkWell(
           onTap: () {
             Navigator.of(context).pushNamed(
@@ -385,71 +552,163 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           },
           borderRadius: BorderRadius.circular(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: imageUrl == null
-                      ? Container(
-                          color: theme.colorScheme.surfaceVariant,
-                          child: Icon(
-                            Icons.home_outlined,
-                            size: 48,
-                            color: theme.colorScheme.onSurfaceVariant,
+                      child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: imageUrl == null
+                            ? Container(
+                                color: theme.colorScheme.surfaceVariant,
+                                child: Icon(
+                                  Icons.home_outlined,
+                                  size: 48,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              )
+                            : Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: theme.colorScheme.surfaceVariant,
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    size: 48,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          propertyType,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
-                        )
-                      : Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: theme.colorScheme.surfaceVariant,
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 48,
-                              color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    if (price.isNotEmpty)
+                      Positioned(
+                        bottom: 12,
+                        right: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            price,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      address,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (price.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        price,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
                   ],
                 ),
-              ),
+                              Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              address,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          if (bedrooms.isNotEmpty) ...[
+                            Icon(
+                              Icons.bed_outlined,
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '$bedrooms Beds',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          if (bathrooms.isNotEmpty) ...[
+                            Icon(
+                              Icons.bathroom_outlined,
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '$bathrooms Baths',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          if (area.isNotEmpty) ...[
+                            Icon(
+                              Icons.square_foot_outlined,
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '$area sq ft',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -462,37 +721,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final address = property['address']?.toString() ?? '';
     final price = (property['price']?.toString() ?? '').isEmpty ? '' : '₹${property['price']}';
     final imageUrl = _pickPrimaryImage(property);
+    final propertyType = property['type']?.toString() ?? '';
+    final bedrooms = property['bedrooms']?.toString() ?? '';
+    final bathrooms = property['bathrooms']?.toString() ?? '';
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: SizedBox(
-            width: 80,
-            height: 80,
-            child: imageUrl == null
-                ? Container(
-                    color: theme.colorScheme.surfaceVariant,
-                    child: Icon(
-                      Icons.home_outlined,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  )
-                : Image.network(
-                    imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: theme.colorScheme.surfaceVariant,
-                      child: Icon(
-                        Icons.broken_image,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+              child: ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          leading: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: imageUrl == null
+                      ? Container(
+                          color: theme.colorScheme.surfaceVariant,
+                          child: Icon(
+                            Icons.home_outlined,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        )
+                      : Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: theme.colorScheme.surfaceVariant,
+                            child: Icon(
+                              Icons.broken_image,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+              Positioned(
+                top: 4,
+                left: 4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    propertyType,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                ),
+              ),
+            ],
           ),
-        ),
         title: Text(
           title,
           maxLines: 2,
@@ -503,13 +787,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text(
-              address,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 14,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    address,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                if (bedrooms.isNotEmpty) ...[
+                  Icon(
+                    Icons.bed_outlined,
+                    size: 14,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$bedrooms Beds',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (bathrooms.isNotEmpty) ...[
+                  Icon(
+                    Icons.bathroom_outlined,
+                    size: 14,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$bathrooms Baths',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
             ),
             if (price.isNotEmpty) ...[
               const SizedBox(height: 8),
