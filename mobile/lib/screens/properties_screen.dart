@@ -15,6 +15,10 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   bool _loading = true;
   String? _error;
   List<dynamic> _properties = const [];
+  String _searchQuery = '';
+  String _selectedFilter = 'All';
+
+  final List<String> _filterOptions = ['All', 'Apartment', 'House', 'Villa', 'Penthouse'];
 
   String? _pickPrimaryImage(Map<String, dynamic> p) {
     final dynamic images = p['images'] ?? p['photos'] ?? p['gallery'];
@@ -33,6 +37,19 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     final base = ApiConfig.baseUrl.replaceFirst(RegExp(r"/api/.*$"), '');
     if (!url.startsWith('/')) url = '/$url';
     return '$base$url';
+  }
+
+  List<dynamic> get _filteredProperties {
+    return _properties.where((property) {
+      final matchesSearch = _searchQuery.isEmpty ||
+          property['title']?.toString().toLowerCase().contains(_searchQuery.toLowerCase()) == true ||
+          property['address']?.toString().toLowerCase().contains(_searchQuery.toLowerCase()) == true;
+      
+      final matchesFilter = _selectedFilter == 'All' ||
+          property['type']?.toString() == _selectedFilter;
+      
+      return matchesSearch && matchesFilter;
+    }).toList();
   }
 
   @override
@@ -65,54 +82,389 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('Properties')),
-      body: RefreshIndicator(
-        onRefresh: _fetch,
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : _error != null
-                ? ListView(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(_error!, style: const TextStyle(color: Colors.red)),
-                    )
-                  ])
-                : ListView.separated(
-                    itemCount: _properties.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final p = _properties[index] as Map<String, dynamic>;
-                      final String title = p['title']?.toString() ?? 'Untitled';
-                      final String address = p['address']?.toString() ?? '';
-                      final String price = (p['price']?.toString() ?? '').isEmpty ? '' : '₹${p['price']}';
-                      final String? imageUrl = _pickPrimaryImage(p);
-                      return ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: SizedBox(
-                            width: 64,
-                            height: 64,
-                            child: imageUrl == null
-                                ? Container(color: Colors.grey.shade300, child: const Icon(Icons.home_outlined))
-                                : Image.network(
-                                    imageUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300, child: const Icon(Icons.broken_image)),
+      appBar: AppBar(
+        title: const Text('Properties'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/search');
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Search and Filter Bar
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Search Bar
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search properties...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceVariant,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Filter Chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _filterOptions.map((filter) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          label: Text(filter),
+                          selected: _selectedFilter == filter,
+                          onSelected: (selected) {
+                            setState(() {
+                              _selectedFilter = selected ? filter : 'All';
+                            });
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Results Count
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${_filteredProperties.length} properties found',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (_filteredProperties.isNotEmpty)
+                  TextButton.icon(
+                    onPressed: _fetch,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Refresh'),
+                  ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Properties List
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: theme.colorScheme.error,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Failed to load properties',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                color: theme.colorScheme.error,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _error!,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _fetch,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      )
+                    : _filteredProperties.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 64,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No properties found',
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Try adjusting your search criteria',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _fetch,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _filteredProperties.length,
+                              itemBuilder: (context, index) {
+                                final property = _filteredProperties[index];
+                                return _buildPropertyCard(context, property, theme);
+                              },
+                            ),
+                          ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPropertyCard(BuildContext context, Map<String, dynamic> property, ThemeData theme) {
+    final title = property['title']?.toString() ?? 'Untitled';
+    final address = property['address']?.toString() ?? '';
+    final price = (property['price']?.toString() ?? '').isEmpty ? '' : '₹${property['price']}';
+    final type = property['type']?.toString() ?? 'Property';
+    final bedrooms = property['bedrooms']?.toString() ?? '';
+    final bathrooms = property['bathrooms']?.toString() ?? '';
+    final area = property['area']?.toString() ?? '';
+    final imageUrl = _pickPrimaryImage(property);
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 4,
+      shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).pushNamed(
+            '/property-detail',
+            arguments: property['_id']?.toString() ?? '',
+          );
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Property Image
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: imageUrl == null
+                    ? Container(
+                        color: theme.colorScheme.surfaceVariant,
+                        child: Icon(
+                          Icons.home_outlined,
+                          size: 48,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      )
+                    : Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: theme.colorScheme.surfaceVariant,
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 48,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        subtitle: Text(address, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        trailing: Text(price),
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => PropertyDetailScreen(id: p['_id']?.toString() ?? ''),
-                          ));
-                        },
-                      );
-                    },
+                      ),
+              ),
+            ),
+            
+            // Property Details
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Property Type Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      type,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Title
+                  Text(
+                    title,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Address
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          address,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Property Features
+                  Row(
+                    children: [
+                      if (bedrooms.isNotEmpty) ...[
+                        _buildFeatureChip(
+                          context,
+                          Icons.bed,
+                          '$bedrooms Beds',
+                          theme,
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      if (bathrooms.isNotEmpty) ...[
+                        _buildFeatureChip(
+                          context,
+                          Icons.bathroom_outlined,
+                          '$bathrooms Baths',
+                          theme,
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      if (area.isNotEmpty) ...[
+                        _buildFeatureChip(
+                          context,
+                          Icons.square_foot,
+                          '$area sq ft',
+                          theme,
+                        ),
+                      ],
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Price and Action
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (price.isNotEmpty)
+                        Text(
+                          price,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                            '/property-detail',
+                            arguments: property['_id']?.toString() ?? '',
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('View Details'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureChip(BuildContext context, IconData icon, String label, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
