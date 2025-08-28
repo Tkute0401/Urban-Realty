@@ -14,8 +14,6 @@ import Header from './components/common/Header';
 import EditProperty from './pages/Properties/EditProperty';
 import AddProperty from './pages/AddProperty/AddProperty';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import { ThemeProvider } from '@mui/material';
-import { urbanRealtyTheme } from './Theme/NewTheme';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
@@ -63,7 +61,6 @@ function App() {
   const isHomePage = location.pathname === '/';
   
   return (
-    <ThemeProvider theme={urbanRealtyTheme}>
       <AuthProvider>
         <PropertiesProvider>
           <AgentsProvider>
@@ -140,7 +137,6 @@ function App() {
           </AgentsProvider>
         </PropertiesProvider>
       </AuthProvider>
-    </ThemeProvider>
   );
 }
 

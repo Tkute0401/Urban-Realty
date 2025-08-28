@@ -3,8 +3,8 @@
 
 .header {
   width: 100%;
-  background-color: #08171A;
-  border-bottom: 1px solid #333;
+  background-color: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-header-border);
   position: sticky;
   top: 0;
   z-index: 1100;
@@ -30,7 +30,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
   transition: transform 0.3s ease;
 }
@@ -48,7 +48,7 @@
   font-weight: 700;
   font-size: 1.5rem;
   letter-spacing: 0.5px;
-  color: white;
+  color: var(--color-text);
 }
 
 /* Navigation */
@@ -63,7 +63,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
   padding: 0.6rem 1.2rem;
   border-radius: 4px;
@@ -74,13 +74,13 @@
 }
 
 .nav-item:hover {
-  background-color: rgba(120, 202, 220, 0.1);
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
   transform: translateY(-2px);
 }
 
 .nav-item-active {
-  background-color: #78CADC;
-  color: #08171A;
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
 }
 
 .nav-item-active:hover {
@@ -88,19 +88,19 @@
 }
 
 .nav-item-outlined {
-  border: 1px solid #78CADC;
+  border: 1px solid var(--color-accent);
 }
 
 .nav-icon {
-  color: #78CADC;
+  color: var(--color-accent);
 }
 
 /* Avatar */
 .user-avatar {
   width: 38px;
   height: 38px;
-  background-color: #78CADC;
-  color: #08171A;
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,24 +112,24 @@
 
 .user-avatar:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(120, 202, 220, 0.4);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 40%, transparent);
 }
 
 /* Mobile menu */
 .menu-button {
-  color: white;
+  color: var(--color-text);
   padding: 0.5rem;
   border-radius: 4px;
   transition: background-color 0.3s ease;
 }
 
 .menu-button:hover {
-  background-color: rgba(120, 202, 220, 0.1);
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 .mobile-menu {
-  background-color: #0B1011;
-  border: 1px solid #333;
+  background-color: var(--color-menu-bg);
+  border: 1px solid var(--color-menu-border);
   border-radius: 8px;
   overflow: hidden;
   min-width: 220px;
@@ -141,22 +141,22 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--color-menu-border);
   transition: background-color 0.3s ease;
 }
 
 .menu-item:hover {
-  background-color: rgba(120, 202, 220, 0.1);
+  background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
 }
 
 .menu-item-icon {
-  color: #78CADC;
+  color: var(--color-accent);
 }
 
 .menu-logout {
-  color: #ff6b6b;
+  color: var(--color-danger);
 }
 
 /* Animation Keyframes - from PropertyList.css */
