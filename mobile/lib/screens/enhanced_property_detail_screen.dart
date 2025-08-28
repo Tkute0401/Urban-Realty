@@ -595,61 +595,363 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Description',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          // Description Section
+          _buildSectionHeader('Description', Icons.description),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _property['description'],
-            style: Theme.of(context).textTheme.bodyMedium,
+            child: Text(
+              _property['description'],
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                height: 1.6,
+              ),
+            ),
           ),
           const SizedBox(height: 24),
-          Text(
-            'Property Details',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildDetailRow('Property Type', _property['propertyType']),
-          _buildDetailRow('Year Built', _property['yearBuilt'].toString()),
-          _buildDetailRow('Floor', '${_property['floor']} of ${_property['totalFloors']}'),
-          _buildDetailRow('Parking Spaces', '${_property['parkingSpaces']} spaces'),
-          _buildDetailRow('Furnished', _property['furnished'] ? 'Yes' : 'No'),
-          _buildDetailRow('Energy Rating', _property['energyRating']),
+
+          // Property Details Section
+          _buildSectionHeader('Property Details', Icons.home),
+          const SizedBox(height: 12),
+          _buildPropertyDetailsGrid(),
           const SizedBox(height: 24),
-          Text(
-            'Amenities',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+
+          // Key Features Section
+          _buildSectionHeader('Key Features', Icons.star),
+          const SizedBox(height: 12),
+          _buildKeyFeaturesGrid(),
+          const SizedBox(height: 24),
+
+          // Amenities Section
+          _buildSectionHeader('Amenities', Icons.amenities),
+          const SizedBox(height: 12),
+          _buildAmenitiesGrid(),
+          const SizedBox(height: 24),
+
+          // Additional Information Section
+          _buildSectionHeader('Additional Information', Icons.info),
+          const SizedBox(height: 12),
+          _buildAdditionalInfoGrid(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(8),
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _property['amenities'].map<Widget>((amenity) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  amenity,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    fontSize: 12,
-                  ),
-                ),
-              );
-            }).toList(),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPropertyDetailsGrid() {
+    final details = [
+      {'label': 'Property Type', 'value': _property['propertyType'], 'icon': Icons.home},
+      {'label': 'Year Built', 'value': '${_property['yearBuilt']}', 'icon': Icons.calendar_today},
+      {'label': 'Floor', 'value': '${_property['floor']} of ${_property['totalFloors']}', 'icon': Icons.apartment},
+      {'label': 'Area', 'value': '${_property['area']} sq ft', 'icon': Icons.square_foot},
+      {'label': 'Bedrooms', 'value': '${_property['bedrooms']}', 'icon': Icons.bed},
+      {'label': 'Bathrooms', 'value': '${_property['bathrooms']}', 'icon': Icons.bathtub_outlined},
+      {'label': 'Parking', 'value': '${_property['parkingSpaces']} spaces', 'icon': Icons.local_parking},
+      {'label': 'Furnished', 'value': _property['furnished'] ? 'Yes' : 'No', 'icon': Icons.chair},
+      {'label': 'Energy Rating', 'value': _property['energyRating'], 'icon': Icons.eco},
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.5,
+      ),
+      itemCount: details.length,
+      itemBuilder: (context, index) {
+        final detail = details[index];
+        return _buildDetailCard(detail['label']!, detail['value']!, detail['icon']!);
+      },
+    );
+  }
+
+  Widget _buildDetailCard(String label, String value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKeyFeaturesGrid() {
+    final features = [
+      {'label': 'Smart Home System', 'icon': Icons.smart_home, 'available': true},
+      {'label': 'Balcony', 'icon': Icons.balcony, 'available': true},
+      {'label': 'Garden View', 'icon': Icons.garden, 'available': true},
+      {'label': 'City View', 'icon': Icons.location_city, 'available': true},
+      {'label': 'High Ceilings', 'icon': Icons.height, 'available': false},
+      {'label': 'Fireplace', 'icon': Icons.local_fire_department, 'available': false},
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.2,
+      ),
+      itemCount: features.length,
+      itemBuilder: (context, index) {
+        final feature = features[index];
+        return _buildFeatureCard(
+          feature['label']!,
+          feature['icon']!,
+          feature['available']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildFeatureCard(String label, IconData icon, bool available) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: available 
+            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+            : Theme.of(context).colorScheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: available 
+              ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
+              : Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: available 
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
+            size: 32,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: available 
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: available 
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              available ? 'Available' : 'Not Available',
+              style: TextStyle(
+                color: available 
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAmenitiesGrid() {
+    final amenities = _property['amenities'] as List<String>;
+    
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 3.5,
+      ),
+      itemCount: amenities.length,
+      itemBuilder: (context, index) {
+        final amenity = amenities[index];
+        return _buildAmenityCard(amenity);
+      },
+    );
+  }
+
+  Widget _buildAmenityCard(String amenity) {
+    final amenityIcons = {
+      'Swimming Pool': Icons.pool,
+      'Gym & Fitness Center': Icons.fitness_center,
+      'Underground Parking': Icons.local_parking,
+      '24/7 Security': Icons.security,
+      'Rooftop Garden': Icons.garden,
+      'Private Balcony': Icons.balcony,
+      'Smart Home System': Icons.smart_home,
+      'Air Conditioning': Icons.ac_unit,
+      'Central Heating': Icons.thermostat,
+      'High-Speed Internet': Icons.wifi,
+      'Concierge Service': Icons.concierge,
+      'Pet Friendly': Icons.pets,
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              amenityIcons[amenity] ?? Icons.check_circle,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              amenity,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdditionalInfoGrid() {
+    final additionalInfo = [
+      {'label': 'Property ID', 'value': _property['id'], 'icon': Icons.tag},
+      {'label': 'Listed Date', 'value': 'December 2024', 'icon': Icons.schedule},
+      {'label': 'Last Updated', 'value': 'Today', 'icon': Icons.update},
+      {'label': 'Property Status', 'value': 'Active', 'icon': Icons.status},
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.5,
+      ),
+      itemCount: additionalInfo.length,
+      itemBuilder: (context, index) {
+        final info = additionalInfo[index];
+        return _buildDetailCard(info['label']!, info['value']!, info['icon']!);
+      },
     );
   }
 
@@ -750,30 +1052,254 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Market Analysis',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildMarketCard('Price per Sq Ft', '\$${marketData['pricePerSqFt']}'),
-          _buildMarketCard('Days on Market', '${marketData['avgDaysOnMarket']} days'),
+          // Market Overview Section
+          _buildSectionHeader('Market Overview', Icons.analytics),
+          const SizedBox(height: 12),
+          _buildMarketOverviewGrid(marketData),
           const SizedBox(height: 24),
-          Text(
-            'Price History',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+
+          // Price History Section
+          _buildSectionHeader('Price History', Icons.trending_up),
+          const SizedBox(height: 12),
+          _buildPriceHistoryChart(marketData),
+          const SizedBox(height: 24),
+
+          // Comparable Properties Section
+          _buildSectionHeader('Comparable Properties', Icons.compare),
+          const SizedBox(height: 12),
+          _buildComparablePropertiesList(marketData),
+          const SizedBox(height: 24),
+
+          // Market Insights Section
+          _buildSectionHeader('Market Insights', Icons.lightbulb),
+          const SizedBox(height: 12),
+          _buildMarketInsightsGrid(marketData),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarketOverviewGrid(Map<String, dynamic> marketData) {
+    final overviewData = [
+      {
+        'label': 'Price per Sq Ft',
+        'value': '\$${marketData['pricePerSqFt']}',
+        'icon': Icons.attach_money,
+        'color': Theme.of(context).colorScheme.primary,
+      },
+      {
+        'label': 'Days on Market',
+        'value': '${marketData['avgDaysOnMarket']} days',
+        'icon': Icons.schedule,
+        'color': Theme.of(context).colorScheme.secondary,
+      },
+      {
+        'label': 'Market Trend',
+        'value': 'Rising',
+        'icon': Icons.trending_up,
+        'color': Colors.green,
+      },
+      {
+        'label': 'Property Value',
+        'value': '\$${(marketData['pricePerSqFt'] * _property['area'] / 1000000).toStringAsFixed(1)}M',
+        'icon': Icons.home,
+        'color': Theme.of(context).colorScheme.tertiary,
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.2,
+      ),
+      itemCount: overviewData.length,
+      itemBuilder: (context, index) {
+        final data = overviewData[index];
+        return _buildMarketOverviewCard(
+          data['label']!,
+          data['value']!,
+          data['icon']!,
+          data['color']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildMarketOverviewCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(height: 16),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 32,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withOpacity(0.8),
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceHistoryChart(Map<String, dynamic> marketData) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Price Trend (Last 3 Months)',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.trending_up,
+                      color: Colors.green,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '+5.2%',
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
           SizedBox(
             height: 200,
             child: LineChart(
               LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 0.5,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.3),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 30,
+                      interval: 1,
+                      getTitlesWidget: (value, meta) {
+                        const months = ['Jan', 'Feb', 'Mar'];
+                        if (value.toInt() < months.length) {
+                          return Text(
+                            months[value.toInt()],
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontSize: 12,
+                            ),
+                          );
+                        }
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 0.5,
+                      reservedSize: 50,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          '\$${value.toStringAsFixed(1)}M',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
                 borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: 2,
+                minY: 2.0,
+                maxY: 2.6,
                 lineBarsData: [
                   LineChartBarData(
                     spots: marketData['priceHistory'].asMap().entries.map((entry) {
@@ -781,23 +1307,239 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
                     }).toList(),
                     isCurved: true,
                     color: Theme.of(context).colorScheme.primary,
-                    barWidth: 3,
-                    dotData: FlDotData(show: true),
+                    barWidth: 4,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 6,
+                          color: Theme.of(context).colorScheme.primary,
+                          strokeWidth: 3,
+                          strokeColor: Colors.white,
+                        );
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComparablePropertiesList(Map<String, dynamic> marketData) {
+    return Column(
+      children: marketData['comparableProperties'].map<Widget>((comp) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.home,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      comp['address'],
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.square_foot,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${comp['sqft']} sq ft',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    NumberFormat.currency(symbol: '\$').format(comp['price']),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${((comp['price'] / comp['sqft']).round())} /sq ft',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildMarketInsightsGrid(Map<String, dynamic> marketData) {
+    final insights = [
+      {
+        'label': 'Market Demand',
+        'value': 'High',
+        'icon': Icons.trending_up,
+        'color': Colors.green,
+        'description': 'Strong buyer interest in this area',
+      },
+      {
+        'label': 'Price Stability',
+        'value': 'Stable',
+        'icon': Icons.balance,
+        'color': Colors.blue,
+        'description': 'Prices have remained consistent',
+      },
+      {
+        'label': 'Investment Potential',
+        'value': 'Excellent',
+        'icon': Icons.investment,
+        'color': Colors.orange,
+        'description': 'High potential for value appreciation',
+      },
+      {
+        'label': 'Market Competition',
+        'value': 'Moderate',
+        'icon': Icons.people,
+        'color': Colors.purple,
+        'description': 'Balanced supply and demand',
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.8,
+      ),
+      itemCount: insights.length,
+      itemBuilder: (context, index) {
+        final insight = insights[index];
+        return _buildMarketInsightCard(
+          insight['label']!,
+          insight['value']!,
+          insight['icon']!,
+          insight['color']!,
+          insight['description']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildMarketInsightCard(String label, String value, IconData icon, Color color, String description) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: color.withOpacity(0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
-            'Comparable Properties',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
-          const SizedBox(height: 16),
-          ...marketData['comparableProperties'].map<Widget>((comp) => 
-            _buildComparableProperty(comp)
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withOpacity(0.8),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -811,37 +1553,490 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Neighborhood Insights',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
+          // Neighborhood Scores Section
+          _buildSectionHeader('Neighborhood Scores', Icons.location_on),
+          const SizedBox(height: 12),
+          _buildNeighborhoodScoresGrid(neighborhood),
+          const SizedBox(height: 24),
+
+          // Local Amenities Section
+          _buildSectionHeader('Local Amenities', Icons.local_activity),
+          const SizedBox(height: 12),
+          _buildLocalAmenitiesGrid(neighborhood),
+          const SizedBox(height: 24),
+
+          // Nearby Schools Section
+          _buildSectionHeader('Nearby Schools', Icons.school),
+          const SizedBox(height: 12),
+          _buildNearbySchoolsList(neighborhood),
+          const SizedBox(height: 24),
+
+          // Safety & Community Section
+          _buildSectionHeader('Safety & Community', Icons.security),
+          const SizedBox(height: 12),
+          _buildSafetyCommunityGrid(neighborhood),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNeighborhoodScoresGrid(Map<String, dynamic> neighborhood) {
+    final scores = [
+      {
+        'label': 'Walk Score',
+        'score': neighborhood['walkScore'],
+        'icon': Icons.directions_walk,
+        'color': Colors.green,
+        'description': 'Very Walkable',
+      },
+      {
+        'label': 'Transit Score',
+        'score': neighborhood['transitScore'],
+        'icon': Icons.directions_bus,
+        'color': Colors.blue,
+        'description': 'Good Transit',
+      },
+      {
+        'label': 'Bike Score',
+        'score': neighborhood['bikeScore'],
+        'icon': Icons.directions_bike,
+        'color': Colors.orange,
+        'description': 'Very Bikeable',
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.2,
+      ),
+      itemCount: scores.length,
+      itemBuilder: (context, index) {
+        final score = scores[index];
+        return _buildNeighborhoodScoreCard(
+          score['label']!,
+          score['score']!,
+          score['icon']!,
+          score['color']!,
+          score['description']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildNeighborhoodScoreCard(String label, int score, IconData icon, Color color, String description) {
+    final scoreColor = score >= 90 ? Colors.green : 
+                      score >= 70 ? Colors.orange : 
+                      score >= 50 ? Colors.yellow : Colors.red;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 32,
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: scoreColor,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '$score',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          Row(
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withOpacity(0.8),
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withOpacity(0.8),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocalAmenitiesGrid(Map<String, dynamic> neighborhood) {
+    final amenities = [
+      {
+        'label': 'Restaurants',
+        'count': neighborhood['restaurants'],
+        'icon': Icons.restaurant,
+        'color': Colors.red,
+        'description': 'Dining options',
+      },
+      {
+        'label': 'Shopping',
+        'count': neighborhood['shopping'],
+        'icon': Icons.shopping_bag,
+        'color': Colors.purple,
+        'description': 'Retail stores',
+      },
+      {
+        'label': 'Entertainment',
+        'count': neighborhood['entertainment'],
+        'icon': Icons.movie,
+        'color': Colors.blue,
+        'description': 'Fun activities',
+      },
+      {
+        'label': 'Parks',
+        'count': 8,
+        'icon': Icons.park,
+        'color': Colors.green,
+        'description': 'Green spaces',
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.2,
+      ),
+      itemCount: amenities.length,
+      itemBuilder: (context, index) {
+        final amenity = amenities[index];
+        return _buildLocalAmenityCard(
+          amenity['label']!,
+          amenity['count']!,
+          amenity['icon']!,
+          amenity['color']!,
+          amenity['description']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildLocalAmenityCard(String label, int count, IconData icon, Color color, String description) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(child: _buildScoreCard('Walk Score', '${neighborhood['walkScore']}', Icons.directions_walk)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildScoreCard('Transit Score', '${neighborhood['transitScore']}', Icons.directions_bus)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildScoreCard('Bike Score', '${neighborhood['bikeScore']}', Icons.directions_bike)),
+              Text(
+                '$count',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              Text(
+                'nearby',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: color.withOpacity(0.8),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
-          _buildNeighborhoodCard('Crime Rate', neighborhood['crimeRate'], Icons.security),
-          _buildNeighborhoodCard('Restaurants', '${neighborhood['restaurants']} nearby', Icons.restaurant),
-          _buildNeighborhoodCard('Shopping', '${neighborhood['shopping']} options', Icons.shopping_bag),
-          _buildNeighborhoodCard('Entertainment', '${neighborhood['entertainment']} venues', Icons.movie),
-          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNearbySchoolsList(Map<String, dynamic> neighborhood) {
+    return Column(
+      children: neighborhood['schools'].map<Widget>((school) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.school,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      school['name'],
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          school['distance'],
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _getSchoolRatingColor(school['rating']),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${school['rating']}/10',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Rating',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Color _getSchoolRatingColor(double rating) {
+    if (rating >= 9.0) return Colors.green;
+    if (rating >= 8.0) return Colors.blue;
+    if (rating >= 7.0) return Colors.orange;
+    return Colors.red;
+  }
+
+  Widget _buildSafetyCommunityGrid(Map<String, dynamic> neighborhood) {
+    final safetyData = [
+      {
+        'label': 'Crime Rate',
+        'value': neighborhood['crimeRate'],
+        'icon': Icons.security,
+        'color': Colors.green,
+        'description': 'Low crime area',
+      },
+      {
+        'label': 'Community Rating',
+        'value': '4.8/5',
+        'icon': Icons.people,
+        'color': Colors.blue,
+        'description': 'Friendly neighborhood',
+      },
+      {
+        'label': 'Noise Level',
+        'value': 'Low',
+        'icon': Icons.volume_down,
+        'color': Colors.green,
+        'description': 'Peaceful area',
+      },
+      {
+        'label': 'Family Friendly',
+        'value': 'Yes',
+        'icon': Icons.family_restroom,
+        'color': Colors.orange,
+        'description': 'Great for families',
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.2,
+      ),
+      itemCount: safetyData.length,
+      itemBuilder: (context, index) {
+        final data = safetyData[index];
+        return _buildSafetyCommunityCard(
+          data['label']!,
+          data['value']!,
+          data['icon']!,
+          data['color']!,
+          data['description']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildSafetyCommunityCard(String label, String value, IconData icon, Color color, String description) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: color.withOpacity(0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
-            'Nearby Schools',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
-          const SizedBox(height: 16),
-          ...neighborhood['schools'].map<Widget>((school) => 
-            _buildSchoolCard(school)
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withOpacity(0.8),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -850,162 +2045,491 @@ class _EnhancedPropertyDetailScreenState extends State<EnhancedPropertyDetailScr
 
   Widget _buildContactTab() {
     final agent = _property['agent'];
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Contact Agent',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Agent Profile Section
+          _buildSectionHeader('Agent Profile', Icons.person),
+          const SizedBox(height: 12),
+          _buildAgentProfileCard(agent),
+          const SizedBox(height: 24),
+
+          // Agent Specializations Section
+          _buildSectionHeader('Specializations', Icons.star),
+          const SizedBox(height: 12),
+          _buildAgentSpecializationsGrid(agent),
+          const SizedBox(height: 24),
+
+          // Contact Methods Section
+          _buildSectionHeader('Contact Methods', Icons.contact_phone),
+          const SizedBox(height: 12),
+          _buildContactMethodsList(agent),
+          const SizedBox(height: 24),
+
+          // Response Time Section
+          _buildSectionHeader('Response Time', Icons.schedule),
+          const SizedBox(height: 12),
+          _buildResponseTimeGrid(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAgentProfileCard(Map<String, dynamic> agent) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: CachedNetworkImageProvider(agent['avatar']),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 3,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: agent['avatar'],
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      child: Icon(
+                        Icons.person,
+                        size: 40,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      agent['name'],
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Real Estate Agent',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
                       children: [
+                        Icon(Icons.star, color: Colors.amber, size: 20),
+                        const SizedBox(width: 4),
                         Text(
-                          agent['name'],
+                          '${agent['rating']}',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(width: 4),
                         Text(
-                          'Real Estate Agent • ${agent['experience']} experience',
-                          style: TextStyle(
+                          '(${agent['reviews']} reviews)',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            Text(' ${agent['rating']} (${agent['reviews']} reviews)'),
-                          ],
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.work,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${agent['experience']} experience',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: agent['specializations'].map<Widget>((spec) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.verified,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
                 ),
-                child: Text(
-                  spec,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                    fontSize: 12,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Verified Agent - Licensed and Insured',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 24),
-          _buildContactButton(
-            Icons.phone,
-            'Call Agent',
-            agent['phone'],
-            _callAgent,
-          ),
-          const SizedBox(height: 8),
-          _buildContactButton(
-            Icons.email,
-            'Email Agent',
-            agent['email'],
-            _emailAgent,
-          ),
-          const SizedBox(height: 8),
-          _buildContactButton(
-            Icons.message,
-            'Send Message',
-            'Open chat',
-            _sendMessage,
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+  Widget _buildAgentSpecializationsGrid(Map<String, dynamic> agent) {
+    final specializations = agent['specializations'] as List<String>;
+    
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 3.5,
+      ),
+      itemCount: specializations.length,
+      itemBuilder: (context, index) {
+        final specialization = specializations[index];
+        return _buildSpecializationCard(specialization);
+      },
+    );
+  }
+
+  Widget _buildSpecializationCard(String specialization) {
+    final specializationIcons = {
+      'Luxury Properties': Icons.luxury,
+      'Smart Homes': Icons.smart_home,
+      'Downtown Real Estate': Icons.location_city,
+      'Investment Properties': Icons.trending_up,
+      'First-time Buyers': Icons.family,
+      'International Clients': Icons.language,
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              specializationIcons[specialization] ?? Icons.star,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
             ),
           ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              specialization,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContactMethodsList(Map<String, dynamic> agent) {
+    final contactMethods = [
+      {
+        'title': 'Call Agent',
+        'subtitle': agent['phone'],
+        'icon': Icons.phone,
+        'color': Colors.green,
+        'onTap': _callAgent,
+      },
+      {
+        'title': 'Email Agent',
+        'subtitle': agent['email'],
+        'icon': Icons.email,
+        'color': Colors.blue,
+        'onTap': _emailAgent,
+      },
+      {
+        'title': 'Send Message',
+        'subtitle': 'Open chat conversation',
+        'icon': Icons.message,
+        'color': Colors.orange,
+        'onTap': _sendMessage,
+      },
+      {
+        'title': 'Schedule Meeting',
+        'subtitle': 'Book a consultation',
+        'icon': Icons.calendar_today,
+        'color': Colors.purple,
+        'onTap': _scheduleViewing,
+      },
+    ];
+
+    return Column(
+      children: contactMethods.map<Widget>((method) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: _buildContactMethodCard(
+            method['title']!,
+            method['subtitle']!,
+            method['icon']!,
+            method['color']!,
+            method['onTap']!,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildContactMethodCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: color.withOpacity(0.6),
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResponseTimeGrid() {
+    final responseData = [
+      {
+        'label': 'Phone Calls',
+        'value': '< 5 min',
+        'icon': Icons.phone,
+        'color': Colors.green,
+        'description': 'Quick response time',
+      },
+      {
+        'label': 'Emails',
+        'value': '< 2 hours',
+        'icon': Icons.email,
+        'color': Colors.blue,
+        'description': 'Professional communication',
+      },
+      {
+        'label': 'Messages',
+        'value': '< 1 hour',
+        'icon': Icons.message,
+        'color': Colors.orange,
+        'description': 'Fast chat responses',
+      },
+      {
+        'label': 'Viewings',
+        'value': '24 hours',
+        'icon': Icons.calendar_today,
+        'color': Colors.purple,
+        'description': 'Flexible scheduling',
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 2.2,
+      ),
+      itemCount: responseData.length,
+      itemBuilder: (context, index) {
+        final data = responseData[index];
+        return _buildResponseTimeCard(
+          data['label']!,
+          data['value']!,
+          data['icon']!,
+          data['color']!,
+          data['description']!,
+        );
+      },
+    );
+  }
+
+  Widget _buildResponseTimeCard(String label, String value, IconData icon, Color color, String description) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: color.withOpacity(0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color.withOpacity(0.8),
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMarketCard(String title, String value) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  Widget _buildComparableProperty(Map<String, dynamic> comp) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
-        title: Text(comp['address']),
-        subtitle: Text('${comp['sqft']} sq ft'),
-        trailing: Text(
-          NumberFormat.currency(symbol: '\$').format(comp['price']),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
+
+
+
+
 
   Widget _buildScoreCard(String title, String score, IconData icon) {
     return Card(
