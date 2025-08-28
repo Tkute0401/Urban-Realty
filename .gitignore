@@ -9,3 +9,35 @@ server/.env
 .env
 client/.env
 server/.env
+
+# Flutter and Android SDK files
+flutter/
+android-sdk/
+flutter_linux_*.tar.xz
+commandlinetools-linux_*.zip
+*.tar.xz
+*.zip
+
+# Mobile app build files
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/coverage/
+mobile/.coverage/
+mobile/.env
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

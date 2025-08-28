@@ -8,6 +8,11 @@ import 'screens/home_tabs.dart';
 import 'screens/search_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/dashboard_screen.dart';
+import 'screens/favorites_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/enhanced_home_screen.dart';
+import 'screens/enhanced_property_detail_screen.dart';
 
 void main() {
   runApp(
@@ -35,12 +40,23 @@ class UrbanRealtyApp extends StatelessWidget {
             '/login': (context) => const LoginScreen(),
             '/properties': (context) => const PropertiesScreen(),
             '/home': (context) => const HomeTabs(),
+            '/enhanced-home': (context) => const EnhancedHomeScreen(),
             '/search': (context) => const SearchScreen(),
             '/notifications': (context) => const NotificationsScreen(),
             '/settings': (context) => const SettingsScreen(),
+            '/dashboard': (context) => const DashboardScreen(),
+            '/favorites': (context) => const FavoritesScreen(),
+            '/profile': (context) => const ProfileScreen(),
             '/property-detail': (context) {
               final args = ModalRoute.of(context)!.settings.arguments as String;
               return PropertyDetailScreen(id: args);
+            },
+            '/enhanced-property-detail': (context) {
+              final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+              return EnhancedPropertyDetailScreen(
+                id: args['id'],
+                propertyData: args['propertyData'],
+              );
             },
           },
         );
