@@ -1,7 +1,30 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const OwnerServiceBlock = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const canPostProperty = !!user && [
+    'individual_seller',
+    'agent',
+    'developer',
+    'admin'
+  ].includes(user.role);
+
+  const handlePostClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (canPostProperty) {
+      navigate('/add-property');
+      return;
+    }
+    navigate('/register');
+  };
   return (
     <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#08171A]">
       {/* Divider line - Enhanced responsiveness */}
@@ -59,8 +82,8 @@ const OwnerServiceBlock = () => {
             </p>
             
             <div className="flex justify-start">
-              <button className="flex items-center gap-2 bg-[#78cadc] text-[#0c0d0e] font-bold px-4 sm:px-5 md:px-6 py-2 sm:py-3 md:py-3.5 rounded-lg md:rounded-xl hover:bg-sky-300 transition-colors duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base md:text-lg">
-                <span>Post Your Property</span>
+              <button onClick={handlePostClick} className="flex items-center gap-2 bg-[#78cadc] text-[#0c0d0e] font-bold px-4 sm:px-5 md:px-6 py-2 sm:py-3 md:py-3.5 rounded-lg md:rounded-xl hover:bg-sky-300 transition-colors duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base md:text-lg">
+                <span>{canPostProperty ? 'Post Your Property' : (user ? 'Switch to a posting account' : 'Login to Post Property')}</span>
                 <ChevronRightIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </button>
             </div>
