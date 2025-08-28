@@ -21,6 +21,30 @@ class PropertyService {
     throw Exception('Featured properties failed: ${res.statusCode}');
   }
 
+  Future<Map<String, dynamic>> searchSuggestions(String query) async {
+    final http.Response res = await _client.get('/properties/search-suggestions', query: {'q': query});
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Search suggestions failed: ${res.statusCode}');
+  }
+
+  Future<Map<String, dynamic>> propertiesInRadius(String zipcode, int distance) async {
+    final http.Response res = await _client.get('/properties/radius/$zipcode/$distance');
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Properties in radius failed: ${res.statusCode}');
+  }
+
+  Future<Map<String, dynamic>> agentProperties(String agentId) async {
+    final http.Response res = await _client.get('/properties/agent/$agentId');
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Agent properties failed: ${res.statusCode}');
+  }
+
   Future<Map<String, dynamic>> detail(String id) async {
     final http.Response res = await _client.get('/properties/$id');
     if (res.statusCode >= 200 && res.statusCode < 300) {

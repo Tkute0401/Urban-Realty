@@ -15,9 +15,11 @@ class _SearchScreenState extends State<SearchScreen> {
   final ScrollController _scrollController = ScrollController();
   
   bool _loading = false;
+  bool _loadingSuggestions = false;
   String? _error;
   List<dynamic> _properties = const [];
   List<dynamic> _filteredProperties = const [];
+  List<dynamic> _searchSuggestions = const [];
   
   // Filter states
   RangeValues _priceRange = const RangeValues(0, 10000000);
@@ -26,13 +28,14 @@ class _SearchScreenState extends State<SearchScreen> {
   int _bedrooms = 0;
   int _bathrooms = 0;
   bool _showFilters = false;
+  bool _showSuggestions = false;
   
   final List<String> _propertyTypes = [
-    'All', 'Apartment', 'House', 'Villa', 'Penthouse', 'Studio', 'Duplex'
+    'All', 'Apartment', 'House', 'Villa', 'Penthouse', 'Studio', 'Duplex', 'Land', 'Commercial'
   ];
   
   final List<String> _locations = [
-    'All', 'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad'
+    'All', 'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad'
   ];
 
   @override
@@ -70,6 +73,39 @@ class _SearchScreenState extends State<SearchScreen> {
     } finally {
       setState(() {
         _loading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchSearchSuggestions(String query) async {
+    if (query.length < 2) {
+      setState(() {
+        _searchSuggestions = [];
+        _showSuggestions = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _loadingSuggestions = true;
+    });
+
+    try {
+      final res = await _service.searchSuggestions(query);
+      final List<dynamic> suggestions = (res['data'] ?? res) as List<dynamic>? ?? [];
+      
+      setState(() {
+        _searchSuggestions = suggestions;
+        _showSuggestions = suggestions.isNotEmpty;
+      });
+    } catch (e) {
+      setState(() {
+        _searchSuggestions = [];
+        _showSuggestions = false;
+      });
+    } finally {
+      setState(() {
+        _loadingSuggestions = false;
       });
     }
   }
@@ -174,28 +210,104 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: Column(
         children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search properties...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _applyFilters();
-                        },
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+          // Enhanced Search Bar
+          Container(
+            margin: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search properties, locations, or keywords...',
+                    prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              _applyFilters();
+                              setState(() {
+                                _showSuggestions = false;
+                              });
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    _applyFilters();
+                    _fetchSearchSuggestions(value);
+                  },
+                  onTap: () {
+                    if (_searchController.text.isNotEmpty) {
+                      setState(() {
+                        _showSuggestions = _searchSuggestions.isNotEmpty;
+                      });
+                    }
+                  },
                 ),
-              ),
-              onChanged: (_) => _applyFilters(),
+                
+                // Search Suggestions
+                if (_showSuggestions && _searchSuggestions.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.shadow.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: _loadingSuggestions
+                        ? const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _searchSuggestions.length,
+                            itemBuilder: (context, index) {
+                              final suggestion = _searchSuggestions[index];
+                              return ListTile(
+                                leading: Icon(
+                                  Icons.search,
+                                  color: theme.colorScheme.primary,
+                                  size: 20,
+                                ),
+                                title: Text(
+                                  suggestion['title']?.toString() ?? suggestion['text']?.toString() ?? '',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                subtitle: suggestion['subtitle'] != null
+                                    ? Text(
+                                        suggestion['subtitle'].toString(),
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      )
+                                    : null,
+                                onTap: () {
+                                  _searchController.text = suggestion['title']?.toString() ?? suggestion['text']?.toString() ?? '';
+                                  setState(() {
+                                    _showSuggestions = false;
+                                  });
+                                  _applyFilters();
+                                },
+                              );
+                            },
+                          ),
+                  ),
+              ],
             ),
           ),
           
