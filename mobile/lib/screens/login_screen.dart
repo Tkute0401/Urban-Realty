@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Urban Realty',
+                          'SQUARE FOOOT',
                           style: theme.textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.primary,
