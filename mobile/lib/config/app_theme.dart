@@ -1,74 +1,83 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Light Theme Colors
+  // SQUARE FOOOT Brand Colors
+  static const Color brandOrange = Color(0xFFF75B00); // Vibrant orange from logo
+  static const Color brandOrangeLight = Color(0xFFFF6600); // Lighter orange variant
+  static const Color brandOrangeDark = Color(0xFFE54D00); // Darker orange variant
+  static const Color brandWhite = Color(0xFFFFFFFF); // Clean white from logo
+  static const Color brandBlack = Color(0xFF000000); // Black for contrast
+  static const Color brandBlue = Color(0xFF1A00FF); // Deep blue variant from logo
+  static const Color brandBlueLight = Color(0xFF3A20FF); // Lighter blue variant
+
+  // Light Theme Colors - Based on SQUARE FOOOT brand
   static const ColorScheme lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: Color(0xFF2563EB), // Modern blue
-    onPrimary: Color(0xFFFFFFFF),
-    primaryContainer: Color(0xFFDBEAFE),
-    onPrimaryContainer: Color(0xFF1E40AF),
-    secondary: Color(0xFF7C3AED), // Purple
-    onSecondary: Color(0xFFFFFFFF),
-    secondaryContainer: Color(0xFFEDE9FE),
-    onSecondaryContainer: Color(0xFF5B21B6),
-    tertiary: Color(0xFF059669), // Green
+    primary: Color(0xFFF75B00), // SQUARE FOOOT orange
+    onPrimary: Color(0xFFFFFFFF), // White text on orange
+    primaryContainer: Color(0xFFFFE8D6), // Light orange background
+    onPrimaryContainer: Color(0xFFE54D00), // Dark orange text
+    secondary: Color(0xFF1A00FF), // Deep blue accent
+    onSecondary: Color(0xFFFFFFFF), // White text on blue
+    secondaryContainer: Color(0xFFE6E0FF), // Light blue background
+    onSecondaryContainer: Color(0xFF1A00FF), // Blue text
+    tertiary: Color(0xFF059669), // Green for success states
     onTertiary: Color(0xFFFFFFFF),
     tertiaryContainer: Color(0xFFD1FAE5),
     onTertiaryContainer: Color(0xFF047857),
-    error: Color(0xFFDC2626),
+    error: Color(0xFFDC2626), // Red for errors
     onError: Color(0xFFFFFFFF),
     errorContainer: Color(0xFFFEE2E2),
     onErrorContainer: Color(0xFF991B1B),
-    background: Color(0xFFFAFAFA),
-    onBackground: Color(0xFF1F2937),
-    surface: Color(0xFFFFFFFF),
-    onSurface: Color(0xFF1F2937),
-    surfaceVariant: Color(0xFFF3F4F6),
-    onSurfaceVariant: Color(0xFF6B7280),
-    outline: Color(0xFFD1D5DB),
-    outlineVariant: Color(0xFFE5E7EB),
+    background: Color(0xFFFAFAFA), // Light gray background
+    onBackground: Color(0xFF1F2937), // Dark text
+    surface: Color(0xFFFFFFFF), // White surface
+    onSurface: Color(0xFF1F2937), // Dark text on surface
+    surfaceVariant: Color(0xFFF8F9FA), // Very light gray
+    onSurfaceVariant: Color(0xFF6B7280), // Medium gray text
+    outline: Color(0xFFE5E7EB), // Light gray outline
+    outlineVariant: Color(0xFFF3F4F6), // Very light gray outline
     shadow: Color(0x00000000),
     scrim: Color(0x00000000),
     inverseSurface: Color(0xFF1F2937),
     onInverseSurface: Color(0xFFF9FAFB),
-    inversePrimary: Color(0xFF93C5FD),
-    surfaceTint: Color(0xFF2563EB),
+    inversePrimary: Color(0xFFFFB366), // Light orange for inverse
+    surfaceTint: Color(0xFFF75B00), // Orange tint
   );
 
-  // Dark Theme Colors
+  // Dark Theme Colors - Based on SQUARE FOOOT brand
   static const ColorScheme darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: Color(0xFF60A5FA), // Lighter blue for dark theme
-    onPrimary: Color(0xFF1E3A8A),
-    primaryContainer: Color(0xFF1E40AF),
-    onPrimaryContainer: Color(0xFFDBEAFE),
-    secondary: Color(0xFFA78BFA), // Lighter purple for dark theme
-    onSecondary: Color(0xFF4C1D95),
-    secondaryContainer: Color(0xFF5B21B6),
-    onSecondaryContainer: Color(0xFFEDE9FE),
+    primary: Color(0xFFFF6600), // Lighter orange for dark theme
+    onPrimary: Color(0xFF000000), // Black text on orange
+    primaryContainer: Color(0xFFE54D00), // Darker orange container
+    onPrimaryContainer: Color(0xFFFFE8D6), // Light orange text
+    secondary: Color(0xFF3A20FF), // Lighter blue for dark theme
+    onSecondary: Color(0xFF000000), // Black text on blue
+    secondaryContainer: Color(0xFF1A00FF), // Dark blue container
+    onSecondaryContainer: Color(0xFFE6E0FF), // Light blue text
     tertiary: Color(0xFF34D399), // Lighter green for dark theme
     onTertiary: Color(0xFF064E3B),
     tertiaryContainer: Color(0xFF047857),
     onTertiaryContainer: Color(0xFFD1FAE5),
-    error: Color(0xFFF87171),
+    error: Color(0xFFF87171), // Lighter red for dark theme
     onError: Color(0xFF7F1D1D),
     errorContainer: Color(0xFF991B1B),
     onErrorContainer: Color(0xFFFEE2E2),
-    background: Color(0xFF0F172A),
-    onBackground: Color(0xFFF1F5F9),
-    surface: Color(0xFF1E293B),
-    onSurface: Color(0xFFF1F5F9),
-    surfaceVariant: Color(0xFF334155),
-    onSurfaceVariant: Color(0xFFCBD5E1),
-    outline: Color(0xFF475569),
-    outlineVariant: Color(0xFF334155),
+    background: Color(0xFF0F172A), // Dark blue-gray background
+    onBackground: Color(0xFFF1F5F9), // Light text
+    surface: Color(0xFF1E293B), // Dark surface
+    onSurface: Color(0xFFF1F5F9), // Light text on surface
+    surfaceVariant: Color(0xFF334155), // Medium dark surface
+    onSurfaceVariant: Color(0xFFCBD5E1), // Light gray text
+    outline: Color(0xFF475569), // Medium gray outline
+    outlineVariant: Color(0xFF334155), // Dark gray outline
     shadow: Color(0x00000000),
     scrim: Color(0x00000000),
     inverseSurface: Color(0xFFF1F5F9),
     onInverseSurface: Color(0xFF0F172A),
-    inversePrimary: Color(0xFF1E40AF),
-    surfaceTint: Color(0xFF60A5FA),
+    inversePrimary: Color(0xFFE54D00), // Dark orange for inverse
+    surfaceTint: Color(0xFFFF6600), // Orange tint
   );
 
   // Light Theme
