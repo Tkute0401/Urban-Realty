@@ -25,8 +25,6 @@ class _HomeTabsState extends State<HomeTabs> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
       body: _tabs[_currentIndex],
       bottomNavigationBar: NavigationBar(

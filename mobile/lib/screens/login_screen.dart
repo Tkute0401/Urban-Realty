@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../widgets/logo_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,32 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     // App Logo and Title
                     Column(
                       children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.primary.withOpacity(0.3),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.home_outlined,
-                            size: 40,
-                            color: theme.colorScheme.onPrimary,
-                          ),
-                        ),
+                        const LogoWidget(size: 100, showText: false),
                         const SizedBox(height: 24),
                         Text(
-                          'Urban Realty',
+                          'SQUARE FOOOT',
                           style: theme.textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.primary,
+                            letterSpacing: 2,
                           ),
                         ),
                         const SizedBox(height: 8),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Light Theme Colors
+  // Light Theme Colors - Based on SQUARE FOOOT logo
   static const ColorScheme lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: Color(0xFF2563EB), // Modern blue
-    onPrimary: Color(0xFFFFFFFF),
-    primaryContainer: Color(0xFFDBEAFE),
-    onPrimaryContainer: Color(0xFF1E40AF),
-    secondary: Color(0xFF7C3AED), // Purple
+    primary: Color(0xFFFF6B35), // Vibrant orange from logo
+    onPrimary: Color(0xFFFFFFFF), // White text/icons on orange
+    primaryContainer: Color(0xFFFFE8D6), // Light orange container
+    onPrimaryContainer: Color(0xFFCC4A1A), // Dark orange text on light orange
+    secondary: Color(0xFF1A00CD), // Deep blue accent
     onSecondary: Color(0xFFFFFFFF),
-    secondaryContainer: Color(0xFFEDE9FE),
-    onSecondaryContainer: Color(0xFF5B21B6),
+    secondaryContainer: Color(0xFFE6E0FF),
+    onSecondaryContainer: Color(0xFF0D0066),
     tertiary: Color(0xFF059669), // Green
     onTertiary: Color(0xFFFFFFFF),
     tertiaryContainer: Color(0xFFD1FAE5),
@@ -20,11 +20,9 @@ class AppTheme {
     onError: Color(0xFFFFFFFF),
     errorContainer: Color(0xFFFEE2E2),
     onErrorContainer: Color(0xFF991B1B),
-    background: Color(0xFFFAFAFA),
-    onBackground: Color(0xFF1F2937),
-    surface: Color(0xFFFFFFFF),
-    onSurface: Color(0xFF1F2937),
-    surfaceVariant: Color(0xFFF3F4F6),
+    surface: Color(0xFFFFFFFF), // White surface
+    onSurface: Color(0xFF1F2937), // Dark text on white
+    surfaceVariant: Color(0xFFF8F9FA), // Light gray surface variant
     onSurfaceVariant: Color(0xFF6B7280),
     outline: Color(0xFFD1D5DB),
     outlineVariant: Color(0xFFE5E7EB),
@@ -32,21 +30,21 @@ class AppTheme {
     scrim: Color(0x00000000),
     inverseSurface: Color(0xFF1F2937),
     onInverseSurface: Color(0xFFF9FAFB),
-    inversePrimary: Color(0xFF93C5FD),
-    surfaceTint: Color(0xFF2563EB),
+    inversePrimary: Color(0xFFFFB366), // Light orange inverse
+    surfaceTint: Color(0xFFFF6B35), // Orange surface tint
   );
 
-  // Dark Theme Colors
+  // Dark Theme Colors - Based on logo with dark variant
   static const ColorScheme darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: Color(0xFF60A5FA), // Lighter blue for dark theme
-    onPrimary: Color(0xFF1E3A8A),
-    primaryContainer: Color(0xFF1E40AF),
-    onPrimaryContainer: Color(0xFFDBEAFE),
-    secondary: Color(0xFFA78BFA), // Lighter purple for dark theme
-    onSecondary: Color(0xFF4C1D95),
-    secondaryContainer: Color(0xFF5B21B6),
-    onSecondaryContainer: Color(0xFFEDE9FE),
+    primary: Color(0xFFFF6B35), // Keep the vibrant orange
+    onPrimary: Color(0xFFFFFFFF),
+    primaryContainer: Color(0xFFCC4A1A), // Darker orange container
+    onPrimaryContainer: Color(0xFFFFE8D6),
+    secondary: Color(0xFF4A90E2), // Lighter blue for dark theme
+    onSecondary: Color(0xFF0D0066),
+    secondaryContainer: Color(0xFF1A00CD),
+    onSecondaryContainer: Color(0xFFE6E0FF),
     tertiary: Color(0xFF34D399), // Lighter green for dark theme
     onTertiary: Color(0xFF064E3B),
     tertiaryContainer: Color(0xFF047857),
@@ -55,10 +53,8 @@ class AppTheme {
     onError: Color(0xFF7F1D1D),
     errorContainer: Color(0xFF991B1B),
     onErrorContainer: Color(0xFFFEE2E2),
-    background: Color(0xFF0F172A),
-    onBackground: Color(0xFFF1F5F9),
-    surface: Color(0xFF1E293B),
-    onSurface: Color(0xFFF1F5F9),
+    surface: Color(0xFF1E293B), // Dark surface
+    onSurface: Color(0xFFF1F5F9), // Light text on dark surface
     surfaceVariant: Color(0xFF334155),
     onSurfaceVariant: Color(0xFFCBD5E1),
     outline: Color(0xFF475569),
@@ -67,8 +63,8 @@ class AppTheme {
     scrim: Color(0x00000000),
     inverseSurface: Color(0xFFF1F5F9),
     onInverseSurface: Color(0xFF0F172A),
-    inversePrimary: Color(0xFF1E40AF),
-    surfaceTint: Color(0xFF60A5FA),
+    inversePrimary: Color(0xFFCC4A1A),
+    surfaceTint: Color(0xFFFF6B35), // Keep orange surface tint
   );
 
   // Light Theme
@@ -87,7 +83,7 @@ class AppTheme {
     ),
     
     // Card Theme
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
       shadowColor: const Color(0xFF000000).withOpacity(0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -220,7 +216,7 @@ class AppTheme {
     ),
     
     // Card Theme
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 4,
       shadowColor: const Color(0xFF000000).withOpacity(0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

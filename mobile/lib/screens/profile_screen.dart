@@ -12,7 +12,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService _auth = AuthService();
   bool _loading = true;
   String? _error;
-  Map<String, dynamic>? _me;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _name = TextEditingController();
@@ -30,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final me = await _auth.me();
       final data = (me['data'] ?? me) as Map<String, dynamic>;
-      _me = data;
       _name.text = data['name']?.toString() ?? '';
       _email.text = data['email']?.toString() ?? '';
       _mobile.text = data['mobile']?.toString() ?? '';
