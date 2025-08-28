@@ -28,5 +28,20 @@ class PropertyService {
     }
     throw Exception('Property detail failed: ${res.statusCode}');
   }
+
+  Future<Map<String, dynamic>> contact({
+    required String id,
+    required String message,
+    required String contactMethod,
+  }) async {
+    final http.Response res = await _client.post('/properties/$id/contact', body: {
+      'message': message,
+      'contactMethod': contactMethod,
+    });
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    }
+    throw Exception('Contact agent failed: ${res.statusCode} ${res.body}');
+  }
 }
 

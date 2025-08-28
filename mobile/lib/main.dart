@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/properties_screen.dart';
+import 'screens/home_tabs.dart';
 
 void main() {
   runApp(const UrbanRealtyApp());
@@ -21,6 +22,7 @@ class UrbanRealtyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/properties': (context) => const PropertiesScreen(),
+        '/home': (context) => const HomeTabs(),
       },
     );
   }
