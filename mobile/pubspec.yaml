@@ -17,6 +17,43 @@ dependencies:
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
   url_launcher: ^6.2.4
+  
+  # Enhanced UI and Animations
+  lottie: ^3.1.0
+  flutter_staggered_animations: ^1.1.1
+  photo_view: ^0.14.0
+  carousel_slider: ^4.2.1
+  
+  # Maps and Location
+  google_maps_flutter: ^2.6.0
+  geolocator: ^11.0.0
+  geocoding: ^2.1.1
+  
+  # Notifications and Storage
+  flutter_local_notifications: ^17.2.2
+  sqflite: ^2.3.2
+  path_provider: ^2.1.2
+  
+  # Advanced UI Components
+  flutter_slidable: ^3.0.1
+  pull_to_refresh: ^2.0.0
+  infinite_scroll_pagination: ^4.0.0
+  
+  # Charts and Analytics
+  fl_chart: ^0.68.0
+  
+  # Social Sharing
+  share_plus: ^7.2.1
+  
+  # QR Code
+  qr_flutter: ^4.1.0
+  
+  # Biometrics
+  local_auth: ^2.1.8
+  
+  # Network and Caching
+  connectivity_plus: ^5.0.2
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:
@@ -25,4 +62,16 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  
+  # Add custom fonts and assets
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
 

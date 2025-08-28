@@ -1,422 +1,895 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/theme_provider.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class EnhancedSettingsScreen extends StatefulWidget {
+  const EnhancedSettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<EnhancedSettingsScreen> createState() => _EnhancedSettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _EnhancedSettingsScreenState extends State<EnhancedSettingsScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late AnimationController _scaleController;
+  
   bool _notificationsEnabled = true;
-  bool _emailNotifications = true;
-  bool _pushNotifications = true;
-  bool _locationServices = true;
+  bool _biometricsEnabled = false;
+  bool _autoSyncEnabled = true;
   String _language = 'English';
-  String _currency = 'INR (₹)';
+  String _currency = 'USD';
 
-  final List<String> _languages = ['English', 'Hindi', 'Gujarati', 'Marathi', 'Tamil'];
-  final List<String> _currencies = ['INR (₹)', 'USD (\$)', 'EUR (€)', 'GBP (£)'];
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(duration: const Duration(milliseconds: 800), vsync: this);
+    _slideController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
+    _scaleController = AnimationController(duration: const Duration(milliseconds: 400), vsync: this);
+    
+    // Start animations
+    _fadeController.forward();
+    _slideController.forward();
+    _scaleController.forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    _scaleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Theme Section
-          _buildSectionHeader('Appearance', Icons.palette_outlined),
-          Card(
-            child: Column(
-              children: [
-                Consumer<ThemeProvider>(
-                  builder: (context, themeProvider, child) {
-                    return ListTile(
-                      leading: Icon(
-                        themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                        color: theme.colorScheme.primary,
-                      ),
-                      title: const Text('Theme'),
-                      subtitle: Text(themeProvider.getThemeModeString()),
-                      trailing: DropdownButton<ThemeMode>(
-                        value: themeProvider.themeMode,
-                        underline: const SizedBox(),
-                        items: const [
-                          DropdownMenuItem(
-                            value: ThemeMode.system,
-                            child: Text('System'),
-                          ),
-                          DropdownMenuItem(
-                            value: ThemeMode.light,
-                            child: Text('Light'),
-                          ),
-                          DropdownMenuItem(
-                            value: ThemeMode.dark,
-                            child: Text('Dark'),
-                          ),
-                        ],
-                        onChanged: (ThemeMode? newValue) {
-                          if (newValue != null) {
-                            themeProvider.setThemeMode(newValue);
-                          }
-                        },
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.language,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Language'),
-                  subtitle: Text(_language),
-                  trailing: DropdownButton<String>(
-                    value: _language,
-                    underline: const SizedBox(),
-                    items: _languages.map((String language) {
-                      return DropdownMenuItem<String>(
-                        value: language,
-                        child: Text(language),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          _language = newValue;
-                        });
-                      }
-                    },
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.attach_money,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Currency'),
-                  subtitle: Text(_currency),
-                  trailing: DropdownButton<String>(
-                    value: _currency,
-                    underline: const SizedBox(),
-                    items: _currencies.map((String currency) {
-                      return DropdownMenuItem<String>(
-                        value: currency,
-                        child: Text(currency),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          _currency = newValue;
-                        });
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Notifications Section
-          _buildSectionHeader('Notifications', Icons.notifications_outlined),
-          Card(
-            child: Column(
-              children: [
-                SwitchListTile(
-                  secondary: Icon(
-                    Icons.notifications,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Enable Notifications'),
-                  subtitle: const Text('Receive push notifications'),
-                  value: _notificationsEnabled,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _notificationsEnabled = value;
-                      if (!value) {
-                        _emailNotifications = false;
-                        _pushNotifications = false;
-                      }
-                    });
-                  },
-                ),
-                if (_notificationsEnabled) ...[
-                  SwitchListTile(
-                    secondary: Icon(
-                      Icons.email_outlined,
-                      color: theme.colorScheme.primary,
-                    ),
-                    title: const Text('Email Notifications'),
-                    subtitle: const Text('Receive updates via email'),
-                    value: _emailNotifications,
-                    onChanged: (bool value) {
-                      setState(() {
-                        _emailNotifications = value;
-                      });
-                    },
-                  ),
-                  SwitchListTile(
-                    secondary: Icon(
-                      Icons.phone_android,
-                      color: theme.colorScheme.primary,
-                    ),
-                    title: const Text('Push Notifications'),
-                    subtitle: const Text('Receive updates on your device'),
-                    value: _pushNotifications,
-                    onChanged: (bool value) {
-                      setState(() {
-                        _pushNotifications = value;
-                      });
-                    },
-                  ),
+      body: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return FadeTransition(
+            opacity: _fadeController,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(_slideController),
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildProfileSection(),
+                  const SizedBox(height: 24),
+                  _buildThemeSection(themeProvider),
+                  const SizedBox(height: 24),
+                  _buildAppearanceSection(themeProvider),
+                  const SizedBox(height: 24),
+                  _buildPreferencesSection(),
+                  const SizedBox(height: 24),
+                  _buildAccountSection(),
+                  const SizedBox(height: 24),
+                  _buildSupportSection(),
+                  const SizedBox(height: 24),
+                  _buildAboutSection(),
+                  const SizedBox(height: 100), // Bottom padding
                 ],
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Privacy & Security Section
-          _buildSectionHeader('Privacy & Security', Icons.security_outlined),
-          Card(
-            child: Column(
-              children: [
-                SwitchListTile(
-                  secondary: Icon(
-                    Icons.location_on_outlined,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Location Services'),
-                  subtitle: const Text('Allow app to access your location'),
-                  value: _locationServices,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _locationServices = value;
-                    });
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.lock_outline,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Change Password'),
-                  subtitle: const Text('Update your account password'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to change password screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Change Password feature coming soon')),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.privacy_tip_outlined,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Privacy Policy'),
-                  subtitle: const Text('Read our privacy policy'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to privacy policy
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Privacy Policy coming soon')),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Support Section
-          _buildSectionHeader('Support', Icons.help_outline),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.help_outline,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Help & FAQ'),
-                  subtitle: const Text('Find answers to common questions'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to help screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Help & FAQ coming soon')),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.contact_support_outlined,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Contact Support'),
-                  subtitle: const Text('Get help from our team'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to contact support
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Contact Support coming soon')),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.rate_review_outlined,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Rate App'),
-                  subtitle: const Text('Rate us on the app store'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to app store rating
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Rate App feature coming soon')),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // About Section
-          _buildSectionHeader('About', Icons.info_outline),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.info_outline,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('App Version'),
-                  subtitle: const Text('1.0.0'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Show app version details
-                    showAboutDialog(
-                      context: context,
-                      applicationName: 'Urban Realty',
-                      applicationVersion: '1.0.0',
-                      applicationIcon: Icon(
-                        Icons.home_outlined,
-                        size: 48,
-                        color: theme.colorScheme.primary,
-                      ),
-                      children: [
-                        const Text('Urban Realty Mobile App'),
-                        const SizedBox(height: 8),
-                        const Text('Find your dream property with ease.'),
-                      ],
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.description_outlined,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('Terms of Service'),
-                  subtitle: const Text('Read our terms of service'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onTap: () {
-                    // Navigate to terms of service
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Terms of Service coming soon')),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Logout Button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                // Show logout confirmation dialog
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Logout'),
-                      content: const Text('Are you sure you want to logout?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            // Navigate to login screen
-                            Navigator.of(context).pushReplacementNamed('/login');
-                          },
-                          child: const Text('Logout'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              icon: const Icon(Icons.logout),
-              label: const Text('Logout'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: theme.colorScheme.error,
-                side: BorderSide(color: theme.colorScheme.error),
-                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileSection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.secondary,
+                  ],
+                ),
+              ),
+              child: const Icon(
+                Icons.person,
+                size: 40,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'John Doe',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'john.doe@example.com',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Premium Member',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                // Navigate to profile edit
+              },
+              icon: Icon(
+                Icons.edit,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeSection(ThemeProvider themeProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.palette,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Theme & Appearance',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            // Theme Mode Selection
+            Text(
+              'Theme Mode',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildThemeOption(
+                    'Light',
+                    Icons.light_mode,
+                    ThemeMode.light,
+                    themeProvider,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildThemeOption(
+                    'Dark',
+                    Icons.dark_mode,
+                    ThemeMode.dark,
+                    themeProvider,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildThemeOption(
+                    'System',
+                    Icons.settings_system_daydream,
+                    ThemeMode.system,
+                    themeProvider,
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Accent Color Selection
+            Text(
+              'Accent Color',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: ThemeProvider.predefinedColors.map((color) {
+                final isSelected = themeProvider.accentColor == color;
+                return GestureDetector(
+                  onTap: () => themeProvider.setAccentColor(color),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? Colors.white : Colors.transparent,
+                        width: 3,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: isSelected
+                        ? const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 24,
+                          )
+                        : null,
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(String title, IconData icon, ThemeMode mode, ThemeProvider themeProvider) {
+    final isSelected = themeProvider.themeMode == mode;
+    
+    return GestureDetector(
+      onTap: () => themeProvider.setThemeMode(mode),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Theme.of(context).colorScheme.surfaceVariant,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Colors.transparent,
+            width: 2,
           ),
-          
-          const SizedBox(height: 16),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppearanceSection(ThemeProvider themeProvider) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.text_fields,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Text & Display',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            // Font Size Control
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Font Size',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '${(themeProvider.fontSize * 100).round()}%',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => themeProvider.decreaseFontSize(),
+                  icon: Icon(
+                    Icons.remove_circle_outline,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                Expanded(
+                  child: Slider(
+                    value: themeProvider.fontSize,
+                    min: 0.8,
+                    max: 1.4,
+                    divisions: 6,
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    inactiveColor: Theme.of(context).colorScheme.surfaceVariant,
+                    onChanged: (value) => themeProvider.setFontSize(value),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => themeProvider.increaseFontSize(),
+                  icon: Icon(
+                    Icons.add_circle_outline,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Font Size Preview
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Preview Text',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'This is how your text will appear with the current font size setting.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Reset Button
+            Center(
+              child: TextButton.icon(
+                onPressed: () => themeProvider.resetFontSize(),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reset to Default'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreferencesSection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.settings,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'App Preferences',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            _buildSwitchTile(
+              'Push Notifications',
+              'Receive notifications about new properties and updates',
+              Icons.notifications,
+              _notificationsEnabled,
+              (value) => setState(() => _notificationsEnabled = value),
+            ),
+            
+            _buildSwitchTile(
+              'Biometric Authentication',
+              'Use fingerprint or face ID to unlock the app',
+              Icons.fingerprint,
+              _biometricsEnabled,
+              (value) => setState(() => _biometricsEnabled = value),
+            ),
+            
+            _buildSwitchTile(
+              'Auto Sync',
+              'Automatically sync data when connected to internet',
+              Icons.sync,
+              _autoSyncEnabled,
+              (value) => setState(() => _autoSyncEnabled = value),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Language Selection
+            _buildDropdownTile(
+              'Language',
+              _language,
+              ['English', 'Spanish', 'French', 'German', 'Chinese'],
+              (value) => setState(() => _language = value!),
+              Icons.language,
+            ),
+            
+            // Currency Selection
+            _buildDropdownTile(
+              'Currency',
+              _currency,
+              ['USD', 'EUR', 'GBP', 'JPY', 'CAD'],
+              (value) => setState(() => _currency = value!),
+              Icons.attach_money,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwitchTile(String title, String subtitle, IconData icon, bool value, ValueChanged<bool> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: Theme.of(context).colorScheme.primary,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
-    final theme = Theme.of(context);
-    
+  Widget _buildDropdownTile(String title, String value, List<String> options, ValueChanged<String?> onChanged, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: theme.colorScheme.primary,
-            size: 20,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.w600,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                DropdownButton<String>(
+                  value: value,
+                  isExpanded: true,
+                  underline: Container(),
+                  items: options.map((String option) {
+                    return DropdownMenuItem<String>(
+                      value: option,
+                      child: Text(option),
+                    );
+                  }).toList(),
+                  onChanged: onChanged,
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAccountSection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.account_circle,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Account',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            _buildListTile(
+              'Edit Profile',
+              'Update your personal information',
+              Icons.edit,
+              () {
+                // Navigate to profile edit
+              },
+            ),
+            
+            _buildListTile(
+              'Change Password',
+              'Update your account password',
+              Icons.lock,
+              () {
+                // Navigate to password change
+              },
+            ),
+            
+            _buildListTile(
+              'Privacy Settings',
+              'Manage your privacy preferences',
+              Icons.privacy_tip,
+              () {
+                // Navigate to privacy settings
+              },
+            ),
+            
+            _buildListTile(
+              'Subscription',
+              'Manage your subscription plan',
+              Icons.card_membership,
+              () {
+                // Navigate to subscription
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSupportSection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.support_agent,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Support & Help',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            _buildListTile(
+              'Help Center',
+              'Find answers to common questions',
+              Icons.help,
+              () {
+                // Navigate to help center
+              },
+            ),
+            
+            _buildListTile(
+              'Contact Support',
+              'Get in touch with our support team',
+              Icons.contact_support,
+              () {
+                // Navigate to contact support
+              },
+            ),
+            
+            _buildListTile(
+              'Report a Bug',
+              'Help us improve by reporting issues',
+              Icons.bug_report,
+              () {
+                // Navigate to bug report
+              },
+            ),
+            
+            _buildListTile(
+              'Feature Request',
+              'Suggest new features for the app',
+              Icons.lightbulb,
+              () {
+                // Navigate to feature request
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAboutSection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.info,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'About',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            _buildListTile(
+              'App Version',
+              'Version 1.0.0 (Build 1)',
+              Icons.info_outline,
+              null,
+            ),
+            
+            _buildListTile(
+              'Terms of Service',
+              'Read our terms and conditions',
+              Icons.description,
+              () {
+                // Navigate to terms of service
+              },
+            ),
+            
+            _buildListTile(
+              'Privacy Policy',
+              'Learn about our privacy practices',
+              Icons.privacy_tip_outlined,
+              () {
+                // Navigate to privacy policy
+              },
+            ),
+            
+            _buildListTile(
+              'Share App',
+              'Share SQUARE FOOOT with friends',
+              Icons.share,
+              () {
+                Share.share(
+                  'Check out SQUARE FOOOT - the best real estate app!',
+                  subject: 'SQUARE FOOOT App',
+                );
+              },
+            ),
+            
+            _buildListTile(
+              'Rate App',
+              'Rate us on the app store',
+              Icons.star,
+              () {
+                // Navigate to app store rating
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title, String subtitle, IconData icon, VoidCallback? onTap) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null)
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  size: 16,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
-import 'config/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/properties_screen.dart';
 import 'screens/home_tabs.dart';
@@ -32,8 +31,8 @@ class UrbanRealtyApp extends StatelessWidget {
       builder: (context, themeProvider, child) {
         return MaterialApp(
           title: 'SQUARE FOOOT',
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
           themeMode: themeProvider.themeMode,
           initialRoute: '/login',
           routes: {
