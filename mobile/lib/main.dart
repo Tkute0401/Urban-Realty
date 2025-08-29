@@ -12,6 +12,14 @@ import 'screens/property_detail_screen.dart';
 import 'screens/static_pages.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/admin/admin_dashboard_screen.dart';
+import 'screens/admin/admin_users_screen.dart';
+import 'screens/agent/agent_dashboard_screen.dart';
+import 'screens/agent/agent_properties_screen.dart';
+import 'screens/agent/agent_leads_screen.dart';
+import 'screens/agent/agent_inquiries_screen.dart';
+import 'screens/agent/agent_analytics_screen.dart';
+import 'screens/developer/developers_list_screen.dart';
 
 void main() {
   runApp(
@@ -77,8 +85,14 @@ class UrbanRealtyApp extends StatelessWidget {
             '/add-property': (context) => const AddPropertyPage(),
             '/edit-property': (context) => const EditPropertyPage(),
             // Areas
-            '/agent': (context) => const AgentDashboardPage(),
-            '/admin': (context) => const AdminDashboardPage(),
+            '/agent': (context) => const AgentDashboardScreen(),
+            '/admin': (context) => const AdminDashboardScreen(),
+            '/admin-users': (context) => const AdminUsersScreen(),
+            '/agent-properties': (context) => const AgentPropertiesScreen(),
+            '/agent-leads': (context) => const AgentLeadsScreen(),
+            '/agent-inquiries': (context) => const AgentInquiriesScreen(),
+            '/agent-analytics': (context) => const AgentAnalyticsScreen(),
+            '/developers': (context) => const DevelopersListScreen(),
           },
         );
       },

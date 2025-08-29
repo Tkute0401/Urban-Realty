@@ -1,0 +1,72 @@
+import 'dart:convert';
+import 'http_client.dart';
+
+class SubscriptionService {
+  static final SubscriptionService _instance = SubscriptionService._internal();
+  factory SubscriptionService() => _instance;
+  SubscriptionService._internal();
+
+  final HttpClient _httpClient = HttpClient();
+
+  Future<List<Map<String, dynamic>>> getSubscriptionPlans() async {
+    try {
+      final response = await _httpClient.get('/subscriptions/plans');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['plans'] ?? []);
+      }
+      throw Exception('Failed to load subscription plans');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getCurrentSubscription() async {
+    try {
+      final response = await _httpClient.get('/subscriptions/current');
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      throw Exception('Failed to load current subscription');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> subscribeToPlan(String planId) async {
+    try {
+      final response = await _httpClient.post('/subscriptions/subscribe', body: {'planId': planId});
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      throw Exception('Failed to subscribe to plan');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> cancelSubscription() async {
+    try {
+      final response = await _httpClient.post('/subscriptions/cancel');
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      throw Exception('Failed to cancel subscription');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getBillingHistory() async {
+    try {
+      final response = await _httpClient.get('/subscriptions/billing-history');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['bills'] ?? []);
+      }
+      throw Exception('Failed to load billing history');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+}
