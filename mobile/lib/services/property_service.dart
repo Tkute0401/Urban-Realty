@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/property.dart';
+import '../config/api_config.dart';
 
 class PropertyService {
-  static const String baseUrl = 'https://urban-realty-production.up.railway.app/api/v1';
 
   static Future<List<Property>> getProperties({
     String? search,
@@ -24,7 +24,7 @@ class PropertyService {
       if (page != null) queryParams['page'] = page.toString();
       if (limit != null) queryParams['limit'] = limit.toString();
 
-      final uri = Uri.parse('$baseUrl/properties').replace(queryParameters: queryParams);
+      final uri = Uri.parse('${ApiConfig.baseUrl}/properties').replace(queryParameters: queryParams);
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
@@ -40,7 +40,7 @@ class PropertyService {
 
   static Future<Property> getPropertyById(String id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/properties/$id'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/properties/$id'));
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -55,7 +55,7 @@ class PropertyService {
 
   static Future<List<Property>> getFeaturedProperties() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/properties/featured'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/properties/featured'));
       
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -70,7 +70,7 @@ class PropertyService {
 
   static Future<List<Property>> getRecentlyViewedProperties() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/properties/recently-viewed'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/properties/recently-viewed'));
       
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -85,7 +85,7 @@ class PropertyService {
 
   static Future<Map<String, dynamic>> list() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/properties'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/properties'));
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -101,7 +101,7 @@ class PropertyService {
   static Future<Map<String, dynamic>> searchSuggestions(String query) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/properties/search-suggestions?q=$query'),
+        Uri.parse('${ApiConfig.baseUrl}/properties/search-suggestions?q=$query'),
       );
       
       if (response.statusCode == 200) {
@@ -117,7 +117,7 @@ class PropertyService {
 
   static Future<Map<String, dynamic>> detail(String id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/properties/$id'));
+      final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/properties/$id'));
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -133,7 +133,7 @@ class PropertyService {
   static Future<Map<String, dynamic>> contact(String propertyId, Map<String, dynamic> contactData) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/properties/$propertyId/contact'),
+        Uri.parse('${ApiConfig.baseUrl}/properties/$propertyId/contact'),
         body: jsonEncode(contactData),
         headers: {'Content-Type': 'application/json'},
       );
@@ -153,7 +153,7 @@ class PropertyService {
       // Create multipart request for property data and images
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/properties'),
+        Uri.parse('${ApiConfig.baseUrl}/properties'),
       );
 
       // Add property data as fields
