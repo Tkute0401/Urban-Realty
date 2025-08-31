@@ -8,45 +8,39 @@ enum Environment {
 }
 
 class EnvironmentConfig {
+  // Force production environment - no development or staging allowed
   static Environment _environment = Environment.production;
   
+  // Disable environment switching - always production
   static void setEnvironment(Environment env) {
-    _environment = env;
+    // Ignore any attempts to change environment - always stay in production
+    _environment = Environment.production;
   }
   
   static Environment get environment => _environment;
   
-  static bool get isDevelopment => _environment == Environment.development;
-  static bool get isStaging => _environment == Environment.staging;
-  static bool get isProduction => _environment == Environment.production;
+  // Always return false for development and staging
+  static bool get isDevelopment => false;
+  static bool get isStaging => false;
+  static bool get isProduction => true;
   
   static String get apiBaseUrl {
-    switch (_environment) {
-      case Environment.development:
-        return dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:5000/api/v1'; // Android emulator
-      case Environment.staging:
-        return 'https://urban-realty-staging.up.railway.app/api/v1';
-      case Environment.production:
-        return 'https://urban-realty-production.up.railway.app/api/v1';
-    }
+    // Always return production URL regardless of environment setting
+    return 'https://urban-realty-production.up.railway.app/api/v1';
   }
   
   static String get appName {
-    switch (_environment) {
-      case Environment.development:
-        return 'SQUARE FOOOT (DEV)';
-      case Environment.staging:
-        return 'SQUARE FOOOT (STAGING)';
-      case Environment.production:
-        return 'SQUARE FOOOT';
-    }
+    // Always return production app name
+    return 'SQUARE FOOOT';
   }
   
   static bool get enableLogging {
-    return !isProduction;
+    // Disable logging in production for security
+    return false;
   }
   
   static bool get enableDebugBanner {
-    return isDevelopment;
+    // Never show debug banner
+    return false;
   }
 }

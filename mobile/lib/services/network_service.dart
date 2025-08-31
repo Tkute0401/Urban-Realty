@@ -20,7 +20,7 @@ class NetworkService {
   static Future<bool> isServerReachable(String baseUrl) async {
     try {
       final uri = Uri.parse(baseUrl);
-      final socket = await Socket.connect(uri.host, uri.port, timeout: Duration(seconds: 5));
+      final socket = await Socket.connect(uri.host, uri.port, timeout: const Duration(seconds: 5));
       await socket.close();
       return true;
     } catch (e) {
@@ -37,7 +37,7 @@ class NetworkService {
       return 'Request timed out. Please try again.';
     } else if (error.toString().contains('HttpException')) {
       return 'Server error occurred. Please try again later.';
-    } catch (e) {
+    } else {
       return 'An unexpected error occurred. Please try again.';
     }
   }
