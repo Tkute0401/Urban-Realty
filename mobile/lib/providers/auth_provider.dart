@@ -79,7 +79,7 @@ class AuthProvider extends ChangeNotifier {
       _user = null;
       notifyListeners();
       // Log the error but don't throw it to prevent app crashes
-      print('Logout error: $e');
+      debugPrint('Logout error: $e');
     }
   }
 

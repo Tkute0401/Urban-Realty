@@ -101,7 +101,7 @@ class MyApp extends StatelessWidget {
               '/notifications': (context) => const NotificationsScreen(),
               // Property routes
               '/property-detail': (context) => PropertyDetailScreen(
-                propertyId: ModalRoute.of(context)!.settings.arguments as String,
+                id: ModalRoute.of(context)!.settings.arguments as String,
               ),
               '/edit-property': (context) => const EditPropertyPage(),
               // Developer routes

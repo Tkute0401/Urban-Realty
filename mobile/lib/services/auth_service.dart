@@ -86,7 +86,7 @@ class AuthService {
     } catch (e) {
       // Don't throw exception for logout failures, just return empty response
       // This prevents app crashes when server is unavailable
-      print('Logout error: $e');
+      debugPrint('Logout error: $e');
       return {};
     }
   }
