@@ -2,27 +2,47 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/user.dart';
 import '../config/api_config.dart';
+import 'network_service.dart';
 
 class AuthService {
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
+      // Check network connectivity first
+      if (!await NetworkService.hasInternetConnection()) {
+        throw Exception('No internet connection available');
+      }
+      
+      // Check if server is reachable
+      if (!await NetworkService.isServerReachable(ApiConfig.baseUrl)) {
+        throw Exception('Server is not reachable. Please check your connection.');
+      }
+      
       final response = await http.post(
-        Uri.parse('https://urban-realty-production.up.railway.app/api/v1/auth/login'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/login'),
         body: jsonEncode({
           'email': email,
           'password': password,
         }),
         headers: {'Content-Type': 'application/json'},
-      );
+      ).timeout(Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        final responseData = jsonDecode(response.body);
+        if (responseData == null) {
+          throw Exception('Invalid response from server');
+        }
+        return responseData;
       } else {
-        throw Exception('Login failed');
+        final errorData = jsonDecode(response.body);
+        final errorMessage = errorData['message'] ?? 'Login failed with status ${response.statusCode}';
+        throw Exception(errorMessage);
       }
     } catch (e) {
-      throw Exception('Error during login: $e');
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Error during login: ${NetworkService.getNetworkErrorMessage(e)}');
     }
   }
 

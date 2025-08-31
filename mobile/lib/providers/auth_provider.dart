@@ -19,6 +19,16 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       final response = await AuthService.login(email, password);
+      
+      // Check if response is null or doesn't contain data
+      if (response == null) {
+        throw Exception('Invalid response from server');
+      }
+      
+      if (response["data"] == null) {
+        throw Exception('No user data received from server');
+      }
+      
       _user = User.fromJson(response["data"]);
       _isLoading = false;
       notifyListeners();
@@ -45,6 +55,16 @@ class AuthProvider extends ChangeNotifier {
     
     try {
       final response = await AuthService.register(email, password, name, role);
+      
+      // Check if response is null or doesn't contain data
+      if (response == null) {
+        throw Exception('Invalid response from server');
+      }
+      
+      if (response["data"] == null) {
+        throw Exception('No user data received from server');
+      }
+      
       _user = User.fromJson(response["data"]);
       _isLoading = false;
       notifyListeners();
