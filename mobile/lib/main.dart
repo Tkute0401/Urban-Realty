@@ -10,11 +10,16 @@ import "screens/home_tabs.dart";
 import "screens/login_screen.dart";
 import "screens/register_screen.dart";
 import "screens/settings_screen.dart";
+import "screens/profile_screen.dart";
+import "screens/search_screen.dart";
 import "screens/subscription_screen.dart";
 import "screens/add_property_screen.dart";
 import "screens/static_pages.dart";
 import "screens/admin/admin_dashboard_screen.dart";
 import "screens/admin/admin_users_screen.dart";
+import "screens/admin/admin_properties_screen.dart";
+import "screens/admin/admin_agents_screen.dart";
+import "screens/admin/admin_analytics_screen.dart";
 import "screens/agent/agent_dashboard_screen.dart";
 import "screens/agent/agent_analytics_screen.dart";
 import "screens/agent/agent_inquiries_screen.dart";
@@ -64,8 +69,10 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const RegisterScreen(),
               '/settings': (context) => const SettingsScreen(),
+              '/profile': (context) => const ProfileScreen(),
               '/subscription': (context) => const SubscriptionScreen(),
               '/add-property': (context) => const AddPropertyScreen(),
+              '/search': (context) => const SearchScreen(),
               '/about': (context) => const AboutPage(),
               '/privacy': (context) => const PrivacyPolicyPage(),
               '/terms': (context) => const TermsConditionsPage(),
@@ -74,6 +81,9 @@ class MyApp extends StatelessWidget {
               // Admin routes
               '/admin/dashboard': (context) => const AdminDashboardScreen(),
               '/admin/users': (context) => const AdminUsersScreen(),
+              '/admin/properties': (context) => const AdminPropertiesScreen(),
+              '/admin/agents': (context) => const AdminAgentsScreen(),
+              '/admin/analytics': (context) => const AdminAnalyticsScreen(),
               // Agent routes
               '/agent/dashboard': (context) => const AgentDashboardScreen(),
               '/agent/analytics': (context) => const AgentAnalyticsScreen(),
