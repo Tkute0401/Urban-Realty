@@ -1,13 +1,21 @@
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
+import "package:flutter_dotenv/flutter_dotenv.dart";
 import "providers/auth_provider.dart";
 import "providers/properties_provider.dart";
 import "providers/theme_provider.dart";
 import "config/app_theme.dart";
+import "config/environment_config.dart";
 import "screens/home_tabs.dart";
 import "screens/login_screen.dart";
 
-void main() {
+void main() async {
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
+  
+  // Set environment for development
+  EnvironmentConfig.setEnvironment(Environment.development);
+  
   runApp(const MyApp());
 }
 
@@ -39,7 +47,7 @@ class MyApp extends StatelessWidget {
                 }
               },
             ),
-            debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: EnvironmentConfig.enableDebugBanner,
           );
         },
       ),

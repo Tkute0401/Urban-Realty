@@ -12,11 +12,15 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    if (json == null) {
+      throw Exception('User data is null');
+    }
+    
     return User(
-      id: json["_id"] ?? json["id"],
-      name: json["name"],
-      email: json["email"],
-      role: json["role"],
+      id: json["_id"] ?? json["id"] ?? '',
+      name: json["name"] ?? '',
+      email: json["email"] ?? '',
+      role: json["role"] ?? '',
     );
   }
 
