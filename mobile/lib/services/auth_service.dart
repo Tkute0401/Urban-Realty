@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/user.dart';
+import '../config/api_config.dart';
 
 class AuthService {
-  static const String baseUrl = 'https://urban-realty-production.up.railway.app/api/v1';
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/login'),
         body: jsonEncode({
           'email': email,
           'password': password,
@@ -29,7 +29,7 @@ class AuthService {
   static Future<Map<String, dynamic>> register(String email, String password, String name, String role) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/register'),
         body: jsonEncode({
           'email': email,
           'password': password,
@@ -52,7 +52,7 @@ class AuthService {
   static Future<Map<String, dynamic>> logout() async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/auth/logout'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/logout'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -69,7 +69,7 @@ class AuthService {
   static Future<User> getCurrentUser() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/auth/me'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/me'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -87,7 +87,7 @@ class AuthService {
   static Future<bool> isAuthenticated() async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/auth/verify'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/verify'),
         headers: {'Content-Type': 'application/json'},
       );
       return response.statusCode == 200;
@@ -99,7 +99,7 @@ class AuthService {
   static Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> userData) async {
     try {
       final response = await http.put(
-        Uri.parse('$baseUrl/auth/profile'),
+        Uri.parse('${ApiConfig.baseUrl}/auth/profile'),
         body: jsonEncode(userData),
         headers: {'Content-Type': 'application/json'},
       );
