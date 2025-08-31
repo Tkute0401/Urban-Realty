@@ -1,46 +1,116 @@
-## Urban Realty Mobile (Flutter)
+# Urban Realty Mobile App
 
-This Flutter app consumes the same APIs as the existing web client, targeting both Android and iOS.
+A Flutter mobile application for Urban Realty, providing a complete real estate platform with property listings, user management, and subscription features.
 
-### Prerequisites
-- Flutter SDK (3.x recommended)
-- Android Studio or Xcode (for device emulators)
-- A running backend at one of:
-  - Production: https://urban-realty-production.up.railway.app/api/v1
-  - Local: http://localhost:5000/api/v1
+## Features
 
-### Configure API base URL
-Update `lib/config/api_config.dart` to switch between production and local environments.
+### Authentication
+- User registration and login
+- Secure token storage using flutter_secure_storage
+- Role-based access (buyer, agent, developer, admin)
+- Profile management
 
-### Run
+### Properties
+- Browse property listings with filters
+- Property search with autocomplete
+- Property details with image carousel
+- Add/edit properties (for agents/developers)
+- Favorites and recently viewed
+- Contact agents
+
+### Subscriptions
+- View subscription plans
+- Payment integration (Razorpay)
+- Subscription management
+- Feature access control
+
+### Additional Features
+- Push notifications
+- Offline support
+- Image caching
+- Responsive design
+- Dark/Light theme
+
+## Installation
+
+1. Ensure you have Flutter SDK installed (version 3.3.0 or higher)
+2. Clone the repository
+3. Navigate to the mobile directory
+4. Install dependencies:
+
 ```bash
 flutter pub get
+```
+
+5. Run the app:
+
+```bash
 flutter run
 ```
 
-If running the backend locally on a device/emulator, ensure the base URL points to your machine's LAN IP instead of `localhost` (e.g., `http://192.168.1.50:5000/api/v1`). On Android emulators you can also use `http://10.0.2.2:5000/api/v1`.
+## Dependencies
 
-### Build
-- Android: `flutter build apk`
-- iOS: `flutter build ios`
+The app uses the following key dependencies:
 
-### Features
-- Login, fetch current user
-- List properties, view details
-- Token-based auth with bearer token
+- **dio**: HTTP client with interceptors
+- **flutter_secure_storage**: Secure token storage
+- **provider**: State management
+- **cached_network_image**: Image caching
+- **image_picker**: Image selection
+- **carousel_slider**: Image carousel
+- **razorpay_flutter**: Payment integration
+- **firebase_messaging**: Push notifications
 
-### Project structure
+## Project Structure
+
 ```
-mobile/
-  lib/
-    config/api_config.dart
-    services/
-      http_client.dart
-      auth_service.dart
-      property_service.dart
-    screens/
-      login_screen.dart
-      properties_screen.dart
-  pubspec.yaml
+lib/
+├── config/           # App configuration
+├── models/           # Data models
+├── providers/        # State management
+├── screens/          # UI screens
+├── services/         # API services
+├── utils/            # Utility functions
+├── widgets/          # Reusable widgets
+└── main.dart         # App entry point
 ```
 
+## API Integration
+
+The app connects to the Urban Realty backend API with the following endpoints:
+
+- **Auth**: `/api/v1/auth/*`
+- **Properties**: `/api/v1/properties/*`
+- **Developers**: `/api/v1/developers/*`
+- **Subscriptions**: `/api/v1/subscriptions/*`
+
+## Testing
+
+Run tests with:
+
+```bash
+flutter test
+```
+
+## Building for Production
+
+### Android
+```bash
+flutter build apk --release
+```
+
+### iOS
+```bash
+flutter build ios --release
+```
+
+## Contributing
+
+1. Follow Flutter best practices
+2. Write tests for new features
+3. Use proper error handling
+4. Maintain code documentation
+
+## License
+
+This project is proprietary software for Urban Realty.
