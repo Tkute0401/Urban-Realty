@@ -5,7 +5,7 @@ import "providers/properties_provider.dart";
 import "config/app_theme.dart";
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

@@ -25,8 +25,8 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
   final _zipcodeController = TextEditingController();
   String _selectedType = "House";
   String _selectedStatus = "For Sale";
-  List<String> _selectedAmenities = [];
-  List<File> _selectedImages = [];
+  final List<String> _selectedAmenities = [];
+  final List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
 
   @override

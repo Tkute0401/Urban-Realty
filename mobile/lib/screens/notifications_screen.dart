@@ -148,14 +148,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest,
+              color: theme.colorScheme.surfaceVariant,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.filter_list,
-                  color: theme.colorScheme.onSurfaceContainerHighest,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -185,13 +185,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         Icon(
                           Icons.notifications_none,
                           size: 64,
-                          color: theme.colorScheme.onSurfaceContainerHighest,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           _showOnlyUnread ? 'No unread notifications' : 'No notifications',
                           style: theme.textTheme.titleLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceContainerHighest,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -200,7 +200,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ? 'You\'re all caught up!'
                               : 'You\'ll see important updates here',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceContainerHighest,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -278,13 +278,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                     Icon(
                                       Icons.access_time,
                                       size: 16,
-                                      color: theme.colorScheme.onSurfaceContainerHighest,
+                                      color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       _getTimeAgo(notification.timestamp),
                                       style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorIndexed(0xFF6B7280),
+                                        color: const Color(0xFF6B7280),
                                       ),
                                     ),
                                     const Spacer(),

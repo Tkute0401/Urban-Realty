@@ -147,4 +147,45 @@ class PropertyService {
       throw Exception('Error sending contact request: $e');
     }
   }
+
+  static Future<bool> createProperty(Map<String, dynamic> propertyData, List<String> imagePaths) async {
+    try {
+      // Create multipart request for property data and images
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/properties'),
+      );
+
+      // Add property data as fields
+      propertyData.forEach((key, value) {
+        if (value != null) {
+          if (value is List) {
+            request.fields[key] = value.join(',');
+          } else {
+            request.fields[key] = value.toString();
+          }
+        }
+      });
+
+      // Add images as files
+      for (int i = 0; i < imagePaths.length; i++) {
+        final file = await http.MultipartFile.fromPath(
+          'images',
+          imagePaths[i],
+        );
+        request.files.add(file);
+      }
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        throw Exception('Failed to create property: ${response.statusCode} - $responseBody');
+      }
+    } catch (e) {
+      throw Exception('Error creating property: $e');
+    }
+  }
 }

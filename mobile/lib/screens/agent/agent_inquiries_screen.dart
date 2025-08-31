@@ -105,7 +105,7 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Theme.of(context).primaryColor,
-          child: Icon(Icons.message, color: Colors.white, size: 16),
+          child: const Icon(Icons.message, color: Colors.white, size: 16),
         ),
         title: Text(
           inquiry['subject'] ?? 'No Subject',
@@ -121,7 +121,7 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: statusColor),
               ),
@@ -217,7 +217,7 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
               children: [
                 CircleAvatar(
                   backgroundColor: Theme.of(context).primaryColor,
-                  child: Icon(Icons.message, color: Colors.white),
+                  child: const Icon(Icons.message, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

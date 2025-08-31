@@ -130,7 +130,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: statusColor),
                   ),
@@ -330,8 +330,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               Navigator.pop(context);
               try {
                 await _adminService.updateUserStatus(userId, status);
-                _loadUsers(refresh: true);
                 if (mounted) {
+                  _loadUsers(refresh: true);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('User ${status == 'active' ? 'activated' : 'deactivated'} successfully')),
                   );

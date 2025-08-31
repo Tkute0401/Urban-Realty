@@ -49,6 +49,8 @@ class FormTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
         border: const OutlineInputBorder(),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         filled: true,

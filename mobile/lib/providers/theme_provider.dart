@@ -84,6 +84,8 @@ class ThemeProvider extends ChangeNotifier {
         return 'Dark';
       case ThemeMode.system:
         return 'System';
+      default:
+        return 'System';
     }
   }
 }
