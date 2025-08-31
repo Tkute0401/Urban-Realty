@@ -6,7 +6,7 @@ class AgentService {
   factory AgentService() => _instance;
   AgentService._internal();
 
-  final HttpClient _httpClient = HttpClient();
+
 
   Future<Map<String, dynamic>> getAgentDashboard() async {
     try {

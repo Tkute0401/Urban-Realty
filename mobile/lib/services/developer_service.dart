@@ -6,7 +6,7 @@ class DeveloperService {
   factory DeveloperService() => _instance;
   DeveloperService._internal();
 
-  final HttpClient _httpClient = HttpClient();
+
 
   Future<List<Map<String, dynamic>>> getDevelopers({int page = 1, int limit = 10}) async {
     try {

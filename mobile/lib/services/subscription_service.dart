@@ -6,7 +6,7 @@ class SubscriptionService {
   factory SubscriptionService() => _instance;
   SubscriptionService._internal();
 
-  final HttpClient _httpClient = HttpClient();
+
 
   Future<List<Map<String, dynamic>>> getSubscriptionPlans() async {
     try {

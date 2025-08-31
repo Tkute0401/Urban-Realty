@@ -290,13 +290,13 @@ class _DevelopersListScreenState extends State<DevelopersListScreen> {
                 await _developerService.deleteDeveloper(developer['id']);
                 if (mounted) {
                   _loadDevelopers(refresh: true);
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(this.context).showSnackBar(
                     const SnackBar(content: Text('Developer deleted successfully')),
                   );
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(content: Text('Error: $e')),
                   );
                 }
