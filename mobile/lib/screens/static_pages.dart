@@ -77,17 +77,7 @@ class BillingDashboardPage extends PlaceholderPage {
   const BillingDashboardPage({super.key}) : super(title: 'Billing Dashboard');
 }
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
-      body: const Center(child: Text('Registration (Coming Soon)')),
-    );
-  }
-}
+// RegisterScreen is now defined in register_screen.dart
 
 class ProfileEditPage extends PlaceholderPage {
   const ProfileEditPage({super.key}) : super(title: 'Edit Profile');
