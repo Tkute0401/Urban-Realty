@@ -270,9 +270,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 const SizedBox(height: 20),
                                 ElevatedButton(
                                   onPressed: () async {
+                                    final navigator = Navigator.of(context);
                                     await authProvider.logout();
                                     if (mounted) {
-                                      Navigator.of(context).pushReplacementNamed('/');
+                                      navigator.pushReplacementNamed('/');
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
