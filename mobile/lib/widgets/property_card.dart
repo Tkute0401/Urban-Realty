@@ -125,7 +125,7 @@ class PropertyCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on, size: 16, color: Colors.grey),
+                      const Icon(Icons.location_on, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -152,21 +152,21 @@ class PropertyCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.bed, size: 16, color: Colors.grey),
+                      const Icon(Icons.bed, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         "${property.bedrooms}",
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.bathroom, size: 16, color: Colors.grey),
+                      const Icon(Icons.bathroom, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         "${property.bathrooms}",
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.square_foot, size: 16, color: Colors.grey),
+                      const Icon(Icons.square_foot, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         "${property.area} sq ft",

@@ -56,8 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              theme.colorScheme.primary.withOpacity(0.1),
-              theme.colorScheme.primaryContainer.withOpacity(0.1),
+              theme.colorScheme.primary.withValues(alpha: 0.1),
+              theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
               theme.colorScheme.surface,
             ],
           ),
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: theme.colorScheme.primary.withOpacity(0.3),
+                                color: theme.colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Login Form
                     Card(
                       elevation: 8,
-                      shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+                      shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
@@ -253,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     backgroundColor: theme.colorScheme.primary,
                                     foregroundColor: theme.colorScheme.onPrimary,
                                     elevation: 4,
-                                    shadowColor: theme.colorScheme.primary.withOpacity(0.3),
+                                    shadowColor: theme.colorScheme.primary.withValues(alpha: 0.3),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),

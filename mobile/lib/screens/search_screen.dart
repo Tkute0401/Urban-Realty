@@ -262,7 +262,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.shadow.withOpacity(0.1),
+                          color: theme.colorScheme.shadow.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -317,7 +317,7 @@ class _SearchScreenState extends State<SearchScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -405,7 +405,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text('Bedrooms', style: theme.textTheme.titleMedium),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<int>(
-                              value: _bedrooms,
+                              initialValue: _bedrooms,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -435,7 +435,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text('Bathrooms', style: theme.textTheme.titleMedium),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<int>(
-                              value: _bathrooms,
+                              initialValue: _bathrooms,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -570,7 +570,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                         height: 80,
                                         child: imageUrl == null
                                             ? Container(
-                                                color: theme.colorScheme.surfaceVariant,
+                                                color: theme.colorScheme.surfaceContainerHighest,
                                                 child: Icon(
                                                   Icons.home_outlined,
                                                   color: theme.colorScheme.onSurfaceVariant,
@@ -580,11 +580,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                                 imageUrl,
                                                 fit: BoxFit.cover,
                                                 errorBuilder: (_, __, ___) => Container(
-                                                  color: theme.colorScheme.surfaceVariant,
-                                                  child: Icon(
-                                                    Icons.broken_image,
-                                                    color: theme.colorScheme.onSurfaceVariant,
-                                                  ),
+                                                                                                  color: theme.colorScheme.surfaceContainerHighest,
+                                                child: Icon(
+                                                  Icons.broken_image,
+                                                  color: theme.colorScheme.onSurfaceVariant,
+                                                ),
                                                 ),
                                               ),
                                       ),
