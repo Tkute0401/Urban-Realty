@@ -58,4 +58,16 @@ class AdminService {
       throw Exception('Error: $e');
     }
   }
+
+  Future<Map<String, dynamic>> updateUserStatus(String userId, String status) async {
+    try {
+      final response = await _httpClient.put('/admin/users/$userId/status', body: {'status': status});
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      throw Exception('Failed to update user status');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 }

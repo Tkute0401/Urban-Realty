@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:provider/provider.dart";
 import "../models/subscription.dart";
 
 class SubscriptionScreen extends StatefulWidget {
@@ -102,7 +101,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 padding: const EdgeInsets.only(bottom: 4),
                                 child: Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.check,
                                       color: Colors.green,
                                       size: 16,

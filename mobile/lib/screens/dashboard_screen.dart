@@ -19,12 +19,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _selectedPropertyType = 'ALL';
 
   final List<Map<String, dynamic>> _propertyCategories = [
-    {'type': 'ALL', 'title': 'All Properties', 'icon': Icons.home, 'color': Color(0xFFF75B00)},
-    {'type': 'House', 'title': 'Houses', 'icon': Icons.house, 'color': Color(0xFF1A00FF)},
-    {'type': 'Apartment', 'title': 'Apartments', 'icon': Icons.apartment, 'color': Color(0xFF059669)},
-    {'type': 'Villa', 'title': 'Villas', 'icon': Icons.villa, 'color': Color(0xFFFF6600)},
-    {'type': 'Land', 'title': 'Land', 'icon': Icons.landscape, 'color': Color(0xFF8B5CF6)},
-    {'type': 'Commercial', 'title': 'Commercial', 'icon': Icons.business, 'color': Color(0xFFDC2626)},
+    {'type': 'ALL', 'title': 'All Properties', 'icon': Icons.home, 'color': const Color(0xFFF75B00)},
+    {'type': 'House', 'title': 'Houses', 'icon': Icons.house, 'color': const Color(0xFF1A00FF)},
+    {'type': 'Apartment', 'title': 'Apartments', 'icon': Icons.apartment, 'color': const Color(0xFF059669)},
+    {'type': 'Villa', 'title': 'Villas', 'icon': Icons.villa, 'color': const Color(0xFFFF6600)},
+    {'type': 'Land', 'title': 'Land', 'icon': Icons.landscape, 'color': const Color(0xFF8B5CF6)},
+    {'type': 'Commercial', 'title': 'Commercial', 'icon': Icons.business, 'color': const Color(0xFFDC2626)},
   ];
 
   @override
@@ -152,9 +152,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  theme.colorScheme.primary.withOpacity(0.1),
-                                  theme.colorScheme.primaryContainer.withOpacity(0.1),
-                                  theme.colorScheme.secondary.withOpacity(0.05),
+                                  theme.colorScheme.primary.withValues(alpha: 0.1),
+                                  theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
+                                  theme.colorScheme.secondary.withValues(alpha: 0.05),
                                 ],
                               ),
                             ),
@@ -177,7 +177,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Icon(
                                     Icons.home_rounded,
                                     size: 80,
-                                    color: theme.colorScheme.primary.withOpacity(0.3),
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
                                   ),
                                 ),
                               ],
@@ -210,7 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: theme.colorScheme.shadow.withOpacity(0.1),
+                                color: theme.colorScheme.shadow.withValues(alpha: 0.1),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -282,8 +282,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         margin: const EdgeInsets.only(right: 12),
                                         decoration: BoxDecoration(
                                           color: isSelected 
-                                              ? category['color'].withOpacity(0.1)
-                                              : theme.colorScheme.surfaceVariant,
+                                              ? category['color'].withValues(alpha: 0.1)
+                                              : theme.colorScheme.surfaceContainerHighest,
                                           borderRadius: BorderRadius.circular(16),
                                           border: isSelected 
                                               ? Border.all(color: category['color'], width: 2)
@@ -503,7 +503,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -563,7 +563,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         aspectRatio: 16 / 9,
                         child: imageUrl == null
                             ? Container(
-                                color: theme.colorScheme.surfaceVariant,
+                                color: theme.colorScheme.surfaceContainerHighest,
                                 child: Icon(
                                   Icons.home_outlined,
                                   size: 48,
@@ -574,7 +574,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 imageUrl,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) => Container(
-                                  color: theme.colorScheme.surfaceVariant,
+                                  color: theme.colorScheme.surfaceContainerHighest,
                                   child: Icon(
                                     Icons.broken_image,
                                     size: 48,
@@ -609,7 +609,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.surface.withOpacity(0.9),
+                                                            color: theme.colorScheme.surface.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -738,7 +738,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   height: 80,
                   child: imageUrl == null
                       ? Container(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           child: Icon(
                             Icons.home_outlined,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -748,7 +748,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            color: theme.colorScheme.surfaceVariant,
+                            color: theme.colorScheme.surfaceContainerHighest,
                             child: Icon(
                               Icons.broken_image,
                               color: theme.colorScheme.onSurfaceVariant,

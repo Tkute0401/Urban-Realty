@@ -112,7 +112,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     filled: true,
-                    fillColor: theme.colorScheme.surfaceVariant,
+                    fillColor: theme.colorScheme.surfaceContainerHighest,
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -265,7 +265,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
-      shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -287,7 +287,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 aspectRatio: 16 / 9,
                 child: imageUrl == null
                     ? Container(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         child: Icon(
                           Icons.home_outlined,
                           size: 48,
@@ -298,7 +298,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                         imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           child: Icon(
                             Icons.broken_image,
                             size: 48,
@@ -446,7 +446,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -488,8 +488,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
   final TextEditingController _messageController = TextEditingController();
   String _contactMethod = 'message';
   int _imageIndex = 0;
-  late TabController _tabController;
-  final ScrollController _scrollController = ScrollController();
+
 
   List<String> _extractImages(Map<String, dynamic> p) {
     final List<String> result = [];
@@ -610,7 +609,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -654,9 +653,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF78CADC).withOpacity(0.1),
+        color: const Color(0xFF78CADC).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF78CADC).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF78CADC).withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -828,9 +827,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
           return Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF78CADC).withOpacity(0.1),
+              color: const Color(0xFF78CADC).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF78CADC).withOpacity(0.3)),
+              border: Border.all(color: const Color(0xFF78CADC).withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -900,7 +899,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _contactMethod,
+            initialValue: _contactMethod,
             items: const [
               DropdownMenuItem(value: 'message', child: Text('Message')),
               DropdownMenuItem(value: 'email', child: Text('Email')),

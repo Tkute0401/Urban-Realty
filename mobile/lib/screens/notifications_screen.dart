@@ -148,14 +148,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.filter_list,
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceContainerHighest,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -185,13 +185,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         Icon(
                           Icons.notifications_none,
                           size: 64,
-                          color: theme.colorScheme.onSurfaceVariant,
+                          color: theme.colorScheme.onSurfaceContainerHighest,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           _showOnlyUnread ? 'No unread notifications' : 'No notifications',
                           style: theme.textTheme.titleLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.onSurfaceContainerHighest,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -200,7 +200,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ? 'You\'re all caught up!'
                               : 'You\'ll see important updates here',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.onSurfaceContainerHighest,
                           ),
                         ),
                       ],
@@ -232,7 +232,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: _getNotificationColor(notification.type, theme).withOpacity(0.1),
+                                color: _getNotificationColor(notification.type, theme).withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
@@ -269,7 +269,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 Text(
                                   notification.message,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
+                                    color: theme.colorScheme.onSurfaceContainerHighest,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -278,13 +278,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                     Icon(
                                       Icons.access_time,
                                       size: 16,
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                      color: theme.colorScheme.onSurfaceContainerHighest,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       _getTimeAgo(notification.timestamp),
                                       style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurfaceVariant,
+                                        color: theme.colorIndexed(0xFF6B7280),
                                       ),
                                     ),
                                     const Spacer(),
