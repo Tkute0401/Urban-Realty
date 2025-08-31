@@ -20,12 +20,12 @@ class AuthProvider extends ChangeNotifier {
     try {
       final response = await AuthService.login(email, password);
       
-      // Check if response doesn't contain data
-      if (response["data"] == null) {
+      // Check if response doesn't contain user data
+      if (response["user"] == null) {
         throw Exception('No user data received from server');
       }
       
-      _user = User.fromJson(response["data"]);
+      _user = User.fromJson(response["user"]);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -52,12 +52,12 @@ class AuthProvider extends ChangeNotifier {
     try {
       final response = await AuthService.register(email, password, name, role);
       
-      // Check if response doesn't contain data
-      if (response["data"] == null) {
+      // Check if response doesn't contain user data
+      if (response["user"] == null) {
         throw Exception('No user data received from server');
       }
       
-      _user = User.fromJson(response["data"]);
+      _user = User.fromJson(response["user"]);
       _isLoading = false;
       notifyListeners();
       return true;
