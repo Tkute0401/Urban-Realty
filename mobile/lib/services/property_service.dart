@@ -28,12 +28,21 @@ class PropertyService {
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => Property.fromJson(json)).toList();
+        // Check if response is JSON
+        final contentType = response.headers['content-type'];
+        if (contentType != null && contentType.contains('application/json')) {
+          final List<dynamic> data = jsonDecode(response.body);
+          return data.map((json) => Property.fromJson(json)).toList();
+        } else {
+          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
+        }
       } else {
-        throw Exception('Failed to load properties');
+        throw Exception('Failed to load properties. Status: ${response.statusCode}');
       }
     } catch (e) {
+      if (e.toString().contains('FormatException')) {
+        throw Exception('Server returned invalid JSON. Please check your connection.');
+      }
       throw Exception('Error fetching properties: $e');
     }
   }
@@ -43,12 +52,21 @@ class PropertyService {
       final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/properties/$id'));
       
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return Property.fromJson(data);
+        // Check if response is JSON
+        final contentType = response.headers['content-type'];
+        if (contentType != null && contentType.contains('application/json')) {
+          final data = jsonDecode(response.body);
+          return Property.fromJson(data);
+        } else {
+          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
+        }
       } else {
-        throw Exception('Failed to load property');
+        throw Exception('Failed to load property. Status: ${response.statusCode}');
       }
     } catch (e) {
+      if (e.toString().contains('FormatException')) {
+        throw Exception('Server returned invalid JSON. Please check your connection.');
+      }
       throw Exception('Error fetching property: $e');
     }
   }
