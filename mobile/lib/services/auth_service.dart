@@ -35,7 +35,7 @@ class AuthService {
         return responseData;
       } else {
         final errorData = jsonDecode(response.body);
-        final errorMessage = errorData['message'] ?? 'Login failed with status ${response.statusCode}';
+        final errorMessage = errorData['error'] ?? errorData['message'] ?? 'Login failed with status ${response.statusCode}';
         throw Exception(errorMessage);
       }
     } catch (e) {
