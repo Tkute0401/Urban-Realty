@@ -8,7 +8,7 @@ class AuthService {
   static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/auth/login'),
+        Uri.parse('https://urban-realty-production.up.railway.app/api/v1/auth/login'),
         body: jsonEncode({
           'email': email,
           'password': password,
