@@ -9,7 +9,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final AuthService _auth = AuthService();
+
   bool _loading = true;
   String? _error;
   Map<String, dynamic>? _me;
@@ -28,12 +28,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _fetch() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final me = await _auth.me();
-      final data = (me['data'] ?? me) as Map<String, dynamic>;
-      _me = data;
-      _name.text = data['name']?.toString() ?? '';
-      _email.text = data['email']?.toString() ?? '';
-      _mobile.text = data['mobile']?.toString() ?? '';
+      final me = await AuthService.getCurrentUser();
+      _me = me.toJson();
+      _name.text = me.name;
+      _email.text = me.email;
+      _mobile.text = _me?['mobile']?.toString() ?? '';
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -45,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _error = null; });
     try {
-      await _auth.update({
+      await AuthService.updateProfile({
         'name': _name.text.trim(),
         'email': _email.text.trim(),
         'mobile': _mobile.text.trim(),

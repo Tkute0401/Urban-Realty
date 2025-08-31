@@ -3,7 +3,6 @@ import "../models/user.dart";
 import "../services/auth_service.dart";
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
   User? _user;
   bool _isLoading = false;
   String? _error;
@@ -19,7 +18,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final response = await _authService.login(email, password);
+      final response = await AuthService.login(email, password);
       _user = User.fromJson(response["data"]);
       _isLoading = false;
       notifyListeners();
@@ -45,7 +44,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final response = await _authService.register(email, password, name, role);
+      final response = await AuthService.register(email, password, name, role);
       _user = User.fromJson(response["data"]);
       _isLoading = false;
       notifyListeners();
@@ -59,14 +58,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _authService.logout();
+    await AuthService.logout();
     _user = null;
     notifyListeners();
   }
 
   Future<void> loadUser() async {
     try {
-      _user = await _authService.getCurrentUser();
+      _user = await AuthService.getCurrentUser();
       notifyListeners();
     } catch (e) {
       _error = e.toString();

@@ -11,7 +11,6 @@ class PropertiesScreen extends StatefulWidget {
 }
 
 class _PropertiesScreenState extends State<PropertiesScreen> {
-  final PropertyService _service = PropertyService();
   bool _loading = true;
   String? _error;
   List<dynamic> _properties = const [];
@@ -64,7 +63,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
       _error = null;
     });
     try {
-      final res = await _service.list();
+      final res = await PropertyService.list();
       final List<dynamic> data = (res['data'] ?? res) as List<dynamic>? ?? (res['data']?['data'] as List<dynamic>? ?? []);
       setState(() {
         _properties = data;
@@ -479,7 +478,6 @@ class PropertyDetailScreen extends StatefulWidget {
 }
 
 class _PropertyDetailScreenState extends State<PropertyDetailScreen> with TickerProviderStateMixin {
-  final PropertyService _service = PropertyService();
   final FavoritesService _favorites = FavoritesService();
   bool _loading = true;
   String? _error;
@@ -526,7 +524,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
       _error = null;
     });
     try {
-      final res = await _service.detail(widget.id);
+      final res = await PropertyService.detail(widget.id);
       setState(() {
         _property = (res['data'] ?? res) as Map<String, dynamic>;
       });
@@ -925,12 +923,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> with Ticker
             child: ElevatedButton.icon(
               onPressed: () async {
                 try {
-                  await _service.contact(
-                    id: widget.id,
-                    message: _messageController.text.trim().isEmpty
-                        ? 'Interested in this property'
-                        : _messageController.text.trim(),
-                    contactMethod: _contactMethod,
+                  await PropertyService.contact(
+                    widget.id,
+                    {
+                      'message': _messageController.text.trim().isEmpty
+                          ? 'Interested in this property'
+                          : _messageController.text.trim(),
+                      'contactMethod': _contactMethod,
+                    },
                   );
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

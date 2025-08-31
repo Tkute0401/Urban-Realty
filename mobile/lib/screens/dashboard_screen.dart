@@ -10,7 +10,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final PropertyService _service = PropertyService();
+
   bool _loading = true;
   String? _error;
   List<dynamic> _featuredProperties = const [];
@@ -46,7 +46,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      final res = await _service.list();
+      final res = await PropertyService.list();
       final List<dynamic> data = (res['data'] ?? res) as List<dynamic>? ?? 
           (res['data']?['data'] as List<dynamic>? ?? []);
       

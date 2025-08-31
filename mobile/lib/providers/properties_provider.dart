@@ -3,7 +3,6 @@ import "../models/property.dart";
 import "../services/property_service.dart";
 
 class PropertiesProvider extends ChangeNotifier {
-  final PropertyService _propertyService = PropertyService();
   final List<Property> _properties = [];
   final List<Property> _favorites = [];
   final List<Property> _recentlyViewed = [];
@@ -31,7 +30,7 @@ class PropertiesProvider extends ChangeNotifier {
         final maxPrice = filters['maxPrice'] as double?;
         final amenities = filters['amenities'] as List<String>?;
         
-        _properties.addAll(await _propertyService.getProperties(
+        _properties.addAll(await PropertyService.getProperties(
           search: search,
           location: location,
           minPrice: minPrice,
@@ -39,7 +38,7 @@ class PropertiesProvider extends ChangeNotifier {
           amenities: amenities,
         ));
       } else {
-        _properties.addAll(await _propertyService.getProperties());
+        _properties.addAll(await PropertyService.getProperties());
       }
       _isLoading = false;
       notifyListeners();
@@ -52,7 +51,7 @@ class PropertiesProvider extends ChangeNotifier {
 
   Future<void> loadProperty(String id) async {
     try {
-      final property = await _propertyService.getPropertyById(id);
+      final property = await PropertyService.getPropertyById(id);
       final index = _properties.indexWhere((p) => p.id == id);
       if (index != -1) {
         _properties[index] = property;
@@ -68,7 +67,7 @@ class PropertiesProvider extends ChangeNotifier {
 
   Future<void> loadFeaturedProperties() async {
     try {
-      final featured = await _propertyService.getFeaturedProperties();
+      final featured = await PropertyService.getFeaturedProperties();
       _properties.clear();
       _properties.addAll(featured);
       notifyListeners();
@@ -80,7 +79,7 @@ class PropertiesProvider extends ChangeNotifier {
 
   Future<void> loadRecentlyViewedProperties() async {
     try {
-      final recent = await _propertyService.getRecentlyViewedProperties();
+      final recent = await PropertyService.getRecentlyViewedProperties();
       _recentlyViewed.clear();
       _recentlyViewed.addAll(recent);
       notifyListeners();

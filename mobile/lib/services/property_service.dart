@@ -82,4 +82,69 @@ class PropertyService {
       throw Exception('Error fetching recently viewed properties: $e');
     }
   }
+
+  static Future<Map<String, dynamic>> list() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/properties'));
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to load properties');
+      }
+    } catch (e) {
+      throw Exception('Error fetching properties: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> searchSuggestions(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/properties/search-suggestions?q=$query'),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to load search suggestions');
+      }
+    } catch (e) {
+      throw Exception('Error fetching search suggestions: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> detail(String id) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/properties/$id'));
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to load property details');
+      }
+    } catch (e) {
+      throw Exception('Error fetching property details: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> contact(String propertyId, Map<String, dynamic> contactData) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/properties/$propertyId/contact'),
+        body: jsonEncode(contactData),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to send contact request');
+      }
+    } catch (e) {
+      throw Exception('Error sending contact request: $e');
+    }
+  }
 }

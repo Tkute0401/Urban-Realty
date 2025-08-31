@@ -3,10 +3,9 @@ import 'package:http/http.dart' as http;
 import 'http_client.dart';
 
 class FavoritesService {
-  final HttpClient _client = HttpClient();
 
   Future<List<dynamic>> list() async {
-    final http.Response res = await _client.get('/auth/favorites');
+    final http.Response res = await HttpClient.get('/auth/favorites');
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final body = jsonDecode(res.body);
       if (body is Map<String, dynamic>) {
@@ -20,7 +19,7 @@ class FavoritesService {
   }
 
   Future<Map<String, dynamic>> toggle(String propertyId) async {
-    final http.Response res = await _client.put('/auth/favorites/$propertyId');
+    final http.Response res = await HttpClient.put('/auth/favorites/$propertyId');
     if (res.statusCode >= 200 && res.statusCode < 300) {
       return jsonDecode(res.body) as Map<String, dynamic>;
     }
@@ -28,7 +27,7 @@ class FavoritesService {
   }
 
   Future<bool> status(String propertyId) async {
-    final http.Response res = await _client.get('/auth/favorites/$propertyId/status');
+    final http.Response res = await HttpClient.get('/auth/favorites/$propertyId/status');
     if (res.statusCode >= 200 && res.statusCode < 300) {
       final body = jsonDecode(res.body);
       if (body is Map<String, dynamic>) {

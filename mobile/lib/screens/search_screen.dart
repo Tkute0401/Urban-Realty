@@ -10,7 +10,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final PropertyService _service = PropertyService();
+
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   
@@ -58,7 +58,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
     
     try {
-      final res = await _service.list();
+      final res = await PropertyService.list();
       final List<dynamic> data = (res['data'] ?? res) as List<dynamic>? ?? 
           (res['data']?['data'] as List<dynamic>? ?? []);
       
@@ -91,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final res = await _service.searchSuggestions(query);
+      final res = await PropertyService.searchSuggestions(query);
       final List<dynamic> suggestions = (res['data'] ?? res) as List<dynamic>? ?? [];
       
       setState(() {
