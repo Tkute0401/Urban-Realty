@@ -2,7 +2,10 @@ import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "providers/auth_provider.dart";
 import "providers/properties_provider.dart";
+import "providers/theme_provider.dart";
 import "config/app_theme.dart";
+import "screens/home_tabs.dart";
+import "screens/login_screen.dart";
 
 void main() {
   runApp(const MyApp());
@@ -17,16 +20,28 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => PropertiesProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'Urban Realty Mobile',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        home: const Scaffold(
-          body: Center(
-            child: Text("Hello World"),
-          ),
-        ),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'Urban Realty Mobile',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
+            home: Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                // Check if user is authenticated
+                if (authProvider.isAuthenticated) {
+                  return const HomeTabs();
+                } else {
+                  return const LoginScreen();
+                }
+              },
+            ),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }

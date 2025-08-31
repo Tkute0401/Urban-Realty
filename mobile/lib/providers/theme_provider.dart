@@ -29,11 +29,8 @@ class ThemeProvider extends ChangeNotifier {
             _themeMode = ThemeMode.dark;
             break;
           case 'system':
-          _themeMode = ThemeMode.system;
-          break;
-        default:
-          _themeMode = ThemeMode.system;
-          break;
+            _themeMode = ThemeMode.system;
+            break;
         }
         notifyListeners();
       }
@@ -62,9 +59,6 @@ class ThemeProvider extends ChangeNotifier {
         case ThemeMode.system:
           themeString = 'system';
           break;
-        default:
-          themeString = 'system';
-          break;
       }
       await prefs.setString(_themeKey, themeString);
     } catch (e) {
@@ -87,8 +81,6 @@ class ThemeProvider extends ChangeNotifier {
       case ThemeMode.dark:
         return 'Dark';
       case ThemeMode.system:
-        return 'System';
-      default:
         return 'System';
     }
   }

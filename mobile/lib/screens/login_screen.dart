@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,12 +29,19 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     
     try {
-      await AuthService.login(
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final success = await authProvider.login(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
+      
+      if (success && mounted) {
+        // Navigation will be handled automatically by the main.dart Consumer
+        // No need to manually navigate
+      } else if (mounted) {
+        setState(() {
+          _error = authProvider.error;
+        });
       }
     } catch (e) {
       setState(() {
