@@ -12,10 +12,19 @@ class AdminService {
     try {
       final response = await HttpClient.get('/admin/dashboard');
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        // Check if response is JSON
+        final contentType = response.headers['content-type'];
+        if (contentType != null && contentType.contains('application/json')) {
+          return jsonDecode(response.body);
+        } else {
+          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
+        }
       }
-      throw Exception('Failed to load dashboard stats');
+      throw Exception('Failed to load dashboard stats. Status: ${response.statusCode}');
     } catch (e) {
+      if (e.toString().contains('FormatException')) {
+        throw Exception('Server returned invalid JSON. Please check your connection.');
+      }
       throw Exception('Error: $e');
     }
   }

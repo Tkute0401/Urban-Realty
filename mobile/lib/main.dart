@@ -26,6 +26,8 @@ import "screens/agent/agent_inquiries_screen.dart";
 import "screens/agent/agent_leads_screen.dart";
 import "screens/agent/agent_properties_screen.dart";
 import "screens/developer/developers_list_screen.dart";
+import "screens/notifications_screen.dart";
+import "screens/properties_screen.dart";
 
 void main() async {
   // Load environment variables
@@ -90,8 +92,30 @@ class MyApp extends StatelessWidget {
               '/agent/inquiries': (context) => const AgentInquiriesScreen(),
               '/agent/leads': (context) => const AgentLeadsScreen(),
               '/agent/properties': (context) => const AgentPropertiesScreen(),
+              // Agent routes without prefix (for backward compatibility)
+              '/agent-properties': (context) => const AgentPropertiesScreen(),
+              '/agent-leads': (context) => const AgentLeadsScreen(),
+              '/agent-inquiries': (context) => const AgentInquiriesScreen(),
+              '/agent-analytics': (context) => const AgentAnalyticsScreen(),
+              // Notifications route
+              '/notifications': (context) => const NotificationsScreen(),
+              // Property routes
+              '/property-detail': (context) => PropertyDetailScreen(
+                propertyId: ModalRoute.of(context)!.settings.arguments as String,
+              ),
+              '/edit-property': (context) => const EditPropertyPage(),
               // Developer routes
               '/developers': (context) => const DevelopersListScreen(),
+              // Developer routes (placeholder - to be implemented)
+              '/developer-add': (context) => const Scaffold(
+                body: Center(child: Text('Add Developer - Coming Soon')),
+              ),
+              '/developer-detail': (context) => const Scaffold(
+                body: Center(child: Text('Developer Details - Coming Soon')),
+              ),
+              '/developer-edit': (context) => const Scaffold(
+                body: Center(child: Text('Edit Developer - Coming Soon')),
+              ),
             },
             debugShowCheckedModeBanner: EnvironmentConfig.enableDebugBanner,
           );
