@@ -64,7 +64,28 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Favorites')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).pushNamed('/search'),
+        icon: const Icon(Icons.search),
+        label: const Text('Search'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+      appBar: AppBar(
+        title: const Text('Favorites'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.of(context).pushNamed('/search'),
+            tooltip: 'Search Properties',
+          ),
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => Navigator.of(context).pushNamed('/'),
+            tooltip: 'Home',
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: _fetch,
         child: _loading

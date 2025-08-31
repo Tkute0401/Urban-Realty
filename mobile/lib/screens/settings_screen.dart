@@ -26,8 +26,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).pushNamed('/profile'),
+        icon: const Icon(Icons.person),
+        label: const Text('Profile'),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
       appBar: AppBar(
         title: const Text('Settings'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => Navigator.of(context).pushNamed('/help'),
+            tooltip: 'Help',
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => Navigator.of(context).pushNamed('/about'),
+            tooltip: 'About',
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -346,6 +365,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
               ],
+            ),
+          ),
+          
+          const SizedBox(height: 32),
+          
+          // Quick Access Section
+          _buildSectionHeader('Quick Access', Icons.flash_on),
+          Card(
+            child: Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                final user = authProvider.user;
+                if (user == null) return const SizedBox.shrink();
+                
+                return Column(
+                  children: [
+                    if (user.role.toLowerCase() == 'agent') ...[
+                      ListTile(
+                        leading: Icon(Icons.dashboard, color: theme.colorScheme.primary),
+                        title: const Text('Agent Dashboard'),
+                        subtitle: const Text('Access your agent tools'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/agent/dashboard'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.analytics, color: theme.colorScheme.secondary),
+                        title: const Text('Analytics'),
+                        subtitle: const Text('View your performance'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/agent/analytics'),
+                      ),
+                    ],
+                    if (user.role.toLowerCase() == 'admin') ...[
+                      ListTile(
+                        leading: Icon(Icons.admin_panel_settings, color: theme.colorScheme.error),
+                        title: const Text('Admin Dashboard'),
+                        subtitle: const Text('Manage the platform'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.people, color: theme.colorScheme.secondary),
+                        title: const Text('Manage Users'),
+                        subtitle: const Text('User administration'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/admin/users'),
+                      ),
+                    ],
+                    if (user.role.toLowerCase() == 'developer') ...[
+                      ListTile(
+                        leading: Icon(Icons.developer_mode, color: theme.colorScheme.tertiary),
+                        title: const Text('Developer Tools'),
+                        subtitle: const Text('Access development features'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/developers'),
+                      ),
+                    ],
+                    if (user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller') ...[
+                      ListTile(
+                        leading: Icon(Icons.add_home, color: theme.colorScheme.primary),
+                        title: const Text('Add Property'),
+                        subtitle: const Text('List your property'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/add-property'),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.card_membership, color: theme.colorScheme.secondary),
+                        title: const Text('Subscription'),
+                        subtitle: const Text('Manage your subscription'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/subscription'),
+                      ),
+                    ],
+                    ListTile(
+                      leading: Icon(Icons.help, color: theme.colorScheme.tertiary),
+                      title: const Text('Help & Support'),
+                      subtitle: const Text('Get help and contact support'),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () => Navigator.of(context).pushNamed('/help'),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           
