@@ -17,13 +17,7 @@ class HomeTabs extends StatefulWidget {
 class _HomeTabsState extends State<HomeTabs> {
   int _currentIndex = 0;
 
-  final List<Widget> _tabs = const [
-    DashboardScreen(),
-    SearchScreen(),
-    FavoritesScreen(),
-    NotificationsScreen(),
-    ProfileScreen(),
-  ];
+  // Removed unused _tabs field as it's not being used
 
   @override
   Widget build(BuildContext context) {

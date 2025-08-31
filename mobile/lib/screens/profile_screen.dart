@@ -268,25 +268,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   () => Navigator.of(context).pushNamed('/terms'),
                                 ),
                               ],
+                              
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  await authProvider.logout();
+                                  if (mounted) {
+                                    Navigator.of(context).pushReplacementNamed('/');
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Logout'),
+                              ),
+                              const SizedBox(height: 8),
                             );
                           },
                         ),
-                        
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () async {
-                            await authProvider.logout();
-                            if (mounted) {
-                              Navigator.of(context).pushReplacementNamed('/');
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('Logout'),
-                        ),
-                        const SizedBox(height: 8),
                       ],
                     ),
                   ),
