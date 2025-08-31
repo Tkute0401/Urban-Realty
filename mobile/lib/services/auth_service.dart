@@ -95,4 +95,22 @@ class AuthService {
       return false;
     }
   }
+
+  static Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> userData) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/auth/profile'),
+        body: jsonEncode(userData),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Profile update failed');
+      }
+    } catch (e) {
+      throw Exception('Error updating profile: $e');
+    }
+  }
 }

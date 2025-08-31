@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   String? _error;
 
-  final AuthService _authService = AuthService();
+
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -27,9 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     
     try {
-      await _authService.login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      await AuthService.login(
+        _emailController.text.trim(),
+        _passwordController.text,
       );
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/home');
