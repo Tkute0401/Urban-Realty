@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/property_service.dart';
 import '../config/api_config.dart';
+import '../providers/auth_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -65,6 +67,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Color _getSubscriptionColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'active':
+      case 'premium':
+        return const Color(0xFF059669); // Green
+      case 'expired':
+      case 'cancelled':
+        return const Color(0xFFDC2626); // Red
+      case 'pending':
+      case 'trial':
+        return const Color(0xFFF59E0B); // Yellow
+      default:
+        return const Color(0xFF6B7280); // Gray
+    }
+  }
+
+  Color _getRoleColor(String role) {
+    switch (role.toLowerCase()) {
+      case 'admin':
+        return const Color(0xFFDC2626); // Red
+      case 'agent':
+        return const Color(0xFF059669); // Green
+      case 'developer':
+        return const Color(0xFF7C3AED); // Purple
+      case 'buyer':
+        return const Color(0xFF1A00FF); // Blue
+      case 'seller':
+        return const Color(0xFFFF6600); // Orange
+      default:
+        return const Color(0xFF6B7280); // Gray
+    }
+  }
+
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickAccessChip(BuildContext context, String label, IconData icon, VoidCallback onTap, {Color? color}) {
+    final theme = Theme.of(context);
+    return ActionChip(
+      avatar: Icon(icon, size: 18, color: color ?? theme.colorScheme.primary),
+      label: Text(label, style: theme.textTheme.bodySmall),
+      onPressed: onTap,
+      backgroundColor: (color ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+      side: BorderSide(color: (color ?? theme.colorScheme.primary).withValues(alpha: 0.3)),
+      labelStyle: TextStyle(color: color ?? theme.colorScheme.primary),
+    );
+  }
+
   String? _pickPrimaryImage(Map<String, dynamic> property) {
     final dynamic images = property['images'] ?? property['photos'] ?? property['gallery'];
     String? url;
@@ -92,6 +172,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
+      floatingActionButton: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          final user = authProvider.user;
+          if (user == null) return const SizedBox.shrink();
+          
+          // Show different FAB based on user role
+          if (user.role.toLowerCase() == 'agent') {
+            return FloatingActionButton.extended(
+              onPressed: () => Navigator.of(context).pushNamed('/agent/dashboard'),
+              icon: const Icon(Icons.dashboard),
+              label: const Text('Agent Panel'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            );
+          } else if (user.role.toLowerCase() == 'admin') {
+            return FloatingActionButton.extended(
+              onPressed: () => Navigator.of(context).pushNamed('/admin/dashboard'),
+              icon: const Icon(Icons.admin_panel_settings),
+              label: const Text('Admin Panel'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            );
+          } else if (user.role.toLowerCase() == 'developer') {
+            return FloatingActionButton.extended(
+              onPressed: () => Navigator.of(context).pushNamed('/developers'),
+              icon: const Icon(Icons.developer_mode),
+              label: const Text('Dev Tools'),
+              backgroundColor: Theme.of(context).colorScheme.tertiary,
+              foregroundColor: Theme.of(context).colorScheme.onTertiary,
+            );
+          } else {
+            return FloatingActionButton.extended(
+              onPressed: () => Navigator.of(context).pushNamed('/add-property'),
+              icon: const Icon(Icons.add_home),
+              label: const Text('Add Property'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            );
+          }
+        },
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
@@ -131,6 +252,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onRefresh: _fetchDashboardData,
                   child: CustomScrollView(
                     slivers: [
+                      // User Info Section
+                      SliverToBoxAdapter(
+                        child: Consumer<AuthProvider>(
+                          builder: (context, authProvider, child) {
+                            final user = authProvider.user;
+                            if (user == null) return const SizedBox.shrink();
+                            
+                            return Container(
+                              margin: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: theme.colorScheme.primary,
+                                    child: Text(
+                                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        color: theme.colorScheme.onPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Welcome back,',
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                        Text(
+                                          user.name,
+                                          style: theme.textTheme.titleMedium?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: _getRoleColor(user.role).withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: _getRoleColor(user.role).withValues(alpha: 0.3),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            user.role.toUpperCase(),
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: _getRoleColor(user.role),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        if (user.subscriptionStatus != null && user.subscriptionStatus!.isNotEmpty) ...[
+                                          const SizedBox(height: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: _getSubscriptionColor(user.subscriptionStatus!).withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(12),
+                                              border: Border.all(
+                                                color: _getSubscriptionColor(user.subscriptionStatus!).withValues(alpha: 0.3),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.card_membership,
+                                                  size: 14,
+                                                  color: _getSubscriptionColor(user.subscriptionStatus!),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  user.subscriptionStatus!.toUpperCase(),
+                                                  style: theme.textTheme.bodySmall?.copyWith(
+                                                    color: _getSubscriptionColor(user.subscriptionStatus!),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => Navigator.of(context).pushNamed('/profile'),
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    tooltip: 'Edit Profile',
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      
                       // Enhanced App Bar with Hero Section
                       SliverAppBar(
                         expandedHeight: 200,
@@ -190,12 +424,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             onPressed: () {
                               Navigator.of(context).pushNamed('/notifications');
                             },
+                            tooltip: 'Notifications',
                           ),
                           IconButton(
                             icon: const Icon(Icons.settings_outlined),
                             onPressed: () {
                               Navigator.of(context).pushNamed('/settings');
                             },
+                            tooltip: 'Settings',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.person_outline),
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/profile');
+                            },
+                            tooltip: 'Profile',
                           ),
                         ],
                       ),
@@ -392,6 +635,548 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                         ),
+                      ),
+                      
+                      // Quick Access Menu
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Consumer<AuthProvider>(
+                            builder: (context, authProvider, child) {
+                              final user = authProvider.user;
+                              if (user == null) return const SizedBox.shrink();
+                              
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Quick Access',
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Wrap(
+                                    spacing: 12,
+                                    runSpacing: 12,
+                                    children: [
+                                      // Common actions for all users
+                                      _buildQuickAccessChip(
+                                        context,
+                                        'Settings',
+                                        Icons.settings,
+                                        () => Navigator.of(context).pushNamed('/settings'),
+                                      ),
+                                      _buildQuickAccessChip(
+                                        context,
+                                        'Help',
+                                        Icons.help,
+                                        () => Navigator.of(context).pushNamed('/help'),
+                                      ),
+                                      _buildQuickAccessChip(
+                                        context,
+                                        'About',
+                                        Icons.info,
+                                        () => Navigator.of(context).pushNamed('/about'),
+                                      ),
+                                      
+                                      // Role-specific actions
+                                      if (user.role.toLowerCase() == 'agent') ...[
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'My Properties',
+                                          Icons.home_work,
+                                          () => Navigator.of(context).pushNamed('/agent/properties'),
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Analytics',
+                                          Icons.analytics,
+                                          () => Navigator.of(context).pushNamed('/agent/analytics'),
+                                          color: theme.colorScheme.secondary,
+                                        ),
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Inquiries',
+                                          Icons.inbox,
+                                          () => Navigator.of(context).pushNamed('/agent/inquiries'),
+                                          color: theme.colorScheme.tertiary,
+                                        ),
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Leads',
+                                          Icons.leaderboard,
+                                          () => Navigator.of(context).pushNamed('/agent/leads'),
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ],
+                                      
+                                      if (user.role.toLowerCase() == 'admin') ...[
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Admin Dashboard',
+                                          Icons.admin_panel_settings,
+                                          () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                                          color: theme.colorScheme.error,
+                                        ),
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Manage Users',
+                                          Icons.people,
+                                          () => Navigator.of(context).pushNamed('/admin/users'),
+                                          color: theme.colorScheme.secondary,
+                                        ),
+                                      ],
+                                      
+                                      if (user.role.toLowerCase() == 'developer') ...[
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Developers List',
+                                          Icons.developer_mode,
+                                          () => Navigator.of(context).pushNamed('/developers'),
+                                          color: theme.colorScheme.tertiary,
+                                        ),
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Add Property',
+                                          Icons.add_home,
+                                          () => Navigator.of(context).pushNamed('/add-property'),
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ],
+                                      
+                                      if (user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller') ...[
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Add Property',
+                                          Icons.add_home,
+                                          () => Navigator.of(context).pushNamed('/add-property'),
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                        _buildQuickAccessChip(
+                                          context,
+                                          'Subscription',
+                                          Icons.card_membership,
+                                          () => Navigator.of(context).pushNamed('/subscription'),
+                                          color: theme.colorScheme.secondary,
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      
+                      // Quick Stats for Agents and Admins
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          final user = authProvider.user;
+                          if (user == null) return const SliverToBoxAdapter(child: SizedBox.shrink());
+                          
+                          if (user.role.toLowerCase() == 'agent') {
+                            return SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Agent Statistics',
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildStatCard(
+                                            context,
+                                            'Properties',
+                                            '12',
+                                            Icons.home_work,
+                                            theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _buildStatCard(
+                                            context,
+                                            'Inquiries',
+                                            '8',
+                                            Icons.inbox,
+                                            theme.colorScheme.secondary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _buildStatCard(
+                                            context,
+                                            'Leads',
+                                            '15',
+                                            Icons.leaderboard,
+                                            theme.colorScheme.tertiary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else if (user.role.toLowerCase() == 'admin') {
+                            return SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Admin Overview',
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildStatCard(
+                                            context,
+                                            'Users',
+                                            '156',
+                                            Icons.people,
+                                            theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _buildStatCard(
+                                            context,
+                                            'Properties',
+                                            '89',
+                                            Icons.home,
+                                            theme.colorScheme.secondary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _buildStatCard(
+                                            context,
+                                            'Agents',
+                                            '23',
+                                            Icons.person_pin,
+                                            theme.colorScheme.tertiary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                          
+                          return const SliverToBoxAdapter(child: SizedBox.shrink());
+                        },
+                      ),
+                      
+                      // Subscription Upgrade Prompt for Regular Users
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          final user = authProvider.user;
+                          if (user == null) return const SliverToBoxAdapter(child: SizedBox.shrink());
+                          
+                          // Show upgrade prompt for regular users without active subscription
+                          if ((user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller') &&
+                              (user.subscriptionStatus == null || user.subscriptionStatus!.isEmpty || user.subscriptionStatus!.toLowerCase() == 'free')) {
+                            return SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        theme.colorScheme.primary.withValues(alpha: 0.1),
+                                        theme.colorScheme.secondary.withValues(alpha: 0.1),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.star,
+                                            color: theme.colorScheme.primary,
+                                            size: 32,
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Upgrade to Premium',
+                                                  style: theme.textTheme.titleLarge?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: theme.colorScheme.primary,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'Get exclusive access to premium features',
+                                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                                    color: theme.colorScheme.onSurfaceVariant,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              onPressed: () => Navigator.of(context).pushNamed('/subscription'),
+                                              icon: const Icon(Icons.upgrade),
+                                              label: const Text('Upgrade Now'),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: theme.colorScheme.primary,
+                                                foregroundColor: theme.colorScheme.onPrimary,
+                                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pushNamed('/subscription'),
+                                            child: const Text('Learn More'),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          
+                          return const SliverToBoxAdapter(child: SizedBox.shrink());
+                        },
+                      ),
+                      
+                      // Role-based Navigation Sections
+                      Consumer<AuthProvider>(
+                        builder: (context, authProvider, child) {
+                          final user = authProvider.user;
+                          if (user == null) return const SliverToBoxAdapter(child: SizedBox.shrink());
+                          
+                          return SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Agent-specific actions
+                                  if (user.role.toLowerCase() == 'agent')
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Agent Dashboard',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'My Properties',
+                                                Icons.home_work,
+                                                theme.colorScheme.primary,
+                                                () => Navigator.of(context).pushNamed('/agent/properties'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Analytics',
+                                                Icons.analytics,
+                                                theme.colorScheme.secondary,
+                                                () => Navigator.of(context).pushNamed('/agent/analytics'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Inquiries',
+                                                Icons.inbox,
+                                                theme.colorScheme.tertiary,
+                                                () => Navigator.of(context).pushNamed('/agent/inquiries'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Leads',
+                                                Icons.leaderboard,
+                                                theme.colorScheme.primary,
+                                                () => Navigator.of(context).pushNamed('/agent/leads'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 24),
+                                      ],
+                                    ),
+                                  
+                                  // Admin-specific actions
+                                  if (user.role.toLowerCase() == 'admin')
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Admin Panel',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.error,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Admin Dashboard',
+                                                Icons.admin_panel_settings,
+                                                theme.colorScheme.error,
+                                                () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Manage Users',
+                                                Icons.people,
+                                                theme.colorScheme.secondary,
+                                                () => Navigator.of(context).pushNamed('/admin/users'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 24),
+                                      ],
+                                    ),
+                                  
+                                  // Developer-specific actions
+                                  if (user.role.toLowerCase() == 'developer')
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Developer Tools',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.tertiary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Developers List',
+                                                Icons.developer_mode,
+                                                theme.colorScheme.tertiary,
+                                                () => Navigator.of(context).pushNamed('/developers'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Add Property',
+                                                Icons.add_home,
+                                                theme.colorScheme.primary,
+                                                () => Navigator.of(context).pushNamed('/add-property'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 24),
+                                      ],
+                                    ),
+                                  
+                                  // Regular user actions
+                                  if (user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller')
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'User Actions',
+                                          style: theme.textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Add Property',
+                                                Icons.add_home,
+                                                theme.colorScheme.primary,
+                                                () => Navigator.of(context).pushNamed('/add-property'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: _buildQuickActionCard(
+                                                context,
+                                                'Subscription',
+                                                Icons.card_membership,
+                                                theme.colorScheme.secondary,
+                                                () => Navigator.of(context).pushNamed('/subscription'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 24),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       
                       // Featured Properties

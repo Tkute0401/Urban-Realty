@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../providers/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -59,10 +61,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Widget _buildProfileActionTile(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        title: Text(title),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).pushNamed('/settings'),
+        icon: const Icon(Icons.settings),
+        label: const Text('Settings'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+            tooltip: 'Settings',
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => Navigator.of(context).pushNamed('/help'),
+            tooltip: 'Help',
+          ),
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -99,6 +134,158 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton(onPressed: _save, child: const Text('Save changes')),
+                        const SizedBox(height: 20),
+                        
+                        // Role-based Navigation Options
+                        Consumer<AuthProvider>(
+                          builder: (context, authProvider, child) {
+                            final user = authProvider.user;
+                            if (user == null) return const SizedBox.shrink();
+                            
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Quick Access',
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                
+                                // Agent options
+                                if (user.role.toLowerCase() == 'agent') ...[
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Agent Dashboard',
+                                    Icons.dashboard,
+                                    () => Navigator.of(context).pushNamed('/agent/dashboard'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'My Properties',
+                                    Icons.home_work,
+                                    () => Navigator.of(context).pushNamed('/agent/properties'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Analytics',
+                                    Icons.analytics,
+                                    () => Navigator.of(context).pushNamed('/agent/analytics'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Inquiries',
+                                    Icons.inbox,
+                                    () => Navigator.of(context).pushNamed('/agent/inquiries'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Leads',
+                                    Icons.leaderboard,
+                                    () => Navigator.of(context).pushNamed('/agent/leads'),
+                                  ),
+                                ],
+                                
+                                // Admin options
+                                if (user.role.toLowerCase() == 'admin') ...[
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Admin Dashboard',
+                                    Icons.admin_panel_settings,
+                                    () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Manage Users',
+                                    Icons.people,
+                                    () => Navigator.of(context).pushNamed('/admin/users'),
+                                  ),
+                                ],
+                                
+                                // Developer options
+                                if (user.role.toLowerCase() == 'developer') ...[
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Developers List',
+                                    Icons.developer_mode,
+                                    () => Navigator.of(context).pushNamed('/developers'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Add Property',
+                                    Icons.add_home,
+                                    () => Navigator.of(context).pushNamed('/add-property'),
+                                  ),
+                                ],
+                                
+                                // Regular user options
+                                if (user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller') ...[
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Add Property',
+                                    Icons.add_home,
+                                    () => Navigator.of(context).pushNamed('/add-property'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
+                                    'Subscription',
+                                    Icons.card_membership,
+                                    () => Navigator.of(context).pushNamed('/subscription'),
+                                  ),
+                                ],
+                                
+                                // Common options for all users
+                                const SizedBox(height: 16),
+                                _buildProfileActionTile(
+                                  context,
+                                  'Settings',
+                                  Icons.settings,
+                                  () => Navigator.of(context).pushNamed('/settings'),
+                                ),
+                                _buildProfileActionTile(
+                                  context,
+                                  'Help & Support',
+                                  Icons.help,
+                                  () => Navigator.of(context).pushNamed('/help'),
+                                ),
+                                _buildProfileActionTile(
+                                  context,
+                                  'About Us',
+                                  Icons.info,
+                                  () => Navigator.of(context).pushNamed('/about'),
+                                ),
+                                _buildProfileActionTile(
+                                  context,
+                                  'Privacy Policy',
+                                  Icons.privacy_tip,
+                                  () => Navigator.of(context).pushNamed('/privacy'),
+                                ),
+                                _buildProfileActionTile(
+                                  context,
+                                  'Terms of Service',
+                                  Icons.description,
+                                  () => Navigator.of(context).pushNamed('/terms'),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await authProvider.logout();
+                            if (mounted) {
+                              Navigator.of(context).pushReplacementNamed('/');
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Logout'),
+                        ),
                         const SizedBox(height: 8),
                       ],
                     ),

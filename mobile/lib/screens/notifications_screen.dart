@@ -131,9 +131,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).pushNamed('/search'),
+        icon: const Icon(Icons.search),
+        label: const Text('Search'),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.of(context).pushNamed('/search'),
+            tooltip: 'Search Properties',
+          ),
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () => Navigator.of(context).pushNamed('/'),
+            tooltip: 'Home',
+          ),
           if (_notifications.any((n) => !n.isRead))
             TextButton(
               onPressed: _markAllAsRead,

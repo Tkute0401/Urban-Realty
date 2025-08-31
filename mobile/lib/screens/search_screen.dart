@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/property_service.dart';
 import '../config/api_config.dart';
+import '../providers/auth_provider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -199,12 +201,41 @@ class _SearchScreenState extends State<SearchScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
+      floatingActionButton: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          final user = authProvider.user;
+          if (user == null) return const SizedBox.shrink();
+          
+          // Show FAB for users who can add properties
+          if (user.role.toLowerCase() == 'agent' || 
+              user.role.toLowerCase() == 'developer' ||
+              user.role.toLowerCase() == 'user' || 
+              user.role.toLowerCase() == 'buyer' || 
+              user.role.toLowerCase() == 'seller') {
+            return FloatingActionButton.extended(
+              onPressed: () => Navigator.of(context).pushNamed('/add-property'),
+              icon: const Icon(Icons.add_home),
+              label: const Text('Add Property'),
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+            );
+          }
+          
+          return const SizedBox.shrink();
+        },
+      ),
       appBar: AppBar(
         title: const Text('Search Properties'),
         actions: [
           IconButton(
             icon: Icon(_showFilters ? Icons.filter_alt : Icons.filter_alt_outlined),
             onPressed: () => setState(() => _showFilters = !_showFilters),
+            tooltip: 'Toggle Filters',
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            onPressed: () => Navigator.of(context).pushNamed('/favorites'),
+            tooltip: 'Favorites',
           ),
         ],
       ),
