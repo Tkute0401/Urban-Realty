@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/auth_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -368,10 +369,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: const Text('Cancel'),
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(context).pop();
-                            // Navigate to login screen
-                            Navigator.of(context).pushReplacementNamed('/login');
+                            // Use the auth provider to logout
+                            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                            await authProvider.logout();
+                            // Navigation will be handled automatically by the main.dart Consumer
                           },
                           child: const Text('Logout'),
                         ),

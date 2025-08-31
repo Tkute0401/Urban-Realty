@@ -174,7 +174,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         reraId: _reraIdController.text.isEmpty ? null : _reraIdController.text,
       );
       if (success && mounted) {
-        Navigator.pushReplacementNamed(context, "/home");
+        // Navigation will be handled automatically by the main.dart Consumer
+        // No need to manually navigate
       }
     }
   }
