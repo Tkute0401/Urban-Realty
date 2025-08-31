@@ -94,7 +94,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: Theme.of(context).primaryColor,
-                  child: Icon(Icons.person, color: Colors.white, size: 28),
+                  child: const Icon(Icons.person, color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -285,14 +285,14 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
-                      child: Icon(Icons.person, color: Colors.white, size: 16),
+                      child: const Icon(Icons.person, color: Colors.white, size: 16),
                     ),
                     title: Text(lead['name'] ?? 'Unknown Lead'),
                     subtitle: Text(lead['property'] ?? ''),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _getLeadStatusColor(lead['status']).withOpacity(0.1),
+                        color: _getLeadStatusColor(lead['status']).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _getLeadStatusColor(lead['status'])),
                       ),
@@ -344,7 +344,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
               children: [
                 CircleAvatar(
                   backgroundColor: Theme.of(context).primaryColor,
-                  child: Icon(Icons.person, color: Colors.white),
+                  child: const Icon(Icons.person, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

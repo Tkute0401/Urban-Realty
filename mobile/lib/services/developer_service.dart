@@ -10,7 +10,7 @@ class DeveloperService {
 
   Future<List<Map<String, dynamic>>> getDevelopers({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/developers', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/developers', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['developers'] ?? []);
@@ -23,7 +23,7 @@ class DeveloperService {
 
   Future<Map<String, dynamic>> getDeveloperDetails(String developerId) async {
     try {
-      final response = await _httpClient.get('/developers/$developerId');
+      final response = await HttpClient.get('/developers/$developerId');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -35,7 +35,7 @@ class DeveloperService {
 
   Future<Map<String, dynamic>> addDeveloper(Map<String, dynamic> developerData) async {
     try {
-      final response = await _httpClient.post('/developers', body: developerData);
+      final response = await HttpClient.post('/developers', body: developerData);
       if (response.statusCode == 201) {
         return jsonDecode(response.body);
       }
@@ -47,7 +47,7 @@ class DeveloperService {
 
   Future<Map<String, dynamic>> updateDeveloper(String developerId, Map<String, dynamic> developerData) async {
     try {
-      final response = await _httpClient.put('/developers/$developerId', body: developerData);
+      final response = await HttpClient.put('/developers/$developerId', body: developerData);
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -59,7 +59,7 @@ class DeveloperService {
 
   Future<bool> deleteDeveloper(String developerId) async {
     try {
-      final response = await _httpClient.delete('/developers/$developerId');
+      final response = await HttpClient.delete('/developers/$developerId');
       return response.statusCode == 200;
     } catch (e) {
       throw Exception('Error: $e');

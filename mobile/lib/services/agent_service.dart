@@ -10,7 +10,7 @@ class AgentService {
 
   Future<Map<String, dynamic>> getAgentDashboard() async {
     try {
-      final response = await _httpClient.get('/agent/dashboard');
+      final response = await HttpClient.get('/agent/dashboard');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -22,7 +22,7 @@ class AgentService {
 
   Future<List<Map<String, dynamic>>> getAgentProperties({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/agent/properties', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/agent/properties', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['properties'] ?? []);
@@ -35,20 +35,20 @@ class AgentService {
 
   Future<List<Map<String, dynamic>>> getAgentLeads({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/agent/leads', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/agent/leads', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['leads'] ?? []);
       }
       throw Exception('Failed to load agent leads');
     } catch (e) {
-      throw Exception('Error: $e');
+      throw Exception('Error: load agent leads');
     }
   }
 
   Future<List<Map<String, dynamic>>> getAgentInquiries({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/agent/inquiries', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/agent/inquiries', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['inquiries'] ?? []);
@@ -61,7 +61,7 @@ class AgentService {
 
   Future<Map<String, dynamic>> getAgentAnalytics() async {
     try {
-      final response = await _httpClient.get('/agent/analytics');
+      final response = await HttpClient.get('/agent/analytics');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }

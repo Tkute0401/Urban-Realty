@@ -10,7 +10,7 @@ class SubscriptionService {
 
   Future<List<Map<String, dynamic>>> getSubscriptionPlans() async {
     try {
-      final response = await _httpClient.get('/subscriptions/plans');
+      final response = await HttpClient.get('/subscriptions/plans');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['plans'] ?? []);
@@ -23,7 +23,7 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> getCurrentSubscription() async {
     try {
-      final response = await _httpClient.get('/subscriptions/current');
+      final response = await HttpClient.get('/subscriptions/current');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -35,7 +35,7 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> subscribeToPlan(String planId) async {
     try {
-      final response = await _httpClient.post('/subscriptions/subscribe', body: {'planId': planId});
+      final response = await HttpClient.post('/subscriptions/subscribe', body: {'planId': planId});
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -47,7 +47,7 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> cancelSubscription() async {
     try {
-      final response = await _httpClient.post('/subscriptions/cancel');
+      final response = await HttpClient.post('/subscriptions/cancel');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -59,7 +59,7 @@ class SubscriptionService {
 
   Future<List<Map<String, dynamic>>> getBillingHistory() async {
     try {
-      final response = await _httpClient.get('/subscriptions/billing-history');
+      final response = await HttpClient.get('/subscriptions/billing-history');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['bills'] ?? []);

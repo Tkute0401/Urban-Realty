@@ -114,4 +114,26 @@ class PropertiesProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+
+  Future<bool> createProperty(Map<String, dynamic> propertyData, List<String> imagePaths) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      final success = await PropertyService.createProperty(propertyData, imagePaths);
+      if (success) {
+        // Reload properties to include the new one
+        await loadProperties();
+      }
+      _isLoading = false;
+      notifyListeners();
+      return success;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 }

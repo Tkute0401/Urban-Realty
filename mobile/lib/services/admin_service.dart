@@ -10,7 +10,7 @@ class AdminService {
 
   Future<Map<String, dynamic>> getDashboardStats() async {
     try {
-      final response = await _httpClient.get('/admin/dashboard');
+      final response = await HttpClient.get('/admin/dashboard');
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }
@@ -22,7 +22,7 @@ class AdminService {
 
   Future<List<Map<String, dynamic>>> getUsers({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/admin/users', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/admin/users', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['users'] ?? []);
@@ -35,7 +35,7 @@ class AdminService {
 
   Future<List<Map<String, dynamic>>> getAdminProperties({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/admin/properties', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/admin/properties', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['properties'] ?? []);
@@ -48,7 +48,7 @@ class AdminService {
 
   Future<List<Map<String, dynamic>>> getAgents({int page = 1, int limit = 10}) async {
     try {
-      final response = await _httpClient.get('/admin/agents', query: {'page': page, 'limit': limit});
+      final response = await HttpClient.get('/admin/agents', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(data['agents'] ?? []);
@@ -61,7 +61,7 @@ class AdminService {
 
   Future<Map<String, dynamic>> updateUserStatus(String userId, String status) async {
     try {
-      final response = await _httpClient.put('/admin/users/$userId/status', body: {'status': status});
+      final response = await HttpClient.put('/admin/users/$userId/status', body: {'status': status});
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }

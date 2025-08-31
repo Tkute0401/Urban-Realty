@@ -296,7 +296,7 @@ class _AgentAnalyticsScreenState extends State<AgentAnalyticsScreen> {
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
-                      child: Icon(Icons.notifications, color: Colors.white, size: 16),
+                      child: const Icon(Icons.notifications, color: Colors.white, size: 16),
                     ),
                     title: Text(activity['message'] ?? ''),
                     subtitle: Text(activity['timestamp'] ?? ''),

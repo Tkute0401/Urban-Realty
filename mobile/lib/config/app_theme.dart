@@ -29,18 +29,18 @@ class AppTheme {
     onError: Color(0xFFFFFFFF),
     errorContainer: Color(0xFFFEE2E2),
     onErrorContainer: Color(0xFF991B1B),
-    surface: const Color(0xFFFAFAFA), // Light gray background
-    onSurface: const Color(0xFF1F2937), // Dark text
-    surfaceContainerHighest: const Color(0xFFF8F9FA), // Very light gray
-    onSurfaceVariant: const Color(0xFF6B7280), // Medium gray text
-    outline: const Color(0xFFE5E7EB), // Light gray outline
-    outlineVariant: const Color(0xFFF3F4F6), // Very light gray outline
-    shadow: const Color(0x00000000),
-    scrim: const Color(0x00000000),
-    inverseSurface: const Color(0xFF1F2937),
-    onInverseSurface: const Color(0xFFF9FAFB),
-    inversePrimary: const Color(0xFFFFB366), // Light orange for inverse
-    surfaceTint: const Color(0xFFF75B00), // Orange tint
+    surface: Color(0xFFFAFAFA), // Light gray background
+    onSurface: Color(0xFF1F2937), // Dark text
+    surfaceContainerHighest: Color(0xFFF8F9FA), // Very light gray
+    onSurfaceVariant: Color(0xFF6B7280), // Medium gray text
+    outline: Color(0xFFE5E7EB), // Light gray outline
+    outlineVariant: Color(0xFFF3F4F6), // Very light gray outline
+    shadow: Color(0x00000000),
+    scrim: Color(0x00000000),
+    inverseSurface: Color(0xFF1F2937),
+    onInverseSurface: Color(0xFFF9FAFB),
+    inversePrimary: Color(0xFFFFB366), // Light orange for inverse
+    surfaceTint: Color(0xFFF75B00), // Orange tint
   );
 
   // Dark Theme Colors - Based on SQUARE FOOOT brand
@@ -62,18 +62,18 @@ class AppTheme {
     onError: Color(0xFF7F1D1D),
     errorContainer: Color(0xFF991B1B),
     onErrorContainer: Color(0xFFFEE2E2),
-    surface: const Color(0xFF0F172A), // Dark blue-gray background
-    onSurface: const Color(0xFFF1F5F9), // Light text
-    surfaceContainerHighest: const Color(0xFF334155), // Medium dark surface
-    onSurfaceVariant: const Color(0xFFCBD5E1), // Light gray text
-    outline: const Color(0xFF475569), // Medium gray outline
-    outlineVariant: const Color(0xFF334155), // Dark gray outline
-    shadow: const Color(0x00000000),
-    scrim: const Color(0x00000000),
-    inverseSurface: const Color(0xFFF1F5F9),
-    onInverseSurface: const Color(0xFF0F172A),
-    inversePrimary: const Color(0xFFE54D00), // Dark orange for inverse
-    surfaceTint: const Color(0xFFFF6600), // Orange tint
+    surface: Color(0xFF0F172A), // Dark blue-gray background
+    onSurface: Color(0xFFF1F5F9), // Light text
+    surfaceContainerHighest: Color(0xFF334155), // Medium dark surface
+    onSurfaceVariant: Color(0xFFCBD5E1), // Light gray text
+    outline: Color(0xFF475569), // Medium gray outline
+    outlineVariant: Color(0xFF334155), // Dark gray outline
+    shadow: Color(0x00000000),
+    scrim: Color(0x00000000),
+    inverseSurface: Color(0xFFF1F5F9),
+    onInverseSurface: Color(0xFF0F172A),
+    inversePrimary: Color(0xFFE54D00), // Dark orange for inverse
+    surfaceTint: Color(0xFFFF6600), // Orange tint
   );
 
   // Light Theme
