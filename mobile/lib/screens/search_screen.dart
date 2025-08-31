@@ -44,6 +44,23 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _fetchProperties();
+    _handleArguments();
+  }
+
+  void _handleArguments() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null) {
+        if (args['query'] != null) {
+          _searchController.text = args['query'];
+          _applyFilters();
+        }
+        if (args['propertyType'] != null) {
+          _propertyType = args['propertyType'];
+          _applyFilters();
+        }
+      }
+    });
   }
 
   @override

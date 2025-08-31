@@ -70,9 +70,17 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await AuthService.logout();
-    _user = null;
-    notifyListeners();
+    try {
+      await AuthService.logout();
+      _user = null;
+      notifyListeners();
+    } catch (e) {
+      // Even if logout fails on server, clear local user data
+      _user = null;
+      notifyListeners();
+      // Log the error but don't throw it to prevent app crashes
+      print('Logout error: $e');
+    }
   }
 
   Future<void> loadUser() async {

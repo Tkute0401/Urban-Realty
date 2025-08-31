@@ -79,10 +79,15 @@ class AuthService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        throw Exception('Logout failed');
+        // Don't throw exception for logout failures, just return empty response
+        // This prevents app crashes when server is unavailable
+        return {};
       }
     } catch (e) {
-      throw Exception('Error during logout: $e');
+      // Don't throw exception for logout failures, just return empty response
+      // This prevents app crashes when server is unavailable
+      print('Logout error: $e');
+      return {};
     }
   }
 

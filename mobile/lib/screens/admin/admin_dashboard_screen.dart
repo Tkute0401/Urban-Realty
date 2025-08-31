@@ -279,18 +279,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   void _navigateToUsers() {
-    Navigator.pushNamed(context, '/admin-users');
+    Navigator.pushNamed(context, '/admin/users');
   }
 
   void _navigateToProperties() {
-    Navigator.pushNamed(context, '/admin-properties');
+    Navigator.pushNamed(context, '/admin/properties');
   }
 
   void _navigateToAgents() {
-    Navigator.pushNamed(context, '/admin-agents');
+    Navigator.pushNamed(context, '/admin/agents');
   }
 
   void _navigateToAnalytics() {
-    Navigator.pushNamed(context, '/admin-analytics');
+    Navigator.pushNamed(context, '/admin/analytics');
   }
 }
