@@ -29,9 +29,11 @@ class ThemeProvider extends ChangeNotifier {
             _themeMode = ThemeMode.dark;
             break;
           case 'system':
-          default:
-            _themeMode = ThemeMode.system;
-            break;
+          _themeMode = ThemeMode.system;
+          break;
+        default:
+          _themeMode = ThemeMode.system;
+          break;
         }
         notifyListeners();
       }
@@ -58,6 +60,8 @@ class ThemeProvider extends ChangeNotifier {
           themeString = 'dark';
           break;
         case ThemeMode.system:
+          themeString = 'system';
+          break;
         default:
           themeString = 'system';
           break;

@@ -39,8 +39,6 @@ class FormTextField extends StatelessWidget {
       keyboardType: keyboardType,
       obscureText: obscureText,
       validator: validator,
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
       maxLines: maxLines,
       maxLength: maxLength,
       enabled: enabled,

@@ -148,7 +148,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -269,7 +269,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 Text(
                                   notification.message,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurfaceContainerHighest,
+                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                                 const SizedBox(height: 8),

@@ -332,13 +332,13 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 await _adminService.updateUserStatus(userId, status);
                 if (mounted) {
                   _loadUsers(refresh: true);
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(content: Text('User ${status == 'active' ? 'activated' : 'deactivated'} successfully')),
                   );
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(content: Text('Error: $e')),
                   );
                 }

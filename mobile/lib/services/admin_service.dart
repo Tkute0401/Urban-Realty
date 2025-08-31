@@ -6,7 +6,7 @@ class AdminService {
   factory AdminService() => _instance;
   AdminService._internal();
 
-  final HttpClient _httpClient = HttpClient();
+
 
   Future<Map<String, dynamic>> getDashboardStats() async {
     try {

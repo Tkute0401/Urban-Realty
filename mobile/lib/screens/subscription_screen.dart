@@ -111,7 +111,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   ],
                                 ),
                               ),
-                            ).toList(),
+                            ),
                             ],
                           ),
                         const SizedBox(height: 16),
