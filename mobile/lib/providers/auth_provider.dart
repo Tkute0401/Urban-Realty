@@ -20,11 +20,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final response = await AuthService.login(email, password);
       
-      // Check if response is null or doesn't contain data
-      if (response == null) {
-        throw Exception('Invalid response from server');
-      }
-      
+      // Check if response doesn't contain data
       if (response["data"] == null) {
         throw Exception('No user data received from server');
       }
@@ -56,11 +52,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final response = await AuthService.register(email, password, name, role);
       
-      // Check if response is null or doesn't contain data
-      if (response == null) {
-        throw Exception('Invalid response from server');
-      }
-      
+      // Check if response doesn't contain data
       if (response["data"] == null) {
         throw Exception('No user data received from server');
       }
