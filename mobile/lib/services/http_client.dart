@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class HttpClient {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'https://urban-realty-production.up.railway.app/api/v1',
   
   static Future<http.Response> get(String endpoint, {Map<String, String>? query, Map<String, String>? headers}) async {
     try {
