@@ -1,139 +1,147 @@
-import "package:flutter/material.dart";
-import "../models/property.dart";
-import "../services/property_service.dart";
+
+import 'package:flutter/material.dart';
+import '../models/property.dart';
+import '../services/property_service.dart';
+import '../services/favorites_service.dart';
 
 class PropertiesProvider extends ChangeNotifier {
-  final List<Property> _properties = [];
-  final List<Property> _favorites = [];
-  final List<Property> _recentlyViewed = [];
+  final PropertyService _propertyService = PropertyService();
+  final FavoritesService _favoritesService = FavoritesService();
+
+  List<Property> _properties = [];
+  List<Property> _featuredProperties = [];
+  Property? _selectedProperty;
+
   bool _isLoading = false;
   String? _error;
+  int _currentPage = 1;
+  bool _hasMore = true;
 
   List<Property> get properties => _properties;
-  List<Property> get favorites => _favorites;
-  List<Property> get recentlyViewed => _recentlyViewed;
+  List<Property> get featuredProperties => _featuredProperties;
+  Property? get selectedProperty => _selectedProperty;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  bool get hasMore => _hasMore;
 
-  Future<void> loadProperties({Map<String, dynamic>? filters}) async {
+  Future<void> fetchProperties({
+    Map<String, dynamic>? filters,
+    bool refresh = false,
+  }) async {
+    if (isLoading) return;
+
+    _isLoading = true;
+    if (refresh) {
+      _currentPage = 1;
+      _properties = [];
+      _hasMore = true;
+    }
+    _error = null;
+    notifyListeners();
+
+    try {
+      final newProperties = await _propertyService.getProperties(
+        page: _currentPage,
+        limit: 10, // Default limit
+        search: filters?['search'],
+        city: filters?['city'],
+        propertyType: filters?['propertyType'],
+        minPrice: filters?['minPrice'],
+        maxPrice: filters?['maxPrice'],
+        bedrooms: filters?['bedrooms'],
+        bathrooms: filters?['bathrooms'],
+      );
+
+      if (newProperties.length < 10) {
+        _hasMore = false;
+      }
+
+      _properties.addAll(newProperties);
+      _currentPage++;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchPropertyById(String id) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    
     try {
-      _properties.clear();
-      if (filters != null) {
-        // Apply filters to the service call
-        final search = filters['search'] as String?;
-        final location = filters['location'] as String?;
-        final minPrice = filters['minPrice'] as double?;
-        final maxPrice = filters['maxPrice'] as double?;
-        final amenities = filters['amenities'] as List<String>?;
-        
-        _properties.addAll(await PropertyService.getProperties(
-          search: search,
-          location: location,
-          minPrice: minPrice,
-          maxPrice: maxPrice,
-          amenities: amenities,
-        ));
-      } else {
-        _properties.addAll(await PropertyService.getProperties());
-      }
-      _isLoading = false;
-      notifyListeners();
+      _selectedProperty = await _propertyService.getPropertyById(id);
     } catch (e) {
       _error = e.toString();
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> loadProperty(String id) async {
-    try {
-      final property = await PropertyService.getPropertyById(id);
-      final index = _properties.indexWhere((p) => p.id == id);
-      if (index != -1) {
-        _properties[index] = property;
-      } else {
-        _properties.add(property);
-      }
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> loadFeaturedProperties() async {
-    try {
-      final featured = await PropertyService.getFeaturedProperties();
-      _properties.clear();
-      _properties.addAll(featured);
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> loadRecentlyViewedProperties() async {
-    try {
-      final recent = await PropertyService.getRecentlyViewedProperties();
-      _recentlyViewed.clear();
-      _recentlyViewed.addAll(recent);
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  void addToFavorites(Property property) {
-    if (!_favorites.any((p) => p.id == property.id)) {
-      _favorites.add(property);
-      notifyListeners();
-    }
-  }
-
-  void removeFromFavorites(String propertyId) {
-    _favorites.removeWhere((p) => p.id == propertyId);
-    notifyListeners();
-  }
-
-  void addToRecentlyViewed(Property property) {
-    _recentlyViewed.removeWhere((p) => p.id == property.id);
-    _recentlyViewed.insert(0, property);
-    if (_recentlyViewed.length > 10) {
-      _recentlyViewed.removeLast();
-    }
-    notifyListeners();
-  }
-
-  void clearError() {
+  Future<void> fetchFeaturedProperties() async {
+    _isLoading = true;
     _error = null;
     notifyListeners();
+    try {
+      _featuredProperties = await _propertyService.getFeaturedProperties();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> toggleFavorite(String propertyId, bool isCurrentlyFavorite) async {
+    try {
+      if (isCurrentlyFavorite) {
+        await _favoritesService.removeFavorite(propertyId);
+      } else {
+        await _favoritesService.addFavorite(propertyId);
+      }
+      // Update the local property state to reflect the change immediately
+      _updateLocalFavoriteStatus(propertyId, !isCurrentlyFavorite);
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  void _updateLocalFavoriteStatus(String propertyId, bool newStatus) {
+    final propertyIndex = _properties.indexWhere((p) => p.id == propertyId);
+    if (propertyIndex != -1) {
+      _properties[propertyIndex] = _properties[propertyIndex].copyWith(isFavorite: newStatus);
+    }
+
+    final featuredIndex = _featuredProperties.indexWhere((p) => p.id == propertyId);
+    if (featuredIndex != -1) {
+      _featuredProperties[featuredIndex] = _featuredProperties[featuredIndex].copyWith(isFavorite: newStatus);
+    }
+
+    if (_selectedProperty?.id == propertyId) {
+      _selectedProperty = _selectedProperty!.copyWith(isFavorite: newStatus);
+    }
   }
 
   Future<bool> createProperty(Map<String, dynamic> propertyData, List<String> imagePaths) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    
+
     try {
-      final success = await PropertyService.createProperty(propertyData, imagePaths);
-      if (success) {
-        // Reload properties to include the new one
-        await loadProperties();
-      }
-      _isLoading = false;
-      notifyListeners();
-      return success;
+      await _propertyService.createProperty(propertyData, imagePaths);
+      // Refresh the list to show the new property
+      await fetchProperties(refresh: true);
+      return true;
     } catch (e) {
       _error = e.toString();
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 }

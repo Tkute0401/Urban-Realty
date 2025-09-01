@@ -16,6 +16,7 @@ class Property {
   final List<String> amenities;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool isFavorite;
 
   Property({
     required this.id,
@@ -35,27 +36,71 @@ class Property {
     this.amenities = const [],
     required this.createdAt,
     required this.updatedAt,
+    this.isFavorite = false,
   });
 
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
       id: json["_id"] ?? json["id"],
-      title: json["title"],
-      description: json["description"],
-      type: json["type"],
-      status: json["status"],
+      title: json["title"] ?? '',
+      description: json["description"] ?? '',
+      type: json["type"] ?? '',
+      status: json["status"] ?? '',
       price: (json["price"] ?? 0).toDouble(),
       bedrooms: json["bedrooms"] ?? 0,
       bathrooms: json["bathrooms"] ?? 0,
       area: (json["area"] ?? 0).toDouble(),
-      address: json["address"],
-      city: json["city"],
-      state: json["state"],
-      zipcode: json["zipcode"],
+      address: json["address"] ?? '',
+      city: json["city"] ?? '',
+      state: json["state"] ?? '',
+      zipcode: json["zipcode"] ?? '',
       images: List<String>.from(json["images"] ?? []),
       amenities: List<String>.from(json["amenities"] ?? []),
-      createdAt: DateTime.parse(json["createdAt"]),
-      updatedAt: DateTime.parse(json["updatedAt"]),
+      createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
+      isFavorite: json["isFavorite"] ?? false,
+    );
+  }
+
+  Property copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? type,
+    String? status,
+    double? price,
+    int? bedrooms,
+    int? bathrooms,
+    double? area,
+    String? address,
+    String? city,
+    String? state,
+    String? zipcode,
+    List<String>? images,
+    List<String>? amenities,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isFavorite,
+  }) {
+    return Property(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      price: price ?? this.price,
+      bedrooms: bedrooms ?? this.bedrooms,
+      bathrooms: bathrooms ?? this.bathrooms,
+      area: area ?? this.area,
+      address: address ?? this.address,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      zipcode: zipcode ?? this.zipcode,
+      images: images ?? this.images,
+      amenities: amenities ?? this.amenities,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }

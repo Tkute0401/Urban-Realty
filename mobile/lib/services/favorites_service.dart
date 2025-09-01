@@ -1,42 +1,44 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'http_client.dart';
+import 'package:dio/dio.dart';
+import 'api_service.dart';
+import '../models/property.dart';
 
 class FavoritesService {
+  final ApiService _apiService = ApiService();
 
-  Future<List<dynamic>> list() async {
-    final http.Response res = await HttpClient.get('/auth/favorites');
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      final body = jsonDecode(res.body);
-      if (body is Map<String, dynamic>) {
-        final data = body['data'] ?? body['favorites'] ?? body;
-        if (data is List) return data;
-        if (data is Map && data['data'] is List) return (data['data'] as List);
-      }
-      if (body is List) return body;
+  Future<List<Property>> getFavorites() async {
+    try {
+      final response = await _apiService.dio.get('/auth/favorites');
+      final List<dynamic> data = response.data['data'];
+      return data.map((json) => Property.fromJson(json)).toList();
+    } on DioException catch (e) {
+      throw Exception('Error fetching favorites: ${e.message}');
     }
-    throw Exception('Fetch favorites failed: ${res.statusCode}');
   }
 
-  Future<Map<String, dynamic>> toggle(String propertyId) async {
-    final http.Response res = await HttpClient.put('/auth/favorites/$propertyId');
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      return jsonDecode(res.body) as Map<String, dynamic>;
+  Future<void> addFavorite(String propertyId) async {
+    try {
+      await _apiService.dio.put('/auth/favorites/$propertyId');
+    } on DioException catch (e) {
+      throw Exception('Error adding favorite: ${e.message}');
     }
-    throw Exception('Toggle favorite failed: ${res.statusCode}');
   }
 
-  Future<bool> status(String propertyId) async {
-    final http.Response res = await HttpClient.get('/auth/favorites/$propertyId/status');
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      final body = jsonDecode(res.body);
-      if (body is Map<String, dynamic>) {
-        final dynamic value = body['isFavorite'] ?? body['data']?['isFavorite'];
-        if (value is bool) return value;
-      }
+  Future<void> removeFavorite(String propertyId) async {
+    try {
+      await _apiService.dio.delete('/auth/favorites/$propertyId');
+    } on DioException catch (e) {
+      throw Exception('Error removing favorite: ${e.message}');
+    }
+  }
+
+  Future<bool> isFavorite(String propertyId) async {
+    try {
+      final response = await _apiService.dio.get('/auth/favorites/$propertyId/status');
+      return response.data['data']['isFavorite'] ?? false;
+    } on DioException catch (e) {
+      // If the status endpoint fails, assume it's not a favorite
+      print('Error checking favorite status: ${e.message}');
       return false;
     }
-    throw Exception('Favorite status failed: ${res.statusCode}');
   }
 }
-
