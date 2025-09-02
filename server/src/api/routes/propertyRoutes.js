@@ -3,8 +3,8 @@ const router = express.Router();
 const { check } = require('express-validator');
 const propertyController = require('../../../controllers/propertyController');
 const contactController = require('../../../controllers/contactController');
-const { protect, authorize } = require('../../middleware/auth');
-const upload = require('../../middleware/multer');
+const { protect, authorize } = require('../../../middleware/auth');
+const upload = require('../../../middleware/multer');
 
 // @desc    Get all properties
 // @route   GET /api/v1/properties

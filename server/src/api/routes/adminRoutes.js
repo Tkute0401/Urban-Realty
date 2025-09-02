@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorize } = require('../../middleware/auth');
+const { protect, authorize } = require('../../../middleware/auth');
 const adminController = require('../../../controllers/adminController');
 const dynamicFieldController = require('../../../controllers/dynamicFieldController');
 const userTypeController = require('../../../controllers/userTypeController');
 const mediaController = require('../../../controllers/mediaController');
-const upload = require('../../middleware/multer');
+const upload = require('../../../middleware/multer');
 
 // User management
 router.get('/users', protect, authorize('admin'), adminController.getUsers);

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorize } = require('../../middleware/auth');
+const { protect, authorize } = require('../../../middleware/auth');
 const {
   getDevelopers,
   getDeveloper,
@@ -9,8 +9,8 @@ const {
   deleteDeveloper,
   uploadDeveloperLogo
 } = require('../../../controllers/developers');
-const upload = require('../../middleware/multer');
-const advancedResults = require('../../middleware/advancedResults');
+const upload = require('../../../middleware/multer');
+const advancedResults = require('../../../middleware/advancedResults');
 const Developer = require('../../../models/Developer');
 
 router

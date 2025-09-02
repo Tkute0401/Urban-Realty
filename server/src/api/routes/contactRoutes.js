@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const contactController = require('../../../controllers/contactController');
-const { protect, authorize } = require('../../middleware/auth');
+const { protect, authorize } = require('../../../middleware/auth');
 
 // @desc    Create contact request
 // @route   POST /api/v1/contacts/property/:propertyId

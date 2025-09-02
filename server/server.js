@@ -1,4 +1,6 @@
-require('dotenv').config({ path: `${__dirname}/.env` });
+// Load environment variables (prefer local dev override, then repo root)
+require('dotenv').config({ path: `${__dirname}/.env.local` });
+require('dotenv').config({ path: `${__dirname}/../.env` });
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -25,7 +27,9 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join('/app/client/dist'); // Updated path
+const clientDistDir = process.env.CLIENT_DIST_DIR
+  ? process.env.CLIENT_DIST_DIR
+  : path.join(__dirname, '../client/dist');
 
 // Create directories
 [uploadsDir, clientDistDir].forEach(dir => {
