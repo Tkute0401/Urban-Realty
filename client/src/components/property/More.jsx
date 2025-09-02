@@ -156,14 +156,7 @@ const More = ({ onApply, currentFilters = {}, amenityOptions = [] }) => {
       >
         More {isOpen ? '▲' : '▼'}
         {hasSelectedFilters && (
-          <span 
-            style={{ 
-              marginLeft: '6px', 
-              color: '#78CADC',
-              fontSize: '12px',
-              fontWeight: '600'
-            }}
-          >
+          <span className="ml-2 text-accent fs-12 fw-600">
             {filterCount}
           </span>
         )}
@@ -187,7 +180,7 @@ const More = ({ onApply, currentFilters = {}, amenityOptions = [] }) => {
                   }
                 }}
               >
-                <span style={{ marginRight: '8px' }}>{icon}</span>
+                <span className="mr-2">{icon}</span>
                 {label}
               </div>
             ))}
@@ -211,7 +204,7 @@ const More = ({ onApply, currentFilters = {}, amenityOptions = [] }) => {
                   ))}
                 </div>
                 {amenityOptions.length === 0 && (
-                  <p style={{ color: '#B8C4C8', fontStyle: 'italic', textAlign: 'center', padding: '20px' }}>
+                  <p className="text-muted italic text-center p-20">
                     No amenities available
                   </p>
                 )}
@@ -277,12 +270,7 @@ const More = ({ onApply, currentFilters = {}, amenityOptions = [] }) => {
                 </div>
                 {selectedFilters.minArea && selectedFilters.maxArea && 
                  Number(selectedFilters.minArea) > Number(selectedFilters.maxArea) && (
-                  <p style={{ 
-                    color: '#ff6b6b', 
-                    fontSize: '12px', 
-                    marginTop: '8px',
-                    fontStyle: 'italic'
-                  }}>
+                  <p className="text-error fs-12 mt-2 italic">
                     ⚠️ Minimum area should be less than maximum area
                   </p>
                 )}

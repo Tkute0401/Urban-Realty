@@ -190,14 +190,7 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
       >
         Price {isPriceOpen ? '▲' : '▼'}
         {hasActiveFilter && (
-          <span style={{ 
-            marginLeft: '6px', 
-            color: '#78CADC',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
-            •
-          </span>
+          <span className="ml-2 text-accent fs-12 fw-600">•</span>
         )}
       </button>
       
@@ -244,9 +237,8 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
                 step={priceRanges.step}
                 value={displayMinValue}
                 onChange={(e) => handleSliderChange(e, 'min')}
-                className="slider min-slider"
+                className={`slider min-slider ${displayMinValue > (priceRanges.max * 0.8) ? 'z-5' : 'z-3'}`}
                 aria-label="Minimum price"
-                style={{ zIndex: displayMinValue > (priceRanges.max * 0.8) ? 5 : 3 }}
               />
               <input
                 ref={maxSliderRef}
@@ -256,9 +248,8 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
                 step={priceRanges.step}
                 value={displayMaxValue}
                 onChange={(e) => handleSliderChange(e, 'max')}
-                className="slider max-slider"
+                className={`slider max-slider ${displayMaxValue < (priceRanges.max * 0.2) ? 'z-5' : 'z-4'}`}
                 aria-label="Maximum price"
-                style={{ zIndex: displayMaxValue < (priceRanges.max * 0.2) ? 5 : 4 }}
               />
             </div>
             

@@ -72,3 +72,16 @@ This file is the single source of truth for all refactoring work performed acros
 - Verified client production build succeeds.
 
 Next targets: migrate inline styles from `components/property/*` (PriceDropdown, BedBath, HomeType, More) and `PropertiesMap.jsx`; add lint rule to flag `style={{` usage.
+
+### Update – Phase 3 Step 19 Progress (CSS Consolidation Round 2)
+- Converted remaining inline styles to utility classes in property filters:
+  - `client/src/components/property/PriceDropdown.jsx`: chip indicator; slider z-index via `.z-*` classes
+  - `client/src/components/property/BedBath.jsx`: chip indicator
+  - `client/src/components/property/HomeType.jsx`: chip indicator, labels, description styles; summary banner via `.summary-banner`
+  - `client/src/components/property/More.jsx`: count badge, sidebar icon spacing, empty state text, error text
+  - `client/src/components/property/PropertiesMap.jsx`: InfoWindow content styling via utilities
+- Extended `client/src/styles/components/utilities.css` with `.fs-12`, `.text-accent`, `.italic`, `.text-center`, `.my-1`, `.p-20`.
+- Added `.summary-banner` to `HomeType.css` to replace inline summary styles.
+
+Verification:
+- Client builds successfully after changes; visual parity maintained on affected components.
