@@ -8,7 +8,7 @@ This file is the single source of truth for all refactoring work performed acros
 ## Current Status Snapshot
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization started)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -127,6 +127,12 @@ Baseline metrics (quick):
 - Remaining inline style occurrences detected by grep: 2 files (now addressed)
 
 ### Phase 1 – Step 2: Backup & Version Control Setup (this session)
+### Phase 3 – Step 21: Form Handling Standardization (this session)
+- Added React Hook Form and resolvers to client dependencies.
+- Introduced reusable `RHFTextField` under `client/src/components/forms/` for controlled MUI inputs.
+- Refactored `client/src/pages/Auth/Login.jsx` to use `react-hook-form` with Zod validation.
+- Submission and loading states unified; prepares for migrating Register/Add/Edit forms next.
+
 - Created compressed backup at `logs/backups/urban-realty-backup-YYYYMMDD-HHMMSS.tar.gz` and pushed tag `backup-pre-phase1-step2-YYYYMMDD-HHMMSS`.
 - Initialized Husky hooks:
   - Pre-commit: `npm run build --prefix client` to avoid committing broken client builds.
