@@ -67,8 +67,14 @@ npx storybook@latest dev -p 6006
 - Created `components/forms/RHFTextField.jsx` for consistent MUI TextField integration.
 - Refactored `pages/Auth/Login.jsx` to RHF with Zod validation; unified loading state.
 - Migrated `pages/Auth/Register.jsx` to RHF + Zod with conditional professional fields (Agent/Developer) and validation for RERA ID.
+ - Migrated footer forms to RHF + Zod:
+   - `components/common/footer/ContactUs.jsx` (adds validation, loading, accessibility attributes)
+   - `components/common/footer/HelpCenter.jsx` (question form migrated; adds validation and loading)
 
 - Centralized API endpoints and query keys in `client/src/constants/api.js`.
 - Added reusable hooks in `client/src/hooks/useApi.js` wrapping Axios + React Query:
   - `useApiQuery`, `useApiMutation`, `useApiClient`.
 - Enables standardized data fetching, caching, and invalidation patterns.
+
+Verification:
+- Vite production build succeeded; Vitest smoke test passed.

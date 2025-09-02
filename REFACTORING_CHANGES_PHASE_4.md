@@ -53,3 +53,8 @@ This step introduces a scalable directory structure for the Flutter app, alignin
 - `main.dart` imports resolve against barrels and features
 - Next: begin moving providers and screens incrementally
 
+### Additional Changes
+- Added feature re-export adapter:
+  - `features/splash/splash_screen.dart` re-exports `screens/splash_screen.dart`
+- Purpose: allow progressive migration of imports to `features/` without breaking.
+

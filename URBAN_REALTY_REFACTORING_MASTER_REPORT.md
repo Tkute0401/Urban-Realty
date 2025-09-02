@@ -8,13 +8,15 @@ This file is the single source of truth for all refactoring work performed acros
 ## Current Status Snapshot
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization: Login done, Register migrated to RHF + Zod)
-- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated into shared/providers with backward-compatible re-exports)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization expanded to ContactUs and HelpCenter)
+- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash)
 - Phase 5: Not started
 
 ## Key Recent Commits (this session)
 - chore(mobile): Phase 4 Step 36 – add core/shared barrels and feature re-exports; update main.dart imports
 - chore(client): Phase 3 – integrate dynamic MUI theme factory and wrap providers
+- chore(client): Phase 3 Step 21 – migrate ContactUs and HelpCenter forms to RHF + Zod
+- chore(mobile): Phase 4 Step 36 – add features/splash re-export adapter
 - docs(mobile): Update Phase 4 change log with barrels and feature re-exports
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
@@ -23,9 +25,13 @@ This file is the single source of truth for all refactoring work performed acros
 - Migrated `client/src/pages/Auth/Register.jsx` from local state to `react-hook-form` with `zod` validation.
 - Implemented `Controller` bindings for all fields, including conditional professional info for Agent/Developer.
 - Unified submission/loading states; removed inline palette styling on submit button.
+- Migrated footer forms to RHF + Zod:
+  - `client/src/components/common/footer/ContactUs.jsx`
+  - `client/src/components/common/footer/HelpCenter.jsx`
 
 Verification:
-- Client build succeeds; form validates RERA ID when role is Agent/Developer.
+- Client build and tests pass after changes (Vite build, Vitest smoke test).
+- Register form validates RERA ID when role is Agent/Developer.
 
 ### Phase 4 – Step 36: Flutter Project Structure Optimization (providers move)
 - Moved providers into `mobile/lib/shared/providers/`:
@@ -35,6 +41,10 @@ Verification:
 
 Verification:
 - `flutter analyze` to be run next; imports remain valid due to re-export stubs.
+
+### Phase 4 – Step 36: Splash feature re-export
+- Added `mobile/lib/features/splash/splash_screen.dart` to re-export `screens/splash_screen.dart`.
+- This enables progressive migration of imports to feature path without breaking.
 ### Phase 3 – Step 22: API Client Optimization (this session)
 - Added `client/src/constants/api.js` centralizing API endpoints and React Query keys.
 - Implemented reusable hooks in `client/src/hooks/useApi.js`:
