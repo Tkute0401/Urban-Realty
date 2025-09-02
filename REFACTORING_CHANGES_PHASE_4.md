@@ -66,6 +66,16 @@ Verification:
 Verification Plan:
 - Run `flutter analyze` and add a widget test to validate cached user render without network.
 
+### API Integration Enhancement (Step 38)
+- Updated `services/api_service.dart` to improve resilience and DX:
+  - Add request interceptor to apply `Authorization` and `Accept` headers.
+  - Add error interceptor with retry/backoff on network and 503 errors (max 2 retries: 300ms, 600ms).
+  - Normalize error messages for consistent UI handling.
+
+Verification Plan:
+- Create integration tests to simulate timeouts and 503 responses and assert retry attempts.
+- Ensure UI surfaces user-friendly error strings.
+
 ### Verification
 - Scaffolding committed and pushed
 - Barrel files verified present:

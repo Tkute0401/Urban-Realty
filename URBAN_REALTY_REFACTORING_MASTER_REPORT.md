@@ -9,7 +9,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization expanded to ContactUs and HelpCenter; Step 29 code splitting complete)
-- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash; migrated auth screens to features; Step 37 AuthProvider offline cache)
+- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash; migrated auth screens to features; Step 37 AuthProvider offline cache; Step 38 API retries/error normalization)
 - Phase 5: Not started
 
 ## Key Recent Commits (this session)
@@ -53,6 +53,16 @@ Verification:
 ### Phase 4 – Step 36: Splash feature re-export
 - Added `mobile/lib/features/splash/splash_screen.dart` to re-export `screens/splash_screen.dart`.
 - This enables progressive migration of imports to feature path without breaking.
+### Phase 4 – Step 38: Flutter API Integration Enhancement (Dio)
+- Enhanced `mobile/lib/services/api_service.dart`:
+  - Added retry with simple exponential backoff for network/503 errors (max 2 retries).
+  - Normalized error messages to user-friendly strings and preserved status codes.
+  - Ensured Authorization and Accept headers are set on each request.
+  - Kept timeouts at 30s and centralized base URL.
+
+Verification Plan:
+- Simulate offline/network errors in integration tests and verify retry/backoff behavior.
+- Validate normalized error messages surface properly in UI when consumed.
 ### Phase 3 – Step 22: API Client Optimization (this session)
 - Added `client/src/constants/api.js` centralizing API endpoints and React Query keys.
 - Implemented reusable hooks in `client/src/hooks/useApi.js`:
