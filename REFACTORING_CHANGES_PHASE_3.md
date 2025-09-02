@@ -45,6 +45,11 @@ This document tracks structural and code changes performed in Phase 3 to organiz
 - Implemented dynamic MUI theme factory `createUrbanRealtyTheme(mode)` in `client/src/Theme/NewTheme.js`.
 - Wrapped root in app-specific ThemeProvider and MUI provider with `CssBaseline` in `client/src/main.jsx`.
 - Updated `client/src/App.jsx` to consume `ThemeContext` and generate theme based on current mode.
+ - Step 19 (CSS Optimization & Consolidation): Migrated inline styles to CSS Modules for base UI kit
+   - `client/src/components/ui/Modal.jsx` -> `Modal.module.css`
+   - `client/src/components/ui/Button.jsx` -> `Button.module.css` (added `clsx` composition)
+   - `client/src/components/ui/Input.jsx` -> `Input.module.css`
+   - Updated hover/focus states using CSS instead of DOM style mutations
 
 ### Commands
 To run Storybook in the client app:
