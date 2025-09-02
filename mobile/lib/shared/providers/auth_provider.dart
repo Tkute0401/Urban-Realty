@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 
@@ -35,6 +36,7 @@ class AuthProvider extends ChangeNotifier {
       _token = response['token'];
       await _secureStorage.write(key: 'jwt_token', value: _token);
       await _getMe();
+      await _cacheUser();
       _isLoading = false;
       notifyListeners();
       return true;
@@ -64,6 +66,7 @@ class AuthProvider extends ChangeNotifier {
       _token = response['token'];
       await _secureStorage.write(key: 'jwt_token', value: _token);
       await _getMe();
+      await _cacheUser();
       _isLoading = false;
       notifyListeners();
       return true;
@@ -80,6 +83,7 @@ class AuthProvider extends ChangeNotifier {
     _user = null;
     _token = null;
     await _secureStorage.delete(key: 'jwt_token');
+    await _secureStorage.delete(key: 'user_cache');
     notifyListeners();
   }
 
@@ -88,6 +92,8 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     final storedToken = await _secureStorage.read(key: 'jwt_token');
     if (storedToken == null || storedToken.isEmpty) {
+      // Try load cached user even if token missing (limited offline mode)
+      await _loadCachedUser();
       _isLoading = false;
       notifyListeners();
       return;
@@ -95,6 +101,7 @@ class AuthProvider extends ChangeNotifier {
     _token = storedToken;
     try {
       await _getMe();
+      await _cacheUser();
     } catch (_) {
       await logout();
     }
@@ -109,6 +116,27 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       rethrow;
+    }
+  }
+
+  Future<void> _cacheUser() async {
+    if (_user == null) return;
+    try {
+      final jsonString = jsonEncode(_user!.toJson());
+      await _secureStorage.write(key: 'user_cache', value: jsonString);
+    } catch (_) {
+      // Ignore cache errors
+    }
+  }
+
+  Future<void> _loadCachedUser() async {
+    try {
+      final jsonString = await _secureStorage.read(key: 'user_cache');
+      if (jsonString == null || jsonString.isEmpty) return;
+      final Map<String, dynamic> decoded = jsonDecode(jsonString) as Map<String, dynamic>;
+      _user = User.fromJson(decoded);
+    } catch (_) {
+      // Ignore cache errors
     }
   }
 
