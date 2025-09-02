@@ -189,6 +189,12 @@
   margin: 20px 10px;
 }
 
+/* Defaults for CSS variables used to render active range; values were previously set inline */
+.range-slider {
+  --min-percent: 0%;
+  --max-percent: 100%;
+}
+
 .range-slider::before {
   content: '';
   position: absolute;
@@ -212,6 +218,12 @@
   transform: translateY(-50%);
   z-index: 2;
   transition: all 0.3s ease;
+}
+
+/* Position the active range using CSS variables instead of inline styles */
+.range-slider::after {
+  left: var(--min-percent);
+  right: calc(100% - var(--max-percent));
 }
 
 .range-slider input[type="range"] {

@@ -6,10 +6,9 @@ This file is the single source of truth for all refactoring work performed acros
 - Monorepo: server (Node/Express), client (React/Vite), mobile (Flutter)
 
 ## Current Status Snapshot
-- Phase 1: Complete (audit, backups/VC, dependency audit, env standardization, testing setup tracked elsewhere)
+- Phase 1: Audit complete; VCS/backups/deps/env/tests to verify/continue
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete)
- - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete; Step 19 CSS consolidation ongoing — removed inline styles in `PropertyCard.jsx`, `Properties.jsx`, `HeroSection.jsx`)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic theme integration). Step 19 CSS consolidation ongoing; inline styles reduced
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -31,6 +30,8 @@ This file is the single source of truth for all refactoring work performed acros
 - Ran lint and captured current violations:
   - Many `react/prop-types` gaps and some missing imports/usages. These will be addressed alongside component refactors in later steps (Forms, UI kit adoption).
 - Outcome: Enforced no-inline-style policy across client; prepared for ongoing CSS consolidation.
+
+Lint snapshot (current): numerous prop-types and unused-var issues remain; no inline style violations for edited components.
 
 ### Phase 4 – Step 36: Flutter Project Structure Optimization (continuation)
 - Added barrel exports to enable clean imports:
@@ -96,3 +97,27 @@ Next targets: migrate inline styles from `components/property/*` (PriceDropdown,
 
 Verification:
 - Client builds successfully after changes; visual parity maintained on affected components.
+
+### Phase 3 – Step 19: Inline style removals (this session)
+- Removed inline styles:
+  - `client/src/components/property/PriceDropdown.jsx`: moved CSS variables to stylesheet and computed via defaults
+  - `client/src/components/property/HomeType.jsx`: replaced icon filter inline style with `.icon-bright`/`.icon-dim`
+- Updated styles:
+  - `client/src/components/property/PriceDropdown.css`: added CSS variable defaults and used them for active range positioning
+  - `client/src/components/property/HomeType.css`: added `.icon-bright`/`.icon-dim` utilities
+
+Baseline metrics (quick):
+- Files: server 75, client 194, mobile 116
+- Remaining inline style occurrences detected by grep: 2 files (now addressed)
+
+### Phase 1 – Step 2: Backup & Version Control Setup (this session)
+- Created compressed backup at `logs/backups/urban-realty-backup-YYYYMMDD-HHMMSS.tar.gz` and pushed tag `backup-pre-phase1-step2-YYYYMMDD-HHMMSS`.
+- Initialized Husky hooks:
+  - Pre-commit: `npm run build --prefix client` to avoid committing broken client builds.
+  - Pre-push: `npm run test --prefix client` (currently prints skip as tests are pending setup).
+- Verified tags and branch are pushed to remote.
+
+Verification:
+- Backup archive present under `logs/backups/`.
+- Hooks trigger on commit and push.
+ - Root Husky installed; client build verified during hook creation.
