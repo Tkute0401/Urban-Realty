@@ -9,6 +9,7 @@ import App from './App';
 import './index.css';
 import ThemeProvider from './context/ThemeProvider';
 import { createUrbanRealtyTheme } from './Theme/NewTheme';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,7 +30,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <ThemeProvider>
           <MuiThemeProvider theme={createUrbanRealtyTheme()}>
             <CssBaseline />
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
           </MuiThemeProvider>
         </ThemeProvider>
       </BrowserRouter>
