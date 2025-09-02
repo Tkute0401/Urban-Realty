@@ -39,7 +39,13 @@ This file is the single source of truth for all refactoring work performed acros
 - Flutter imports now resolve via feature re-exports without moving underlying files. Full Flutter build to be executed after file moves.
 - Client uses CSS tokens and base UI kit; Storybook config present.
 - Client theme switching is wired: CSS tokens + MUI theme are synchronized based on `ThemeContext` mode with `CssBaseline` applied.
- - Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
+- Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
+
+### Phase 3 – Step 19: CSS Optimization & Consolidation (incremental)
+- Removed inline styles in `client/src/components/common/Header.jsx`:
+  - Mobile menu absolute positioning moved to CSS class `.mobile-menu`
+  - Logout button inline styles replaced by `.button-link`
+- Updated `client/src/components/common/Header.css` accordingly.
 
 ## Next Planned Steps
 - Move providers to `mobile/lib/shared/providers/` and update imports.
