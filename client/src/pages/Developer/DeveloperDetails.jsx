@@ -225,11 +225,7 @@ const DeveloperDetails = () => {
                   <img 
                     src={developer.logo.url} 
                     alt={`${developer.name} logo`} 
-                    style={{ 
-                      maxWidth: '100%', 
-                      maxHeight: '200px',
-                      objectFit: 'contain'
-                    }}
+                    className="w-100 h-auto"
                   />
                 ) : (
                   <Apartment sx={{ fontSize: 100, color: '#78CADC' }} />

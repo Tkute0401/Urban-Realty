@@ -12,12 +12,7 @@ const PropertyFloorPlan = ({ property, floorplanRef }) => {
             <img 
               src={property.floorPlan} 
               alt="Floor Plan" 
-              style={{ 
-                maxWidth: '100%', 
-                height: 'auto',
-                borderRadius: '8px',
-                border: '1px solid rgba(120, 202, 220, 0.3)'
-              }} 
+              className="w-100 h-auto"
             />
           </Box>
         ) : (
