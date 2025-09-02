@@ -99,7 +99,7 @@ const Header = () => {
             
             {/* Mobile Menu */}
             {mobileMenuOpen && (
-              <div className="mobile-menu" style={{ position: 'absolute', right: '1rem', top: '4rem' }}>
+              <div className="mobile-menu">
                 <Link to="/properties" className="menu-item" onClick={handleMenuClose}>
                   <ListIcon className="menu-item-icon" />
                   <span>Browse Properties</span>
@@ -185,13 +185,7 @@ const Header = () => {
                 </Link>
                 <button 
                   onClick={logout} 
-                  className="nav-item"
-                  style={{ 
-                    border: 'none', 
-                    cursor: 'pointer', 
-                    backgroundColor: 'transparent',
-                    color: '#ff6b6b'
-                  }}
+                  className="nav-item button-link"
                 >
                   Logout
                 </button>
