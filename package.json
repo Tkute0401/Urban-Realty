@@ -1,1 +1,52 @@
+<<<<<<< HEAD
 {"name":"urban-realty","version":"1.0.0","private":true,"workspaces":["server","client","mobile"],"scripts":{"start":"npm run start --workspace=server","server":"npm run dev --workspace=server","client":"npm run dev --workspace=client","build":"npm run build --workspace=client","dev":"concurrently \"npm run server\" \"npm run client\"","install-all":"npm install && npm install --workspace=server && npm install --workspace=client","test":"npm run test --workspace=server && npm run test --workspace=client","test:server":"npm run test --workspace=server","test:client":"npm run test --workspace=client"},"devDependencies":{"concurrently":"^8.2.2"},"engines":{"node":">=18.0.0"}}
+=======
+{
+  "name": "urban-realty",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Urban Realty - Full Stack Real Estate Platform",
+  "scripts": {
+    "start": "npm run start --prefix server",
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "mobile": "cd mobile && flutter run",
+    "build": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && npm install --prefix server && npm install --prefix client",
+    "test": "npm run test --prefix server && npm run test --prefix client",
+    "test:server": "npm run test --prefix server",
+    "test:client": "npm run test --prefix client",
+    "lint": "npm run lint --prefix server && npm run lint --prefix client",
+    "lint:server": "npm run lint --prefix server",
+    "lint:client": "npm run lint --prefix client",
+    "heroku-postbuild": "npm run build --prefix client && npm install --prefix server"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "keywords": [
+    "realty",
+    "property",
+    "real-estate",
+    "fullstack",
+    "react",
+    "express",
+    "mongodb",
+    "flutter"
+  ],
+  "author": "Urban Realty Team",
+  "license": "MIT"
+}
+>>>>>>> 8996dbf766572af12f78cd9ad6ab9fbd165f3ace

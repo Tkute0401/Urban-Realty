@@ -1,8 +1,14 @@
 {
   "name": "urban-realty-server",
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "Urban Realty Backend Server",
   "main": "server.js",
+=======
+  "description": "Urban Realty Server API",
+  "main": "server.js",
+  "type": "commonjs",
+>>>>>>> 8996dbf766572af12f78cd9ad6ab9fbd165f3ace
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
@@ -41,12 +47,29 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "nodemon": "^3.0.2",
+<<<<<<< HEAD
     "supertest": "^6.3.3"
+=======
+    "supertest": "^6.3.4"
+>>>>>>> 8996dbf766572af12f78cd9ad6ab9fbd165f3ace
   },
   "engines": {
     "node": ">=18.0.0"
   },
+<<<<<<< HEAD
   "keywords": ["realty", "property", "express", "mongodb"],
   "author": "Urban Realty Team",
   "license": "MIT"
 }
+=======
+  "keywords": [
+    "realty",
+    "property",
+    "api",
+    "express",
+    "mongodb"
+  ],
+  "author": "Urban Realty Team",
+  "license": "MIT"
+}
+>>>>>>> 8996dbf766572af12f78cd9ad6ab9fbd165f3ace
