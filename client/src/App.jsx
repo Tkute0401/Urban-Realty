@@ -14,8 +14,9 @@ import Header from './components/common/Header';
 import EditProperty from './pages/Properties/EditProperty';
 import AddProperty from './pages/AddProperty/AddProperty';
 import ProtectedRoute from './components/common/ProtectedRoute';
-import { ThemeProvider } from '@mui/material';
-import { urbanRealtyTheme } from './Theme/NewTheme';
+import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
+import { createUrbanRealtyTheme } from './Theme/NewTheme';
+import ThemeProviderCtx, { ThemeContext } from './context/ThemeProvider';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
@@ -61,9 +62,12 @@ import BillingDashboard from './components/Subscription/BillingDashboard';
 function App() {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const { theme } = React.useContext(ThemeContext);
+  const muiTheme = React.useMemo(() => createUrbanRealtyTheme(theme), [theme]);
   
   return (
-    <ThemeProvider theme={urbanRealtyTheme}>
+    <MuiThemeProvider theme={muiTheme}>
+      <CssBaseline />
       <AuthProvider>
         <PropertiesProvider>
           <AgentsProvider>
@@ -141,7 +145,7 @@ function App() {
           </AgentsProvider>
         </PropertiesProvider>
       </AuthProvider>
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 }
 
