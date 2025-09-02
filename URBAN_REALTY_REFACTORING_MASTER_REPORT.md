@@ -120,3 +120,4 @@ Baseline metrics (quick):
 Verification:
 - Backup archive present under `logs/backups/`.
 - Hooks trigger on commit and push.
+ - Root Husky installed; client build verified during hook creation.
