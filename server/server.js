@@ -25,20 +25,21 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join('/app/client/dist'); // Updated path
+// Prefer env override; fall back to repo-relative client dist. Avoid absolute container path.
+const clientDistDir = process.env.CLIENT_DIST_DIR
+  ? process.env.CLIENT_DIST_DIR
+  : path.join(__dirname, '..', 'client', 'dist');
 
-// Create directories
-[uploadsDir, clientDistDir].forEach(dir => {
-  try {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-      console.log(`Directory created: ${dir}`);
-    }
-  } catch (err) {
-    console.error(`Error creating ${dir}:`, err);
-    process.exit(1);
+// Ensure uploads directory exists (do not attempt to create client dist)
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    console.log(`Directory created: ${uploadsDir}`);
   }
-});
+} catch (err) {
+  console.error(`Error creating uploads directory ${uploadsDir}:`, err);
+  process.exit(1);
+}
 
 // Middleware
 app.use(cors({
@@ -50,7 +51,11 @@ app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize })
 
 // Static files
 app.use('/uploads', express.static(uploadsDir));
-app.use(express.static(clientDistDir)); // Serve React build
+if (fs.existsSync(clientDistDir)) {
+  app.use(express.static(clientDistDir)); // Serve React build
+} else {
+  console.warn(`Client dist directory not found, skipping static serve: ${clientDistDir}`);
+}
 
 // API Routes
 app.use('/api/v1/auth', require('./src/api/routes/authRoutes'));
@@ -113,7 +118,11 @@ const server = app.listen(PORT, () => {
   console.log(`Uploads directory: ${uploadsDir}`);
   
   // Verify frontend files
-  console.log('Frontend files:', fs.readdirSync(clientDistDir));
+  if (fs.existsSync(clientDistDir)) {
+    console.log('Frontend files:', fs.readdirSync(clientDistDir));
+  } else {
+    console.log('Frontend files: client dist directory not found');
+  }
 });
 
 process.on('unhandledRejection', (err) => {

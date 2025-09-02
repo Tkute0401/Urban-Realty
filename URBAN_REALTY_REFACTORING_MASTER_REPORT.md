@@ -20,6 +20,20 @@ This file is the single source of truth for all refactoring work performed acros
 - docs(mobile): Update Phase 4 change log with barrels and feature re-exports
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
+### Server Runtime Fixes (this session)
+- Fixed MODULE_NOT_FOUND due to incorrect middleware import paths after server restructuring:
+  - Updated route files under `server/src/api/routes/*` to import from `../middleware/*` instead of `../../middleware/*`.
+  - Files updated: `authRoutes.js`, `adminRoutes.js`, `mediaRoutes.js`, `contactRoutes.js`, `propertyRoutes.js`, `subscriptionRoutes.js`, `developerRoutes.js`.
+- Hardened static client path handling in `server/server.js`:
+  - Added `CLIENT_DIST_DIR` env override; default to `path.join(__dirname, '..', 'client', 'dist')` instead of hard-coded `/app/client/dist`.
+  - Avoid creating client dist directory on boot; only ensure `uploads` exists.
+  - Conditionally mount static middleware only if the client dist directory exists.
+
+Verification:
+- Server boots to the point of DB connection attempt with all routes resolving (no middleware path errors).
+- Current blocking errors are environment/infra-related (no local MongoDB at `127.0.0.1:27017`).
+- Static serving logs a warning if client dist is missing rather than exiting.
+
 ## Detailed Actions This Session
 ### Phase 3 – Step 27: Loading States & Error Boundaries
 - Wrapped the entire client app with a global ErrorBoundary at `client/src/main.jsx`.

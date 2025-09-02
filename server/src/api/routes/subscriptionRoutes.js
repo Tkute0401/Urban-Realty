@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const subscriptionController = require('../../../controllers/subscriptionController');
-const { protect, authorize } = require('../../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const paymentController = require('../../../controllers/paymentController');
 
 // Public routes
