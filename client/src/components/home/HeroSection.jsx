@@ -406,7 +406,7 @@ const HeroSection = () => {
         )}
 
         {/* Main search container */}
-        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
+        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative z-[200]">
           {/* Property type tabs */}
           <div className="flex gap-0 mb-1 sm:mb-1.5 rounded-lg sm:rounded-xl p-1">
             {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
@@ -443,7 +443,7 @@ const HeroSection = () => {
             <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-visible border border-white/20 max-h-8 sm:max-h-10 md:max-h-12">
               {/* City dropdown */}
               {availableCities.length > 0 && (
-                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12" style={{ zIndex: 9000 }}>
+                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12 z-[9000]">
                   <button
                     type="button"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}

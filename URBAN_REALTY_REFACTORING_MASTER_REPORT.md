@@ -9,7 +9,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Phase 1: Complete (audit, backups/VC, dependency audit, env standardization, testing setup tracked elsewhere)
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete)
- - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete; Step 19 CSS consolidation started)
+ - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete; Step 19 CSS consolidation ongoing — removed inline styles in `PropertyCard.jsx`, `Properties.jsx`, `HeroSection.jsx`)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -42,10 +42,11 @@ This file is the single source of truth for all refactoring work performed acros
 - Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
 
 ### Phase 3 – Step 19: CSS Optimization & Consolidation (incremental)
-- Removed inline styles in `client/src/components/common/Header.jsx`:
-  - Mobile menu absolute positioning moved to CSS class `.mobile-menu`
-  - Logout button inline styles replaced by `.button-link`
-- Updated `client/src/components/common/Header.css` accordingly.
+- Removed inline styles in key components:
+  - `client/src/components/home/PropertyCard.jsx`: replaced icon inline fontSize with utility class
+  - `client/src/pages/Properties/Properties.jsx`: replaced icon color inline style with class
+  - `client/src/components/home/HeroSection.jsx`: replaced inline zIndex with utility classes
+ - Prior work: `client/src/components/common/Header.jsx` and related CSS moved inline styles to classes
 
 ## Next Planned Steps
 - Move providers to `mobile/lib/shared/providers/` and update imports.
