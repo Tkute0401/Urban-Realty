@@ -28,10 +28,25 @@ This document tracks structural and code changes performed in Phase 3 to organiz
 - Added this file to document decisions, edits, and follow-ups for Phase 3.
 
 ### Next
-- Introduce design tokens and a minimal UI kit (`Button`, `Input`, `Modal`).
-- Set up Storybook and theme provider; wire CSS variables.
 - Migrate existing components into the new structure.
+- Add more base components and accessibility improvements.
+- Document Storybook usage in client README.
 
 ### Verification
 - Client builds successfully after each structural change.
 - No broken imports; alias adjustments documented when applied.
+
+### This Session
+- Added CSS design tokens at `client/src/styles/themes/tokens.css` with light/dark variables.
+- Introduced `ThemeProvider` with toggle and persistence at `client/src/context/ThemeProvider.jsx`.
+- Created base UI kit: `Button`, `Input`, `Modal` under `client/src/components/ui/`.
+- Set up Storybook with Vite: `.storybook/main.js`, `.storybook/preview.js` and stories for the UI kit.
+- Wired tokens import in `client/src/index.css`.
+
+### Commands
+To run Storybook in the client app:
+
+```
+cd client
+npx storybook@latest dev -p 6006
+```
