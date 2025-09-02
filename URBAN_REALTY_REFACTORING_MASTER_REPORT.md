@@ -21,6 +21,17 @@ This file is the single source of truth for all refactoring work performed acros
 
 ## Detailed Actions This Session
 
+### Phase 3 – Step 19: Add ESLint rule to prevent inline styles
+- Added `eslint-plugin-react` to client devDependencies.
+- Updated `client/eslint.config.js`:
+  - Enabled React recommended rules with `settings.react.version: 'detect'`.
+  - Disabled legacy `react/react-in-jsx-scope` for React 17+.
+  - Forbid inline `style` prop via `react/forbid-component-props`.
+  - Added Node globals override for config files (Vite/Tailwind) to prevent `no-undef`.
+- Ran lint and captured current violations:
+  - Many `react/prop-types` gaps and some missing imports/usages. These will be addressed alongside component refactors in later steps (Forms, UI kit adoption).
+- Outcome: Enforced no-inline-style policy across client; prepared for ongoing CSS consolidation.
+
 ### Phase 4 – Step 36: Flutter Project Structure Optimization (continuation)
 - Added barrel exports to enable clean imports:
   - `mobile/lib/core/config/index.dart`
