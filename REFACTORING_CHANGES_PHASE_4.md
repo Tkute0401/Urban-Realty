@@ -30,6 +30,18 @@ This step introduces a scalable directory structure for the Flutter app, alignin
   - `shared/providers/index.dart`, `shared/models/index.dart`, `shared/widgets/index.dart`
 - Created feature re-export stubs so imports can be updated without moving files yet:
   - `features/{auth,home,profile,settings,search,subscription,properties,static_pages,admin,agent,developers,notifications,splash}/*`
+  - Batch 1 added:
+    - `features/home/dashboard_screen.dart`
+    - `features/home/home_tabs.dart`
+    - `features/notifications/notifications_screen.dart`
+    - `features/profile/profile_screen.dart`
+    - `features/properties/properties_screen.dart`
+    - `features/search/search_screen.dart`
+    - `features/settings/settings_screen.dart`
+    - `features/subscription/subscription_screen.dart`
+    - `features/add_property/add_property_screen.dart`
+    - `features/static_pages/static_pages.dart`
+    - `features/favorites/favorites_screen.dart`
 - Updated `main.dart` to import from `features/*` and `shared/providers/*`
 
 ### Auth Screens Migration (Step 36 continuation)
