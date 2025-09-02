@@ -6,9 +6,9 @@ This file is the single source of truth for all refactoring work performed acros
 - Monorepo: server (Node/Express), client (React/Vite), mobile (Flutter)
 
 ## Current Status Snapshot
-- Phase 1: Audit complete; VCS/backups/deps/env/tests to verify/continue
-- Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic theme integration). Step 19 CSS consolidation ongoing; inline styles reduced
+- Phase 1: Completed
+- Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -19,6 +19,14 @@ This file is the single source of truth for all refactoring work performed acros
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
 ## Detailed Actions This Session
+### Phase 3 – Step 22: API Client Optimization (this session)
+- Added `client/src/constants/api.js` centralizing API endpoints and React Query keys.
+- Implemented reusable hooks in `client/src/hooks/useApi.js`:
+  - `useApiQuery` for standardized querying
+  - `useApiMutation` with cache invalidation
+  - `useApiClient` for imperative calls
+- These leverage existing Axios instance with interceptors.
+
 
 ### Phase 3 – Step 19: Add ESLint rule to prevent inline styles
 - Added `eslint-plugin-react` to client devDependencies.
