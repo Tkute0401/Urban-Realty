@@ -1,3 +1,64 @@
+## Urban Realty Refactoring - Master Report
+
+### Scope
+Canonical, continuously updated log of all refactoring activities, decisions, and code edits across phases. This file is the single source of truth for progress and context between sessions.
+
+### Current Branch
+`cursor/fix-auth-middleware-path-in-server-routes-0a1a`
+
+---
+
+### 2025-09-02 Changes
+
+1) Fixed server boot error (MODULE_NOT_FOUND: middleware/auth)
+- Updated route imports under `server/src/api/routes/*` to correctly point to the adapter layer in `server/src/api/middleware/*`:
+  - `adminRoutes.js`
+  - `authRoutes.js`
+  - `contactRoutes.js`
+  - `developerRoutes.js`
+  - `mediaRoutes.js`
+  - `propertyRoutes.js`
+  - `subscriptionRoutes.js`
+- Verified presence of adapter `server/src/api/middleware/auth.js` that re-exports legacy `server/middleware/auth.js`.
+
+2) Installed root dependencies
+- Ran `npm ci` at repo root to ensure `dotenv` and peer deps are available for `server/server.js`.
+
+3) Environment validation made development-friendly
+- Edited `server/config/environment.js` to allow sensible defaults in non-production:
+  - `MONGODB_URI` defaults to `mongodb://127.0.0.1:27017/urban_realty`
+  - `JWT_SECRET`, `SESSION_SECRET` default strong dev values
+  - Email, Cloudinary, Razorpay keys optional or defaulted for dev
+
+4) Static assets path hardening
+- Updated `server/server.js` to avoid creating `/app/client/dist` (permission issue) and serve static from `__dirname + '/../client/dist'` if it exists. Only creates `uploads` dir.
+
+5) Current server state
+- Starts process and config loads, but database connection fails locally because MongoDB is not running: `ECONNREFUSED 127.0.0.1:27017`.
+- Action required to run locally: start MongoDB (e.g., Docker) or set `MONGODB_URI` to a reachable instance.
+
+---
+
+### Phase Status (from existing repository reports)
+- Phase 1: Completed (per `REFACTORING_PROGRESS.md`)
+- Phase 2: Completed (per `REFACTORING_CHANGES_PHASE_2_COMPLETE.md`)
+- Phase 3: In Progress (design system, theme, Storybook scaffold noted)
+- Phase 4: In Progress (Flutter structure/scaffolding partly done)
+
+Next actionable phase work: Continue Phase 3 verification and build; then advance remaining Step 16–35 items. Phase 5 will begin after Phase 3 and 4 completion.
+
+---
+
+### Verification Performed Today
+- Route imports corrected; dev env validation loosened; static path handling fixed.
+- Server now reaches DB connect step; fails only due to missing MongoDB instance.
+
+---
+
+### Follow-ups
+- Provide local MongoDB via Docker or update `MONGODB_URI`.
+- Run client build to verify routing and imports after server path changes.
+
 # Urban Realty Refactoring Master Report
 
 This file is the single source of truth for all refactoring work performed across sessions and phases. It is continuously updated with context so future sessions can resume seamlessly.

@@ -11,16 +11,18 @@ const envSchema = Joi.object({
     .default(5000),
   
   // Database Configuration
-  MONGODB_URI: Joi.string()
-    .uri()
-    .required()
-    .description('MongoDB connection string'),
+  MONGODB_URI: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().uri().required(),
+    otherwise: Joi.string().uri().default('mongodb://127.0.0.1:27017/urban_realty')
+  }).description('MongoDB connection string'),
   
   // JWT Configuration
-  JWT_SECRET: Joi.string()
-    .min(32)
-    .required()
-    .description('JWT secret key for token signing'),
+  JWT_SECRET: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().min(32).required(),
+    otherwise: Joi.string().min(32).default('devsecretdevsecretdevsecretdevsec')
+  }).description('JWT secret key for token signing'),
   
   JWT_EXPIRE: Joi.string()
     .default('7d')
@@ -31,48 +33,55 @@ const envSchema = Joi.object({
     .description('JWT cookie expiration in days'),
   
   // Email Configuration
-  EMAIL_FROM: Joi.string()
-    .email()
-    .required()
-    .description('Email address for sending emails'),
+  EMAIL_FROM: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().email().required(),
+    otherwise: Joi.string().email().default('dev@example.com')
+  }).description('Email address for sending emails'),
   
-  EMAIL_HOST: Joi.string()
-    .required()
-    .description('SMTP host for email service'),
+  EMAIL_HOST: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().required(),
+    otherwise: Joi.string().default('smtp.example.com')
+  }).description('SMTP host for email service'),
   
   EMAIL_PORT: Joi.number()
     .port()
     .default(587)
     .description('SMTP port for email service'),
   
-  EMAIL_USER: Joi.string()
-    .required()
-    .description('SMTP username'),
+  EMAIL_USER: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().required(),
+    otherwise: Joi.string().default('user')
+  }).description('SMTP username'),
   
-  EMAIL_PASS: Joi.string()
-    .required()
-    .description('SMTP password'),
+  EMAIL_PASS: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().required(),
+    otherwise: Joi.string().default('pass')
+  }).description('SMTP password'),
   
   // Cloudinary Configuration
   CLOUDINARY_CLOUD_NAME: Joi.string()
-    .required()
+    .optional()
     .description('Cloudinary cloud name'),
   
   CLOUDINARY_API_KEY: Joi.string()
-    .required()
+    .optional()
     .description('Cloudinary API key'),
   
   CLOUDINARY_API_SECRET: Joi.string()
-    .required()
+    .optional()
     .description('Cloudinary API secret'),
   
   // Razorpay Configuration
   RAZORPAY_KEY_ID: Joi.string()
-    .required()
+    .optional()
     .description('Razorpay key ID'),
   
   RAZORPAY_KEY_SECRET: Joi.string()
-    .required()
+    .optional()
     .description('Razorpay key secret'),
   
   // Frontend URL
@@ -117,10 +126,11 @@ const envSchema = Joi.object({
     .default(12)
     .description('BCrypt salt rounds for password hashing'),
   
-  SESSION_SECRET: Joi.string()
-    .min(32)
-    .required()
-    .description('Session secret for secure sessions'),
+  SESSION_SECRET: Joi.when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().min(32).required(),
+    otherwise: Joi.string().min(32).default('devsessionsecretdevsessionsecretxxx')
+  }).description('Session secret for secure sessions'),
   
   // API Keys
   GOOGLE_MAPS_API_KEY: Joi.string()

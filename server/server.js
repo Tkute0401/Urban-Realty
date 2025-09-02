@@ -25,10 +25,10 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join('/app/client/dist'); // Updated path
+const clientDistDir = path.join(__dirname, '../client/dist');
 
 // Create directories
-[uploadsDir, clientDistDir].forEach(dir => {
+[uploadsDir].forEach(dir => {
   try {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -113,7 +113,11 @@ const server = app.listen(PORT, () => {
   console.log(`Uploads directory: ${uploadsDir}`);
   
   // Verify frontend files
-  console.log('Frontend files:', fs.readdirSync(clientDistDir));
+  if (fs.existsSync(clientDistDir)) {
+    console.log('Frontend files:', fs.readdirSync(clientDistDir));
+  } else {
+    console.log('Frontend files directory not found');
+  }
 });
 
 process.on('unhandledRejection', (err) => {
