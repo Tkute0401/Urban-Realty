@@ -29,6 +29,22 @@ Verification:
 - All three projects present; server/client scripts identified; Flutter project builds to be validated after ongoing moves.
 - Audit artifacts stored in repo under `logs/`.
 
+### Phase 1 – Step 4 & 5: Env standardization and Testing setup
+- Added `.env.example` files:
+  - `server/.env.example` with DB, JWT, Cloudinary, Razorpay, SMTP placeholders.
+  - `client/.env.example` with `VITE_API_BASE_URL`, Google Maps, Cloudinary.
+- Server testing:
+  - Added Jest config `server/tests/jest.config.js` and smoke test `server/tests/smoke.test.js`.
+  - Root scripts include `test:server`.
+- Client testing:
+  - Added Vitest + RTL setup via `vite.config.js` test block and `vitest.setup.js`.
+  - Created smoke test `client/src/__tests__/smoke.test.jsx`.
+  - Root scripts include `test:client`.
+
+Verification:
+- Server tests: PASS (1/1).
+- Client tests: PASS (1/1).
+
 ### Phase 3 – Step 19: Add ESLint rule to prevent inline styles
 - Added `eslint-plugin-react` to client devDependencies.
 - Updated `client/eslint.config.js`:
