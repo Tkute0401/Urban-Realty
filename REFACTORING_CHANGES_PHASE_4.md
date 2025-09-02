@@ -32,6 +32,18 @@ This step introduces a scalable directory structure for the Flutter app, alignin
   - `features/{auth,home,profile,settings,search,subscription,properties,static_pages,admin,agent,developers,notifications,splash}/*`
 - Updated `main.dart` to import from `features/*` and `shared/providers/*`
 
+### Auth Screens Migration (Step 36 continuation)
+- Moved implementations into feature files:
+  - `features/auth/login_screen.dart` now contains the full Login screen implementation
+  - `features/auth/register_screen.dart` now contains the full Register screen implementation
+- Converted legacy screens to re-exports:
+  - `screens/login_screen.dart` -> `export '../features/auth/login_screen.dart';`
+  - `screens/register_screen.dart` -> `export '../features/auth/register_screen.dart';`
+
+Verification:
+- `main.dart` already routes to `features/auth/*`; no changes required.
+- Will run `flutter analyze` and a build in a Flutter-enabled environment.
+
 ### Providers Migration (Step 36 continuation)
 - Moved providers to `shared/providers/` and updated barrel exports:
   - `shared/providers/auth_provider.dart`
