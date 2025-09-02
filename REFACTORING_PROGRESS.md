@@ -23,12 +23,20 @@
 
 ## PHASE 2 STATUS
 
+Status: Complete
+
+- Completed Steps 7–9 (constants/config, database layer, service layer)
+- Server starts cleanly; configuration validation with Joi is in place
+
+## PHASE 3 STATUS
+
 Status: In Progress
 
-Step 6: Server Directory Restructuring
-- Created `server/src/` with `api/{routes,middleware}`, `config/`
-- Updated `server/server.js` to load from `src/`
-- Added adapter exports to avoid breaking changes while we migrate controllers/models later
-- No functional changes to controllers/models yet; only import path updates
+- Client directory scaffolding added; pending design tokens and UI kit
 
-Next: Step 7 (Constants & Configuration Centralization)
+## PHASE 4 STATUS
+
+Status: In Progress
+
+- Step 36: Core/shared barrels added; feature re-exports created; `main.dart` updated
+- Next: Move providers to `shared/providers` and migrate screens/widgets into `features/*` & `shared/*`
