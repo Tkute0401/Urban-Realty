@@ -153,6 +153,14 @@ Next:
 - Evaluate critical route preloading and `Suspense` fallbacks for UX polish.
 - Continue Phase 3 Step 19 and 21 scopes where remaining.
 
+### Phase 3 – Step 25: Navigation & Routing Optimization (Breadcrumbs)
+- Implemented `client/src/components/layout/Breadcrumbs.jsx` using MUI `Breadcrumbs`.
+- Integrated breadcrumbs into `client/src/components/Layout/layout.jsx` above page content.
+- Path segments are title-cased; Home links to `/`; last segment is non-clickable text.
+
+Verification:
+- All routes render; breadcrumbs appear for non-root paths.
+
 ### Phase 4 – Step 36: Barrel verification (this session)
 - Verified presence of `index.dart` barrels in `core/{config,utils,services}` and `shared/{providers,models,widgets}`.
 - Confirmed `main.dart` imports resolve against barrels and feature re-exports.

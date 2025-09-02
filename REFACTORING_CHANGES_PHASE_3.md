@@ -78,3 +78,13 @@ npx storybook@latest dev -p 6006
 
 Verification:
 - Vite production build succeeded; Vitest smoke test passed.
+
+### Step 25: Navigation & Routing Optimization (Breadcrumbs)
+- Added reusable Breadcrumbs component at `client/src/components/layout/Breadcrumbs.jsx`.
+- Integrated breadcrumbs into `client/src/components/Layout/layout.jsx` above page content.
+- Labels are derived from the current path with title-casing and separators via MUI `Breadcrumbs`.
+- Home link always shown; last segment rendered as plain text.
+
+Verification:
+- App routes render correctly with lazy loading in place.
+- Breadcrumbs appear on all routes except the home page (no segments after `/`).
