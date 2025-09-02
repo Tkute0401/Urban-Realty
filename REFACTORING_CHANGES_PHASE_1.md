@@ -14,6 +14,10 @@
 - Setup Husky + lint-staged pre-commit hook
 - Lint-staged config for eslint/prettier added
 
+## Step 4: Environment Configuration Standardization
+- Added `.env.example` at repo root aligned with `server/config/environment.js`
+- Added `client/.env.example` with `VITE_GOOGLE_MAPS_API_KEY` and `VITE_API_BASE_URL`
+
 ## Step 3: Dependency Audit & Optimization (in-progress)
 - Root `npm audit`: 0 vulnerabilities
 - Client `npm audit`: 9 remaining (3 moderate, 6 high) tied to `react-scripts/svgo/resolve-url-loader/webpack-dev-server` chain; will resolve during Phase 3 by removing CRA residuals and upgrading build chain
