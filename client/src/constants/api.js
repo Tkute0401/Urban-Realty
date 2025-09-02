@@ -1,26 +1,25 @@
 // API constants for the client
 // Centralizes endpoint paths and query keys
+// Import shared constants and extend with client-specific ones
 
-export const API_BASE_URL = 'https://urban-realty-production.up.railway.app/api/v1';
+import { API_CONFIG, API_ENDPOINTS as SHARED_ENDPOINTS } from '../../../shared/constants/index.js';
 
+export const API_BASE_URL = API_CONFIG.BASE_URL;
+
+// Client-specific API endpoints (extending shared endpoints)
 export const API_ENDPOINTS = {
-	// Auth
-	login: '/auth/login',
-	register: '/auth/register',
-	profile: '/auth/me',
-
-	// Properties
-	properties: '/properties',
-	propertyById: (id) => `/properties/${id}`,
-	propertyImages: (id) => `/properties/${id}/images`,
-
-	// Users
-	users: '/users',
-	userById: (id) => `/users/${id}`,
-
-	// Subscriptions
-	subscriptions: '/subscriptions',
-	subscriptionById: (id) => `/subscriptions/${id}`,
+	...SHARED_ENDPOINTS,
+	
+	// Client-specific endpoints
+	properties: SHARED_ENDPOINTS.PROPERTIES.LIST,
+	propertyById: SHARED_ENDPOINTS.PROPERTIES.BY_ID,
+	propertyImages: SHARED_ENDPOINTS.PROPERTIES.IMAGES,
+	
+	users: SHARED_ENDPOINTS.USERS.LIST,
+	userById: SHARED_ENDPOINTS.USERS.BY_ID,
+	
+	subscriptions: SHARED_ENDPOINTS.SUBSCRIPTIONS.LIST,
+	subscriptionById: SHARED_ENDPOINTS.SUBSCRIPTIONS.BY_ID,
 };
 
 export const QUERY_KEYS = {
