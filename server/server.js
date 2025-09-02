@@ -6,6 +6,8 @@ const fs = require('fs');
 const connectDB = require('./src/config/db');
 const errorHandler = require('./src/api/middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
+const config = require('./config/environment');
+const { HTTP_STATUS, ERROR_MESSAGES } = require('./constants');
 
 const app = express();
 
@@ -40,11 +42,11 @@ const clientDistDir = path.join('/app/client/dist'); // Updated path
 
 // Middleware
 app.use(cors({
-  origin: true,
+  origin: config.cors.origin,
   credentials: true // If you're using cookies/sessions
 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: config.upload.maxFileSize }));
+app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
 
 // Static files
 app.use('/uploads', express.static(uploadsDir));
@@ -61,17 +63,20 @@ app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'))
 
 // Health endpoints
 app.get('/api/v1/health', (req, res) => {
-  res.status(200).json({ 
+  res.status(HTTP_STATUS.OK).json({ 
     status: 'healthy',
+    environment: config.env,
     staticFilesPath: clientDistDir,
-    uploadsPath: uploadsDir
+    uploadsPath: uploadsDir,
+    timestamp: new Date().toISOString()
   });
 });
 
 app.get('/api/v1/test', (req, res) => {
-  res.json({ 
+  res.status(HTTP_STATUS.OK).json({ 
     status: 'success',
     message: 'API is working',
+    environment: config.env,
     staticFiles: fs.existsSync(path.join(clientDistDir, 'index.html')) 
       ? 'Found' 
       : 'Not found'
@@ -85,9 +90,9 @@ app.get('*', (req, res) => {
     res.sendFile(indexPath);
   } else {
     console.error(`Frontend file not found at: ${indexPath}`);
-    res.status(500).json({ 
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
       success: false,
-      error: 'Frontend assets not found',
+      error: ERROR_MESSAGES.INTERNAL_ERROR,
       path: indexPath
     });
   }
@@ -95,12 +100,15 @@ app.get('*', (req, res) => {
 
 // Error handling
 app.use(errorHandler);
-app.use((req, res) => res.status(404).json({ success: false, error: 'Not found' }));
+app.use((req, res) => res.status(HTTP_STATUS.NOT_FOUND).json({ 
+  success: false, 
+  error: ERROR_MESSAGES.NOT_FOUND 
+}));
 
 // Server
-const PORT = process.env.PORT || 5000;
+const PORT = config.port;
 const server = app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running in ${config.env} mode on port ${PORT}`);
   console.log(`Serving static files from: ${clientDistDir}`);
   console.log(`Uploads directory: ${uploadsDir}`);
   
