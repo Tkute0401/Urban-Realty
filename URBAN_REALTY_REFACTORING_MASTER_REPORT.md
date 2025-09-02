@@ -61,6 +61,14 @@ Lint snapshot (current): numerous prop-types and unused-var issues remain; no in
 - Client theme switching is wired: CSS tokens + MUI theme are synchronized based on `ThemeContext` mode with `CssBaseline` applied.
 - Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
 
+### Phase 4 – Step 36: Barrel verification (this session)
+- Verified presence of `index.dart` barrels in `core/{config,utils,services}` and `shared/{providers,models,widgets}`.
+- Confirmed `main.dart` imports resolve against barrels and feature re-exports.
+
+### Phase 3 – Step 22: API Client Optimization (this session)
+- Added `client/src/constants/api.js` (endpoints + query keys) and `client/src/hooks/useApi.js`.
+- Hooks wrap Axios and React Query for standardized data fetching and cache invalidation.
+
 ### Phase 3 – Step 19: CSS Optimization & Consolidation (incremental)
 - Removed inline styles in key components:
   - `client/src/components/home/PropertyCard.jsx`: replaced icon inline fontSize with utility class

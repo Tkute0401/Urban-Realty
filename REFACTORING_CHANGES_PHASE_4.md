@@ -39,6 +39,10 @@ This step introduces a scalable directory structure for the Flutter app, alignin
 - Run `flutter analyze` and tests after each batch of moves
 
 ### Verification
-- Scaffolding committed and pushed to `main`
-- Next commit will update imports and begin moving files without breaking the build
+- Scaffolding committed and pushed
+- Barrel files verified present:
+  - `mobile/lib/core/{config,utils,services}/index.dart`
+  - `mobile/lib/shared/{providers,models,widgets}/index.dart`
+- `main.dart` imports resolve against barrels and features
+- Next: begin moving providers and screens incrementally
 
