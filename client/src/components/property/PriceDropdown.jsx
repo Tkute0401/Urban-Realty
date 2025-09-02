@@ -14,6 +14,7 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
   const buttonRef = useRef(null);
   const minSliderRef = useRef(null);
   const maxSliderRef = useRef(null);
+  const sliderContainerRef = useRef(null);
 
   // Enhanced price ranges with better formatting
   const priceRanges = useMemo(() => {
@@ -82,6 +83,16 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
       };
     }
   }, [isPriceOpen]);
+
+  // Reflect slider percentages as CSS variables (replacing inline style)
+  useEffect(() => {
+    const container = sliderContainerRef.current;
+    if (!container) return;
+    const minPercent = ((displayMinValue - priceRanges.min) / (priceRanges.max - priceRanges.min)) * 100;
+    const maxPercent = ((displayMaxValue - priceRanges.min) / (priceRanges.max - priceRanges.min)) * 100;
+    container.style.setProperty('--min-percent', `${minPercent}%`);
+    container.style.setProperty('--max-percent', `${maxPercent}%`);
+  }, [priceRanges.min, priceRanges.max, displayMinValue, displayMaxValue]);
 
   // Adjust dropdown position to prevent overflow
   useEffect(() => {
@@ -223,11 +234,8 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
             </div>
             
             <div 
+              ref={sliderContainerRef}
               className="range-slider"
-              style={{
-                '--min-percent': `${((displayMinValue - priceRanges.min) / (priceRanges.max - priceRanges.min)) * 100}%`,
-                '--max-percent': `${((displayMaxValue - priceRanges.min) / (priceRanges.max - priceRanges.min)) * 100}%`
-              }}
             >
               <input
                 ref={minSliderRef}

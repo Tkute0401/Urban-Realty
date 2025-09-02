@@ -268,7 +268,7 @@ const HomeType = ({ onApply, currentType = '' }) => {
                   aria-label={`Select ${option.label}`}
                 />
                 <label htmlFor={key}>
-                  <span className="mr-2 fs-16" style={{ filter: selectedTypes[key] ? 'brightness(1.2)' : 'brightness(0.8)' }}>
+                  <span className={`mr-2 fs-16 ${selectedTypes[key] ? 'brightness-120' : 'brightness-80'}`}>
                     {option.icon}
                   </span>
                   <span className={selectedTypes[key] ? 'fw-600' : 'fw-500'}>

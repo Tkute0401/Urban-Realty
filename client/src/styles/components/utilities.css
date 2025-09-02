@@ -28,6 +28,10 @@
 .fs-14 { font-size: 14px; }
 .fs-16 { font-size: 16px; }
 
+/* Visual intensity utilities */
+.brightness-80 { filter: brightness(0.8); }
+.brightness-120 { filter: brightness(1.2); }
+
 /* Color utilities */
 .text-muted { color: #B8C4C8; }
 .text-error { color: #ff6b6b; }
