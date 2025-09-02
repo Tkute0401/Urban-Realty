@@ -9,7 +9,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Phase 1: Complete (audit, backups/VC, dependency audit, env standardization, testing setup tracked elsewhere)
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete)
- - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete; Step 19 CSS consolidation ongoing — removed inline styles in `PropertyCard.jsx`, `Properties.jsx`, `HeroSection.jsx`)
+ - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete; Step 19 CSS consolidation ongoing — removed inline styles in `PropertyCard.jsx`, `Properties.jsx`, `HeroSection.jsx`, `HomeType.jsx`, `PriceDropdown.jsx`)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -51,6 +51,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Client uses CSS tokens and base UI kit; Storybook config present.
 - Client theme switching is wired: CSS tokens + MUI theme are synchronized based on `ThemeContext` mode with `CssBaseline` applied.
 - Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
+ - Client build passes (vite build). ESLint shows remaining prop-types and usage warnings to be addressed in later steps.
 
 ### Phase 3 – Step 19: CSS Optimization & Consolidation (incremental)
 - Removed inline styles in key components:
@@ -81,6 +82,11 @@ This file is the single source of truth for all refactoring work performed acros
 - Extended `client/src/styles/components/utilities.css` with spacing, typography, color, layout, and z-index helpers.
 - Fixed PostCSS import order by moving `@import` lines above Tailwind directives in `client/src/index.css`.
 - Verified client production build succeeds.
+- Removed remaining inline styles:
+  - `client/src/components/property/HomeType.jsx`: replaced brightness inline style with `.brightness-80`/`.brightness-120` helpers
+  - `client/src/components/property/PriceDropdown.jsx`: removed inline CSS variables; now applied via ref-driven `style.setProperty`.
+- Added utilities:
+  - `client/src/styles/components/utilities.css`: `.brightness-80`, `.brightness-120`.
 
 Next targets: migrate inline styles from `components/property/*` (PriceDropdown, BedBath, HomeType, More) and `PropertiesMap.jsx`; add lint rule to flag `style={{` usage.
 
