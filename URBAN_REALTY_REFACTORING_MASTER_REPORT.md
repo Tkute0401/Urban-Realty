@@ -8,7 +8,7 @@ This file is the single source of truth for all refactoring work performed acros
 ## Current Status Snapshot
 - Phase 1: Complete (audit, backups/VC, dependency audit, env standardization, testing setup tracked elsewhere)
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (client scaffolding; design system/theming pending)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -35,6 +35,7 @@ This file is the single source of truth for all refactoring work performed acros
 
 ### Verification
 - Flutter imports now resolve via feature re-exports without moving underlying files. Full Flutter build to be executed after file moves.
+- Client uses CSS tokens and base UI kit; Storybook config present.
 
 ## Next Planned Steps
 - Move providers to `mobile/lib/shared/providers/` and update imports.
