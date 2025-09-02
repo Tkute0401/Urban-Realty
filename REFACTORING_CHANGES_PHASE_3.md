@@ -60,3 +60,9 @@ To run Storybook in the client app:
 cd client
 npx storybook@latest dev -p 6006
 ```
+
+### Step 22: API Client Optimization (Completed)
+- Centralized API endpoints and query keys in `client/src/constants/api.js`.
+- Added reusable hooks in `client/src/hooks/useApi.js` wrapping Axios + React Query:
+  - `useApiQuery`, `useApiMutation`, `useApiClient`.
+- Enables standardized data fetching, caching, and invalidation patterns.
