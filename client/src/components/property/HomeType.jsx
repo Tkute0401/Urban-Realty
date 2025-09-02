@@ -208,14 +208,7 @@ const HomeType = ({ onApply, currentType = '' }) => {
       >
         Home Type {isOpen ? '▲' : '▼'}
         {hasActiveFilter && (
-          <span style={{ 
-            marginLeft: '6px', 
-            color: '#78CADC',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
-            •
-          </span>
+          <span className="ml-2 text-accent fs-12 fw-600">•</span>
         )}
       </button>
       
@@ -246,7 +239,7 @@ const HomeType = ({ onApply, currentType = '' }) => {
                 aria-label="Select all home types"
               />
               <label htmlFor="selectAll">
-                <span style={{ fontWeight: '700', marginRight: '8px' }}>✨</span>
+                <span className="fw-700 mr-2">✨</span>
                 All Home Types
               </label>
             </div>
@@ -275,22 +268,13 @@ const HomeType = ({ onApply, currentType = '' }) => {
                   aria-label={`Select ${option.label}`}
                 />
                 <label htmlFor={key}>
-                  <span style={{ 
-                    marginRight: '8px', 
-                    fontSize: '16px',
-                    filter: selectedTypes[key] ? 'brightness(1.2)' : 'brightness(0.8)'
-                  }}>
+                  <span className="mr-2 fs-16" style={{ filter: selectedTypes[key] ? 'brightness(1.2)' : 'brightness(0.8)' }}>
                     {option.icon}
                   </span>
-                  <span style={{ fontWeight: selectedTypes[key] ? '600' : '500' }}>
+                  <span className={selectedTypes[key] ? 'fw-600' : 'fw-500'}>
                     {option.label}
                   </span>
-                  <span style={{ 
-                    fontSize: '11px', 
-                    color: selectedTypes[key] ? '#78CADC' : 'rgba(184, 196, 200, 0.7)',
-                    marginLeft: '4px',
-                    fontStyle: 'italic'
-                  }}>
+                  <span className={`fs-11 ml-1 italic ${selectedTypes[key] ? 'text-accent' : ''}`}>
                     • {option.description}
                   </span>
                 </label>
@@ -300,17 +284,7 @@ const HomeType = ({ onApply, currentType = '' }) => {
           
           {/* Summary footer */}
           {(selectedCount > 0 || selectAll) && (
-            <div style={{
-              marginTop: '16px',
-              padding: '12px 16px',
-              background: 'linear-gradient(145deg, rgba(120, 202, 220, 0.08) 0%, rgba(120, 202, 220, 0.03) 100%)',
-              borderRadius: '8px',
-              border: '1px solid rgba(120, 202, 220, 0.2)',
-              fontSize: '12px',
-              color: '#78CADC',
-              textAlign: 'center',
-              fontWeight: '500'
-            }}>
+            <div className="summary-banner">
               {selectAll 
                 ? '🌟 Showing all property types' 
                 : `📋 ${selectedCount} type${selectedCount !== 1 ? 's' : ''} selected`

@@ -352,12 +352,12 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
             >
               {activeMarker === index && (
                 <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-                  <div style={{ color: '#0B1011', maxWidth: '200px' }}>
-                    <h3 style={{ margin: '4px 0', fontSize: '16px' }}>{property.title}</h3>
-                    <p style={{ margin: '4px 0', fontSize: '14px' }}>
+                  <div className="text-dark maxw-200">
+                    <h3 className="my-1 fs-16">{property.title}</h3>
+                    <p className="my-1 fs-14">
                       {property.address?.street}, {property.address?.city}
                     </p>
-                    <p style={{ margin: '4px 0', fontSize: '14px', fontWeight: 'bold' }}>
+                    <p className="my-1 fs-14 fw-700">
                       {property.price ? `$${property.price.toLocaleString()}` : 'Price not available'}
                     </p>
                   </div>
