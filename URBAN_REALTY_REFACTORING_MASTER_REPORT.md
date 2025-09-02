@@ -17,6 +17,7 @@ This file is the single source of truth for all refactoring work performed acros
 - chore(client): Phase 3 – integrate dynamic MUI theme factory and wrap providers
 - docs(mobile): Update Phase 4 change log with barrels and feature re-exports
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
+ - chore(mobile): Phase 4 Step 36 – move providers to shared/providers; update imports; fix barrel exports; update app wiring
 
 ## Detailed Actions This Session
 ### Phase 3 – Step 22: API Client Optimization (this session)
@@ -64,6 +65,16 @@ Lint snapshot (current): numerous prop-types and unused-var issues remain; no in
 ### Phase 4 – Step 36: Barrel verification (this session)
 - Verified presence of `index.dart` barrels in `core/{config,utils,services}` and `shared/{providers,models,widgets}`.
 - Confirmed `main.dart` imports resolve against barrels and feature re-exports.
+
+### Phase 4 – Step 36: Providers moved to shared/providers (this session)
+- Moved `mobile/lib/providers/*` to `mobile/lib/shared/providers/*` using Git move to preserve history.
+- Updated all screen imports to reference `../shared/providers/*`.
+- Simplified barrel `mobile/lib/shared/providers/index.dart` to re-export local providers.
+- `main.dart` already uses `shared/providers/index.dart`, now backed by relocated files.
+
+Verification:
+- `flutter analyze` to be run in subsequent step along with widget tests after remaining file moves.
+- Imports in screens now reference the new shared path.
 
 ### Phase 3 – Step 22: API Client Optimization (this session)
 - Added `client/src/constants/api.js` (endpoints + query keys) and `client/src/hooks/useApi.js`.
