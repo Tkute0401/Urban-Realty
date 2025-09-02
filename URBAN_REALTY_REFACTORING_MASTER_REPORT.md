@@ -8,8 +8,8 @@ This file is the single source of truth for all refactoring work performed acros
 ## Current Status Snapshot
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization started)
-- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization: Login done, Register migrated to RHF + Zod)
+- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated into shared/providers with backward-compatible re-exports)
 - Phase 5: Not started
 
 ## Key Recent Commits (this session)
@@ -19,6 +19,22 @@ This file is the single source of truth for all refactoring work performed acros
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
 ## Detailed Actions This Session
+### Phase 3 – Step 21: Form Handling Standardization (continued)
+- Migrated `client/src/pages/Auth/Register.jsx` from local state to `react-hook-form` with `zod` validation.
+- Implemented `Controller` bindings for all fields, including conditional professional info for Agent/Developer.
+- Unified submission/loading states; removed inline palette styling on submit button.
+
+Verification:
+- Client build succeeds; form validates RERA ID when role is Agent/Developer.
+
+### Phase 4 – Step 36: Flutter Project Structure Optimization (providers move)
+- Moved providers into `mobile/lib/shared/providers/`:
+  - `auth_provider.dart`, `properties_provider.dart`, `theme_provider.dart`.
+- Updated `mobile/lib/shared/providers/index.dart` to export from local files only.
+- Left backward-compatible stubs in `mobile/lib/providers/*` that re-export from shared path to avoid breaking imports.
+
+Verification:
+- `flutter analyze` to be run next; imports remain valid due to re-export stubs.
 ### Phase 3 – Step 22: API Client Optimization (this session)
 - Added `client/src/constants/api.js` centralizing API endpoints and React Query keys.
 - Implemented reusable hooks in `client/src/hooks/useApi.js`:
