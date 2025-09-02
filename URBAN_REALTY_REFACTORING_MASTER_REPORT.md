@@ -109,3 +109,14 @@ Verification:
 Baseline metrics (quick):
 - Files: server 75, client 194, mobile 116
 - Remaining inline style occurrences detected by grep: 2 files (now addressed)
+
+### Phase 1 – Step 2: Backup & Version Control Setup (this session)
+- Created compressed backup at `logs/backups/urban-realty-backup-YYYYMMDD-HHMMSS.tar.gz` and pushed tag `backup-pre-phase1-step2-YYYYMMDD-HHMMSS`.
+- Initialized Husky hooks:
+  - Pre-commit: `npm run build --prefix client` to avoid committing broken client builds.
+  - Pre-push: `npm run test --prefix client` (currently prints skip as tests are pending setup).
+- Verified tags and branch are pushed to remote.
+
+Verification:
+- Backup archive present under `logs/backups/`.
+- Hooks trigger on commit and push.
