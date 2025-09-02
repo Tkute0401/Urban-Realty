@@ -48,6 +48,10 @@ This document tracks structural and code changes performed in Phase 3 to organiz
  - Step 19 (CSS Optimization & Consolidation): Consolidated icon sizing in PropertyCard
    - `client/src/components/property/PropertyCard.jsx`: replaced inline icon sizes with utility classes
    - `client/src/styles/components/utilities.css`: added `.icon-sm` and `.icon-lg`
+ - Step 19 (CSS Optimization & Consolidation): Removed inline styles in home components
+   - `client/src/components/home/PropertyCard.jsx`: icon size via `text-[1rem]`
+   - `client/src/pages/Properties/Properties.jsx`: search icon color via `text-white`
+   - `client/src/components/home/HeroSection.jsx`: z-index via `z-[...]` utility classes
 
 ### Commands
 To run Storybook in the client app:

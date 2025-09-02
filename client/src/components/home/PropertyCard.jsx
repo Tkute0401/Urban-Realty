@@ -137,19 +137,19 @@ const PropertyCard = ({ property, index }) => {
         
         <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
           <div className="flex items-center gap-1 sm:gap-2">
-            <HomeOutlinedIcon className="text-gray-400" style={{ fontSize: '1rem' }} />
+            <HomeOutlinedIcon className="text-gray-400 text-[1rem]" />
             <span className="text-gray-300 text-xs sm:text-sm">
               {property.area ? `${property.area} sqft` : 'N/A'}
             </span>
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
-            <LocalHotelOutlinedIcon className="text-gray-400" style={{ fontSize: '1rem' }} />
+            <LocalHotelOutlinedIcon className="text-gray-400 text-[1rem]" />
             <span className="text-gray-300 text-xs sm:text-sm">
               {property.bedrooms || '0'} Bed
             </span>
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
-            <BathtubOutlinedIcon className="text-gray-400" style={{ fontSize: '1rem' }} />
+            <BathtubOutlinedIcon className="text-gray-400 text-[1rem]" />
             <span className="text-gray-300 text-xs sm:text-sm">
               {property.bathrooms || '0'} Bath
             </span>
