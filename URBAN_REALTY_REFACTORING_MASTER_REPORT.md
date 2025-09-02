@@ -9,6 +9,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Phase 1: Complete (audit, backups/VC, dependency audit, env standardization, testing setup tracked elsewhere)
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete)
+ - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete; Step 19 CSS consolidation started)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
@@ -38,12 +39,14 @@ This file is the single source of truth for all refactoring work performed acros
 - Flutter imports now resolve via feature re-exports without moving underlying files. Full Flutter build to be executed after file moves.
 - Client uses CSS tokens and base UI kit; Storybook config present.
 - Client theme switching is wired: CSS tokens + MUI theme are synchronized based on `ThemeContext` mode with `CssBaseline` applied.
+ - Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
 
 ## Next Planned Steps
 - Move providers to `mobile/lib/shared/providers/` and update imports.
 - Migrate screens/widgets/models into `features/*` and `shared/*` progressively.
 - Run `flutter analyze` and tests; fix import issues.
 - Continue Phase 4 Steps 37–45 after Step 36 migration stabilizes.
+ - Phase 3 Step 19: Continue removing inline styles across client (forms, feature components). Add lint rule to disallow inline styles where feasible.
 
 ## Notes
 - Prior phases are documented in: `REFACTORING_CHANGES_PHASE_2_COMPLETE.md`, `REFACTORING_CHANGES_PHASE_3.md`, `REFACTORING_CHANGES_PHASE_4.md`, and `REFACTORING_PROGRESS.md`.
