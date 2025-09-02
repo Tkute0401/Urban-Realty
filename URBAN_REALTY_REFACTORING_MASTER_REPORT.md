@@ -121,3 +121,18 @@ Verification:
 - Backup archive present under `logs/backups/`.
 - Hooks trigger on commit and push.
  - Root Husky installed; client build verified during hook creation.
+
+### Phase 1 Verification (Completed)
+- Backup confirmed at `logs/backups/urban-realty-backup-YYYYMMDD-HHMMSS.tar.gz`.
+- VCS hooks present in `.husky/` (`pre-commit`, `pre-push`).
+- Root `npm audit`: 0 vulnerabilities.
+- Client `npm audit`: residual low/moderate/high from transitive CRA-era packages (`svgo`, `resolve-url-loader`, `webpack-dev-server`, `@svgr/*`, `postcss` in `resolve-url-loader`). `react-scripts` removed from direct deps; remaining advisories are dev-only/transitive, not bundled by Vite. Mitigation tracked for later dep pruning.
+- Client build (Vite) succeeds with chunk splitting.
+- Testing set up on client with Vitest + RTL and a passing smoke test.
+
+Baseline metrics update:
+- Files: server 75, client 194, mobile 116 (unchanged materially).
+- Inline style occurrences via grep: 0 detected.
+
+Outcome:
+- Phase 1 steps 1–5 verified and completed. Proceeding to Phase 3 (client) and Phase 4 (mobile) next.
