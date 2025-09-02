@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @import './styles/themes/tokens.css';
+@import './styles/components/utilities.css';
 
 /* Base Styles */
 body {

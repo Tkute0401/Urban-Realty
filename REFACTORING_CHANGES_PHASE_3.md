@@ -45,6 +45,9 @@ This document tracks structural and code changes performed in Phase 3 to organiz
  - Step 19 (CSS Optimization & Consolidation): Removed inline styles in common header
    - `client/src/components/common/Header.jsx`: eliminated inline position for mobile menu and logout button styles
    - `client/src/components/common/Header.css`: added absolute positioning to `.mobile-menu` and `.button-link` class
+ - Step 19 (CSS Optimization & Consolidation): Consolidated icon sizing in PropertyCard
+   - `client/src/components/property/PropertyCard.jsx`: replaced inline icon sizes with utility classes
+   - `client/src/styles/components/utilities.css`: added `.icon-sm` and `.icon-lg`
 
 ### Commands
 To run Storybook in the client app:
