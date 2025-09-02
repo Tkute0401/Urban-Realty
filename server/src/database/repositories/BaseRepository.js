@@ -1,5 +1,5 @@
 const BaseModel = require('../models/BaseModel');
-const { HTTP_STATUS, ERROR_MESSAGES } = require('../../../constants');
+const { HTTP_STATUS, ERROR_MESSAGES } = require('../../constants');
 
 /**
  * Base Repository Class implementing Repository Pattern

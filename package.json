@@ -22,6 +22,7 @@
     "@mui/lab": "^7.0.0-beta.10",
     "@mui/material": "^7.0.0",
     "@react-google-maps/api": "^2.20.6",
+    "@sentry/node": "^10.8.0",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.5",
     "all": "^0.0.0",
