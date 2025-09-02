@@ -6,7 +6,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Monorepo: server (Node/Express), client (React/Vite), mobile (Flutter)
 
 ## Current Status Snapshot
-- Phase 1: Audit complete; VCS/backups/deps/env/tests to verify/continue
+- Phase 1: Audit updated (root/client audits run; duplication baseline captured); VCS/backups/env/tests to continue
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic theme integration). Step 19 CSS consolidation ongoing; inline styles reduced
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
@@ -19,6 +19,15 @@ This file is the single source of truth for all refactoring work performed acros
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
 ## Detailed Actions This Session
+### Phase 1 – Step 1: Initial Codebase Audit (update)
+- Ran `npm audit` at root: 0 vulnerabilities.
+- Ran `npm audit` in client: 13 issues (1 critical via transitive deps tied to removed `react-scripts`). Removed `react-scripts` from `client/package.json` and reinstalled; remaining issues tracked for future dependency pruning. Saved reports: `audit-root.json`, `audit-client.json`.
+- Executed duplicate-code scan with jscpd across repo. Baseline: 39.89% duplicated lines across 39,515 files (multiple formats). Reports saved under `logs/jscpd/` (JSON + HTML).
+- Existing structure confirmed: `server/`, `client/`, `mobile/` align with monorepo plan.
+
+Verification:
+- All three projects present; server/client scripts identified; Flutter project builds to be validated after ongoing moves.
+- Audit artifacts stored in repo under `logs/`.
 
 ### Phase 3 – Step 19: Add ESLint rule to prevent inline styles
 - Added `eslint-plugin-react` to client devDependencies.
