@@ -20,9 +20,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          react: ['react', 'react-dom','react-toastify'],
+          react: ['react', 'react-dom'],
+          router: ['react-router-dom'],
           mui: ['@mui/material', '@mui/icons-material'],
-          vendor: ['axios', 'formik', 'yup'],
+          query: ['@tanstack/react-query', '@tanstack/react-query-devtools'],
+          maps: ['leaflet', 'react-leaflet', '@react-google-maps/api'],
+          charts: ['recharts'],
+          vendor: ['axios', 'lodash', 'date-fns', 'swiper', 'react-slick', 'react-toastify', 'formik', 'yup'],
         }
       }
     }

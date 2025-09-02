@@ -8,7 +8,7 @@ This file is the single source of truth for all refactoring work performed acros
 ## Current Status Snapshot
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization expanded to ContactUs and HelpCenter)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization expanded to ContactUs and HelpCenter; Step 29 code splitting complete)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash)
 - Phase 5: Not started
 
@@ -94,6 +94,19 @@ Lint snapshot (current): numerous prop-types and unused-var issues remain; no in
 - Client uses CSS tokens and base UI kit; Storybook config present.
 - Client theme switching is wired: CSS tokens + MUI theme are synchronized based on `ThemeContext` mode with `CssBaseline` applied.
 - Base UI components now use CSS Modules (no inline styles) improving consistency and theming.
+
+### Phase 3 – Step 29: Performance Optimization (Code Splitting)
+- Implemented route-based lazy loading via `React.lazy` and `Suspense` for all major routes in `client/src/App.jsx`.
+- Added granular Rollup chunking in `client/vite.config.js` with `manualChunks` for `react`, `router`, `mui`, `query`, `maps`, `charts`, and `vendor`.
+
+Verification (post-build):
+- Main bundle reduced from ~1701 kB to ~327 kB (`index-*.js`).
+- Large libraries isolated into dedicated chunks: `mui ~459 kB`, `charts ~365 kB`, `maps ~146 kB`, `vendor ~124 kB`, `router ~36 kB`, `query ~40 kB` (pre-gzip sizes). These are now loaded on-demand.
+- Build succeeded; no ESLint inline style violations introduced.
+
+Next:
+- Evaluate critical route preloading and `Suspense` fallbacks for UX polish.
+- Continue Phase 3 Step 19 and 21 scopes where remaining.
 
 ### Phase 4 – Step 36: Barrel verification (this session)
 - Verified presence of `index.dart` barrels in `core/{config,utils,services}` and `shared/{providers,models,widgets}`.
@@ -208,5 +221,5 @@ Outcome:
 - Client build outputs large chunks; to be addressed with route-level code splitting in Step 29.
 
 ## Next Immediate Actions
-- Phase 3 Step 29: Introduce dynamic imports for large routes and configure Rollup `manualChunks`.
+- Phase 3 Step 29: Completed. Monitor runtime for chunk load behavior and adjust preloading.
 - Phase 4 Step 36: Continue file moves in Flutter; tooling not available in this environment, will proceed with code-level re-exports and documentation, and run `flutter analyze` when tooling is accessible.

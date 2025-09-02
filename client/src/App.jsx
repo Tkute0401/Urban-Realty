@@ -1,63 +1,64 @@
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AgentsProvider } from './context/AgentsContext';
 import { PropertiesProvider } from './context/PropertiesContext';
-import Home from './pages/Home/Home';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import PropertyList from './components/property/PropertyList';
-import PropertyDetails from './pages/PropertyDetails/PropertyDetails';
-import Profile from './pages/User/Profile';
+const Home = lazy(() => import('./pages/Home/Home'));
+const Login = lazy(() => import('./pages/Auth/Login'));
+const Register = lazy(() => import('./pages/Auth/Register'));
+const PropertyList = lazy(() => import('./components/property/PropertyList'));
+const PropertyDetails = lazy(() => import('./pages/PropertyDetails/PropertyDetails'));
+const Profile = lazy(() => import('./pages/User/Profile'));
 import Layout from './components/Layout/layout';
 import 'leaflet/dist/leaflet.css';
 import Header from './components/common/Header';
-import EditProperty from './pages/Properties/EditProperty';
-import AddProperty from './pages/AddProperty/AddProperty';
+const EditProperty = lazy(() => import('./pages/Properties/EditProperty'));
+const AddProperty = lazy(() => import('./pages/AddProperty/AddProperty'));
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
 import { createUrbanRealtyTheme } from './Theme/NewTheme';
 import ThemeProviderCtx, { ThemeContext } from './context/ThemeProvider';
-import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminAnalytics from './pages/admin/AdminAnalytics';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminProperties from './pages/admin/AdminProperties';
-import AdminContacts from './pages/admin/AdminContacts';
-import AdminMedia from './pages/admin/AdminMedia';
-import AdminReports from './pages/admin/AdminReports';
-import AdminSettings from './pages/admin/AdminSettings';
-import AgentsPage from './pages/admin/AgentsPage';
-import AdminSubscriptionManagement from './components/admin/SubscriptionManagement';
-import AgentLayout from './components/agent/AgentLayout';
-import AgentDashboard from './pages/Agent/AgentDashboard';
-import AgentProperties from './pages/Agent/AgentProperties';
-import AgentLeads from './pages/Agent/AgentLeads';
-import AgentAnalytics from './pages/Agent/AgentAnalytics';
-import AgentInquiries from './pages/Agent/Inquiries';
-import AgentSettings from './pages/Agent/AgentSettings';
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminProperties = lazy(() => import('./pages/admin/AdminProperties'));
+const AdminContacts = lazy(() => import('./pages/admin/AdminContacts'));
+const AdminMedia = lazy(() => import('./pages/admin/AdminMedia'));
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AgentsPage = lazy(() => import('./pages/admin/AgentsPage'));
+const AdminSubscriptionManagement = lazy(() => import('./components/admin/SubscriptionManagement'));
+const AgentLayout = lazy(() => import('./components/agent/AgentLayout'));
+const AgentDashboard = lazy(() => import('./pages/Agent/AgentDashboard'));
+const AgentProperties = lazy(() => import('./pages/Agent/AgentProperties'));
+const AgentLeads = lazy(() => import('./pages/Agent/AgentLeads'));
+const AgentAnalytics = lazy(() => import('./pages/Agent/AgentAnalytics'));
+const AgentInquiries = lazy(() => import('./pages/Agent/Inquiries'));
+const AgentSettings = lazy(() => import('./pages/Agent/AgentSettings'));
 import MainPage from './components/property/MainPage';
-import AboutUs from './components/common/footer/AboutUs';
-import ContactUs from './components/common/footer/ContactUs';
-import HelpCenter from './components/common/footer/HelpCenter';
-import PrivacyPolicy from './components/common/footer/PrivacyPolicy';
-import TermsConditions from './components/common/footer/TermsConditions';
-import Career from './components/common/footer/Career';
-import TrustSafety from './components/common/footer/TrustSafety';
-import HowWeWork from './components/common/footer/HowWeWork';
-import LawyerConsultancy from './components/common/footer/LaywerConsultancy';
-import PackersMovers from './components/common/footer/PackersMovers';
-import InteriorDesign from './components/common/footer/InteriorDesign';
-import EMICalculator from './components/common/footer/EMICalculator';
+const AboutUs = lazy(() => import('./components/common/footer/AboutUs'));
+const ContactUs = lazy(() => import('./components/common/footer/ContactUs'));
+const HelpCenter = lazy(() => import('./components/common/footer/HelpCenter'));
+const PrivacyPolicy = lazy(() => import('./components/common/footer/PrivacyPolicy'));
+const TermsConditions = lazy(() => import('./components/common/footer/TermsConditions'));
+const Career = lazy(() => import('./components/common/footer/Career'));
+const TrustSafety = lazy(() => import('./components/common/footer/TrustSafety'));
+const HowWeWork = lazy(() => import('./components/common/footer/HowWeWork'));
+const LawyerConsultancy = lazy(() => import('./components/common/footer/LaywerConsultancy'));
+const PackersMovers = lazy(() => import('./components/common/footer/PackersMovers'));
+const InteriorDesign = lazy(() => import('./components/common/footer/InteriorDesign'));
+const EMICalculator = lazy(() => import('./components/common/footer/EMICalculator'));
 import Footer from './components/common/footer/Footer';
 import { DevelopersProvider } from './context/DevelopersContext';
-import DeveloperList from './pages/Developer/DeveloperList';
-import DeveloperDetails from './pages/Developer/DeveloperDetails';
-import AddDeveloperPage from './pages/Developer/AddDeveloperPage';
-import EditDeveloperPage from './pages/Developer/EditDeveloperPage';
-import SubscriptionPlans from './components/Subscription/SubscriptionPlans';
-import SubscriptionManagement from './components/Subscription/SubscriptionManagement';
-import SubscriptionComparison from './components/Subscription/SubscriptionComparison';
-import BillingDashboard from './components/Subscription/BillingDashboard';
+const DeveloperList = lazy(() => import('./pages/Developer/DeveloperList'));
+const DeveloperDetails = lazy(() => import('./pages/Developer/DeveloperDetails'));
+const AddDeveloperPage = lazy(() => import('./pages/Developer/AddDeveloperPage'));
+const EditDeveloperPage = lazy(() => import('./pages/Developer/EditDeveloperPage'));
+const SubscriptionPlans = lazy(() => import('./components/Subscription/SubscriptionPlans'));
+const SubscriptionManagement = lazy(() => import('./components/Subscription/SubscriptionManagement'));
+const SubscriptionComparison = lazy(() => import('./components/Subscription/SubscriptionComparison'));
+const BillingDashboard = lazy(() => import('./components/Subscription/BillingDashboard'));
 
 function App() {
   const location = useLocation();
@@ -76,6 +77,7 @@ function App() {
             {/* Conditionally render Header based on current path */}
             {!isHomePage && <Header />}
             <Layout>
+              <Suspense fallback={<div style={{ padding: 16 }}>Loading...</div>}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
@@ -139,6 +141,7 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                 </Route>
               </Routes>
+              </Suspense>
             </Layout>
             <Footer />
             </DevelopersProvider>
