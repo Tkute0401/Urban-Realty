@@ -21,6 +21,14 @@ This file is the single source of truth for all refactoring work performed acros
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
 ## Detailed Actions This Session
+### Phase 3 – Step 27: Loading States & Error Boundaries
+- Wrapped the entire client app with a global ErrorBoundary at `client/src/main.jsx`.
+- Error fallback provides refresh and home navigation with development-only error details.
+
+Verification:
+- Client production build succeeded via `vite build`.
+- No runtime issues observed during build; bundle sizes noted for future splitting.
+
 ### Phase 3 – Step 21: Form Handling Standardization (continued)
 - Migrated `client/src/pages/Auth/Register.jsx` from local state to `react-hook-form` with `zod` validation.
 - Implemented `Controller` bindings for all fields, including conditional professional info for Agent/Developer.
