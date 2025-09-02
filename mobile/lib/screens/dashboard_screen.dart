@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/property_service.dart';
 import '../config/api_config.dart';
-import '../providers/auth_provider.dart';
+import '../shared/providers/auth_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

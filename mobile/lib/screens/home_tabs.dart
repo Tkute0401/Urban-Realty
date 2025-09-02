@@ -5,7 +5,7 @@ import 'search_screen.dart';
 import 'favorites_screen.dart';
 import 'notifications_screen.dart';
 import 'profile_screen.dart';
-import '../providers/auth_provider.dart';
+import '../shared/providers/auth_provider.dart';
 
 class HomeTabs extends StatefulWidget {
   const HomeTabs({super.key});

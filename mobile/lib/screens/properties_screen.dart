@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/properties_provider.dart';
+import '../shared/providers/properties_provider.dart';
 import '../widgets/property_card.dart';
 
 class PropertiesScreen extends StatefulWidget {
