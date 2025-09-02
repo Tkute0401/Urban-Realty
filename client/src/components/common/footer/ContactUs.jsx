@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { PhoneIcon, EnvelopeIcon, MapPinIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const ContactUs = () => {
 
@@ -8,6 +11,28 @@ const ContactUs = () => {
     window.scrollTo(0, 0);
   }, []);
   
+  const schema = z.object({
+    name: z.string().min(2, "Name is required"),
+    email: z.string().email("Enter a valid email"),
+    subject: z.string().min(2, "Subject is required"),
+    message: z.string().min(10, "Message must be at least 10 characters"),
+  });
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { name: "", email: "", subject: "", message: "" }
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      // Placeholder: integrate API hook when backend endpoint is ready
+      await new Promise((r) => setTimeout(r, 600));
+      reset();
+    } catch (_) {
+      // Intentionally swallow for now; standardized error toasts handled globally
+    }
+  };
+
   return (
     <section className="bg-[#08171A] min-h-screen text-white">
       {/* Header Section */}
@@ -94,49 +119,70 @@ const ContactUs = () => {
           <h2 className="font-poppins text-3xl font-bold mb-2">Send Us a Message</h2>
           <p className="text-gray-400 mb-8">We typically respond within 24 hours</p>
           
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
               <input
                 type="text"
                 id="name"
+                {...register("name")}
                 className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
                 placeholder="Your name"
+                aria-invalid={!!errors.name}
               />
+              {errors.name && (
+                <p className="text-red-400 text-sm mt-2" role="alert">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email</label>
               <input
                 type="email"
                 id="email"
+                {...register("email")}
                 className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
                 placeholder="your.email@example.com"
+                aria-invalid={!!errors.email}
               />
+              {errors.email && (
+                <p className="text-red-400 text-sm mt-2" role="alert">{errors.email.message}</p>
+              )}
             </div>
             <div className="md:col-span-2">
               <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
               <input
                 type="text"
                 id="subject"
+                {...register("subject")}
                 className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
                 placeholder="How can we help?"
+                aria-invalid={!!errors.subject}
               />
+              {errors.subject && (
+                <p className="text-red-400 text-sm mt-2" role="alert">{errors.subject.message}</p>
+              )}
             </div>
             <div className="md:col-span-2">
               <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
               <textarea
                 id="message"
                 rows="5"
+                {...register("message")}
                 className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
                 placeholder="Your message here..."
+                aria-invalid={!!errors.message}
               ></textarea>
+              {errors.message && (
+                <p className="text-red-400 text-sm mt-2" role="alert">{errors.message.message}</p>
+              )}
             </div>
             <div className="md:col-span-2">
               <button
                 type="submit"
-                className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+                disabled={isSubmitting}
+                className="bg-[#78cadc] hover:bg-[#8DD9E5] disabled:opacity-60 disabled:cursor-not-allowed text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </button>
             </div>
           </form>
