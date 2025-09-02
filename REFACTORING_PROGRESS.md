@@ -20,3 +20,15 @@
 3. Update server.js to use centralized configuration
 4. Test server startup with new configuration
 5. Begin Phase 2: Server restructuring
+
+## PHASE 2 STATUS
+
+Status: In Progress
+
+Step 6: Server Directory Restructuring
+- Created `server/src/` with `api/{routes,middleware}`, `config/`
+- Updated `server/server.js` to load from `src/`
+- Added adapter exports to avoid breaking changes while we migrate controllers/models later
+- No functional changes to controllers/models yet; only import path updates
+
+Next: Step 7 (Constants & Configuration Centralization)
