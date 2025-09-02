@@ -91,14 +91,21 @@ app.get('/api/v1/test', (req, res) => {
 // SPA Fallback - MUST BE LAST ROUTE
 app.get('*', (req, res) => {
   const indexPath = path.join(clientDistDir, 'index.html');
+  console.log(`Attempting to serve SPA from: ${indexPath}`);
+  console.log(`Client dist directory exists: ${fs.existsSync(clientDistDir)}`);
+  console.log(`Index file exists: ${fs.existsSync(indexPath)}`);
+  
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
     console.error(`Frontend file not found at: ${indexPath}`);
+    console.error(`Client dist directory contents:`, fs.existsSync(clientDistDir) ? fs.readdirSync(clientDistDir) : 'Directory does not exist');
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
       success: false,
       error: ERROR_MESSAGES.INTERNAL_ERROR,
-      path: indexPath
+      path: indexPath,
+      clientDistExists: fs.existsSync(clientDistDir),
+      clientDistContents: fs.existsSync(clientDistDir) ? fs.readdirSync(clientDistDir) : null
     });
   }
 });
