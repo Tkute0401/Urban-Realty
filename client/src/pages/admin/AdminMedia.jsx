@@ -660,7 +660,7 @@ const AdminMedia = () => {
                 <img 
                   src={previewMedia.url} 
                   alt={previewMedia.title}
-                  style={{ width: '100%', height: 'auto' }}
+                  className="w-100 h-auto"
                 />
               ) : (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
