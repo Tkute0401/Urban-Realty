@@ -9,6 +9,7 @@ This document outlines the completion of Phase 2 of the Urban Realty project ref
 **Files Created/Modified:**
 - `server/constants/index.js` - Comprehensive constants file with all application constants
 - `server/config/environment.js` - Environment configuration with validation using Joi
+- `package.json` - Added `joi` runtime dependency required by environment validation
 - `server/server.js` - Updated to use centralized configuration
 
 **Key Features:**
