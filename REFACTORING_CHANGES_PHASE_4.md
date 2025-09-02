@@ -32,6 +32,13 @@ This step introduces a scalable directory structure for the Flutter app, alignin
   - `features/{auth,home,profile,settings,search,subscription,properties,static_pages,admin,agent,developers,notifications,splash}/*`
 - Updated `main.dart` to import from `features/*` and `shared/providers/*`
 
+### Providers Migration (Step 36 continuation)
+- Moved providers to `shared/providers/` and updated barrel exports:
+  - `shared/providers/auth_provider.dart`
+  - `shared/providers/properties_provider.dart`
+  - `shared/providers/theme_provider.dart`
+- Left compatibility re-export stubs in `providers/` to avoid breaking existing imports.
+
 ### Next Steps (Step 36 continuation)
 - Incrementally move screens from `screens/` into `features/*` directories
 - Move providers to `shared/providers` and update imports

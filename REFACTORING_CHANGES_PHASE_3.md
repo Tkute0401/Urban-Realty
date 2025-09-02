@@ -62,10 +62,11 @@ npx storybook@latest dev -p 6006
 ```
 
 ### Step 22: API Client Optimization (Completed)
-- ### Step 21: Form Handling Standardization (Started)
+### Step 21: Form Handling Standardization (In Progress)
 - Added `react-hook-form` and `@hookform/resolvers` for schema-based validation.
 - Created `components/forms/RHFTextField.jsx` for consistent MUI TextField integration.
 - Refactored `pages/Auth/Login.jsx` to RHF with Zod validation; unified loading state.
+- Migrated `pages/Auth/Register.jsx` to RHF + Zod with conditional professional fields (Agent/Developer) and validation for RERA ID.
 
 - Centralized API endpoints and query keys in `client/src/constants/api.js`.
 - Added reusable hooks in `client/src/hooks/useApi.js` wrapping Axios + React Query:
