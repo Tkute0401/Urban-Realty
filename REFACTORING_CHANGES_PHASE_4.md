@@ -57,6 +57,15 @@ Verification:
 - Move widgets/models to `shared` and update re-exports
 - Run `flutter analyze` and tests after each batch of moves
 
+### State Management Optimization (Step 37)
+- Enhanced `shared/providers/auth_provider.dart` to improve offline readiness and startup UX:
+  - Persist user JSON in secure storage under `user_cache` after successful `_getMe()`.
+  - Load cached user on `tryAutoLogin()` when token is absent for limited offline mode.
+  - Clear `user_cache` on `logout`.
+
+Verification Plan:
+- Run `flutter analyze` and add a widget test to validate cached user render without network.
+
 ### Verification
 - Scaffolding committed and pushed
 - Barrel files verified present:

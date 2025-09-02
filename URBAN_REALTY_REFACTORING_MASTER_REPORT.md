@@ -9,7 +9,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization expanded to ContactUs and HelpCenter; Step 29 code splitting complete)
-- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash; migrated auth screens to features)
+- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash; migrated auth screens to features; Step 37 AuthProvider offline cache)
 - Phase 5: Not started
 
 ## Key Recent Commits (this session)
@@ -98,6 +98,17 @@ Lint snapshot (current): numerous prop-types and unused-var issues remain; no in
 Verification:
 - `main.dart` already imports from `features/auth/*`, so no route changes required.
 - Build to be validated with `flutter build` in a Flutter-enabled environment; file structure compiles logically.
+ 
+### Phase 4 – Step 37: Flutter State Management Optimization (AuthProvider)
+- Enhanced `mobile/lib/shared/providers/auth_provider.dart`:
+  - Added secure cached user persistence using `flutter_secure_storage` key `user_cache`.
+  - On `login`/`register`, fetch user via `_getMe()` then cache with `_cacheUser()`.
+  - On `tryAutoLogin`, load cached user if token missing (limited offline), and cache fresh user after successful `_getMe()`.
+  - On `logout`, clear `jwt_token` and `user_cache`.
+
+Verification:
+- Static analysis by inspection; requires `flutter analyze` in CI to confirm (to be run next).
+- Behavioral expectation: app can show last known user details offline; token still required for API calls.
 
 ### Verification
 - Flutter imports now resolve via feature re-exports without moving underlying files. Full Flutter build to be executed after file moves.
@@ -137,6 +148,7 @@ Next:
 - Move providers to `mobile/lib/shared/providers/` and update imports.
 - Migrate screens/widgets/models into `features/*` and `shared/*` progressively.
 - Run `flutter analyze` and tests; fix import issues.
+ - Validate Step 37 behavior for offline cached user load; add widget test to ensure cached user is displayed when offline.
 - Continue Phase 4 Steps 37–45 after Step 36 migration stabilizes.
  - Phase 3 Step 19: Continue removing inline styles across client (forms, feature components). Add lint rule to disallow inline styles where feasible.
 
