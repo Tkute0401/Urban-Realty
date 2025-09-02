@@ -1,5 +1,6 @@
 // Application Constants
 // Import shared constants and extend with server-specific ones
+const path = require('path');
 
 const {
   HTTP_STATUS,
@@ -12,7 +13,7 @@ const {
   SUCCESS_MESSAGES,
   API_ENDPOINTS,
   UPLOAD_LIMITS
-} = require('../../shared/constants/index.cjs');
+} = require(path.resolve(__dirname, '../../shared/constants/index.cjs'));
 
 // Server-specific constants (extending shared constants)
 
@@ -86,6 +87,27 @@ const RAZORPAY_CONFIG = {
   }
 };
 
+// Response helper functions
+const createSuccessResponse = (data, message = 'Success', statusCode = HTTP_STATUS.OK) => {
+  return {
+    success: true,
+    statusCode,
+    message,
+    data,
+    timestamp: new Date().toISOString()
+  };
+};
+
+const createErrorResponse = (message, statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR, details = null) => {
+  return {
+    success: false,
+    statusCode,
+    message,
+    details,
+    timestamp: new Date().toISOString()
+  };
+};
+
 module.exports = {
   // Shared constants
   HTTP_STATUS,
@@ -105,5 +127,9 @@ module.exports = {
   JWT_CONFIG,
   EMAIL_TEMPLATES,
   CLOUDINARY_CONFIG,
-  RAZORPAY_CONFIG
+  RAZORPAY_CONFIG,
+  
+  // Response helper functions
+  createSuccessResponse,
+  createErrorResponse
 };

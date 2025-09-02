@@ -1,5 +1,5 @@
 const BaseRepository = require('./BaseRepository');
-const User = require('../../models/User');
+const User = require('../../../models/User');
 const { USER_ROLES } = require('../../../constants');
 
 /**

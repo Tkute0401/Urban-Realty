@@ -1,5 +1,5 @@
 const BaseRepository = require('./BaseRepository');
-const Property = require('../../models/Property');
+const Property = require('../../../models/Property');
 const { PROPERTY_TYPES, PROPERTY_STATUS } = require('../../../constants');
 
 /**
