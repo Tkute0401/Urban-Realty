@@ -255,3 +255,20 @@ Outcome:
 ## Next Immediate Actions
 - Phase 3 Step 29: Completed. Monitor runtime for chunk load behavior and adjust preloading.
 - Phase 4 Step 36: Continue file moves in Flutter; tooling not available in this environment, will proceed with code-level re-exports and documentation, and run `flutter analyze` when tooling is accessible.
+
+### Phase 4 – Step 36: Feature re-export adapters (batch 1)
+- Added feature adapters to re-export existing screens to enable safe import migration without moving implementations yet:
+  - `mobile/lib/features/home/dashboard_screen.dart`
+  - `mobile/lib/features/notifications/notifications_screen.dart`
+  - `mobile/lib/features/profile/profile_screen.dart`
+  - `mobile/lib/features/properties/properties_screen.dart`
+  - `mobile/lib/features/search/search_screen.dart`
+  - `mobile/lib/features/settings/settings_screen.dart`
+  - `mobile/lib/features/subscription/subscription_screen.dart`
+  - `mobile/lib/features/add_property/add_property_screen.dart`
+  - `mobile/lib/features/static_pages/static_pages.dart`
+  - `mobile/lib/features/home/home_tabs.dart`
+  - `mobile/lib/features/favorites/favorites_screen.dart`
+
+Verification:
+- Imports can now be switched to `features/*` without breaking; full moves can proceed incrementally.
