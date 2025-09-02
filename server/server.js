@@ -8,6 +8,15 @@ const errorHandler = require('./src/api/middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
 const config = require('./config/environment');
 const { HTTP_STATUS, ERROR_MESSAGES } = require('./constants');
+const {
+  trackUserAction,
+  trackApiUsage,
+  trackPropertyView,
+  trackSearch,
+  trackAuthEvents,
+  trackErrors,
+  trackPerformance
+} = require('./src/middleware/analytics');
 
 const app = express();
 
@@ -49,6 +58,14 @@ app.use(cors({
 app.use(express.json({ limit: config.upload.maxFileSize }));
 app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
 
+// Analytics middleware
+app.use(trackUserAction);
+app.use(trackApiUsage);
+app.use(trackPropertyView);
+app.use(trackSearch);
+app.use(trackAuthEvents);
+app.use(trackPerformance);
+
 // Static files
 app.use('/uploads', express.static(uploadsDir));
 if (fs.existsSync(clientDistDir)) {
@@ -63,6 +80,7 @@ app.use('/api/v1/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/v1/contacts', require('./src/api/routes/contactRoutes'));
 app.use('/api/v1/admin', require('./src/api/routes/adminRoutes'));
 app.use('/api/v1/subscriptions', require('./src/api/routes/subscriptionRoutes'));
+app.use('/api/v1/analytics', require('./src/api/routes/analyticsRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'))
 
@@ -91,19 +109,27 @@ app.get('/api/v1/test', (req, res) => {
 // SPA Fallback - MUST BE LAST ROUTE
 app.get('*', (req, res) => {
   const indexPath = path.join(clientDistDir, 'index.html');
+  console.log(`Attempting to serve SPA from: ${indexPath}`);
+  console.log(`Client dist directory exists: ${fs.existsSync(clientDistDir)}`);
+  console.log(`Index file exists: ${fs.existsSync(indexPath)}`);
+  
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
     console.error(`Frontend file not found at: ${indexPath}`);
+    console.error(`Client dist directory contents:`, fs.existsSync(clientDistDir) ? fs.readdirSync(clientDistDir) : 'Directory does not exist');
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
       success: false,
       error: ERROR_MESSAGES.INTERNAL_ERROR,
-      path: indexPath
+      path: indexPath,
+      clientDistExists: fs.existsSync(clientDistDir),
+      clientDistContents: fs.existsSync(clientDistDir) ? fs.readdirSync(clientDistDir) : null
     });
   }
 });
 
 // Error handling
+app.use(trackErrors);
 app.use(errorHandler);
 app.use((req, res) => res.status(HTTP_STATUS.NOT_FOUND).json({ 
   success: false, 
