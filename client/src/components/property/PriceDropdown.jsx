@@ -224,10 +224,6 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
             
             <div 
               className="range-slider"
-              style={{
-                '--min-percent': `${((displayMinValue - priceRanges.min) / (priceRanges.max - priceRanges.min)) * 100}%`,
-                '--max-percent': `${((displayMaxValue - priceRanges.min) / (priceRanges.max - priceRanges.min)) * 100}%`
-              }}
             >
               <input
                 ref={minSliderRef}
