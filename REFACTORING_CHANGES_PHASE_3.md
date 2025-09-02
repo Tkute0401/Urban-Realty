@@ -42,6 +42,9 @@ This document tracks structural and code changes performed in Phase 3 to organiz
 - Created base UI kit: `Button`, `Input`, `Modal` under `client/src/components/ui/`.
 - Set up Storybook with Vite: `.storybook/main.js`, `.storybook/preview.js` and stories for the UI kit.
 - Wired tokens import in `client/src/index.css`.
+- Implemented dynamic MUI theme factory `createUrbanRealtyTheme(mode)` in `client/src/Theme/NewTheme.js`.
+- Wrapped root in app-specific ThemeProvider and MUI provider with `CssBaseline` in `client/src/main.jsx`.
+- Updated `client/src/App.jsx` to consume `ThemeContext` and generate theme based on current mode.
 
 ### Commands
 To run Storybook in the client app:

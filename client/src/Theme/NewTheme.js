@@ -1,7 +1,9 @@
 // In your theme configuration (or create a new theme file)
 import { createTheme } from '@mui/material/styles';
 
-export const urbanRealtyTheme = createTheme({
+export function createUrbanRealtyTheme(mode = 'light') {
+  const isDark = mode === 'dark';
+  return createTheme({
   breakpoints: {
     values: {
       xs: 0,
@@ -11,6 +13,7 @@ export const urbanRealtyTheme = createTheme({
       xl: 1536,
     },},
   palette: {
+    mode,
     primary: {
       main: '#2E86AB', // Deep ocean blue
       light: '#5AB1D1',
@@ -24,12 +27,12 @@ export const urbanRealtyTheme = createTheme({
       contrastText: '#FFFFFF'
     },
     background: {
-      default: '#F8F9FA', // Light gray background
-      paper: '#FFFFFF'
+      default: isDark ? '#0f172a' : '#F8F9FA', // sync with CSS tokens
+      paper: isDark ? '#111827' : '#FFFFFF'
     },
     text: {
-      primary: '#333333',
-      secondary: '#666666'
+      primary: isDark ? '#e5e7eb' : '#333333',
+      secondary: isDark ? '#9ca3af' : '#666666'
     },
     success: {
       main: '#4CAF50'
@@ -135,4 +138,8 @@ export const urbanRealtyTheme = createTheme({
       }
     }
   }
-});
+  });
+}
+
+// Backward-compatible static export using light mode
+export const urbanRealtyTheme = createUrbanRealtyTheme('light');

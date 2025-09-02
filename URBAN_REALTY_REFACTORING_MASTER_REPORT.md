@@ -8,12 +8,13 @@ This file is the single source of truth for all refactoring work performed acros
 ## Current Status Snapshot
 - Phase 1: Complete (audit, backups/VC, dependency audit, env standardization, testing setup tracked elsewhere)
 - Phase 2: Complete (server restructuring, constants/config, DB layer, service layer)
-- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added)
+- Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook added; dynamic MUI theme integration complete)
 - Phase 4: In Progress (Flutter structure; barrels + feature re-exports added)
 - Phase 5: Not started
 
 ## Key Recent Commits (this session)
 - chore(mobile): Phase 4 Step 36 – add core/shared barrels and feature re-exports; update main.dart imports
+- chore(client): Phase 3 – integrate dynamic MUI theme factory and wrap providers
 - docs(mobile): Update Phase 4 change log with barrels and feature re-exports
 - docs: Update refactoring progress to reflect Phases 2 complete, 3/4 in progress
 
@@ -36,6 +37,7 @@ This file is the single source of truth for all refactoring work performed acros
 ### Verification
 - Flutter imports now resolve via feature re-exports without moving underlying files. Full Flutter build to be executed after file moves.
 - Client uses CSS tokens and base UI kit; Storybook config present.
+- Client theme switching is wired: CSS tokens + MUI theme are synchronized based on `ThemeContext` mode with `CssBaseline` applied.
 
 ## Next Planned Steps
 - Move providers to `mobile/lib/shared/providers/` and update imports.
