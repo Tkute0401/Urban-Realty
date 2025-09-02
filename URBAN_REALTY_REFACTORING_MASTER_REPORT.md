@@ -9,7 +9,7 @@ This file is the single source of truth for all refactoring work performed acros
 - Phase 1: Completed
 - Phase 2: Completed (server restructuring, constants/config, DB layer, service layer)
 - Phase 3: In Progress (design tokens, ThemeProvider, base UI kit, Storybook; CSS consolidation; API hooks added; Step 21 forms standardization expanded to ContactUs and HelpCenter; Step 29 code splitting complete)
-- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash)
+- Phase 4: In Progress (Flutter structure; barrels + feature re-exports added; providers migrated; splash screen re-export added under features/splash; migrated auth screens to features)
 - Phase 5: Not started
 
 ## Key Recent Commits (this session)
@@ -88,6 +88,16 @@ Lint snapshot (current): numerous prop-types and unused-var issues remain; no in
   - `mobile/lib/features/{auth,home,profile,settings,search,subscription,properties,static_pages,admin,agent,developers,notifications,splash}/*`
 - Updated `REFACTORING_CHANGES_PHASE_4.md` with follow-up progress and next steps.
 - Updated `REFACTORING_PROGRESS.md` to reflect Phase 2 completion and Phase 3/4 status.
+
+### Phase 4 – Step 36: Auth screen migration (this session)
+- Implemented real screens under feature paths:
+  - `mobile/lib/features/auth/login_screen.dart` now contains the full implementation
+  - `mobile/lib/features/auth/register_screen.dart` now contains the full implementation
+- Converted legacy `mobile/lib/screens/login_screen.dart` and `mobile/lib/screens/register_screen.dart` into re-export stubs pointing to feature paths.
+
+Verification:
+- `main.dart` already imports from `features/auth/*`, so no route changes required.
+- Build to be validated with `flutter build` in a Flutter-enabled environment; file structure compiles logically.
 
 ### Verification
 - Flutter imports now resolve via feature re-exports without moving underlying files. Full Flutter build to be executed after file moves.
