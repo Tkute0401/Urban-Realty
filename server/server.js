@@ -3,8 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const connectDB = require('./config/db');
-const errorHandler = require('./middleware/errorHandler');
+const connectDB = require('./src/config/db');
+const errorHandler = require('./src/api/middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
 
 const app = express();
@@ -51,13 +51,13 @@ app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(clientDistDir)); // Serve React build
 
 // API Routes
-app.use('/api/v1/auth', require('./routes/authRoutes'));
-app.use('/api/v1/properties', require('./routes/propertyRoutes'));
-app.use('/api/v1/contacts', require('./routes/contactRoutes'));
-app.use('/api/v1/admin', require('./routes/adminRoutes'));
-app.use('/api/v1/subscriptions', require('./routes/subscriptionRoutes'));
-app.use('/media', require('./routes/mediaRoutes'));
-app.use('/api/v1/developers', require('./routes/developerRoutes'))
+app.use('/api/v1/auth', require('./src/api/routes/authRoutes'));
+app.use('/api/v1/properties', require('./src/api/routes/propertyRoutes'));
+app.use('/api/v1/contacts', require('./src/api/routes/contactRoutes'));
+app.use('/api/v1/admin', require('./src/api/routes/adminRoutes'));
+app.use('/api/v1/subscriptions', require('./src/api/routes/subscriptionRoutes'));
+app.use('/media', require('./src/api/routes/mediaRoutes'));
+app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'))
 
 // Health endpoints
 app.get('/api/v1/health', (req, res) => {
