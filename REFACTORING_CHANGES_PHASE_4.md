@@ -24,13 +24,19 @@ This step introduces a scalable directory structure for the Flutter app, alignin
 - `shared/models/index.dart` re-exports shared models
 - `shared/providers/index.dart` re-exports providers
 
-### Next Steps (Step 36 follow-up)
-- Incrementally move files into the new structure:
-  - Move configs to `core/config`, services to `core/services`, utilities to `core/utils`
-  - Move models/providers/widgets to `shared`
-  - Group screens into `features/*`
-- Update imports to use barrel exports gradually to avoid breakage
-- Run builds and tests after each batch of moves
+### Follow-up Progress
+- Added barrel files:
+  - `core/config/index.dart`, `core/utils/index.dart`, `core/services/index.dart`
+  - `shared/providers/index.dart`, `shared/models/index.dart`, `shared/widgets/index.dart`
+- Created feature re-export stubs so imports can be updated without moving files yet:
+  - `features/{auth,home,profile,settings,search,subscription,properties,static_pages,admin,agent,developers,notifications,splash}/*`
+- Updated `main.dart` to import from `features/*` and `shared/providers/*`
+
+### Next Steps (Step 36 continuation)
+- Incrementally move screens from `screens/` into `features/*` directories
+- Move providers to `shared/providers` and update imports
+- Move widgets/models to `shared` and update re-exports
+- Run `flutter analyze` and tests after each batch of moves
 
 ### Verification
 - Scaffolding committed and pushed to `main`
