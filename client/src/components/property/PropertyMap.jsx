@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import './PropertyMap.css';
 
-const containerStyle = {
-  width: '100%',
-  height: '400px',
-  borderRadius: '8px'
-};
+// Styles moved to CSS to avoid inline-style usage
 
 const PropertyMap = ({ location, address }) => {
   const mapRef = useRef(null);
@@ -47,7 +44,7 @@ const PropertyMap = ({ location, address }) => {
       }}
       >
       <GoogleMap
-        mapContainerStyle={containerStyle}
+        mapContainerClassName="map-container map-container--sm"
         center={center}
         zoom={15}
         onLoad={onLoad}

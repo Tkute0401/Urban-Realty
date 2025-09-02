@@ -160,6 +160,16 @@ Baseline metrics (quick):
 - Files: server 75, client 194, mobile 116
 - Remaining inline style occurrences detected by grep: 2 files (now addressed)
 
+### Phase 3 – Step 19: Inline style removals (map components, this session)
+- Moved inline container styles to CSS for maps:
+  - `client/src/components/property/PropertyMap.jsx` -> `PropertyMap.css` using `map-container map-container--sm`
+  - `client/src/components/property/PropertiesMap.jsx` -> `PropertiesMap.css` using `map-container map-container--lg`, added `.map-empty` for empty state
+- Updated components to use `mapContainerClassName` instead of `mapContainerStyle`.
+
+Verification:
+- Vite production build succeeded after changes.
+- Grep scan now reports 0 inline `style={{` usage in `client/src`.
+
 ### Phase 1 – Step 2: Backup & Version Control Setup (this session)
 ### Phase 3 – Step 21: Form Handling Standardization (this session)
 - Added React Hook Form and resolvers to client dependencies.
@@ -192,3 +202,11 @@ Baseline metrics update:
 
 Outcome:
 - Phase 1 steps 1–5 verified and completed. Proceeding to Phase 3 (client) and Phase 4 (mobile) next.
+
+## Session Verification Updates
+- Root `npm ci` and audit: 0 vulnerabilities at root; client reports 7 (1 low, 5 moderate, 1 critical) from transitive packages. Will address in Phase 3 Step 29 (bundle/deps optimization).
+- Client build outputs large chunks; to be addressed with route-level code splitting in Step 29.
+
+## Next Immediate Actions
+- Phase 3 Step 29: Introduce dynamic imports for large routes and configure Rollup `manualChunks`.
+- Phase 4 Step 36: Continue file moves in Flutter; tooling not available in this environment, will proceed with code-level re-exports and documentation, and run `flutter analyze` when tooling is accessible.
