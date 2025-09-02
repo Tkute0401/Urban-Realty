@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'providers/auth_provider.dart';
-import 'providers/properties_provider.dart';
-import 'providers/theme_provider.dart';
-import 'config/app_theme.dart';
-import 'config/environment_config.dart';
+import 'shared/providers/index.dart';
+import 'core/config/index.dart';
 import 'screens/home_tabs.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
