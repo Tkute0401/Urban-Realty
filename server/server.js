@@ -8,6 +8,15 @@ const errorHandler = require('./src/api/middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
 const config = require('./config/environment');
 const { HTTP_STATUS, ERROR_MESSAGES } = require('./constants');
+const {
+  trackUserAction,
+  trackApiUsage,
+  trackPropertyView,
+  trackSearch,
+  trackAuthEvents,
+  trackErrors,
+  trackPerformance
+} = require('./src/middleware/analytics');
 
 const app = express();
 
@@ -49,6 +58,14 @@ app.use(cors({
 app.use(express.json({ limit: config.upload.maxFileSize }));
 app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
 
+// Analytics middleware
+app.use(trackUserAction);
+app.use(trackApiUsage);
+app.use(trackPropertyView);
+app.use(trackSearch);
+app.use(trackAuthEvents);
+app.use(trackPerformance);
+
 // Static files
 app.use('/uploads', express.static(uploadsDir));
 if (fs.existsSync(clientDistDir)) {
@@ -63,6 +80,7 @@ app.use('/api/v1/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/v1/contacts', require('./src/api/routes/contactRoutes'));
 app.use('/api/v1/admin', require('./src/api/routes/adminRoutes'));
 app.use('/api/v1/subscriptions', require('./src/api/routes/subscriptionRoutes'));
+app.use('/api/v1/analytics', require('./src/api/routes/analyticsRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'))
 
@@ -111,6 +129,7 @@ app.get('*', (req, res) => {
 });
 
 // Error handling
+app.use(trackErrors);
 app.use(errorHandler);
 app.use((req, res) => res.status(HTTP_STATUS.NOT_FOUND).json({ 
   success: false, 
