@@ -292,7 +292,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _getLeadStatusColor(lead['status']).withValues(alpha: 0.1),
+                        color: _getLeadStatusColor(lead['status']).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _getLeadStatusColor(lead['status'])),
                       ),

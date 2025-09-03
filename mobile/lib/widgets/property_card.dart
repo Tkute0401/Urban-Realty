@@ -142,7 +142,7 @@ class PropertyCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "\$${property.price.toStringAsFixed(0)}",
+                    _formatPrice(property.price),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -181,5 +181,15 @@ class PropertyCard extends StatelessWidget {
         ),
       ),
     );
+  }
+  
+  String _formatPrice(double price) {
+    final String raw = price.toStringAsFixed(0);
+    // Insert thousands separators for USD-style formatting
+    final String withSeparators = raw.replaceAllMapped(
+      RegExp(r"\B(?=(\d{3})+(?!\d))"),
+      (m) => ",",
+    );
+    return "\$${withSeparators}";
   }
 }
