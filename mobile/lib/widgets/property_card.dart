@@ -190,7 +190,7 @@ class PropertyCard extends StatelessWidget {
       RegExp(r"\B(?=(\d{3})+(?!\d))"),
       (m) => ",",
     );
-    return "\$${withSeparators}";
+    return "\$$withSeparators";
   }
 
   String _formatArea(double area) {
