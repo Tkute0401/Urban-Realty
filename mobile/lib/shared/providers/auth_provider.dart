@@ -5,8 +5,8 @@ import '../../models/user.dart';
 import '../../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final AuthService _authService;
+  final FlutterSecureStorage _secureStorage;
 
   User? _user;
   String? _token;
@@ -19,8 +19,15 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
   bool get isAuthenticated => _token != null && _user != null;
 
-  AuthProvider() {
-    tryAutoLogin();
+  AuthProvider({
+    AuthService? authService,
+    FlutterSecureStorage? secureStorage,
+    bool autoLogin = true,
+  })  : _authService = authService ?? AuthService(),
+        _secureStorage = secureStorage ?? const FlutterSecureStorage() {
+    if (autoLogin) {
+      tryAutoLogin();
+    }
   }
 
   Future<bool> login(String email, String password) async {

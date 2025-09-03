@@ -34,13 +34,14 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool enableAutoLogin;
+  const MyApp({super.key, this.enableAutoLogin = true});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider(autoLogin: enableAutoLogin)),
         ChangeNotifierProvider(create: (_) => PropertiesProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
