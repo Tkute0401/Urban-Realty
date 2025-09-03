@@ -32,6 +32,7 @@ router.delete('/contacts/:id', protect, authorize('admin'), adminController.dele
 
 // Statistics
 router.get('/stats', protect, authorize('admin'), adminController.getStats);
+router.get('/dashboard', protect, authorize('admin'), adminController.getStats);
 
 // Analytics
 router.get('/analytics', protect, authorize('admin'), adminController.getAnalytics);

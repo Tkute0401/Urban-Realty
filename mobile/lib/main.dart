@@ -80,12 +80,12 @@ class MyApp extends StatelessWidget {
                 case '/add-property':
                   return MaterialPageRoute(builder: (context) => const AddPropertyScreen());
                 case '/property-detail':
-                  final args = settings.arguments as String?;
-                  if (args == null || args.isEmpty) {
+                  final args = settings.arguments;
+                  if (args == null || args.toString().isEmpty) {
                     // If no property ID provided, navigate back to home
                     return MaterialPageRoute(builder: (context) => const HomeTabs());
                   }
-                  return MaterialPageRoute(builder: (context) => PropertyDetailScreen(propertyId: args));
+                  return MaterialPageRoute(builder: (context) => PropertyDetailScreen(propertyId: args.toString()));
                 case '/search':
                   return MaterialPageRoute(builder: (context) => const SearchScreen());
                 case '/about':
