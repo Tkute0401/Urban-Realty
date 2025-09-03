@@ -24,7 +24,6 @@ import 'features/agent/agent_leads_screen.dart';
 import 'features/agent/agent_properties_screen.dart';
 import 'features/developers/developers_list_screen.dart';
 import 'features/notifications/notifications_screen.dart';
-import 'features/properties/properties_screen.dart';
 import 'features/splash/splash_screen.dart';
 
 void main() async {

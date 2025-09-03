@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import '../config/api_config.dart';
 import 'api_service.dart';
 
 class HttpClient {
