@@ -9,17 +9,24 @@ class AdminService {
 
   Future<Map<String, dynamic>> getDashboardStats() async {
     try {
-      final response = await HttpClient.get('/admin/dashboard');
+      final response = await HttpClient.get('/admin/stats');
       if (response.statusCode == 200) {
         final data = response.data;
         
-        // Handle different response types safely
+        // Handle the API response structure: { success: true, data: {...} }
         if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is Map<String, dynamic>) {
+            return data['data'] as Map<String, dynamic>;
+          }
           return data;
         }
         
         if (data is Map) {
-          return Map<String, dynamic>.from(data);
+          final mapData = Map<String, dynamic>.from(data);
+          if (mapData['success'] == true && mapData['data'] is Map<String, dynamic>) {
+            return mapData['data'] as Map<String, dynamic>;
+          }
+          return mapData;
         }
         
         if (data is String) {
@@ -59,6 +66,13 @@ class AdminService {
       final response = await HttpClient.get('/admin/users', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = response.data;
+        // Handle the API response structure: { success: true, data: [...] }
+        if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is List) {
+            return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+          }
+          return List<Map<String, dynamic>>.from((data['users'] != null) ? data['users'] : []);
+        }
         return List<Map<String, dynamic>>.from((data is Map && data['users'] != null) ? data['users'] : []);
       }
       throw Exception('Failed to load users');
@@ -72,6 +86,13 @@ class AdminService {
       final response = await HttpClient.get('/admin/properties', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = response.data;
+        // Handle the API response structure: { success: true, data: [...] }
+        if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is List) {
+            return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+          }
+          return List<Map<String, dynamic>>.from((data['properties'] != null) ? data['properties'] : []);
+        }
         return List<Map<String, dynamic>>.from((data is Map && data['properties'] != null) ? data['properties'] : []);
       }
       throw Exception('Failed to load properties');
@@ -85,6 +106,13 @@ class AdminService {
       final response = await HttpClient.get('/admin/agents', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = response.data;
+        // Handle the API response structure: { success: true, data: [...] }
+        if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is List) {
+            return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+          }
+          return List<Map<String, dynamic>>.from((data['agents'] != null) ? data['agents'] : []);
+        }
         return List<Map<String, dynamic>>.from((data is Map && data['agents'] != null) ? data['agents'] : []);
       }
       throw Exception('Failed to load agents');

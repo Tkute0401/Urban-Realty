@@ -32,7 +32,8 @@ import 'screens/properties_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  EnvironmentConfig.setEnvironment(Environment.development);
+  // Force production environment - no development or staging allowed
+  EnvironmentConfig.setEnvironment(Environment.production);
   runApp(const MyApp());
 }
 
