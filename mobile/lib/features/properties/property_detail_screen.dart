@@ -31,7 +31,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       });
 
       final provider = Provider.of<PropertiesProvider>(context, listen: false);
-      final loadedProperty = await provider.getPropertyById(widget.propertyId);
+      await provider.fetchPropertyById(widget.propertyId);
+      final loadedProperty = provider.selectedProperty;
       
       setState(() {
         property = loadedProperty;
@@ -111,18 +112,18 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Property Images
-            if (property!.images != null && property!.images!.isNotEmpty)
+            if (property!.images.isNotEmpty)
               SizedBox(
                 height: 250,
                 child: PageView.builder(
-                  itemCount: property!.images!.length,
+                  itemCount: property!.images.length,
                   itemBuilder: (context, index) {
                     return Image.network(
-                      property!.images![index],
+                      property!.images[index],
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           child: Icon(
                             Icons.image_not_supported,
                             size: 64,
@@ -137,7 +138,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             else
               Container(
                 height: 250,
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 child: Icon(
                   Icons.image_not_supported,
                   size: 64,
@@ -174,7 +175,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   _buildDetailRow(Icons.bed, 'Bedrooms', property!.bedrooms.toString()),
                   _buildDetailRow(Icons.bathtub, 'Bathrooms', property!.bathrooms.toString()),
                   
-                  if (property!.amenities != null && property!.amenities!.isNotEmpty) ...[
+                  if (property!.amenities.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text(
                       'Amenities',
@@ -186,7 +187,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: property!.amenities!.map((amenity) {
+                      children: property!.amenities.map((amenity) {
                         return Chip(
                           label: Text(amenity),
                           backgroundColor: theme.colorScheme.primaryContainer,
@@ -195,7 +196,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     ),
                   ],
 
-                  if (property!.description != null && property!.description!.isNotEmpty) ...[
+                  if (property!.description.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text(
                       'Description',
@@ -205,7 +206,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      property!.description!,
+                      property!.description,
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],

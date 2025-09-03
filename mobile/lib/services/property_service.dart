@@ -78,7 +78,7 @@ class PropertyService {
       // Fallback to empty list if structure is unexpected
       return <dynamic>[];
     } catch (e) {
-      print('Error in PropertyService.list(): $e');
+      // Error in PropertyService.list(): $e
       return <dynamic>[];
     }
   }
@@ -102,7 +102,7 @@ class PropertyService {
       // Fallback to empty list if structure is unexpected
       return <dynamic>[];
     } catch (e) {
-      print('Error in PropertyService.searchSuggestions(): $e');
+      // Error in PropertyService.searchSuggestions(): $e
       return <dynamic>[];
     }
   }
