@@ -12,13 +12,9 @@ class AdminService {
     try {
       final response = await HttpClient.get('/admin/dashboard');
       if (response.statusCode == 200) {
-        // Check if response is JSON
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          return jsonDecode(response.body);
-        } else {
-          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
-        }
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to load dashboard stats. Status: ${response.statusCode}');
     } catch (e) {
@@ -33,8 +29,8 @@ class AdminService {
     try {
       final response = await HttpClient.get('/admin/users', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['users'] ?? []);
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['users'] != null) ? data['users'] : []);
       }
       throw Exception('Failed to load users');
     } catch (e) {
@@ -46,8 +42,8 @@ class AdminService {
     try {
       final response = await HttpClient.get('/admin/properties', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['properties'] ?? []);
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['properties'] != null) ? data['properties'] : []);
       }
       throw Exception('Failed to load properties');
     } catch (e) {
@@ -59,8 +55,8 @@ class AdminService {
     try {
       final response = await HttpClient.get('/admin/agents', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['agents'] ?? []);
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['agents'] != null) ? data['agents'] : []);
       }
       throw Exception('Failed to load agents');
     } catch (e) {
@@ -72,7 +68,9 @@ class AdminService {
     try {
       final response = await HttpClient.put('/admin/users/$userId/status', body: {'status': status});
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to update user status');
     } catch (e) {
