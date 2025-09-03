@@ -1,5 +1,5 @@
-// Re-export shared models when moved here
-export * from "./user.dart";
-export * from "./property.dart";
-export * from "./subscription.dart";
-export * from "./developer.dart";
+// Re-export shared models
+export '../../models/user.dart';
+export '../../models/property.dart';
+export '../../models/subscription.dart';
+export '../../models/developer.dart';

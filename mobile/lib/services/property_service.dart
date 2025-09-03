@@ -121,7 +121,7 @@ class PropertyService {
 
   Future<void> deleteProperty(String id) async {
     try {
-      await _api_service.dio.delete('/properties/$id');
+      await _apiService.dio.delete('/properties/$id');
     } on DioException catch (e) {
       throw Exception('Error deleting property: ${e.message}');
     }
