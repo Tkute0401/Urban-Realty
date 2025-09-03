@@ -26,11 +26,6 @@ router.get('/featured', propertyController.getFeaturedProperties);
 // @access  Public
 router.get('/radius/:zipcode/:distance', propertyController.getPropertiesInRadius);
 
-// @desc    Get agent properties
-// @route   GET /api/v1/properties/agent
-// @access  Public
-router.get('/agent/:id', propertyController.getAgentProperties);
-
 // @desc    Create contact request for property
 // @route   POST /api/v1/properties/:id/contact
 // @access  Private
@@ -43,6 +38,11 @@ router.post(
   ],
   contactController.createContactRequest
 );
+
+// @desc    Get agent properties
+// @route   GET /api/v1/properties/agent
+// @access  Public
+router.get('/agent/:id', propertyController.getAgentProperties);
 
 // @desc    Create property
 // @route   POST /api/v1/properties
