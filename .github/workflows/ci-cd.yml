@@ -14,7 +14,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  FLUTTER_VERSION: '3.19.0'
+  FLUTTER_VERSION: '3.24.4'
 
 jobs:
   # Lint and format check
