@@ -78,8 +78,8 @@ class _SearchScreenState extends State<SearchScreen> {
     
     try {
       final res = await PropertyService.list();
-      final List<dynamic> data = (res['data'] ?? res) as List<dynamic>? ?? 
-          (res['data']?['data'] as List<dynamic>? ?? []);
+      // PropertyService.list() now returns the data array directly
+      final List<dynamic> data = res is List ? res : [];
       
       setState(() {
         _properties = data;
@@ -111,7 +111,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
     try {
       final res = await PropertyService.searchSuggestions(query);
-      final List<dynamic> suggestions = (res['data'] ?? res) as List<dynamic>? ?? [];
+      // PropertyService.searchSuggestions() now returns the data array directly
+      final List<dynamic> suggestions = res is List ? res : [];
       
       setState(() {
         _searchSuggestions = suggestions;

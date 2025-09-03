@@ -49,8 +49,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     try {
       final res = await PropertyService.list();
-      final List<dynamic> data = (res['data'] ?? res) as List<dynamic>? ?? 
-          (res['data']?['data'] as List<dynamic>? ?? []);
+      // PropertyService.list() now returns the data array directly
+      final List<dynamic> data = res is List ? res : [];
       
       setState(() {
         _featuredProperties = data.take(3).toList();

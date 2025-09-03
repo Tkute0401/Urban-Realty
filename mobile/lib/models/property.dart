@@ -13,6 +13,64 @@ List<String> _extractStringList(dynamic input) {
   return const [];
 }
 
+String _extractAddress(Map<String, dynamic> json) {
+  // Handle both old string format and new object format
+  if (json["address"] is String) {
+    return json["address"] as String;
+  } else if (json["address"] is Map<String, dynamic>) {
+    final address = json["address"] as Map<String, dynamic>;
+    final parts = <String>[];
+    
+    if (address["line1"] != null && address["line1"].toString().isNotEmpty) {
+      parts.add(address["line1"].toString());
+    }
+    if (address["street"] != null && address["street"].toString().isNotEmpty) {
+      parts.add(address["street"].toString());
+    }
+    if (address["locality"] != null && address["locality"].toString().isNotEmpty) {
+      parts.add(address["locality"].toString());
+    }
+    
+    return parts.join(", ");
+  }
+  return '';
+}
+
+String _extractCity(Map<String, dynamic> json) {
+  // Handle both old format and new nested format
+  if (json["city"] is String) {
+    return json["city"] as String;
+  } else if (json["address"] is Map<String, dynamic>) {
+    final address = json["address"] as Map<String, dynamic>;
+    return address["city"]?.toString() ?? '';
+  }
+  return '';
+}
+
+String _extractState(Map<String, dynamic> json) {
+  // Handle both old format and new nested format
+  if (json["state"] is String) {
+    return json["state"] as String;
+  } else if (json["address"] is Map<String, dynamic>) {
+    final address = json["address"] as Map<String, dynamic>;
+    return address["state"]?.toString() ?? '';
+  }
+  return '';
+}
+
+String _extractZipcode(Map<String, dynamic> json) {
+  // Handle both old format and new nested format
+  if (json["zipcode"] is String) {
+    return json["zipcode"] as String;
+  } else if (json["zipCode"] is String) {
+    return json["zipCode"] as String;
+  } else if (json["address"] is Map<String, dynamic>) {
+    final address = json["address"] as Map<String, dynamic>;
+    return address["zipCode"]?.toString() ?? address["zipcode"]?.toString() ?? '';
+  }
+  return '';
+}
+
 class Property {
   final String id;
   final String title;
@@ -77,10 +135,10 @@ class Property {
           : (json["area"] is num)
               ? (json["area"] as num).toDouble()
               : (double.tryParse(json["area"].toString()) ?? 0),
-      address: json["address"] ?? '',
-      city: json["city"] ?? '',
-      state: json["state"] ?? '',
-      zipcode: json["zipcode"] ?? '',
+      address: _extractAddress(json),
+      city: _extractCity(json),
+      state: _extractState(json),
+      zipcode: _extractZipcode(json),
       images: _extractStringList(json["images"] ?? json["photos"] ?? json["gallery"]),
       amenities: _extractStringList(json["amenities"]),
       createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
