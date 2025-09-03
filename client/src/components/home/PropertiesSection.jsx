@@ -32,9 +32,25 @@ const PropertiesSection = () => {
           </h2>
           <button 
             onClick={handleViewAll}
-            className="text-[#78cadc] hover:text-sky-300 transition-colors text-sm sm:text-base"
+            className="group relative inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#78cadc] to-[#5bb3c7] text-white font-medium text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out overflow-hidden"
           >
-            View All →
+            <span className="absolute inset-0 bg-gradient-to-r from-[#5bb3c7] to-[#4a9fb0] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="relative flex items-center gap-2 text-[#08171A]">
+              View All
+              <svg 
+                className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M13 7l5 5m0 0l-5 5m5-5H6" 
+                />
+              </svg>
+            </span>
           </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6 sm:mt-10">
