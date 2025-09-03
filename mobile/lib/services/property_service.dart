@@ -45,8 +45,17 @@ class PropertyService {
         queryParameters: queryParams,
       );
 
-      final List<dynamic> data = response.data['data'];
-      return data.map((json) => Property.fromJson(json)).toList();
+      // Handle the API response structure: { success: true, data: [...], count: number }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is List) {
+          final List<dynamic> data = responseData['data'] as List<dynamic>;
+          return data.map((json) => Property.fromJson(json)).toList();
+        }
+      }
+      
+      // Fallback to empty list if structure is unexpected
+      return <Property>[];
     } on DioException catch (e) {
       throw Exception('Error fetching properties: ${e.message}');
     }
@@ -54,22 +63,63 @@ class PropertyService {
 
   // Backwards-compat for callers expecting static list() returning raw map/list
   static Future<dynamic> list() async {
-    final service = PropertyService();
-    final results = await service.getProperties(limit: 50);
-    // Return as plain list of maps to satisfy callers that index with ['data'] or not
-    return results.map<Map<String, dynamic>>((p) => p.toJson()).toList();
+    try {
+      final service = PropertyService();
+      final response = await service._apiService.dio.get('/properties', queryParameters: {'limit': 50});
+      
+      // Handle the API response structure: { success: true, data: [...], count: number }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is List) {
+          return responseData['data'] as List<dynamic>;
+        }
+      }
+      
+      // Fallback to empty list if structure is unexpected
+      return <dynamic>[];
+    } catch (e) {
+      print('Error in PropertyService.list(): $e');
+      return <dynamic>[];
+    }
   }
 
   static Future<dynamic> searchSuggestions(String query) async {
-    final service = PropertyService();
-    final suggestions = await service.getSearchSuggestions(query);
-    return suggestions;
+    try {
+      final service = PropertyService();
+      final response = await service._apiService.dio.get(
+        '/properties/search-suggestions',
+        queryParameters: {'q': query},
+      );
+      
+      // Handle the API response structure: { success: true, data: [...] }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is List) {
+          return responseData['data'] as List<dynamic>;
+        }
+      }
+      
+      // Fallback to empty list if structure is unexpected
+      return <dynamic>[];
+    } catch (e) {
+      print('Error in PropertyService.searchSuggestions(): $e');
+      return <dynamic>[];
+    }
   }
 
   Future<Property> getPropertyById(String id) async {
     try {
       final response = await _apiService.dio.get('/properties/$id');
-      return Property.fromJson(response.data['data']);
+      
+      // Handle the API response structure: { success: true, data: {...} }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is Map<String, dynamic>) {
+          return Property.fromJson(responseData['data'] as Map<String, dynamic>);
+        }
+      }
+      
+      throw Exception('Invalid response structure');
     } on DioException catch (e) {
       throw Exception('Error fetching property: ${e.message}');
     }
@@ -78,8 +128,18 @@ class PropertyService {
   Future<List<Property>> getFeaturedProperties() async {
     try {
       final response = await _apiService.dio.get('/properties/featured');
-      final List<dynamic> data = response.data['data'];
-      return data.map((json) => Property.fromJson(json)).toList();
+      
+      // Handle the API response structure: { success: true, data: [...] }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is List) {
+          final List<dynamic> data = responseData['data'] as List<dynamic>;
+          return data.map((json) => Property.fromJson(json)).toList();
+        }
+      }
+      
+      // Fallback to empty list if structure is unexpected
+      return <Property>[];
     } on DioException catch (e) {
       throw Exception('Error fetching featured properties: ${e.message}');
     }
@@ -91,8 +151,18 @@ class PropertyService {
         '/properties/search-suggestions',
         queryParameters: {'q': query},
       );
-      final List<dynamic> data = response.data['data'];
-      return data.cast<String>();
+      
+      // Handle the API response structure: { success: true, data: [...] }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is List) {
+          final List<dynamic> data = responseData['data'] as List<dynamic>;
+          return data.cast<String>();
+        }
+      }
+      
+      // Fallback to empty list if structure is unexpected
+      return <String>[];
     } on DioException catch (e) {
       throw Exception('Error fetching search suggestions: ${e.message}');
     }
@@ -115,7 +185,15 @@ class PropertyService {
         data: formData,
       );
 
-      return Property.fromJson(response.data['data']);
+      // Handle the API response structure: { success: true, data: {...} }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is Map<String, dynamic>) {
+          return Property.fromJson(responseData['data'] as Map<String, dynamic>);
+        }
+      }
+      
+      throw Exception('Invalid response structure');
     } on DioException catch (e) {
       throw Exception('Error creating property: ${e.message}');
     }
@@ -127,7 +205,16 @@ class PropertyService {
         '/properties/$id',
         data: propertyData,
       );
-      return Property.fromJson(response.data['data']);
+      
+      // Handle the API response structure: { success: true, data: {...} }
+      if (response.data is Map<String, dynamic>) {
+        final responseData = response.data as Map<String, dynamic>;
+        if (responseData['success'] == true && responseData['data'] is Map<String, dynamic>) {
+          return Property.fromJson(responseData['data'] as Map<String, dynamic>);
+        }
+      }
+      
+      throw Exception('Invalid response structure');
     } on DioException catch (e) {
       throw Exception('Error updating property: ${e.message}');
     }
