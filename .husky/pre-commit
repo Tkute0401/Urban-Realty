@@ -1,1 +1,1 @@
-npm run -s build --prefix client || exit 1
+npm run -s lint --prefix client || exit 1
