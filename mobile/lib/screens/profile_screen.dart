@@ -30,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _fetch() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final me = await AuthService.getCurrentUser();
+      final me = await AuthService().getCurrentUser();
       _me = me.toJson();
       _name.text = me.name;
       _email.text = me.email;
@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _error = null; });
     try {
-      await AuthService.updateProfile({
+      await AuthService().updateProfile({
         'name': _name.text.trim(),
         'email': _email.text.trim(),
         'mobile': _mobile.text.trim(),

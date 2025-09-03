@@ -12,8 +12,8 @@ class DeveloperService {
     try {
       final response = await HttpClient.get('/developers', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data['developers'] ?? []);
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['developers'] != null) ? data['developers'] : []);
       }
       throw Exception('Failed to load developers');
     } catch (e) {
@@ -25,7 +25,9 @@ class DeveloperService {
     try {
       final response = await HttpClient.get('/developers/$developerId');
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to load developer details');
     } catch (e) {
@@ -37,7 +39,9 @@ class DeveloperService {
     try {
       final response = await HttpClient.post('/developers', body: developerData);
       if (response.statusCode == 201) {
-        return jsonDecode(response.body);
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to add developer');
     } catch (e) {
@@ -49,7 +53,9 @@ class DeveloperService {
     try {
       final response = await HttpClient.put('/developers/$developerId', body: developerData);
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to update developer');
     } catch (e) {

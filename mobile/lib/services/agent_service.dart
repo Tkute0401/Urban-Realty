@@ -12,13 +12,9 @@ class AgentService {
     try {
       final response = await HttpClient.get('/agent/dashboard');
       if (response.statusCode == 200) {
-        // Check if response is JSON
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          return jsonDecode(response.body);
-        } else {
-          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
-        }
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to load agent dashboard. Status: ${response.statusCode}');
     } catch (e) {
@@ -33,14 +29,8 @@ class AgentService {
     try {
       final response = await HttpClient.get('/agent/properties', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        // Check if response is JSON
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          final data = jsonDecode(response.body);
-          return List<Map<String, dynamic>>.from(data['properties'] ?? []);
-        } else {
-          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
-        }
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['properties'] != null) ? data['properties'] : []);
       }
       throw Exception('Failed to load agent properties. Status: ${response.statusCode}');
     } catch (e) {
@@ -55,14 +45,8 @@ class AgentService {
     try {
       final response = await HttpClient.get('/agent/leads', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        // Check if response is JSON
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          final data = jsonDecode(response.body);
-          return List<Map<String, dynamic>>.from(data['leads'] ?? []);
-        } else {
-          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
-        }
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['leads'] != null) ? data['leads'] : []);
       }
       throw Exception('Failed to load agent leads. Status: ${response.statusCode}');
     } catch (e) {
@@ -77,14 +61,8 @@ class AgentService {
     try {
       final response = await HttpClient.get('/agent/inquiries', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
-        // Check if response is JSON
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          final data = jsonDecode(response.body);
-          return List<Map<String, dynamic>>.from(data['inquiries'] ?? []);
-        } else {
-          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
-        }
+        final data = response.data;
+        return List<Map<String, dynamic>>.from((data is Map && data['inquiries'] != null) ? data['inquiries'] : []);
       }
       throw Exception('Failed to load agent inquiries. Status: ${response.statusCode}');
     } catch (e) {
@@ -99,13 +77,9 @@ class AgentService {
     try {
       final response = await HttpClient.get('/agent/analytics');
       if (response.statusCode == 200) {
-        // Check if response is JSON
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          return jsonDecode(response.body);
-        } else {
-          throw Exception('Server returned non-JSON response. Status: ${response.statusCode}');
-        }
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        return Map<String, dynamic>.from(data as Map);
       }
       throw Exception('Failed to load agent analytics. Status: ${response.statusCode}');
     } catch (e) {

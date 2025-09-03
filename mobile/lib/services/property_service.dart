@@ -52,6 +52,20 @@ class PropertyService {
     }
   }
 
+  // Backwards-compat for callers expecting static list() returning raw map/list
+  static Future<dynamic> list() async {
+    final service = PropertyService();
+    final results = await service.getProperties(limit: 50);
+    // Return as plain list of maps to satisfy callers that index with ['data'] or not
+    return results.map((p) => p.toJson()).toList();
+  }
+
+  static Future<dynamic> searchSuggestions(String query) async {
+    final service = PropertyService();
+    final suggestions = await service.getSearchSuggestions(query);
+    return suggestions;
+  }
+
   Future<Property> getPropertyById(String id) async {
     try {
       final response = await _apiService.dio.get('/properties/$id');
