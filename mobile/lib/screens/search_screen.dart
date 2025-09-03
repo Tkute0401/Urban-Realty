@@ -310,7 +310,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                          color: theme.colorScheme.shadow.withOpacity(0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -453,7 +453,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text('Bedrooms', style: theme.textTheme.titleMedium),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<int>(
-                              initialValue: _bedrooms,
+                              value: _bedrooms,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -483,7 +483,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text('Bathrooms', style: theme.textTheme.titleMedium),
                             const SizedBox(height: 8),
                             DropdownButtonFormField<int>(
-                              initialValue: _bathrooms,
+                              value: _bathrooms,
                               decoration: const InputDecoration(
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),

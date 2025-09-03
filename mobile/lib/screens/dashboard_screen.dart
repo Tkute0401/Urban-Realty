@@ -105,9 +105,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [
@@ -139,8 +139,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       avatar: Icon(icon, size: 18, color: color ?? theme.colorScheme.primary),
       label: Text(label, style: theme.textTheme.bodySmall),
       onPressed: onTap,
-      backgroundColor: (color ?? theme.colorScheme.primary).withValues(alpha: 0.1),
-      side: BorderSide(color: (color ?? theme.colorScheme.primary).withValues(alpha: 0.3)),
+      backgroundColor: (color ?? theme.colorScheme.primary).withOpacity(0.1),
+      side: BorderSide(color: (color ?? theme.colorScheme.primary).withOpacity(0.3)),
       labelStyle: TextStyle(color: color ?? theme.colorScheme.primary),
     );
   }
@@ -266,7 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 color: theme.colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                                  color: theme.colorScheme.outline.withOpacity(0.2),
                                 ),
                               ),
                               child: Row(
@@ -302,10 +302,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                           decoration: BoxDecoration(
-                                            color: _getRoleColor(user.role).withValues(alpha: 0.1),
+                                            color: _getRoleColor(user.role).withOpacity(0.1),
                                             borderRadius: BorderRadius.circular(12),
                                             border: Border.all(
-                                              color: _getRoleColor(user.role).withValues(alpha: 0.3),
+                                              color: _getRoleColor(user.role).withOpacity(0.3),
                                             ),
                                           ),
                                           child: Text(
@@ -321,10 +321,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                             decoration: BoxDecoration(
-                                              color: _getSubscriptionColor(user.subscriptionStatus!).withValues(alpha: 0.1),
+                                              color: _getSubscriptionColor(user.subscriptionStatus!).withOpacity(0.1),
                                               borderRadius: BorderRadius.circular(12),
                                               border: Border.all(
-                                                color: _getSubscriptionColor(user.subscriptionStatus!).withValues(alpha: 0.3),
+                                                color: _getSubscriptionColor(user.subscriptionStatus!).withOpacity(0.3),
                                               ),
                                             ),
                                             child: Row(
@@ -386,9 +386,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  theme.colorScheme.primary.withValues(alpha: 0.1),
-                                  theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
-                                  theme.colorScheme.secondary.withValues(alpha: 0.05),
+                                  theme.colorScheme.primary.withOpacity(0.1),
+                                  theme.colorScheme.primaryContainer.withOpacity(0.1),
+                                  theme.colorScheme.secondary.withOpacity(0.05),
                                 ],
                               ),
                             ),
@@ -411,7 +411,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Icon(
                                     Icons.home_rounded,
                                     size: 80,
-                                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                    color: theme.colorScheme.primary.withOpacity(0.3),
                                   ),
                                 ),
                               ],
@@ -453,7 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                                color: theme.colorScheme.shadow.withOpacity(0.1),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -525,7 +525,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         margin: const EdgeInsets.only(right: 12),
                                         decoration: BoxDecoration(
                                           color: isSelected 
-                                              ? category['color'].withValues(alpha: 0.1)
+                                              ? category['color'].withOpacity(0.1)
                                               : theme.colorScheme.surfaceContainerHighest,
                                           borderRadius: BorderRadius.circular(16),
                                           border: isSelected 
@@ -902,13 +902,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        theme.colorScheme.primary.withValues(alpha: 0.1),
-                                        theme.colorScheme.secondary.withValues(alpha: 0.1),
+                                        theme.colorScheme.primary.withOpacity(0.1),
+                                        theme.colorScheme.secondary.withOpacity(0.1),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                      color: theme.colorScheme.primary.withOpacity(0.3),
                                     ),
                                   ),
                                   child: Column(
@@ -1288,7 +1288,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -1394,7 +1394,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                                                            color: theme.colorScheme.surface.withValues(alpha: 0.9),
+                                                            color: theme.colorScheme.surface.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
