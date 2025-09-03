@@ -13,7 +13,7 @@ const {
   SUCCESS_MESSAGES,
   API_ENDPOINTS,
   UPLOAD_LIMITS
-} = require('../../shared/constants/index.js');
+} = require(path.resolve(__dirname, '../../shared/constants/index.cjs'));
 
 // Server-specific constants (extending shared constants)
 
