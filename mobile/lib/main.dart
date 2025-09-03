@@ -26,6 +26,8 @@ import 'features/agent/agent_properties_screen.dart';
 import 'features/developers/developers_list_screen.dart';
 import 'features/notifications/notifications_screen.dart';
 import 'features/splash/splash_screen.dart';
+import 'screens/favorites_screen.dart';
+import 'screens/properties_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -115,6 +117,22 @@ class MyApp extends StatelessWidget {
                 case '/notifications':
                   return MaterialPageRoute(builder: (context) => const NotificationsScreen());
                 case '/developers':
+                  return MaterialPageRoute(builder: (context) => const DevelopersListScreen());
+                // Add missing routes that are being called with hyphen format
+                case '/agent-leads':
+                  return MaterialPageRoute(builder: (context) => const AgentLeadsScreen());
+                case '/agent-properties':
+                  return MaterialPageRoute(builder: (context) => const AgentPropertiesScreen());
+                case '/agent-inquiries':
+                  return MaterialPageRoute(builder: (context) => const AgentInquiriesScreen());
+                case '/agent-analytics':
+                  return MaterialPageRoute(builder: (context) => const AgentAnalyticsScreen());
+                // Add other missing routes
+                case '/favorites':
+                  return MaterialPageRoute(builder: (context) => const FavoritesScreen());
+                case '/properties':
+                  return MaterialPageRoute(builder: (context) => const PropertiesScreen());
+                case '/developer-add':
                   return MaterialPageRoute(builder: (context) => const DevelopersListScreen());
                 default:
                   return MaterialPageRoute(builder: (context) => const HomeTabs());
