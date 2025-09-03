@@ -11,6 +11,7 @@ import 'features/profile/profile_screen.dart';
 import 'features/search/search_screen.dart';
 import 'features/subscription/subscription_screen.dart';
 import 'features/properties/add_property_screen.dart';
+import 'features/properties/property_detail_screen.dart';
 import 'features/static_pages/static_pages.dart';
 import 'features/admin/admin_dashboard_screen.dart';
 import 'features/admin/admin_users_screen.dart';
@@ -68,6 +69,10 @@ class MyApp extends StatelessWidget {
               '/profile': (context) => const ProfileScreen(),
               '/subscription': (context) => const SubscriptionScreen(),
               '/add-property': (context) => const AddPropertyScreen(),
+              '/property-detail': (context) {
+                final args = ModalRoute.of(context)?.settings.arguments as String?;
+                return PropertyDetailScreen(propertyId: args ?? '');
+              },
               '/search': (context) => const SearchScreen(),
               '/about': (context) => const AboutPage(),
               '/privacy': (context) => const PrivacyPolicyPage(),
