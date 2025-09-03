@@ -295,6 +295,8 @@ const PropertyList = () => {
     
     if (filters.bedrooms) {
       if (filters.bedrooms === 'Any') {
+        // No bedroom filtering when 'Any' is selected
+        return true;
       } else if (filters.bedrooms.endsWith('+')) {
         const minBedrooms = parseInt(filters.bedrooms);
         if (!property.bedrooms || property.bedrooms < minBedrooms) return false;
@@ -305,6 +307,8 @@ const PropertyList = () => {
     
     if (filters.bathrooms) {
       if (filters.bathrooms === 'Any') {
+        // No bathrooms filtering when 'Any' is selected
+        return true;
       } else if (filters.bathrooms.endsWith('+')) {
         const minBathrooms = parseFloat(filters.bathrooms);
         if (!property.bathrooms || property.bathrooms < minBathrooms) return false;
