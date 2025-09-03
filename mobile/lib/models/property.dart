@@ -62,6 +62,30 @@ class Property {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'id': id,
+      'title': title,
+      'description': description,
+      'type': type,
+      'status': status,
+      'price': price,
+      'bedrooms': bedrooms,
+      'bathrooms': bathrooms,
+      'area': area,
+      'address': address,
+      'city': city,
+      'state': state,
+      'zipcode': zipcode,
+      'images': images,
+      'amenities': amenities,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'isFavorite': isFavorite,
+    };
+  }
+
   Property copyWith({
     String? id,
     String? title,

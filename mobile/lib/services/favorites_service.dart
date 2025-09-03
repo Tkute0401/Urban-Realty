@@ -18,7 +18,7 @@ class FavoritesService {
   // Backwards-compat for callers expecting list()
   Future<List<Map<String, dynamic>>> list() async {
     final favorites = await getFavorites();
-    return favorites.map((p) => p.toJson()).toList();
+    return favorites.map<Map<String, dynamic>>((p) => p.toJson()).toList();
   }
 
   Future<void> addFavorite(String propertyId) async {

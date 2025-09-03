@@ -57,7 +57,7 @@ class PropertyService {
     final service = PropertyService();
     final results = await service.getProperties(limit: 50);
     // Return as plain list of maps to satisfy callers that index with ['data'] or not
-    return results.map((p) => p.toJson()).toList();
+    return results.map<Map<String, dynamic>>((p) => p.toJson()).toList();
   }
 
   static Future<dynamic> searchSuggestions(String query) async {

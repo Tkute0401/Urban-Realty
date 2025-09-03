@@ -28,8 +28,8 @@ class LoginScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              theme.colorScheme.primary.withOpacity(0.1),
-              theme.colorScheme.primaryContainer.withOpacity(0.1),
+              theme.colorScheme.primary.withValues(alpha: 0.1),
+              theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
               theme.colorScheme.surface,
             ],
           ),
@@ -49,7 +49,7 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 48),
                       Card(
                         elevation: 8,
-                        shadowColor: theme.shadowColor.withOpacity(0.1),
+                        shadowColor: theme.shadowColor.withValues(alpha: 0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
