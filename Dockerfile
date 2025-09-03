@@ -42,4 +42,4 @@ RUN echo "=== Checking for shared folder ===" && if [ -d "/app/shared" ]; then l
 RUN echo "=== Checking for server folder ===" && if [ -d "/app/server" ]; then ls -la /app/server; else echo "No server folder"; fi
 
 EXPOSE 5000
-CMD ["node", "server.js"]
+CMD ["node", "server/server.js"]
