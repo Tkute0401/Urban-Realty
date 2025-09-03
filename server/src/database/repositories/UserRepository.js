@@ -1,6 +1,6 @@
 const BaseRepository = require('./BaseRepository');
-const User = require('../../../models/User');
-const { USER_ROLES } = require('../../../constants');
+const User = require('../../models/User');
+const { USER_ROLES } = require('../../constants');
 
 /**
  * User Repository - Handles all user-related database operations

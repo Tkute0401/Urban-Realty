@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { HTTP_STATUS, ERROR_MESSAGES } = require('../../../constants');
+const { HTTP_STATUS, ERROR_MESSAGES } = require('../../constants');
 
 /**
  * Base Model Class with common CRUD operations
@@ -73,7 +73,7 @@ class BaseModel {
    */
   async findWithPagination(query = {}, pagination = {}, options = {}) {
     const { page = 1, limit = 10, sort = '-createdAt' } = pagination;
-    const { PAGINATION } = require('../../../constants');
+    const { PAGINATION } = require('../../constants');
     
     const skip = (page - 1) * limit;
     const maxLimit = Math.min(limit, PAGINATION.MAX_LIMIT);

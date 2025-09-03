@@ -3,11 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const analyticsService = require('../../services/analyticsService');
-const { authenticate, authorize } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const { HTTP_STATUS, createSuccessResponse, createErrorResponse } = require('../../../constants');
 
 // Get dashboard analytics (admin only)
-router.get('/dashboard', authenticate, authorize(['admin']), async (req, res) => {
+router.get('/dashboard', protect, authorize(['admin']), async (req, res) => {
   try {
     const analytics = analyticsService.getDashboardAnalytics();
     res.status(HTTP_STATUS.OK).json(createSuccessResponse(analytics, 'Dashboard analytics retrieved successfully'));
@@ -20,7 +20,7 @@ router.get('/dashboard', authenticate, authorize(['admin']), async (req, res) =>
 });
 
 // Get user analytics
-router.get('/user/:userId', authenticate, async (req, res) => {
+router.get('/user/:userId', protect, async (req, res) => {
   try {
     const { userId } = req.params;
     const { user } = req;
@@ -49,7 +49,7 @@ router.get('/user/:userId', authenticate, async (req, res) => {
 });
 
 // Get property analytics
-router.get('/property/:propertyId', authenticate, async (req, res) => {
+router.get('/property/:propertyId', protect, async (req, res) => {
   try {
     const { propertyId } = req.params;
     const { user } = req;
@@ -75,7 +75,7 @@ router.get('/property/:propertyId', authenticate, async (req, res) => {
 });
 
 // Get search analytics
-router.get('/search', authenticate, authorize(['admin']), async (req, res) => {
+router.get('/search', protect, authorize(['admin']), async (req, res) => {
   try {
     const { timeframe = '24h' } = req.query;
     const searchAnalytics = analyticsService.getSearchAnalytics(timeframe);
@@ -90,7 +90,7 @@ router.get('/search', authenticate, authorize(['admin']), async (req, res) => {
 });
 
 // Get system metrics
-router.get('/system', authenticate, authorize(['admin']), async (req, res) => {
+router.get('/system', protect, authorize(['admin']), async (req, res) => {
   try {
     const systemMetrics = analyticsService.getSystemMetrics();
     res.status(HTTP_STATUS.OK).json(createSuccessResponse(systemMetrics, 'System metrics retrieved successfully'));
@@ -103,7 +103,7 @@ router.get('/system', authenticate, authorize(['admin']), async (req, res) => {
 });
 
 // Track user action
-router.post('/track', authenticate, async (req, res) => {
+router.post('/track', protect, async (req, res) => {
   try {
     const { action, data } = req.body;
     const { user } = req;
@@ -148,7 +148,7 @@ router.post('/track', authenticate, async (req, res) => {
 });
 
 // Get analytics export
-router.get('/export', authenticate, authorize(['admin']), async (req, res) => {
+router.get('/export', protect, authorize(['admin']), async (req, res) => {
   try {
     const { format = 'json' } = req.query;
     const data = analyticsService.exportAnalytics(format);
@@ -169,7 +169,7 @@ router.get('/export', authenticate, authorize(['admin']), async (req, res) => {
 });
 
 // Get real-time metrics
-router.get('/realtime', authenticate, authorize(['admin']), async (req, res) => {
+router.get('/realtime', protect, authorize(['admin']), async (req, res) => {
   try {
     const realtimeMetrics = {
       timestamp: new Date().toISOString(),
@@ -199,7 +199,7 @@ router.get('/realtime', authenticate, authorize(['admin']), async (req, res) => 
 });
 
 // Get user behavior insights
-router.get('/insights/user/:userId', authenticate, async (req, res) => {
+router.get('/insights/user/:userId', protect, async (req, res) => {
   try {
     const { userId } = req.params;
     const { user } = req;

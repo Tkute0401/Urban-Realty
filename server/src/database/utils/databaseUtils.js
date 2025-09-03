@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { HTTP_STATUS, ERROR_MESSAGES } = require('../../../constants');
+const { HTTP_STATUS, ERROR_MESSAGES } = require('../../constants');
 
 /**
  * Database utility functions for common operations
