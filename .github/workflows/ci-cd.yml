@@ -219,17 +219,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Railway (Staging)
-        run: echo "Starting Railway deployment to Staging"
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy via Railway CLI (Staging)
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          railway up --service "urban-realty-staging" --detach
+      - name: Await Railway auto-deploy (Staging)
+        run: echo "Relying on Railway auto-deploy for Staging"
 
       - name: Run smoke tests
         run: |
@@ -247,17 +238,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Railway (Production)
-        run: echo "Starting Railway deployment to Production"
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy via Railway CLI (Production)
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          railway up --service "urban-realty-production" --detach
+      - name: Await Railway auto-deploy (Production)
+        run: echo "Relying on Railway auto-deploy for Production"
 
       - name: Run production smoke tests
         run: |
