@@ -17,7 +17,12 @@ FROM node:18-alpine AS backend-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
-COPY server .
+# Copy server folder
+COPY server ./server
+# Copy shared folder (if it exists at root level)
+COPY shared ./shared
+# Copy any other necessary files
+COPY server.js ./
 
 # Final stage
 FROM node:18-alpine
@@ -34,8 +39,9 @@ COPY --from=backend-builder /app ./
 RUN mkdir -p /app/uploads
 
 # Verification
-RUN ls -la /app/client/dist
-RUN ls -la /app/client/dist/index.html
+RUN ls -la /app
+RUN if [ -d "/app/shared" ]; then echo "Shared folder found"; ls -la /app/shared; else echo "Shared folder NOT found"; fi
+RUN if [ -d "/app/server" ]; then echo "Server folder found"; ls -la /app/server; else echo "Server folder NOT found"; fi
 
 EXPOSE 5000
-CMD ["node", "server.js"]
+CMD ["node", "server/server.js"]
