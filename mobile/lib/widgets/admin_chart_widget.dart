@@ -69,9 +69,10 @@ class ChartPainter extends CustomPainter {
 
     final maxValue = data.fold<double>(
       0,
-      (max, item) => (item[yField] as num?)?.toDouble() ?? 0 > max
-          ? (item[yField] as num?)?.toDouble() ?? 0
-          : max,
+      (max, item) {
+        final value = (item[yField] as num?)?.toDouble() ?? 0;
+        return value > max ? value : max;
+      },
     );
 
     if (maxValue == 0) return;

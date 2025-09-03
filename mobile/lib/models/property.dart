@@ -1,4 +1,3 @@
-import "dart:convert";
 
 class Property {
   final String id;
@@ -119,6 +118,65 @@ class Property {
       "constructionStatus": constructionStatus,
       "floorPlanImages": floorPlanImages,
     };
+  }
+
+  Property copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? type,
+    String? status,
+    int? price,
+    int? bedrooms,
+    int? bathrooms,
+    int? area,
+    PropertyAddress? address,
+    PropertyLocation? location,
+    NearbyLocalities? nearbyLocalities,
+    ProjectDetails? projectDetails,
+    String? buildingName,
+    String? floorNumber,
+    List<String>? amenities,
+    List<String>? highlights,
+    List<PropertyImage>? images,
+    bool? featured,
+    PropertyAgent? agent,
+    int? views,
+    DateTime? createdAt,
+    String? slug,
+    List<String>? approvals,
+    String? constructionStatus,
+    List<String>? floorPlanImages,
+    bool? isFavorite,
+  }) {
+    return Property(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      price: price ?? this.price,
+      bedrooms: bedrooms ?? this.bedrooms,
+      bathrooms: bathrooms ?? this.bathrooms,
+      area: area ?? this.area,
+      address: address ?? this.address,
+      location: location ?? this.location,
+      nearbyLocalities: nearbyLocalities ?? this.nearbyLocalities,
+      projectDetails: projectDetails ?? this.projectDetails,
+      buildingName: buildingName ?? this.buildingName,
+      floorNumber: floorNumber ?? this.floorNumber,
+      amenities: amenities ?? this.amenities,
+      highlights: highlights ?? this.highlights,
+      images: images ?? this.images,
+      featured: featured ?? this.featured,
+      agent: agent ?? this.agent,
+      views: views ?? this.views,
+      createdAt: createdAt ?? this.createdAt,
+      slug: slug ?? this.slug,
+      approvals: approvals ?? this.approvals,
+      constructionStatus: constructionStatus ?? this.constructionStatus,
+      floorPlanImages: floorPlanImages ?? this.floorPlanImages,
+    );
   }
 }
 
