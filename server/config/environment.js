@@ -33,11 +33,11 @@ const envSchema = Joi.object({
   // Email Configuration
   EMAIL_FROM: Joi.string()
     .email()
-    .required()
+    .optional()
     .description('Email address for sending emails'),
   
   EMAIL_HOST: Joi.string()
-    .required()
+    .optional()
     .description('SMTP host for email service'),
   
   EMAIL_PORT: Joi.number()
@@ -46,33 +46,33 @@ const envSchema = Joi.object({
     .description('SMTP port for email service'),
   
   EMAIL_USER: Joi.string()
-    .required()
+    .optional()
     .description('SMTP username'),
   
   EMAIL_PASS: Joi.string()
-    .required()
+    .optional()
     .description('SMTP password'),
   
   // Cloudinary Configuration
   CLOUDINARY_CLOUD_NAME: Joi.string()
-    .required()
+    .optional()
     .description('Cloudinary cloud name'),
   
   CLOUDINARY_API_KEY: Joi.string()
-    .required()
+    .optional()
     .description('Cloudinary API key'),
   
   CLOUDINARY_API_SECRET: Joi.string()
-    .required()
+    .optional()
     .description('Cloudinary API secret'),
   
   // Razorpay Configuration
   RAZORPAY_KEY_ID: Joi.string()
-    .required()
+    .optional()
     .description('Razorpay key ID'),
   
   RAZORPAY_KEY_SECRET: Joi.string()
-    .required()
+    .optional()
     .description('Razorpay key secret'),
   
   // Frontend URL
@@ -119,7 +119,7 @@ const envSchema = Joi.object({
   
   SESSION_SECRET: Joi.string()
     .min(32)
-    .required()
+    .optional()
     .description('Session secret for secure sessions'),
   
   // API Keys
