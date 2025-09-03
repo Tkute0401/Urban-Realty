@@ -1330,11 +1330,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 4,
         child: InkWell(
           onTap: () {
-            Navigator.pushNamed(
-              context,
-              '/property-detail',
-              arguments: property['_id']?.toString() ?? '',
-            );
+            final propertyId = property['_id']?.toString();
+            if (propertyId != null && propertyId.isNotEmpty) {
+              Navigator.pushNamed(
+                context,
+                '/property-detail',
+                arguments: propertyId,
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Property ID not available')),
+              );
+            }
           },
           borderRadius: BorderRadius.circular(16),
                       child: Column(

@@ -42,12 +42,12 @@ class AuthService {
   Future<void> logout() async {
     try {
       // The backend doesn't seem to have a formal logout endpoint to invalidate tokens.
-      // If it did, we would call it here.
       // For now, logout is a client-side operation (handled by AuthProvider).
-      await _apiService.dio.post('/auth/logout');
-    } on DioException catch (e) {
+      // We'll skip the API call to avoid the error since the backend doesn't have this endpoint.
+      developer.log('Logout completed (client-side only)', name: 'AuthService.logout');
+    } catch (e) {
       // Don't throw exception for logout failures, just log it without using print.
-      developer.log('Logout error: ${e.message}', name: 'AuthService.logout');
+      developer.log('Logout error: ${e.toString()}', name: 'AuthService.logout');
     }
   }
 
