@@ -1,75 +1,4 @@
-List<String> _extractStringList(dynamic input) {
-  if (input is List) {
-    final List<String> results = [];
-    for (final dynamic item in input) {
-      if (item is String) {
-        results.add(item);
-      } else if (item is Map && item['url'] is String) {
-        results.add(item['url'] as String);
-      }
-    }
-    return results;
-  }
-  return const [];
-}
-
-String _extractAddress(Map<String, dynamic> json) {
-  // Handle both old string format and new object format
-  if (json["address"] is String) {
-    return json["address"] as String;
-  } else if (json["address"] is Map<String, dynamic>) {
-    final address = json["address"] as Map<String, dynamic>;
-    final parts = <String>[];
-    
-    if (address["line1"] != null && address["line1"].toString().isNotEmpty) {
-      parts.add(address["line1"].toString());
-    }
-    if (address["street"] != null && address["street"].toString().isNotEmpty) {
-      parts.add(address["street"].toString());
-    }
-    if (address["locality"] != null && address["locality"].toString().isNotEmpty) {
-      parts.add(address["locality"].toString());
-    }
-    
-    return parts.join(", ");
-  }
-  return '';
-}
-
-String _extractCity(Map<String, dynamic> json) {
-  // Handle both old format and new nested format
-  if (json["city"] is String) {
-    return json["city"] as String;
-  } else if (json["address"] is Map<String, dynamic>) {
-    final address = json["address"] as Map<String, dynamic>;
-    return address["city"]?.toString() ?? '';
-  }
-  return '';
-}
-
-String _extractState(Map<String, dynamic> json) {
-  // Handle both old format and new nested format
-  if (json["state"] is String) {
-    return json["state"] as String;
-  } else if (json["address"] is Map<String, dynamic>) {
-    final address = json["address"] as Map<String, dynamic>;
-    return address["state"]?.toString() ?? '';
-  }
-  return '';
-}
-
-String _extractZipcode(Map<String, dynamic> json) {
-  // Handle both old format and new nested format
-  if (json["zipcode"] is String) {
-    return json["zipcode"] as String;
-  } else if (json["zipCode"] is String) {
-    return json["zipCode"] as String;
-  } else if (json["address"] is Map<String, dynamic>) {
-    final address = json["address"] as Map<String, dynamic>;
-    return address["zipCode"]?.toString() ?? address["zipcode"]?.toString() ?? '';
-  }
-  return '';
-}
+import "dart:convert";
 
 class Property {
   final String id;
@@ -77,19 +6,27 @@ class Property {
   final String description;
   final String type;
   final String status;
-  final double price;
+  final int price;
   final int bedrooms;
   final int bathrooms;
-  final double area;
-  final String address;
-  final String city;
-  final String state;
-  final String zipcode;
-  final List<String> images;
+  final int area;
+  final PropertyAddress address;
+  final PropertyLocation location;
+  final NearbyLocalities nearbyLocalities;
+  final ProjectDetails projectDetails;
+  final String buildingName;
+  final String floorNumber;
   final List<String> amenities;
+  final List<String> highlights;
+  final List<PropertyImage> images;
+  final bool featured;
+  final PropertyAgent agent;
+  final int views;
   final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool isFavorite;
+  final String slug;
+  final List<String> approvals;
+  final String constructionStatus;
+  final List<String> floorPlanImages;
 
   Property({
     required this.id,
@@ -102,114 +39,347 @@ class Property {
     required this.bathrooms,
     required this.area,
     required this.address,
-    required this.city,
-    required this.state,
-    required this.zipcode,
-    this.images = const [],
-    this.amenities = const [],
+    required this.location,
+    required this.nearbyLocalities,
+    required this.projectDetails,
+    required this.buildingName,
+    required this.floorNumber,
+    required this.amenities,
+    required this.highlights,
+    required this.images,
+    required this.featured,
+    required this.agent,
+    required this.views,
     required this.createdAt,
-    required this.updatedAt,
-    this.isFavorite = false,
+    required this.slug,
+    required this.approvals,
+    required this.constructionStatus,
+    required this.floorPlanImages,
   });
 
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
-      id: json["_id"] ?? json["id"],
-      title: json["title"] ?? '',
-      description: json["description"] ?? '',
-      type: json["type"] ?? '',
-      status: json["status"] ?? '',
-      price: (json["price"] == null)
-          ? 0
-          : (json["price"] is num)
-              ? (json["price"] as num).toDouble()
-              : (double.tryParse(json["price"].toString()) ?? 0),
-      bedrooms: (json["bedrooms"] is num)
-          ? (json["bedrooms"] as num).toInt()
-          : int.tryParse(json["bedrooms"].toString()) ?? 0,
-      bathrooms: (json["bathrooms"] is num)
-          ? (json["bathrooms"] as num).toInt()
-          : int.tryParse(json["bathrooms"].toString()) ?? 0,
-      area: (json["area"] == null)
-          ? 0
-          : (json["area"] is num)
-              ? (json["area"] as num).toDouble()
-              : (double.tryParse(json["area"].toString()) ?? 0),
-      address: _extractAddress(json),
-      city: _extractCity(json),
-      state: _extractState(json),
-      zipcode: _extractZipcode(json),
-      images: _extractStringList(json["images"] ?? json["photos"] ?? json["gallery"]),
-      amenities: _extractStringList(json["amenities"]),
-      createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
-      isFavorite: json["isFavorite"] ?? false,
+      id: json["_id"] ?? json["id"] ?? "",
+      title: json["title"] ?? "",
+      description: json["description"] ?? "",
+      type: json["type"] ?? "",
+      status: json["status"] ?? "",
+      price: json["price"] ?? 0,
+      bedrooms: json["bedrooms"] ?? 0,
+      bathrooms: json["bathrooms"] ?? 0,
+      area: json["area"] ?? 0,
+      address: PropertyAddress.fromJson(json["address"] ?? {}),
+      location: PropertyLocation.fromJson(json["location"] ?? {}),
+      nearbyLocalities: NearbyLocalities.fromJson(json["nearbyLocalities"] ?? {}),
+      projectDetails: ProjectDetails.fromJson(json["projectDetails"] ?? {}),
+      buildingName: json["buildingName"] ?? "",
+      floorNumber: json["floorNumber"] ?? "",
+      amenities: List<String>.from(json["amenities"] ?? []),
+      highlights: List<String>.from(json["highlights"] ?? []),
+      images: (json["images"] as List<dynamic>?)
+          ?.map((img) => PropertyImage.fromJson(img))
+          .toList() ?? [],
+      featured: json["featured"] ?? false,
+      agent: PropertyAgent.fromJson(json["agent"] ?? {}),
+      views: json["views"] ?? 0,
+      createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
+      slug: json["slug"] ?? "",
+      approvals: List<String>.from(json["approvals"] ?? []),
+      constructionStatus: json["constructionStatus"] ?? "",
+      floorPlanImages: List<String>.from(json["floorPlanImages"] ?? []),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
-      'id': id,
-      'title': title,
-      'description': description,
-      'type': type,
-      'status': status,
-      'price': price,
-      'bedrooms': bedrooms,
-      'bathrooms': bathrooms,
-      'area': area,
-      'address': address,
-      'city': city,
-      'state': state,
-      'zipcode': zipcode,
-      'images': images,
-      'amenities': amenities,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'isFavorite': isFavorite,
+      "_id": id,
+      "title": title,
+      "description": description,
+      "type": type,
+      "status": status,
+      "price": price,
+      "bedrooms": bedrooms,
+      "bathrooms": bathrooms,
+      "area": area,
+      "address": address.toJson(),
+      "location": location.toJson(),
+      "nearbyLocalities": nearbyLocalities.toJson(),
+      "projectDetails": projectDetails.toJson(),
+      "buildingName": buildingName,
+      "floorNumber": floorNumber,
+      "amenities": amenities,
+      "highlights": highlights,
+      "images": images.map((img) => img.toJson()).toList(),
+      "featured": featured,
+      "agent": agent.toJson(),
+      "views": views,
+      "createdAt": createdAt.toIso8601String(),
+      "slug": slug,
+      "approvals": approvals,
+      "constructionStatus": constructionStatus,
+      "floorPlanImages": floorPlanImages,
     };
   }
+}
 
-  Property copyWith({
-    String? id,
-    String? title,
-    String? description,
-    String? type,
-    String? status,
-    double? price,
-    int? bedrooms,
-    int? bathrooms,
-    double? area,
-    String? address,
-    String? city,
-    String? state,
-    String? zipcode,
-    List<String>? images,
-    List<String>? amenities,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    bool? isFavorite,
-  }) {
-    return Property(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      type: type ?? this.type,
-      status: status ?? this.status,
-      price: price ?? this.price,
-      bedrooms: bedrooms ?? this.bedrooms,
-      bathrooms: bathrooms ?? this.bathrooms,
-      area: area ?? this.area,
-      address: address ?? this.address,
-      city: city ?? this.city,
-      state: state ?? this.state,
-      zipcode: zipcode ?? this.zipcode,
-      images: images ?? this.images,
-      amenities: amenities ?? this.amenities,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      isFavorite: isFavorite ?? this.isFavorite,
+class PropertyAddress {
+  final String line1;
+  final String street;
+  final String city;
+  final String locality;
+  final String state;
+  final String zipCode;
+  final String country;
+  final String formattedAddress;
+
+  PropertyAddress({
+    required this.line1,
+    required this.street,
+    required this.city,
+    required this.locality,
+    required this.state,
+    required this.zipCode,
+    required this.country,
+    required this.formattedAddress,
+  });
+
+  factory PropertyAddress.fromJson(Map<String, dynamic> json) {
+    return PropertyAddress(
+      line1: json["line1"] ?? "",
+      street: json["street"] ?? "",
+      city: json["city"] ?? "",
+      locality: json["locality"] ?? "",
+      state: json["state"] ?? "",
+      zipCode: json["zipCode"] ?? "",
+      country: json["country"] ?? "",
+      formattedAddress: json["formattedAddress"] ?? "",
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "line1": line1,
+      "street": street,
+      "city": city,
+      "locality": locality,
+      "state": state,
+      "zipCode": zipCode,
+      "country": country,
+      "formattedAddress": formattedAddress,
+    };
+  }
+}
+
+class PropertyLocation {
+  final String type;
+  final List<double> coordinates;
+  final String formattedAddress;
+  final String street;
+  final String city;
+  final String state;
+  final String zipCode;
+  final String country;
+
+  PropertyLocation({
+    required this.type,
+    required this.coordinates,
+    required this.formattedAddress,
+    required this.street,
+    required this.city,
+    required this.state,
+    required this.zipCode,
+    required this.country,
+  });
+
+  factory PropertyLocation.fromJson(Map<String, dynamic> json) {
+    return PropertyLocation(
+      type: json["type"] ?? "",
+      coordinates: List<double>.from(json["coordinates"] ?? []),
+      formattedAddress: json["formattedAddress"] ?? "",
+      street: json["street"] ?? "",
+      city: json["city"] ?? "",
+      state: json["state"] ?? "",
+      zipCode: json["zipCode"] ?? "",
+      country: json["country"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type,
+      "coordinates": coordinates,
+      "formattedAddress": formattedAddress,
+      "street": street,
+      "city": city,
+      "state": state,
+      "zipCode": zipCode,
+      "country": country,
+    };
+  }
+}
+
+class NearbyLocalities {
+  final bool hasSchool;
+  final String school;
+  final bool hasHospital;
+  final String hospital;
+  final bool hasMall;
+  final String mall;
+  final bool hasPark;
+  final String park;
+  final bool hasTransport;
+  final String transport;
+
+  NearbyLocalities({
+    required this.hasSchool,
+    required this.school,
+    required this.hasHospital,
+    required this.hospital,
+    required this.hasMall,
+    required this.mall,
+    required this.hasPark,
+    required this.park,
+    required this.hasTransport,
+    required this.transport,
+  });
+
+  factory NearbyLocalities.fromJson(Map<String, dynamic> json) {
+    return NearbyLocalities(
+      hasSchool: json["hasSchool"] ?? false,
+      school: json["school"] ?? "",
+      hasHospital: json["hasHospital"] ?? false,
+      hospital: json["hospital"] ?? "",
+      hasMall: json["hasMall"] ?? false,
+      mall: json["mall"] ?? "",
+      hasPark: json["hasPark"] ?? false,
+      park: json["park"] ?? "",
+      hasTransport: json["hasTransport"] ?? false,
+      transport: json["transport"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "hasSchool": hasSchool,
+      "school": school,
+      "hasHospital": hasHospital,
+      "hospital": hospital,
+      "hasMall": hasMall,
+      "mall": mall,
+      "hasPark": hasPark,
+      "park": park,
+      "hasTransport": hasTransport,
+      "transport": transport,
+    };
+  }
+}
+
+class ProjectDetails {
+  final String projectArea;
+  final String totalUnits;
+  final DateTime? launchDate;
+  final String reraId;
+  final String configurations;
+
+  ProjectDetails({
+    required this.projectArea,
+    required this.totalUnits,
+    this.launchDate,
+    required this.reraId,
+    required this.configurations,
+  });
+
+  factory ProjectDetails.fromJson(Map<String, dynamic> json) {
+    return ProjectDetails(
+      projectArea: json["projectArea"] ?? "",
+      totalUnits: json["totalUnits"] ?? "",
+      launchDate: json["launchDate"] != null 
+          ? DateTime.tryParse(json["launchDate"]) 
+          : null,
+      reraId: json["reraId"] ?? "",
+      configurations: json["configurations"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "projectArea": projectArea,
+      "totalUnits": totalUnits,
+      "launchDate": launchDate?.toIso8601String(),
+      "reraId": reraId,
+      "configurations": configurations,
+    };
+  }
+}
+
+class PropertyImage {
+  final String url;
+  final String publicId;
+  final int width;
+  final int height;
+  final String id;
+  final DateTime uploadedAt;
+
+  PropertyImage({
+    required this.url,
+    required this.publicId,
+    required this.width,
+    required this.height,
+    required this.id,
+    required this.uploadedAt,
+  });
+
+  factory PropertyImage.fromJson(Map<String, dynamic> json) {
+    return PropertyImage(
+      url: json["url"] ?? "",
+      publicId: json["publicId"] ?? "",
+      width: json["width"] ?? 0,
+      height: json["height"] ?? 0,
+      id: json["_id"] ?? json["id"] ?? "",
+      uploadedAt: DateTime.tryParse(json["uploadedAt"] ?? "") ?? DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "url": url,
+      "publicId": publicId,
+      "width": width,
+      "height": height,
+      "id": id,
+      "uploadedAt": uploadedAt.toIso8601String(),
+    };
+  }
+}
+
+class PropertyAgent {
+  final String id;
+  final String name;
+  final String email;
+  final String mobile;
+
+  PropertyAgent({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.mobile,
+  });
+
+  factory PropertyAgent.fromJson(Map<String, dynamic> json) {
+    return PropertyAgent(
+      id: json["_id"] ?? json["id"] ?? "",
+      name: json["name"] ?? "",
+      email: json["email"] ?? "",
+      mobile: json["mobile"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "email": email,
+      "mobile": mobile,
+    };
   }
 }

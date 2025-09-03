@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/properties_provider.dart';
 import '../../models/property.dart';
+import '../../widgets/property_image_gallery.dart';
+import '../../widgets/property_map.dart';
+import '../../utils/format_utils.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final String propertyId;
