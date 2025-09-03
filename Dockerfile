@@ -44,4 +44,4 @@ RUN if [ -d "/app/shared" ]; then echo "Shared folder found"; ls -la /app/shared
 RUN if [ -d "/app/server" ]; then echo "Server folder found"; ls -la /app/server; else echo "Server folder NOT found"; fi
 
 EXPOSE 5000
-CMD ["node", "server/server.js"]
+CMD ["node", "server.js"]
