@@ -76,7 +76,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedType,
+                      initialValue: _selectedType,
                       decoration: const InputDecoration(
                         labelText: "Type",
                         border: OutlineInputBorder(),
@@ -100,7 +100,7 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _selectedStatus,
+                      initialValue: _selectedStatus,
                       decoration: const InputDecoration(
                         labelText: "Status",
                         border: OutlineInputBorder(),
