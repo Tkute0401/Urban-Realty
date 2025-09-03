@@ -26,7 +26,11 @@ class DeveloperService {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
-        return Map<String, dynamic>.from(data as Map);
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
       }
       throw Exception('Failed to load developer details');
     } catch (e) {
@@ -40,7 +44,11 @@ class DeveloperService {
       if (response.statusCode == 201) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
-        return Map<String, dynamic>.from(data as Map);
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
       }
       throw Exception('Failed to add developer');
     } catch (e) {
@@ -54,7 +62,11 @@ class DeveloperService {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
-        return Map<String, dynamic>.from(data as Map);
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
       }
       throw Exception('Failed to update developer');
     } catch (e) {

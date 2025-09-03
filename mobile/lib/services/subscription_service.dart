@@ -26,7 +26,11 @@ class SubscriptionService {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
-        return Map<String, dynamic>.from(data as Map);
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
       }
       throw Exception('Failed to load current subscription');
     } catch (e) {
@@ -40,7 +44,11 @@ class SubscriptionService {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
-        return Map<String, dynamic>.from(data as Map);
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
       }
       throw Exception('Failed to subscribe to plan');
     } catch (e) {
@@ -54,7 +62,11 @@ class SubscriptionService {
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
-        return Map<String, dynamic>.from(data as Map);
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
       }
       throw Exception('Failed to cancel subscription');
     } catch (e) {

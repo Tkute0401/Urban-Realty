@@ -646,6 +646,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ),
                                     subtitle: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         const SizedBox(height: 4),
                                         Text(
