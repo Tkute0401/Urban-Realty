@@ -17,12 +17,10 @@ FROM node:18-alpine AS backend-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
-# Copy server folder
-COPY server ./server
-# Copy shared folder (if it exists at root level)
-COPY shared ./shared
-# Copy any other necessary files
-COPY server.js ./
+# Copy everything to preserve the exact folder structure
+COPY . .
+# Remove client folder to avoid conflicts (we'll copy the built version later)
+RUN rm -rf client
 
 # Final stage
 FROM node:18-alpine
@@ -32,16 +30,16 @@ WORKDIR /app
 # Copy built frontend
 COPY --from=frontend-builder /app/client/dist ./client/dist
 
-# Copy backend
+# Copy backend with complete project structure
 COPY --from=backend-builder /app ./
 
 # Create uploads directory
 RUN mkdir -p /app/uploads
 
-# Verification
-RUN ls -la /app
-RUN if [ -d "/app/shared" ]; then echo "Shared folder found"; ls -la /app/shared; else echo "Shared folder NOT found"; fi
-RUN if [ -d "/app/server" ]; then echo "Server folder found"; ls -la /app/server; else echo "Server folder NOT found"; fi
+# Debug: Show the file structure
+RUN echo "=== App directory structure ===" && ls -la /app
+RUN echo "=== Checking for shared folder ===" && if [ -d "/app/shared" ]; then ls -la /app/shared; else echo "No shared folder"; fi
+RUN echo "=== Checking for server folder ===" && if [ -d "/app/server" ]; then ls -la /app/server; else echo "No server folder"; fi
 
 EXPOSE 5000
 CMD ["node", "server.js"]
