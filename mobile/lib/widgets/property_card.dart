@@ -169,7 +169,7 @@ class PropertyCard extends StatelessWidget {
                       const Icon(Icons.square_foot, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        "${property.area} sq ft",
+                        "${_formatArea(property.area)} sq ft",
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -191,5 +191,14 @@ class PropertyCard extends StatelessWidget {
       (m) => ",",
     );
     return "\$${withSeparators}";
+  }
+
+  String _formatArea(double area) {
+    final String raw = area.toStringAsFixed(0);
+    final String withSeparators = raw.replaceAllMapped(
+      RegExp(r"\B(?=(\d{3})+(?!\d))"),
+      (m) => ",",
+    );
+    return withSeparators;
   }
 }

@@ -13,8 +13,9 @@ void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our app shows "Hello World".
-    expect(find.text('Hello World'), findsOneWidget);
+    // App initially shows login screen; verify stable text.
+    expect(find.text('Welcome Back'), findsOneWidget);
   });
 }
