@@ -1,5 +1,6 @@
 
 import 'package:dio/dio.dart';
+import 'dart:developer' as developer;
 import '../models/user.dart';
 import 'api_service.dart';
 
@@ -45,9 +46,8 @@ class AuthService {
       // For now, logout is a client-side operation (handled by AuthProvider).
       await _apiService.dio.post('/auth/logout');
     } on DioException catch (e) {
-      // Don't throw exception for logout failures, just log it.
-      // This prevents app crashes when server is unavailable during logout.
-      print('Logout error: ${e.message}');
+      // Don't throw exception for logout failures, just log it without using print.
+      developer.log('Logout error: ${e.message}', name: 'AuthService.logout');
     }
   }
 

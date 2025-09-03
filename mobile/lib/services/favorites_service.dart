@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'dart:developer' as developer;
 import 'api_service.dart';
 import '../models/property.dart';
 
@@ -43,7 +44,7 @@ class FavoritesService {
       return response.data['data']['isFavorite'] ?? false;
     } on DioException catch (e) {
       // If the status endpoint fails, assume it's not a favorite
-      print('Error checking favorite status: ${e.message}');
+      developer.log('Error checking favorite status: ${e.message}', name: 'FavoritesService.isFavorite');
       return false;
     }
   }

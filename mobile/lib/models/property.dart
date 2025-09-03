@@ -1,3 +1,18 @@
+List<String> _extractStringList(dynamic input) {
+  if (input is List) {
+    final List<String> results = [];
+    for (final dynamic item in input) {
+      if (item is String) {
+        results.add(item);
+      } else if (item is Map && item['url'] is String) {
+        results.add(item['url'] as String);
+      }
+    }
+    return results;
+  }
+  return const [];
+}
+
 class Property {
   final String id;
   final String title;
@@ -46,16 +61,28 @@ class Property {
       description: json["description"] ?? '',
       type: json["type"] ?? '',
       status: json["status"] ?? '',
-      price: (json["price"] ?? 0).toDouble(),
-      bedrooms: json["bedrooms"] ?? 0,
-      bathrooms: json["bathrooms"] ?? 0,
-      area: (json["area"] ?? 0).toDouble(),
+      price: (json["price"] == null)
+          ? 0
+          : (json["price"] is num)
+              ? (json["price"] as num).toDouble()
+              : (double.tryParse(json["price"].toString()) ?? 0),
+      bedrooms: (json["bedrooms"] is num)
+          ? (json["bedrooms"] as num).toInt()
+          : int.tryParse(json["bedrooms"].toString()) ?? 0,
+      bathrooms: (json["bathrooms"] is num)
+          ? (json["bathrooms"] as num).toInt()
+          : int.tryParse(json["bathrooms"].toString()) ?? 0,
+      area: (json["area"] == null)
+          ? 0
+          : (json["area"] is num)
+              ? (json["area"] as num).toDouble()
+              : (double.tryParse(json["area"].toString()) ?? 0),
       address: json["address"] ?? '',
       city: json["city"] ?? '',
       state: json["state"] ?? '',
       zipcode: json["zipcode"] ?? '',
-      images: List<String>.from(json["images"] ?? []),
-      amenities: List<String>.from(json["amenities"] ?? []),
+      images: _extractStringList(json["images"] ?? json["photos"] ?? json["gallery"]),
+      amenities: _extractStringList(json["amenities"]),
       createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
       isFavorite: json["isFavorite"] ?? false,
