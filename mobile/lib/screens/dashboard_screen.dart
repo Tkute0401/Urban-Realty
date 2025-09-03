@@ -180,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Show different FAB based on user role
           if (user.role.toLowerCase() == 'agent') {
             return FloatingActionButton.extended(
-              onPressed: () => Navigator.of(context).pushNamed('/agent/dashboard'),
+              onPressed: () => Navigator.pushNamed(context, '/agent/dashboard'),
               icon: const Icon(Icons.dashboard),
               label: const Text('Agent Panel'),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -188,7 +188,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           } else if (user.role.toLowerCase() == 'admin') {
             return FloatingActionButton.extended(
-              onPressed: () => Navigator.of(context).pushNamed('/admin/dashboard'),
+              onPressed: () => Navigator.pushNamed(context, '/admin/dashboard'),
               icon: const Icon(Icons.admin_panel_settings),
               label: const Text('Admin Panel'),
               backgroundColor: Theme.of(context).colorScheme.error,
@@ -196,7 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           } else if (user.role.toLowerCase() == 'developer') {
             return FloatingActionButton.extended(
-              onPressed: () => Navigator.of(context).pushNamed('/developers'),
+              onPressed: () => Navigator.pushNamed(context, '/developers'),
               icon: const Icon(Icons.developer_mode),
               label: const Text('Dev Tools'),
               backgroundColor: Theme.of(context).colorScheme.tertiary,
@@ -204,7 +204,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           } else {
             return FloatingActionButton.extended(
-              onPressed: () => Navigator.of(context).pushNamed('/add-property'),
+              onPressed: () => Navigator.pushNamed(context, '/add-property'),
               icon: const Icon(Icons.add_home),
               label: const Text('Add Property'),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -351,7 +351,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                    onPressed: () => Navigator.of(context).pushNamed('/profile'),
+                                    onPressed: () => Navigator.pushNamed(context, '/profile'),
                                     icon: Icon(
                                       Icons.edit,
                                       color: theme.colorScheme.primary,
@@ -422,21 +422,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           IconButton(
                             icon: const Icon(Icons.notifications_outlined),
                             onPressed: () {
-                              Navigator.of(context).pushNamed('/notifications');
+                              Navigator.pushNamed(context, '/notifications');
                             },
                             tooltip: 'Notifications',
                           ),
                           IconButton(
                             icon: const Icon(Icons.settings_outlined),
                             onPressed: () {
-                              Navigator.of(context).pushNamed('/settings');
+                              Navigator.pushNamed(context, '/settings');
                             },
                             tooltip: 'Settings',
                           ),
                           IconButton(
                             icon: const Icon(Icons.person_outline),
                             onPressed: () {
-                              Navigator.of(context).pushNamed('/profile');
+                              Navigator.pushNamed(context, '/profile');
                             },
                             tooltip: 'Profile',
                           ),
@@ -472,7 +472,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   onSubmitted: (value) {
                                     if (value.isNotEmpty) {
-                                      Navigator.of(context).pushNamed('/search', arguments: {'query': value});
+                                      Navigator.pushNamed(context, '/search', arguments: {'query': value});
                                     }
                                   },
                                 ),
@@ -480,7 +480,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               IconButton(
                                 icon: Icon(Icons.tune, color: theme.colorScheme.primary),
                                 onPressed: () {
-                                  Navigator.of(context).pushNamed('/search');
+                                  Navigator.pushNamed(context, '/search');
                                 },
                               ),
                             ],
@@ -516,7 +516,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         setState(() {
                                           _selectedPropertyType = category['type'];
                                         });
-                                        Navigator.of(context).pushNamed('/search', arguments: {
+                                        Navigator.pushNamed(context, '/search', arguments: {
                                           'propertyType': category['type']
                                         });
                                       },
@@ -585,7 +585,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       'Search Properties',
                                       Icons.search,
                                       theme.colorScheme.primary,
-                                      () => Navigator.of(context).pushNamed('/search'),
+                                      () => Navigator.pushNamed(context, '/search'),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -595,7 +595,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       'My Favorites',
                                       Icons.favorite,
                                       theme.colorScheme.secondary,
-                                      () => Navigator.of(context).pushNamed('/favorites'),
+                                      () => Navigator.pushNamed(context, '/favorites'),
                                     ),
                                   ),
                                 ],
@@ -665,19 +665,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         context,
                                         'Settings',
                                         Icons.settings,
-                                        () => Navigator.of(context).pushNamed('/settings'),
+                                        () => Navigator.pushNamed(context, '/settings'),
                                       ),
                                       _buildQuickAccessChip(
                                         context,
                                         'Help',
                                         Icons.help,
-                                        () => Navigator.of(context).pushNamed('/help'),
+                                        () => Navigator.pushNamed(context, '/help'),
                                       ),
                                       _buildQuickAccessChip(
                                         context,
                                         'About',
                                         Icons.info,
-                                        () => Navigator.of(context).pushNamed('/about'),
+                                        () => Navigator.pushNamed(context, '/about'),
                                       ),
                                       
                                       // Role-specific actions
@@ -686,28 +686,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           context,
                                           'My Properties',
                                           Icons.home_work,
-                                          () => Navigator.of(context).pushNamed('/agent/properties'),
+                                          () => Navigator.pushNamed(context, '/agent/properties'),
                                           color: theme.colorScheme.primary,
                                         ),
                                         _buildQuickAccessChip(
                                           context,
                                           'Analytics',
                                           Icons.analytics,
-                                          () => Navigator.of(context).pushNamed('/agent/analytics'),
+                                          () => Navigator.pushNamed(context, '/agent/analytics'),
                                           color: theme.colorScheme.secondary,
                                         ),
                                         _buildQuickAccessChip(
                                           context,
                                           'Inquiries',
                                           Icons.inbox,
-                                          () => Navigator.of(context).pushNamed('/agent/inquiries'),
+                                          () => Navigator.pushNamed(context, '/agent/inquiries'),
                                           color: theme.colorScheme.tertiary,
                                         ),
                                         _buildQuickAccessChip(
                                           context,
                                           'Leads',
                                           Icons.leaderboard,
-                                          () => Navigator.of(context).pushNamed('/agent/leads'),
+                                          () => Navigator.pushNamed(context, '/agent/leads'),
                                           color: theme.colorScheme.primary,
                                         ),
                                       ],
@@ -717,14 +717,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           context,
                                           'Admin Dashboard',
                                           Icons.admin_panel_settings,
-                                          () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                                          () => Navigator.pushNamed(context, '/admin/dashboard'),
                                           color: theme.colorScheme.error,
                                         ),
                                         _buildQuickAccessChip(
                                           context,
                                           'Manage Users',
                                           Icons.people,
-                                          () => Navigator.of(context).pushNamed('/admin/users'),
+                                          () => Navigator.pushNamed(context, '/admin/users'),
                                           color: theme.colorScheme.secondary,
                                         ),
                                       ],
@@ -734,14 +734,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           context,
                                           'Developers List',
                                           Icons.developer_mode,
-                                          () => Navigator.of(context).pushNamed('/developers'),
+                                          () => Navigator.pushNamed(context, '/developers'),
                                           color: theme.colorScheme.tertiary,
                                         ),
                                         _buildQuickAccessChip(
                                           context,
                                           'Add Property',
                                           Icons.add_home,
-                                          () => Navigator.of(context).pushNamed('/add-property'),
+                                          () => Navigator.pushNamed(context, '/add-property'),
                                           color: theme.colorScheme.primary,
                                         ),
                                       ],
@@ -751,14 +751,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           context,
                                           'Add Property',
                                           Icons.add_home,
-                                          () => Navigator.of(context).pushNamed('/add-property'),
+                                          () => Navigator.pushNamed(context, '/add-property'),
                                           color: theme.colorScheme.primary,
                                         ),
                                         _buildQuickAccessChip(
                                           context,
                                           'Subscription',
                                           Icons.card_membership,
-                                          () => Navigator.of(context).pushNamed('/subscription'),
+                                          () => Navigator.pushNamed(context, '/subscription'),
                                           color: theme.colorScheme.secondary,
                                         ),
                                       ],
@@ -949,7 +949,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         children: [
                                           Expanded(
                                             child: ElevatedButton.icon(
-                                              onPressed: () => Navigator.of(context).pushNamed('/subscription'),
+                                              onPressed: () => Navigator.pushNamed(context, '/subscription'),
                                               icon: const Icon(Icons.upgrade),
                                               label: const Text('Upgrade Now'),
                                               style: ElevatedButton.styleFrom(
@@ -961,7 +961,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           ),
                                           const SizedBox(width: 12),
                                           TextButton(
-                                            onPressed: () => Navigator.of(context).pushNamed('/subscription'),
+                                            onPressed: () => Navigator.pushNamed(context, '/subscription'),
                                             child: const Text('Learn More'),
                                           ),
                                         ],
@@ -1010,7 +1010,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'My Properties',
                                                 Icons.home_work,
                                                 theme.colorScheme.primary,
-                                                () => Navigator.of(context).pushNamed('/agent/properties'),
+                                                () => Navigator.pushNamed(context, '/agent/properties'),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -1020,7 +1020,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Analytics',
                                                 Icons.analytics,
                                                 theme.colorScheme.secondary,
-                                                () => Navigator.of(context).pushNamed('/agent/analytics'),
+                                                () => Navigator.pushNamed(context, '/agent/analytics'),
                                               ),
                                             ),
                                           ],
@@ -1034,7 +1034,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Inquiries',
                                                 Icons.inbox,
                                                 theme.colorScheme.tertiary,
-                                                () => Navigator.of(context).pushNamed('/agent/inquiries'),
+                                                () => Navigator.pushNamed(context, '/agent/inquiries'),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -1044,7 +1044,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Leads',
                                                 Icons.leaderboard,
                                                 theme.colorScheme.primary,
-                                                () => Navigator.of(context).pushNamed('/agent/leads'),
+                                                () => Navigator.pushNamed(context, '/agent/leads'),
                                               ),
                                             ),
                                           ],
@@ -1074,7 +1074,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Admin Dashboard',
                                                 Icons.admin_panel_settings,
                                                 theme.colorScheme.error,
-                                                () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                                                () => Navigator.pushNamed(context, '/admin/dashboard'),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -1084,7 +1084,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Manage Users',
                                                 Icons.people,
                                                 theme.colorScheme.secondary,
-                                                () => Navigator.of(context).pushNamed('/admin/users'),
+                                                () => Navigator.pushNamed(context, '/admin/users'),
                                               ),
                                             ),
                                           ],
@@ -1114,7 +1114,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Developers List',
                                                 Icons.developer_mode,
                                                 theme.colorScheme.tertiary,
-                                                () => Navigator.of(context).pushNamed('/developers'),
+                                                () => Navigator.pushNamed(context, '/developers'),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -1124,7 +1124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Add Property',
                                                 Icons.add_home,
                                                 theme.colorScheme.primary,
-                                                () => Navigator.of(context).pushNamed('/add-property'),
+                                                () => Navigator.pushNamed(context, '/add-property'),
                                               ),
                                             ),
                                           ],
@@ -1154,7 +1154,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Add Property',
                                                 Icons.add_home,
                                                 theme.colorScheme.primary,
-                                                () => Navigator.of(context).pushNamed('/add-property'),
+                                                () => Navigator.pushNamed(context, '/add-property'),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
@@ -1164,7 +1164,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 'Subscription',
                                                 Icons.card_membership,
                                                 theme.colorScheme.secondary,
-                                                () => Navigator.of(context).pushNamed('/subscription'),
+                                                () => Navigator.pushNamed(context, '/subscription'),
                                               ),
                                             ),
                                           ],
@@ -1197,7 +1197,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pushNamed('/properties'),
+                                      onPressed: () => Navigator.pushNamed(context, '/properties'),
                                       child: const Text('View All'),
                                     ),
                                   ],
@@ -1233,11 +1233,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     Text(
                                       'Recent Properties',
                                       style: theme.textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                        fontWeight: FontWeight.w600),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pushNamed('/properties'),
+                                      onPressed: () => Navigator.pushNamed(context, '/properties'),
                                       child: const Text('View All'),
                                     ),
                                   ],
@@ -1331,7 +1330,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         elevation: 4,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(
+            Navigator.pushNamed(
+              context,
               '/property-detail',
               arguments: property['_id']?.toString() ?? '',
             );
@@ -1639,7 +1639,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         onTap: () {
-          Navigator.of(context).pushNamed(
+          Navigator.pushNamed(
+            context,
             '/property-detail',
             arguments: property['_id']?.toString() ?? '',
           );

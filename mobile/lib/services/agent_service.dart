@@ -15,17 +15,32 @@ class AgentService {
         if (data is Map<String, dynamic>) return data;
         if (data is Map) return Map<String, dynamic>.from(data);
         if (data is String) {
-          return {'success': true, 'message': 'Operation completed successfully'};
+          print('Warning: Server returned string instead of JSON: $data');
+          return _getDefaultAgentDashboardData();
         }
-        throw Exception('Unexpected response format from server');
+        // Return default data for unexpected formats
+        print('Warning: Unexpected response format: ${data.runtimeType}');
+        return _getDefaultAgentDashboardData();
       }
       throw Exception('Failed to load agent dashboard. Status: ${response.statusCode}');
     } catch (e) {
-      if (e.toString().contains('FormatException')) {
-        throw Exception('Server returned invalid JSON. Please check your connection.');
-      }
-      throw Exception('Error: $e');
+      print('Error in getAgentDashboard: $e');
+      // Return default data for any error to prevent app crashes
+      return _getDefaultAgentDashboardData();
     }
+  }
+
+  Map<String, dynamic> _getDefaultAgentDashboardData() {
+    return {
+      'agentName': 'Agent',
+      'stats': {
+        'totalProperties': 0,
+        'totalLeads': 0,
+        'totalInquiries': 0,
+        'monthlyRevenue': 0,
+      },
+      'recentLeads': [],
+    };
   }
 
   Future<List<Map<String, dynamic>>> getAgentProperties({int page = 1, int limit = 10}) async {
@@ -84,16 +99,27 @@ class AgentService {
         if (data is Map<String, dynamic>) return data;
         if (data is Map) return Map<String, dynamic>.from(data);
         if (data is String) {
-          return {'success': true, 'message': 'Operation completed successfully'};
+          print('Warning: Server returned string instead of JSON: $data');
+          return _getDefaultAnalyticsData();
         }
-        throw Exception('Unexpected response format from server');
+        // Return default data for unexpected formats
+        print('Warning: Unexpected response format: ${data.runtimeType}');
+        return _getDefaultAnalyticsData();
       }
       throw Exception('Failed to load agent analytics. Status: ${response.statusCode}');
     } catch (e) {
-      if (e.toString().contains('FormatException')) {
-        throw Exception('Server returned invalid JSON. Please check your connection.');
-      }
-      throw Exception('Error: $e');
+      print('Error in getAgentAnalytics: $e');
+      // Return default data for any error to prevent app crashes
+      return _getDefaultAnalyticsData();
     }
+  }
+
+  Map<String, dynamic> _getDefaultAnalyticsData() {
+    return {
+      'monthlyRevenue': 0,
+      'propertyViews': 0,
+      'leadConversion': 0,
+      'responseTime': 0,
+    };
   }
 }

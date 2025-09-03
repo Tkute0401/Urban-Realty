@@ -61,36 +61,69 @@ class MyApp extends StatelessWidget {
                 return auth.isAuthenticated ? const HomeTabs() : const LoginScreen();
               },
             ),
-            routes: {
-              '/home': (context) => const HomeTabs(),
-              '/login': (context) => const LoginScreen(),
-              '/register': (context) => const RegisterScreen(),
-              '/settings': (context) => const SettingsScreen(),
-              '/profile': (context) => const ProfileScreen(),
-              '/subscription': (context) => const SubscriptionScreen(),
-              '/add-property': (context) => const AddPropertyScreen(),
-              '/property-detail': (context) {
-                final args = ModalRoute.of(context)?.settings.arguments as String?;
-                return PropertyDetailScreen(propertyId: args ?? '');
-              },
-              '/search': (context) => const SearchScreen(),
-              '/about': (context) => const AboutPage(),
-              '/privacy': (context) => const PrivacyPolicyPage(),
-              '/terms': (context) => const TermsConditionsPage(),
-              '/contact': (context) => const ContactPage(),
-              '/help': (context) => const HelpCenterPage(),
-              '/admin/dashboard': (context) => const AdminDashboardScreen(),
-              '/admin/users': (context) => const AdminUsersScreen(),
-              '/admin/properties': (context) => const AdminPropertiesScreen(),
-              '/admin/agents': (context) => const AdminAgentsScreen(),
-              '/admin/analytics': (context) => const AdminAnalyticsScreen(),
-              '/agent/dashboard': (context) => const AgentDashboardScreen(),
-              '/agent/analytics': (context) => const AgentAnalyticsScreen(),
-              '/agent/inquiries': (context) => const AgentInquiriesScreen(),
-              '/agent/leads': (context) => const AgentLeadsScreen(),
-              '/agent/properties': (context) => const AgentPropertiesScreen(),
-              '/notifications': (context) => const NotificationsScreen(),
-              '/developers': (context) => const DevelopersListScreen(),
+            onGenerateRoute: (settings) {
+              switch (settings.name) {
+                case '/home':
+                  return MaterialPageRoute(builder: (context) => const HomeTabs());
+                case '/login':
+                  return MaterialPageRoute(builder: (context) => const LoginScreen());
+                case '/register':
+                  return MaterialPageRoute(builder: (context) => const RegisterScreen());
+                case '/settings':
+                  return MaterialPageRoute(builder: (context) => const SettingsScreen());
+                case '/profile':
+                  return MaterialPageRoute(builder: (context) => const ProfileScreen());
+                case '/subscription':
+                  return MaterialPageRoute(builder: (context) => const SubscriptionScreen());
+                case '/add-property':
+                  return MaterialPageRoute(builder: (context) => const AddPropertyScreen());
+                case '/property-detail':
+                  final args = settings.arguments as String?;
+                  return MaterialPageRoute(builder: (context) => PropertyDetailScreen(propertyId: args ?? ''));
+                case '/search':
+                  return MaterialPageRoute(builder: (context) => const SearchScreen());
+                case '/about':
+                  return MaterialPageRoute(builder: (context) => const AboutPage());
+                case '/privacy':
+                  return MaterialPageRoute(builder: (context) => const PrivacyPolicyPage());
+                case '/terms':
+                  return MaterialPageRoute(builder: (context) => const TermsConditionsPage());
+                case '/contact':
+                  return MaterialPageRoute(builder: (context) => const ContactPage());
+                case '/help':
+                  return MaterialPageRoute(builder: (context) => const HelpCenterPage());
+                case '/admin/dashboard':
+                  return MaterialPageRoute(builder: (context) => const AdminDashboardScreen());
+                case '/admin/users':
+                  return MaterialPageRoute(builder: (context) => const AdminUsersScreen());
+                case '/admin/properties':
+                  return MaterialPageRoute(builder: (context) => const AdminPropertiesScreen());
+                case '/admin/agents':
+                  return MaterialPageRoute(builder: (context) => const AdminAgentsScreen());
+                case '/admin/analytics':
+                  return MaterialPageRoute(builder: (context) => const AdminAnalyticsScreen());
+                case '/agent/dashboard':
+                  return MaterialPageRoute(builder: (context) => const AgentDashboardScreen());
+                case '/agent/analytics':
+                  return MaterialPageRoute(builder: (context) => const AgentAnalyticsScreen());
+                case '/agent/inquiries':
+                  return MaterialPageRoute(builder: (context) => const AgentInquiriesScreen());
+                case '/agent/leads':
+                  return MaterialPageRoute(builder: (context) => const AgentLeadsScreen());
+                case '/agent/properties':
+                  return MaterialPageRoute(builder: (context) => const AgentPropertiesScreen());
+                case '/notifications':
+                  return MaterialPageRoute(builder: (context) => const NotificationsScreen());
+                case '/developers':
+                  return MaterialPageRoute(builder: (context) => const DevelopersListScreen());
+                default:
+                  return MaterialPageRoute(builder: (context) => const HomeTabs());
+              }
+            },
+            onUnknownRoute: (settings) {
+              // Handle unknown routes gracefully
+              print('Unknown route: ${settings.name}');
+              return MaterialPageRoute(builder: (context) => const HomeTabs());
             },
             debugShowCheckedModeBanner: EnvironmentConfig.enableDebugBanner,
           );
