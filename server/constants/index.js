@@ -14,7 +14,7 @@ const {
   API_ENDPOINTS,
   UPLOAD_LIMITS
 } = require(path.resolve(__dirname, '../../shared/constants/index.cjs'));
-
+console.log("dir:"+__dirname);
 // Server-specific constants (extending shared constants)
 
 // Extended API Endpoints (server-specific)
