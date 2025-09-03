@@ -77,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).pushNamed('/settings'),
+        onPressed: () => Navigator.pushNamed(context, '/settings'),
         icon: const Icon(Icons.settings),
         label: const Text('Settings'),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -88,12 +88,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+            onPressed: () => Navigator.pushNamed(context, '/settings'),
             tooltip: 'Settings',
           ),
           IconButton(
             icon: const Icon(Icons.help_outline),
-            onPressed: () => Navigator.of(context).pushNamed('/help'),
+            onPressed: () => Navigator.pushNamed(context, '/help'),
             tooltip: 'Help',
           ),
         ],
@@ -159,31 +159,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     context,
                                     'Agent Dashboard',
                                     Icons.dashboard,
-                                    () => Navigator.of(context).pushNamed('/agent/dashboard'),
+                                    () => Navigator.pushNamed(context, '/agent/dashboard'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'My Properties',
                                     Icons.home_work,
-                                    () => Navigator.of(context).pushNamed('/agent/properties'),
+                                    () => Navigator.pushNamed(context, '/agent/properties'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'Analytics',
                                     Icons.analytics,
-                                    () => Navigator.of(context).pushNamed('/agent/analytics'),
+                                    () => Navigator.pushNamed(context, '/agent/analytics'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'Inquiries',
                                     Icons.inbox,
-                                    () => Navigator.of(context).pushNamed('/agent/inquiries'),
+                                    () => Navigator.pushNamed(context, '/agent/inquiries'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'Leads',
                                     Icons.leaderboard,
-                                    () => Navigator.of(context).pushNamed('/agent/leads'),
+                                    () => Navigator.pushNamed(context, '/agent/leads'),
                                   ),
                                 ],
                                 
@@ -193,13 +193,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     context,
                                     'Admin Dashboard',
                                     Icons.admin_panel_settings,
-                                    () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                                    () => Navigator.pushNamed(context, '/admin/dashboard'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'Manage Users',
                                     Icons.people,
-                                    () => Navigator.of(context).pushNamed('/admin/users'),
+                                    () => Navigator.pushNamed(context, '/admin/users'),
                                   ),
                                 ],
                                 
@@ -209,13 +209,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     context,
                                     'Developers List',
                                     Icons.developer_mode,
-                                    () => Navigator.of(context).pushNamed('/developers'),
+                                    () => Navigator.pushNamed(context, '/developers'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'Add Property',
                                     Icons.add_home,
-                                    () => Navigator.of(context).pushNamed('/add-property'),
+                                    () => Navigator.pushNamed(context, '/add-property'),
                                   ),
                                 ],
                                 
@@ -225,13 +225,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     context,
                                     'Add Property',
                                     Icons.add_home,
-                                    () => Navigator.of(context).pushNamed('/add-property'),
+                                    () => Navigator.pushNamed(context, '/add-property'),
                                   ),
                                   _buildProfileActionTile(
                                     context,
                                     'Subscription',
                                     Icons.card_membership,
-                                    () => Navigator.of(context).pushNamed('/subscription'),
+                                    () => Navigator.pushNamed(context, '/subscription'),
                                   ),
                                 ],
                                 
@@ -241,31 +241,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context,
                                   'Settings',
                                   Icons.settings,
-                                  () => Navigator.of(context).pushNamed('/settings'),
+                                  () => Navigator.pushNamed(context, '/settings'),
                                 ),
                                 _buildProfileActionTile(
                                   context,
                                   'Help & Support',
                                   Icons.help,
-                                  () => Navigator.of(context).pushNamed('/help'),
+                                  () => Navigator.pushNamed(context, '/help'),
                                 ),
                                 _buildProfileActionTile(
                                   context,
                                   'About Us',
                                   Icons.info,
-                                  () => Navigator.of(context).pushNamed('/about'),
+                                  () => Navigator.pushNamed(context, '/about'),
                                 ),
                                 _buildProfileActionTile(
                                   context,
                                   'Privacy Policy',
                                   Icons.privacy_tip,
-                                  () => Navigator.of(context).pushNamed('/privacy'),
+                                  () => Navigator.pushNamed(context, '/privacy'),
                                 ),
                                 _buildProfileActionTile(
                                   context,
                                   'Terms of Service',
                                   Icons.description,
-                                  () => Navigator.of(context).pushNamed('/terms'),
+                                  () => Navigator.pushNamed(context, '/terms'),
                                 ),
                                 const SizedBox(height: 20),
                                 ElevatedButton(

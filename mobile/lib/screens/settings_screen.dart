@@ -27,7 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).pushNamed('/profile'),
+        onPressed: () => Navigator.pushNamed(context, '/profile'),
         icon: const Icon(Icons.person),
         label: const Text('Profile'),
         backgroundColor: theme.colorScheme.primary,
@@ -38,12 +38,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
-            onPressed: () => Navigator.of(context).pushNamed('/help'),
+            onPressed: () => Navigator.pushNamed(context, '/help'),
             tooltip: 'Help',
           ),
           IconButton(
             icon: const Icon(Icons.info_outline),
-            onPressed: () => Navigator.of(context).pushNamed('/about'),
+            onPressed: () => Navigator.pushNamed(context, '/about'),
             tooltip: 'About',
           ),
         ],
@@ -386,14 +386,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: const Text('Agent Dashboard'),
                         subtitle: const Text('Access your agent tools'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => Navigator.of(context).pushNamed('/agent/dashboard'),
+                        onTap: () => Navigator.pushNamed(context, '/agent/dashboard'),
                       ),
                       ListTile(
                         leading: Icon(Icons.analytics, color: theme.colorScheme.secondary),
                         title: const Text('Analytics'),
                         subtitle: const Text('View your performance'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => Navigator.of(context).pushNamed('/agent/analytics'),
+                        onTap: () => Navigator.pushNamed(context, '/agent/analytics'),
                       ),
                     ],
                     if (user.role.toLowerCase() == 'admin') ...[
@@ -402,14 +402,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: const Text('Admin Dashboard'),
                         subtitle: const Text('Manage the platform'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => Navigator.of(context).pushNamed('/admin/dashboard'),
+                        onTap: () => Navigator.pushNamed(context, '/admin/dashboard'),
                       ),
                       ListTile(
                         leading: Icon(Icons.people, color: theme.colorScheme.secondary),
                         title: const Text('Manage Users'),
                         subtitle: const Text('User administration'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => Navigator.of(context).pushNamed('/admin/users'),
+                        onTap: () => Navigator.pushNamed(context, '/admin/users'),
                       ),
                     ],
                     if (user.role.toLowerCase() == 'developer') ...[
@@ -418,7 +418,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: const Text('Developer Tools'),
                         subtitle: const Text('Access development features'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => Navigator.of(context).pushNamed('/developers'),
+                        onTap: () => Navigator.pushNamed(context, '/developers'),
                       ),
                     ],
                     if (user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller') ...[
@@ -427,7 +427,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: const Text('Add Property'),
                         subtitle: const Text('List your property'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => Navigator.of(context).pushNamed('/add-property'),
+                        onTap: () => Navigator.pushNamed(context, '/add-property'),
                       ),
                       ListTile(
                         leading: Icon(Icons.card_membership, color: theme.colorScheme.secondary),

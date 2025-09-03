@@ -65,7 +65,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).pushNamed('/search'),
+                    onPressed: () => Navigator.pushNamed(context, '/search'),
         icon: const Icon(Icons.search),
         label: const Text('Search'),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -76,12 +76,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () => Navigator.of(context).pushNamed('/search'),
+            onPressed: () => Navigator.pushNamed(context, '/search'),
             tooltip: 'Search Properties',
           ),
           IconButton(
             icon: const Icon(Icons.home),
-            onPressed: () => Navigator.of(context).pushNamed('/'),
+            onPressed: () => Navigator.pushNamed(context, '/'),
             tooltip: 'Home',
           ),
         ],

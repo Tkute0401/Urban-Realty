@@ -231,7 +231,7 @@ class _SearchScreenState extends State<SearchScreen> {
               user.role.toLowerCase() == 'buyer' || 
               user.role.toLowerCase() == 'seller') {
             return FloatingActionButton.extended(
-              onPressed: () => Navigator.of(context).pushNamed('/add-property'),
+                              onPressed: () => Navigator.pushNamed(context, '/add-property'),
               icon: const Icon(Icons.add_home),
               label: const Text('Add Property'),
               backgroundColor: theme.colorScheme.primary,
@@ -252,7 +252,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.favorite_border),
-            onPressed: () => Navigator.of(context).pushNamed('/favorites'),
+                            onPressed: () => Navigator.pushNamed(context, '/favorites'),
             tooltip: 'Favorites',
           ),
         ],
@@ -670,7 +670,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                       ],
                                     ),
                                     onTap: () {
-                                      Navigator.of(context).pushNamed(
+                                      Navigator.pushNamed(
+                                        context,
                                         '/property-detail',
                                         arguments: property['_id']?.toString() ?? '',
                                       );

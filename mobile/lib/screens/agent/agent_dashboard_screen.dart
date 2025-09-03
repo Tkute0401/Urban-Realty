@@ -429,18 +429,18 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
   }
 
   void _navigateToProperties() {
-    Navigator.pushNamed(context, '/agent-properties');
+    Navigator.pushNamed(context, '/agent/properties');
   }
 
   void _navigateToLeads() {
-    Navigator.pushNamed(context, '/agent-leads');
+    Navigator.pushNamed(context, '/agent/leads');
   }
 
   void _navigateToInquiries() {
-    Navigator.pushNamed(context, '/agent-inquiries');
+    Navigator.pushNamed(context, '/agent/inquiries');
   }
 
   void _navigateToAnalytics() {
-    Navigator.pushNamed(context, '/agent-analytics');
+    Navigator.pushNamed(context, '/agent/analytics');
   }
 }
