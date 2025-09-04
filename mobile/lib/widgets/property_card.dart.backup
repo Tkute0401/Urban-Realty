@@ -20,21 +20,16 @@ class PropertyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(8),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-              child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Column(
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+                    top: Radius.circular(8),
                   ),
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
@@ -68,18 +63,18 @@ class PropertyCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: 12,
-                  left: 12,
+                  top: 8,
+                  right: 8,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 8,
+                      vertical: 4,
                     ),
                     decoration: BoxDecoration(
                       color: property.status == "For Sale"
                           ? Colors.green
                           : Colors.orange,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       property.status,
@@ -128,36 +123,6 @@ class PropertyCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.home,
-                          size: 16,
-                          color: Colors.blue,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          property.type,
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
                   Row(
                     children: [
                       const Icon(Icons.location_on, size: 16, color: Colors.grey),
@@ -177,45 +142,11 @@ class PropertyCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    property.description,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
                     _formatPrice(property.price),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: onTap,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Colors.blue,
-                        side: const BorderSide(
-                          color: Colors.blue,
-                          width: 1,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        "View Details",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -253,15 +184,21 @@ class PropertyCard extends StatelessWidget {
   }
   
   String _formatPrice(int price) {
-    if (price >= 10000000) {
-      return "₹ ${(price / 10000000).toStringAsFixed(2)} Cr";
-    } else if (price >= 100000) {
-      return "₹ ${(price / 100000).toStringAsFixed(2)} Lac";
-    }
-    return "₹ ${price.toStringAsFixed(0)}";
+    final String raw = price.toStringAsFixed(0);
+    // Insert thousands separators for USD-style formatting
+    final String withSeparators = raw.replaceAllMapped(
+      RegExp(r"\B(?=(\d{3})+(?!\d))"),
+      (m) => ",",
+    );
+    return "\$$withSeparators";
   }
 
   String _formatArea(int area) {
-    return area.toStringAsFixed(0);
+    final String raw = area.toStringAsFixed(0);
+    final String withSeparators = raw.replaceAllMapped(
+      RegExp(r"\B(?=(\d{3})+(?!\d))"),
+      (m) => ",",
+    );
+    return withSeparators;
   }
 }
