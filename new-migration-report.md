@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (mobile: admin settings/reports parity; analytics dashboard added)
+Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics dashboard added)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -16,8 +16,8 @@ Last updated: 2025-09-04 (mobile: admin settings/reports parity; analytics dashb
 
 ### Current Integrations (Mobile)
 - Centralized `ApiService` with Dio interceptor attaching `Authorization` header from `FlutterSecureStorage`. Retries and normalized errors present. Base URL from env `API_BASE_URL` or `ApiConfig.baseUrl`.
-- Implemented services: `auth_service.dart` (`/auth/login`, `/auth/register`, `/auth/me`, `/auth/update`), `favorites_service.dart` (favorites CRUD + status), `property_service.dart` (list, by id, featured, suggestions, CRUD including upload via multipart), `subscription_service.dart` (plans, my-subscription, billing history, upcoming billing, subscribe, cancel, Razorpay key/order/verify, invoice download), `admin_service.dart` (stats, users, properties, agents, verify agent), lightweight `analytics_service.dart` (`/analytics/track`).
-- Remaining: Dynamic fields, user types; admin media delete; any missing admin CRUD nuances.
+- Implemented services: `auth_service.dart` (`/auth/login`, `/auth/register`, `/auth/me`, `/auth/update`), `favorites_service.dart` (favorites CRUD + status), `property_service.dart` (list, by id, featured, suggestions, CRUD including upload via multipart), `subscription_service.dart` (plans, my-subscription, billing history, upcoming billing, subscribe, cancel, Razorpay key/order/verify, invoice download), `admin_service.dart` (stats, users, properties, agents, verify agent, settings get/update, backup/restore, reports generate/export/email, media list/delete/upload), lightweight `analytics_service.dart` (`/analytics/track`).
+- Remaining: Dynamic fields, user types; any missing admin CRUD nuances.
   - Implemented now: Recently Viewed parity (fetch + track) on mobile
 
 ### Gaps Identified
@@ -68,19 +68,26 @@ Last updated: 2025-09-04 (mobile: admin settings/reports parity; analytics dashb
     - Enhanced `mobile/lib/screens/favorites_screen.dart` with empty state, and tap to open property detail.
     - Added Favorites quick access links in `mobile/lib/screens/profile_screen.dart`; route `/favorites` already wired in `mobile/lib/main.dart`.
 
+ - [Mobile] Admin media parity:
+   - Extended `AdminService` with `getMedia`, `deleteMedia`, `uploadMedia` using multipart via `HttpClient.postMultipart`.
+   - Added `AdminMediaScreen` at `mobile/lib/screens/admin/admin_media_screen.dart` with list, infinite scroll, delete, and upload (FilePicker).
+   - Wired route `/admin/media` in `mobile/lib/main.dart` and quick action in `admin_dashboard_screen.dart` already navigates to it.
+
 ## Current Work In This Run
 - Admin analytics parity on mobile: dashboard/search/system metrics and CSV export.
 - Admin settings parity on mobile: fetch/save settings, backup and restore actions.
 - Admin reports parity on mobile: generate reports, export CSV/PDF, email report.
+- Admin media parity on mobile: list, delete, and upload media.
 - Recently Viewed, Favorites, Contact, Agent inquiries, and Subscription flows previously completed remain stable.
 
 ## Immediate Next Steps (Run Order)
 1. QA Admin Settings on mobile: fetch/save flows; maintenance mode toggle; backup/restore happy/edge cases.
 2. QA Admin Reports on mobile: generate report types; export CSV/PDF saved under UrbanRealty/Reports; email success path.
 3. QA Admin Analytics on mobile: timeframe switching; CSV export path confirmation; non-admin access handled.
-4. Regression QA: Favorites, Recently Viewed, Search analytics breadcrumbs, Contact creation, Agent inquiries status updates.
-5. QA Subscription management: update payment method, browse plans navigation, cancel/invoice download flow.
-6. Verify base URL envs for both clients against production.
+4. QA Admin Media on mobile: list pagination, delete confirmation, upload via file picker.
+5. Regression QA: Favorites, Recently Viewed, Search analytics breadcrumbs, Contact creation, Agent inquiries status updates.
+6. QA Subscription management: update payment method, browse plans navigation, cancel/invoice download flow.
+7. Verify base URL envs for both clients against production.
 
 ## Suggestions for Improvement
 - Add shared TypeScript/JSON schema or OpenAPI spec in `shared/` to generate both Axios types and Dart models.

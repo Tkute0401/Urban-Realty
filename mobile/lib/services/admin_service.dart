@@ -1,4 +1,5 @@
 import 'http_client.dart';
+import 'package:dio/dio.dart';
 
 class AdminService {
   static final AdminService _instance = AdminService._internal();
@@ -333,6 +334,66 @@ class AdminService {
         return {'success': true};
       }
       throw Exception('Failed to verify agent');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  // Media Management
+  Future<List<Map<String, dynamic>>> getMedia({int page = 1, int limit = 20}) async {
+    try {
+      final response = await HttpClient.get('/admin/media', query: {
+        'page': page.toString(),
+        'limit': limit.toString(),
+      });
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is List) {
+            return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+          }
+          if (data['data'] is Map && (data['data']['items'] is List)) {
+            return List<Map<String, dynamic>>.from(data['data']['items'] as List<dynamic>);
+          }
+        }
+      }
+      throw Exception('Failed to load media');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteMedia(String mediaId) async {
+    try {
+      final response = await HttpClient.delete('/admin/media/$mediaId');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to delete media');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> uploadMedia({required String filePath, String fieldName = 'file'}) async {
+    try {
+      final fileName = filePath.split('/').last;
+      final formData = FormData.fromMap({
+        fieldName: await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+      final response = await HttpClient.postMultipart('/admin/media/upload', formData: formData, options: Options(headers: {
+        'Content-Type': 'multipart/form-data',
+      }));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to upload media');
     } catch (e) {
       throw Exception('Error: $e');
     }

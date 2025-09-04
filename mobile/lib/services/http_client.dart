@@ -24,5 +24,10 @@ class HttpClient {
   static Future<Response<T>> getRaw<T>(String path, {Map<String, dynamic>? query, Options? options}) {
     return _api.dio.get<T>(path, queryParameters: query, options: options);
   }
+
+  // Multipart POST helper for file uploads
+  static Future<Response> postMultipart(String path, {required FormData formData, Options? options}) {
+    return _api.dio.post(path, data: formData, options: options);
+  }
 }
 
