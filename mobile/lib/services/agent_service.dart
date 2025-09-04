@@ -127,9 +127,8 @@ class AgentService {
       // Not provided by server; synthesize simple analytics from properties count for now
       final props = await getAgentProperties(limit: 50);
       final response = { 'data': { 'monthlyRevenue': 0, 'propertyViews': 0, 'leadConversion': 0, 'responseTime': 0, 'totalProperties': props.length } };
-      final data = response['data'];
-      if (data is Map<String, dynamic>) return data;
-      if (data is Map) return Map<String, dynamic>.from(data as Map<dynamic, dynamic>);
+      final data = response['data'] as Map<String, dynamic>?;
+      if (data != null) return data;
       return _getDefaultAnalyticsData();
     } catch (e) {
       print('Error in getAgentAnalytics: $e');

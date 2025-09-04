@@ -43,7 +43,6 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
       final properties = await _propertyService.getProperties(
         page: _currentPage,
         limit: _limit,
-        status: _selectedFilter == 'all' ? null : _selectedFilter,
       );
       
       setState(() {
