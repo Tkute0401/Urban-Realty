@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../shared/providers/properties_provider.dart';
 import '../../models/property.dart';
+import '../../widgets/property_image_gallery.dart';
+import '../../widgets/property_amenities_section.dart';
+import '../../widgets/property_highlights_section.dart';
+import '../../widgets/property_nearby_section.dart';
+import '../../widgets/property_agent_section.dart';
+import '../../widgets/property_contact_section.dart';
+import '../../utils/format_utils.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final String propertyId;
@@ -97,12 +104,18 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             icon: const Icon(Icons.favorite_border),
             onPressed: () {
               // TODO: Implement favorite functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Favorite functionality coming soon!')),
+              );
             },
           ),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: () {
               // TODO: Implement share functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Share functionality coming soon!')),
+              );
             },
           ),
         ],
@@ -112,39 +125,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Property Images
-            if (property!.images.isNotEmpty)
-              SizedBox(
-                height: 250,
-                child: PageView.builder(
-                  itemCount: property!.images.length,
-                  itemBuilder: (context, index) {
-                    return Image.network(
-                      property!.images[index].url,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: 64,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              )
-            else
-              Container(
-                height: 250,
-                color: theme.colorScheme.surfaceContainerHighest,
-                child: Icon(
-                  Icons.image_not_supported,
-                  size: 64,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
+            PropertyImageGallery(
+              images: property!.images,
+              title: property!.title,
+            ),
 
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -159,76 +143,115 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    '₹${property!.price.toStringAsFixed(0)}',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      Text(
+                        FormatUtils.formatPrice(property!.price),
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (property!.featured)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'FEATURED',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Property Basic Details
+                  Card(
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Property Details',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildDetailRow(Icons.location_on, 'Address', property!.address.formattedAddress),
+                          _buildDetailRow(Icons.home, 'Type', property!.type),
+                          _buildDetailRow(Icons.square_foot, 'Area', '${property!.area} sq ft'),
+                          _buildDetailRow(Icons.bed, 'Bedrooms', property!.bedrooms.toString()),
+                          _buildDetailRow(Icons.bathtub, 'Bathrooms', property!.bathrooms.toString()),
+                          _buildDetailRow(Icons.business, 'Building', property!.buildingName),
+                          _buildDetailRow(Icons.layers, 'Floor', property!.floorNumber),
+                          _buildDetailRow(Icons.construction, 'Status', property!.constructionStatus),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Property Details
-                  _buildDetailRow(Icons.location_on, 'Address', property!.address.formattedAddress),
-                  _buildDetailRow(Icons.home, 'Type', property!.type),
-                  _buildDetailRow(Icons.square_foot, 'Area', '${property!.area} sq ft'),
-                  _buildDetailRow(Icons.bed, 'Bedrooms', property!.bedrooms.toString()),
-                  _buildDetailRow(Icons.bathtub, 'Bathrooms', property!.bathrooms.toString()),
-                  
-                  if (property!.amenities.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Amenities',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: property!.amenities.map((amenity) {
-                        return Chip(
-                          label: Text(amenity),
-                          backgroundColor: theme.colorScheme.primaryContainer,
-                        );
-                      }).toList(),
-                    ),
-                  ],
-
+                  // Description
                   if (property!.description.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Text(
-                      'Description',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    Card(
+                      elevation: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Description',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              property!.description,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      property!.description,
-                      style: theme.textTheme.bodyMedium,
-                    ),
+                    const SizedBox(height: 16),
                   ],
 
-                  const SizedBox(height: 24),
-                  
-                  // Contact Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement contact functionality
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Contact functionality coming soon!')),
-                        );
-                      },
-                      icon: const Icon(Icons.phone),
-                      label: const Text('Contact Agent'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
+                  // Amenities
+                  PropertyAmenitiesSection(amenities: property!.amenities),
+                  const SizedBox(height: 16),
+
+                  // Highlights
+                  PropertyHighlightsSection(highlights: property!.highlights),
+                  const SizedBox(height: 16),
+
+                  // Nearby Facilities
+                  PropertyNearbySection(nearbyLocalities: property!.nearbyLocalities),
+                  const SizedBox(height: 16),
+
+                  // Agent Details
+                  PropertyAgentSection(agent: property!.agent),
+                  const SizedBox(height: 16),
+
+                  // Contact Section
+                  PropertyContactSection(
+                    onContact: () {
+                      // TODO: Implement contact functionality
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Contact functionality coming soon!')),
+                      );
+                    },
                   ),
                 ],
               ),

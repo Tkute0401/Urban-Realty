@@ -6,6 +6,10 @@ import '../../models/property.dart';
 import '../../services/api_service.dart';
 import '../../widgets/admin_chart_widget.dart';
 import '../../utils/format_utils.dart';
+import '../../widgets/quick_action_card.dart';
+import '../../widgets/stats_card.dart';
+import '../../widgets/recent_activity_card.dart';
+import '../../widgets/analytics_chart.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -236,6 +240,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     );
   }
 
+  String _formatTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+    
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -301,26 +320,61 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Welcome Header
           Card(
             elevation: 2,
-            child: Padding(
+            child: Container(
               padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.colorScheme.primary.withOpacity(0.1),
+                    theme.colorScheme.secondary.withOpacity(0.05),
+                  ],
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Welcome back, Admin!',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Complete overview of your real estate platform',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.dashboard,
+                          color: theme.colorScheme.primary,
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome back, Admin!',
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Complete overview of your real estate platform',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -328,7 +382,70 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           ),
           const SizedBox(height: 24),
 
+          // Quick Actions
+          Text(
+            'Quick Actions',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 3,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.1,
+            children: [
+              QuickActionCard(
+                title: 'Manage Users',
+                icon: Icons.people,
+                color: Colors.blue,
+                onTap: () => Navigator.pushNamed(context, '/admin/users'),
+              ),
+              QuickActionCard(
+                title: 'View Properties',
+                icon: Icons.home,
+                color: Colors.green,
+                onTap: () => Navigator.pushNamed(context, '/admin/properties'),
+              ),
+              QuickActionCard(
+                title: 'Analytics',
+                icon: Icons.analytics,
+                color: Colors.purple,
+                onTap: () => Navigator.pushNamed(context, '/admin/analytics'),
+              ),
+              QuickActionCard(
+                title: 'Settings',
+                icon: Icons.settings,
+                color: Colors.orange,
+                onTap: () => Navigator.pushNamed(context, '/admin/settings'),
+              ),
+              QuickActionCard(
+                title: 'Reports',
+                icon: Icons.assessment,
+                color: Colors.teal,
+                onTap: () => Navigator.pushNamed(context, '/admin/reports'),
+              ),
+              QuickActionCard(
+                title: 'Media',
+                icon: Icons.storage,
+                color: Colors.red,
+                onTap: () => Navigator.pushNamed(context, '/admin/media'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
           // Stats Grid
+          Text(
+            'Statistics',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -337,59 +454,91 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
             mainAxisSpacing: 16,
             childAspectRatio: 1.3,
             children: [
-              _buildStatCard(
-                'Total Users',
-                '${stats['counts']['users']}',
-                Icons.people,
-                Colors.blue,
-                'Registered users',
-                '+15% this month',
-                theme,
+              StatsCard(
+                title: 'Total Users',
+                value: '${stats['counts']['users']}',
+                subtitle: 'Registered users',
+                icon: Icons.people,
+                color: Colors.blue,
+                percentage: 15.0,
+                isPositive: true,
               ),
-              _buildStatCard(
-                'Agents',
-                '${stats['counts']['agents']}',
-                Icons.business,
-                Colors.purple,
-                'Active agents',
-                '+8% this month',
-                theme,
+              StatsCard(
+                title: 'Agents',
+                value: '${stats['counts']['agents']}',
+                subtitle: 'Active agents',
+                icon: Icons.business,
+                color: Colors.purple,
+                percentage: 8.0,
+                isPositive: true,
               ),
-              _buildStatCard(
-                'Properties',
-                '${stats['counts']['properties']}',
-                Icons.home,
-                Colors.cyan,
-                'Listed properties',
-                '+22% this month',
-                theme,
+              StatsCard(
+                title: 'Properties',
+                value: '${stats['counts']['properties']}',
+                subtitle: 'Listed properties',
+                icon: Icons.home,
+                color: Colors.cyan,
+                percentage: 22.0,
+                isPositive: true,
               ),
-              _buildStatCard(
-                'Contacts',
-                '${stats['counts']['contacts']}',
-                Icons.email,
-                Colors.green,
-                'Total inquiries',
-                '+18% this month',
-                theme,
+              StatsCard(
+                title: 'Contacts',
+                value: '${stats['counts']['contacts']}',
+                subtitle: 'Total inquiries',
+                icon: Icons.email,
+                color: Colors.green,
+                percentage: 18.0,
+                isPositive: true,
               ),
-              _buildStatCard(
-                'Subscriptions',
-                '${stats['counts']['subscriptions']}',
-                Icons.trending_up,
-                Colors.pink,
-                'Active plans',
-                '+12% this month',
-                theme,
+              StatsCard(
+                title: 'Subscriptions',
+                value: '${stats['counts']['subscriptions']}',
+                subtitle: 'Active plans',
+                icon: Icons.trending_up,
+                color: Colors.pink,
+                percentage: 12.0,
+                isPositive: true,
               ),
-              _buildStatCard(
-                'Revenue',
-                '\$${stats['counts']['revenue']}',
-                Icons.attach_money,
-                Colors.teal,
-                'Monthly revenue',
-                '+25% this month',
-                theme,
+              StatsCard(
+                title: 'Revenue',
+                value: '\$${stats['counts']['revenue']}',
+                subtitle: 'Monthly revenue',
+                icon: Icons.attach_money,
+                color: Colors.teal,
+                percentage: 25.0,
+                isPositive: true,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // Recent Activity
+          Row(
+            children: [
+              Expanded(
+                child: RecentActivityCard(
+                  title: 'Recent Properties',
+                  activities: recentProperties.map((property) => {
+                    'type': 'property',
+                    'title': property.title,
+                    'subtitle': property.address.city,
+                    'time': _formatTimeAgo(property.createdAt),
+                  }).toList(),
+                  onViewAll: () => Navigator.pushNamed(context, '/admin/properties'),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: RecentActivityCard(
+                  title: 'Recent Users',
+                  activities: recentUsers.map((user) => {
+                    'type': 'user',
+                    'title': user['name'] ?? 'Unknown User',
+                    'subtitle': user['email'] ?? '',
+                    'time': _formatTimeAgo(user['createdAt']),
+                  }).toList(),
+                  onViewAll: () => Navigator.pushNamed(context, '/admin/users'),
+                ),
               ),
             ],
           ),

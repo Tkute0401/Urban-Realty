@@ -1329,15 +1329,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Card(
         elevation: 4,
         child: InkWell(
-          onTap: () {
-            final propertyId = property['_id']?.toString();
-            if (propertyId != null && propertyId.isNotEmpty) {
-              Navigator.pushNamed(
-                context,
-                '/property-detail',
-                arguments: propertyId,
-              );
-            } else {
+                  onTap: () {
+          final propertyId = property['_id']?.toString();
+          print('Featured property tapped with ID: $propertyId');
+          if (propertyId != null && propertyId.isNotEmpty) {
+            print('Navigating to property detail with ID: $propertyId');
+            Navigator.pushNamed(
+              context,
+              '/property-detail',
+              arguments: propertyId,
+            );
+          } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Property ID not available')),
               );
@@ -1646,11 +1648,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/property-detail',
-            arguments: property['_id']?.toString() ?? '',
-          );
+          final propertyId = property['_id']?.toString() ?? '';
+          print('Recent property tapped with ID: $propertyId');
+          if (propertyId.isNotEmpty) {
+            print('Navigating to property detail with ID: $propertyId');
+            Navigator.pushNamed(
+              context,
+              '/property-detail',
+              arguments: propertyId,
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Property ID not available')),
+            );
+          }
         },
       ),
     );

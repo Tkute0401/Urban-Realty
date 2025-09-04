@@ -1,13 +1,14 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
+import '../models/property.dart';
 
 class PropertyImageGallery extends StatefulWidget {
-  final List<dynamic> images;
-  final Function(int)? onImageChanged;
+  final List<PropertyImage> images;
+  final String? title;
 
   const PropertyImageGallery({
     super.key,
     required this.images,
-    this.onImageChanged,
+    this.title,
   });
 
   @override
@@ -15,8 +16,14 @@ class PropertyImageGallery extends StatefulWidget {
 }
 
 class _PropertyImageGalleryState extends State<PropertyImageGallery> {
-  int currentIndex = 0;
-  final PageController _pageController = PageController();
+  late PageController _pageController;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
 
   @override
   void dispose() {
@@ -26,100 +33,163 @@ class _PropertyImageGalleryState extends State<PropertyImageGallery> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     if (widget.images.isEmpty) {
       return Container(
-        color: Colors.grey[300],
-        child: const Center(
-          child: Icon(Icons.image, size: 64, color: Colors.grey),
+        height: 300,
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.image_not_supported,
+                size: 64,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No images available',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    return Stack(
-      children: [
-        PageView.builder(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() {
-              currentIndex = index;
-            });
-            widget.onImageChanged?.call(index);
-          },
-          itemCount: widget.images.length,
-          itemBuilder: (context, index) {
-            final image = widget.images[index];
-            return Image.network(
-              image["url"] ?? "",
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: Colors.grey[300],
-                child: const Icon(Icons.broken_image, size: 64),
-              ),
-            );
-          },
-        ),
-        if (widget.images.length > 1) ...[
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                "${currentIndex + 1}/${widget.images.length}",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+    return Container(
+      height: 300,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemCount: widget.images.length,
+            itemBuilder: (context, index) {
+              return Image.network(
+                widget.images[index].url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: Icon(
+                      Icons.image_not_supported,
+                      size: 64,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          
+          // Image counter
+          if (widget.images.length > 1)
+            Positioned(
+              top: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${_currentIndex + 1}/${widget.images.length}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            top: 16,
-            right: 16,
-            child: Row(
-              children: [
-                if (currentIndex > 0)
-                  Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.chevron_left, color: Colors.white),
-                      onPressed: () {
-                        _pageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                    ),
+          
+          // Navigation arrows
+          if (widget.images.length > 1) ...[
+            Positioned(
+              left: 16,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IconButton(
+                  onPressed: _currentIndex > 0 ? _previousImage : null,
+                  icon: const Icon(Icons.chevron_left, color: Colors.white),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black.withOpacity(0.5),
+                    shape: const CircleBorder(),
                   ),
-                if (currentIndex < widget.images.length - 1)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.chevron_right, color: Colors.white),
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                    ),
-                  ),
-              ],
+                ),
+              ),
             ),
-          ),
+            Positioned(
+              right: 16,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IconButton(
+                  onPressed: _currentIndex < widget.images.length - 1 ? _nextImage : null,
+                  icon: const Icon(Icons.chevron_right, color: Colors.white),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.black.withOpacity(0.5),
+                    shape: const CircleBorder(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          
+          // Page indicators
+          if (widget.images.length > 1)
+            Positioned(
+              bottom: 16,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  widget.images.length,
+                  (index) => Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentIndex == index
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.5),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
-      ],
+      ),
     );
+  }
+
+  void _previousImage() {
+    if (_currentIndex > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _nextImage() {
+    if (_currentIndex < widget.images.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 }
