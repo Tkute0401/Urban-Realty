@@ -48,6 +48,19 @@ flutter pub get
 flutter run
 ```
 
+## Environment Configuration
+
+Create a `.env` file based on `.env.example` to configure the API base URL.
+
+```
+API_BASE_URL=https://urban-realty-production.up.railway.app/api/v1
+```
+
+- Local development notes:
+  - Android emulator to host machine: `API_BASE_URL=http://10.0.2.2:5000/api/v1`
+  - iOS simulator: `API_BASE_URL=http://localhost:5000/api/v1`
+- The app reads this via `flutter_dotenv` in `lib/services/api_service.dart`.
+
 ## Dependencies
 
 The app uses the following key dependencies:

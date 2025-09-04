@@ -436,6 +436,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () => Navigator.of(context).pushNamed('/subscription'),
                       ),
+                      ListTile(
+                        leading: Icon(Icons.receipt_long, color: theme.colorScheme.secondary),
+                        title: const Text('Billing & Invoices'),
+                        subtitle: const Text('View billing history and download invoices'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () => Navigator.of(context).pushNamed('/subscription/manage'),
+                      ),
                     ],
                     ListTile(
                       leading: Icon(Icons.help, color: theme.colorScheme.tertiary),

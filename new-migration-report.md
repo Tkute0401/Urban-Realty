@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (env unification applied)
+Last updated: 2025-09-04 (env unification applied; .env examples added)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -35,6 +35,8 @@ Last updated: 2025-09-04 (env unification applied)
 - Completed: Endpoint inventory and parity mapping.
 - Completed: Unify API config variables via `.env.example` in `client` and `mobile`.
 - In progress next: Wire mobile subscription UI to new `SubscriptionService`.
+  - Implement plans list, subscribe flow, manage screen navigation from profile/settings.
+  - Integrate Razorpay checkout using key/order/verify endpoints.
 
 ### Credentials for manual verification
 - admin: email `tanmay@gmail.com`, password `123456`
@@ -45,6 +47,10 @@ Last updated: 2025-09-04 (env unification applied)
 - [Mobile] Consolidated duplicate `SubscriptionService` in `mobile/lib/services/subscription_service.dart` into a single singleton with full parity methods (plans, subscribe, billing, cancel, Razorpay, invoice download, payment method update).
 - [Mobile] Added `getRaw` helper to `mobile/lib/services/http_client.dart` to support byte responses for invoice download.
 - [Config] Added `.env.example` files for `client` and `mobile` with unified base URL.
+  - `client/.env.example` with `VITE_API_BASE_URL`
+  - `mobile/.env.example` with `API_BASE_URL`
+  - Updated `client/README.md` and `mobile/README.md` with environment usage instructions.
+  - Added Settings -> Subscription and Billing navigation in mobile.
 
 ## Mobile Parity Migration Report
 
@@ -135,6 +141,8 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - Wire new `SubscriptionService` into mobile UI (create list/manage/subscribe screens).
 - Add invoice download if exposed, and Razorpay checkout flow on mobile.
 - Add `.env` usage docs to `client/README.md` and `mobile/README.md`.
+  - Client: document `VITE_API_BASE_URL` usage in `client/README.md`.
+  - Mobile: document `API_BASE_URL` and emulator/simulator localhost nuances.
 
 ### Implementation Notes (env unification)
 - Created `client/.env.example` with `VITE_API_BASE_URL`.
