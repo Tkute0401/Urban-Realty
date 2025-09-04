@@ -35,9 +35,9 @@ class _BillingDashboardScreenState extends State<BillingDashboardScreen> {
       ]);
 
       setState(() {
-        _currentSubscription = results[0];
-        _billingHistory = List<Map<String, dynamic>>.from(results[1]);
-        _upcomingBilling = results[2];
+        _currentSubscription = results[0] as Map<String, dynamic>?;
+        _billingHistory = List<Map<String, dynamic>>.from(results[1] as List<dynamic>);
+        _upcomingBilling = results[2] as Map<String, dynamic>?;
         _isLoading = false;
       });
     } catch (e) {

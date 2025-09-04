@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/subscription.dart';
 import '../services/subscription_service.dart';
 
 class SubscriptionComparisonScreen extends StatefulWidget {
@@ -11,7 +10,7 @@ class SubscriptionComparisonScreen extends StatefulWidget {
 
 class _SubscriptionComparisonScreenState extends State<SubscriptionComparisonScreen> {
   final SubscriptionService _subscriptionService = SubscriptionService();
-  List<Subscription> _plans = [];
+  List<Map<String, dynamic>> _plans = [];
   bool _isLoading = true;
 
   @override
@@ -155,19 +154,19 @@ class _SubscriptionComparisonScreenState extends State<SubscriptionComparisonScr
                   const DataColumn(label: Text('Features')),
                   ..._plans.map((plan) => DataColumn(
                     label: Text(
-                      plan.name,
+                      plan['name'] ?? 'Unknown',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   )),
                 ],
                 rows: [
-                  _buildComparisonRow('Price', _plans.map((p) => '₹${p.price.toStringAsFixed(0)}/month').toList()),
-                  _buildComparisonRow('Duration', _plans.map((p) => '${p.duration} months').toList()),
-                  _buildComparisonRow('Property Listings', _plans.map((p) => p.maxProperties == -1 ? 'Unlimited' : '${p.maxProperties}').toList()),
-                  _buildComparisonRow('Featured Properties', _plans.map((p) => p.featuredProperties == -1 ? 'Unlimited' : '${p.featuredProperties}').toList()),
-                  _buildComparisonRow('Priority Support', _plans.map((p) => p.prioritySupport ? 'Yes' : 'No').toList()),
-                  _buildComparisonRow('Analytics', _plans.map((p) => p.analytics ? 'Yes' : 'No').toList()),
-                  _buildComparisonRow('Custom Branding', _plans.map((p) => p.customBranding ? 'Yes' : 'No').toList()),
+                  _buildComparisonRow('Price', _plans.map((p) => '₹${(p['price'] ?? 0).toStringAsFixed(0)}/month').toList()),
+                  _buildComparisonRow('Duration', _plans.map((p) => '${p['duration'] ?? 1} months').toList()),
+                  _buildComparisonRow('Property Listings', _plans.map((p) => (p['maxProperties'] ?? -1) == -1 ? 'Unlimited' : '${p['maxProperties'] ?? 0}').toList()),
+                  _buildComparisonRow('Featured Properties', _plans.map((p) => (p['featuredProperties'] ?? 0) == -1 ? 'Unlimited' : '${p['featuredProperties'] ?? 0}').toList()),
+                  _buildComparisonRow('Priority Support', _plans.map((p) => (p['prioritySupport'] ?? false) ? 'Yes' : 'No').toList()),
+                  _buildComparisonRow('Analytics', _plans.map((p) => (p['analytics'] ?? false) ? 'Yes' : 'No').toList()),
+                  _buildComparisonRow('Custom Branding', _plans.map((p) => (p['customBranding'] ?? false) ? 'Yes' : 'No').toList()),
                 ],
               ),
             ),
