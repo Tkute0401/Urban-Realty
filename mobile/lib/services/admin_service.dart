@@ -49,6 +49,179 @@ class AdminService {
     }
   }
 
+  // Settings
+  Future<Map<String, dynamic>> getSettings() async {
+    try {
+      final response = await HttpClient.get('/admin/settings');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is Map<String, dynamic>) {
+            return data['data'] as Map<String, dynamic>;
+          }
+          return data;
+        }
+        if (data is Map) {
+          final mapData = Map<String, dynamic>.from(data);
+          if (mapData['success'] == true && mapData['data'] is Map<String, dynamic>) {
+            return mapData['data'] as Map<String, dynamic>;
+          }
+          return mapData;
+        }
+      }
+      throw Exception('Failed to load settings');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateSettings(Map<String, dynamic> settings) async {
+    try {
+      final response = await HttpClient.put('/admin/settings', body: settings);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to update settings');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  // Backup & Restore
+  Future<Map<String, dynamic>> createBackup() async {
+    try {
+      final response = await HttpClient.post('/admin/backup');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to create backup');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> restoreFromBackup(String backupId) async {
+    try {
+      final response = await HttpClient.post('/admin/restore/' + backupId);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to restore system');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  // Reports
+  Future<Map<String, dynamic>> generateReport({
+    required String type,
+    String dateRange = '30',
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final query = <String, dynamic>{
+        'type': type,
+        'dateRange': dateRange,
+      };
+      if (dateRange == 'custom') {
+        if (startDate != null) query['startDate'] = startDate;
+        if (endDate != null) query['endDate'] = endDate;
+      }
+      final response = await HttpClient.get('/admin/reports', query: query);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) {
+          if (data['success'] == true && data['data'] is Map<String, dynamic>) {
+            return data['data'] as Map<String, dynamic>;
+          }
+          return data;
+        }
+        if (data is Map) {
+          final mapData = Map<String, dynamic>.from(data);
+          if (mapData['success'] == true && mapData['data'] is Map<String, dynamic>) {
+            return mapData['data'] as Map<String, dynamic>;
+          }
+          return mapData;
+        }
+      }
+      throw Exception('Failed to generate report');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<int>> exportReport({
+    required String type,
+    required String format,
+    String dateRange = '30',
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final query = <String, dynamic>{
+        'type': type,
+        'format': format,
+        'dateRange': dateRange,
+      };
+      if (dateRange == 'custom') {
+        if (startDate != null) query['startDate'] = startDate;
+        if (endDate != null) query['endDate'] = endDate;
+      }
+      final response = await HttpClient.getRaw<List<int>>(
+        '/admin/reports/export',
+        query: query,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return response.data ?? <int>[];
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> emailReport({
+    required String email,
+    required String subject,
+    String message = '',
+    required String type,
+    String dateRange = '30',
+    String? startDate,
+    String? endDate,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        'email': email,
+        'subject': subject,
+        'message': message,
+        'type': type,
+        'dateRange': dateRange,
+      };
+      if (dateRange == 'custom') {
+        if (startDate != null) body['startDate'] = startDate;
+        if (endDate != null) body['endDate'] = endDate;
+      }
+      final response = await HttpClient.post('/admin/reports/email', body: body);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to email report');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
   Map<String, dynamic> _getDefaultDashboardData() {
     return {
       'counts': {
