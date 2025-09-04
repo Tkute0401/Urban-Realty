@@ -33,6 +33,12 @@ import 'features/notifications/notifications_screen.dart';
 import 'features/splash/splash_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/properties_screen.dart';
+import 'screens/developer/developer_detail_screen.dart';
+import 'screens/developer/developer_edit_screen.dart';
+import 'screens/developer/developer_add_screen.dart';
+import 'screens/emi_calculator_screen.dart';
+import 'screens/subscription_comparison_screen.dart';
+import 'screens/billing_dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -114,6 +120,12 @@ class MyApp extends StatelessWidget {
                   return MaterialPageRoute(builder: (context) => const ContactPage());
                 case '/help':
                   return MaterialPageRoute(builder: (context) => const HelpCenterPage());
+                case '/emi-calculator':
+                  return MaterialPageRoute(builder: (context) => const EMICalculatorScreen());
+                case '/subscription-comparison':
+                  return MaterialPageRoute(builder: (context) => const SubscriptionComparisonScreen());
+                case '/billing-dashboard':
+                  return MaterialPageRoute(builder: (context) => const BillingDashboardScreen());
                 case '/admin/dashboard':
                   return MaterialPageRoute(builder: (context) => const AdminDashboardScreen());
                 case '/admin/users':
@@ -159,7 +171,25 @@ class MyApp extends StatelessWidget {
                 case '/properties':
                   return MaterialPageRoute(builder: (context) => const PropertiesScreen());
                 case '/developer-add':
-                  return MaterialPageRoute(builder: (context) => const DevelopersListScreen());
+                  return MaterialPageRoute(builder: (context) => const DeveloperAddScreen());
+                case '/developer-detail':
+                  final args = settings.arguments as String?;
+                  if (args == null) {
+                    return MaterialPageRoute(builder: (context) => const HomeTabs());
+                  }
+                  return MaterialPageRoute(
+                    builder: (context) => DeveloperDetailScreen(developerId: args),
+                    settings: settings,
+                  );
+                case '/developer-edit':
+                  final args = settings.arguments as String?;
+                  if (args == null) {
+                    return MaterialPageRoute(builder: (context) => const HomeTabs());
+                  }
+                  return MaterialPageRoute(
+                    builder: (context) => DeveloperEditScreen(developerId: args),
+                    settings: settings,
+                  );
                 default:
                   return MaterialPageRoute(builder: (context) => const HomeTabs());
               }
