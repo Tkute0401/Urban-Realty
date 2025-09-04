@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (env unification applied; .env examples added)
+Last updated: 2025-09-04 (env unification applied; .env examples added; subscription UI wiring in progress)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -34,9 +34,10 @@ Last updated: 2025-09-04 (env unification applied; .env examples added)
 ### Next Steps
 - Completed: Endpoint inventory and parity mapping.
 - Completed: Unify API config variables via `.env.example` in `client` and `mobile`.
-- In progress next: Wire mobile subscription UI to new `SubscriptionService`.
-  - Implement plans list, subscribe flow, manage screen navigation from profile/settings.
-  - Integrate Razorpay checkout using key/order/verify endpoints.
+- In progress: Wire mobile subscription UI to new `SubscriptionService`.
+  - Plans list screen present (`mobile/lib/screens/subscription_screen.dart`).
+  - Management screen present (`mobile/lib/features/subscription/subscription_management_screen.dart`).
+  - Next: Integrate Razorpay checkout using key/order/verify endpoints; connect navigation from profile/settings.
 
 ### Credentials for manual verification
 - admin: email `tanmay@gmail.com`, password `123456`
@@ -131,6 +132,7 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - [Config] Web now reads API base URL from `VITE_API_BASE_URL` in `client/src/services/axios.js` with production fallback.
 - [Config] Mobile `ApiService` now reads `API_BASE_URL` from `.env` with fallback to `ApiConfig.baseUrl`.
 - [Mobile] Added `SubscriptionService` in `mobile/lib/services/subscription_service.dart` implementing all server endpoints: list plans, subscribe, my-subscription, cancel, upcoming billing, billing history, update payment method, and Razorpay (key, order, verify).
+  - [Config] Added `client/.env.example` and `mobile/.env.example` with base URL settings.
 
 ### Pending Work
 - Evaluate whether admin, agent, developer features need full mobile parity; design and implement role-guarded screens as required.
