@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import "../models/subscription.dart";
 import "../services/subscription_service.dart";
 import "../services/analytics_service.dart";
@@ -14,14 +15,25 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   List<Subscription> _plans = [];
   bool _isLoading = true;
   bool _subscribing = false;
+  late final Razorpay _razorpay;
 
   @override
   void initState() {
     super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
     _loadPlans();
     AnalyticsService().track('mobile_subscription_viewed', {
       'screen': 'SubscriptionScreen'
     });
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+    super.dispose();
   }
 
   @override
@@ -202,20 +214,50 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _processSubscription(Subscription plan) async {
     try {
       setState(() { _subscribing = true; });
-      final result = await SubscriptionService().subscribeToPlan(plan.id);
-      AnalyticsService().track('mobile_subscription_subscribed', {
-        'planId': plan.id,
-        'planName': plan.name,
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message']?.toString() ?? 'Subscription activated')),
-        );
+      // If the plan is free or price is zero, call direct subscribe API
+      if (plan.price <= 0) {
+        final result = await SubscriptionService().subscribeToPlan(plan.id, billingCycle: plan.billingCycle);
+        AnalyticsService().track('mobile_subscription_subscribed', {
+          'planId': plan.id,
+          'planName': plan.name,
+          'type': 'free'
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result['message']?.toString() ?? 'Subscription activated')),
+          );
+        }
+        return;
       }
+
+      // Paid plans -> start Razorpay flow
+      final service = SubscriptionService();
+      final keyRes = await service.getRazorpayKey();
+      final orderRes = await service.createRazorpayOrder(
+        subscriptionId: plan.id,
+        billingCycle: plan.billingCycle,
+      );
+
+      final key = (keyRes.data is Map && keyRes.data['key'] != null) ? keyRes.data['key'].toString() : '';
+      final orderId = (orderRes.data is Map && orderRes.data['orderId'] != null) ? orderRes.data['orderId'].toString() : '';
+      if (key.isEmpty || orderId.isEmpty) {
+        throw Exception('Failed to initiate payment');
+      }
+
+      final options = {
+        'key': key,
+        'amount': (plan.price * 100).toInt(), // in paise
+        'currency': 'INR',
+        'name': 'Urban Realty',
+        'description': 'Subscription: ${plan.name} (${plan.billingCycle})',
+        'order_id': orderId,
+      };
+
+      _razorpay.open(options);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to subscribe: $e')),
+          SnackBar(content: Text('Failed to start subscription: $e')),
         );
       }
     } finally {
@@ -223,5 +265,49 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         setState(() { _subscribing = false; });
       }
     }
+  }
+
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    try {
+      final verifyRes = await SubscriptionService().verifyRazorpayPayment(
+        razorpayPaymentId: response.paymentId ?? '',
+        razorpayOrderId: response.orderId ?? '',
+        razorpaySignature: response.signature ?? '',
+      );
+      AnalyticsService().track('mobile_payment_success', {
+        'orderId': response.orderId,
+        'paymentId': response.paymentId,
+      });
+    
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(verifyRes.data is Map && verifyRes.data['message'] != null ? verifyRes.data['message'].toString() : 'Payment verified and subscription activated')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment verification failed: $e')),
+        );
+      }
+    }
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    AnalyticsService().track('mobile_payment_failed', {
+      'code': response.code,
+      'message': response.message,
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Payment failed: ${response.message ?? response.code}')),
+      );
+    }
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    AnalyticsService().track('mobile_payment_external_wallet', {
+      'walletName': response.walletName,
+    });
   }
 }

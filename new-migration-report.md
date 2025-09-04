@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (env unification applied; .env examples added; subscription UI wiring in progress)
+Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription UI wired incl. Razorpay)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -34,10 +34,11 @@ Last updated: 2025-09-04 (env unification applied; .env examples added; subscrip
 ### Next Steps
 - Completed: Endpoint inventory and parity mapping.
 - Completed: Unify API config variables via `.env.example` in `client` and `mobile`.
-- In progress: Wire mobile subscription UI to new `SubscriptionService`.
-  - Plans list screen present (`mobile/lib/screens/subscription_screen.dart`).
-  - Management screen present (`mobile/lib/features/subscription/subscription_management_screen.dart`).
-  - Next: Integrate Razorpay checkout using key/order/verify endpoints; connect navigation from profile/settings.
+- Completed: Wire mobile subscription UI to `SubscriptionService`.
+  - Plans list screen wired: `mobile/lib/screens/subscription_screen.dart` (free + paid flow).
+  - Razorpay checkout integrated using key/order/verify endpoints.
+  - Management screen wired: `mobile/lib/features/subscription/subscription_management_screen.dart` (my-subscription, billing-history, upcoming-billing, cancel, invoice download).
+  - Navigation from settings in place.
 
 ### Credentials for manual verification
 - admin: email `tanmay@gmail.com`, password `123456`
@@ -52,6 +53,24 @@ Last updated: 2025-09-04 (env unification applied; .env examples added; subscrip
   - `mobile/.env.example` with `API_BASE_URL`
   - Updated `client/README.md` and `mobile/README.md` with environment usage instructions.
   - Added Settings -> Subscription and Billing navigation in mobile.
+  - [Mobile] Wired `subscription_screen.dart` to handle free plan direct subscribe and paid plans via Razorpay, added handlers for success/error/external wallet, and verification call.
+  - [Mobile] Wired `subscription_management_screen.dart` to fetch current subscription, upcoming billing, billing history; added cancel and invoice download using bytes.
+
+## Current Work In This Run
+- Created `client/.env.example` and `mobile/.env.example` using production API default and local dev comments.
+- Set task to wire mobile subscription UI screens to `SubscriptionService`.
+
+## Immediate Next Steps (Run Order)
+1. Wire `mobile/lib/screens/subscription_screen.dart` to `SubscriptionService.getPlans()` and navigation to management/checkout.
+2. Implement subscription management screen data fetch: my-subscription, billing-history, upcoming-billing.
+3. Add invoice download button using byte response via `http_client.getRaw`.
+4. Integrate Razorpay flow (key/order/verify) in mobile; handle callbacks and error states.
+5. QA with provided admin/agent accounts for parity.
+
+## Suggestions for Improvement
+- Add shared TypeScript/JSON schema or OpenAPI spec in `shared/` to generate both Axios types and Dart models.
+- Introduce feature flags per role to conditionally enable admin/agent-only mobile screens.
+- Add e2e tests for subscription flow on mobile using integration test + mock server.
 
 ## Mobile Parity Migration Report
 
