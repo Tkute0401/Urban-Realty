@@ -36,7 +36,14 @@ class PropertiesProvider extends ChangeNotifier {
       _hasMore = true;
     }
     _error = null;
-    notifyListeners();
+    // Only notify listeners if we're not in build phase
+    if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+      notifyListeners();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
 
     try {
       final newProperties = await _propertyService.getProperties(
@@ -61,42 +68,86 @@ class PropertiesProvider extends ChangeNotifier {
       _error = e.toString();
     } finally {
       _isLoading = false;
-      notifyListeners();
+      // Only notify listeners if we're not in build phase
+      if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+        notifyListeners();
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+      }
     }
   }
 
   Future<void> fetchPropertyById(String id) async {
     _isLoading = true;
     _error = null;
-    notifyListeners();
+    // Only notify listeners if we're not in build phase
+    if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+      notifyListeners();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
+    
     try {
       _selectedProperty = await _propertyService.getPropertyById(id);
     } catch (e) {
       _error = e.toString();
     } finally {
       _isLoading = false;
-      notifyListeners();
+      // Only notify listeners if we're not in build phase
+      if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+        notifyListeners();
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+      }
     }
   }
 
   Future<void> fetchFeaturedProperties() async {
     _isLoading = true;
     _error = null;
-    notifyListeners();
+    // Only notify listeners if we're not in build phase
+    if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+      notifyListeners();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
+    
     try {
       _featuredProperties = await _propertyService.getFeaturedProperties();
     } catch (e) {
       _error = e.toString();
     } finally {
       _isLoading = false;
-      notifyListeners();
+      // Only notify listeners if we're not in build phase
+      if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+        notifyListeners();
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+      }
     }
   }
 
   Future<bool> createProperty(Map<String, dynamic> propertyData, List<String> imagePaths) async {
     _isLoading = true;
     _error = null;
-    notifyListeners();
+    // Only notify listeners if we're not in build phase
+    if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+      notifyListeners();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    }
 
     try {
       await _propertyService.createProperty(propertyData, imagePaths);
@@ -107,7 +158,14 @@ class PropertiesProvider extends ChangeNotifier {
       return false;
     } finally {
       _isLoading = false;
-      notifyListeners();
+      // Only notify listeners if we're not in build phase
+      if (!WidgetsBinding.instance.schedulerPhase.isInBuildPhase) {
+        notifyListeners();
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
+      }
     }
   }
 
