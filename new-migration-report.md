@@ -204,3 +204,17 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - Mobile `ApiService` already reads `API_BASE_URL` via `flutter_dotenv`; `pubspec.yaml` includes `.env` asset.
 - Web `axios` reads `VITE_API_BASE_URL` with production fallback.
 
+### Addendum - Admin Analytics parity on mobile (this run)
+- Extended `mobile/lib/services/analytics_service.dart`:
+  - `getDashboardAnalytics()`, `getSearchAnalytics(timeframe)`, `getSystemMetrics()`, `exportAnalyticsCsv()` which saves to `UrbanRealty/Analytics/analytics_<timestamp>.csv` using `FileSaver`.
+- Implemented `mobile/lib/screens/admin/admin_analytics_screen.dart`:
+  - Timeframe selector, refresh, overview metric cards, system health, top queries list, and an Export CSV button that shows saved path via snackbar.
+- Route `/admin/analytics` is already present in `mobile/lib/main.dart`.
+
+### QA Additions
+7. Admin analytics on mobile (login as admin): verify dashboard/search/system metrics across timeframes; confirm CSV export saves to device and opens; ensure non-admin authorization is gracefully handled.
+8. Repeat smoke tests with admin/agent accounts for subscriptions, favorites, recently viewed, contact, and subscription flows.
+
+### Suggestions Additions
+- Add "Open File" action after export and optional in-app CSV preview.
+- Hide admin screens in navigation when `auth.me.role !== 'admin'` to avoid confusion for non-admin users.
