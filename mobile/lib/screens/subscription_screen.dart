@@ -238,15 +238,35 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         billingCycle: plan.billingCycle,
       );
 
-      final key = (keyRes.data is Map && keyRes.data['key'] != null) ? keyRes.data['key'].toString() : '';
-      final orderId = (orderRes.data is Map && orderRes.data['orderId'] != null) ? orderRes.data['orderId'].toString() : '';
+      final key = (keyRes.data is Map && keyRes.data['key'] != null)
+          ? keyRes.data['key'].toString()
+          : '';
+
+      // Server responds with { success, order, subscription }
+      // Extract order.id and order.amount (already in paise)
+      String orderId = '';
+      int amountPaise = (plan.price * 100).toInt();
+      if (orderRes.data is Map) {
+        final map = Map<String, dynamic>.from(orderRes.data as Map);
+        final order = map['order'] is Map ? Map<String, dynamic>.from(map['order']) : null;
+        if (order != null) {
+          orderId = order['id']?.toString() ?? '';
+          final dynamic srvAmount = order['amount'];
+          if (srvAmount is int) {
+            amountPaise = srvAmount;
+          } else if (srvAmount is String) {
+            amountPaise = int.tryParse(srvAmount) ?? amountPaise;
+          }
+        }
+      }
+
       if (key.isEmpty || orderId.isEmpty) {
         throw Exception('Failed to initiate payment');
       }
 
       final options = {
         'key': key,
-        'amount': (plan.price * 100).toInt(), // in paise
+        'amount': amountPaise, // in paise, from server
         'currency': 'INR',
         'name': 'Urban Realty',
         'description': 'Subscription: ${plan.name} (${plan.billingCycle})',
