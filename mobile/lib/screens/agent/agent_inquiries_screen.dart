@@ -351,9 +351,32 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
   }
 
   void _markInquiryAsRead(Map<String, dynamic> inquiry) {
-    // Implement mark as read functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mark as read functionality to be implemented')),
-    );
+    _updateInquiryStatus(inquiry, 'contacted');
+  }
+
+  Future<void> _updateInquiryStatus(Map<String, dynamic> inquiry, String status) async {
+    try {
+      final id = (inquiry['_id'] ?? inquiry['id'] ?? '').toString();
+      if (id.isEmpty) throw Exception('Invalid contact id');
+      await _agentService.updateContactStatus(contactId: id, status: status);
+      if (!mounted) return;
+      setState(() {
+        final index = _inquiries.indexWhere((q) => (q['_id'] ?? q['id']).toString() == id);
+        if (index != -1) {
+          _inquiries[index] = {
+            ..._inquiries[index],
+            'status': status,
+          };
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Inquiry marked as ' + status)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: ' + e.toString())),
+      );
+    }
   }
 }
