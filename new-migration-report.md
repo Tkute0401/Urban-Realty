@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription UI wired incl. Razorpay; mobile Recently Viewed added)
+Last updated: 2025-09-04 (mobile subscription management enhanced: payment method update, browse plans link)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -83,6 +83,10 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
   - Agent inquiries management parity on mobile:
     - Added `updateContactStatus` in `mobile/lib/services/agent_service.dart` to call `PUT /api/v1/contacts/:id` with server-supported statuses: `pending`, `contacted`, `followup`, `closed`
     - Updated `AgentInquiriesScreen` to include status actions (Contacted, Follow Up, Closed), status color mapping, and status filter chips; list supports pull-to-refresh and in-place updates on success
+ - Subscription management enhancements on mobile (`mobile/lib/features/subscription/subscription_management_screen.dart`):
+   - Added Update Payment Method flow invoking `/subscriptions/payment-method`
+   - Added "Browse Plans" link to open `/subscription` plans screen
+   - Invoice download remains bytes-only confirmation; full file save deferred (requires `path_provider` and platform permissions)
 
 ## Immediate Next Steps (Run Order)
 1. QA Favorites on mobile: toggle on detail; verify appears in `/favorites` and persists; status reflects correctly on reopen.
@@ -90,7 +94,8 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
 3. QA Search analytics on mobile: verify events emit without blocking UI; suggestion taps recorded.
 4. QA Contact flow on mobile: ensure inquiry is created and visible to agent in web/admin; confirm analytics fired.
 5. QA Agent inquiries status update on mobile: ensure status changes (`contacted`, `followup`, `closed`) persist and are visible on refresh; test filter chips.
-6. QA with provided admin/agent accounts for subscription + favorites + recently viewed + contact flows.
+6. QA Subscription management on mobile: payment method update success and error paths; browse plans navigation; cancel flow happy/edge cases; invoice download bytes length sanity.
+7. QA with provided admin/agent accounts for subscription + favorites + recently viewed + contact + subscription flows.
 
 ## Suggestions for Improvement
 - Add shared TypeScript/JSON schema or OpenAPI spec in `shared/` to generate both Axios types and Dart models.
