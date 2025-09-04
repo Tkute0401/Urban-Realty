@@ -229,6 +229,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   _buildProfileActionTile(
                                     context,
+                                    'Favorites',
+                                    Icons.favorite,
+                                    () => Navigator.pushNamed(context, '/favorites'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
                                     'Recently Viewed',
                                     Icons.history,
                                     () => Navigator.pushNamed(context, '/recently-viewed'),
@@ -248,6 +254,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   'Settings',
                                   Icons.settings,
                                   () => Navigator.pushNamed(context, '/settings'),
+                                ),
+                                _buildProfileActionTile(
+                                  context,
+                                  'Favorites',
+                                  Icons.favorite,
+                                  () => Navigator.pushNamed(context, '/favorites'),
                                 ),
                                 _buildProfileActionTile(
                                   context,

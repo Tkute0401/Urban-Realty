@@ -97,36 +97,61 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       child: Text(_error!, style: const TextStyle(color: Colors.red)),
                     )
                   ])
-                : ListView.separated(
-                    itemCount: _favorites.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final p = _favorites[index] as Map<String, dynamic>;
-                      final String title = p['title']?.toString() ?? 'Untitled';
-                      final String address = p['address']?.toString() ?? '';
-                      final String price = (p['price']?.toString() ?? '').isEmpty ? '' : '₹${p['price']}';
-                      final imageUrl = _pickPrimaryImage(p);
-                      return ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: SizedBox(
-                            width: 64,
-                            height: 64,
-                            child: imageUrl == null
-                                ? Container(color: Colors.grey.shade300, child: const Icon(Icons.home_outlined))
-                                : Image.network(
-                                    imageUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300, child: const Icon(Icons.broken_image)),
-                                  ),
+                : _favorites.isEmpty
+                    ? ListView(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(Icons.favorite_border, size: 72, color: Colors.grey.shade500),
+                              const SizedBox(height: 12),
+                              const Text('No favorites yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 8),
+                              const Text('Tap the heart on a property to save it here.'),
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: () => Navigator.pushNamed(context, '/search'),
+                                icon: const Icon(Icons.search),
+                                label: const Text('Find properties'),
+                              )
+                            ],
                           ),
                         ),
-                        title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        subtitle: Text(address, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        trailing: Text(price),
-                      );
-                    },
-                  ),
+                      ])
+                    : ListView.separated(
+                        itemCount: _favorites.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final p = _favorites[index] as Map<String, dynamic>;
+                          final String title = p['title']?.toString() ?? 'Untitled';
+                          final String address = p['address']?.toString() ?? '';
+                          final String price = (p['price']?.toString() ?? '').isEmpty ? '' : '₹${p['price']}';
+                          final imageUrl = _pickPrimaryImage(p);
+                          final String propertyId = p['_id']?.toString() ?? p['id']?.toString() ?? '';
+                          return ListTile(
+                            onTap: propertyId.isEmpty ? null : () => Navigator.pushNamed(context, '/property-detail', arguments: propertyId),
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: SizedBox(
+                                width: 64,
+                                height: 64,
+                                child: imageUrl == null
+                                    ? Container(color: Colors.grey.shade300, child: const Icon(Icons.home_outlined))
+                                    : Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300, child: const Icon(Icons.broken_image)),
+                                      ),
+                              ),
+                            ),
+                            title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            subtitle: Text(address, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            trailing: Text(price),
+                          );
+                        },
+                      ),
       ),
     );
   }
