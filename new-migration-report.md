@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics dashboard added; reports email UI)
+Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics dashboard added; reports email UI; analytics payload fix)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -75,6 +75,11 @@ Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics
  - [Mobile] Admin dashboard quick actions updated:
    - Added buttons for `Settings`, `Reports`, and `Media` in `mobile/lib/screens/admin/admin_dashboard_screen.dart` to match web navigation.
    - Ensures faster access to admin parity features on mobile.
+
+ - [Mobile] Analytics payload alignment:
+   - Updated `mobile/lib/services/analytics_service.dart` `track()` to send `{ action, data }` per server expectation instead of `{ event, properties }`.
+   - Adds `source: 'mobile'` inside `data`.
+   - Validated against `server/src/api/routes/analyticsRoutes.js` which expects `action` and `data`.
 
 ## Current Work In This Run
 - Admin analytics parity on mobile: dashboard/search/system metrics and CSV export.
@@ -208,7 +213,7 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - Route `/admin/analytics` is already present in `mobile/lib/main.dart`.
 
 ### QA Additions
-7. Admin analytics on mobile (login as admin): verify dashboard/search/system metrics across timeframes; confirm CSV export saves to device and opens; ensure non-admin authorization is gracefully handled.
+7. Admin analytics on mobile (login as admin): verify dashboard/search/system metrics across timeframes; confirm CSV export saves to device and opens; ensure non-admin authorization is gracefully handled; confirm track events succeed after payload fix.
 8. Admin settings on mobile: toggle/inputs persist after save; backup returns success; restore triggers refresh.
 9. Admin reports on mobile: each report type generates; CSV/PDF export saved path snackbar; email endpoint returns success.
 10. Repeat smoke tests with admin/agent accounts for subscriptions, favorites, recently viewed, contact, and subscription flows.
