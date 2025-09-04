@@ -1,3 +1,75 @@
+import 'package:dio/dio.dart';
+import 'http_client.dart';
+
+class SubscriptionService {
+  Future<Response> getPlans() {
+    return HttpClient.get('/subscriptions');
+  }
+
+  Future<Response> getMySubscription() {
+    return HttpClient.get('/subscriptions/my-subscription');
+  }
+
+  Future<Response> getBillingHistory() {
+    return HttpClient.get('/subscriptions/billing-history');
+  }
+
+  Future<Response> getUpcomingBilling() {
+    return HttpClient.get('/subscriptions/upcoming-billing');
+  }
+
+  Future<Response> subscribe({
+    required String subscriptionId,
+    required String billingCycle,
+    required String paymentMethod,
+  }) {
+    return HttpClient.post('/subscriptions/subscribe', body: {
+      'subscriptionId': subscriptionId,
+      'billingCycle': billingCycle,
+      'paymentMethod': paymentMethod,
+    });
+  }
+
+  Future<Response> cancelSubscription() {
+    return HttpClient.put('/subscriptions/cancel');
+  }
+
+  Future<Response> updatePaymentMethod({
+    required String paymentMethod,
+  }) {
+    return HttpClient.put('/subscriptions/payment-method', body: {
+      'paymentMethod': paymentMethod,
+    });
+  }
+
+  // Razorpay helpers
+  Future<Response> getRazorpayKey() {
+    return HttpClient.get('/subscriptions/razorpay/key');
+  }
+
+  Future<Response> createRazorpayOrder({
+    required String subscriptionId,
+    required String billingCycle,
+  }) {
+    return HttpClient.post('/subscriptions/razorpay/order', body: {
+      'subscriptionId': subscriptionId,
+      'billingCycle': billingCycle,
+    });
+  }
+
+  Future<Response> verifyRazorpayPayment({
+    required String razorpayPaymentId,
+    required String razorpayOrderId,
+    required String razorpaySignature,
+  }) {
+    return HttpClient.post('/subscriptions/razorpay/verify', body: {
+      'razorpay_payment_id': razorpayPaymentId,
+      'razorpay_order_id': razorpayOrderId,
+      'razorpay_signature': razorpaySignature,
+    });
+  }
+}
+
 import 'http_client.dart';
 
 class SubscriptionService {

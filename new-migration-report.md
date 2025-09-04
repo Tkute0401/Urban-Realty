@@ -76,13 +76,14 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - [Init] Created report and captured current inventory and gaps.
 - [Config] Web now reads API base URL from `VITE_API_BASE_URL` in `client/src/services/axios.js` with production fallback.
 - [Config] Mobile `ApiService` now reads `API_BASE_URL` from `.env` with fallback to `ApiConfig.baseUrl`.
-- [Mobile] Wired `SubscriptionScreen` to live APIs using `SubscriptionService` for: list plans (GET `/subscriptions`) and subscribe (POST `/subscriptions/subscribe`). Removed mock data.
-- [Mobile] Added `SubscriptionManagementScreen` to manage current plan, cancel, view upcoming billing, and billing history, with invoice download (bytes response) via `/subscriptions/*` endpoints.
-- [Mobile] Added `AnalyticsService` posting to `/analytics/track` to capture `mobile_subscription_viewed` and `mobile_subscription_subscribed` events. Integrated in `SubscriptionScreen`.
-- [Mobile] Updated routing in `main.dart` to include `/subscription/manage`, and linked from `ProfileScreen` quick access.
+- [Mobile] Added `SubscriptionService` in `mobile/lib/services/subscription_service.dart` implementing all server endpoints: list plans, subscribe, my-subscription, cancel, upcoming billing, billing history, update payment method, and Razorpay (key, order, verify).
 
 ### Pending Work
 - Evaluate whether admin, agent, developer features need full mobile parity; design and implement role-guarded screens as required.
 - Extend analytics parity across properties search/view, favorites, inquiries, add property, and admin actions.
 - Ensure media upload parity and any missing endpoints in mobile services.
+
+### Next Implementation Targets
+- Wire new `SubscriptionService` into mobile UI (create list/manage/subscribe screens).
+- Add invoice download if exposed, and Razorpay checkout flow on mobile.
 
