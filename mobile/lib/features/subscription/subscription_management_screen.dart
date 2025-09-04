@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/subscription_service.dart';
+import '../../utils/file_saver.dart';
 
 class SubscriptionManagementScreen extends StatefulWidget {
   const SubscriptionManagementScreen({super.key});
@@ -71,14 +72,17 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
   Future<void> _downloadInvoice(String subscriptionId) async {
     try {
       final bytes = await SubscriptionService().downloadInvoicePdf(subscriptionId);
-      // Save to a temp file path
-      // Avoid new imports; use basic DateTime-based file name and default temp directory via getTemporaryDirectory if available
-      // Since path_provider isn't guaranteed, use a simple snackbar confirmation of bytes and suggest feature flag
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invoice downloaded (${bytes.length} bytes). Saving to device coming soon.')),
-        );
-      }
+      final String timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final String fileName = 'invoice_$subscriptionId_$timestamp.pdf';
+      final String savedPath = await FileSaver.saveBytes(
+        bytes: bytes,
+        fileName: fileName,
+        subdirectory: 'UrbanRealty/Invoices',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invoice saved: $savedPath')),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
