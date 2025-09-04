@@ -72,6 +72,9 @@ Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics
    - Extended `AdminService` with `getMedia`, `deleteMedia`, `uploadMedia` using multipart via `HttpClient.postMultipart`.
    - Added `AdminMediaScreen` at `mobile/lib/screens/admin/admin_media_screen.dart` with list, infinite scroll, delete, and upload (FilePicker).
    - Wired route `/admin/media` in `mobile/lib/main.dart` and quick action in `admin_dashboard_screen.dart` already navigates to it.
+ - [Mobile] Admin dashboard quick actions updated:
+   - Added buttons for `Settings`, `Reports`, and `Media` in `mobile/lib/screens/admin/admin_dashboard_screen.dart` to match web navigation.
+   - Ensures faster access to admin parity features on mobile.
 
 ## Current Work In This Run
 - Admin analytics parity on mobile: dashboard/search/system metrics and CSV export.
@@ -81,10 +84,10 @@ Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics
 - Recently Viewed, Favorites, Contact, Agent inquiries, and Subscription flows previously completed remain stable.
 
 ## Immediate Next Steps (Run Order)
-1. QA Admin Settings on mobile: fetch/save flows; maintenance mode toggle; backup/restore happy/edge cases.
-2. QA Admin Reports on mobile: generate report types; export CSV/PDF saved under UrbanRealty/Reports; email success path.
+1. QA Admin Settings on mobile: fetch/save flows; maintenance mode toggle; backup/restore happy/edge cases. Access via Admin Dashboard quick action.
+2. QA Admin Reports on mobile: generate report types; export CSV/PDF saved under UrbanRealty/Reports; email success path. Access via Admin Dashboard quick action.
 3. QA Admin Analytics on mobile: timeframe switching; CSV export path confirmation; non-admin access handled.
-4. QA Admin Media on mobile: list pagination, delete confirmation, upload via file picker.
+4. QA Admin Media on mobile: list pagination, delete confirmation, upload via file picker. Access via Admin Dashboard quick action.
 5. Regression QA: Favorites, Recently Viewed, Search analytics breadcrumbs, Contact creation, Agent inquiries status updates.
 6. QA Subscription management: update payment method, browse plans navigation, cancel/invoice download flow.
 7. Verify base URL envs for both clients against production.
