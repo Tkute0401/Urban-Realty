@@ -81,6 +81,9 @@ Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics
    - Adds `source: 'mobile'` inside `data`.
    - Validated against `server/src/api/routes/analyticsRoutes.js` which expects `action` and `data`.
 
+ - [Mobile] Razorpay integration fix:
+   - Corrected parsing of Razorpay order response in `mobile/lib/screens/subscription_screen.dart` to use `order.id` and server-provided `order.amount` (paise) instead of expecting `orderId` at root and recomputing amount. This prevents amount/signature mismatches during checkout.
+
 ## Current Work In This Run
 - Admin analytics parity on mobile: dashboard/search/system metrics and CSV export.
 - Admin settings parity on mobile: fetch/save settings, backup and restore actions.
