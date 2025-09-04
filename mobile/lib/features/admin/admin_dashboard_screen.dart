@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../shared/providers/properties_provider.dart';
 import '../../models/property.dart';
+import '../../services/admin_service.dart';
 // Removed unused imports
 import '../../utils/format_utils.dart';
 import '../../widgets/quick_action_card.dart';
@@ -21,6 +22,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   late TabController _tabController;
   bool isLoading = true;
   bool isRefreshing = false;
+  final AdminService _adminService = AdminService();
   
   // Dashboard data
   Map<String, dynamic> stats = {
@@ -120,35 +122,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
   Future<void> _loadStats() async {
     try {
-      // In a real app, this would call the API
-      // For now, using mock data that matches the React app structure
+      final dashboard = await _adminService.getDashboardStats();
       setState(() {
-        stats = {
-          'counts': {
-            'users': 1200,
-            'agents': 45,
-            'properties': 850,
-            'contacts': 320,
-            'subscriptions': 28,
-            'revenue': 125000,
-          },
-          'analytics': {
-            'growthRate': 15.5,
-            'conversionRate': 8.2,
-            'avgResponseTime': 2.3,
-            'topPerformingAgents': [
-              {'name': 'John Doe', 'properties': 25, 'revenue': 150000},
-              {'name': 'Jane Smith', 'properties': 22, 'revenue': 135000},
-              {'name': 'Mike Johnson', 'properties': 18, 'revenue': 120000},
-            ],
-            'systemHealth': {
-              'cpu': 45,
-              'memory': 62,
-              'storage': 78,
-              'network': 92,
-            }
-          }
-        };
+        stats = dashboard;
+        // Populate recent lists if the API provides them
+        final recent = (dashboard['recent'] is Map<String, dynamic>)
+            ? dashboard['recent'] as Map<String, dynamic>
+            : <String, dynamic>{};
+        recentUsers = List<Map<String, dynamic>>.from(recent['users'] ?? const []);
+        recentContacts = List<Map<String, dynamic>>.from(recent['contacts'] ?? const []);
       });
     } catch (e) {
       throw Exception('Failed to load stats: $e');
@@ -171,26 +153,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
   Future<void> _loadRecentUsers() async {
     try {
-      // Mock data for recent users
+      // Prefer recent users from stats if already loaded
+      if (recentUsers.isNotEmpty) return;
+      final users = await _adminService.getUsers(page: 1, limit: 5);
       setState(() {
-        recentUsers = [
-          {
-            '_id': '1',
-            'name': 'John Doe',
-            'email': 'john@example.com',
-            'role': 'agent',
-            'status': 'active',
-            'createdAt': DateTime.now().subtract(const Duration(days: 2)),
-          },
-          {
-            '_id': '2',
-            'name': 'Jane Smith',
-            'email': 'jane@example.com',
-            'role': 'user',
-            'status': 'active',
-            'createdAt': DateTime.now().subtract(const Duration(days: 5)),
-          },
-        ];
+        recentUsers = users;
       });
     } catch (e) {
       throw Exception('Failed to load recent users: $e');
@@ -199,25 +166,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
   Future<void> _loadRecentContacts() async {
     try {
-      // Mock data for recent contacts
-      setState(() {
-        recentContacts = [
-          {
-            '_id': '1',
-            'user': {'name': 'Mike Johnson', 'email': 'mike@example.com'},
-            'property': {'title': 'Luxury Villa in Pune'},
-            'status': 'pending',
-            'createdAt': DateTime.now().subtract(const Duration(hours: 2)),
-          },
-          {
-            '_id': '2',
-            'user': {'name': 'Sarah Wilson', 'email': 'sarah@example.com'},
-            'property': {'title': 'Modern Apartment in Mumbai'},
-            'status': 'contacted',
-            'createdAt': DateTime.now().subtract(const Duration(hours: 5)),
-          },
-        ];
-      });
+      // Use contacts from stats payload if available; else leave empty for now
+      // (Add service endpoint when backend exposes it)
+      // No-op here; _loadStats already fills recentContacts when present.
     } catch (e) {
       throw Exception('Failed to load recent contacts: $e');
     }
@@ -455,7 +406,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 1.3,
+            // Give items a bit more height to prevent overflow in smaller widths
+            childAspectRatio: 1.0,
             children: [
               StatsCard(
                 title: 'Total Users',
