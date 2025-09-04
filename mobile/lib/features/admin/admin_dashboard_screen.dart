@@ -567,28 +567,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     children: [
                       _buildSystemHealthCard(
                         'CPU Usage',
-                        '${stats['analytics']['systemHealth']['cpu']}%',
+                        '${stats['analytics']?['systemHealth']?['cpu'] ?? 0}%',
                         Icons.speed,
                         Colors.blue,
                         theme,
                       ),
                       _buildSystemHealthCard(
                         'Memory',
-                        '${stats['analytics']['systemHealth']['memory']}%',
+                        '${stats['analytics']?['systemHealth']?['memory'] ?? 0}%',
                         Icons.storage,
                         Colors.purple,
                         theme,
                       ),
                       _buildSystemHealthCard(
                         'Storage',
-                        '${stats['analytics']['systemHealth']['storage']}%',
+                        '${stats['analytics']?['systemHealth']?['storage'] ?? 0}%',
                         Icons.storage,
                         Colors.cyan,
                         theme,
                       ),
                       _buildSystemHealthCard(
                         'Network',
-                        '${stats['analytics']['systemHealth']['network']}%',
+                        '${stats['analytics']?['systemHealth']?['network'] ?? 0}%',
                         Icons.network_check,
                         Colors.green,
                         theme,
