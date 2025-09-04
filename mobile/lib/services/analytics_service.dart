@@ -9,10 +9,13 @@ class AnalyticsService {
 
   Future<void> track(String eventName, Map<String, dynamic> properties) async {
     try {
+      // Server expects { action, data } shape
       await HttpClient.post('/analytics/track', body: {
-        'event': eventName,
-        'properties': properties,
-        'source': 'mobile',
+        'action': eventName,
+        'data': {
+          ...properties,
+          'source': 'mobile',
+        },
       });
     } catch (_) {
       // Swallow analytics errors to avoid breaking UX
