@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04
+Last updated: 2025-09-04 (env unification applied)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -32,8 +32,9 @@ Last updated: 2025-09-04
 6) Keep this report updated after each change.
 
 ### Next Steps
-- In progress: Audit web endpoints and features.
-- Pending: Audit mobile feature and API usage; parity mapping; unify API config variables.
+- Completed: Endpoint inventory and parity mapping.
+- Completed: Unify API config variables via `.env.example` in `client` and `mobile`.
+- In progress next: Wire mobile subscription UI to new `SubscriptionService`.
 
 ### Credentials for manual verification
 - admin: email `tanmay@gmail.com`, password `123456`
@@ -43,7 +44,7 @@ Last updated: 2025-09-04
 - Initial report created. Discovered key server routes and client base URLs.
 - [Mobile] Consolidated duplicate `SubscriptionService` in `mobile/lib/services/subscription_service.dart` into a single singleton with full parity methods (plans, subscribe, billing, cancel, Razorpay, invoice download, payment method update).
 - [Mobile] Added `getRaw` helper to `mobile/lib/services/http_client.dart` to support byte responses for invoice download.
- - [Config] Added `.env.example` files for `client` and `mobile` with unified base URL.
+- [Config] Added `.env.example` files for `client` and `mobile` with unified base URL.
 
 ## Mobile Parity Migration Report
 
@@ -133,4 +134,11 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 ### Next Implementation Targets
 - Wire new `SubscriptionService` into mobile UI (create list/manage/subscribe screens).
 - Add invoice download if exposed, and Razorpay checkout flow on mobile.
+- Add `.env` usage docs to `client/README.md` and `mobile/README.md`.
+
+### Implementation Notes (env unification)
+- Created `client/.env.example` with `VITE_API_BASE_URL`.
+- Created `mobile/.env.example` with `API_BASE_URL`.
+- Mobile `ApiService` already reads `API_BASE_URL` via `flutter_dotenv`; `pubspec.yaml` includes `.env` asset.
+- Web `axios` reads `VITE_API_BASE_URL` with production fallback.
 
