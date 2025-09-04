@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (mobile: invoice saving implemented; subscription mgmt enhancements)
+Last updated: 2025-09-04 (mobile: admin settings/reports parity; analytics dashboard added)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -17,7 +17,7 @@ Last updated: 2025-09-04 (mobile: invoice saving implemented; subscription mgmt 
 ### Current Integrations (Mobile)
 - Centralized `ApiService` with Dio interceptor attaching `Authorization` header from `FlutterSecureStorage`. Retries and normalized errors present. Base URL from env `API_BASE_URL` or `ApiConfig.baseUrl`.
 - Implemented services: `auth_service.dart` (`/auth/login`, `/auth/register`, `/auth/me`, `/auth/update`), `favorites_service.dart` (favorites CRUD + status), `property_service.dart` (list, by id, featured, suggestions, CRUD including upload via multipart), `subscription_service.dart` (plans, my-subscription, billing history, upcoming billing, subscribe, cancel, Razorpay key/order/verify, invoice download), `admin_service.dart` (stats, users, properties, agents, verify agent), lightweight `analytics_service.dart` (`/analytics/track`).
-- Remaining: Admin endpoints for settings, reports, backup/restore, dynamic fields, user types; analytics dashboard/export; contact requests mgmt; property media delete (admin).
+- Remaining: Dynamic fields, user types; admin media delete; any missing admin CRUD nuances.
   - Implemented now: Recently Viewed parity (fetch + track) on mobile
 
 ### Gaps Identified
@@ -69,34 +69,18 @@ Last updated: 2025-09-04 (mobile: invoice saving implemented; subscription mgmt 
     - Added Favorites quick access links in `mobile/lib/screens/profile_screen.dart`; route `/favorites` already wired in `mobile/lib/main.dart`.
 
 ## Current Work In This Run
-- Implemented Recently Viewed parity on mobile (service, tracking, screen, routing, nav entry).
-- Implemented Favorites parity on mobile (toggle in detail, list screen polish, profile links).
-- Added analytics tracking for view and favorite/unfavorite events on mobile.
-- Extended analytics parity to search interactions on mobile:
-  - Screen view `search_screen_viewed`
-  - Typing breadcrumbs `search_typing` (sampled)
-  - Clear action `search_cleared`
-  - Suggestion tap `search_suggestion_selected`
-- Implemented property contact requests on mobile:
-  - New `ContactService` at `mobile/lib/services/contact_service.dart` hitting `POST /api/v1/contacts/property/:propertyId`
-  - Inquiry flow wired in `PropertyDetailScreen` with a message dialog and success/error toasts
-  - Analytics `contact_created` fired on success
-  - Agent inquiries management parity on mobile:
-    - Added `updateContactStatus` in `mobile/lib/services/agent_service.dart` to call `PUT /api/v1/contacts/:id` with server-supported statuses: `pending`, `contacted`, `followup`, `closed`
-    - Updated `AgentInquiriesScreen` to include status actions (Contacted, Follow Up, Closed), status color mapping, and status filter chips; list supports pull-to-refresh and in-place updates on success
- - Subscription management enhancements on mobile (`mobile/lib/features/subscription/subscription_management_screen.dart`):
-   - Added Update Payment Method flow invoking `/subscriptions/payment-method`
-   - Added "Browse Plans" link to open `/subscription` plans screen
-   - Invoice download now saves PDF to device using `FileSaver.saveBytes` and `path_provider`.
+- Admin analytics parity on mobile: dashboard/search/system metrics and CSV export.
+- Admin settings parity on mobile: fetch/save settings, backup and restore actions.
+- Admin reports parity on mobile: generate reports, export CSV/PDF, email report.
+- Recently Viewed, Favorites, Contact, Agent inquiries, and Subscription flows previously completed remain stable.
 
 ## Immediate Next Steps (Run Order)
-1. QA Favorites on mobile: toggle on detail; verify appears in `/favorites` and persists; status reflects correctly on reopen.
-2. QA Recently Viewed on mobile: open multiple properties; verify order/cap of 10.
-3. QA Search analytics on mobile: verify events emit without blocking UI; suggestion taps recorded.
-4. QA Contact flow on mobile: ensure inquiry is created and visible to agent in web/admin; confirm analytics fired.
-5. QA Agent inquiries status update on mobile: ensure status changes (`contacted`, `followup`, `closed`) persist and are visible on refresh; test filter chips.
-6. QA Subscription management on mobile: payment method update success and error paths; browse plans navigation; cancel flow happy/edge cases; invoice saving writes file (verify path in snackbar) and opens.
-7. QA with provided admin/agent accounts for subscription + favorites + recently viewed + contact + subscription flows.
+1. QA Admin Settings on mobile: fetch/save flows; maintenance mode toggle; backup/restore happy/edge cases.
+2. QA Admin Reports on mobile: generate report types; export CSV/PDF saved under UrbanRealty/Reports; email success path.
+3. QA Admin Analytics on mobile: timeframe switching; CSV export path confirmation; non-admin access handled.
+4. Regression QA: Favorites, Recently Viewed, Search analytics breadcrumbs, Contact creation, Agent inquiries status updates.
+5. QA Subscription management: update payment method, browse plans navigation, cancel/invoice download flow.
+6. Verify base URL envs for both clients against production.
 
 ## Suggestions for Improvement
 - Add shared TypeScript/JSON schema or OpenAPI spec in `shared/` to generate both Axios types and Dart models.
@@ -104,6 +88,8 @@ Last updated: 2025-09-04 (mobile: invoice saving implemented; subscription mgmt 
 - Add e2e tests for subscription flow on mobile using integration test + mock server.
  - Add scroll-based lazy loading and skeletons for Recently Viewed and Favorites lists.
  - Consider merging favorites/recently-viewed into a single "Library" tab for UX parity with web `AccountSidebar` tabs.
+ - Centralize admin-only navigation visibility based on `auth.me.role` to hide settings/reports for non-admin users.
+ - Implement proper email UI to let admin specify target email/subject/body when emailing reports on mobile.
 
 ## Mobile Parity Migration Report
 
@@ -204,7 +190,7 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - Mobile `ApiService` already reads `API_BASE_URL` via `flutter_dotenv`; `pubspec.yaml` includes `.env` asset.
 - Web `axios` reads `VITE_API_BASE_URL` with production fallback.
 
-### Addendum - Admin Analytics parity on mobile (this run)
+### Addendum - Admin Analytics parity on mobile (previous step)
 - Extended `mobile/lib/services/analytics_service.dart`:
   - `getDashboardAnalytics()`, `getSearchAnalytics(timeframe)`, `getSystemMetrics()`, `exportAnalyticsCsv()` which saves to `UrbanRealty/Analytics/analytics_<timestamp>.csv` using `FileSaver`.
 - Implemented `mobile/lib/screens/admin/admin_analytics_screen.dart`:
@@ -213,7 +199,9 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 
 ### QA Additions
 7. Admin analytics on mobile (login as admin): verify dashboard/search/system metrics across timeframes; confirm CSV export saves to device and opens; ensure non-admin authorization is gracefully handled.
-8. Repeat smoke tests with admin/agent accounts for subscriptions, favorites, recently viewed, contact, and subscription flows.
+8. Admin settings on mobile: toggle/inputs persist after save; backup returns success; restore triggers refresh.
+9. Admin reports on mobile: each report type generates; CSV/PDF export saved path snackbar; email endpoint returns success.
+10. Repeat smoke tests with admin/agent accounts for subscriptions, favorites, recently viewed, contact, and subscription flows.
 
 ### Suggestions Additions
 - Add "Open File" action after export and optional in-app CSV preview.
