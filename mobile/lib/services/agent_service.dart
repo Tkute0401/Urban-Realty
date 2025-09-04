@@ -146,4 +146,27 @@ class AgentService {
       'responseTime': 0,
     };
   }
+
+  Future<Map<String, dynamic>> updateContactStatus({
+    required String contactId,
+    required String status,
+  }) async {
+    try {
+      final response = await HttpClient.put('/contacts/' + contactId, body: {
+        'status': status,
+      });
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to update contact status. Status: ' + response.statusCode.toString());
+    } catch (e) {
+      if (e.toString().contains('FormatException')) {
+        throw Exception('Server returned invalid JSON. Please check your connection.');
+      }
+      throw Exception('Error: ' + e.toString());
+    }
+  }
 }
