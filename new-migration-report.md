@@ -61,16 +61,21 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
     - `POST /auth/recently-viewed/:propertyId` to track views (fire-and-forget)
   - [Mobile] Tracked property views in `PropertyDetailScreen` via `RecentlyViewedService().trackViewed(id)`.
   - [Mobile] Added `RecentlyViewedScreen` with route `/recently-viewed` and navigation entry in `ProfileScreen` under user quick access.
+  - [Mobile] Favorites parity:
+    - Added toggle to `mobile/lib/features/properties/property_detail_screen.dart` using `FavoritesService` (`/auth/favorites/:propertyId` PUT/DELETE and status GET).
+    - Added analytics events on mobile via `AnalyticsService().track(...)` for `property_viewed`, `favorite_added`, `favorite_removed`.
+    - Enhanced `mobile/lib/screens/favorites_screen.dart` with empty state, and tap to open property detail.
+    - Added Favorites quick access links in `mobile/lib/screens/profile_screen.dart`; route `/favorites` already wired in `mobile/lib/main.dart`.
 
 ## Current Work In This Run
-- Created `client/.env.example` and `mobile/.env.example` using production API default and local dev comments.
-- Set task to wire mobile subscription UI screens to `SubscriptionService`.
 - Implemented Recently Viewed parity on mobile (service, tracking, screen, routing, nav entry).
+- Implemented Favorites parity on mobile (toggle in detail, list screen polish, profile links).
+- Added analytics tracking for view and favorite/unfavorite events on mobile.
 
 ## Immediate Next Steps (Run Order)
-1. QA Recently Viewed on mobile: open multiple properties to populate list; verify order and cap of 10.
-2. Add Favorites parity UI: mark/unmark from `PropertyDetailScreen` using `FavoritesService`; add favorites list screen and link from profile.
-3. Implement Analytics parity minimal events on mobile (search, view, favorite, contact) to `/api/v1/analytics/track`.
+1. QA Favorites on mobile: toggle on detail; verify appears in `/favorites` and persists; status reflects correctly on reopen.
+2. QA Recently Viewed on mobile: open multiple properties; verify order/cap of 10.
+3. Extend analytics parity to search and contact events; send to `/api/v1/analytics/track`.
 4. QA with provided admin/agent accounts for subscription + favorites + recently viewed flows.
 
 ## Suggestions for Improvement

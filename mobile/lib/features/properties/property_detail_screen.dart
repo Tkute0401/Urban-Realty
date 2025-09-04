@@ -10,6 +10,8 @@ import '../../widgets/property_agent_section.dart';
 import '../../widgets/property_contact_section.dart';
 import '../../utils/format_utils.dart';
 import '../../services/recently_viewed_service.dart';
+import '../../services/favorites_service.dart';
+import '../../services/analytics_service.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final String propertyId;
@@ -24,6 +26,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   Property? property;
   bool isLoading = true;
   String? error;
+  bool isFavorite = false;
+  bool isTogglingFavorite = false;
 
   @override
   void initState() {
@@ -47,6 +51,19 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       // Track recently viewed (non-blocking)
       // Fire and forget to avoid delaying UI rendering
       RecentlyViewedService().trackViewed(widget.propertyId);
+      // Track analytics for view (non-blocking)
+      AnalyticsService().track('property_viewed', {
+        'propertyId': widget.propertyId,
+      });
+      // Fetch favorite status (best-effort)
+      try {
+        final fav = await FavoritesService().isFavorite(widget.propertyId);
+        if (mounted) {
+          isFavorite = fav;
+        }
+      } catch (_) {
+        // ignore
+      }
       
       if (mounted) {
         setState(() {
@@ -59,6 +76,55 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         setState(() {
           error = e.toString();
           isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (property == null || isTogglingFavorite) return;
+    setState(() {
+      isTogglingFavorite = true;
+    });
+    final service = FavoritesService();
+    try {
+      if (isFavorite) {
+        await service.removeFavorite(widget.propertyId);
+        setState(() {
+          isFavorite = false;
+        });
+        AnalyticsService().track('favorite_removed', {
+          'propertyId': widget.propertyId,
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Removed from favorites')),
+          );
+        }
+      } else {
+        await service.addFavorite(widget.propertyId);
+        setState(() {
+          isFavorite = true;
+        });
+        AnalyticsService().track('favorite_added', {
+          'propertyId': widget.propertyId,
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Added to favorites')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating favorite: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isTogglingFavorite = false;
         });
       }
     }
@@ -112,13 +178,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         title: const Text('Property Details'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border),
-            onPressed: () {
-              // TODO: Implement favorite functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Favorite functionality coming soon!')),
-              );
-            },
+            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+            onPressed: isTogglingFavorite ? null : _toggleFavorite,
+            tooltip: isFavorite ? 'Remove from favorites' : 'Add to favorites',
           ),
           IconButton(
             icon: const Icon(Icons.share),
