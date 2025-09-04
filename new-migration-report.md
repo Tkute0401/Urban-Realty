@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: INITIAL
+Last updated: 2025-09-04
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -41,6 +41,9 @@ Last updated: INITIAL
 
 ### Change Log
 - Initial report created. Discovered key server routes and client base URLs.
+- [Mobile] Consolidated duplicate `SubscriptionService` in `mobile/lib/services/subscription_service.dart` into a single singleton with full parity methods (plans, subscribe, billing, cancel, Razorpay, invoice download, payment method update).
+- [Mobile] Added `getRaw` helper to `mobile/lib/services/http_client.dart` to support byte responses for invoice download.
+ - [Config] Added `.env.example` files for `client` and `mobile` with unified base URL.
 
 ## Mobile Parity Migration Report
 
