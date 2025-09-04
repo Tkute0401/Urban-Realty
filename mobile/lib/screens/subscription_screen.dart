@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "../models/subscription.dart";
 import "../services/subscription_service.dart";
+import "../services/analytics_service.dart";
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -18,6 +19,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   void initState() {
     super.initState();
     _loadPlans();
+    AnalyticsService().track('mobile_subscription_viewed', {
+      'screen': 'SubscriptionScreen'
+    });
   }
 
   @override
@@ -199,6 +203,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     try {
       setState(() { _subscribing = true; });
       final result = await SubscriptionService().subscribeToPlan(plan.id);
+      AnalyticsService().track('mobile_subscription_subscribed', {
+        'planId': plan.id,
+        'planName': plan.name,
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result['message']?.toString() ?? 'Subscription activated')),

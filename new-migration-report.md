@@ -77,9 +77,12 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - [Config] Web now reads API base URL from `VITE_API_BASE_URL` in `client/src/services/axios.js` with production fallback.
 - [Config] Mobile `ApiService` now reads `API_BASE_URL` from `.env` with fallback to `ApiConfig.baseUrl`.
 - [Mobile] Wired `SubscriptionScreen` to live APIs using `SubscriptionService` for: list plans (GET `/subscriptions`) and subscribe (POST `/subscriptions/subscribe`). Removed mock data.
+- [Mobile] Added `SubscriptionManagementScreen` to manage current plan, cancel, view upcoming billing, and billing history, with invoice download (bytes response) via `/subscriptions/*` endpoints.
+- [Mobile] Added `AnalyticsService` posting to `/analytics/track` to capture `mobile_subscription_viewed` and `mobile_subscription_subscribed` events. Integrated in `SubscriptionScreen`.
+- [Mobile] Updated routing in `main.dart` to include `/subscription/manage`, and linked from `ProfileScreen` quick access.
 
 ### Pending Work
-- Implement mobile subscription management (view current plan, cancel, billing history, invoices) using existing `SubscriptionService` methods.
-- Evaluate whether admin features need mobile parity; if yes, design role-gated screens.
-- Add analytics event parity (track key actions) if required.
+- Evaluate whether admin, agent, developer features need full mobile parity; design and implement role-guarded screens as required.
+- Extend analytics parity across properties search/view, favorites, inquiries, add property, and admin actions.
+- Ensure media upload parity and any missing endpoints in mobile services.
 

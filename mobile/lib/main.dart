@@ -10,6 +10,7 @@ import 'features/settings/settings_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/search/search_screen.dart';
 import 'features/subscription/subscription_screen.dart';
+import 'features/subscription/subscription_management_screen.dart';
 import 'features/properties/add_property_screen.dart';
 import 'features/properties/property_detail_screen.dart';
 import 'features/static_pages/static_pages.dart';
@@ -78,6 +79,8 @@ class MyApp extends StatelessWidget {
                   return MaterialPageRoute(builder: (context) => const ProfileScreen());
                 case '/subscription':
                   return MaterialPageRoute(builder: (context) => const SubscriptionScreen());
+                case '/subscription/manage':
+                  return MaterialPageRoute(builder: (context) => const SubscriptionManagementScreen());
                 case '/add-property':
                   return MaterialPageRoute(builder: (context) => const AddPropertyScreen());
                 case '/property-detail':

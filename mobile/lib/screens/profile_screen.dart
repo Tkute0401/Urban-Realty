@@ -231,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     context,
                                     'Subscription',
                                     Icons.card_membership,
-                                    () => Navigator.pushNamed(context, '/subscription'),
+                                    () => Navigator.pushNamed(context, '/subscription/manage'),
                                   ),
                                 ],
                                 

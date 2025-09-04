@@ -115,12 +115,17 @@ class SubscriptionService {
 
   Future<List<int>> downloadInvoicePdf(String subscriptionId) async {
     try {
-      final response = await HttpClient.get('/subscriptions/invoice/$subscriptionId/download');
-      if (response.statusCode == 200) {
-        // Assuming server returns binary PDF; dio may already parse bytes
-        final data = response.data;
-        if (data is List<int>) return data;
-        if (data is List) return List<int>.from(data);
+      // Use dio directly to request bytes
+      final dio = HttpClient._api.dio;
+      final response = await dio.get(
+        '/subscriptions/invoice/$subscriptionId/download',
+        options: Options(responseType: ResponseType.bytes),
+      );
+      if (response.statusCode == 200 && response.data is List<int>) {
+        return List<int>.from(response.data as List<int>);
+      }
+      if (response.data is List) {
+        return List<int>.from(response.data as List);
       }
       throw Exception('Failed to download invoice');
     } catch (e) {
