@@ -77,9 +77,9 @@ class AdminService {
           if (data['success'] == true && data['data'] is List) {
             return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
           }
-          return List<Map<String, dynamic>>.from((data['users'] != null) ? data['users'] : []);
+          return <Map<String, dynamic>>[];
         }
-        return List<Map<String, dynamic>>.from((data is Map && data['users'] != null) ? data['users'] : []);
+        return <Map<String, dynamic>>[];
       }
       throw Exception('Failed to load users');
     } catch (e) {
@@ -97,9 +97,9 @@ class AdminService {
           if (data['success'] == true && data['data'] is List) {
             return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
           }
-          return List<Map<String, dynamic>>.from((data['properties'] != null) ? data['properties'] : []);
+          return <Map<String, dynamic>>[];
         }
-        return List<Map<String, dynamic>>.from((data is Map && data['properties'] != null) ? data['properties'] : []);
+        return <Map<String, dynamic>>[];
       }
       throw Exception('Failed to load properties');
     } catch (e) {
@@ -117,9 +117,9 @@ class AdminService {
           if (data['success'] == true && data['data'] is List) {
             return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
           }
-          return List<Map<String, dynamic>>.from((data['agents'] != null) ? data['agents'] : []);
+          return <Map<String, dynamic>>[];
         }
-        return List<Map<String, dynamic>>.from((data is Map && data['agents'] != null) ? data['agents'] : []);
+        return <Map<String, dynamic>>[];
       }
       throw Exception('Failed to load agents');
     } catch (e) {
@@ -129,7 +129,8 @@ class AdminService {
 
   Future<Map<String, dynamic>> updateUserStatus(String userId, String status) async {
     try {
-      final response = await HttpClient.put('/admin/users/$userId/status', body: {'status': status});
+      // Server route observed in web: PUT /admin/users/:id
+      final response = await HttpClient.put('/admin/users/$userId', body: {'status': status});
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
@@ -145,6 +146,22 @@ class AdminService {
       print('Error in updateUserStatus: $e');
       // Return default success response for any error
       return {'success': true, 'message': 'Status updated successfully'};
+    }
+  }
+  
+  Future<Map<String, dynamic>> verifyAgent(String userId) async {
+    try {
+      // Server route: PUT /admin/agents/:id/verify
+      final response = await HttpClient.put('/admin/agents/$userId/verify');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to verify agent');
+    } catch (e) {
+      throw Exception('Error: $e');
     }
   }
 }
