@@ -1,5 +1,7 @@
 
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../config/api_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:async';
 
@@ -8,7 +10,10 @@ class ApiService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final int _maxRetries = 2;
 
-  static const String _baseUrl = 'https://urban-realty-production.up.railway.app/api/v1';
+  static final String _baseUrl =
+      dotenv.env['API_BASE_URL']?.trim().isNotEmpty == true
+          ? dotenv.env['API_BASE_URL']!.trim()
+          : ApiConfig.baseUrl;
 
   ApiService() : _dio = Dio() {
     _dio.options.baseUrl = _baseUrl;
