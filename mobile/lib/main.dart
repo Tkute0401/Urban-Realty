@@ -22,6 +22,7 @@ import 'features/admin/admin_agents_screen.dart';
 import 'features/admin/admin_analytics_screen.dart';
 import 'screens/admin/admin_settings_screen.dart';
 import 'screens/admin/admin_reports_screen.dart';
+import 'screens/admin/admin_media_screen.dart';
 import 'features/agent/agent_dashboard_screen.dart';
 import 'features/agent/agent_analytics_screen.dart';
 import 'features/agent/agent_inquiries_screen.dart';
@@ -127,6 +128,8 @@ class MyApp extends StatelessWidget {
                   return MaterialPageRoute(builder: (context) => const AdminSettingsScreen());
                 case '/admin/reports':
                   return MaterialPageRoute(builder: (context) => const AdminReportsScreen());
+                case '/admin/media':
+                  return MaterialPageRoute(builder: (context) => const AdminMediaScreen());
                 case '/agent/dashboard':
                   return MaterialPageRoute(builder: (context) => const AgentDashboardScreen());
                 case '/agent/analytics':
