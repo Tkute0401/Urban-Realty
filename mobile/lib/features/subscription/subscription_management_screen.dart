@@ -11,6 +11,7 @@ class SubscriptionManagementScreen extends StatefulWidget {
 class _SubscriptionManagementScreenState extends State<SubscriptionManagementScreen> {
   bool _loading = true;
   bool _cancelling = false;
+  bool _updatingPayment = false;
   Map<String, dynamic>? _current;
   List<Map<String, dynamic>> _billing = const [];
   List<Map<String, dynamic>> _upcoming = const [];
@@ -70,10 +71,12 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
   Future<void> _downloadInvoice(String subscriptionId) async {
     try {
       final bytes = await SubscriptionService().downloadInvoicePdf(subscriptionId);
-      // For simplicity, just confirm download; integrate file saver/share later
+      // Save to a temp file path
+      // Avoid new imports; use basic DateTime-based file name and default temp directory via getTemporaryDirectory if available
+      // Since path_provider isn't guaranteed, use a simple snackbar confirmation of bytes and suggest feature flag
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invoice downloaded (${bytes.length} bytes)')),
+          SnackBar(content: Text('Invoice downloaded (${bytes.length} bytes). Saving to device coming soon.')),
         );
       }
     } catch (e) {
@@ -82,6 +85,42 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
           SnackBar(content: Text('Failed to download invoice: $e')),
         );
       }
+    }
+  }
+
+  Future<void> _updatePaymentMethod() async {
+    final controller = TextEditingController();
+    final method = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Update Payment Method'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'Enter payment method (e.g., card_xxx)'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Update')),
+        ],
+      ),
+    );
+    if (method == null || method.isEmpty) return;
+    setState(() { _updatingPayment = true; });
+    try {
+      final res = await SubscriptionService().updatePaymentMethod(method);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res['message']?.toString() ?? 'Payment method updated')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update payment: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() { _updatingPayment = false; });
     }
   }
 
@@ -101,6 +140,14 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                   _buildUpcomingCard(),
                   const SizedBox(height: 12),
                   _buildBillingCard(),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => Navigator.of(context).pushNamed('/subscription'),
+                      icon: const Icon(Icons.shopping_bag_outlined),
+                      label: const Text('Browse Plans'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -130,6 +177,11 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                     onPressed: _cancelling ? null : _cancel,
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
                     child: _cancelling ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Cancel Subscription'),
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton(
+                    onPressed: _updatingPayment ? null : _updatePaymentMethod,
+                    child: _updatingPayment ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Update Payment Method'),
                   ),
                 ],
               ),
