@@ -197,17 +197,44 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   String _formatTimeAgo(dynamic date) {
     // Accepts DateTime, ISO8601 string, or epoch (ms/seconds)
     DateTime dateTime;
-    if (date is DateTime) {
-      dateTime = date;
-    } else if (date is String) {
-      dateTime = DateTime.tryParse(date) ?? DateTime.now();
-    } else if (date is int) {
-      // Heuristic: treat 13-digit as milliseconds, 10-digit as seconds
-      final isSeconds = date.toString().length <= 10;
-      dateTime = DateTime.fromMillisecondsSinceEpoch(
-        isSeconds ? date * 1000 : date,
-      );
-    } else {
+    try {
+      if (date is DateTime) {
+        dateTime = date;
+      } else if (date is String) {
+        // Handle ISO8601 string or numeric epoch represented as string
+        final numeric = int.tryParse(date);
+        if (numeric != null) {
+          final isSeconds = date.length <= 10;
+          dateTime = DateTime.fromMillisecondsSinceEpoch(
+            isSeconds ? numeric * 1000 : numeric,
+          );
+        } else {
+          dateTime = DateTime.tryParse(date) ?? DateTime.now();
+        }
+      } else if (date is int) {
+        // Heuristic: treat 13-digit as milliseconds, 10-digit as seconds
+        final isSeconds = date.toString().length <= 10;
+        dateTime = DateTime.fromMillisecondsSinceEpoch(
+          isSeconds ? date * 1000 : date,
+        );
+      } else if (date is Map<String, dynamic>) {
+        // Support Firebase-like timestamp { seconds: 123, nanoseconds: ... }
+        if (date['seconds'] is int) {
+          final seconds = date['seconds'] as int;
+          dateTime = DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+        } else if (date['milliseconds'] is int) {
+          dateTime = DateTime.fromMillisecondsSinceEpoch(date['milliseconds'] as int);
+        } else if (date['ms'] is int) {
+          dateTime = DateTime.fromMillisecondsSinceEpoch(date['ms'] as int);
+        } else if (date['iso'] is String) {
+          dateTime = DateTime.tryParse(date['iso'] as String) ?? DateTime.now();
+        } else {
+          dateTime = DateTime.now();
+        }
+      } else {
+        dateTime = DateTime.now();
+      }
+    } catch (_) {
       dateTime = DateTime.now();
     }
 
