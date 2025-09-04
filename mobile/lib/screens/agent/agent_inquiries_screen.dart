@@ -15,6 +15,7 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
   int _currentPage = 1;
   final int _limit = 10;
   bool _hasMoreData = true;
+  String _statusFilter = 'all';
 
   @override
   void initState() {
@@ -69,35 +70,43 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _loadInquiries(refresh: true),
-        child: _inquiries.isEmpty && !_isLoading
-            ? const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.message_outlined, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('No inquiries found'),
-                  ],
-                ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: _inquiries.length + (_hasMoreData ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == _inquiries.length) {
-                    return _buildLoadMoreButton();
-                  }
-                  return _buildInquiryCard(_inquiries[index]);
-                },
-              ),
+      body: Column(
+        children: [
+          _buildStatusFilters(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => _loadInquiries(refresh: true),
+              child: _filteredInquiries().isEmpty && !_isLoading
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.message_outlined, size: 64, color: Colors.grey),
+                          SizedBox(height: 16),
+                          Text('No inquiries found'),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: _filteredInquiries().length + (_hasMoreData ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        final items = _filteredInquiries();
+                        if (index == items.length) {
+                          return _buildLoadMoreButton();
+                        }
+                        return _buildInquiryCard(items[index]);
+                      },
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildInquiryCard(Map<String, dynamic> inquiry) {
-    final status = inquiry['status'] ?? 'new';
+    final status = (inquiry['status'] ?? 'pending').toString();
     final statusColor = _getInquiryStatusColor(status);
     
     return Card(
@@ -138,8 +147,8 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
         ),
         trailing: PopupMenuButton<String>(
           onSelected: (value) => _handleInquiryAction(value, inquiry),
-          itemBuilder: (context) => [
-            const PopupMenuItem(
+          itemBuilder: (context) => const [
+            PopupMenuItem(
               value: 'view',
               child: Row(
                 children: [
@@ -149,7 +158,7 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'reply',
               child: Row(
                 children: [
@@ -159,13 +168,33 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
                 ],
               ),
             ),
-            const PopupMenuItem(
-              value: 'mark',
+            PopupMenuItem(
+              value: 'status:contacted',
               child: Row(
                 children: [
-                  Icon(Icons.check),
+                  Icon(Icons.check_circle),
                   SizedBox(width: 8),
-                  Text('Mark as Read'),
+                  Text('Mark as Contacted'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'status:followup',
+              child: Row(
+                children: [
+                  Icon(Icons.update),
+                  SizedBox(width: 8),
+                  Text('Mark as Follow Up'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'status:closed',
+              child: Row(
+                children: [
+                  Icon(Icons.done_all),
+                  SizedBox(width: 8),
+                  Text('Mark as Closed'),
                 ],
               ),
             ),
@@ -192,11 +221,13 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
 
   Color _getInquiryStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'new':
-        return Colors.red;
-      case 'read':
+      case 'pending':
+        return Colors.orange;
+      case 'contacted':
         return Colors.blue;
-      case 'replied':
+      case 'followup':
+        return Colors.purple;
+      case 'closed':
         return Colors.green;
       default:
         return Colors.grey;
@@ -305,8 +336,11 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
       case 'reply':
         _replyToInquiry(inquiry);
         break;
-      case 'mark':
-        _markInquiryAsRead(inquiry);
+      default:
+        if (action.startsWith('status:')) {
+          final newStatus = action.split(':').last;
+          _updateInquiryStatus(inquiry, newStatus);
+        }
         break;
     }
   }
@@ -378,5 +412,37 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
         SnackBar(content: Text('Failed to update status: ' + e.toString())),
       );
     }
+  }
+
+  // Filtering helpers
+  List<Map<String, dynamic>> _filteredInquiries() {
+    if (_statusFilter == 'all') return _inquiries;
+    return _inquiries.where((q) => (q['status'] ?? 'pending').toString().toLowerCase() == _statusFilter).toList();
+  }
+
+  Widget _buildStatusFilters() {
+    final statuses = ['all', 'pending', 'contacted', 'followup', 'closed'];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          for (final s in statuses)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ChoiceChip(
+                label: Text(s.toUpperCase()),
+                selected: _statusFilter == s,
+                selectedColor: _getInquiryStatusColor(s == 'all' ? 'pending' : s).withValues(alpha: 0.15),
+                onSelected: (_) {
+                  setState(() {
+                    _statusFilter = s;
+                  });
+                },
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

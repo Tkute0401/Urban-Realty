@@ -82,14 +82,14 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
   - Analytics `contact_created` fired on success
   - Agent inquiries management parity on mobile:
     - Added `updateContactStatus` in `mobile/lib/services/agent_service.dart` to call `PUT /api/v1/contacts/:id` with server-supported statuses: `pending`, `contacted`, `followup`, `closed`
-    - Updated `AgentInquiriesScreen` to mark inquiries as contacted via action; UI reflects server status values and updates in-place
+    - Updated `AgentInquiriesScreen` to include status actions (Contacted, Follow Up, Closed), status color mapping, and status filter chips; list supports pull-to-refresh and in-place updates on success
 
 ## Immediate Next Steps (Run Order)
 1. QA Favorites on mobile: toggle on detail; verify appears in `/favorites` and persists; status reflects correctly on reopen.
 2. QA Recently Viewed on mobile: open multiple properties; verify order/cap of 10.
 3. QA Search analytics on mobile: verify events emit without blocking UI; suggestion taps recorded.
 4. QA Contact flow on mobile: ensure inquiry is created and visible to agent in web/admin; confirm analytics fired.
-5. QA Agent inquiries status update on mobile: ensure `contacted` status change persists and is visible on refresh; test all allowed statuses.
+5. QA Agent inquiries status update on mobile: ensure status changes (`contacted`, `followup`, `closed`) persist and are visible on refresh; test filter chips.
 6. QA with provided admin/agent accounts for subscription + favorites + recently viewed + contact flows.
 
 ## Suggestions for Improvement
