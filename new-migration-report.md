@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (mobile subscription management enhanced: payment method update, browse plans link)
+Last updated: 2025-09-04 (mobile: invoice saving implemented; subscription mgmt enhancements)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -38,7 +38,7 @@ Last updated: 2025-09-04 (mobile subscription management enhanced: payment metho
 - Completed: Wire mobile subscription UI to `SubscriptionService`.
   - Plans list screen wired: `mobile/lib/screens/subscription_screen.dart` (free + paid flow).
   - Razorpay checkout integrated using key/order/verify endpoints.
-  - Management screen wired: `mobile/lib/features/subscription/subscription_management_screen.dart` (my-subscription, billing-history, upcoming-billing, cancel, invoice download).
+  - Management screen wired: `mobile/lib/features/subscription/subscription_management_screen.dart` (my-subscription, billing-history, upcoming-billing, cancel, invoice download + save to device).
   - Navigation from settings in place.
 
 ### Credentials for manual verification
@@ -56,6 +56,7 @@ Last updated: 2025-09-04 (mobile subscription management enhanced: payment metho
   - Added Settings -> Subscription and Billing navigation in mobile.
   - [Mobile] Wired `subscription_screen.dart` to handle free plan direct subscribe and paid plans via Razorpay, added handlers for success/error/external wallet, and verification call.
   - [Mobile] Wired `subscription_management_screen.dart` to fetch current subscription, upcoming billing, billing history; added cancel and invoice download using bytes.
+  - [Mobile] Implemented invoice saving to device using `lib/utils/file_saver.dart` with `path_provider`. Files saved under `UrbanRealty/Invoices` as `invoice_<id>_<timestamp>.pdf` with snackbar path confirmation.
   - [Mobile] Added `RecentlyViewedService` (`mobile/lib/services/recently_viewed_service.dart`) implementing:
     - `GET /auth/recently-viewed` to list items
     - `POST /auth/recently-viewed/:propertyId` to track views (fire-and-forget)
@@ -86,7 +87,7 @@ Last updated: 2025-09-04 (mobile subscription management enhanced: payment metho
  - Subscription management enhancements on mobile (`mobile/lib/features/subscription/subscription_management_screen.dart`):
    - Added Update Payment Method flow invoking `/subscriptions/payment-method`
    - Added "Browse Plans" link to open `/subscription` plans screen
-   - Invoice download remains bytes-only confirmation; full file save deferred (requires `path_provider` and platform permissions)
+   - Invoice download now saves PDF to device using `FileSaver.saveBytes` and `path_provider`.
 
 ## Immediate Next Steps (Run Order)
 1. QA Favorites on mobile: toggle on detail; verify appears in `/favorites` and persists; status reflects correctly on reopen.
@@ -94,7 +95,7 @@ Last updated: 2025-09-04 (mobile subscription management enhanced: payment metho
 3. QA Search analytics on mobile: verify events emit without blocking UI; suggestion taps recorded.
 4. QA Contact flow on mobile: ensure inquiry is created and visible to agent in web/admin; confirm analytics fired.
 5. QA Agent inquiries status update on mobile: ensure status changes (`contacted`, `followup`, `closed`) persist and are visible on refresh; test filter chips.
-6. QA Subscription management on mobile: payment method update success and error paths; browse plans navigation; cancel flow happy/edge cases; invoice download bytes length sanity.
+6. QA Subscription management on mobile: payment method update success and error paths; browse plans navigation; cancel flow happy/edge cases; invoice saving writes file (verify path in snackbar) and opens.
 7. QA with provided admin/agent accounts for subscription + favorites + recently viewed + contact + subscription flows.
 
 ## Suggestions for Improvement
