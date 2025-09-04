@@ -11,7 +11,6 @@ class AdminAgentsScreen extends StatefulWidget {
 
 class _AdminAgentsScreenState extends State<AdminAgentsScreen> {
   final AdminService _adminService = AdminService();
-  final AgentService _agentService = AgentService();
   List<Map<String, dynamic>> _agents = [];
   bool _isLoading = true;
   int _currentPage = 1;

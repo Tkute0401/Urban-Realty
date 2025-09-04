@@ -22,6 +22,16 @@ class SubscriptionService {
     }
   }
 
+  // Alias for getSubscriptionPlans to match web app usage
+  Future<List<Map<String, dynamic>>> getPlans() async {
+    return getSubscriptionPlans();
+  }
+
+  // Alias for getCurrentSubscription to match web app usage
+  Future<Map<String, dynamic>> getMySubscription() async {
+    return getCurrentSubscription();
+  }
+
   Future<Map<String, dynamic>> getCurrentSubscription() async {
     try {
       final response = await HttpClient.get('/subscriptions/my-subscription');

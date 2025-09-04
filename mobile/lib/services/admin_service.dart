@@ -241,9 +241,11 @@ class AdminService {
     };
   }
 
-  Future<List<Map<String, dynamic>>> getUsers({int page = 1, int limit = 10}) async {
+  Future<List<Map<String, dynamic>>> getUsers({int page = 1, int limit = 10, String? role}) async {
     try {
-      final response = await HttpClient.get('/admin/users', query: {'page': page.toString(), 'limit': limit.toString()});
+      final query = {'page': page.toString(), 'limit': limit.toString()};
+      if (role != null) query['role'] = role;
+      final response = await HttpClient.get('/admin/users', query: query);
       if (response.statusCode == 200) {
         final data = response.data;
         // Handle the API response structure: { success: true, data: [...] }
@@ -261,9 +263,26 @@ class AdminService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAdminProperties({int page = 1, int limit = 10}) async {
+  Future<Map<String, dynamic>> deleteUser(String userId) async {
     try {
-      final response = await HttpClient.get('/admin/properties', query: {'page': page.toString(), 'limit': limit.toString()});
+      final response = await HttpClient.delete('/admin/users/$userId');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        return {'success': true};
+      }
+      throw Exception('Failed to delete user');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAdminProperties({int page = 1, int limit = 10, String? status}) async {
+    try {
+      final query = {'page': page.toString(), 'limit': limit.toString()};
+      if (status != null) query['status'] = status;
+      final response = await HttpClient.get('/admin/properties', query: query);
       if (response.statusCode == 200) {
         final data = response.data;
         // Handle the API response structure: { success: true, data: [...] }

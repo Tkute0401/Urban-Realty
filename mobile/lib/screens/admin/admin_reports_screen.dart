@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'dart:convert';
 import '../../services/admin_service.dart';
 import '../../utils/file_saver.dart';
 
@@ -226,7 +227,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                   : _reportData == null
                       ? const Center(child: Text('No report data'))
                       : SingleChildScrollView(
-                          child: Text(const JsonEncoder.withIndent('  ').convert(_reportData)),
+                          child: Text(JsonEncoder.withIndent('  ').convert(_reportData)),
                         ),
             ),
           ],

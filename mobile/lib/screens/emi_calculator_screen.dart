@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:math';
 
 class EMICalculatorScreen extends StatefulWidget {
   const EMICalculatorScreen({super.key});
@@ -39,8 +40,8 @@ class _EMICalculatorScreenState extends State<EMICalculatorScreen> {
     final tenureInMonths = tenure * 12;
 
     // EMI calculation formula
-    final emi = (principal * monthlyRate * (1 + monthlyRate).pow(tenureInMonths)) /
-        ((1 + monthlyRate).pow(tenureInMonths) - 1);
+    final emi = (principal * monthlyRate * pow(1 + monthlyRate, tenureInMonths)) /
+        (pow(1 + monthlyRate, tenureInMonths) - 1);
 
     final totalAmount = emi * tenureInMonths;
     final totalInterest = totalAmount - principal;
