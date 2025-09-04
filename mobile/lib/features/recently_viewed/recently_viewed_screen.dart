@@ -72,7 +72,7 @@ class _RecentlyViewedScreenState extends State<RecentlyViewedScreen> {
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(6),
                                       child: Image.network(
-                                        p.images.first,
+                                        p.images.first.url,
                                         width: 56,
                                         height: 56,
                                         fit: BoxFit.cover,

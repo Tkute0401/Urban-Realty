@@ -73,7 +73,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
     try {
       final bytes = await SubscriptionService().downloadInvoicePdf(subscriptionId);
       final String timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-      final String fileName = 'invoice_$subscriptionId_$timestamp.pdf';
+      final String fileName = 'invoice_${subscriptionId}_$timestamp.pdf';
       final String savedPath = await FileSaver.saveBytes(
         bytes: bytes,
         fileName: fileName,

@@ -384,10 +384,6 @@ class _AgentInquiriesScreenState extends State<AgentInquiriesScreen> {
     );
   }
 
-  void _markInquiryAsRead(Map<String, dynamic> inquiry) {
-    _updateInquiryStatus(inquiry, 'contacted');
-  }
-
   Future<void> _updateInquiryStatus(Map<String, dynamic> inquiry, String status) async {
     try {
       final id = (inquiry['_id'] ?? inquiry['id'] ?? '').toString();

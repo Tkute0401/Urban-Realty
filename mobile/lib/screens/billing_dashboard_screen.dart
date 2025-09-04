@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/subscription_service.dart';
-import '../models/subscription.dart';
 
 class BillingDashboardScreen extends StatefulWidget {
   const BillingDashboardScreen({super.key});
@@ -111,7 +110,7 @@ class _BillingDashboardScreenState extends State<BillingDashboardScreen> {
               const Center(
                 child: Column(
                   children: [
-                    Icon(Icons.subscriptions_off, size: 48, color: Colors.grey),
+                    Icon(Icons.cancel_outlined, size: 48, color: Colors.grey),
                     SizedBox(height: 8),
                     Text('No active subscription'),
                     SizedBox(height: 16),

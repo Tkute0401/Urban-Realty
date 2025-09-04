@@ -11,7 +11,6 @@ class AdminPropertiesScreen extends StatefulWidget {
 }
 
 class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
-  final AdminService _adminService = AdminService();
   final PropertyService _propertyService = PropertyService();
   List<Property> _properties = [];
   bool _isLoading = true;
@@ -182,7 +181,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              property.images.first,
+                              property.images.first.url,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) => const Icon(Icons.home),
                             ),
@@ -205,7 +204,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          property.location,
+                          property.location.formattedAddress,
                           style: const TextStyle(color: Colors.grey),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

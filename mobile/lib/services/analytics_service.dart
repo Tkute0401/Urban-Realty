@@ -42,7 +42,7 @@ class AnalyticsService {
 
   // Admin: export analytics, saves CSV to device and returns local path
   Future<String> exportAnalyticsCsv() async {
-    final Response<List<int>> response = await HttpClient.getRaw<List<int>(
+    final Response<List<int>> response = await HttpClient.getRaw<List<int>>(
       '/analytics/export',
       query: {'format': 'csv'},
       options: Options(responseType: ResponseType.bytes),

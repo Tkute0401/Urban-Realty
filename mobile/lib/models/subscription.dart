@@ -8,6 +8,14 @@ class Subscription {
   final int listingLimit;
   final DateTime createdAt;
   final DateTime updatedAt;
+  
+  // Additional properties for subscription comparison
+  final int duration;
+  final int maxProperties;
+  final int featuredProperties;
+  final bool prioritySupport;
+  final bool analytics;
+  final bool customBranding;
 
   Subscription({
     required this.id,
@@ -19,6 +27,12 @@ class Subscription {
     required this.listingLimit,
     required this.createdAt,
     required this.updatedAt,
+    this.duration = 1,
+    this.maxProperties = -1,
+    this.featuredProperties = 0,
+    this.prioritySupport = false,
+    this.analytics = false,
+    this.customBranding = false,
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) {
@@ -32,6 +46,12 @@ class Subscription {
       listingLimit: json["listingLimit"] ?? 0,
       createdAt: DateTime.parse(json["createdAt"]),
       updatedAt: DateTime.parse(json["updatedAt"]),
+      duration: json["duration"] ?? 1,
+      maxProperties: json["maxProperties"] ?? -1,
+      featuredProperties: json["featuredProperties"] ?? 0,
+      prioritySupport: json["prioritySupport"] ?? false,
+      analytics: json["analytics"] ?? false,
+      customBranding: json["customBranding"] ?? false,
     );
   }
 }

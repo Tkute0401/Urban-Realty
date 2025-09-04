@@ -129,7 +129,7 @@ class AgentService {
       final response = { 'data': { 'monthlyRevenue': 0, 'propertyViews': 0, 'leadConversion': 0, 'responseTime': 0, 'totalProperties': props.length } };
       final data = response['data'];
       if (data is Map<String, dynamic>) return data;
-      if (data is Map) return Map<String, dynamic>.from(data);
+      if (data is Map) return Map<String, dynamic>.from(data as Map<dynamic, dynamic>);
       return _getDefaultAnalyticsData();
     } catch (e) {
       print('Error in getAgentAnalytics: $e');
