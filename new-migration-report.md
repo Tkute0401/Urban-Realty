@@ -1,3 +1,47 @@
+## Mobile/Web Parity Migration Report
+
+Last updated: INITIAL
+
+### Context
+- Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
+- Web client: `client/` (Vite + React). Uses `axios` with base URL `VITE_API_BASE_URL` fallback to `https://urban-realty-production.up.railway.app/api/v1`.
+- Mobile app: `mobile/` (Flutter + Dio). Uses `.env` `API_BASE_URL` with fallback from `ApiConfig.baseUrl`.
+
+### Current Integrations (Web)
+- Subscriptions: `/subscriptions`, `/subscriptions/my-subscription`, billing history, upcoming billing, Razorpay (`/subscriptions/razorpay/*`), cancel, invoice download, admin subscription management.
+- Admin: `/admin/*` (users, properties, agents, contacts, stats, subscription-analytics, reports export/email, settings, backup/restore, dynamic fields, user-types, media delete).
+- Auth: `/auth/*` (register, login, me, update, favorites: add/remove/status/list; recently-viewed list/add).
+- Analytics tracking: `/api/v1/analytics/track`, export `/api/v1/analytics/export?format=csv`.
+- Properties: `GET /properties`, `GET /properties/:id`, search suggestions, featured, radius, agent properties, contact request, CRUD (auth roles: agent/admin/individual_seller/developer) + media upload.
+
+### Current Integrations (Mobile)
+- Centralized `ApiService` with Dio interceptor attaching `Authorization` header from `FlutterSecureStorage`. Retries and normalized errors present. Base URL from env `API_BASE_URL` or `ApiConfig.baseUrl`.
+- Implemented services: `auth_service.dart` (`/auth/login`, `/auth/register`, `/auth/me`, `/auth/update`), `favorites_service.dart` (favorites CRUD + status), `property_service.dart` (list, by id, featured, suggestions, CRUD including upload via multipart), `subscription_service.dart` (plans, my-subscription, billing history, upcoming billing, subscribe, cancel, Razorpay key/order/verify, invoice download), `admin_service.dart` (stats, users, properties, agents, verify agent), lightweight `analytics_service.dart` (`/analytics/track`).
+- Remaining: Admin endpoints for settings, reports, backup/restore, dynamic fields, user types; analytics dashboard/export; contact requests mgmt; property media delete (admin).
+
+### Gaps Identified
+- Mobile lacks concrete API method implementations for many web features (subscriptions, admin dashboards, analytics, favorites/recently-viewed, invoices, settings, backups/restores, dynamic fields, user types, property CRUD/media upload, search suggestions, featured).
+- Ensure consistent base URL and versioning: All clients should target `/api/v1`.
+
+### Plan
+1) Audit endpoints and features across web and mobile, produce mapping.
+2) Unify API configuration: env naming and base URL per environment for both clients.
+3) Implement missing mobile API methods mirroring web calls (with strong typing and error handling).
+4) Add/align mobile screens for roles (admin/agent/user) to match web features.
+5) Test flows end-to-end; fix auth/token refresh and error UX.
+6) Keep this report updated after each change.
+
+### Next Steps
+- In progress: Audit web endpoints and features.
+- Pending: Audit mobile feature and API usage; parity mapping; unify API config variables.
+
+### Credentials for manual verification
+- admin: email `tanmay@gmail.com`, password `123456`
+- agent: email `mrudul@gmail.com`, password `123456`
+
+### Change Log
+- Initial report created. Discovered key server routes and client base URLs.
+
 ## Mobile Parity Migration Report
 
 Owner: AI Assistant (Cursor)  
