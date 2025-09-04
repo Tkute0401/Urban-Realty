@@ -229,6 +229,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   _buildProfileActionTile(
                                     context,
+                                    'Recently Viewed',
+                                    Icons.history,
+                                    () => Navigator.pushNamed(context, '/recently-viewed'),
+                                  ),
+                                  _buildProfileActionTile(
+                                    context,
                                     'Subscription',
                                     Icons.card_membership,
                                     () => Navigator.pushNamed(context, '/subscription/manage'),

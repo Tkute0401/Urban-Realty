@@ -9,6 +9,7 @@ import '../../widgets/property_nearby_section.dart';
 import '../../widgets/property_agent_section.dart';
 import '../../widgets/property_contact_section.dart';
 import '../../utils/format_utils.dart';
+import '../../services/recently_viewed_service.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final String propertyId;
@@ -43,6 +44,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       final provider = Provider.of<PropertiesProvider>(context, listen: false);
       await provider.fetchPropertyById(widget.propertyId);
       final loadedProperty = provider.selectedProperty;
+      // Track recently viewed (non-blocking)
+      // Fire and forget to avoid delaying UI rendering
+      RecentlyViewedService().trackViewed(widget.propertyId);
       
       if (mounted) {
         setState(() {
