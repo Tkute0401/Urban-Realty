@@ -27,7 +27,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _loadProperty();
+    // Use WidgetsBinding to ensure we're not in build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProperty();
+    });
   }
 
   Future<void> _loadProperty() async {
@@ -41,15 +44,19 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       await provider.fetchPropertyById(widget.propertyId);
       final loadedProperty = provider.selectedProperty;
       
-      setState(() {
-        property = loadedProperty;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          property = loadedProperty;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        error = e.toString();
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          error = e.toString();
+          isLoading = false;
+        });
+      }
     }
   }
 

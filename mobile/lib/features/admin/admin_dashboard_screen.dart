@@ -61,7 +61,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    _loadDashboardData();
+    // Use WidgetsBinding to ensure we're not in build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDashboardData();
+    });
   }
 
   @override
@@ -158,9 +161,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     try {
       final propertiesProvider = Provider.of<PropertiesProvider>(context, listen: false);
       await propertiesProvider.fetchProperties();
-      setState(() {
-        recentProperties = propertiesProvider.properties.take(5).toList();
-      });
+      if (mounted) {
+        setState(() {
+          recentProperties = propertiesProvider.properties.take(5).toList();
+        });
+      }
     } catch (e) {
       throw Exception('Failed to load recent properties: $e');
     }
