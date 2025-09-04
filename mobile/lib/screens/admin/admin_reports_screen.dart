@@ -16,6 +16,9 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
   String _dateRange = '30';
   String _startDate = '';
   String _endDate = '';
+  String _email = '';
+  String _subject = '';
+  String _message = '';
   bool _loading = false;
   bool _working = false;
   String? _error;
@@ -90,10 +93,14 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
   Future<void> _emailReport() async {
     setState(() { _working = true; _error = null; _success = null; });
     try {
+      if (_email.trim().isEmpty) {
+        setState(() { _error = 'Please enter recipient email'; });
+        return;
+      }
       final res = await _adminService.emailReport(
-        email: 'admin@example.com',
-        subject: 'Report: $_reportType',
-        message: 'Please find the attached report.',
+        email: _email.trim(),
+        subject: _subject.trim().isEmpty ? 'Report: $_reportType' : _subject.trim(),
+        message: _message.trim().isEmpty ? 'Please find the attached report.' : _message.trim(),
         type: _reportType,
         dateRange: _dateRange,
         startDate: _dateRange == 'custom' ? _startDate : null,
@@ -169,6 +176,25 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                   )),
                 ],
               ),
+            const SizedBox(height: 12),
+            const Text('Email Report', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Recipient Email'),
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (v) => _email = v,
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Subject (optional)'),
+              onChanged: (v) => _subject = v,
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Message (optional)'),
+              maxLines: 3,
+              onChanged: (v) => _message = v,
+            ),
             const SizedBox(height: 12),
             Row(
               children: [

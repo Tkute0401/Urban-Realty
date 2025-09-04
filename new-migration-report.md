@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics dashboard added)
+Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics dashboard added; reports email UI)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -85,7 +85,7 @@ Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics
 
 ## Immediate Next Steps (Run Order)
 1. QA Admin Settings on mobile: fetch/save flows; maintenance mode toggle; backup/restore happy/edge cases. Access via Admin Dashboard quick action.
-2. QA Admin Reports on mobile: generate report types; export CSV/PDF saved under UrbanRealty/Reports; email success path. Access via Admin Dashboard quick action.
+2. QA Admin Reports on mobile: generate report types; export CSV/PDF saved under UrbanRealty/Reports; email success path using custom email/subject/message; validate error when email is empty. Access via Admin Dashboard quick action.
 3. QA Admin Analytics on mobile: timeframe switching; CSV export path confirmation; non-admin access handled.
 4. QA Admin Media on mobile: list pagination, delete confirmation, upload via file picker. Access via Admin Dashboard quick action.
 5. Regression QA: Favorites, Recently Viewed, Search analytics breadcrumbs, Contact creation, Agent inquiries status updates.
