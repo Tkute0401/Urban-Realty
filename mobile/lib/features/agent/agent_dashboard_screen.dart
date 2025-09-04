@@ -309,8 +309,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            // Slightly reduce height to avoid small vertical overflows on narrow widths
-            childAspectRatio: 1.25,
+            // Increase aspect ratio so each card is slightly shorter, reducing overflow risk
+            childAspectRatio: 1.35,
             children: [
               _buildStatCard(
                 'Total Properties',
@@ -438,6 +438,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -446,6 +448,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                           fontWeight: FontWeight.bold,
                           color: color,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -453,6 +457,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
