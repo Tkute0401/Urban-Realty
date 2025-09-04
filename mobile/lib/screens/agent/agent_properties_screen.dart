@@ -126,7 +126,16 @@ class _AgentPropertiesScreenState extends State<AgentPropertiesScreen> {
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                   image: DecorationImage(
-                    image: NetworkImage(property['images'][0]),
+                    image: NetworkImage(
+                      (() {
+                        final dynamic firstImage = property['images'][0];
+                        if (firstImage is String) return firstImage;
+                        if (firstImage is Map<String, dynamic>) {
+                          return firstImage['url'] ?? firstImage['src'] ?? '';
+                        }
+                        return '';
+                      })(),
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),

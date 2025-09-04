@@ -490,7 +490,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     'type': 'user',
                     'title': user['name'] ?? 'Unknown User',
                     'subtitle': user['email'] ?? '',
-                    'time': _formatTimeAgo(user['createdAt']),
+                    'time': _formatTimeAgo(
+                      DateTime.tryParse(user['createdAt'] ?? '') ?? DateTime.now(),
+                    ),
                   }).toList(),
                   onViewAll: () => Navigator.pushNamed(context, '/admin/users'),
                 ),
