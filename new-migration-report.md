@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription UI wired incl. Razorpay)
+Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription UI wired incl. Razorpay; mobile Recently Viewed added)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -18,6 +18,7 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
 - Centralized `ApiService` with Dio interceptor attaching `Authorization` header from `FlutterSecureStorage`. Retries and normalized errors present. Base URL from env `API_BASE_URL` or `ApiConfig.baseUrl`.
 - Implemented services: `auth_service.dart` (`/auth/login`, `/auth/register`, `/auth/me`, `/auth/update`), `favorites_service.dart` (favorites CRUD + status), `property_service.dart` (list, by id, featured, suggestions, CRUD including upload via multipart), `subscription_service.dart` (plans, my-subscription, billing history, upcoming billing, subscribe, cancel, Razorpay key/order/verify, invoice download), `admin_service.dart` (stats, users, properties, agents, verify agent), lightweight `analytics_service.dart` (`/analytics/track`).
 - Remaining: Admin endpoints for settings, reports, backup/restore, dynamic fields, user types; analytics dashboard/export; contact requests mgmt; property media delete (admin).
+  - Implemented now: Recently Viewed parity (fetch + track) on mobile
 
 ### Gaps Identified
 - Mobile lacks concrete API method implementations for many web features (subscriptions, admin dashboards, analytics, favorites/recently-viewed, invoices, settings, backups/restores, dynamic fields, user types, property CRUD/media upload, search suggestions, featured).
@@ -55,22 +56,29 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
   - Added Settings -> Subscription and Billing navigation in mobile.
   - [Mobile] Wired `subscription_screen.dart` to handle free plan direct subscribe and paid plans via Razorpay, added handlers for success/error/external wallet, and verification call.
   - [Mobile] Wired `subscription_management_screen.dart` to fetch current subscription, upcoming billing, billing history; added cancel and invoice download using bytes.
+  - [Mobile] Added `RecentlyViewedService` (`mobile/lib/services/recently_viewed_service.dart`) implementing:
+    - `GET /auth/recently-viewed` to list items
+    - `POST /auth/recently-viewed/:propertyId` to track views (fire-and-forget)
+  - [Mobile] Tracked property views in `PropertyDetailScreen` via `RecentlyViewedService().trackViewed(id)`.
+  - [Mobile] Added `RecentlyViewedScreen` with route `/recently-viewed` and navigation entry in `ProfileScreen` under user quick access.
 
 ## Current Work In This Run
 - Created `client/.env.example` and `mobile/.env.example` using production API default and local dev comments.
 - Set task to wire mobile subscription UI screens to `SubscriptionService`.
+- Implemented Recently Viewed parity on mobile (service, tracking, screen, routing, nav entry).
 
 ## Immediate Next Steps (Run Order)
-1. Wire `mobile/lib/screens/subscription_screen.dart` to `SubscriptionService.getPlans()` and navigation to management/checkout.
-2. Implement subscription management screen data fetch: my-subscription, billing-history, upcoming-billing.
-3. Add invoice download button using byte response via `http_client.getRaw`.
-4. Integrate Razorpay flow (key/order/verify) in mobile; handle callbacks and error states.
-5. QA with provided admin/agent accounts for parity.
+1. QA Recently Viewed on mobile: open multiple properties to populate list; verify order and cap of 10.
+2. Add Favorites parity UI: mark/unmark from `PropertyDetailScreen` using `FavoritesService`; add favorites list screen and link from profile.
+3. Implement Analytics parity minimal events on mobile (search, view, favorite, contact) to `/api/v1/analytics/track`.
+4. QA with provided admin/agent accounts for subscription + favorites + recently viewed flows.
 
 ## Suggestions for Improvement
 - Add shared TypeScript/JSON schema or OpenAPI spec in `shared/` to generate both Axios types and Dart models.
 - Introduce feature flags per role to conditionally enable admin/agent-only mobile screens.
 - Add e2e tests for subscription flow on mobile using integration test + mock server.
+ - Add scroll-based lazy loading and skeletons for Recently Viewed and Favorites lists.
+ - Consider merging favorites/recently-viewed into a single "Library" tab for UX parity with web `AccountSidebar` tabs.
 
 ## Mobile Parity Migration Report
 
