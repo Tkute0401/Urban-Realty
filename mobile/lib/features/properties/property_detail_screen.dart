@@ -12,6 +12,7 @@ import '../../utils/format_utils.dart';
 import '../../services/recently_viewed_service.dart';
 import '../../services/favorites_service.dart';
 import '../../services/analytics_service.dart';
+import '../../services/contact_service.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final String propertyId;
@@ -324,6 +325,71 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Contact functionality coming soon!')),
                       );
+                    },
+                    onInquiry: () async {
+                      if (property == null) return;
+                      final messageController = TextEditingController();
+                      final theme = Theme.of(context);
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Send Inquiry'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Message to agent', style: theme.textTheme.bodyMedium),
+                              const SizedBox(height: 8),
+                              TextField(
+                                controller: messageController,
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  hintText: 'I am interested in this property. Please contact me.',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(false),
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.of(ctx).pop(true),
+                              child: const Text('Send'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (result == true) {
+                        final text = messageController.text.trim().isEmpty
+                            ? 'I am interested in this property. Please contact me.'
+                            : messageController.text.trim();
+                        try {
+                          final contactService = ContactService();
+                          await contactService.createPropertyContact(
+                            propertyId: property!.id,
+                            message: text,
+                            contactMethod: 'message',
+                          );
+                          AnalyticsService().track('contact_created', {
+                            'propertyId': property!.id,
+                            'method': 'message',
+                          });
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Inquiry sent to agent.')),
+                            );
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed to send inquiry: $e')),
+                            );
+                          }
+                        }
+                      }
                     },
                   ),
                 ],

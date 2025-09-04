@@ -71,12 +71,22 @@ Last updated: 2025-09-04 (client/mobile .env.example added; mobile subscription 
 - Implemented Recently Viewed parity on mobile (service, tracking, screen, routing, nav entry).
 - Implemented Favorites parity on mobile (toggle in detail, list screen polish, profile links).
 - Added analytics tracking for view and favorite/unfavorite events on mobile.
+- Extended analytics parity to search interactions on mobile:
+  - Screen view `search_screen_viewed`
+  - Typing breadcrumbs `search_typing` (sampled)
+  - Clear action `search_cleared`
+  - Suggestion tap `search_suggestion_selected`
+- Implemented property contact requests on mobile:
+  - New `ContactService` at `mobile/lib/services/contact_service.dart` hitting `POST /api/v1/contacts/property/:propertyId`
+  - Inquiry flow wired in `PropertyDetailScreen` with a message dialog and success/error toasts
+  - Analytics `contact_created` fired on success
 
 ## Immediate Next Steps (Run Order)
 1. QA Favorites on mobile: toggle on detail; verify appears in `/favorites` and persists; status reflects correctly on reopen.
 2. QA Recently Viewed on mobile: open multiple properties; verify order/cap of 10.
-3. Extend analytics parity to search and contact events; send to `/api/v1/analytics/track`.
-4. QA with provided admin/agent accounts for subscription + favorites + recently viewed flows.
+3. QA Search analytics on mobile: verify events emit without blocking UI; suggestion taps recorded.
+4. QA Contact flow on mobile: ensure inquiry is created and visible to agent in web/admin; confirm analytics fired.
+5. QA with provided admin/agent accounts for subscription + favorites + recently viewed + contact flows.
 
 ## Suggestions for Improvement
 - Add shared TypeScript/JSON schema or OpenAPI spec in `shared/` to generate both Axios types and Dart models.

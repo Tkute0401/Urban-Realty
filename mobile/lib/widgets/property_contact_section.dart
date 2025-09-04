@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class PropertyContactSection extends StatelessWidget {
   final VoidCallback? onContact;
+  final VoidCallback? onInquiry;
 
   const PropertyContactSection({
     super.key,
     this.onContact,
+    this.onInquiry,
   });
 
   @override
@@ -55,8 +57,7 @@ class PropertyContactSection extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Implement inquiry functionality
+                onPressed: onInquiry ?? () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Inquiry functionality coming soon!')),
                   );

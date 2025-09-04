@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/property_service.dart';
 import '../config/api_config.dart';
 import '../providers/auth_provider.dart';
+import '../services/analytics_service.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -45,6 +46,9 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     _fetchProperties();
     _handleArguments();
+    AnalyticsService().track('search_screen_viewed', {
+      'screen': 'SearchScreen'
+    });
   }
 
   void _handleArguments() {
@@ -278,6 +282,9 @@ class _SearchScreenState extends State<SearchScreen> {
                               setState(() {
                                 _showSuggestions = false;
                               });
+                              AnalyticsService().track('search_cleared', {
+                                'source': 'clear_icon'
+                              });
                             },
                           )
                         : null,
@@ -292,6 +299,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   onChanged: (value) {
                     _applyFilters();
                     _fetchSearchSuggestions(value);
+                    if (value.length == 2 || value.length == 5 || value.length == 10) {
+                      AnalyticsService().track('search_typing', {
+                        'querySample': value,
+                        'length': value.length,
+                      });
+                    }
                   },
                   onTap: () {
                     if (_searchController.text.isNotEmpty) {
@@ -351,6 +364,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                     _showSuggestions = false;
                                   });
                                   _applyFilters();
+                                  AnalyticsService().track('search_suggestion_selected', {
+                                    'text': _searchController.text,
+                                  });
                                 },
                               );
                             },
