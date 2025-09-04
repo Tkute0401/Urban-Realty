@@ -19,5 +19,10 @@ class HttpClient {
   static Future<Response> delete(String path, {dynamic body}) {
     return _api.dio.delete(path, data: body);
   }
+
+  // Raw GET helper to customize options like responseType
+  static Future<Response<T>> getRaw<T>(String path, {Map<String, dynamic>? query, Options? options}) {
+    return _api.dio.get<T>(path, queryParameters: query, options: options);
+  }
 }
 

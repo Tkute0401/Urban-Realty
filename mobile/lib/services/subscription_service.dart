@@ -2,86 +2,12 @@ import 'package:dio/dio.dart';
 import 'http_client.dart';
 
 class SubscriptionService {
-  Future<Response> getPlans() {
-    return HttpClient.get('/subscriptions');
-  }
-
-  Future<Response> getMySubscription() {
-    return HttpClient.get('/subscriptions/my-subscription');
-  }
-
-  Future<Response> getBillingHistory() {
-    return HttpClient.get('/subscriptions/billing-history');
-  }
-
-  Future<Response> getUpcomingBilling() {
-    return HttpClient.get('/subscriptions/upcoming-billing');
-  }
-
-  Future<Response> subscribe({
-    required String subscriptionId,
-    required String billingCycle,
-    required String paymentMethod,
-  }) {
-    return HttpClient.post('/subscriptions/subscribe', body: {
-      'subscriptionId': subscriptionId,
-      'billingCycle': billingCycle,
-      'paymentMethod': paymentMethod,
-    });
-  }
-
-  Future<Response> cancelSubscription() {
-    return HttpClient.put('/subscriptions/cancel');
-  }
-
-  Future<Response> updatePaymentMethod({
-    required String paymentMethod,
-  }) {
-    return HttpClient.put('/subscriptions/payment-method', body: {
-      'paymentMethod': paymentMethod,
-    });
-  }
-
-  // Razorpay helpers
-  Future<Response> getRazorpayKey() {
-    return HttpClient.get('/subscriptions/razorpay/key');
-  }
-
-  Future<Response> createRazorpayOrder({
-    required String subscriptionId,
-    required String billingCycle,
-  }) {
-    return HttpClient.post('/subscriptions/razorpay/order', body: {
-      'subscriptionId': subscriptionId,
-      'billingCycle': billingCycle,
-    });
-  }
-
-  Future<Response> verifyRazorpayPayment({
-    required String razorpayPaymentId,
-    required String razorpayOrderId,
-    required String razorpaySignature,
-  }) {
-    return HttpClient.post('/subscriptions/razorpay/verify', body: {
-      'razorpay_payment_id': razorpayPaymentId,
-      'razorpay_order_id': razorpayOrderId,
-      'razorpay_signature': razorpaySignature,
-    });
-  }
-}
-
-import 'http_client.dart';
-
-class SubscriptionService {
   static final SubscriptionService _instance = SubscriptionService._internal();
   factory SubscriptionService() => _instance;
   SubscriptionService._internal();
 
-
-
   Future<List<Map<String, dynamic>>> getSubscriptionPlans() async {
     try {
-      // Server returns { success, data: [ ...plans ] } at GET /subscriptions
       final response = await HttpClient.get('/subscriptions');
       if (response.statusCode == 200) {
         final data = response.data;
@@ -98,7 +24,6 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> getCurrentSubscription() async {
     try {
-      // Server route: GET /subscriptions/my-subscription -> { success, data }
       final response = await HttpClient.get('/subscriptions/my-subscription');
       if (response.statusCode == 200) {
         final data = response.data;
@@ -115,10 +40,14 @@ class SubscriptionService {
     }
   }
 
-  Future<Map<String, dynamic>> subscribeToPlan(String planId) async {
+  Future<Map<String, dynamic>> subscribeToPlan(String planId, {String? billingCycle, String? paymentMethod}) async {
     try {
-      // Server expects { subscriptionId, billingCycle? }
-      final response = await HttpClient.post('/subscriptions/subscribe', body: {'subscriptionId': planId});
+      final body = {
+        'subscriptionId': planId,
+        if (billingCycle != null) 'billingCycle': billingCycle,
+        if (paymentMethod != null) 'paymentMethod': paymentMethod,
+      };
+      final response = await HttpClient.post('/subscriptions/subscribe', body: body);
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
@@ -136,7 +65,6 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> cancelSubscription() async {
     try {
-      // Server route uses PUT /subscriptions/cancel
       final response = await HttpClient.put('/subscriptions/cancel');
       if (response.statusCode == 200) {
         final data = response.data;
@@ -185,11 +113,55 @@ class SubscriptionService {
     }
   }
 
+  Future<Map<String, dynamic>> updatePaymentMethod(String paymentMethod) async {
+    try {
+      final response = await HttpClient.put('/subscriptions/payment-method', body: {
+        'paymentMethod': paymentMethod,
+      });
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic>) return data;
+        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is String) {
+          return {'success': true, 'message': 'Operation completed successfully'};
+        }
+        throw Exception('Unexpected response format from server');
+      }
+      throw Exception('Failed to update payment method');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<Response> getRazorpayKey() {
+    return HttpClient.get('/subscriptions/razorpay/key');
+  }
+
+  Future<Response> createRazorpayOrder({
+    required String subscriptionId,
+    String? billingCycle,
+  }) {
+    return HttpClient.post('/subscriptions/razorpay/order', body: {
+      'subscriptionId': subscriptionId,
+      if (billingCycle != null) 'billingCycle': billingCycle,
+    });
+  }
+
+  Future<Response> verifyRazorpayPayment({
+    required String razorpayPaymentId,
+    required String razorpayOrderId,
+    required String razorpaySignature,
+  }) {
+    return HttpClient.post('/subscriptions/razorpay/verify', body: {
+      'razorpay_payment_id': razorpayPaymentId,
+      'razorpay_order_id': razorpayOrderId,
+      'razorpay_signature': razorpaySignature,
+    });
+  }
+
   Future<List<int>> downloadInvoicePdf(String subscriptionId) async {
     try {
-      // Use dio directly to request bytes
-      final dio = HttpClient._api.dio;
-      final response = await dio.get(
+      final response = await HttpClient.getRaw<List<int>>(
         '/subscriptions/invoice/$subscriptionId/download',
         options: Options(responseType: ResponseType.bytes),
       );
