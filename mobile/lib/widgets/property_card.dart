@@ -35,7 +35,7 @@ class PropertyCard extends StatelessWidget {
                     aspectRatio: 16 / 9,
                     child: property.images.isNotEmpty
                         ? CachedNetworkImage(
-                            imageUrl: property.images.first,
+                            imageUrl: property.images.first.url,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
                               color: Colors.grey.shade200,
@@ -129,7 +129,7 @@ class PropertyCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          "${property.city}, ${property.state}",
+                          "${property.address.city}, ${property.address.state}",
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
@@ -183,7 +183,7 @@ class PropertyCard extends StatelessWidget {
     );
   }
   
-  String _formatPrice(double price) {
+  String _formatPrice(int price) {
     final String raw = price.toStringAsFixed(0);
     // Insert thousands separators for USD-style formatting
     final String withSeparators = raw.replaceAllMapped(
@@ -193,7 +193,7 @@ class PropertyCard extends StatelessWidget {
     return "\$$withSeparators";
   }
 
-  String _formatArea(double area) {
+  String _formatArea(int area) {
     final String raw = area.toStringAsFixed(0);
     final String withSeparators = raw.replaceAllMapped(
       RegExp(r"\B(?=(\d{3})+(?!\d))"),

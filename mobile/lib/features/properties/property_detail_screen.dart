@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/properties_provider.dart';
+import '../../shared/providers/properties_provider.dart';
 import '../../models/property.dart';
-import '../../widgets/property_image_gallery.dart';
-import '../../widgets/property_map.dart';
-import '../../utils/format_utils.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   final String propertyId;
@@ -122,7 +119,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   itemCount: property!.images.length,
                   itemBuilder: (context, index) {
                     return Image.network(
-                      property!.images[index],
+                      property!.images[index].url,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -172,7 +169,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   const SizedBox(height: 16),
 
                   // Property Details
-                  _buildDetailRow(Icons.location_on, 'Address', property!.address),
+                  _buildDetailRow(Icons.location_on, 'Address', property!.address.formattedAddress),
                   _buildDetailRow(Icons.home, 'Type', property!.type),
                   _buildDetailRow(Icons.square_foot, 'Area', '${property!.area} sq ft'),
                   _buildDetailRow(Icons.bed, 'Bedrooms', property!.bedrooms.toString()),
