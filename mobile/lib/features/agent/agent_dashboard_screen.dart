@@ -309,8 +309,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            // Increase aspect ratio so each card is slightly shorter, reducing overflow risk
-            childAspectRatio: 1.35,
+            // Increase aspect ratio to provide more height for content
+            childAspectRatio: 1.2,
             children: [
               _buildStatCard(
                 'Total Properties',
@@ -441,17 +441,17 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         value,
-                        style: theme.textTheme.headlineMedium?.copyWith(
+                        style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         subtitle,
                         style: theme.textTheme.bodySmall?.copyWith(
@@ -469,7 +469,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Row(
               children: [
                 Icon(
