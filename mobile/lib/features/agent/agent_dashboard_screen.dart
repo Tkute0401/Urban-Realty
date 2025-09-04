@@ -309,7 +309,8 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen>
             crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 1.3,
+            // Slightly reduce height to avoid small vertical overflows on narrow widths
+            childAspectRatio: 1.25,
             children: [
               _buildStatCard(
                 'Total Properties',
