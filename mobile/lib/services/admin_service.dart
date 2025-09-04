@@ -51,13 +51,19 @@ class AdminService {
 
   Map<String, dynamic> _getDefaultDashboardData() {
     return {
-      'stats': {
-        'totalUsers': 0,
-        'totalProperties': 0,
-        'totalAgents': 0,
-        'totalRevenue': 0,
+      'counts': {
+        'users': 0,
+        'agents': 0,
+        'properties': 0,
+        'contacts': 0,
+        'subscriptions': 0,
+        'revenue': 0,
       },
-      'recentActivities': [],
+      'recent': {
+        'users': [],
+        'properties': [],
+        'contacts': [],
+      },
     };
   }
 

@@ -63,6 +63,7 @@ class AgentService {
         'monthlyRevenue': 0,
       },
       'recentLeads': [],
+      'properties': [],
     };
   }
 

@@ -111,7 +111,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget _buildStatsGrid() {
     if (_dashboardData == null) return const SizedBox.shrink();
 
-    final stats = _dashboardData!['stats'] ?? {};
+    final counts = _dashboardData!['counts'] ?? {};
     
     return GridView.count(
       shrinkWrap: true,
@@ -123,27 +123,39 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       children: [
         _buildStatCard(
           'Total Users',
-          stats['totalUsers']?.toString() ?? '0',
+          counts['users']?.toString() ?? '0',
           Icons.people,
           Colors.blue,
         ),
         _buildStatCard(
           'Total Properties',
-          stats['totalProperties']?.toString() ?? '0',
+          counts['properties']?.toString() ?? '0',
           Icons.home,
           Colors.green,
         ),
         _buildStatCard(
           'Total Agents',
-          stats['totalAgents']?.toString() ?? '0',
+          counts['agents']?.toString() ?? '0',
           Icons.person,
           Colors.orange,
         ),
         _buildStatCard(
           'Total Revenue',
-          '₹${stats['totalRevenue']?.toString() ?? '0'}',
+          '₹${counts['revenue']?.toString() ?? '0'}',
           Icons.attach_money,
           Colors.purple,
+        ),
+        _buildStatCard(
+          'Total Contacts',
+          counts['contacts']?.toString() ?? '0',
+          Icons.contact_mail,
+          Colors.teal,
+        ),
+        _buildStatCard(
+          'Subscriptions',
+          counts['subscriptions']?.toString() ?? '0',
+          Icons.card_membership,
+          Colors.indigo,
         ),
       ],
     );
@@ -233,7 +245,49 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildRecentActivity() {
-    final activities = _dashboardData?['recentActivities'] ?? [];
+    final recent = _dashboardData?['recent'] ?? {};
+    final recentUsers = recent['users'] ?? [];
+    final recentProperties = recent['properties'] ?? [];
+    final recentContacts = recent['contacts'] ?? [];
+    
+    // Combine all recent activities
+    List<Map<String, dynamic>> allActivities = [];
+    
+    // Add recent users
+    for (var user in recentUsers) {
+      allActivities.add({
+        'type': 'user',
+        'message': 'New user registered: ${user['name'] ?? user['email'] ?? 'Unknown'}',
+        'timestamp': _formatDate(user['createdAt']),
+        'icon': Icons.person_add,
+        'color': Colors.blue,
+      });
+    }
+    
+    // Add recent properties
+    for (var property in recentProperties) {
+      allActivities.add({
+        'type': 'property',
+        'message': 'New property added: ${property['title'] ?? 'Untitled Property'}',
+        'timestamp': _formatDate(property['createdAt']),
+        'icon': Icons.home,
+        'color': Colors.green,
+      });
+    }
+    
+    // Add recent contacts
+    for (var contact in recentContacts) {
+      allActivities.add({
+        'type': 'contact',
+        'message': 'New inquiry for: ${contact['property']?['title'] ?? 'Property'}',
+        'timestamp': _formatDate(contact['createdAt']),
+        'icon': Icons.contact_mail,
+        'color': Colors.orange,
+      });
+    }
+    
+    // Sort by timestamp (most recent first)
+    allActivities.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
     
     return Card(
       elevation: 4,
@@ -247,7 +301,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            if (activities.isEmpty)
+            if (allActivities.isEmpty)
               const Center(
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
@@ -258,16 +312,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: activities.length > 5 ? 5 : activities.length,
+                itemCount: allActivities.length > 5 ? 5 : allActivities.length,
                 itemBuilder: (context, index) {
-                  final activity = activities[index];
+                  final activity = allActivities[index];
                   return ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      child: const Icon(Icons.notifications, color: Colors.white, size: 16),
+                      backgroundColor: activity['color'],
+                      child: Icon(activity['icon'], color: Colors.white, size: 16),
                     ),
-                    title: Text(activity['message'] ?? ''),
-                    subtitle: Text(activity['timestamp'] ?? ''),
+                    title: Text(activity['message']),
+                    subtitle: Text(activity['timestamp']),
                     dense: true,
                   );
                 },
@@ -276,6 +330,27 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ),
       ),
     );
+  }
+
+  String _formatDate(dynamic date) {
+    if (date == null) return 'Unknown date';
+    try {
+      final dateTime = DateTime.parse(date.toString());
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+      
+      if (difference.inDays > 0) {
+        return '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
+      } else {
+        return 'Just now';
+      }
+    } catch (e) {
+      return 'Unknown date';
+    }
   }
 
   void _navigateToUsers() {

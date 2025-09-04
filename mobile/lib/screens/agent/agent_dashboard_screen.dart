@@ -140,14 +140,14 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
           Colors.blue,
         ),
         _buildStatCard(
-          'Active Leads',
-          stats['activeLeads']?.toString() ?? '0',
+          'Total Leads',
+          stats['totalLeads']?.toString() ?? '0',
           Icons.people,
           Colors.green,
         ),
         _buildStatCard(
-          'This Month',
-          '₹${stats['monthlyEarnings']?.toString() ?? '0'}',
+          'Monthly Revenue',
+          '₹${stats['monthlyRevenue']?.toString() ?? '0'}',
           Icons.attach_money,
           Colors.orange,
         ),
@@ -245,7 +245,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
   }
 
   Widget _buildRecentLeads() {
-    final leads = _dashboardData?['recentLeads'] ?? [];
+    final properties = _dashboardData?['properties'] ?? [];
     
     return Card(
       elevation: 4,
@@ -258,54 +258,54 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Recent Leads',
+                  'My Properties',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
-                  onPressed: () => _navigateToLeads(),
+                  onPressed: () => _navigateToProperties(),
                   child: const Text('View All'),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            if (leads.isEmpty)
+            if (properties.isEmpty)
               const Center(
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: Text('No recent leads'),
+                  child: Text('No properties added yet'),
                 ),
               )
             else
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: leads.length > 3 ? 3 : leads.length,
+                itemCount: properties.length > 3 ? 3 : properties.length,
                 itemBuilder: (context, index) {
-                  final lead = leads[index];
+                  final property = properties[index];
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
-                      child: const Icon(Icons.person, color: Colors.white, size: 16),
+                      child: const Icon(Icons.home, color: Colors.white, size: 16),
                     ),
-                    title: Text(lead['name'] ?? 'Unknown Lead'),
-                    subtitle: Text(lead['property'] ?? ''),
+                    title: Text(property['title'] ?? 'Untitled Property'),
+                    subtitle: Text('₹${property['price']?.toString() ?? '0'} - ${property['location'] ?? 'Unknown Location'}'),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _getLeadStatusColor(lead['status']).withValues(alpha: 0.1),
+                        color: _getPropertyStatusColor(property['status']).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _getLeadStatusColor(lead['status'])),
+                        border: Border.all(color: _getPropertyStatusColor(property['status'])),
                       ),
                       child: Text(
-                        lead['status'] ?? 'new',
+                        property['status'] ?? 'active',
                         style: TextStyle(
-                          color: _getLeadStatusColor(lead['status']),
+                          color: _getPropertyStatusColor(property['status']),
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    onTap: () => _showLeadDetails(lead),
+                    onTap: () => _showPropertyDetails(property),
                   );
                 },
               ),
@@ -315,22 +315,22 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
     );
   }
 
-  Color _getLeadStatusColor(String? status) {
+  Color _getPropertyStatusColor(String? status) {
     switch (status?.toLowerCase()) {
-      case 'new':
-        return Colors.blue;
-      case 'contacted':
-        return Colors.orange;
-      case 'interested':
+      case 'active':
         return Colors.green;
-      case 'converted':
-        return Colors.purple;
+      case 'sold':
+        return Colors.blue;
+      case 'rented':
+        return Colors.orange;
+      case 'inactive':
+        return Colors.red;
       default:
         return Colors.grey;
     }
   }
 
-  void _showLeadDetails(Map<String, dynamic> lead) {
+  void _showPropertyDetails(Map<String, dynamic> property) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -344,7 +344,7 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
               children: [
                 CircleAvatar(
                   backgroundColor: Theme.of(context).primaryColor,
-                  child: const Icon(Icons.person, color: Colors.white),
+                  child: const Icon(Icons.home, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -352,11 +352,11 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lead['name'] ?? 'Unknown Lead',
+                        property['title'] ?? 'Untitled Property',
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        lead['email'] ?? '',
+                        property['location'] ?? 'Unknown Location',
                         style: const TextStyle(color: Colors.grey),
                       ),
                     ],
@@ -365,10 +365,12 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            _buildDetailRow('Phone', lead['phone'] ?? 'Not provided'),
-            _buildDetailRow('Property', lead['property'] ?? 'Not specified'),
-            _buildDetailRow('Status', lead['status'] ?? 'new'),
-            _buildDetailRow('Date', lead['date'] ?? 'Unknown'),
+            _buildDetailRow('Price', '₹${property['price']?.toString() ?? '0'}'),
+            _buildDetailRow('Type', property['type'] ?? 'Not specified'),
+            _buildDetailRow('Bedrooms', property['bedrooms']?.toString() ?? 'Not specified'),
+            _buildDetailRow('Bathrooms', property['bathrooms']?.toString() ?? 'Not specified'),
+            _buildDetailRow('Status', property['status'] ?? 'active'),
+            _buildDetailRow('Added', _formatDate(property['createdAt'])),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -376,9 +378,9 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      _handleLeadAction('contact', lead);
+                      _handlePropertyAction('edit', property);
                     },
-                    child: const Text('Contact'),
+                    child: const Text('Edit'),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -417,14 +419,33 @@ class _AgentDashboardScreenState extends State<AgentDashboardScreen> {
     );
   }
 
-  void _handleLeadAction(String action, Map<String, dynamic> lead) {
+  void _handlePropertyAction(String action, Map<String, dynamic> property) {
     switch (action) {
-      case 'contact':
-        // Implement contact lead functionality
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Contact functionality to be implemented')),
-        );
+      case 'edit':
+        // Navigate to edit property screen
+        Navigator.pushNamed(context, '/add-property', arguments: property);
         break;
+    }
+  }
+
+  String _formatDate(dynamic date) {
+    if (date == null) return 'Unknown date';
+    try {
+      final dateTime = DateTime.parse(date.toString());
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+      
+      if (difference.inDays > 0) {
+        return '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
+      } else {
+        return 'Just now';
+      }
+    } catch (e) {
+      return 'Unknown date';
     }
   }
 
