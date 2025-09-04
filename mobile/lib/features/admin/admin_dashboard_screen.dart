@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../shared/providers/properties_provider.dart';
-import '../../shared/providers/auth_provider.dart';
 import '../../models/property.dart';
-import '../../services/api_service.dart';
-import '../../widgets/admin_chart_widget.dart';
+// Removed unused imports
 import '../../utils/format_utils.dart';
 import '../../widgets/quick_action_card.dart';
 import '../../widgets/stats_card.dart';
 import '../../widgets/recent_activity_card.dart';
-import '../../widgets/analytics_chart.dart';
+// Removed unused imports
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});

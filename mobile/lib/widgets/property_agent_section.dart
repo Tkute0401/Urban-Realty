@@ -68,10 +68,10 @@ class PropertyAgentSection extends StatelessWidget {
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      if (agent.mobile != null && agent.mobile!.isNotEmpty) ...[
+                      if (agent.mobile.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
-                          agent.mobile!,
+                          agent.mobile,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),

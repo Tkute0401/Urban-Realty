@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../shared/providers/properties_provider.dart';
 import '../../shared/providers/auth_provider.dart';
 import '../../models/property.dart';
-import '../../services/api_service.dart';
+// Removed unused import
 import '../../utils/format_utils.dart';
 
 class AgentDashboardScreen extends StatefulWidget {

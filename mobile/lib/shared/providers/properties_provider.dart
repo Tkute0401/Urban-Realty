@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import '../../models/property.dart';
 import '../../services/property_service.dart';
 import '../../services/favorites_service.dart';
