@@ -38,7 +38,7 @@ class PropertiesProvider extends ChangeNotifier {
     }
     _error = null;
     // Only notify listeners if we're not in build phase
-    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
       notifyListeners();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -70,7 +70,7 @@ class PropertiesProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       // Only notify listeners if we're not in build phase
-      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
         notifyListeners();
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -84,7 +84,7 @@ class PropertiesProvider extends ChangeNotifier {
     _isLoading = true;
     _error = null;
     // Only notify listeners if we're not in build phase
-    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
       notifyListeners();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -99,7 +99,7 @@ class PropertiesProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       // Only notify listeners if we're not in build phase
-      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
         notifyListeners();
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -113,7 +113,7 @@ class PropertiesProvider extends ChangeNotifier {
     _isLoading = true;
     _error = null;
     // Only notify listeners if we're not in build phase
-    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
       notifyListeners();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -128,7 +128,7 @@ class PropertiesProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       // Only notify listeners if we're not in build phase
-      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
         notifyListeners();
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -142,7 +142,7 @@ class PropertiesProvider extends ChangeNotifier {
     _isLoading = true;
     _error = null;
     // Only notify listeners if we're not in build phase
-    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+    if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
       notifyListeners();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -160,7 +160,7 @@ class PropertiesProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       // Only notify listeners if we're not in build phase
-      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.build) {
+      if (WidgetsBinding.instance.schedulerPhase != SchedulerPhase.persistentCallbacks) {
         notifyListeners();
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
