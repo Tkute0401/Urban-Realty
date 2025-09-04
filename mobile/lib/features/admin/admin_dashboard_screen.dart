@@ -194,7 +194,23 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     );
   }
 
-  String _formatTimeAgo(DateTime dateTime) {
+  String _formatTimeAgo(dynamic date) {
+    // Accepts DateTime, ISO8601 string, or epoch (ms/seconds)
+    DateTime dateTime;
+    if (date is DateTime) {
+      dateTime = date;
+    } else if (date is String) {
+      dateTime = DateTime.tryParse(date) ?? DateTime.now();
+    } else if (date is int) {
+      // Heuristic: treat 13-digit as milliseconds, 10-digit as seconds
+      final isSeconds = date.toString().length <= 10;
+      dateTime = DateTime.fromMillisecondsSinceEpoch(
+        isSeconds ? date * 1000 : date,
+      );
+    } else {
+      dateTime = DateTime.now();
+    }
+
     final now = DateTime.now();
     final difference = now.difference(dateTime);
     
@@ -490,9 +506,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     'type': 'user',
                     'title': user['name'] ?? 'Unknown User',
                     'subtitle': user['email'] ?? '',
-                    'time': _formatTimeAgo(
-                      DateTime.tryParse(user['createdAt'] ?? '') ?? DateTime.now(),
-                    ),
+                    'time': _formatTimeAgo(user['createdAt']),
                   }).toList(),
                   onViewAll: () => Navigator.pushNamed(context, '/admin/users'),
                 ),
