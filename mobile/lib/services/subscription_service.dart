@@ -9,10 +9,14 @@ class SubscriptionService {
 
   Future<List<Map<String, dynamic>>> getSubscriptionPlans() async {
     try {
-      final response = await HttpClient.get('/subscriptions/plans');
+      // Server returns { success, data: [ ...plans ] } at GET /subscriptions
+      final response = await HttpClient.get('/subscriptions');
       if (response.statusCode == 200) {
         final data = response.data;
-        return List<Map<String, dynamic>>.from((data is Map && data['plans'] != null) ? data['plans'] : []);
+        if (data is Map && data['data'] is List) {
+          return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+        }
+        return <Map<String, dynamic>>[];
       }
       throw Exception('Failed to load subscription plans');
     } catch (e) {
@@ -22,11 +26,12 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> getCurrentSubscription() async {
     try {
-      final response = await HttpClient.get('/subscriptions/current');
+      // Server route: GET /subscriptions/my-subscription -> { success, data }
+      final response = await HttpClient.get('/subscriptions/my-subscription');
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data is Map<String, dynamic>) return data;
-        if (data is Map) return Map<String, dynamic>.from(data);
+        if (data is Map<String, dynamic>) return data['data'] is Map<String, dynamic> ? data['data'] as Map<String, dynamic> : data;
+        if (data is Map) return Map<String, dynamic>.from(data['data'] is Map ? data['data'] : data);
         if (data is String) {
           return {'success': true, 'message': 'Operation completed successfully'};
         }
@@ -40,7 +45,8 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> subscribeToPlan(String planId) async {
     try {
-      final response = await HttpClient.post('/subscriptions/subscribe', body: {'planId': planId});
+      // Server expects { subscriptionId, billingCycle? }
+      final response = await HttpClient.post('/subscriptions/subscribe', body: {'subscriptionId': planId});
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
@@ -58,7 +64,8 @@ class SubscriptionService {
 
   Future<Map<String, dynamic>> cancelSubscription() async {
     try {
-      final response = await HttpClient.post('/subscriptions/cancel');
+      // Server route uses PUT /subscriptions/cancel
+      final response = await HttpClient.put('/subscriptions/cancel');
       if (response.statusCode == 200) {
         final data = response.data;
         if (data is Map<String, dynamic>) return data;
@@ -79,9 +86,43 @@ class SubscriptionService {
       final response = await HttpClient.get('/subscriptions/billing-history');
       if (response.statusCode == 200) {
         final data = response.data;
-        return List<Map<String, dynamic>>.from((data is Map && data['bills'] != null) ? data['bills'] : []);
+        if (data is Map && data['data'] is List) {
+          return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+        }
+        return <Map<String, dynamic>>[];
       }
       throw Exception('Failed to load billing history');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getUpcomingBilling() async {
+    try {
+      final response = await HttpClient.get('/subscriptions/upcoming-billing');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map && data['data'] is List) {
+          return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+        }
+        return <Map<String, dynamic>>[];
+      }
+      throw Exception('Failed to load upcoming billing');
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<int>> downloadInvoicePdf(String subscriptionId) async {
+    try {
+      final response = await HttpClient.get('/subscriptions/invoice/$subscriptionId/download');
+      if (response.statusCode == 200) {
+        // Assuming server returns binary PDF; dio may already parse bytes
+        final data = response.data;
+        if (data is List<int>) return data;
+        if (data is List) return List<int>.from(data);
+      }
+      throw Exception('Failed to download invoice');
     } catch (e) {
       throw Exception('Error: $e');
     }

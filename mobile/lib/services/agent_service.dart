@@ -90,10 +90,11 @@ class AgentService {
 
   Future<List<Map<String, dynamic>>> getAgentLeads({int page = 1, int limit = 10}) async {
     try {
-      final response = await HttpClient.get('/agent/leads', query: {'page': page.toString(), 'limit': limit.toString()});
+      // Server route provides agent contacts at /contacts/agent
+      final response = await HttpClient.get('/contacts/agent', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = response.data;
-        return List<Map<String, dynamic>>.from((data is Map && data['leads'] != null) ? data['leads'] : []);
+        return List<Map<String, dynamic>>.from((data is Map && data['data'] is List) ? data['data'] : []);
       }
       throw Exception('Failed to load agent leads. Status: ${response.statusCode}');
     } catch (e) {
@@ -106,10 +107,11 @@ class AgentService {
 
   Future<List<Map<String, dynamic>>> getAgentInquiries({int page = 1, int limit = 10}) async {
     try {
-      final response = await HttpClient.get('/agent/inquiries', query: {'page': page.toString(), 'limit': limit.toString()});
+      // No distinct inquiries endpoint; reuse contacts for now
+      final response = await HttpClient.get('/contacts/agent', query: {'page': page.toString(), 'limit': limit.toString()});
       if (response.statusCode == 200) {
         final data = response.data;
-        return List<Map<String, dynamic>>.from((data is Map && data['inquiries'] != null) ? data['inquiries'] : []);
+        return List<Map<String, dynamic>>.from((data is Map && data['data'] is List) ? data['data'] : []);
       }
       throw Exception('Failed to load agent inquiries. Status: ${response.statusCode}');
     } catch (e) {
@@ -122,20 +124,13 @@ class AgentService {
 
   Future<Map<String, dynamic>> getAgentAnalytics() async {
     try {
-      final response = await HttpClient.get('/agent/analytics');
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is Map<String, dynamic>) return data;
-        if (data is Map) return Map<String, dynamic>.from(data);
-        if (data is String) {
-          print('Warning: Server returned string instead of JSON: $data');
-          return _getDefaultAnalyticsData();
-        }
-        // Return default data for unexpected formats
-        print('Warning: Unexpected response format: ${data.runtimeType}');
-        return _getDefaultAnalyticsData();
-      }
-      throw Exception('Failed to load agent analytics. Status: ${response.statusCode}');
+      // Not provided by server; synthesize simple analytics from properties count for now
+      final props = await getAgentProperties(limit: 50);
+      final response = { 'data': { 'monthlyRevenue': 0, 'propertyViews': 0, 'leadConversion': 0, 'responseTime': 0, 'totalProperties': props.length } };
+      final data = response['data'];
+      if (data is Map<String, dynamic>) return data;
+      if (data is Map) return Map<String, dynamic>.from(data);
+      return _getDefaultAnalyticsData();
     } catch (e) {
       print('Error in getAgentAnalytics: $e');
       // Return default data for any error to prevent app crashes
