@@ -76,4 +76,10 @@ Scope: Align `mobile` app features and APIs with `client` (web) app using the sa
 - [Init] Created report and captured current inventory and gaps.
 - [Config] Web now reads API base URL from `VITE_API_BASE_URL` in `client/src/services/axios.js` with production fallback.
 - [Config] Mobile `ApiService` now reads `API_BASE_URL` from `.env` with fallback to `ApiConfig.baseUrl`.
+- [Mobile] Wired `SubscriptionScreen` to live APIs using `SubscriptionService` for: list plans (GET `/subscriptions`) and subscribe (POST `/subscriptions/subscribe`). Removed mock data.
+
+### Pending Work
+- Implement mobile subscription management (view current plan, cancel, billing history, invoices) using existing `SubscriptionService` methods.
+- Evaluate whether admin features need mobile parity; if yes, design role-gated screens.
+- Add analytics event parity (track key actions) if required.
 

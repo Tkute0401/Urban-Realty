@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "../models/subscription.dart";
+import "../services/subscription_service.dart";
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -11,6 +12,7 @@ class SubscriptionScreen extends StatefulWidget {
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   List<Subscription> _plans = [];
   bool _isLoading = true;
+  bool _subscribing = false;
 
   @override
   void initState() {
@@ -150,77 +152,22 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> _loadPlans() async {
-    // Mock data for now - replace with actual API call
-    setState(() {
-      _plans = [
-        Subscription(
-          id: "1",
-          name: "Free Plan",
-          type: "free",
-          price: 0,
-          billingCycle: "monthly",
-          features: [
-            "5 property listings",
-            "Basic search",
-            "Email support"
-          ],
-          listingLimit: 5,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        Subscription(
-          id: "2",
-          name: "Basic Plan",
-          type: "basic",
-          price: 29,
-          billingCycle: "monthly",
-          features: [
-            "25 property listings",
-            "Advanced search",
-            "Priority support",
-            "Property analytics"
-          ],
-          listingLimit: 25,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        Subscription(
-          id: "3",
-          name: "Premium Plan",
-          type: "premium",
-          price: 79,
-          billingCycle: "monthly",
-          features: [
-            "Unlimited listings",
-            "Premium support",
-            "Advanced analytics",
-            "Featured listings",
-            "Lead management"
-          ],
-          listingLimit: -1,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        Subscription(
-          id: "4",
-          name: "Enterprise Plan",
-          type: "enterprise",
-          price: 199,
-          billingCycle: "monthly",
-          features: [
-            "Everything in Premium",
-            "Custom branding",
-            "API access",
-            "Dedicated support",
-            "White-label solution"
-          ],
-          listingLimit: -1,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      ];
-      _isLoading = false;
-    });
+    try {
+      setState(() { _isLoading = true; });
+      final List<Map<String, dynamic>> plansJson = await SubscriptionService().getSubscriptionPlans();
+      final List<Subscription> plans = plansJson.map((json) => Subscription.fromJson(json)).toList();
+      setState(() {
+        _plans = plans;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() { _isLoading = false; });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load plans: $e')),
+        );
+      }
+    }
   }
 
   void _subscribeToPlan(Subscription plan) {
@@ -237,9 +184,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             child: const Text("Cancel"),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: _subscribing ? null : () async {
               Navigator.pop(context);
-              _processPayment(plan);
+              await _processSubscription(plan);
             },
             child: const Text("Proceed"),
           ),
@@ -248,12 +195,25 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     );
   }
 
-  void _processPayment(Subscription plan) {
-    // This would integrate with Razorpay or other payment gateway
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Payment processing for ${plan.name} will be implemented"),
-      ),
-    );
+  Future<void> _processSubscription(Subscription plan) async {
+    try {
+      setState(() { _subscribing = true; });
+      final result = await SubscriptionService().subscribeToPlan(plan.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message']?.toString() ?? 'Subscription activated')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to subscribe: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() { _subscribing = false; });
+      }
+    }
   }
 }
