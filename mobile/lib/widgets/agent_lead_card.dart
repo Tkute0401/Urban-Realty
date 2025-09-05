@@ -150,9 +150,12 @@ class AgentLeadCard extends StatelessWidget {
   }
 
   String _formatDate(dynamic date) {
-    if (date is DateTime) {
-      return "${date.day}/${date.month}/${date.year} at ${date.hour}:${date.minute}";
+    try {
+      final dt = date is DateTime ? date : DateTime.tryParse(date.toString());
+      if (dt == null) return "Unknown date";
+      return "${dt.day}/${dt.month}/${dt.year} at ${dt.hour}:${dt.minute}";
+    } catch (_) {
+      return "Unknown date";
     }
-    return "Unknown date";
   }
 }

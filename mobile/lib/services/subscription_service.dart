@@ -11,8 +11,15 @@ class SubscriptionService {
       final response = await HttpClient.get('/subscriptions');
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data is Map && data['data'] is List) {
-          return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+        if (data is Map) {
+          final dynamic inner = (data as Map)['data'];
+          if (inner is List) {
+            return List<Map<String, dynamic>>.from(inner as List<dynamic>);
+          }
+          if (inner is Map) {
+            return [Map<String, dynamic>.from(inner as Map)];
+          }
+          return <Map<String, dynamic>>[];
         }
         return <Map<String, dynamic>>[];
       }
@@ -96,8 +103,15 @@ class SubscriptionService {
       final response = await HttpClient.get('/subscriptions/billing-history');
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data is Map && data['data'] is List) {
-          return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+        if (data is Map) {
+          final dynamic inner = (data as Map)['data'];
+          if (inner is List) {
+            return List<Map<String, dynamic>>.from(inner as List<dynamic>);
+          }
+          if (inner is Map) {
+            return [Map<String, dynamic>.from(inner as Map)];
+          }
+          return <Map<String, dynamic>>[];
         }
         return <Map<String, dynamic>>[];
       }
