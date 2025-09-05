@@ -335,41 +335,45 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: EdgeInsets.all(16),
                             child: Center(child: CircularProgressIndicator()),
                           )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _searchSuggestions.length,
-                            itemBuilder: (context, index) {
-                              final suggestion = _searchSuggestions[index];
-                              return ListTile(
-                                leading: Icon(
-                                  Icons.search,
-                                  color: theme.colorScheme.primary,
-                                  size: 20,
-                                ),
-                                title: Text(
-                                  suggestion['title']?.toString() ?? suggestion['text']?.toString() ?? '',
-                                  style: theme.textTheme.bodyMedium,
-                                ),
-                                subtitle: suggestion['subtitle'] != null
-                                    ? Text(
-                                        suggestion['subtitle'].toString(),
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurfaceVariant,
-                                        ),
-                                      )
-                                    : null,
-                                onTap: () {
-                                  _searchController.text = suggestion['title']?.toString() ?? suggestion['text']?.toString() ?? '';
-                                  setState(() {
-                                    _showSuggestions = false;
-                                  });
-                                  _applyFilters();
-                                  AnalyticsService().track('search_suggestion_selected', {
-                                    'text': _searchController.text,
-                                  });
-                                },
-                              );
-                            },
+                        : ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 240),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const ClampingScrollPhysics(),
+                              itemCount: _searchSuggestions.length,
+                              itemBuilder: (context, index) {
+                                final suggestion = _searchSuggestions[index];
+                                return ListTile(
+                                  leading: Icon(
+                                    Icons.search,
+                                    color: theme.colorScheme.primary,
+                                    size: 20,
+                                  ),
+                                  title: Text(
+                                    suggestion['title']?.toString() ?? suggestion['text']?.toString() ?? '',
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  subtitle: suggestion['subtitle'] != null
+                                      ? Text(
+                                          suggestion['subtitle'].toString(),
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                        )
+                                      : null,
+                                  onTap: () {
+                                    _searchController.text = suggestion['title']?.toString() ?? suggestion['text']?.toString() ?? '';
+                                    setState(() {
+                                      _showSuggestions = false;
+                                    });
+                                    _applyFilters();
+                                    AnalyticsService().track('search_suggestion_selected', {
+                                      'text': _searchController.text,
+                                    });
+                                  },
+                                );
+                              },
+                            ),
                           ),
                   ),
               ],

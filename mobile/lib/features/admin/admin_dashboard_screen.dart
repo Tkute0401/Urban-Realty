@@ -869,6 +869,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   }
 
   Widget _buildAnalyticsTab(ThemeData theme) {
+    final Map<String, dynamic> analytics =
+        (stats['analytics'] as Map<String, dynamic>?) ?? const {};
+    final num growthRate = (analytics['growthRate'] as num?) ?? 0;
+    final num conversionRate = (analytics['conversionRate'] as num?) ?? 0;
+    final num avgResponseTime = (analytics['avgResponseTime'] as num?) ?? 0;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -899,17 +905,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                   const SizedBox(height: 16),
                   _buildMetricRow(
                     'Growth Rate',
-                    '${stats['analytics']['growthRate']}%',
+                    '${growthRate.toString()}%',
                     theme,
                   ),
                   _buildMetricRow(
                     'Conversion Rate',
-                    '${stats['analytics']['conversionRate']}%',
+                    '${conversionRate.toString()}%',
                     theme,
                   ),
                   _buildMetricRow(
                     'Avg Response Time',
-                    '${stats['analytics']['avgResponseTime']}h',
+                    '${avgResponseTime.toString()}h',
                     theme,
                   ),
                 ],
