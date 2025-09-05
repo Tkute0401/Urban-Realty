@@ -149,7 +149,7 @@ class _BillingDashboardScreenState extends State<BillingDashboardScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '₹${subscription['plan']?['price']?.toStringAsFixed(0) ?? '0'}/month',
+                    '₹${_formatAmount(subscription['plan']?['price'])}/month',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -214,7 +214,7 @@ class _BillingDashboardScreenState extends State<BillingDashboardScreen> {
                 Expanded(
                   child: _buildInfoItem(
                     'Date',
-                    _formatDate(_upcomingBilling!['billingDate']),
+                    _formatDate(_upcomingBilling!['billingDate'] ?? _upcomingBilling!['nextBillingDate']),
                     Icons.calendar_today,
                   ),
                 ),
@@ -414,10 +414,45 @@ class _BillingDashboardScreenState extends State<BillingDashboardScreen> {
   String _formatDate(dynamic date) {
     if (date == null) return 'Unknown';
     try {
-      final DateTime dateTime = DateTime.parse(date.toString());
-      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      DateTime dt;
+      if (date is DateTime) {
+        dt = date;
+      } else if (date is int) {
+        final isSeconds = date.toString().length <= 10;
+        dt = DateTime.fromMillisecondsSinceEpoch(isSeconds ? date * 1000 : date);
+      } else if (date is String) {
+        final n = int.tryParse(date);
+        if (n != null) {
+          final isSeconds = date.length <= 10;
+          dt = DateTime.fromMillisecondsSinceEpoch(isSeconds ? n * 1000 : n);
+        } else {
+          dt = DateTime.tryParse(date) ?? DateTime.now();
+        }
+      } else if (date is Map) {
+        final map = Map<String, dynamic>.from(date as Map);
+        if (map['seconds'] is int) {
+          dt = DateTime.fromMillisecondsSinceEpoch((map['seconds'] as int) * 1000);
+        } else if (map['milliseconds'] is int) {
+          dt = DateTime.fromMillisecondsSinceEpoch(map['milliseconds'] as int);
+        } else if (map['ms'] is int) {
+          dt = DateTime.fromMillisecondsSinceEpoch(map['ms'] as int);
+        } else if (map['iso'] is String) {
+          dt = DateTime.tryParse(map['iso'] as String) ?? DateTime.now();
+        } else {
+          dt = DateTime.now();
+        }
+      } else {
+        dt = DateTime.now();
+      }
+      return '${dt.day}/${dt.month}/${dt.year}';
     } catch (e) {
       return 'Unknown';
     }
+  }
+
+  String _formatAmount(dynamic amount) {
+    if (amount == null) return '0';
+    if (amount is num) return amount.toStringAsFixed(0);
+    return (double.tryParse(amount.toString()) ?? 0).toStringAsFixed(0);
   }
 }
