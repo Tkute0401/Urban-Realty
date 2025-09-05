@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics dashboard added; reports email UI; analytics payload fix)
+Last updated: 2025-09-05 (fixed Admin Dashboard null crash; removed duplicate screen; continued parity QA)
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
@@ -67,6 +67,8 @@ Last updated: 2025-09-04 (mobile: admin settings/reports/media parity; analytics
     - Added analytics events on mobile via `AnalyticsService().track(...)` for `property_viewed`, `favorite_added`, `favorite_removed`.
     - Enhanced `mobile/lib/screens/favorites_screen.dart` with empty state, and tap to open property detail.
     - Added Favorites quick access links in `mobile/lib/screens/profile_screen.dart`; route `/favorites` already wired in `mobile/lib/main.dart`.
+  - [Fix] Admin Dashboard null crash: guarded `analytics.topPerformingAgents` with null-safe list fallback in `mobile/lib/features/admin/admin_dashboard_screen.dart` to prevent `NoSuchMethodError` when analytics or list is absent.
+  - [Cleanup] Removed duplicate `mobile/lib/screens/admin/admin_dashboard_screen.dart` ensuring single source of truth (features version used by routes).
 
  - [Mobile] Admin media parity:
    - Extended `AdminService` with `getMedia`, `deleteMedia`, `uploadMedia` using multipart via `HttpClient.postMultipart`.
@@ -206,7 +208,7 @@ All compilation errors in the mobile app have been resolved:
 6. **COMPLETED**: QA Admin Properties screen: test filtering, property approval/rejection, and deletion workflows.
 7. **COMPLETED**: QA Developer management: test developer detail view, edit functionality, and CRUD operations.
 8. **COMPLETED**: Fixed all compilation errors in mobile app.
-9. **NEW**: Test mobile app compilation and build process to ensure all errors are resolved.
+9. **NEW**: Test mobile app on emulator/device: verify Admin Dashboard renders without crash with/without analytics data.
 10. **NEW**: QA EMI Calculator: test calculation accuracy, input validation, and result display.
 11. **NEW**: QA Subscription Comparison: verify plan comparison table and feature details.
 12. **NEW**: QA Billing Dashboard: test subscription overview, billing history, and quick actions.
