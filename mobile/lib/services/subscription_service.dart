@@ -112,8 +112,17 @@ class SubscriptionService {
       final response = await HttpClient.get('/subscriptions/upcoming-billing');
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data is Map && data['data'] is List) {
-          return List<Map<String, dynamic>>.from(data['data'] as List<dynamic>);
+        if (data is Map) {
+          // API may return an object or a list under data
+          final map = Map<String, dynamic>.from(data);
+          final dynamic inner = map['data'];
+          if (inner is List) {
+            return List<Map<String, dynamic>>.from(inner);
+          }
+          if (inner is Map) {
+            return [Map<String, dynamic>.from(inner)];
+          }
+          return <Map<String, dynamic>>[];
         }
         return <Map<String, dynamic>>[];
       }
