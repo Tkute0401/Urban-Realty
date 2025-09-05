@@ -616,7 +616,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...stats['analytics']['topPerformingAgents'].map<Widget>((agent) {
+                  ...((stats['analytics']?['topPerformingAgents'] as List?) ?? const <dynamic>[])
+                      .map<Widget>((agent) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Row(
