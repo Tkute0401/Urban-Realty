@@ -160,7 +160,11 @@ class _SubscriptionComparisonScreenState extends State<SubscriptionComparisonScr
                   )),
                 ],
                 rows: [
-                  _buildComparisonRow('Price', _plans.map((p) => '₹${(p['price'] ?? 0).toStringAsFixed(0)}/month').toList()),
+                  _buildComparisonRow('Price', _plans.map((p) {
+                    final dynamic price = p['price'];
+                    final double d = price is num ? price.toDouble() : double.tryParse('${price ?? 0}') ?? 0.0;
+                    return '₹${d.toStringAsFixed(0)}/month';
+                  }).toList()),
                   _buildComparisonRow('Duration', _plans.map((p) => '${p['duration'] ?? 1} months').toList()),
                   _buildComparisonRow('Property Listings', _plans.map((p) => (p['maxProperties'] ?? -1) == -1 ? 'Unlimited' : '${p['maxProperties'] ?? 0}').toList()),
                   _buildComparisonRow('Featured Properties', _plans.map((p) => (p['featuredProperties'] ?? 0) == -1 ? 'Unlimited' : '${p['featuredProperties'] ?? 0}').toList()),

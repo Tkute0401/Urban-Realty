@@ -175,14 +175,15 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
               Text('Status: ${current['status'] ?? 'N/A'}'),
               if (current['billingCycle'] != null) Text('Billing: ${current['billingCycle']}'),
               const SizedBox(height: 12),
-              Row(
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
                 children: [
                   ElevatedButton(
                     onPressed: _cancelling ? null : _cancel,
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
                     child: _cancelling ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Cancel Subscription'),
                   ),
-                  const SizedBox(width: 12),
                   OutlinedButton(
                     onPressed: _updatingPayment ? null : _updatePaymentMethod,
                     child: _updatingPayment ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Update Payment Method'),
