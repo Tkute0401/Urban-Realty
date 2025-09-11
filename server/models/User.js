@@ -27,8 +27,14 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['buyer', 'agent', 'admin'],
+    enum: ['buyer', 'individual_seller', 'agent', 'developer', 'admin'],
     default: 'buyer'
+  },
+  // RERA ID for agent/developer users (India-specific)
+  reraId: {
+    type: String,
+    trim: true,
+    default: ''
   },
   password: {
     type: String,
@@ -73,7 +79,57 @@ const UserSchema = new mongoose.Schema({
         default: Date.now
       }
     }
-  ]
+  ],
+  // Subscription related fields
+  currentSubscription: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'UserSubscription'
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ['free', 'basic', 'premium', 'enterprise'],
+    default: 'free',
+    required: true
+  },
+  subscriptionExpiry: {
+    type: Date
+  },
+  // Professional fields for professional roles
+  professionalInfo: {
+    licenseNumber: {
+      type: String,
+      trim: true
+    },
+    yearsOfExperience: {
+      type: Number,
+      min: 0
+    },
+    specializations: [{
+      type: String,
+      trim: true
+    }],
+    certifications: [{
+      type: String,
+      trim: true
+    }],
+    businessName: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Business name cannot be more than 100 characters']
+    },
+    businessAddress: {
+      type: String,
+      trim: true
+    },
+    businessPhone: {
+      type: String,
+      trim: true
+    },
+    businessWebsite: {
+      type: String,
+      trim: true
+    }
+  }
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
@@ -98,6 +154,46 @@ UserSchema.methods.getSignedJwtToken = function() {
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Check if user has required subscription level
+UserSchema.methods.hasSubscription = function(requiredPlan) {
+  const subscriptionLevels = {
+    'free': 0,
+    'basic': 1,
+    'premium': 2,
+    'enterprise': 3
+  };
+  
+  const userLevel = subscriptionLevels[this.subscriptionStatus] || 0;
+  const requiredLevel = subscriptionLevels[requiredPlan] || 0;
+  
+  return userLevel >= requiredLevel;
+};
+
+// Check if user can access a specific feature
+UserSchema.methods.canAccessFeature = function(feature) {
+  const featureAccess = {
+    'advancedSearch': 'basic',
+    'analytics': 'premium',
+    'customBranding': 'enterprise',
+    'apiAccess': 'enterprise',
+    'prioritySupport': 'premium'
+  };
+  
+  const requiredPlan = featureAccess[feature];
+  if (!requiredPlan) return true; // Feature doesn't require subscription
+  
+  return this.hasSubscription(requiredPlan);
+};
+
+// Get subscription info for display
+UserSchema.methods.getSubscriptionInfo = function() {
+  return {
+    status: this.subscriptionStatus,
+    expiry: this.subscriptionExpiry,
+    currentSubscription: this.currentSubscription
+  };
 };
 
 module.exports = mongoose.model('User', UserSchema);

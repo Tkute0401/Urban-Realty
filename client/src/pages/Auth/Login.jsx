@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -13,33 +15,22 @@ import {
 import { Login as LoginIcon } from '@mui/icons-material';
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+  const LoginSchema = z.object({
+    email: z.string().email('Enter a valid email'),
+    password: z.string().min(6, 'Password must be at least 6 characters')
   });
-  
+
+  const { register, handleSubmit, formState: { isSubmitting } } = useForm({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: { email: '', password: '' }
+  });
+
   const { login, error, clearError, loading } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (values) => {
     clearError();
-    
-    // Basic validation
-    if (!formData.email || !formData.password) {
-      // Use the setError from context if needed
-      return;
-    }
-
-    await login(formData);
+    await login(values);
   };
 
   return (
@@ -57,15 +48,14 @@ const Login = () => {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
           <TextField
             fullWidth
             label="Email Address"
             name="email"
             type="email"
-            value={formData.email}
-            onChange={handleChange}
             required
+            {...register('email')}
             sx={{
               mb: 2,
               '& .MuiOutlinedInput-root': {
@@ -100,9 +90,8 @@ const Login = () => {
             label="Password"
             name="password"
             type="password"
-            value={formData.password}
-            onChange={handleChange}
             required
+            {...register('password')}
             sx={{
               mb: 2,
               '& .MuiOutlinedInput-root': {
@@ -139,9 +128,9 @@ const Login = () => {
             size="large"
             startIcon={<LoginIcon />}
             sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "#78CADC" }}
-            disabled={loading}
+            disabled={loading || isSubmitting}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {(loading || isSubmitting) ? 'Logging in...' : 'Login'}
           </Button>
         </Box>
       </Paper>

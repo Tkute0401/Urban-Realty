@@ -47,11 +47,7 @@ const PropertySimilar = ({ property, similarRef, navigate }) => {
                       <img 
                         src={similarProp.images[0].url} 
                         alt={similarProp.title} 
-                        style={{ 
-                          width: '100%', 
-                          height: '100%', 
-                          objectFit: 'cover' 
-                        }}
+                        className="w-100 h-full object-cover"
                       />
                     ) : (
                       <Box sx={{

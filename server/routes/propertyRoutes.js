@@ -11,6 +11,11 @@ const upload = require('../middleware/multer');
 // @access  Public
 router.get('/', propertyController.getProperties);
 
+// @desc    Get search suggestions and autocomplete
+// @route   GET /api/v1/properties/search-suggestions
+// @access  Public
+router.get('/search-suggestions', propertyController.getSearchSuggestions);
+
 // @desc    Get featured properties
 // @route   GET /api/v1/properties/featured
 // @access  Public
@@ -46,12 +51,12 @@ router.post(
   '/',
   [
     protect,
-    authorize('agent', 'admin'),
+    authorize('agent', 'admin', 'individual_seller', 'developer'),
     upload.array('images', 10),
     [
       check('title', 'Title is required').not().isEmpty(),
       check('description', 'Description is required').not().isEmpty(),
-      check('type', 'Type is required').isIn(['House', 'Apartment', 'Villa', 'Condo', 'Land']),
+      check('type', 'Type is required').isIn(['House', 'Apartment', 'Villa', 'Condo', 'Land', 'Commercial', 'PG']),
       check('status', 'Status is required').isIn(['For Sale', 'For Rent', 'Sold']),
       check('price', 'Price must be a number').isNumeric(),
       check('bedrooms', 'Bedrooms must be a number').isNumeric(),
@@ -70,12 +75,12 @@ router.put(
   '/:id',
   [
     protect,
-    authorize('agent', 'admin'),
+    authorize('agent', 'admin', 'individual_seller', 'developer'),
     upload.array('images', 10),
     [
       check('title', 'Title is required').optional().not().isEmpty(),
       check('description', 'Description is required').optional().not().isEmpty(),
-      check('type', 'Type is required').optional().isIn(['House', 'Apartment', 'Villa', 'Condo', 'Land']),
+      check('type', 'Type is required').optional().isIn(['House', 'Apartment', 'Villa', 'Condo', 'Land', 'Commercial', 'PG']),
       check('status', 'Status is required').optional().isIn(['For Sale', 'For Rent', 'Sold']),
       check('price', 'Price must be a number').optional().isNumeric(),
       check('bedrooms', 'Bedrooms must be a number').optional().isNumeric(),
@@ -91,7 +96,7 @@ router.put(
 // @access  Private (Agent/Admin)
 router.delete(
   '/:id',
-  [protect, authorize('agent', 'admin')],
+  [protect, authorize('agent', 'admin', 'individual_seller', 'developer')],
   propertyController.deleteProperty
 );
 
@@ -100,7 +105,7 @@ router.delete(
 // @access  Private (Agent/Admin)
 router.put(
   '/:id/photo',
-  [protect, authorize('agent', 'admin'), upload.single('file')],
+  [protect, authorize('agent', 'admin', 'individual_seller', 'developer'), upload.single('file')],
   propertyController.uploadPropertyPhoto
 );
 

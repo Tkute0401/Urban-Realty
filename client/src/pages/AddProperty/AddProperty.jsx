@@ -192,12 +192,19 @@ const AddPropertyPage = () => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [sectionVisibility, setSectionVisibility] = useState({
+    developer: true,
+    projectDetails: true,
+    approvals: true,
+    floorPlans: true,
+    brochure: true
+  });
   const imagesInputRef = useRef(null);
   const floorPlansInputRef = useRef(null);
   const brochureInputRef = useRef(null);
   const virtualTourInputRef = useRef(null);
 
-  const propertyTypes = Object.keys(propertyTypeIcons);
+  const propertyTypes = [...Object.keys(propertyTypeIcons), 'PG'];
   const propertyStatuses = ['For Sale', 'For Rent'];
 
   useEffect(() => {
@@ -214,6 +221,27 @@ const AddPropertyPage = () => {
       setSnackbarOpen(true);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user.role === 'individual_seller') {
+      setSectionVisibility({
+        developer: false,
+        projectDetails: false,
+        approvals: false,
+        floorPlans: false,
+        brochure: false
+      });
+    } else {
+      setSectionVisibility({
+        developer: true,
+        projectDetails: true,
+        approvals: true,
+        floorPlans: true,
+        brochure: true
+      });
+    }
+  }, [user]);
 
   const validateForm = () => {
     const errors = {};
@@ -599,9 +627,27 @@ const AddPropertyPage = () => {
             </Grid>
           )}
 
-          {/* Developer Selection */}
+          {/* Developer Selection (toggle for individual sellers) */}
           <Grid item xs={12}>
-            <SectionHeader variant="h6">Developer Information</SectionHeader>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Developer Information</SectionHeader>
+              {user?.role === 'individual_seller' && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.developer}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, developer: e.target.checked }))}
+                      sx={{
+                        color: '#78CADC',
+                        '&.Mui-checked': { color: '#78CADC' }
+                      }}
+                    />
+                  }
+                  label={<Typography sx={{ color: '#fff' }}>Include Developer</Typography>}
+                />
+              )}
+            </Box>
+            {(user?.role !== 'individual_seller' || sectionVisibility.developer) && (
             <PremiumPaper>
               {console.log(developers)}
               <Autocomplete
@@ -656,6 +702,7 @@ const AddPropertyPage = () => {
                 )}
               />
             </PremiumPaper>
+            )}
           </Grid>
 
           {/* Basic Information Section */}
@@ -1795,7 +1842,20 @@ const AddPropertyPage = () => {
 
           {/* Project Details Section */}
           <Grid item xs={12}>
-            <SectionHeader variant="h6">Project Details</SectionHeader>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Project Details</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.projectDetails}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, projectDetails: e.target.checked }))}
+                    sx={{ color: '#78CADC', '&.Mui-checked': { color: '#78CADC' } }}
+                  />
+                }
+                label={<Typography sx={{ color: '#fff' }}>Show</Typography>}
+              />
+            </Box>
+            {sectionVisibility.projectDetails && (
             <PremiumPaper>
               <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
                 Additional project information
@@ -1966,11 +2026,25 @@ const AddPropertyPage = () => {
                 </Grid>
               </Grid>
             </PremiumPaper>
+            )}
           </Grid>
 
           {/* Approvals Section */}
           <Grid item xs={12}>
-            <SectionHeader variant="h6">Approvals & Certifications</SectionHeader>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Approvals & Certifications</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.approvals}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, approvals: e.target.checked }))}
+                    sx={{ color: '#78CADC', '&.Mui-checked': { color: '#78CADC' } }}
+                  />
+                }
+                label={<Typography sx={{ color: '#fff' }}>Show</Typography>}
+              />
+            </Box>
+            {sectionVisibility.approvals && (
             <PremiumPaper>
               <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
                 Add relevant approvals and certifications for this property
@@ -2089,6 +2163,7 @@ const AddPropertyPage = () => {
                 Add Approval
               </Button>
             </PremiumPaper>
+            )}
           </Grid>
 
           {/* Images Section */}
@@ -2186,7 +2261,20 @@ const AddPropertyPage = () => {
 
           {/* Floor Plans Section */}
           <Grid item xs={12}>
-            <SectionHeader variant="h6">Floor Plans</SectionHeader>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Floor Plans</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.floorPlans}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, floorPlans: e.target.checked }))}
+                    sx={{ color: '#78CADC', '&.Mui-checked': { color: '#78CADC' } }}
+                  />
+                }
+                label={<Typography sx={{ color: '#fff' }}>Show</Typography>}
+              />
+            </Box>
+            {sectionVisibility.floorPlans && (
             <PremiumPaper>
               <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
                 Upload up to 5 floor plan images (5MB each)
@@ -2264,11 +2352,25 @@ const AddPropertyPage = () => {
                 />
               </Button>
             </PremiumPaper>
+            )}
           </Grid>
 
           {/* Brochure Section */}
           <Grid item xs={12} sm={6}>
-            <SectionHeader variant="h6">Property Brochure</SectionHeader>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Property Brochure</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.brochure}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, brochure: e.target.checked }))}
+                    sx={{ color: '#78CADC', '&.Mui-checked': { color: '#78CADC' } }}
+                  />
+                }
+                label={<Typography sx={{ color: '#fff' }}>Show</Typography>}
+              />
+            </Box>
+            {sectionVisibility.brochure && (
             <PremiumPaper>
               <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
                 Upload a PDF brochure for this property (optional)
@@ -2322,6 +2424,7 @@ const AddPropertyPage = () => {
                 />
               </Button>
             </PremiumPaper>
+            )}
           </Grid>
 
           {/* Virtual Tour Section */}

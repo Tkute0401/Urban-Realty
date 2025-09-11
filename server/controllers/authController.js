@@ -3,7 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role, mobile, occupation } = req.body;
+  const { name, email, password, role, mobile, occupation, professionalInfo, reraId } = req.body;
 
   // Validate required fields
   if (!name || !email || !password) {
@@ -19,15 +19,28 @@ exports.register = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Email already in use', 400));
   }
 
-  // Create user
-  const user = await User.create({
+  // Prepare user data
+  const userData = {
     name,
     email,
     password,
     role: role || 'buyer',
     mobile: mobile || '',
     occupation: occupation || ''
-  });
+  };
+
+  // Add professional info for professional roles
+  if (['agent', 'developer'].includes(role) && professionalInfo) {
+    userData.professionalInfo = professionalInfo;
+  }
+
+  // Add RERA ID for agent/developer
+  if (['agent', 'developer'].includes(role) && reraId) {
+    userData.reraId = reraId;
+  }
+
+  // Create user
+  const user = await User.create(userData);
 
   // Create token
   const token = user.getSignedJwtToken();
@@ -41,7 +54,10 @@ exports.register = asyncHandler(async (req, res, next) => {
       email: user.email,
       mobile: user.mobile,
       role: user.role,
-      occupation: user.occupation
+      occupation: user.occupation,
+      professionalInfo: user.professionalInfo,
+      reraId: user.reraId,
+      subscriptionStatus: user.subscriptionStatus
     }
   });
 });
@@ -67,6 +83,12 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
+  // Ensure user has subscription status (migrate if needed)
+  if (!user.subscriptionStatus) {
+    user.subscriptionStatus = 'free';
+    await user.save();
+  }
+
   const token = user.getSignedJwtToken();
 
   res.status(200).json({
@@ -77,7 +99,11 @@ exports.login = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       mobile: user.mobile,
-      role: user.role
+      role: user.role,
+      occupation: user.occupation,
+      professionalInfo: user.professionalInfo,
+      reraId: user.reraId,
+      subscriptionStatus: user.subscriptionStatus
     }
   });
 });
@@ -92,7 +118,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateUser = asyncHandler(async (req, res, next) => {
-  const { name, email, mobile, role } = req.body;
+  const { name, email, mobile, role, reraId, professionalInfo } = req.body;
   const userId = req.user.id;
 
   const updateFields = {};
@@ -100,6 +126,8 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (email) updateFields.email = email;
   if (mobile) updateFields.mobile = mobile;
   if (role) updateFields.role = role;
+  if (reraId !== undefined) updateFields.reraId = reraId;
+  if (professionalInfo) updateFields.professionalInfo = professionalInfo;
 
   if (email) {
     const existingUser = await User.findOne({ 

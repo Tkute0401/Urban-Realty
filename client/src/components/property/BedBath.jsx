@@ -133,14 +133,7 @@ const BedBath = ({ onApply, currentBedrooms = '', currentBathrooms = '' }) => {
       >
         Beds & Baths {isOpen ? '▲' : '▼'}
         {hasActiveFilters && (
-          <span style={{ 
-            marginLeft: '6px', 
-            color: '#78CADC',
-            fontSize: '12px',
-            fontWeight: '600'
-          }}>
-            •
-          </span>
+          <span className="ml-2 text-accent fs-12 fw-600">•</span>
         )}
       </button>
       

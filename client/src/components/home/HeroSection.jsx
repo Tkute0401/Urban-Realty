@@ -257,28 +257,31 @@ const HeroSection = () => {
                   homes, apartments, and commercial spaces across the country.
                 </p>
               </div>
+            </div>
+          </div>
 
-              <div className="flex items-center justify-between mb-4 sm:mb-8 md:mb-12 lg:mb-16">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
-                  <img 
-                    src="/building_1.jpg" 
-                    alt="Map view" 
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                </div>
+          {/* Map and Rating positioned at bottom corners */}
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
+            {/* Map thumbnail on left */}
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
+              <img 
+                src="/building_1.jpg" 
+                alt="Map view" 
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                loading="lazy"
+              />
+            </div>
 
-                <div className="bg-white/0 p-1 sm:p-1.5 rounded-xl">
-                  <div className="flex flex-col items-end">
-                    <div className="flex gap-1 items-center">
-                      <span className="text-yellow-400 text-base sm:text-lg md:text-xl lg:text-2xl">★</span>
-                      <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
-                    </div>
-                    <span className="text-[0.5rem] sm:text-xs font-poppins text-gray-300 text-right mt-0.5">
-                      FROM 6,900+ CUSTOMERS
-                    </span>
-                  </div>
+            {/* Rating on right */}
+            <div className="bg-white/0 p-1 sm:p-1.5 rounded-xl">
+              <div className="flex flex-col items-end">
+                <div className="flex gap-1 items-center">
+                  <span className="text-yellow-400 text-base sm:text-lg md:text-xl lg:text-2xl">★</span>
+                  <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
                 </div>
+                <span className="text-[0.5rem] sm:text-xs font-poppins text-gray-300 text-right mt-0.5">
+                  FROM 6,900+ CUSTOMERS
+                </span>
               </div>
             </div>
           </div>
@@ -350,7 +353,7 @@ const HeroSection = () => {
         )}
       </AnimatePresence>
       
-      {/* Search and filter bar */}
+      {/* Search and filter bar - remains unchanged */}
       <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center z-[100] px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2">
         {/* Popular localities with scrolling */}
         {selectedCity && currentCityLocalities.length > 0 && (
@@ -406,7 +409,7 @@ const HeroSection = () => {
         )}
 
         {/* Main search container */}
-        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative" style={{ zIndex: 200 }}>
+        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative z-[200]">
           {/* Property type tabs */}
           <div className="flex gap-0 mb-1 sm:mb-1.5 rounded-lg sm:rounded-xl p-1">
             {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
@@ -443,7 +446,7 @@ const HeroSection = () => {
             <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-visible border border-white/20 max-h-8 sm:max-h-10 md:max-h-12">
               {/* City dropdown */}
               {availableCities.length > 0 && (
-                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12" style={{ zIndex: 9000 }}>
+                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12 z-[9000]">
                   <button
                     type="button"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}

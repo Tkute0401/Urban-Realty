@@ -83,15 +83,15 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
   const getPropertyTypeIcon = () => {
     switch (property.type?.toLowerCase()) {
       case 'apartment':
-        return <HomeOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />;
+        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
       case 'villa':
-        return <HomeOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />;
+        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
       case 'land':
-        return <HomeOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />;
+        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
       case 'commercial':
-        return <HomeOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />;
+        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
       default:
-        return <HomeOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />;
+        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
     }
   };
 
@@ -134,7 +134,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#0B1011] to-[#1a2a32] flex items-center justify-center">
-            <HomeOutlinedIcon className="text-[#78CADC]/50" style={{ fontSize: '2rem' }} />
+            <HomeOutlinedIcon className="text-[#78CADC]/50 icon-lg" />
           </div>
         )}
         
@@ -198,7 +198,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
         <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
           <Tooltip title="Area" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <HomeOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />
+              <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
               </span>
@@ -207,7 +207,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           
           <Tooltip title="Bedrooms" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <LocalHotelOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />
+              <LocalHotelOutlinedIcon className="text-[#78CADC] icon-sm" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {property.bedrooms || '0'} Bed
               </span>
@@ -216,7 +216,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           
           <Tooltip title="Bathrooms" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <BathtubOutlinedIcon className="text-[#78CADC]" style={{ fontSize: '1rem' }} />
+              <BathtubOutlinedIcon className="text-[#78CADC] icon-sm" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {property.bathrooms || '0'} Bath
               </span>

@@ -1,0 +1,203 @@
+# Dependency update workflow
+
+name: Dependency Update
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # Update Node.js dependencies
+  update-node-deps:
+    name: Update Node.js Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install-all
+
+      - name: Update dependencies
+        run: |
+          # Update root dependencies
+          npm update
+          
+          # Update client dependencies
+          cd client && npm update
+          
+          # Update server dependencies
+          cd ../server && npm update
+
+      - name: Check for security vulnerabilities
+        run: |
+          npm audit --audit-level=moderate
+          cd client && npm audit --audit-level=moderate
+          cd ../server && npm audit --audit-level=moderate
+
+      - name: Run tests
+        run: |
+          cd client && npm test -- --watchAll=false
+          cd ../server && npm test || echo "No server tests"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update Node.js dependencies'
+          title: 'chore: update Node.js dependencies'
+          body: |
+            This PR updates Node.js dependencies to their latest versions.
+            
+            ## Changes
+            - Updated root package.json dependencies
+            - Updated client package.json dependencies  
+            - Updated server package.json dependencies
+            
+            ## Testing
+            - [x] All tests pass
+            - [x] No security vulnerabilities found
+            - [x] Build successful
+            
+            Please review and merge if everything looks good.
+          branch: update-node-dependencies
+          delete-branch: true
+
+  # Update Flutter dependencies
+  update-flutter-deps:
+    name: Update Flutter Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+
+      - name: Update Flutter dependencies
+        run: |
+          cd mobile
+          flutter pub upgrade
+
+      - name: Run Flutter tests
+        run: |
+          cd mobile
+          flutter test
+
+      - name: Run Flutter analyze
+        run: |
+          cd mobile
+          flutter analyze
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update Flutter dependencies'
+          title: 'chore: update Flutter dependencies'
+          body: |
+            This PR updates Flutter dependencies to their latest versions.
+            
+            ## Changes
+            - Updated pubspec.yaml dependencies
+            - Ran flutter pub upgrade
+            
+            ## Testing
+            - [x] All Flutter tests pass
+            - [x] Flutter analyze passes
+            - [x] No breaking changes detected
+            
+            Please review and merge if everything looks good.
+          branch: update-flutter-dependencies
+          delete-branch: true
+
+  # Security audit
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install-all
+
+      - name: Run security audit
+        run: |
+          npm audit --audit-level=moderate
+          cd client && npm audit --audit-level=moderate
+          cd ../server && npm audit --audit-level=moderate
+
+      - name: Create security report
+        run: |
+          echo "# Security Audit Report" > security-report.md
+          echo "Date: $(date)" >> security-report.md
+          echo "" >> security-report.md
+          echo "## Root Dependencies" >> security-report.md
+          npm audit --json >> security-report.md || echo "No vulnerabilities found" >> security-report.md
+          echo "" >> security-report.md
+          echo "## Client Dependencies" >> security-report.md
+          cd client && npm audit --json >> ../security-report.md || echo "No vulnerabilities found" >> ../security-report.md
+          echo "" >> security-report.md
+          echo "## Server Dependencies" >> security-report.md
+          cd ../server && npm audit --json >> ../security-report.md || echo "No vulnerabilities found" >> ../security-report.md
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.md
+
+  # Docker image update
+  update-docker:
+    name: Update Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and test Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: urban-realty:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'urban-realty:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'

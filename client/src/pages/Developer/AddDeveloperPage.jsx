@@ -139,12 +139,12 @@ const AddDeveloperPage = () => {
     if (!formData.description.trim()) errors.description = 'Description is required';
     
     // Contact validation
-    if (formData.contact.email && !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(formData.contact.email)) {
+    if (formData.contact.email && !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.contact.email)) {
       errors.email = 'Please enter a valid email';
     }
     
     // Website validation
-    if (formData.website && !/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(formData.website)) {
+    if (formData.website && !/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(formData.website)) {
       errors.website = 'Please enter a valid URL';
     }
     

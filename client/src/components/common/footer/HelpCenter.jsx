@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { LifebuoyIcon, DocumentTextIcon, PhoneIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const HelpCenter = () => {
 
@@ -12,8 +15,16 @@ const HelpCenter = () => {
   
   // State for role selection and user question
   const [selectedRole, setSelectedRole] = useState(null);
-  const [userQuestion, setUserQuestion] = useState("");
   const [submittedQuestions, setSubmittedQuestions] = useState([]);
+
+  const schema = z.object({
+    userQuestion: z.string().min(5, "Please enter at least 5 characters"),
+  });
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { userQuestion: "" }
+  });
 
   // Support options
   const supportOptions = [
@@ -99,12 +110,13 @@ const HelpCenter = () => {
   ];
 
   // Handle question submission
-  const handleQuestionSubmit = (e) => {
-    e.preventDefault();
-    if (userQuestion.trim()) {
-      setSubmittedQuestions([...submittedQuestions, userQuestion]);
-      setUserQuestion("");
-      // Here you would typically send the question to your backend
+  const handleQuestionSubmit = async (data) => {
+    try {
+      setSubmittedQuestions([...submittedQuestions, data.userQuestion]);
+      await new Promise((r) => setTimeout(r, 300));
+      reset();
+    } catch (_) {
+      // Global error handling via toast boundary
     }
   };
 
@@ -227,7 +239,7 @@ const HelpCenter = () => {
           {/* Ask Question Form */}
           <div className="bg-[#0c2327] p-6 rounded-xl border border-[#78cadc]/20">
             <h3 className="text-xl font-bold mb-4">Can't find what you're looking for?</h3>
-            <form onSubmit={handleQuestionSubmit}>
+            <form onSubmit={handleSubmit(handleQuestionSubmit)}>
               <div className="mb-4">
                 <label htmlFor="userQuestion" className="block text-sm font-medium text-gray-300 mb-2">
                   Ask your question
@@ -235,18 +247,20 @@ const HelpCenter = () => {
                 <textarea
                   id="userQuestion"
                   rows="3"
-                  value={userQuestion}
-                  onChange={(e) => setUserQuestion(e.target.value)}
+                  {...register("userQuestion")}
                   className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
                   placeholder="Type your question here..."
                 ></textarea>
+                {errors.userQuestion && (
+                  <p className="text-red-400 text-sm mt-2" role="alert">{errors.userQuestion.message}</p>
+                )}
               </div>
               <button
                 type="submit"
-                className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
-                disabled={!userQuestion.trim()}
+                className="bg-[#78cadc] hover:bg-[#8DD9E5] disabled:opacity-60 disabled:cursor-not-allowed text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+                disabled={isSubmitting}
               >
-                Submit Question
+                {isSubmitting ? "Submitting..." : "Submit Question"}
               </button>
             </form>
 

@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import './PropertiesMap.css';
 
-const containerStyle = {
-  width: '100%',
-  height: '500px',
-  borderRadius: '8px',
-  border: '1px solid #78CADC'
-};
+// Styles moved to CSS to avoid inline-style usage
 
 const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const mapRef = useRef(null);
@@ -37,15 +33,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
 
   if (!properties || properties.length === 0) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        height: '500px',
-        backgroundColor: '#0B1011',
-        borderRadius: '8px',
-        border: '1px solid #78CADC'
-      }}>
+      <Box className="map-empty">
         <Typography variant="body2" color="text.secondary">
           No properties to display on map.
         </Typography>
@@ -78,7 +66,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       }}
     >
       <GoogleMap
-        mapContainerStyle={containerStyle}
+        mapContainerClassName="map-container map-container--lg"
         zoom={10}
         onLoad={onLoad}
         onUnmount={onUnmount}
@@ -352,12 +340,12 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
             >
               {activeMarker === index && (
                 <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-                  <div style={{ color: '#0B1011', maxWidth: '200px' }}>
-                    <h3 style={{ margin: '4px 0', fontSize: '16px' }}>{property.title}</h3>
-                    <p style={{ margin: '4px 0', fontSize: '14px' }}>
+                  <div className="text-dark maxw-200">
+                    <h3 className="my-1 fs-16">{property.title}</h3>
+                    <p className="my-1 fs-14">
                       {property.address?.street}, {property.address?.city}
                     </p>
-                    <p style={{ margin: '4px 0', fontSize: '14px', fontWeight: 'bold' }}>
+                    <p className="my-1 fs-14 fw-700">
                       {property.price ? `$${property.price.toLocaleString()}` : 'Price not available'}
                     </p>
                   </div>
