@@ -15,7 +15,7 @@ export function createUrbanRealtyTheme(mode = 'light') {
   palette: {
     mode,
     primary: {
-      main: '#2E86AB', // Deep ocean blue
+      main: '#78CADC', // Deep ocean blue
       light: '#5AB1D1',
       dark: '#1B5E7A',
       contrastText: '#FFFFFF'

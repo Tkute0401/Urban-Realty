@@ -67,7 +67,7 @@ const TrustSafety = () => {
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/30 z-10" />
         <img 
-          src="/trust-safety-2.jpg" 
+          src="/trust-safety-2.png" 
           alt="Trust & Safety" 
           className="absolute inset-0 w-full h-full object-cover"
         />
