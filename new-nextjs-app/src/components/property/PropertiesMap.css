@@ -1,0 +1,20 @@
+.map-container {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #78CADC;
+}
+
+.map-container--lg {
+  height: 500px;
+}
+
+.map-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  background-color: #0B1011;
+  border-radius: 8px;
+  border: 1px solid #78CADC;
+}
+
