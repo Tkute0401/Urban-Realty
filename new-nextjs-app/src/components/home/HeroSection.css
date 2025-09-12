@@ -167,7 +167,7 @@
 }
 
 .hero-nav-button:hover {
-  color: #78cadc;
+  color: var(--color-primary);
 }
 
 @media (min-width: 640px) {
@@ -219,14 +219,14 @@
   display: block;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--color-text-muted);
   transition: all 0.2s;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hero-dropdown-item:hover {
   background-color: rgba(120, 202, 220, 0.1);
-  color: #08171A;
+  color: var(--color-primary-contrast);
 }
 
 @media (min-width: 640px) {
@@ -399,7 +399,7 @@
 }
 
 .hero-title-highlight {
-  color: #78cadc;
+  color: var(--color-primary);
 }
 
 .hero-subtitle {
@@ -455,7 +455,7 @@
 }
 
 .hero-image-container:hover {
-  border-color: #78cadc;
+  border-color: var(--color-primary);
 }
 
 @media (min-width: 640px) {
@@ -522,7 +522,7 @@
 }
 
 .hero-star-icon {
-  color: #facc15;
+  color: var(--color-warning);
   font-size: 1.125rem;
 }
 
@@ -949,7 +949,7 @@
   bottom: 0;
   left: 0;
   height: 0.125rem;
-  background-color: #78cadc;
+  background-color: var(--color-primary);
 }
 
 .hero-search-input-container {
@@ -1181,6 +1181,6 @@
   left: 0;
   width: 100%;
   height: 2.5rem;
-  background: linear-gradient(to bottom, transparent 0%, #08171A 100%);
+  background: linear-gradient(to bottom, transparent 0%, var(--color-primary-contrast) 100%);
   pointer-events: none;
 }

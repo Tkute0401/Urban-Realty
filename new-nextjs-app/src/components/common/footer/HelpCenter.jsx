@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { LifebuoyIcon, DocumentTextIcon, PhoneIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

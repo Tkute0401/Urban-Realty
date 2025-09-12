@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { useEffect } from 'react';
 

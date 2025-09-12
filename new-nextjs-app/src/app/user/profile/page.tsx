@@ -292,9 +292,9 @@ const Profile = () => {
             </Typography>
             
             <Grid container spacing={3}>
-              {agentProperties.map((property) => (
+              {agentProperties.map((property, index) => (
                 <Grid item xs={12} sm={6} key={property._id}>
-                  <PropertyCard property={property} />
+                  <PropertyCard property={property} index={index} />
                 </Grid>
               ))}
             </Grid>

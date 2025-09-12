@@ -3,8 +3,8 @@
 
 .header {
   width: 100%;
-  background-color: #08171A;
-  border-bottom: 1px solid #333;
+  background-color: var(--color-primary-contrast);
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 1100;

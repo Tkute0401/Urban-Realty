@@ -22,7 +22,7 @@ import {
   Phone as PhoneIcon,
   Notifications as NotificationsIcon
 } from '@mui/icons-material';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useMutation } from '@tanstack/react-query';
 import axios from '@/lib/services/axios';
 

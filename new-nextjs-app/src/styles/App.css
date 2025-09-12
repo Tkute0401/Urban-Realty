@@ -41,7 +41,7 @@
 }
 
 .read-the-docs {
-  color: #888;
+  color: var(--color-text-muted);
   font-family: "Poppins";
 }
 /* Form styling */
@@ -49,9 +49,9 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background: white;
+  background: var(--color-surface);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px var(--color-border);
   font-family: "Poppins";
 }
 
@@ -89,19 +89,19 @@
 /* Button hover effects */
 .MuiButton-contained:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px var(--color-border);
   transition: all 0.3s ease;
 }
 
 .MuiButton-outlined:hover {
-  background-color: rgba(255,255,255,0.1);
+  background-color: var(--color-accent);
   transition: all 0.3s ease;
 }
 
 /* Header styling */
 .MuiAppBar-root {
   box-shadow: none;
-  border-bottom: 1px solid rgba(0,0,0,0.12);
+  border-bottom: 1px solid var(--color-border);
   font-family: "Poppins";
 }
 

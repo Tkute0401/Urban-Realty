@@ -11,8 +11,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
-  color: #212121;
-  background-color: #08171A;
+  color: var(--color-text);
+  background-color: var(--color-primary-contrast);
   overflow-x: hidden;
   
 }
@@ -106,17 +106,17 @@ button {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--color-accent);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--color-text-muted);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--color-text);
 }
 
 /* Responsive Tables */
@@ -132,7 +132,7 @@ button {
 @media print {
   body {
     background: none;
-    color: #000;
+    color: var(--color-text);
   }
   
   .no-print {
@@ -157,7 +157,7 @@ button {
 
 /* Leaflet Map Fixes */
 .leaflet-container {
-  background: #f8f9fa;
+  background: var(--color-accent);
 }
 
 /* Animation */
