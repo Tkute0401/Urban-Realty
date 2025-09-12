@@ -33,8 +33,10 @@ export const AuthProvider = ({ children }) => {
         return response;
       },
       (error) => {
-        // Always log errors except in test environment
-        if (process.env.NODE_ENV !== 'test') {
+        // Only log errors except in test environment and for network issues
+        if (process.env.NODE_ENV !== 'test' && 
+            error.code !== 'ERR_NETWORK' && 
+            error.code !== 'ECONNREFUSED') {
           console.error('API Error:', {
             url: error.config?.url,
             status: error.response?.status,
@@ -86,7 +88,10 @@ export const AuthProvider = ({ children }) => {
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
       }
-      setError(err.response?.data?.message || 'Failed to load user');
+      // Only set error for non-network issues
+      if (err.code !== 'ERR_NETWORK' && err.code !== 'ECONNREFUSED') {
+        setError(err.response?.data?.message || 'Failed to load user');
+      }
     } finally {
       setLoading(false);
     }

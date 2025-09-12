@@ -76,6 +76,8 @@ const HeroSection = () => {
   const currentCityLocalities = getLocalitiesForCity();
 
   useEffect(() => {
+    if (!searchParams) return;
+    
     const params = Object.fromEntries(searchParams.entries());
     if (params.search) setSearchText(params.search);
     if (params.city) {
