@@ -157,7 +157,7 @@ const SubscriptionPlans = () => {
         }
       };
 
-      const razorpay = new window.Razorpay(options);
+      const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
     } catch (err) {
       setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
@@ -339,12 +339,12 @@ const SubscriptionPlans = () => {
                     label="Current Plan" 
                     color="success" 
                     variant="outlined"
-                    size="large"
+                    size="medium"
                   />
                 ) : (
                   <Button
                     variant="contained"
-                    size="large"
+                    size="medium"
                     onClick={() => handleSubscribe(plan)}
                     disabled={plan.type === 'free' && user?.subscriptionStatus === 'free'}
                     sx={{ 

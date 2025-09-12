@@ -115,7 +115,7 @@ const AddDeveloperPage = () => {
     awards: [{ name: '', year: '', category: '' }]
   });
   
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
   const [teamPhotoPreviews, setTeamPhotoPreviews] = useState([]);
@@ -134,7 +134,7 @@ const AddDeveloperPage = () => {
   }, [error]);
 
   const validateForm = () => {
-    const errors = {};
+    const errors: Record<string, string> = {};
     
     // Basic information
     if (!formData.name.trim()) errors.name = 'Developer name is required';
@@ -151,7 +151,7 @@ const AddDeveloperPage = () => {
     }
     
     // Year validation
-    if (formData.foundedYear && (formData.foundedYear < 1800 || formData.foundedYear > new Date().getFullYear())) {
+    if (formData.foundedYear && (parseInt(formData.foundedYear) < 1800 || parseInt(formData.foundedYear) > new Date().getFullYear())) {
       errors.foundedYear = 'Please enter a valid year';
     }
     
@@ -188,9 +188,9 @@ const AddDeveloperPage = () => {
       });
       
       // Append projects counts
-      formDataToSend.append('completedProjects', formData.completedProjects);
-      formDataToSend.append('ongoingProjects', formData.ongoingProjects);
-      formDataToSend.append('upcomingProjects', formData.upcomingProjects);
+      formDataToSend.append('completedProjects', formData.completedProjects.toString());
+      formDataToSend.append('ongoingProjects', formData.ongoingProjects.toString());
+      formDataToSend.append('upcomingProjects', formData.upcomingProjects.toString());
       
       // Append flagship projects
       formData.flagshipProjects.forEach((project, index) => {
@@ -265,8 +265,8 @@ const AddDeveloperPage = () => {
     }
   };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       setLogoPreview(URL.createObjectURL(file));
       setLogoFile(file);
@@ -274,9 +274,9 @@ const AddDeveloperPage = () => {
     if (logoInputRef.current) logoInputRef.current.value = '';
   };
 
-  const handleTeamPhotoChange = (e) => {
-    const files = Array.from(e.target.files).slice(0, 5); // Limit to 5 files
-    const previews = files.map(file => URL.createObjectURL(file));
+  const handleTeamPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).slice(0, 5); // Limit to 5 files
+    const previews = files.map(file => URL.createObjectURL(file as File));
     setTeamPhotoPreviews([...teamPhotoPreviews, ...previews]);
     setTeamPhotoFiles([...teamPhotoFiles, ...files]);
     if (teamPhotoInputRef.current) teamPhotoInputRef.current.value = '';

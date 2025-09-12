@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useEffect } from "react";
-import { useAuth } from '../../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 const EMICalculator = () => {
   useEffect(() => {
@@ -10,7 +10,7 @@ const EMICalculator = () => {
   }, []);
 
   const { user, login, error: authError } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [loanAmount, setLoanAmount] = useState(8000000);
   const [loanTenure, setLoanTenure] = useState(15);
   const [interestRate, setInterestRate] = useState(8.15);
@@ -543,7 +543,7 @@ const unitData = {
                 <p className="text-gray-400 text-sm">
                   Don't have an account?{' '}
                   <button 
-                    onClick={() => navigate('/register')}
+                    onClick={() => router.push('/register')}
                     className="text-[#78CADC] hover:underline"
                   >
                     Register

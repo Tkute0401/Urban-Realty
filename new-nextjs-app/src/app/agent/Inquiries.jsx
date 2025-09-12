@@ -32,7 +32,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import axios from '@/lib/services/axios';
 import { formatDate } from '../../utils/format';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AgentInquiries = () => {
   const [page, setPage] = useState(0);

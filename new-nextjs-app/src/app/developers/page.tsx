@@ -68,11 +68,11 @@ const DeveloperList = () => {
               if (op === '$lte') newSearchParams.set(key.startsWith('$') ? `max${key.slice(1)}` : `max${key}`, val);
             });
           } else {
-            newSearchParams.set(key, value);
+            newSearchParams.set(key, String(value));
           }
         }
       });
-      setSearchParams(newSearchParams);
+      router.push(`?${newSearchParams.toString()}`);
 
       setTimeout(() => setIsLoaded(true), 100);
       initialLoad.current = false;

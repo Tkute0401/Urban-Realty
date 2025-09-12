@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { BriefcaseIcon, BuildingOfficeIcon, RocketLaunchIcon, UserGroupIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 

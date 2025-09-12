@@ -99,7 +99,7 @@ const DeveloperDetails = () => {
   useEffect(() => {
     const calculateHeaderHeight = () => {
       const header = document.querySelector('.header') || document.querySelector('header');
-      setHeaderHeight(header?.offsetHeight || 70);
+      setHeaderHeight((header as HTMLElement)?.offsetHeight || 70);
     };
 
     calculateHeaderHeight();
