@@ -1,6 +1,13 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-05 (fixed Admin Dashboard null crash; fixed Search overflow; continued parity QA)
+Last updated: 2025-09-12 (Next.js Phase 2 assets/styles/tokens scaffolded; dev server verified)
+### Next.js Migration (Web) - Current Run
+- Created `new-nextjs-app` with App Router and TypeScript.
+- Copied static assets from `client/public` to `new-nextjs-app/public`.
+- Merged global CSS and copied `src/styles/**` into `new-nextjs-app/src/styles/`.
+- Added centralized style constants under `new-nextjs-app/src/style-constants/` with `tokens.ts`, `color-schemes.ts`, `themes.css`, and `index.ts`.
+- Wired `themes.css` into `src/app/globals.css`.
+- Installed dependencies and started dev server to validate setup.
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
