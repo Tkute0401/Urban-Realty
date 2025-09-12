@@ -9,6 +9,18 @@
 - Added `package.json`, `next.config.js`, `tsconfig.json`, `next-env.d.ts`, `src/app/layout.tsx`, `src/app/page.tsx`, and `src/app/globals.css`.
 - Copied/adapted Tailwind and PostCSS configurations; created `tailwind.config.js` and `postcss.config.cjs`.
 
+### Session: Phase 2 - Assets, Styles, and Tokens
+- Copied static assets: `client/public/*` → `new-nextjs-app/public/`.
+- Merged global CSS: appended `client/index.css` into `src/app/globals.css`.
+- Copied styles: `client/src/index.css`, `client/src/App.css`, and `client/src/styles/**` → `new-nextjs-app/src/styles/`.
+- Scaffolded centralized style constants in `src/style-constants/`:
+  - `tokens.ts` (spacing, radii, typography, z-index, base colors)
+  - `color-schemes.ts` (light/dark semantic roles)
+  - `themes.css` (CSS variables for light/dark)
+  - `index.ts` (barrel + `toCssVars`)
+- Wired `themes.css` into `src/app/globals.css` via `@import`.
+- Installed dependencies and started dev server to verify basic rendering.
+
 ### Next Steps
 - Run `npm install` inside `new-nextjs-app` (network timeouts observed; retry as needed).
 - Merge ESLint settings from `client/eslint.config.js` into Next.js base.
