@@ -5,14 +5,14 @@ import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
 import LocalHotelOutlinedIcon from '@mui/icons-material/LocalHotelOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../contexts/AuthContext';
 import axios from '@/lib/services/axios';
 import { toast } from 'react-toastify';
 import { Tooltip } from '@mui/material';
 
 const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
@@ -37,7 +37,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
   }, [user, property?._id]);
 
   const handleClick = () => {
-    navigate(`/properties/${property._id}`);
+    router.push(`/properties/${property._id}`);
     if (onClick) {
       onClick(property);
     }
@@ -47,7 +47,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
     e.stopPropagation();
     
     if (!user) {
-      navigate('/login', { state: { from: window.location.pathname } });
+      router.push('/login');
       toast.info('Please login to save favorites');
       return;
     }
