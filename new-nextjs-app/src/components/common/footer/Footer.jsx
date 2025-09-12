@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { motion } from "framer-motion";
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -65,7 +65,7 @@ const Footer = () => {
               {resources.map((item, index) => (
                 <li key={index}>
                   <Link 
-                    to={item.path} 
+                    href={item.path} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
                     {item.name}
@@ -82,7 +82,7 @@ const Footer = () => {
               {about.map((item, index) => (
                 <li key={index}>
                   <Link 
-                    to={item.path}
+                    href={item.path}
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
                     {item.name}
@@ -99,7 +99,7 @@ const Footer = () => {
               {services.map((item, index) => (
                 <li key={index}>
                   <Link 
-                    to={item.path} 
+                    href={item.path} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
                     {item.name}
@@ -117,7 +117,7 @@ const Footer = () => {
               {partners.map((item, index) => (
                 <li key={index}>
                   <Link 
-                    to={item.path} 
+                    href={item.path} 
                     className="font-poppins text-sm hover:text-[#78cadc] transition-colors"
                   >
                     {item.name}

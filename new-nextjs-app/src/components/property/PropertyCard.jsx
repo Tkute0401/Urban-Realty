@@ -7,7 +7,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import axios from '../../services/axios';
+import axios from '@/lib/services/axios';
 import { toast } from 'react-toastify';
 import { Tooltip } from '@mui/material';
 

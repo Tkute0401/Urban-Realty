@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { StarIcon, ChatBubbleLeftRightIcon, ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
