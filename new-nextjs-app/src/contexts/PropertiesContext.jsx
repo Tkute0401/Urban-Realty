@@ -77,12 +77,15 @@ export const PropertiesProvider = ({ children }) => {
         } 
       }));
     } catch (err) {
-      console.error('API Error:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        url: err.config?.url
-      });
+      // Only log errors for non-network issues
+      if (err.code !== 'ERR_NETWORK' && err.code !== 'ECONNREFUSED') {
+        console.error('API Error:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+          url: err.config?.url
+        });
+      }
       setError(err.response?.data?.message || err.message || 'Failed to fetch properties');
       setProperties([]);
       setPagination({});
@@ -105,7 +108,10 @@ export const PropertiesProvider = ({ children }) => {
       setFeaturedProperties(data);
       return data;
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch featured properties');
+      // Only log errors for non-network issues
+      if (err.code !== 'ERR_NETWORK' && err.code !== 'ECONNREFUSED') {
+        setError(err.response?.data?.message || err.message || 'Failed to fetch featured properties');
+      }
       setFeaturedProperties([]);
       throw err;
     } finally {
@@ -347,7 +353,7 @@ export const PropertiesProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  })
+  }, [])
 
   const clearProperty = useCallback(() => setProperty(null), []);
   const clearErrors = useCallback(() => setError(null), []);
