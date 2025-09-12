@@ -72,7 +72,7 @@ const Properties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(false);
   const amenityOptions = [
     'Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 
     'Security', 'Furnished', 'Fireplace', 'Elevator'
@@ -83,6 +83,9 @@ const Properties = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
+    // Set initial value
+    handleResize();
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -90,13 +93,15 @@ const Properties = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get('/api/properties');
-        setProperties(response.data.data);
+        const response = await axios.get('/properties');
+        setProperties(response.data.data || []);
         setLoading(false);
         setIsLoaded(true);
       } catch (err) {
         console.error('Error fetching properties:', err);
+        setProperties([]);
         setLoading(false);
+        setIsLoaded(true);
       }
     };
 
@@ -221,7 +226,7 @@ const Properties = () => {
 
       <div className="page-title fade-in-delay-2">
         <h1>Available Properties <span>Listings</span></h1>
-        <div className="listings-count">{properties.length} LISTINGS</div>
+        <div className="listings-count">{properties?.length || 0} LISTINGS</div>
       </div>
 
       <div className="filter-tags fade-in-delay-3">
@@ -242,9 +247,9 @@ const Properties = () => {
               <span>Loading properties...</span>
             </div>
           ) : (
-            properties.map(property => (
+            properties?.map(property => (
               <PropertyCard key={property._id} property={property} />
-            ))
+            )) || []
           )}
         </div>
         <div className="map-container">
