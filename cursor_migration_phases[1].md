@@ -1,11 +1,11 @@
-# Cursor Migration Phases: Functionally Dependent React to Next.js Migration
+# Cursor Migration Phases: Zero-Drift React → Next.js Migration (with Centralized Style Constants)
 
 ## Prerequisites
 1. Create directory structure:
    ```
    project-root/
-   ├── old-react-app/     # Your current client folder
-   └── new-nextjs-app/    # New Next.js project
+   ├── old-react-app/        # Current client (source of truth)
+   └── new-nextjs-app/       # New Next.js project (App Router)
    ```
 
 2. Initialize Next.js project:
@@ -13,6 +13,10 @@
    cd new-nextjs-app
    npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir
    ```
+
+3. Establish a centralized style-constants system (created in Phase 2 but referenced throughout):
+   - Dedicated directory for design tokens and CSS variables: `src/style-constants/`
+   - Everything themeable (colors, spacing, radii, typography, z-index, shadows) must be defined here; components import from here only.
 
 ---
 
@@ -51,11 +55,11 @@ Verify: Next.js development server starts without errors.
 
 ---
 
-## Phase 2: Static Assets and Global Styles (Testable: Assets load correctly)
+## Phase 2: Static Assets, Global Styles, and Centralized Style Constants (Testable: Assets load correctly; tokens compile)
 
 ### Cursor Prompt 2A: Public Assets and Global Styles
 ```
-Relocate all static assets and global styling to make the basic Next.js app visually match the React app structure.
+Relocate all static assets and global styling to make the basic Next.js app visually match the React app structure. Introduce a centralized token system to control CSS from a single directory.
 
 COPY ENTIRE DIRECTORIES:
 1. old-react-app/public/* → new-nextjs-app/public/ (merge with existing, preserve all files)
@@ -66,9 +70,22 @@ RELOCATE GLOBAL STYLES:
 4. old-react-app/src/App.css → new-nextjs-app/src/styles/App.css
 5. old-react-app/src/styles/ → new-nextjs-app/src/styles/ (copy entire directory structure)
 
-CREATE DIRECTORY if not exists: new-nextjs-app/src/styles/
+CREATE DIRECTORIES if not exist:
+- new-nextjs-app/src/styles/
+- new-nextjs-app/src/style-constants/
 
-After completion, the Next.js app should have access to all static assets and styling files.
+CREATE CENTRALIZED STYLE CONSTANTS:
+6. Add the following files (scaffold; wire them in Phase 6 layout):
+   - `src/style-constants/tokens.ts`  → source-of-truth design tokens (colors, spacing, typography, radii, shadows, z-index). Export JS/TS objects.
+   - `src/style-constants/color-schemes.ts` → semantic color roles mapped to tokens. Provide light and dark schemes; support brand variants.
+   - `src/style-constants/themes.css` → CSS custom properties generated from active scheme. Define variables under `:root` and `[data-theme="dark"]`.
+   - `src/style-constants/index.ts` → barrel exports and helpers (`getActiveScheme`, `toCssVars`).
+
+7. Enforce consumption:
+   - Components must import from `src/style-constants` or use the CSS variables defined in `themes.css`.
+   - Direct literal colors are disallowed. Replace hardcoded values during migration with variables or token references.
+
+After completion, the Next.js app should have access to all static assets and styling files, with a single source of truth for style constants.
 ```
 
 ### Test Phase 2:
@@ -115,11 +132,11 @@ import { useApi } from '@/hooks/useApi'
 
 ---
 
-## Phase 4: Theme System (Testable: Theme provides work)
+## Phase 4: Theme System and Token Bridging (Testable: Theme providers work; tokens drive UI)
 
 ### Cursor Prompt 4A: Theme Configuration and Context
 ```
-Relocate the complete theme system to enable styled components.
+Relocate the complete theme system to enable styled components. Bridge the old theme values to the new centralized tokens so components retain their exact visuals while gaining centralized control.
 
 RELOCATE THEME SYSTEM:
 1. old-react-app/src/styles/Theme/ → new-nextjs-app/src/lib/theme/
@@ -134,9 +151,11 @@ CREATE these directories:
 - new-nextjs-app/src/contexts/
 - new-nextjs-app/src/lib/theme/
 
-IMPORTANT: Copy all files exactly as they are with no modifications to the code.
+IMPORTANT: Copy all files exactly as they are. Then, introduce a non-invasive mapping layer:
+   - Create `new-nextjs-app/src/lib/theme/tokenBridge.ts` that maps legacy theme keys (e.g., `primary`, `secondary`, `textPrimary`) to semantic variables from `src/style-constants/color-schemes.ts`.
+   - Ensure ThemeProvider derives palette values from CSS variables where possible, falling back to tokens. This preserves visuals while centralizing control.
 
-After completion, theme providers should be ready to wrap the Next.js app.
+After completion, theme providers should be ready to wrap the Next.js app and reflect variable changes instantly.
 ```
 
 ### Test Phase 4:
@@ -176,11 +195,11 @@ After completion, basic layout components should be available for import.
 
 ---
 
-## Phase 6: Root Layout Setup (Testable: App renders with providers)
+## Phase 6: Root Layout Setup (Testable: App renders with providers; CSS variables active)
 
 ### Cursor Prompt 6A: Convert App Structure to Next.js Layout
 ```
-Convert the React app entry points to Next.js App Router layout.
+Convert the React app entry points to Next.js App Router layout. Wire the centralized style constants so CSS variables are available globally.
 
 CONVERT MAIN ENTRY POINTS:
 1. Take provider setup logic from old-react-app/src/main.jsx
@@ -192,6 +211,8 @@ REQUIREMENTS FOR layout.tsx:
 - Set up provider nesting exactly as in main.jsx: QueryClientProvider → BrowserRouter (remove this) → ThemeProvider → MuiThemeProvider → AuthProvider → PropertiesProvider → AgentsProvider → DevelopersProvider
 - Include global ErrorBoundary
 - Import global styles
+- Import `src/style-constants/themes.css` once at the root so CSS variables are available.
+- Toggle theme via `data-theme` on `<html>` based on context if applicable.
 - Remove BrowserRouter (not needed in Next.js)
 - Keep all other provider logic identical
 
@@ -211,11 +232,11 @@ npm run dev
 
 ---
 
-## Phase 7: Home Page Components (Testable: Home page renders)
+## Phase 7: Home Page Components (Testable: Home page renders with identical visuals)
 
 ### Cursor Prompt 7A: Home Page Implementation
 ```
-Relocate home page components and create a functional home page.
+Relocate home page components and create a functional home page. Replace hardcoded styles with semantic variables where encountered (1:1 visual parity maintained).
 
 RELOCATE HOME COMPONENTS:
 1. old-react-app/src/components/home/ → new-nextjs-app/src/components/home/
@@ -230,6 +251,7 @@ UPDATE new-nextjs-app/src/app/page.tsx:
 - Replace placeholder with actual home page component from old-react-app/src/pages/Home/
 - Keep all component logic and imports exactly the same
 - Just change the file structure to Next.js format
+- For any inline styles/colors, reference `var(--color-*)` variables introduced by `themes.css`.
 
 After completion, the home page should render with all sections visible.
 ```
@@ -242,7 +264,7 @@ After completion, the home page should render with all sections visible.
 
 ---
 
-## Phase 8: Authentication System (Testable: Auth flows work)
+## Phase 8: Authentication System (Testable: Auth flows work; consistent tokens)
 
 ### Cursor Prompt 8A: Authentication Pages and Components
 ```
@@ -272,7 +294,7 @@ After completion, login and register pages should be accessible and functional.
 
 ---
 
-## Phase 9: Property System (Testable: Property listings work)
+## Phase 9: Property System (Testable: Property listings work; maps and cards match design)
 
 ### Cursor Prompt 9A: Property Components and Pages
 ```
@@ -304,7 +326,7 @@ After completion, property listing, viewing, and adding should work.
 
 ---
 
-## Phase 10: User Management (Testable: User profiles work)
+## Phase 10: User Management (Testable: User profiles work; UI parity)
 
 ### Cursor Prompt 10A: User Components and Profile System
 ```
@@ -393,7 +415,7 @@ After completion, subscription management should be fully functional.
 
 ---
 
-## Phase 13: Admin System (Testable: Admin dashboard works)
+## Phase 13: Admin System (Testable: Admin dashboard works; charts themed)
 
 ### Cursor Prompt 13A: Admin Dashboard and Management
 ```
@@ -461,7 +483,7 @@ After completion, complete agent system should be functional.
 
 ---
 
-## Phase 15: Footer Content and Remaining Pages (Testable: All routes work)
+## Phase 15: Footer Content and Remaining Pages (Testable: All routes work; fully tokenized)
 
 ### Cursor Prompt 15A: Footer Pages and Remaining Content
 ```
@@ -501,7 +523,7 @@ After completion, all website routes should be functional and accessible.
 
 ---
 
-## Phase 16: Testing and Verification (Testable: Complete functionality)
+## Phase 16: Testing and Verification (Testable: Complete functionality; token coverage)
 
 ### Cursor Prompt 16A: Testing Setup and Final Verification
 ```
@@ -513,18 +535,22 @@ RELOCATE TESTING:
 3. old-react-app/vitest.setup.ts → new-nextjs-app/vitest.setup.ts
 4. old-react-app/src/setupTests.ts → new-nextjs-app/src/setupTests.ts
 
+TOKEN COVERAGE CHECKS:
+5. Grep the codebase for prohibited patterns (hardcoded colors): `#[0-9a-fA-F]{3,8}` and `rgb(a)?\(`; replace with `var(--color-*)` or token usage.
+6. Ensure all spacing, radii, shadows used are sourced from `src/style-constants/tokens.ts`.
+
 FINAL VERIFICATION:
-5. Check old-react-app/src/ for any remaining files not relocated
-6. Verify all routes are accessible and functional
-7. Test that all major features work: auth, properties, admin, agent, subscriptions
-8. Confirm all components render without errors
+7. Check old-react-app/src/ for any remaining files not relocated
+8. Verify all routes are accessible and functional
+9. Test that all major features work: auth, properties, admin, agent, subscriptions
+10. Confirm all components render without errors
 
 PROVIDE SUMMARY:
 - List all successfully migrated features
 - Note any issues or missing functionality
 - Highlight any files that couldn't be relocated
 
-After completion, the entire application should be fully functional in Next.js.
+After completion, the entire application should be fully functional in Next.js with a centralized, token-driven styling system.
 ```
 
 ### Test Phase 16:
@@ -537,12 +563,43 @@ After completion, the entire application should be fully functional in Next.js.
 
 ## Summary
 
-This phase-by-phase approach ensures:
+This zero-drift migration plan guarantees:
 
-1. **Each phase is independently testable** - you can verify functionality works before moving on
-2. **Dependency order is maintained** - services and contexts are set up before components that use them
-3. **Incremental functionality** - each phase adds working features to your Next.js app
-4. **Risk mitigation** - problems can be identified and fixed at each phase
-5. **Progress tracking** - clear milestones to measure migration progress
+1. **Perfect visual parity** — all components and designs are migrated as-is, no redesigns.
+2. **Single source of truth for styles** — `src/style-constants/` owns all tokens and CSS variables.
+3. **Progressive hardening** — hardcoded values are replaced with semantic variables during relocation.
+4. **Independent, testable phases** — each step is verifiable before advancing.
+5. **Future-proof theming** — light/dark and brand variants via tokenized color schemes.
 
-After completing all phases, you'll have a fully functional Next.js application with all your original React functionality preserved and working.
+Outcome: A fully functional Next.js app with centralized, maintainable styling and unchanged UX.
+
+---
+
+## Appendix: Token and Color Scheme Structure (authoritative reference)
+
+Directory: `src/style-constants/`
+
+- `tokens.ts` (TypeScript objects)
+  - colors.base: grayscale, brand primaries, semantic feedback base
+  - spacing: 0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64
+  - radii: none, sm, md, lg, xl, pill, round
+  - typography: font families, sizes, weights, line-heights
+  - shadows: xs, sm, md, lg, xl
+  - zIndex: dropdown, sticky, overlay, modal, popover, tooltip
+
+- `color-schemes.ts`
+  - semantic roles: `bg`, `surface`, `surfaceElevated`, `text`, `textMuted`, `primary`, `primaryHover`, `primaryContrast`, `secondary`, `accent`, `success`, `warning`, `danger`, `border`, `focusRing`.
+  - export `lightScheme`, `darkScheme`, optional `brandScheme` overlays.
+
+- `themes.css`
+  - define CSS variables for each semantic role under `:root` (light) and `[data-theme="dark"]` (dark)
+  - example variables: `--color-bg`, `--color-surface`, `--color-text`, `--color-primary`, `--color-border`, `--focus-ring`
+  - spacing/radii as CSS variables: `--space-2`, `--radius-md`, etc., as needed by plain CSS consumers
+
+- `index.ts`
+  - exports tokens, schemes, utilities (e.g., `applyScheme(scheme) → Record<string,string>`)
+
+Usage guidance:
+- Prefer semantic variables in CSS: `color: var(--color-text); background: var(--color-surface);`
+- In JS/TS, import tokens: `import { tokens } from '@/style-constants'`
+- In MUI/Tailwind bridges, resolve from tokens to framework theme objects.
