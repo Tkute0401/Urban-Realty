@@ -22,7 +22,7 @@ const OwnerServiceBlock = () => {
       return;
     }
     if (canPostProperty) {
-      router.push('/add-property');
+      router.push('/properties/add');
       return;
     }
     router.push('/register');

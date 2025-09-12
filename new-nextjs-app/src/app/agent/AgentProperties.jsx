@@ -153,7 +153,7 @@ const AgentProperties = () => {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => navigate('/add-property')}
+            onClick={() => navigate('/properties/add')}
           >
             Add Property
           </Button>
@@ -347,7 +347,7 @@ const AgentProperties = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => navigate('/add-property')}
+                onClick={() => navigate('/properties/add')}
               >
                 Add Your First Property
               </Button>

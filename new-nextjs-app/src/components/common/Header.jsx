@@ -116,7 +116,7 @@ const Header = () => {
                 </Link>
                 
                 {user?.role === 'agent' && (
-                  <Link to="/add-property" className="menu-item" onClick={handleMenuClose}>
+                  <Link to="/properties/add" className="menu-item" onClick={handleMenuClose}>
                     <AddIcon className="menu-item-icon" />
                     <span>Add Property</span>
                   </Link>
@@ -124,7 +124,7 @@ const Header = () => {
                 
                 {user ? (
                   <>
-                    <Link to="/profile" className="menu-item" onClick={handleMenuClose}>
+                    <Link to="/user/profile" className="menu-item" onClick={handleMenuClose}>
                       <PersonIcon className="menu-item-icon" />
                       <span>Profile</span>
                     </Link>
@@ -172,7 +172,7 @@ const Header = () => {
             </Link>
 
             {user?.role === 'agent' && (
-              <Link to="/add-property" className="nav-item nav-item-outlined">
+              <Link to="/properties/add" className="nav-item nav-item-outlined">
                 <AddIcon />
                 <span>Add Property</span>
               </Link>
@@ -180,7 +180,7 @@ const Header = () => {
 
             {user ? (
               <>
-                <Link to="/profile" className="user-avatar">
+                <Link to="/user/profile" className="user-avatar">
                   {user.name.charAt(0).toUpperCase()}
                 </Link>
                 <button 

@@ -139,7 +139,7 @@ const AgentLayout = ({ children }) => {
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => router.push('/profile')}>
+          <ListItemButton onClick={() => router.push('/user/profile')}>
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
@@ -246,7 +246,7 @@ const AgentLayout = ({ children }) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={() => router.push('/profile')}>
+        <MenuItem onClick={() => router.push('/user/profile')}>
           <ListItemIcon>
             <AccountCircleIcon fontSize="small" />
           </ListItemIcon>

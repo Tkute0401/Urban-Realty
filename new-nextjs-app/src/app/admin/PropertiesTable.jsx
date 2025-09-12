@@ -102,7 +102,7 @@ const PropertiesTable = () => {
   };
 
   const handleAddProperty = () => {
-    navigate('/add-property');
+    navigate('/properties/add');
   };
 
   const handleChangePage = (event, newPage) => {

@@ -179,7 +179,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   <button 
                     onClick={() => {
                       onClose();
-                      router.push('/profile');
+                      router.push('/user/profile');
                     }}
                     className="ml-auto bg-[#08171A]/70 text-white border border-[#78CADC] py-1 px-3 rounded-lg hover:bg-[#78CADC] hover:text-black transition-colors font-poppins text-sm"
                   >

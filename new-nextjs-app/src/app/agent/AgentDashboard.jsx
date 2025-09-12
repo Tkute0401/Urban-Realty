@@ -99,7 +99,7 @@ const AgentDashboard = () => {
     propertyType: 'all'
   });
   const [quickActions, setQuickActions] = useState([
-    { id: 1, title: 'Add Property', icon: <AddIcon />, action: () => router.push('/add-property'), color: 'primary' },
+    { id: 1, title: 'Add Property', icon: <AddIcon />, action: () => router.push('/properties/add'), color: 'primary' },
     { id: 2, title: 'View Leads', icon: <PeopleIcon />, action: () => router.push('/agent/leads'), color: 'success' },
     { id: 3, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/agent/analytics'), color: 'info' },
     { id: 4, title: 'Settings', icon: <EditIcon />, action: () => router.push('/agent/settings'), color: 'warning' }
@@ -424,7 +424,7 @@ const AgentDashboard = () => {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => navigate('/add-property')}
+              onClick={() => navigate('/properties/add')}
               sx={{ 
                 background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
                 '&:hover': { transform: 'translateY(-2px)' }
@@ -785,7 +785,7 @@ const AgentDashboard = () => {
                   <Button
                     variant="contained"
                     startIcon={<AddIcon />}
-                    onClick={() => router.push('/add-property')}
+                    onClick={() => router.push('/properties/add')}
                   >
                     Add Your First Property
                   </Button>

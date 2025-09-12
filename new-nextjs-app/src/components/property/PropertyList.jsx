@@ -1086,7 +1086,7 @@ const PropertyList = () => {
           </Button>
           <Button 
             variant="outlined" 
-            href="/add-property"
+            href="/properties/add"
             startIcon={<Add />}
             size={isMobile ? 'small' : 'medium'}
             sx={{ 

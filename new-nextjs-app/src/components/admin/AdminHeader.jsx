@@ -76,7 +76,7 @@ const AdminHeader = ({ onMenuClick }) => {
           >
             <MenuItem onClick={() => {
               handleMenuClose();
-              navigate('/profile');
+              navigate('/user/profile');
             }}>
               Profile
             </MenuItem>
