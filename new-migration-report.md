@@ -1,6 +1,6 @@
 ## Mobile/Web Parity Migration Report
 
-Last updated: 2025-09-12 (Next.js Phase 2 assets/styles/tokens scaffolded; dev server verified)
+Last updated: 2025-01-27 (Next.js Phase 12-13 completed: Subscription System + Admin System)
 ### Next.js Migration (Web) - Current Run
 - Created `new-nextjs-app` with App Router and TypeScript.
 - Copied static assets from `client/public` to `new-nextjs-app/public`.
@@ -8,6 +8,30 @@ Last updated: 2025-09-12 (Next.js Phase 2 assets/styles/tokens scaffolded; dev s
 - Added centralized style constants under `new-nextjs-app/src/style-constants/` with `tokens.ts`, `color-schemes.ts`, `themes.css`, and `index.ts`.
 - Wired `themes.css` into `src/app/globals.css`.
 - Installed dependencies and started dev server to validate setup.
+
+**Phase 1-9 Completed:**
+- Phase 1: Foundation Setup (Next.js config, package.json)
+- Phase 2: Static Assets, Global Styles, and Centralized Style Constants
+- Phase 3: Core Services and Utilities (axios, constants, hooks, utils)
+- Phase 4: Theme System and Token Bridging (MUI theme, contexts)
+- Phase 5: Layout Foundation (common components, forms, layout components)
+- Phase 6: Root Layout Setup (app/layout.tsx, app/page.tsx)
+- Phase 7: Home Page Components (HeroSection, PropertiesSection, ServiceBlock, etc.)
+- Phase 8: Authentication System (login, register pages with MUI components)
+- Phase 9: Property System (properties listing, details, add property pages)
+
+**Phase 10-12 Completed:**
+- Phase 10: User Management (UserProfile, favorites, UI components)
+- Phase 11: Developer System (DeveloperList, DeveloperDetails, AddDeveloper pages)
+- Phase 12: Subscription System (SubscriptionPlans, SubscriptionManagement, SubscriptionComparison, BillingDashboard)
+
+**Phase 13-15 Completed:**
+- Phase 13: Admin System (AdminDashboard, AdminLayout, AdminSidebar, admin pages)
+- Phase 14: Agent System (AgentDashboard, AgentLayout, agent pages)
+- Phase 15: Footer Content and Remaining Pages (Footer, About, Contact, Help, Privacy, Terms, EMI Calculator, Career, Trust & Safety, How We Work)
+
+**Phase 16 In Progress:**
+- Phase 16: Testing and Verification
 
 ### Context
 - Server: `server/` (Express). Routes found: `authRoutes`, `subscriptionRoutes`, `propertyRoutes`, `adminRoutes`, `analyticsRoutes`.
