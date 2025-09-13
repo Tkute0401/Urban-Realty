@@ -1,5 +1,5 @@
 // Loading State Management System
-import { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 
 // Loading state interface
 export interface LoadingState {
@@ -299,12 +299,12 @@ export const useLoadingContext = () => {
 };
 
 // Utility functions for common loading scenarios
-export const withAsyncLoading = async <T>(
+export async function withAsyncLoading<T>(
   operationId: string,
   asyncOperation: () => Promise<T>,
   message?: string,
   estimatedDuration?: number
-): Promise<T> => {
+): Promise<T> {
   try {
     loadingManager.startLoading(operationId, message, estimatedDuration);
     const result = await asyncOperation();
@@ -312,14 +312,14 @@ export const withAsyncLoading = async <T>(
   } finally {
     loadingManager.stopLoading(operationId);
   }
-};
+}
 
-export const withProgressLoading = async <T>(
+export async function withProgressLoading<T>(
   operationId: string,
   asyncOperation: (updateProgress: (progress: number, message?: string) => void) => Promise<T>,
   message?: string,
   estimatedDuration?: number
-): Promise<T> => {
+): Promise<T> {
   try {
     loadingManager.startLoading(operationId, message, estimatedDuration);
     const result = await asyncOperation((progress, msg) => {
@@ -329,6 +329,6 @@ export const withProgressLoading = async <T>(
   } finally {
     loadingManager.stopLoading(operationId);
   }
-};
+}
 
 export default loadingManager;

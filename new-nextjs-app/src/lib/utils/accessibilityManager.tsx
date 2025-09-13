@@ -35,7 +35,7 @@ export class AccessibilityManager {
   }
 
   // Initialize accessibility checks
-  private initializeAccessibilityChecks(): void {
+  public initializeAccessibilityChecks(): void {
     if (typeof window === 'undefined') return;
 
     // Check for missing alt text on images
@@ -89,7 +89,7 @@ export class AccessibilityManager {
           type: 'heading-hierarchy',
           severity: 'warning',
           message: `Heading level ${level} follows heading level ${previousLevel}`,
-          element: heading,
+          element: heading as HTMLElement,
           fix: 'Ensure heading levels increase by no more than one',
         });
       }
@@ -112,7 +112,7 @@ export class AccessibilityManager {
           type: 'missing-form-label',
           severity: 'error',
           message: 'Form input missing label',
-          element: input,
+          element: input as HTMLElement,
           fix: 'Add a label element or aria-label attribute',
         });
       }
@@ -236,7 +236,7 @@ export class AccessibilityManager {
   // Check individual element for accessibility issues
   private checkElement(element: HTMLElement): void {
     // Check for missing alt text
-    if (element.tagName === 'IMG' && !element.alt && !element.getAttribute('aria-label')) {
+    if (element.tagName === 'IMG' && !(element as HTMLImageElement).alt && !element.getAttribute('aria-label')) {
       this.addViolation({
         type: 'missing-alt-text',
         severity: 'error',

@@ -40,6 +40,18 @@ export class MockApiService {
     });
   }
 
+  async updateUser(userData: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.auth.updateUser(userData);
+        resolve({
+          data: response,
+          status: response.success ? 200 : 400,
+        });
+      }, 300);
+    });
+  }
+
   // Property endpoints
   async getProperties(filters?: any) {
     return new Promise((resolve) => {
@@ -565,6 +577,7 @@ export const mockApi = {
     login: (email: string, password: string) => mockApiService.login(email, password),
     register: (userData: any) => mockApiService.register(userData),
     getMe: (token: string) => mockApiService.getMe(token),
+    updateUser: (userData: any) => mockApiService.updateUser(userData),
   },
   properties: {
     list: (filters?: any) => mockApiService.getProperties(filters),

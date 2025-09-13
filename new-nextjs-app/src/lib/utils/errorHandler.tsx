@@ -306,7 +306,16 @@ export const useErrorHandler = () => {
 };
 
 // Error boundary component
-export class ErrorBoundary extends React.Component {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: any;
+}
+
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null };

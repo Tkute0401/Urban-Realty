@@ -15,6 +15,26 @@ interface ApiResponse<T = any> {
   message?: string;
 }
 
+// Login response interface
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
+
+// Register response interface
+interface RegisterResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
+
 // API Error class
 class ApiError extends Error {
   status: number;
@@ -146,13 +166,13 @@ const httpClient = new HttpClient(API_BASE_URL);
 // Real API Service class
 export class ApiService {
   // Authentication endpoints
-  async login(email: string, password: string): Promise<ApiResponse> {
+  async login(email: string, password: string): Promise<ApiResponse<LoginResponse>> {
     if (USE_MOCK_DATA) {
-      return await mockApi.auth.login(email, password) as ApiResponse;
+      return await mockApi.auth.login(email, password) as ApiResponse<LoginResponse>;
     }
 
     try {
-      const response = await httpClient.post('/auth/login', { email, password });
+      const response = await httpClient.post<LoginResponse>('/auth/login', { email, password });
       
       // Store token if login successful
       if (response.data.token) {
@@ -166,13 +186,13 @@ export class ApiService {
     }
   }
 
-  async register(userData: any): Promise<ApiResponse> {
+  async register(userData: any): Promise<ApiResponse<RegisterResponse>> {
     if (USE_MOCK_DATA) {
-      return await mockApi.auth.register(userData) as ApiResponse;
+      return await mockApi.auth.register(userData) as ApiResponse<RegisterResponse>;
     }
 
     try {
-      const response = await httpClient.post('/auth/register', userData);
+      const response = await httpClient.post<RegisterResponse>('/auth/register', userData);
       
       // Store token if registration successful
       if (response.data.token) {

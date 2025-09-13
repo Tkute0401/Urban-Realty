@@ -1,5 +1,5 @@
 // Performance Optimization System
-import { useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 
 // Performance metrics interface
 export interface PerformanceMetrics {
@@ -57,11 +57,12 @@ export class PerformanceOptimizer {
       try {
         const layoutShiftObserver = new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (entry.hadRecentInput) continue;
-            if (entry.value > 0.1) {
+            const layoutShiftEntry = entry as any; // LayoutShift entry type
+            if (layoutShiftEntry.hadRecentInput) continue;
+            if (layoutShiftEntry.value > 0.1) {
               console.warn('Layout shift detected:', {
-                value: entry.value,
-                startTime: entry.startTime,
+                value: layoutShiftEntry.value,
+                startTime: layoutShiftEntry.startTime,
               });
             }
           }
