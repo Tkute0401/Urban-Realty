@@ -57,13 +57,13 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
 const AgentLeads = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   
   const [page, setPage] = useState(0);
@@ -85,14 +85,12 @@ const AgentLeads = () => {
   const { data: leads, isLoading, error } = useQuery({
     queryKey: ['agentLeads', user?.id, page, rowsPerPage, searchTerm, statusFilter, contactMethodFilter],
     queryFn: async () => {
-      const res = await axios.get('/contacts/agent', {
-        params: {
-          page: page + 1,
-          limit: rowsPerPage,
-          search: searchTerm,
-          status: statusFilter !== 'all' ? statusFilter : undefined,
-          contactMethod: contactMethodFilter !== 'all' ? contactMethodFilter : undefined
-        }
+      const res = await mockApi.agent.getLeads(user?.id || 'agent1', {
+        page: page + 1,
+        limit: rowsPerPage,
+        search: searchTerm,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        contactMethod: contactMethodFilter !== 'all' ? contactMethodFilter : undefined
       });
       return res.data;
     },
@@ -102,7 +100,7 @@ const AgentLeads = () => {
   // Update lead status mutation
   const updateLeadStatusMutation = useMutation({
     mutationFn: async ({ leadId, status }) => {
-      await axios.put(`/contacts/${leadId}`, { status });
+      await mockApi.agent.updateLeadStatus(leadId, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agentLeads'] });

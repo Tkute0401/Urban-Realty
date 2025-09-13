@@ -5,6 +5,7 @@ export * from './developers';
 export * from './subscriptions';
 export * from './contacts';
 export * from './location-services';
+export * from './agents';
 
 // Re-export all mock data and APIs
 export { mockUsers, mockAuthResponses } from './users';
@@ -13,6 +14,7 @@ export { mockDevelopers, mockDeveloperAPI } from './developers';
 export { mockSubscriptionPlans, mockUserSubscriptions, mockSubscriptionAPI } from './subscriptions';
 export { mockContactRequests, mockContactAPI } from './contacts';
 export { mockNearbyAmenities, mockLocationServicesAPI } from './location-services';
+export { mockAgents, mockAgentProperties, mockAgentLeads, mockAgentAnalytics, mockAgentAPI } from './agents';
 
 // Combined mock API for easy access
 export const mockAPI = {
@@ -147,6 +149,32 @@ export const mockAPI = {
       const { mockLocationServicesAPI } = require('./location-services');
       return mockLocationServicesAPI.getDirections(origin, destination);
     },
+  },
+  agent: {
+    getDashboard: (agentId: string) => {
+      const { mockAgentAPI } = require('./agents');
+      return mockAgentAPI.getDashboard(agentId);
+    },
+    getProperties: (agentId: string, filters?: any) => {
+      const { mockAgentAPI } = require('./agents');
+      return mockAgentAPI.getProperties(agentId, filters);
+    },
+    getLeads: (agentId: string, filters?: any) => {
+      const { mockAgentAPI } = require('./agents');
+      return mockAgentAPI.getLeads(agentId, filters);
+    },
+    getAnalytics: (agentId: string) => {
+      const { mockAgentAPI } = require('./agents');
+      return mockAgentAPI.getAnalytics(agentId);
+    },
+    updateLeadStatus: (leadId: string, status: string) => {
+      const { mockAgentAPI } = require('./agents');
+      return mockAgentAPI.updateLeadStatus(leadId, status);
+    },
+    getPerformance: (agentId: string) => {
+      const { mockAgentAPI } = require('./agents');
+      return mockAgentAPI.getPerformance(agentId);
+    }
   },
   admin: {
     getDashboard: (filters?: any) => {

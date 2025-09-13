@@ -420,23 +420,73 @@ export class MockApiService {
     });
   }
 
+  // Agent-specific endpoints
   async getAgentDashboard(agentId: string) {
     return new Promise((resolve) => {
       setTimeout(() => {
+        const response = mockAPI.agent.getDashboard(agentId);
         resolve({
-          data: {
-            success: true,
-            dashboard: {
-              stats: {
-                totalProperties: 5,
-                totalLeads: 6,
-                totalSales: 2500000,
-                conversionRate: 0.15,
-              },
-              recentLeads: mockAPI.contacts.list({ agentId, limit: 5 }),
-              myProperties: mockAPI.properties.list({ agentId }),
-            },
-          },
+          data: response,
+          status: 200,
+        });
+      }, 400);
+    });
+  }
+
+  async getAgentProperties(agentId: string, filters?: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.agent.getProperties(agentId, filters);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 400);
+    });
+  }
+
+  async getAgentLeads(agentId: string, filters?: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.agent.getLeads(agentId, filters);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 400);
+    });
+  }
+
+  async getAgentAnalytics(agentId: string) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.agent.getAnalytics(agentId);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 400);
+    });
+  }
+
+  async updateLeadStatus(leadId: string, status: string) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.agent.updateLeadStatus(leadId, status);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
+  async getAgentPerformance(agentId: string) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.agent.getPerformance(agentId);
+        resolve({
+          data: response,
           status: 200,
         });
       }, 400);
@@ -484,6 +534,14 @@ export const mockApi = {
     update: (id: string, updates: any) => mockApiService.updateContact(id, updates),
     delete: (id: string) => mockApiService.deleteContact(id),
     assign: (id: string, agentId: string) => mockApiService.assignContact(id, agentId),
+  },
+  agent: {
+    getDashboard: (agentId: string) => mockApiService.getAgentDashboard(agentId),
+    getProperties: (agentId: string, filters?: any) => mockApiService.getAgentProperties(agentId, filters),
+    getLeads: (agentId: string, filters?: any) => mockApiService.getAgentLeads(agentId, filters),
+    getAnalytics: (agentId: string) => mockApiService.getAgentAnalytics(agentId),
+    updateLeadStatus: (leadId: string, status: string) => mockApiService.updateLeadStatus(leadId, status),
+    getPerformance: (agentId: string) => mockApiService.getAgentPerformance(agentId),
   },
   admin: {
     getDashboard: (filters?: any) => mockApiService.getAdminStats(filters),

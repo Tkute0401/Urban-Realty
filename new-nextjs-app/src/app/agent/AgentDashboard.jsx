@@ -78,7 +78,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 import { motion } from 'framer-motion';
@@ -118,19 +118,19 @@ const AgentDashboard = () => {
 
   // Enhanced queries with TanStack Query v5 object syntax and better error handling
   const { 
-    data: properties, 
-    isLoading: propertiesLoading, 
-    error: propertiesError,
-    refetch: refetchProperties
+    data: dashboardData, 
+    isLoading: dashboardLoading, 
+    error: dashboardError,
+    refetch: refetchDashboard
   } = useQuery({
-    queryKey: ['agentProperties', user?.id, filters],
+    queryKey: ['agentDashboard', user?.id, filters],
     queryFn: async () => {
       try {
-        const res = await axios.get(`/properties/agent/${user?.id}`, { params: filters });
+        const res = await mockApi.agent.getDashboard(user?.id || 'agent1');
         return res.data;
       } catch (error) {
-        console.error('Error fetching properties:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch properties');
+        console.error('Error fetching dashboard:', error);
+        throw new Error(error.message || 'Failed to fetch dashboard data');
       }
     },
     enabled: !!user?.id,
@@ -139,34 +139,6 @@ const AgentDashboard = () => {
     retry: (failureCount, error) => {
       // Retry up to 3 times, but not for 4xx errors
       if (failureCount >= 3) return false;
-      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
-      return true;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
-
-  const { 
-    data: contacts, 
-    isLoading: contactsLoading, 
-    error: contactsError,
-    refetch: refetchContacts
-  } = useQuery({
-    queryKey: ['agentContacts', user?.id, filters],
-    queryFn: async () => {
-      try {
-        const res = await axios.get('/contacts/agent', { params: filters });
-        return res.data;
-      } catch (error) {
-        console.error('Error fetching contacts:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch contacts');
-      }
-    },
-    enabled: !!user?.id,
-    staleTime: 1 * 60 * 1000, // 1 minute
-    refetchInterval: 2 * 60 * 1000, // 2 minutes
-    retry: (failureCount, error) => {
-      if (failureCount >= 3) return false;
-      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
       return true;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -180,18 +152,17 @@ const AgentDashboard = () => {
     queryKey: ['agentAnalytics', user?.id],
     queryFn: async () => {
       try {
-        const res = await axios.get(`/analytics/agent/${user?.id}`);
+        const res = await mockApi.agent.getAnalytics(user?.id || 'agent1');
         return res.data;
       } catch (error) {
         console.error('Error fetching analytics:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch analytics');
+        throw new Error(error.message || 'Failed to fetch analytics');
       }
     },
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
       if (failureCount >= 2) return false;
-      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
       return true;
     },
   });
@@ -200,8 +171,7 @@ const AgentDashboard = () => {
   const refreshMutation = useMutation({
     mutationFn: async () => {
       await Promise.all([
-        refetchProperties(),
-        refetchContacts(),
+        refetchDashboard(),
         queryClient.invalidateQueries({ queryKey: ['agentAnalytics', user?.id] })
       ]);
     },
@@ -223,48 +193,32 @@ const AgentDashboard = () => {
 
   // Calculate enhanced dashboard stats
   useEffect(() => {
-    if (properties?.data && contacts?.data) {
-      const totalProperties = properties.data.length;
-      const activeProperties = properties.data.filter(p => p.status === 'active').length;
-      const activeLeads = contacts.data.filter(contact => 
-        ['pending', 'contacted', 'followup'].includes(contact.status)
-      ).length;
-      const totalViews = properties.data.reduce((sum, prop) => sum + (prop.views || 0), 0);
-      const monthlyRevenue = properties.data.reduce((sum, prop) => {
-        return sum + (prop.price ? prop.price * 0.02 : 0);
-      }, 0);
+    if (dashboardData) {
+      const { stats: dashboardStats, properties, leads } = dashboardData;
       
-      const conversionRate = totalViews > 0 ? (activeLeads / totalViews) * 100 : 0;
-      const avgResponseTime = contacts.data.length > 0 ? 
-        contacts.data.reduce((sum, contact) => sum + (contact.responseTime || 0), 0) / contacts.data.length : 0;
-      
-      const topPerformingProperty = properties.data.reduce((top, prop) => 
-        (prop.views || 0) > (top?.views || 0) ? prop : top, null
-      );
-
       setStats({
-        totalProperties,
-        activeProperties,
-        activeLeads,
-        totalViews,
-        monthlyRevenue,
-        conversionRate,
-        avgResponseTime,
-        topPerformingProperty,
-        recentActivity: contacts.data.slice(0, 10)
+        totalProperties: dashboardStats.totalProperties,
+        activeProperties: dashboardStats.activeProperties,
+        activeLeads: dashboardStats.activeLeads,
+        totalViews: dashboardStats.totalViews,
+        monthlyRevenue: dashboardStats.monthlyRevenue,
+        conversionRate: dashboardStats.conversionRate,
+        avgResponseTime: dashboardStats.avgResponseTime,
+        topPerformingProperty: properties?.[0] || null,
+        recentActivity: leads?.slice(0, 10) || []
       });
     }
-  }, [properties, contacts]);
+  }, [dashboardData]);
 
   // Chart data preparation
-  const viewsData = properties?.data?.map(prop => ({
+  const viewsData = dashboardData?.properties?.map(prop => ({
     name: prop.title.substring(0, 15) + '...',
     views: prop.views || 0,
     price: prop.price || 0
   })) || [];
 
-  const leadStatusData = contacts?.data?.reduce((acc, contact) => {
-    acc[contact.status] = (acc[contact.status] || 0) + 1;
+  const leadStatusData = dashboardData?.leads?.reduce((acc, lead) => {
+    acc[lead.status] = (acc[lead.status] || 0) + 1;
     return acc;
   }, {}) || {};
 
@@ -277,7 +231,7 @@ const AgentDashboard = () => {
     { month: 'Jun', views: 2800, leads: 95, revenue: 25000 }
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  const COLORS = ['var(--color-primary)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-info)'];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -308,11 +262,11 @@ const AgentDashboard = () => {
       <Card 
         sx={{ 
           height: '100%',
-          background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-          border: `1px solid ${color}20`,
+          background: 'var(--color-bg-secondary)',
+          border: '1px solid var(--color-border-light)',
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: `0 8px 25px ${color}20`,
+            boxShadow: '0 8px 25px var(--color-primary-20)',
             transition: 'all 0.3s ease'
           }
         }}
@@ -323,7 +277,7 @@ const AgentDashboard = () => {
               <Typography color="text.secondary" gutterBottom variant="body2" fontWeight={500}>
                 {title}
               </Typography>
-              <Typography variant="h4" fontWeight="bold" color={color}>
+              <Typography variant="h4" fontWeight="bold" sx={{ color: 'var(--color-primary)' }}>
                 {value}
               </Typography>
               {subtitle && (
@@ -340,7 +294,7 @@ const AgentDashboard = () => {
                 </Box>
               )}
             </Box>
-            <Avatar sx={{ bgcolor: color, width: 56, height: 56 }}>
+            <Avatar sx={{ bgcolor: 'var(--color-primary)', width: 56, height: 56 }}>
               {icon}
             </Avatar>
           </Box>
@@ -350,13 +304,13 @@ const AgentDashboard = () => {
   );
 
   // Enhanced loading state with skeleton
-  if (propertiesLoading || contactsLoading) {
+  if (dashboardLoading) {
     return <LoadingSkeleton.Dashboard />;
   }
 
   // Enhanced error handling with retry options
-  if (propertiesError || contactsError) {
-    const errorMessage = propertiesError?.message || contactsError?.message || 'Failed to load dashboard data';
+  if (dashboardError) {
+    const errorMessage = dashboardError?.message || 'Failed to load dashboard data';
     
     return (
       <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -409,10 +363,7 @@ const AgentDashboard = () => {
         <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} mb={4} gap={2}>
           <Box>
             <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
-              background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              color: 'var(--color-text-primary)'
             }}>
               Welcome back, {user?.name}! 👋
             </Typography>
@@ -426,8 +377,11 @@ const AgentDashboard = () => {
               startIcon={<AddIcon />}
               onClick={() => navigate('/add-property')}
               sx={{ 
-                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-                '&:hover': { transform: 'translateY(-2px)' }
+                backgroundColor: 'var(--color-primary)',
+                '&:hover': { 
+                  transform: 'translateY(-2px)',
+                  backgroundColor: 'var(--color-primary-hover)'
+                }
               }}
             >
               Add Property
@@ -456,7 +410,6 @@ const AgentDashboard = () => {
             title="Total Properties"
             value={stats.totalProperties}
             icon={<HomeIcon />}
-            color="#667eea"
             subtitle={`${stats.activeProperties} active`}
             trend="+12% this month"
           />
@@ -466,7 +419,6 @@ const AgentDashboard = () => {
             title="Active Leads"
             value={stats.activeLeads}
             icon={<PeopleIcon />}
-            color="#f093fb"
             subtitle="Require attention"
             trend="+8% this week"
           />
@@ -476,7 +428,6 @@ const AgentDashboard = () => {
             title="Total Views"
             value={stats.totalViews.toLocaleString()}
             icon={<VisibilityIcon />}
-            color="#4facfe"
             subtitle="Property impressions"
             trend="+15% this month"
           />
@@ -486,7 +437,6 @@ const AgentDashboard = () => {
             title="Monthly Revenue"
             value={`₹${stats.monthlyRevenue.toLocaleString()}`}
             icon={<MoneyIcon />}
-            color="#43e97b"
             subtitle="Commission earned"
             trend="+22% this month"
           />
@@ -499,7 +449,7 @@ const AgentDashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <Card sx={{ mb: 4, background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)' }}>
+        <Card sx={{ mb: 4, background: 'var(--color-bg-secondary)' }}>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
               Quick Actions
@@ -521,13 +471,13 @@ const AgentDashboard = () => {
                         height: 80,
                         flexDirection: 'column',
                         gap: 1,
-                        borderColor: `${action.color}.main`,
-                        color: `${action.color}.main`,
+                        borderColor: 'var(--color-primary)',
+                        color: 'var(--color-primary)',
                         '&:hover': {
-                          backgroundColor: `${action.color}.main`,
-                          color: 'white',
+                          backgroundColor: 'var(--color-primary)',
+                          color: 'var(--color-text-inverse)',
                           transform: 'translateY(-2px)',
-                          boxShadow: `0 4px 12px ${action.color}40`
+                          boxShadow: '0 4px 12px var(--color-primary-40)'
                         }
                       }}
                     >
@@ -640,8 +590,8 @@ const AgentDashboard = () => {
                   <YAxis />
                   <RechartsTooltip />
                   <Legend />
-                  <Area type="monotone" dataKey="views" stackId="1" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                  <Area type="monotone" dataKey="leads" stackId="1" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="views" stackId="1" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.6} />
+                  <Area type="monotone" dataKey="leads" stackId="1" stroke="var(--color-success)" fill="var(--color-success)" fillOpacity={0.6} />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -662,7 +612,7 @@ const AgentDashboard = () => {
                     labelLine={false}
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
-                    fill="#8884d8"
+                    fill="var(--color-primary)"
                     dataKey="value"
                   >
                     {Object.entries(leadStatusData).map((entry, index) => (
@@ -705,7 +655,7 @@ const AgentDashboard = () => {
                 </Box>
               </Box>
               
-              {properties?.data?.length > 0 ? (
+              {dashboardData?.properties?.length > 0 ? (
                 <TableContainer>
                   <Table>
                     <TableHead>
@@ -719,7 +669,7 @@ const AgentDashboard = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {properties.data.slice(0, 5).map((property) => (
+                      {dashboardData.properties.slice(0, 5).map((property) => (
                         <TableRow key={property._id} hover>
                           <TableCell>
                             <Box display="flex" alignItems="center" gap={2}>
@@ -760,7 +710,7 @@ const AgentDashboard = () => {
                             <Box display="flex" alignItems="center" gap={1}>
                               <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
                               <Typography variant="body2">
-                                {((property.views || 0) / Math.max(...properties.data.map(p => p.views || 0)) * 100).toFixed(0)}%
+                                {((property.views || 0) / Math.max(...dashboardData.properties.map(p => p.views || 0)) * 100).toFixed(0)}%
                               </Typography>
                             </Box>
                           </TableCell>
@@ -807,25 +757,25 @@ const AgentDashboard = () => {
                 </Button>
               </Box>
 
-              {contacts?.data?.length > 0 ? (
+              {dashboardData?.leads?.length > 0 ? (
                 <List>
-                  {contacts.data.slice(0, 5).map((contact) => (
-                    <React.Fragment key={contact._id}>
+                  {dashboardData.leads.slice(0, 5).map((lead) => (
+                    <React.Fragment key={lead.id}>
                       <ListItem alignItems="flex-start">
                         <ListItemAvatar>
                           <Avatar>
-                            {contact.user?.name?.charAt(0) || 'U'}
+                            {lead.user?.name?.charAt(0) || 'U'}
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
                           primary={
                             <Box display="flex" justifyContent="space-between" alignItems="center">
                               <Typography variant="subtitle2" fontWeight="bold">
-                                {contact.user?.name || 'Unknown'}
+                                {lead.user?.name || 'Unknown'}
                               </Typography>
                               <Chip
-                                label={contact.status}
-                                color={getStatusColor(contact.status)}
+                                label={lead.status}
+                                color={getStatusColor(lead.status)}
                                 size="small"
                               />
                             </Box>
@@ -833,10 +783,10 @@ const AgentDashboard = () => {
                           secondary={
                             <Box>
                               <Typography variant="body2" color="text.secondary">
-                                {contact.property?.title || 'Property'}
+                                {lead.property?.title || 'Property'}
                               </Typography>
                               <Typography variant="caption" color="text.secondary">
-                                {formatDate(contact.createdAt)}
+                                {formatDate(lead.createdAt)}
                               </Typography>
                             </Box>
                           }
@@ -880,7 +830,7 @@ const AgentDashboard = () => {
                           <XAxis dataKey="name" />
                           <YAxis />
                           <RechartsTooltip />
-                          <Bar dataKey="views" fill="#8884d8" />
+                          <Bar dataKey="views" fill="var(--color-primary)" />
                         </BarChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -898,8 +848,8 @@ const AgentDashboard = () => {
                           <XAxis dataKey="name" />
                           <YAxis />
                           <RechartsTooltip />
-                          <Line type="monotone" dataKey="views" stroke="#8884d8" />
-                          <Line type="monotone" dataKey="price" stroke="#82ca9d" />
+                          <Line type="monotone" dataKey="views" stroke="var(--color-primary)" />
+                          <Line type="monotone" dataKey="price" stroke="var(--color-success)" />
                         </LineChart>
                       </ResponsiveContainer>
                     </CardContent>

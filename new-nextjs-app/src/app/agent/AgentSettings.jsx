@@ -22,9 +22,9 @@ import {
   Phone as PhoneIcon,
   Notifications as NotificationsIcon
 } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMutation } from '@tanstack/react-query';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 
 const AgentSettings = () => {
   const { user, updateUser } = useAuth();
@@ -46,8 +46,12 @@ const AgentSettings = () => {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axios.put('/auth/profile', data);
-      return res.data;
+      // Mock API call - in real app this would update the user profile
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ success: true, data: { ...user, ...data } });
+        }, 1000);
+      });
     },
     onSuccess: (data) => {
       updateUser(data.data);
