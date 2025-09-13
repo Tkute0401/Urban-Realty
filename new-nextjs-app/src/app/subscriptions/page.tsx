@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -6,41 +6,48 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
   Typography,
   Button,
-  Chip,
   Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem,
-  Alert
+  Chip,
+  Switch,
+  FormControlLabel,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import {
   Check as CheckIcon,
-  Close as CloseIcon,
-  Star as StarIcon
+  Star as StarIcon,
+  CreditCard as CreditCardIcon,
+  TrendingUp as TrendingUpIcon,
+  Security as SecurityIcon,
+  Support as SupportIcon
 } from '@mui/icons-material';
-import axios from '../../lib/services/axios';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { mockApiService } from '@/lib/services/mockApi';
+import PaymentForm from '@/components/Subscription/PaymentForm';
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  billingCycle: 'monthly' | 'yearly';
+  features: string[];
+  maxProperties: number;
+  maxAgents: number;
+  maxUsers: number;
+  isPopular: boolean;
+  isActive: boolean;
+}
 
 const SubscriptionPlans = () => {
-  const [plans, setPlans] = useState([]);
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showYearly, setShowYearly] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
-  const [billingCycle, setBillingCycle] = useState('monthly');
-  const [subscribing, setSubscribing] = useState(false);
-  const [subscribeError, setSubscribeError] = useState(null);
-  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
 
   const { user } = useAuth();
 
@@ -51,9 +58,8 @@ const SubscriptionPlans = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/subscriptions');
-      console.log('Fetched subscription plans:', response.data);
-      setPlans(response.data.data);
+      const response = await mockApiService.getSubscriptionPlans();
+      setPlans(response.data.plans || []);
     } catch (err) {
       setError('Failed to load subscription plans');
       console.error('Error fetching plans:', err);
@@ -62,135 +68,66 @@ const SubscriptionPlans = () => {
     }
   };
 
-  const handleSubscribe = (plan) => {
+  const handleSubscribe = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
     setSubscribeDialog(true);
-    setSubscribeError(null);
-    setSubscribeSuccess(false);
   };
 
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      if (document.getElementById('razorpay-sdk')) return resolve(true);
-      const script = document.createElement('script');
-      script.id = 'razorpay-sdk';
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
+  const handleSubscribeConfirm = async (paymentData: any) => {
+    if (!selectedPlan || !user) return;
 
-  const handleSubscribeConfirm = async () => {
     try {
-      setSubscribing(true);
-      setSubscribeError(null);
-
-      // Always use Razorpay for paid plans
-      const isFree = selectedPlan.type === 'free';
-      if (isFree) {
-        // Fallback to existing endpoint for free plan activation
-        await axios.post('/subscriptions/subscribe', {
-          subscriptionId: selectedPlan._id,
-          billingCycle,
-          paymentMethod: 'free'
-        });
-        setSubscribeSuccess(true);
-        setTimeout(() => {
-          setSubscribeDialog(false);
-          setSubscribeSuccess(false);
-          window.location.reload();
-        }, 1200);
-        return;
+      const response = await mockApiService.subscribe(user.id, selectedPlan.id, paymentData.paymentMethod);
+      if (response.data.success) {
+        setSubscribeDialog(false);
+        setSelectedPlan(null);
+        // Show success message or redirect
+        alert('Subscription successful!');
+      } else {
+        setError(response.data.error || 'Subscription failed');
       }
-
-      const sdkLoaded = await loadRazorpayScript();
-      if (!sdkLoaded) {
-        setSubscribeError('Failed to load Razorpay. Please try again.');
-        return;
-      }
-
-      const [{ data: keyRes }, { data: orderRes }] = await Promise.all([
-        axios.get('/subscriptions/razorpay/key'),
-        axios.post('/subscriptions/razorpay/order', {
-          subscriptionId: selectedPlan._id,
-          billingCycle
-        })
-      ]);
-
-      const { key } = keyRes;
-      const { order, subscription } = orderRes;
-
-      const options = {
-        key,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Urban Realty',
-        description: `${selectedPlan.name} - ${billingCycle} subscription`,
-        order_id: order.id,
-        prefill: {
-          name: user?.name || '',
-          email: user?.email || ''
-        },
-        theme: { color: '#78CADC' },
-        handler: async function (response) {
-          try {
-            await axios.post('/subscriptions/razorpay/verify', {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
-            });
-            setSubscribeSuccess(true);
-            setTimeout(() => {
-              setSubscribeDialog(false);
-              setSubscribeSuccess(false);
-              window.location.reload();
-            }, 1200);
-          } catch (err) {
-            setSubscribeError(err.response?.data?.message || 'Payment verification failed');
-          }
-        },
-        modal: {
-          ondismiss: function () {
-            setSubscribing(false);
-          }
-        }
-      };
-
-      const razorpay = new (window as any).Razorpay(options);
-      razorpay.open();
     } catch (err) {
-      setSubscribeError(err.response?.data?.message || 'Failed to subscribe');
-    } finally {
-      setSubscribing(false);
+      setError('Subscription failed. Please try again.');
     }
   };
 
-  const getFeatureIcon = (feature) => {
-    return feature ? <CheckIcon color="success" /> : <CloseIcon color="error" />;
+  const getPrice = (plan: SubscriptionPlan) => {
+    if (showYearly) {
+      const yearlyPrice = plan.price * 12 * 0.8; // 20% discount for yearly
+      return `$${yearlyPrice.toFixed(0)}/year`;
+    }
+    return `$${plan.price}/month`;
   };
 
-  const getPlanColor = (type) => {
-    switch (type) {
-      case 'free': return 'default';
-      case 'basic': return 'primary';
-      case 'premium': return 'secondary';
-      case 'enterprise': return 'warning';
-      default: return 'default';
+  const getSavings = (plan: SubscriptionPlan) => {
+    if (showYearly) {
+      const monthlyTotal = plan.price * 12;
+      const yearlyPrice = plan.price * 12 * 0.8;
+      const savings = monthlyTotal - yearlyPrice;
+      return `Save $${savings.toFixed(0)}/year`;
     }
+    return '';
   };
 
-  const getPlanIcon = (type) => {
-    if (type === 'premium' || type === 'enterprise') {
-      return <StarIcon sx={{ color: '#FFD700', mr: 1 }} />;
+  const getFeatureIcon = (feature: string) => {
+    switch (feature) {
+      case 'Priority support':
+      case '24/7 phone support':
+        return <SupportIcon sx={{ color: 'var(--color-primary)', fontSize: 20 }} />;
+      case 'API access':
+      case 'White-label options':
+        return <SecurityIcon sx={{ color: 'var(--color-primary)', fontSize: 20 }} />;
+      default:
+        return <CheckIcon sx={{ color: 'var(--color-success)', fontSize: 20 }} />;
     }
-    return null;
   };
 
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography variant="h4" align="center">Loading subscription plans...</Typography>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+          <CircularProgress />
+        </Box>
       </Container>
     );
   }
@@ -205,224 +142,310 @@ const SubscriptionPlans = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ mb: 4, color: '#78CADC' }}>
-        Choose Your Plan
-      </Typography>
-      
-      <Typography variant="h6" align="center" color="text.secondary" sx={{ mb: 4 }}>
-        Select the perfect plan for your real estate needs
-      </Typography>
-      
+      {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Button
-          variant="outlined"
-          href="/subscription-comparison"
+        <Typography 
+          variant="h2" 
+          component="h1" 
+          gutterBottom 
           sx={{ 
-            borderColor: '#78CADC',
-            color: '#78CADC',
-            '&:hover': {
-              borderColor: '#5BA3B3',
-              backgroundColor: 'rgba(120, 202, 220, 0.1)'
-            }
+            color: 'var(--color-primary)',
+            fontWeight: 'bold',
+            mb: 2
           }}
         >
-          Compare All Plans
-        </Button>
+          Choose Your Plan
+        </Typography>
+        <Typography 
+          variant="h6" 
+          color="var(--color-text-secondary)"
+          sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}
+        >
+          Select the perfect subscription plan for your real estate business needs. 
+          All plans include our core features with different levels of access.
+        </Typography>
+
+        {/* Billing Toggle */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body1" color="var(--color-text-secondary)">
+            Monthly
+          </Typography>
+          <Switch
+            checked={showYearly}
+            onChange={(e) => setShowYearly(e.target.checked)}
+            sx={{
+              '& .MuiSwitch-switchBase.Mui-checked': {
+                color: 'var(--color-primary)',
+              },
+              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                backgroundColor: 'var(--color-primary)',
+              },
+            }}
+          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body1" color="var(--color-text-secondary)">
+              Yearly
+            </Typography>
+            <Chip 
+              label="Save 20%" 
+              size="small" 
+              sx={{ 
+                bgcolor: 'var(--color-success)',
+                color: 'var(--color-text-inverse)',
+                fontWeight: 'bold'
+              }} 
+            />
+          </Box>
+        </Box>
       </Box>
 
-      <Grid container spacing={4}>
+      {/* Plans Grid */}
+      <Grid container spacing={4} sx={{ mb: 6 }}>
         {plans.map((plan) => (
-          <Grid item xs={12} md={6} lg={3} key={plan._id}>
+          <Grid item xs={12} md={4} key={plan.id}>
             <Card 
-              elevation={plan.type === 'premium' ? 8 : 2}
+              elevation={plan.isPopular ? 8 : 2}
               sx={{ 
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                border: plan.type === 'premium' ? '2px solid #FFD700' : '1px solid #e0e0e0',
+                border: plan.isPopular ? '2px solid var(--color-primary)' : '1px solid var(--color-border-light)',
                 position: 'relative',
+                transition: 'all 0.3s ease-in-out',
                 '&:hover': {
-                  transform: 'translateY(-4px)',
-                  transition: 'transform 0.3s ease-in-out'
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
                 }
               }}
             >
-              {plan.type === 'premium' && (
+              {plan.isPopular && (
                 <Box
                   sx={{
                     position: 'absolute',
-                    top: -10,
+                    top: -12,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    bgcolor: '#FFD700',
-                    color: '#000',
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 1,
+                    bgcolor: 'var(--color-primary)',
+                    color: 'var(--color-text-inverse)',
+                    px: 3,
+                    py: 1,
+                    borderRadius: 2,
                     fontSize: '0.875rem',
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
                   }}
                 >
+                  <StarIcon sx={{ fontSize: 16 }} />
                   MOST POPULAR
                 </Box>
               )}
 
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
+              <CardContent sx={{ flexGrow: 1, textAlign: 'center', pt: plan.isPopular ? 4 : 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                  {getPlanIcon(plan.type)}
-                  <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
+                  {plan.isPopular && <StarIcon sx={{ color: 'var(--color-primary)', mr: 1 }} />}
+                  <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
                     {plan.name}
                   </Typography>
                 </Box>
                 
-                <Typography variant="h4" component="div" sx={{ mb: 2, color: '#78CADC' }}>
-                  ${plan.price}
-                  <Typography variant="body2" component="span" color="text.secondary">
-                    /{plan.billingCycle}
-                  </Typography>
+                <Typography variant="h3" component="div" sx={{ mb: 1, color: 'var(--color-primary)', fontWeight: 'bold' }}>
+                  {getPrice(plan)}
                 </Typography>
+                
+                {getSavings(plan) && (
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      mb: 2, 
+                      fontWeight: 'bold',
+                      color: 'var(--color-success)',
+                      bgcolor: 'var(--color-bg-secondary)',
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: 1,
+                      display: 'inline-block'
+                    }}
+                  >
+                    {getSavings(plan)}
+                  </Typography>
+                )}
 
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <Typography 
+                  variant="body1" 
+                  color="var(--color-text-secondary)" 
+                  sx={{ mb: 3, minHeight: 60, display: 'flex', alignItems: 'center' }}
+                >
                   {plan.description}
                 </Typography>
 
-                <List dense>
-                  <ListItem>
-                    <ListItemIcon>
-                      {getFeatureIcon(plan.features.propertyListings > 0)}
-                    </ListItemIcon>
-                    <ListItemText 
-                      primary={`${plan.features.propertyListings} Property Listings`}
-                    />
-                  </ListItem>
-                  
-                  <ListItem>
-                    <ListItemIcon>
-                      {getFeatureIcon(plan.features.advancedSearch)}
-                    </ListItemIcon>
-                    <ListItemText primary="Advanced Search" />
-                  </ListItem>
-                  
-                  <ListItem>
-                    <ListItemIcon>
-                      {getFeatureIcon(plan.features.prioritySupport)}
-                    </ListItemIcon>
-                    <ListItemText primary="Priority Support" />
-                  </ListItem>
-                  
-                  <ListItem>
-                    <ListItemIcon>
-                      {getFeatureIcon(plan.features.analytics)}
-                    </ListItemIcon>
-                    <ListItemText primary="Analytics & Insights" />
-                  </ListItem>
-                  
-                  <ListItem>
-                    <ListItemIcon>
-                      {getFeatureIcon(plan.features.customBranding)}
-                    </ListItemIcon>
-                    <ListItemText primary="Custom Branding" />
-                  </ListItem>
-                  
-                  <ListItem>
-                    <ListItemIcon>
-                      {getFeatureIcon(plan.features.apiAccess)}
-                    </ListItemIcon>
-                    <ListItemText primary="API Access" />
-                  </ListItem>
-                </List>
-              </CardContent>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => handleSubscribe(plan)}
+                  disabled={user?.subscriptionStatus === plan.name.toLowerCase()}
+                  sx={{ 
+                    bgcolor: plan.isPopular ? 'var(--color-primary)' : 'var(--color-primary)',
+                    color: 'var(--color-text-inverse)',
+                    py: 1.5,
+                    px: 4,
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      bgcolor: 'var(--color-primary-hover)',
+                    },
+                    mb: 3,
+                    width: '100%'
+                  }}
+                >
+                  {user?.subscriptionStatus === plan.name.toLowerCase() ? 'Current Plan' : 'Choose Plan'}
+                </Button>
 
-              <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-                {user?.subscriptionStatus === plan.type ? (
-                  <Chip 
-                    label="Current Plan" 
-                    color="success" 
-                    variant="outlined"
-                    size="medium"
-                  />
-                ) : (
-                  <Button
-                    variant="contained"
-                    size="medium"
-                    onClick={() => handleSubscribe(plan)}
-                    disabled={plan.type === 'free' && user?.subscriptionStatus === 'free'}
-                    sx={{ 
-                      bgcolor: plan.type === 'premium' ? '#FFD700' : '#78CADC',
-                      color: plan.type === 'premium' ? '#000' : '#fff',
-                      '&:hover': {
-                        bgcolor: plan.type === 'premium' ? '#FFC700' : '#5BA3B3'
-                      }
-                    }}
-                  >
-                    {plan.type === 'free' ? 'Current Plan' : 'Subscribe'}
-                  </Button>
-                )}
-              </CardActions>
+                {/* Features List */}
+                <Box sx={{ textAlign: 'left' }}>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)', fontWeight: 'bold' }}>
+                    What's included:
+                  </Typography>
+                  {plan.features.map((feature, index) => (
+                    <Box 
+                      key={index} 
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        mb: 1.5,
+                        py: 0.5
+                      }}
+                    >
+                      {getFeatureIcon(feature)}
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          ml: 1.5, 
+                          color: 'var(--color-text-secondary)',
+                          flex: 1
+                        }}
+                      >
+                        {feature}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-      {/* Subscribe Dialog */}
-      <Dialog open={subscribeDialog} onClose={() => setSubscribeDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          Subscribe to {selectedPlan?.name}
-        </DialogTitle>
-        <DialogContent>
-          {subscribeSuccess ? (
-            <Alert severity="success" sx={{ mt: 2 }}>
-              Subscription successful! You will be redirected shortly.
-            </Alert>
-          ) : (
-            <>
-              <Typography variant="body1" sx={{ mb: 3 }}>
-                Complete your subscription to {selectedPlan?.name} for ${selectedPlan?.price}/{billingCycle}
+      {/* Features Comparison */}
+      <Card sx={{ mb: 6 }}>
+        <CardContent>
+          <Typography variant="h4" gutterBottom sx={{ mb: 4, color: 'var(--color-primary)', textAlign: 'center' }}>
+            <TrendingUpIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+            Feature Comparison
+          </Typography>
+          
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                All Plans Include:
               </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {['Mobile app access', 'Email support', 'Basic analytics', 'Standard templates'].map((feature, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CheckIcon sx={{ color: 'var(--color-success)', fontSize: 20, mr: 1 }} />
+                    <Typography variant="body2" color="var(--color-text-secondary)">
+                      {feature}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                Professional & Enterprise:
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {['Priority support', 'Advanced analytics', 'Lead management', 'CRM integration'].map((feature, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CheckIcon sx={{ color: 'var(--color-success)', fontSize: 20, mr: 1 }} />
+                    <Typography variant="body2" color="var(--color-text-secondary)">
+                      {feature}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                Enterprise Only:
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {['24/7 phone support', 'API access', 'White-label options', 'Dedicated account manager'].map((feature, index) => (
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CheckIcon sx={{ color: 'var(--color-success)', fontSize: 20, mr: 1 }} />
+                    <Typography variant="body2" color="var(--color-text-secondary)">
+                      {feature}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    fullWidth
-                    label="Billing Cycle"
-                    value={billingCycle}
-                    onChange={(e) => setBillingCycle(e.target.value)}
-                  >
-                    <MenuItem value="monthly">Monthly</MenuItem>
-                    <MenuItem value="yearly">Yearly (20% discount)</MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                  <Alert severity="info">
-                    You will be redirected to Razorpay to complete your payment and choose your preferred payment method there.
-                  </Alert>
-                </Grid>
-              </Grid>
-
-              {subscribeError && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {subscribeError}
-                </Alert>
-              )}
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSubscribeDialog(false)}>
-            Cancel
+      {/* Call to Action */}
+      <Card sx={{ 
+        textAlign: 'center', 
+        py: 6, 
+        background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%)', 
+        color: 'var(--color-text-inverse)',
+        borderRadius: 3
+      }}>
+        <CardContent>
+          <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
+            Ready to Get Started?
+          </Typography>
+          <Typography variant="h6" sx={{ mb: 4, opacity: 0.9, maxWidth: 600, mx: 'auto' }}>
+            Join thousands of real estate professionals who trust our platform to grow their business.
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            href="/subscription-comparison"
+            sx={{ 
+              bgcolor: 'var(--color-text-inverse)',
+              color: 'var(--color-primary)',
+              py: 2,
+              px: 6,
+              fontSize: '1.2rem',
+              fontWeight: 'bold',
+              '&:hover': {
+                bgcolor: 'var(--color-bg-secondary)',
+              }
+            }}
+          >
+            Compare All Plans
           </Button>
-          {!subscribeSuccess && (
-            <Button 
-              onClick={handleSubscribeConfirm}
-              variant="contained"
-              disabled={subscribing}
-            >
-              {subscribing ? 'Processing...' : 'Subscribe'}
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* Payment Form Dialog */}
+      {selectedPlan && (
+        <PaymentForm
+          open={subscribeDialog}
+          onClose={() => {
+            setSubscribeDialog(false);
+            setSelectedPlan(null);
+          }}
+          onSuccess={handleSubscribeConfirm}
+          plan={selectedPlan}
+          billingCycle={showYearly ? 'yearly' : 'monthly'}
+        />
+      )}
     </Container>
   );
 };

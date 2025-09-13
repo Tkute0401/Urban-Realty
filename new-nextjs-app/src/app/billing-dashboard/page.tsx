@@ -1,7 +1,10 @@
-'use client'
-import React from "react";
-import BillingDashboard from "@/components/Subscription/BillingDashboard";
+'use client';
 
-export default function BillingDashboardPage() {
+import React from 'react';
+import BillingDashboard from '@/components/Subscription/BillingDashboard';
+
+const BillingDashboardPage = () => {
   return <BillingDashboard />;
-}
+};
+
+export default BillingDashboardPage;

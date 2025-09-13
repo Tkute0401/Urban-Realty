@@ -247,6 +247,68 @@ export class MockApiService {
     });
   }
 
+  // Billing endpoints
+  async getBillingHistory(userId: string) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockHistory = [
+          {
+            id: 'bill1',
+            date: '2024-01-01T00:00:00Z',
+            description: 'Professional Plan - Monthly',
+            amount: 79,
+            currency: 'USD',
+            status: 'paid',
+            billingCycle: 'monthly'
+          },
+          {
+            id: 'bill2',
+            date: '2023-12-01T00:00:00Z',
+            description: 'Professional Plan - Monthly',
+            amount: 79,
+            currency: 'USD',
+            status: 'paid',
+            billingCycle: 'monthly'
+          }
+        ];
+        resolve({
+          data: { success: true, data: mockHistory },
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
+  async getUpcomingBilling(userId: string) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockUpcoming = {
+          amount: 79,
+          billingCycle: 'monthly',
+          nextBillingDate: '2024-02-01T00:00:00Z',
+          daysUntilBilling: 15,
+          autoRenew: true
+        };
+        resolve({
+          data: { success: true, data: mockUpcoming },
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
+  async downloadInvoice(invoiceId: string) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Mock invoice download
+        resolve({
+          data: { success: true, message: 'Invoice downloaded' },
+          status: 200,
+        });
+      }, 500);
+    });
+  }
+
   // Contact endpoints
   async getContacts(filters?: any) {
     return new Promise((resolve) => {
@@ -526,6 +588,11 @@ export const mockApi = {
     subscribe: (userId: string, planId: string, paymentMethod: string) => mockApiService.subscribe(userId, planId, paymentMethod),
     cancel: (userId: string) => mockApiService.cancelSubscription(userId),
     update: (userId: string, planId: string) => mockApiService.updateSubscription(userId, planId),
+  },
+  billing: {
+    getHistory: (userId: string) => mockApiService.getBillingHistory(userId),
+    getUpcoming: (userId: string) => mockApiService.getUpcomingBilling(userId),
+    downloadInvoice: (invoiceId: string) => mockApiService.downloadInvoice(invoiceId),
   },
   contacts: {
     list: (filters?: any) => mockApiService.getContacts(filters),

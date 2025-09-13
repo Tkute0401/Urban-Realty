@@ -131,7 +131,7 @@ const SubscriptionComparison = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ mb: 2, color: '#78CADC' }}>
+      <Typography variant="h3" component="h1" align="center" gutterBottom sx={{ mb: 2, color: 'var(--color-primary)' }}>
         Plan Comparison
       </Typography>
       
@@ -170,7 +170,7 @@ const SubscriptionComparison = () => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                border: plan.type === 'premium' ? '2px solid #FFD700' : '1px solid #e0e0e0',
+                border: plan.type === 'premium' ? '2px solid var(--color-warning)' : '1px solid var(--color-border-light)',
                 position: 'relative',
                 '&:hover': {
                   transform: 'translateY(-4px)',
@@ -185,8 +185,8 @@ const SubscriptionComparison = () => {
                     top: -10,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    bgcolor: '#FFD700',
-                    color: '#000',
+                    bgcolor: 'var(--color-warning)',
+                    color: 'var(--color-text-primary)',
                     px: 2,
                     py: 0.5,
                     borderRadius: 1,
@@ -200,13 +200,13 @@ const SubscriptionComparison = () => {
 
               <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                  {plan.type === 'premium' && <StarIcon sx={{ color: '#FFD700', mr: 1 }} />}
+                  {plan.type === 'premium' && <StarIcon sx={{ color: 'var(--color-warning)', mr: 1 }} />}
                   <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
                     {plan.name}
                   </Typography>
                 </Box>
                 
-                <Typography variant="h4" component="div" sx={{ mb: 1, color: '#78CADC' }}>
+                <Typography variant="h4" component="div" sx={{ mb: 1, color: 'var(--color-primary)' }}>
                   {getPrice(plan)}
                 </Typography>
                 
@@ -226,10 +226,10 @@ const SubscriptionComparison = () => {
                   onClick={() => handleSubscribe(plan)}
                   disabled={user?.subscriptionStatus === plan.type}
                   sx={{ 
-                    bgcolor: plan.type === 'premium' ? '#FFD700' : '#78CADC',
-                    color: plan.type === 'premium' ? '#000' : '#fff',
+                    bgcolor: plan.type === 'premium' ? 'var(--color-warning)' : 'var(--color-primary)',
+                    color: plan.type === 'premium' ? 'var(--color-text-primary)' : 'var(--color-text-inverse)',
                     '&:hover': {
-                      bgcolor: plan.type === 'premium' ? '#FFC700' : '#5BA3B3'
+                      bgcolor: plan.type === 'premium' ? 'var(--color-warning-hover)' : 'var(--color-primary-hover)'
                     },
                     mb: 2
                   }}
@@ -245,7 +245,7 @@ const SubscriptionComparison = () => {
       {/* Detailed Comparison Table */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Typography variant="h5" gutterBottom sx={{ mb: 3, color: '#78CADC' }}>
+          <Typography variant="h5" gutterBottom sx={{ mb: 3, color: 'var(--color-primary)' }}>
             <TrendingUpIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
             Feature Comparison
           </Typography>
@@ -314,7 +314,7 @@ const SubscriptionComparison = () => {
       </Card>
 
       {/* Call to Action */}
-      <Card sx={{ textAlign: 'center', py: 4, background: 'linear-gradient(135deg, #78CADC 0%, #5BA3B3 100%)', color: 'white' }}>
+      <Card sx={{ textAlign: 'center', py: 4, background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%)', color: 'var(--color-text-inverse)' }}>
         <CardContent>
           <Typography variant="h4" gutterBottom>
             Ready to Get Started?
@@ -327,10 +327,10 @@ const SubscriptionComparison = () => {
             size="large"
             href="/subscriptions"
             sx={{ 
-              bgcolor: '#FFD700',
-              color: '#000',
+              bgcolor: 'var(--color-warning)',
+              color: 'var(--color-text-primary)',
               '&:hover': {
-                bgcolor: '#FFC700'
+                bgcolor: 'var(--color-warning-hover)'
               }
             }}
           >
