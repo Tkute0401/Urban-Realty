@@ -100,10 +100,18 @@ const nextConfig = {
 
   // Rewrites for API proxy
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    
+    // Only add rewrite if API URL is defined
+    if (!apiUrl) {
+      console.warn('NEXT_PUBLIC_API_URL is not defined. API rewrites will be skipped.');
+      return [];
+    }
+    
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
