@@ -4,6 +4,7 @@ export * from './properties';
 export * from './developers';
 export * from './subscriptions';
 export * from './contacts';
+export * from './location-services';
 
 // Re-export all mock data and APIs
 export { mockUsers, mockAuthResponses } from './users';
@@ -11,6 +12,7 @@ export { mockProperties, mockPropertyAPI } from './properties';
 export { mockDevelopers, mockDeveloperAPI } from './developers';
 export { mockSubscriptionPlans, mockUserSubscriptions, mockSubscriptionAPI } from './subscriptions';
 export { mockContactRequests, mockContactAPI } from './contacts';
+export { mockNearbyAmenities, mockLocationServicesAPI } from './location-services';
 
 // Combined mock API for easy access
 export const mockAPI = {
@@ -126,6 +128,24 @@ export const mockAPI = {
     assign: (id: string, agentId: string) => {
       const { mockContactAPI } = require('./contacts');
       return mockContactAPI.assign(id, agentId);
+    },
+  },
+  location: {
+    getNearbyAmenities: (coordinates: any, radius?: number) => {
+      const { mockLocationServicesAPI } = require('./location-services');
+      return mockLocationServicesAPI.getNearbyAmenities(coordinates, radius);
+    },
+    getLocationInfo: (coordinates: any) => {
+      const { mockLocationServicesAPI } = require('./location-services');
+      return mockLocationServicesAPI.getLocationInfo(coordinates);
+    },
+    searchByLocation: (coordinates: any, radius?: number) => {
+      const { mockLocationServicesAPI } = require('./location-services');
+      return mockLocationServicesAPI.searchByLocation(coordinates, radius);
+    },
+    getDirections: (origin: any, destination: any) => {
+      const { mockLocationServicesAPI } = require('./location-services');
+      return mockLocationServicesAPI.getDirections(origin, destination);
     },
   },
 };

@@ -9,8 +9,8 @@ const PropertyMap = ({ location, address }) => {
   const mapRef = useRef(null);
   const [activeMarker, setActiveMarker] = useState(null);
 
-  // Use environment variable from Vite
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  // Use environment variable from Next.js
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (
