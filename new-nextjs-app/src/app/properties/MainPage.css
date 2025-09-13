@@ -1,0 +1,661 @@
+/* PropertyList.css - Optimized and Consolidated */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes highlight {
+  0% { box-shadow: 0 0 0 0 rgba(247, 107, 28, 0.7); }
+  50% { box-shadow: 0 0 0 10px rgba(247, 107, 28, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 107, 28, 0); }
+}
+
+/* Animation Classes */
+.fade-in-delay-1 { opacity: 0; animation: fadeIn 0.6s ease-in-out forwards 0.2s; }
+.fade-in-delay-2 { opacity: 0; animation: fadeIn 0.6s ease-in-out forwards 0.4s; }
+.fade-in-delay-3 { opacity: 0; animation: fadeIn 0.6s ease-in-out forwards 0.6s; }
+.fade-in-delay-4 { opacity: 0; animation: fadeIn 0.6s ease-in-out forwards 0.8s; }
+
+.slide-in-left { animation: slideInLeft 0.6s ease-out forwards; }
+
+.highlight-card {
+  animation: highlight 2s ease-out;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+/* Layout */
+.main-container {
+  width: 100%;
+  max-width: min(1600px, 100vw - 20px);
+  margin: 0 auto;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  opacity: 0;
+  padding: 0 10px;
+}
+
+.main-container.fade-in {
+  opacity: 1;
+}
+
+/* Navbar */
+.Navbar {
+  display: flex;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  background-color: var(--color-bg) !important;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar-content {
+  display: flex;
+  align-items: baseline;
+  justify-content: baseline;
+  width: 100%;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  position: static;
+  flex: none;
+  margin-right: 2%;
+  max-width: 27%;
+  min-width: 20%;
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid var(--color-primary);
+  border-radius: 5px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.search-container input {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  border-radius: 5px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  outline: none;
+}
+
+.search-container input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 0.5rem;
+  border: none;
+}
+
+.search-button:hover {
+  transform: scale(1.1);
+}
+
+.BuyRentToggle {
+  margin-left: 2%;
+  display: flex;
+  min-width: 20%;
+  max-width: 30%;
+}
+
+.BuyRentToggle button {
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--color-primary) !important;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  flex: 1;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+#AllBtn {
+  border-top-left-radius: 10%;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#BuyBtn {
+  border-radius: 0;
+}
+
+#RentBtn {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.bg-cyan-400 {
+  background-color: var(--color-primary);
+}
+
+.bg-black-400 {
+  background-color: var(--color-surface);
+}
+
+.OtherNavbarBtn {
+  display: flex;
+  flex: 1;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.OtherNavbarBtn button {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.75rem;
+  min-width: 2%;
+  color: var(--color-text);
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-animate:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(247, 107, 28, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Content Sections */
+.breadcrumb {
+  display: flow-root;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+  line-height: 1.5;
+}
+
+.breadcrumb a {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+  color: var(--color-primary);
+}
+
+.breadcrumb .separator {
+  color: var(--color-text-muted);
+  margin: 0 2px;
+}
+
+.page-title {
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-title h1 {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.page-title h1 span {
+  color: var(--color-primary);
+}
+
+.listings-count {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+/* Filter Tags */
+.filter-tags {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  margin-bottom: 0.25rem;
+  z-index: 10;
+}
+
+.filter-tag:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.filter-label {
+  font-size: 0.8rem;
+  white-space: nowrap;
+  color: var(--color-text);
+}
+
+.filter-tag button {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  transition: transform 0.2s ease;
+}
+
+.filter-tag button:hover {
+  transform: rotate(90deg);
+}
+
+.clear-all-filters {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Property Listings */
+.property-listings {
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+  gap: 1.5rem;
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 1.5rem;
+}
+
+/* Property Card Styles */
+.property-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.property-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-primary);
+}
+
+.property-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.property-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.property-card:hover .property-image {
+  transform: scale(1.05);
+}
+
+.property-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 1rem;
+}
+
+.property-card:hover .property-image-overlay {
+  opacity: 1;
+}
+
+.property-image-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.image-action-btn {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--color-text);
+}
+
+.image-action-btn:hover {
+  background-color: var(--color-primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.property-details {
+  padding: 1rem;
+}
+
+.property-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.property-specs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.property-spec {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.property-spec-divider {
+  color: var(--color-border);
+  font-weight: bold;
+}
+
+.property-location {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Google Map Container */
+.map-container {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  height: 500px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-primary);
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-surface);
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+/* Empty State */
+.empty-state {
+  margin-top: 1.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.mobile-menu-content {
+  background-color: var(--color-surface);
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 20px 20px 0 0;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+.mobile-menu-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.mobile-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 10px 12px;
+  gap: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.mobile-menu-button:hover {
+  background-color: rgba(247, 107, 28, 0.1);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .Navbar {
+    display: none;
+  }
+
+  .mobile-top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 12px;
+    padding: 12px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: var(--color-bg) !important;
+    border-bottom: 1px solid var(--color-border);
+    align-items: center;
+  }
+
+  .mobile-search-container {
+    flex: 2;
+    position: relative;
+    min-width: 60%;
+  }
+
+  .mobile-search-container.expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--color-bg) !important;
+    padding: 0.5rem;
+    z-index: 1100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .mobile-search-form {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mobile-search-input {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    color: var(--color-text);
+    font-size: 14px;
+  }
+
+  .mobile-search-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    color: var(--color-text);
+    padding: 10px;
+    min-width: 40px;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-search-button:hover {
+    background-color: rgba(247, 107, 28, 0.1);
+  }
+
+  .property-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    height: 350px;
+  }
+
+  .listings-count {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-primary);
+    border-radius: 12px;
+    margin-top: 8px;
+    display: inline-block;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .property-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mobile-top-bar {
+    display: none;
+  }
+
+  .Navbar {
+    display: flex;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1025px) {
+  .property-listings {
+    flex-direction: row;
+  }
+
+  .property-grid {
+    flex: 2;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .map-container {
+    flex: 1;
+    width: 80px;
+    top: 2rem;
+    height: calc(100vh - 4rem);
+    max-height: 500px;
+    margin-left: 1.5rem;
+    width: 97%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .navbar-content {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .search-container {
+    min-width: 100%;
+    order: 1;
+  }
+  
+  .BuyRentToggle {
+    order: 2;
+  }
+  
+  .OtherNavbarBtn {
+    order: 3;
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-drawer-content {
+    padding-bottom: 100px;
+  }
+
+  .listings-count {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+}
