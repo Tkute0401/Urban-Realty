@@ -11,7 +11,8 @@ export function createUrbanRealtyTheme(mode = 'light') {
       md: 900,
       lg: 1200,
       xl: 1536,
-    },},
+    },
+  },
   palette: {
     mode,
     primary: {
@@ -137,7 +138,7 @@ export function createUrbanRealtyTheme(mode = 'light') {
         }
       }
     }
-  }
+  },
   });
 }
 
