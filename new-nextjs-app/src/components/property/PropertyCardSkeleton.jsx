@@ -1,4 +1,5 @@
 import Skeleton from '@mui/material/Skeleton';
+import { Card, CardContent, Box } from '@mui/material';
 
 const PropertyCardSkeleton = ({ count = 1 }) => {
   return (

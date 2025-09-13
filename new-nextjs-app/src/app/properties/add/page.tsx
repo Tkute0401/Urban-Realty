@@ -25,11 +25,11 @@ import { styled } from '@mui/material/styles';
 
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#0B1011',
-  color: '#fff',
+  backgroundColor: 'var(--color-bg-dark)',
+  color: 'var(--color-text-inverse)',
   borderRadius: '16px',
   boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
-  border: `2px solid #78CADC`,
+  border: `2px solid var(--color-primary)`,
   padding: theme.spacing(3),
   fontFamily: '"Poppins", sans-serif',
   position: 'relative',
@@ -41,13 +41,13 @@ const PremiumPaper = styled(Paper)(({ theme }) => ({
     left: 0,
     right: 0,
     height: '4px',
-    background: 'linear-gradient(90deg, #78CADC 0%, #0B1011 100%)',
+    background: 'linear-gradient(90deg, var(--color-primary) 0%, var(--color-bg-dark) 100%)',
   }
 }));
 
 const PremiumButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#78CADC',
-  color: '#0B1011',
+  backgroundColor: 'var(--color-primary)',
+  color: 'var(--color-bg-dark)',
   fontWeight: 600,
   padding: theme.spacing(1.8, 4),
   borderRadius: '12px',
@@ -56,13 +56,13 @@ const PremiumButton = styled(Button)(({ theme }) => ({
   boxShadow: '0 8px 24px rgba(120, 202, 220, 0.3)',
   transition: 'all 0.3s ease',
   '&:hover': {
-    backgroundColor: '#6bb6c7',
+    backgroundColor: 'var(--color-primary-hover)',
     transform: 'translateY(-2px)',
     boxShadow: '0 12px 32px rgba(120, 202, 220, 0.4)',
   },
   '&:disabled': {
-    backgroundColor: '#4a5568',
-    color: '#a0aec0',
+    backgroundColor: 'var(--color-surface)',
+    color: 'var(--color-text-muted)',
   }
 }));
 
@@ -246,9 +246,9 @@ const AddProperty = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4, bgcolor: '#0c0d0e', minHeight: '100vh' }}>
+    <Container maxWidth="lg" sx={{ py: 4, bgcolor: 'var(--color-bg-dark)', minHeight: '100vh' }}>
       <PremiumPaper>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#78CADC', textAlign: 'center', mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'var(--color-primary)', textAlign: 'center', mb: 4 }}>
           Add New Property
         </Typography>
 
@@ -256,7 +256,7 @@ const AddProperty = () => {
           <Grid container spacing={3}>
             {/* Basic Information */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: '#78CADC', mb: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2 }}>
                 Basic Information
               </Typography>
             </Grid>

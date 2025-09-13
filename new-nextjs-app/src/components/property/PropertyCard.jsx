@@ -83,15 +83,15 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
   const getPropertyTypeIcon = () => {
     switch (property.type?.toLowerCase()) {
       case 'apartment':
-        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'villa':
-        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'land':
-        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'commercial':
-        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       default:
-        return <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
     }
   };
 
@@ -101,15 +101,15 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      className={`relative bg-[#08171A] rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-[#78CADC]/20 group
-        ${isSelected ? 'border-2 border-[#78CADC] shadow-lg shadow-[#78CADC]/30' : 'border-[#78CADC]/50'}`}
+      className={`relative bg-[var(--color-bg-dark)] rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-[var(--color-primary)]/20 group
+        ${isSelected ? 'border-2 border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/30' : 'border-[var(--color-primary)]/50'}`}
       onClick={handleClick}
       whileHover={{ y: -5 }}
     >
       {/* Status Badge */}
       {property.status && (
         <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-md text-xs font-bold ${
-          property.status === 'For Sale' ? 'bg-[#78CADC] text-[#0B1011]' : 'bg-[#e74c3c] text-white'
+          property.status === 'For Sale' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-[var(--color-error)] text-white'
         }`}>
           {property.status}
         </div>
@@ -120,8 +120,8 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
         {property.images?.length > 0 ? (
           <>
             {!imageLoaded && (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0B1011] to-[#1a2a32] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-transparent border-t-[#78CADC] border-l-[#78CADC] rounded-full animate-spin" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-bg-dark)] to-[var(--color-surface)] flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-transparent border-t-[var(--color-primary)] border-l-[var(--color-primary)] rounded-full animate-spin" />
               </div>
             )}
             <img 
@@ -133,15 +133,15 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
             />
           </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#0B1011] to-[#1a2a32] flex items-center justify-center">
-            <HomeOutlinedIcon className="text-[#78CADC]/50 icon-lg" />
+          <div className="w-full h-full bg-gradient-to-br from-[var(--color-bg-dark)] to-[var(--color-surface)] flex items-center justify-center">
+            <HomeOutlinedIcon className="text-[var(--color-primary)]/50 icon-lg" />
           </div>
         )}
         
         {/* Favorite Button */}
         <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
           <button 
-            className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1.5 sm:p-2 bg-[#0c0d0e]/90 rounded-full hover:bg-[#0c0d0e] transition-all
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1.5 sm:p-2 bg-[var(--color-bg-dark)]/90 rounded-full hover:bg-[var(--color-bg-dark)] transition-all
                       backdrop-blur-sm shadow-md group-hover:opacity-100"
             onClick={handleFavoriteClick}
             disabled={loadingFavorite}
@@ -169,7 +169,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           </div>
           <div className="flex items-center gap-1">
             {getPropertyTypeIcon()}
-            <span className="text-xs sm:text-sm text-[#78CADC] capitalize">
+            <span className="text-xs sm:text-sm text-[var(--color-primary)] capitalize">
               {property.type || 'Property'}
             </span>
           </div>
@@ -181,7 +181,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
         </h3>
         
         {/* Location */}
-        <div className="flex items-center gap-1 sm:gap-2 text-[#78CADC] mb-2 sm:mb-3">
+        <div className="flex items-center gap-1 sm:gap-2 text-[var(--color-primary)] mb-2 sm:mb-3">
           <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
           <span className="font-poppins text-xs sm:text-sm line-clamp-1">
             {property.address?.street && `${property.address.street}, `}
@@ -198,7 +198,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
         <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
           <Tooltip title="Area" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <HomeOutlinedIcon className="text-[#78CADC] icon-sm" />
+              <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
               </span>
@@ -207,7 +207,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           
           <Tooltip title="Bedrooms" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <LocalHotelOutlinedIcon className="text-[#78CADC] icon-sm" />
+              <LocalHotelOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {property.bedrooms || '0'} Bed
               </span>
@@ -216,7 +216,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           
           <Tooltip title="Bathrooms" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <BathtubOutlinedIcon className="text-[#78CADC] icon-sm" />
+              <BathtubOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {property.bathrooms || '0'} Bath
               </span>
@@ -232,7 +232,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
               {property.status === 'For Rent' && <span className="text-sm text-gray-400">/mo</span>}
             </p>
             {property.projectDetails?.launchDate && (
-              <span className="text-xs bg-[#78CADC]/10 text-[#78CADC] px-2 py-1 rounded">
+              <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
                 {new Date(property.projectDetails.launchDate) > new Date() ? 
                   `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
                   'Ready to Move'}
@@ -241,8 +241,8 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
           </div>
           
           <motion.button 
-            className="w-full bg-transparent border border-[#78cadc] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#78cadc]/20 transition-all text-xs sm:text-sm
-                      group-hover:bg-[#78cadc] group-hover:text-[#0B1011] group-hover:font-bold"
+            className="w-full bg-transparent border border-[var(--color-primary)] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[var(--color-primary)]/20 transition-all text-xs sm:text-sm
+                      group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-bg-dark)] group-hover:font-bold"
             onClick={(e) => {
               e.stopPropagation();
               handleClick();
@@ -258,7 +258,7 @@ const PropertyCard = ({ property, index, isSelected, onClick, id }) => {
       {/* Highlight animation when selected */}
       {isSelected && (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 border-2 border-[#78CADC] rounded-xl sm:rounded-3xl opacity-0 animate-ping-slow" />
+          <div className="absolute inset-0 border-2 border-[var(--color-primary)] rounded-xl sm:rounded-3xl opacity-0 animate-ping-slow" />
         </div>
       )}
     </motion.div>

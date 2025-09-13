@@ -354,16 +354,16 @@ const PropertyList = () => {
         justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '50vh',
-        background: '#08171A'
+        background: 'var(--color-bg-dark)'
       }}>
-        <CircularProgress size={isMobile ? 40 : 60} sx={{ color: '#78CADC' }} />
+        <CircularProgress size={isMobile ? 40 : 60} sx={{ color: 'var(--color-primary)' }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center', color: 'white', background: '#08171A' }}>
+      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center', color: 'white', background: 'var(--color-bg-dark)' }}>
         <Typography color="error" gutterBottom>
           Error loading properties
         </Typography>
@@ -373,7 +373,7 @@ const PropertyList = () => {
           onClick={() => getProperties({})}
           startIcon={<Refresh />}
           size={isMobile ? 'small' : 'medium'}
-          sx={{ backgroundColor: '#78CADC', '&:hover': { backgroundColor: '#5cb3c5' } }}
+          sx={{ backgroundColor: 'var(--color-primary)', '&:hover': { backgroundColor: 'var(--color-primary-hover)' } }}
         >
           Retry
         </Button>
@@ -545,21 +545,21 @@ const PropertyList = () => {
           <div className="BuyRentToggle">
             <button 
               id="AllBtn" 
-              className={`${filters.propertyType === 'ALL' ? 'bg-[#78cadc] text-black' : 'bg-[#08171A] text-white'}`} 
+              className={`${filters.propertyType === 'ALL' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-[var(--color-bg-dark)] text-white'}`} 
               onClick={() => handlePropertyTypeChange('ALL')}
             >
               ALL
             </button>
             <button 
               id="BuyBtn" 
-              className={`${filters.propertyType === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
+              className={`${filters.propertyType === 'BUY' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-[var(--color-surface)] text-white'}`} 
               onClick={() => handlePropertyTypeChange('BUY')}
             >
               BUY
             </button>
             <button 
               id="RentBtn" 
-              className={`${filters.propertyType === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
+              className={`${filters.propertyType === 'RENT' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-[var(--color-surface)] text-white'}`}
               onClick={() => handlePropertyTypeChange('RENT')}
             >
               RENT
