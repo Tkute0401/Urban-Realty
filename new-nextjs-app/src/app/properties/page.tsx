@@ -32,7 +32,7 @@ const PropertyCard = ({ property }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="property-image-container">
-        <img src={property.image} alt={property.location} className="property-image" />
+        <img src={property.images?.[0] || '/placeholder-property.jpg'} alt={property.title} className="property-image" />
         <div className="property-image-overlay">
           <div className="property-image-actions">
             <button className="image-action-btn">
@@ -46,13 +46,13 @@ const PropertyCard = ({ property }) => {
       </div>
 
       <div className="property-details">
-        <div className="property-price">{property.price}</div>
+        <div className="property-price">${property.price?.toLocaleString()}</div>
         <div className="property-specs">
-          <div className="property-spec">{property.sqft}</div>
+          <div className="property-spec">{property.features?.sqft} sqft</div>
           <div className="property-spec-divider">|</div>
-          <div className="property-spec">{property.beds} Bed</div>
+          <div className="property-spec">{property.features?.bedrooms} Bed</div>
           <div className="property-spec-divider">|</div>
-          <div className="property-spec">{property.baths} Bath</div>
+          <div className="property-spec">{property.features?.bathrooms} Bath</div>
         </div>
         <div className="property-location">
           {typeof property.location === 'object' 
@@ -248,7 +248,7 @@ const Properties = () => {
             </div>
           ) : (
             properties.map(property => (
-              <PropertyCard key={property._id} property={property} />
+              <PropertyCard key={property.id} property={property} />
             ))
           )}
         </div>
