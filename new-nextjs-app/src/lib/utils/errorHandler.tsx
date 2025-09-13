@@ -1,4 +1,5 @@
 // Comprehensive Error Handling System
+import React from 'react';
 import { ApiError } from '@/lib/services/apiService';
 
 // Error types
