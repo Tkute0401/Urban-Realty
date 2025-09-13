@@ -119,7 +119,7 @@ const AdminProperties = () => {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%)',
             color: 'white'
           }}>
             <CardContent>
@@ -130,7 +130,7 @@ const AdminProperties = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            background: 'linear-gradient(135deg, var(--color-success) 0%, var(--color-success-hover) 100%)',
             color: 'white'
           }}>
             <CardContent>
@@ -141,7 +141,7 @@ const AdminProperties = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            background: 'linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-hover) 100%)',
             color: 'white'
           }}>
             <CardContent>
@@ -152,7 +152,7 @@ const AdminProperties = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            background: 'linear-gradient(135deg, var(--color-info) 0%, var(--color-info-hover) 100%)',
             color: 'white'
           }}>
             <CardContent>
@@ -163,7 +163,7 @@ const AdminProperties = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            background: 'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 100%)',
             color: 'white'
           }}>
             <CardContent>
