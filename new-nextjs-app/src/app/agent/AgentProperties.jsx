@@ -45,13 +45,13 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
 const AgentProperties = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   
   const [page, setPage] = useState(0);
@@ -66,14 +66,12 @@ const AgentProperties = () => {
   const { data: properties, isLoading, error } = useQuery({
     queryKey: ['agentProperties', user?.id, page, rowsPerPage, searchTerm, statusFilter, priceRange],
     queryFn: async () => {
-      const res = await axios.get(`/properties/agent/${user?.id}`, {
-        params: {
-          page: page + 1,
-          limit: rowsPerPage,
-          search: searchTerm,
-          status: statusFilter !== 'all' ? statusFilter : undefined,
-          priceRange: priceRange !== 'all' ? priceRange : undefined
-        }
+      const res = await mockApi.agent.getProperties(user?.id || 'agent1', {
+        page: page + 1,
+        limit: rowsPerPage,
+        search: searchTerm,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        priceRange: priceRange !== 'all' ? priceRange : undefined
       });
       return res.data;
     },
@@ -83,7 +81,7 @@ const AgentProperties = () => {
   // Delete property mutation
   const deletePropertyMutation = useMutation({
     mutationFn: async (propertyId) => {
-      await axios.delete(`/properties/${propertyId}`);
+      await mockApi.properties.delete(propertyId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agentProperties'] });
@@ -153,7 +151,7 @@ const AgentProperties = () => {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => navigate('/add-property')}
+            onClick={() => router.push('/add-property')}
           >
             Add Property
           </Button>
@@ -277,7 +275,7 @@ const AgentProperties = () => {
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Typography fontWeight="500" color="primary">
+                      <Typography fontWeight="500" sx={{ color: 'var(--color-primary)' }}>
                         ₹{property.price?.toLocaleString()}
                       </Typography>
                       {property.pricePerSqFt && (
@@ -306,7 +304,7 @@ const AgentProperties = () => {
                         <Tooltip title="View Property">
                           <IconButton
                             size="small"
-                            onClick={() => navigate(`/properties/${property._id}`)}
+                            onClick={() => router.push(`/properties/${property._id}`)}
                           >
                             <ViewIcon />
                           </IconButton>
@@ -314,7 +312,7 @@ const AgentProperties = () => {
                         <Tooltip title="Edit Property">
                           <IconButton
                             size="small"
-                            onClick={() => navigate(`/properties/${property._id}/edit`)}
+                            onClick={() => router.push(`/properties/${property._id}/edit`)}
                           >
                             <EditIcon />
                           </IconButton>
@@ -347,7 +345,7 @@ const AgentProperties = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => navigate('/add-property')}
+                onClick={() => router.push('/add-property')}
               >
                 Add Your First Property
               </Button>

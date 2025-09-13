@@ -46,7 +46,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -56,91 +56,31 @@ const AgentAnalytics = () => {
   const [timeRange, setTimeRange] = useState('30');
   const [activeTab, setActiveTab] = useState(0);
 
-  // Fetch agent's properties
-  const { data: properties, isLoading: propertiesLoading } = useQuery({
-    queryKey: ['agentProperties', user?.id],
+  // Fetch agent's analytics
+  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['agentAnalytics', user?.id],
     queryFn: async () => {
-      const res = await axios.get(`/properties/agent/${user?.id}`);
+      const res = await mockApi.agent.getAnalytics(user?.id || 'agent1');
       return res.data;
     },
     enabled: !!user?.id
   });
 
-  // Fetch agent's contact requests
-  const { data: contacts, isLoading: contactsLoading } = useQuery({
-    queryKey: ['agentContacts', user?.id],
-    queryFn: async () => {
-      const res = await axios.get('/contacts/agent');
-      return res.data;
+  // Use analytics data from mock API
+  const analytics = analyticsData || {
+    overview: {
+      totalProperties: 0,
+      activeProperties: 0,
+      totalLeads: 0,
+      conversionRate: 0,
+      avgResponseTime: 0
     },
-    enabled: !!user?.id
-  });
-
-  // Calculate analytics data
-  const [analytics, setAnalytics] = useState({
-    totalProperties: 0,
-    activeProperties: 0,
-    totalLeads: 0,
-    conversionRate: 0,
-    avgResponseTime: 0,
-    topPerformingProperties: [],
-    leadSources: {},
-    monthlyTrends: {}
-  });
-
-  useEffect(() => {
-    if (properties?.data && contacts?.data) {
-      const totalProperties = properties.data.length;
-      const activeProperties = properties.data.filter(p => p.status === 'active').length;
-      const totalLeads = contacts.data.length;
-      
-      // Calculate conversion rate (leads to closed deals)
-      const closedLeads = contacts.data.filter(c => c.status === 'closed').length;
-      const conversionRate = totalLeads > 0 ? (closedLeads / totalLeads) * 100 : 0;
-
-      // Calculate average response time (simplified)
-      const responseTimes = contacts.data
-        .filter(c => c.status !== 'pending')
-        .map(c => {
-          const createdAt = new Date(c.createdAt);
-          const updatedAt = new Date(c.updatedAt);
-          return (updatedAt - createdAt) / (1000 * 60 * 60); // hours
-        });
-      const avgResponseTime = responseTimes.length > 0 
-        ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
-        : 0;
-
-      // Top performing properties (by views)
-      const topPerformingProperties = properties.data
-        .sort((a, b) => (b.views || 0) - (a.views || 0))
-        .slice(0, 5);
-
-      // Lead sources breakdown
-      const leadSources = contacts.data.reduce((acc, contact) => {
-        const method = contact.contactMethod || 'email';
-        acc[method] = (acc[method] || 0) + 1;
-        return acc;
-      }, {});
-
-      // Monthly trends (simplified)
-      const monthlyTrends = contacts.data.reduce((acc, contact) => {
-        const month = new Date(contact.createdAt).toLocaleDateString('en-US', { month: 'short' });
-        acc[month] = (acc[month] || 0) + 1;
-        return acc;
-      }, {});
-
-      setAnalytics({
-        totalProperties,
-        activeProperties,
-        totalLeads,
-        conversionRate,
-        avgResponseTime,
-        topPerformingProperties,
-        leadSources,
-        monthlyTrends
-      });
+    performance: {
+      topPerformingProperties: [],
+      leadSources: {},
+      leadStatusBreakdown: {}
     }
-  }, [properties, contacts]);
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -161,7 +101,7 @@ const AgentAnalytics = () => {
     }
   };
 
-  if (propertiesLoading || contactsLoading) {
+  if (analyticsLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress size={60} />
@@ -216,10 +156,10 @@ const AgentAnalytics = () => {
                     Total Properties
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.totalProperties}
+                    {analytics.overview.totalProperties}
                   </Typography>
                   <Typography variant="body2" color="success.main">
-                    {analytics.activeProperties} active
+                    {analytics.overview.activeProperties} active
                   </Typography>
                 </Box>
                 <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -239,7 +179,7 @@ const AgentAnalytics = () => {
                     Total Leads
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.totalLeads}
+                    {analytics.overview.totalLeads}
                   </Typography>
                   <Typography variant="body2" color="primary.main">
                     +12% this month
@@ -262,7 +202,7 @@ const AgentAnalytics = () => {
                     Conversion Rate
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.conversionRate.toFixed(1)}%
+                    {analytics.overview.conversionRate.toFixed(1)}%
                   </Typography>
                   <Typography variant="body2" color="success.main">
                     <TrendingUpIcon sx={{ fontSize: 14, mr: 0.5 }} />
@@ -286,7 +226,7 @@ const AgentAnalytics = () => {
                     Avg Response Time
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.avgResponseTime.toFixed(1)}h
+                    {analytics.overview.avgResponseTime.toFixed(1)}h
                   </Typography>
                   <Typography variant="body2" color="success.main">
                     <TrendingDownIcon sx={{ fontSize: 14, mr: 0.5 }} />
@@ -321,7 +261,7 @@ const AgentAnalytics = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {analytics.topPerformingProperties.map((property) => (
+                    {analytics.performance.topPerformingProperties.map((property) => (
                       <TableRow key={property._id} hover>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={2}>
@@ -377,7 +317,7 @@ const AgentAnalytics = () => {
                 Lead Sources
               </Typography>
               <List>
-                {Object.entries(analytics.leadSources).map(([method, count]) => (
+                {Object.entries(analytics.performance.leadSources).map(([method, count]) => (
                   <ListItem key={method}>
                     <ListItemAvatar>
                       <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -389,7 +329,7 @@ const AgentAnalytics = () => {
                       secondary={`${count} leads`}
                     />
                     <Typography variant="h6" color="primary">
-                      {((count / analytics.totalLeads) * 100).toFixed(1)}%
+                      {((count / analytics.overview.totalLeads) * 100).toFixed(1)}%
                     </Typography>
                   </ListItem>
                 ))}
@@ -407,8 +347,8 @@ const AgentAnalytics = () => {
               </Typography>
               <List>
                 {['pending', 'contacted', 'followup', 'closed'].map((status) => {
-                  const count = contacts?.data?.filter(c => c.status === status).length || 0;
-                  const percentage = analytics.totalLeads > 0 ? (count / analytics.totalLeads) * 100 : 0;
+                  const count = analytics.performance.leadStatusBreakdown[status] || 0;
+                  const percentage = analytics.overview.totalLeads > 0 ? (count / analytics.overview.totalLeads) * 100 : 0;
                   
                   return (
                     <ListItem key={status}>
@@ -440,7 +380,7 @@ const AgentAnalytics = () => {
                 Recent Activity
               </Typography>
               <List>
-                {contacts?.data?.slice(0, 5).map((contact) => (
+                {analytics.performance.recentActivity?.slice(0, 5).map((contact) => (
                   <ListItem key={contact._id}>
                     <ListItemAvatar>
                       <Avatar>
