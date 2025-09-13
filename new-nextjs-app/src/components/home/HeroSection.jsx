@@ -188,7 +188,7 @@ const HeroSection = () => {
                 <div key={item.name} className="relative group">
                   <button
                     onClick={() => toggleDropdown(item.name)}
-                    className="flex items-center gap-1 font-poppins text-sm sm:text-sm md:text-base xl:text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-300"
+                    className="flex items-center gap-1 font-poppins text-sm sm:text-sm md:text-base xl:text-lg font-medium text-white hover:text-[var(--color-primary)] transition-colors duration-300"
                   >
                     {item.name}
                     {activeDropdown === item.name ? (
@@ -211,7 +211,7 @@ const HeroSection = () => {
                           <a
                             key={subItem}
                             href="#"
-                            className="block px-3 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 text-xs sm:text-sm md:text-base text-gray-800 hover:bg-[#78cadc]/10 hover:text-[#08171A] transition-colors duration-200 border-b border-white/10 last:border-0"
+                            className="block px-3 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 text-xs sm:text-sm md:text-base text-gray-800 hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-bg-dark)] transition-colors duration-200 border-b border-white/10 last:border-0"
                           >
                             {subItem}
                           </a>
@@ -250,7 +250,7 @@ const HeroSection = () => {
             <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
               <div className="text-center mb-2 sm:mb-3 md:mb-4 lg:mb-6">
                 <h1 className="font-poppins text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight font-bold mb-1 sm:mb-2 md:mb-4 lg:mb-6 text-white">
-                  Find Your <br />Perfect <span className="text-[#78cadc]">Spot.</span>
+                  Find Your <br />Perfect <span className="text-[var(--color-primary)]">Spot.</span>
                 </h1>
                 <br/>
                 
@@ -265,7 +265,7 @@ const HeroSection = () => {
           {/* Map and Rating positioned at bottom corners */}
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
             {/* Map thumbnail on left */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-gray-700/50 hover:border-[#78cadc] transition-colors duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-gray-700/50 hover:border-[var(--color-primary)] transition-colors duration-300">
               <img 
                 src="/building_1.jpg" 
                 alt="Map view" 
@@ -433,7 +433,7 @@ const HeroSection = () => {
                 <span className="relative z-10">{tab}</span>
                 {selectedTab === tab && (
                   <motion.div
-                    className="absolute bottom-0 left-0 h-0.5 bg-[#78cadc]"
+                    className="absolute bottom-0 left-0 h-0.5 bg-[var(--color-primary)]"
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -478,7 +478,7 @@ const HeroSection = () => {
                                 key={city}
                                 type="button"
                                 onClick={() => handleCitySelect(city)}
-                                className={`block w-full text-left px-2 sm:px-3 py-1 sm:py-1.5 md:py-2 text-xs sm:text-sm text-white hover:bg-white/25 transition-colors ${selectedCity === city ? 'bg-[#78CADC]/65' : ''}`}
+                                className={`block w-full text-left px-2 sm:px-3 py-1 sm:py-1.5 md:py-2 text-xs sm:text-sm text-white hover:bg-white/25 transition-colors ${selectedCity === city ? 'bg-[var(--color-primary)]/65' : ''}`}
                               >
                                 {city}
                               </button>
@@ -529,7 +529,7 @@ const HeroSection = () => {
       />
 
       {/* Gradient overlay at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-8 sm:h-10 bg-gradient-to-b from-transparent to-[#08171A] pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-full h-8 sm:h-10 bg-gradient-to-b from-transparent to-[var(--color-bg-dark)] pointer-events-none"></div>
     </section>
   );
 };

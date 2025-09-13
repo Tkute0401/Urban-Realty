@@ -15,15 +15,15 @@ export function createUrbanRealtyTheme(mode = 'light') {
   palette: {
     mode,
     primary: {
-      main: '#78CADC', // Deep ocean blue
-      light: '#5AB1D1',
-      dark: '#1B5E7A',
+      main: '#F76B1C', // Brand orange from logo
+      light: '#FB923C',
+      dark: '#EA580C',
       contrastText: '#FFFFFF'
     },
     secondary: {
-      main: '#FF7D00', // Vibrant orange
-      light: '#FF9E40',
-      dark: '#E65100',
+      main: '#1A2BFF', // Brand blue from logo
+      light: '#3B82F6',
+      dark: '#1E40AF',
       contrastText: '#FFFFFF'
     },
     background: {

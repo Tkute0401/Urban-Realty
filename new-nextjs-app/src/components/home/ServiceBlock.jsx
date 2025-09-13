@@ -129,14 +129,14 @@ const ServiceBlock = ({
   const isPlots = title === "BUY PLOTS/LAND";
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#08171A]">
+    <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[var(--color-bg-dark)]">
       {/* Divider line with enhanced responsive behavior */}
       <div className="flex justify-center px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: "60%" }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className={`h-0.5 bg-[#78CADC] mb-8 sm:mb-10 lg:mb-12 ${imageRight ? 'mr-auto' : 'ml-auto'}`} 
+          className={`h-0.5 bg-[var(--color-primary)] mb-8 sm:mb-10 lg:mb-12 ${imageRight ? 'mr-auto' : 'ml-auto'}`} 
         />
       </div>
       
@@ -178,7 +178,7 @@ const ServiceBlock = ({
             
             <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold mb-3 sm:mb-4 md:mb-5 text-white leading-tight">
               {subtitle} <br className="hidden sm:block" />
-              <span className="text-[#78CADC]">Dream {propertyType}.</span>
+              <span className="text-[var(--color-primary)]">Dream {propertyType}.</span>
             </h2>
             
             <p className="font-poppins text-gray-300 mb-6 sm:mb-8 md:mb-10 tracking-wide text-xs sm:text-sm md:text-base">
@@ -189,7 +189,7 @@ const ServiceBlock = ({
             
             <div className={`flex ${imageRight ? "justify-start" : "justify-end"}`}>
               <button 
-                className="flex items-center gap-2 bg-[#78cadc] text-[#0c0d0e] font-bold px-4 sm:px-5 md:px-6 py-2 sm:py-3 md:py-3.5 rounded-lg md:rounded-xl hover:bg-[#8DD9E5] transition-colors duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base md:text-lg"
+                className="flex items-center gap-2 bg-[var(--color-primary)] text-[var(--color-bg-dark)] font-bold px-4 sm:px-5 md:px-6 py-2 sm:py-3 md:py-3.5 rounded-lg md:rounded-xl hover:bg-[var(--color-primary-hover)] transition-colors duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base md:text-lg"
                 onClick={handleClick}
               >
                 {!imageRight && <ChevronLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />}

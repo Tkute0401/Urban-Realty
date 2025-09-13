@@ -26,18 +26,18 @@ const PropertiesSection = () => {
   };
 
   return (
-    <section className="py-12 sm:py-20 bg-[#08171A]">
+    <section className="py-12 sm:py-20 bg-[var(--color-bg-dark)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-4">
           <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-0">
-            Properties based on <span className="text-[#78cadc]">Your Location</span>
+            Properties based on <span className="text-[var(--color-primary)]">Your Location</span>
           </h2>
           <button 
             onClick={handleViewAll}
-            className="group relative inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#78cadc] to-[#5bb3c7] text-white font-medium text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out overflow-hidden"
+            className="group relative inline-flex items-center px-6 py-3 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] text-white font-medium text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out overflow-hidden"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-[#5bb3c7] to-[#4a9fb0] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            <span className="relative flex items-center gap-2 text-[#08171A]">
+            <span className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary-hover)] to-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="relative flex items-center gap-2 text-[var(--color-bg-dark)]">
               View All
               <svg 
                 className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 

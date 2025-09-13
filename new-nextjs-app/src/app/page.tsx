@@ -9,7 +9,7 @@ import Reviews from "@/components/common/footer/Reviews";
 
 export default function Page() {
   return (
-    <div className="font-poppins bg-[#0c0d0e] text-white">
+    <div className="font-poppins bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
       <HeroSection/>
       <PropertiesSection />
       <ServiceBlock 
