@@ -54,7 +54,12 @@ const PropertyCard = ({ property }) => {
           <div className="property-spec-divider">|</div>
           <div className="property-spec">{property.baths} Bath</div>
         </div>
-        <div className="property-location">{property.location}</div>
+        <div className="property-location">
+          {typeof property.location === 'object' 
+            ? `${property.location.address || ''}, ${property.location.city || ''}, ${property.location.state || ''}`.replace(/^,\s*|,\s*$/g, '')
+            : property.location
+          }
+        </div>
       </div>
     </div>
   );

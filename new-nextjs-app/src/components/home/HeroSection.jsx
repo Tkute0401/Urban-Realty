@@ -76,15 +76,17 @@ const HeroSection = () => {
   const currentCityLocalities = getLocalitiesForCity();
 
   useEffect(() => {
-    const params = Object.fromEntries(searchParams.entries());
-    if (params.search) setSearchText(params.search);
-    if (params.city) {
-      if (availableCities.includes(params.city)) {
-        setSelectedCity(params.city);
+    if (searchParams) {
+      const params = Object.fromEntries(searchParams.entries());
+      if (params.search) setSearchText(params.search);
+      if (params.city) {
+        if (availableCities.includes(params.city)) {
+          setSelectedCity(params.city);
+        }
       }
-    }
-    if (params.propertyType) {
-      setSelectedTab(params.propertyType === 'BUY' ? 'BUY' : params.propertyType === 'RENT' ? 'RENT' : 'ALL');
+      if (params.propertyType) {
+        setSelectedTab(params.propertyType === 'BUY' ? 'BUY' : params.propertyType === 'RENT' ? 'RENT' : 'ALL');
+      }
     }
 
     const updateVisibleCount = () => {
