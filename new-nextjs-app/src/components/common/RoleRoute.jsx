@@ -1,29 +1,75 @@
-// src/components/common/RoleRoute.jsx
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import PropTypes from 'prop-types';
+'use client'
 
-const RoleRoute = ({ children, allowedRoles }) => {
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { CircularProgress, Box, Alert } from '@mui/material';
+
+const RoleRoute = ({ 
+  children, 
+  allowedRoles = [], 
+  fallbackPath = '/',
+  showAccessDenied = true 
+}) => {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    } else if (!loading && user && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+      if (fallbackPath) {
+        router.push(fallbackPath);
+      }
+    }
+  }, [user, loading, allowedRoles, fallbackPath, router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="100vh"
+        sx={{ bgcolor: 'var(--color-bg-primary)' }}
+      >
+        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
+      </Box>
+    );
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return null; // Will redirect to login
   }
 
-  if (!allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    if (showAccessDenied) {
+      return (
+        <Box 
+          display="flex" 
+          justifyContent="center" 
+          alignItems="center" 
+          minHeight="100vh"
+          sx={{ bgcolor: 'var(--color-bg-primary)', p: 3 }}
+        >
+          <Alert 
+            severity="error" 
+            sx={{ 
+              maxWidth: 400,
+              '& .MuiAlert-message': {
+                color: 'var(--color-text-primary)'
+              }
+            }}
+          >
+            Access denied. You don't have permission to view this page.
+          </Alert>
+        </Box>
+      );
+    }
+    return null; // Will redirect to fallback path
   }
 
   return children;
-};
-
-RoleRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-  allowedRoles: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
 export default RoleRoute;

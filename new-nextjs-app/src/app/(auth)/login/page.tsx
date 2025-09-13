@@ -37,7 +37,7 @@ const Login = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: 4, border:"1px solid #78CADC", bgcolor: "#08171A", color: "#FFFFFF"}}>
+      <Paper elevation={3} sx={{ p: 4, border: "1px solid var(--color-primary)", bgcolor: "var(--color-bg-dark)", color: "var(--color-text-inverse)" }}>
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
             Login
@@ -61,29 +61,29 @@ const Login = () => {
             sx={{
               mb: 2,
               '& .MuiOutlinedInput-root': {
-                backgroundColor: '#08171A',   // default background
-                color: 'white',
+                backgroundColor: 'var(--color-bg-dark)',
+                color: 'var(--color-text-inverse)',
                 '& fieldset': {
-                  borderColor: '#78CADC',     // normal border
+                  borderColor: 'var(--color-primary)',
                 },
                 '&:hover fieldset': {
-                  borderColor: '#78CADC',     // border when hovered
+                  borderColor: 'var(--color-primary)',
                 },
                 '&.Mui-focused': {
-                  backgroundColor: '#08171A',  // maintain background even when focused
+                  backgroundColor: 'var(--color-bg-dark)',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: '#78CADC',     // border when focused
+                  borderColor: 'var(--color-primary)',
                 },
               },
               '& .MuiInputLabel-root': {
-                color: 'white',                // label default
+                color: 'var(--color-text-inverse)',
               },
               '& .MuiInputLabel-root.Mui-focused': {
-                color: 'white',                // label when focused
+                color: 'var(--color-text-inverse)',
               },
               input: {
-                color: 'white',                // text color
+                color: 'var(--color-text-inverse)',
               }
             }}
           />
@@ -97,29 +97,29 @@ const Login = () => {
             sx={{
               mb: 2,
               '& .MuiOutlinedInput-root': {
-                backgroundColor: '#08171A',   // default background
-                color: 'white',
+                backgroundColor: 'var(--color-bg-dark)',
+                color: 'var(--color-text-inverse)',
                 '& fieldset': {
-                  borderColor: '#78CADC',     // normal border
+                  borderColor: 'var(--color-primary)',
                 },
                 '&:hover fieldset': {
-                  borderColor: '#78CADC',     // border when hovered
+                  borderColor: 'var(--color-primary)',
                 },
                 '&.Mui-focused': {
-                  backgroundColor: '#08171A',  // maintain background even when focused
+                  backgroundColor: 'var(--color-bg-dark)',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: '#78CADC',     // border when focused
+                  borderColor: 'var(--color-primary)',
                 },
               },
               '& .MuiInputLabel-root': {
-                color: 'white',                // label default
+                color: 'var(--color-text-inverse)',
               },
               '& .MuiInputLabel-root.Mui-focused': {
-                color: 'white',                // label when focused
+                color: 'var(--color-text-inverse)',
               },
               input: {
-                color: 'white',                // text color
+                color: 'var(--color-text-inverse)',
               }
             }}
           />
@@ -129,7 +129,7 @@ const Login = () => {
             variant="contained"
             size="large"
             startIcon={<LoginIcon />}
-            sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "#78CADC" }}
+            sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "var(--color-primary)" }}
             disabled={loading || isSubmitting}
           >
             {(loading || isSubmitting) ? 'Logging in...' : 'Login'}

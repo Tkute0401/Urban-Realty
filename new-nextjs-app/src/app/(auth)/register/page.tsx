@@ -90,35 +90,35 @@ const Register = () => {
   const textFieldStyles = {
     mb: 2,
     '& .MuiOutlinedInput-root': {
-      backgroundColor: '#08171A',
-      color: 'white',
+      backgroundColor: 'var(--color-bg-dark)',
+      color: 'var(--color-text-inverse)',
       '& fieldset': {
-        borderColor: '#78CADC',
+        borderColor: 'var(--color-primary)',
       },
       '&:hover fieldset': {
-        borderColor: '#78CADC',
+        borderColor: 'var(--color-primary)',
       },
       '&.Mui-focused': {
-        backgroundColor: '#08171A',
+        backgroundColor: 'var(--color-bg-dark)',
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#78CADC',
+        borderColor: 'var(--color-primary)',
       },
     },
     '& .MuiInputLabel-root': {
-      color: 'white',
+      color: 'var(--color-text-inverse)',
     },
     '& .MuiInputLabel-root.Mui-focused': {
-      color: 'white',
+      color: 'var(--color-text-inverse)',
     },
     input: {
-      color: 'white',
+      color: 'var(--color-text-inverse)',
     }
   };
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: 4, border: "1px solid #78CADC", bgcolor: "#08171A", color: "#FFFFFF" }}>
+      <Paper elevation={3} sx={{ p: 4, border: "1px solid var(--color-primary)", bgcolor: "var(--color-bg-dark)", color: "var(--color-text-inverse)" }}>
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
             Create Account
@@ -215,7 +215,7 @@ const Register = () => {
             {['agent', 'developer'].includes(formData.role) && (
               <>
                 <Grid item xs={12}>
-                  <Typography variant="h6" sx={{ mt: 2, mb: 2, color: '#78CADC' }}>
+                  <Typography variant="h6" sx={{ mt: 2, mb: 2, color: 'var(--color-primary)' }}>
                     Professional Information (RERA for India)
                   </Typography>
                 </Grid>
@@ -324,7 +324,7 @@ const Register = () => {
             variant="contained"
             size="large"
             startIcon={<PersonAdd />}
-            sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "#78CADC", color: "#08171A", fontWeight: "bold" }}
+            sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "var(--color-primary)", color: "var(--color-bg-dark)", fontWeight: "bold" }}
             disabled={loading}
           >
             {loading ? 'Registering...' : 'Register'}

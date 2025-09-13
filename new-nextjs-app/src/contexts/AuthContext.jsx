@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import axios from '@/lib/services/axios';
+import { mockApiService } from '@/lib/services/mockApi';
+import { sessionManager } from '@/lib/utils/sessionManager';
 import { useRouter } from 'next/navigation';
 
 export const AuthContext = createContext();
@@ -10,83 +11,43 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  // Initialize axios interceptors with cleanup
+  // Mock API doesn't need interceptors, but we'll keep the structure for future real API integration
   useEffect(() => {
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => {
-        // Only log non-auth responses in development
-        if (process.env.NODE_ENV === 'development' && 
-            !response.config.url.includes('/auth/')) {
-          // Intentionally no-op: hook preserved for potential debug logging
-        }
-        return response;
-      },
-      (error) => {
-        // Always log errors except in test environment
-        if (process.env.NODE_ENV !== 'test') {
-          console.error('API Error:', {
-            url: error.config?.url,
-            status: error.response?.status,
-            message: error.message,
-            response: error.response?.data
-          });
-        }
-        
-        if (error.response?.status === 401) {
-          localStorage.removeItem('token');
-          setUser(null);
-          router.push('/login');
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor);
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, [router.push]);
+    // Mock API service handles authentication internally
+    // No interceptors needed for mock data
+  }, []);
 
   // Load user function - memoized
   const loadUser = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionManager.getToken();
       if (!token) {
         setLoading(false);
         return;
       }
 
-      const response = await axios.get('/auth/me');
+      const response = await mockApiService.getMe(token);
       const userData = response.data?.data || response.data;
-      if (userData) {
-        setUser({
-          email: userData.email,
-          id: userData._id || userData.id,
-          name: userData.name,
-          role: userData.role,
-          mobile: userData.mobile,
-          reraId: userData.reraId,
-          favorites: userData?.favorites,
-          occupation: userData?.occupation,
-          recentlyViewed: userData?.recentlyViewed
-        });
+      if (userData && userData.success) {
+        const userInfo = {
+          email: userData.user.email,
+          id: userData.user._id || userData.user.id,
+          name: userData.user.name,
+          role: userData.user.role,
+          mobile: userData.user.mobile,
+          reraId: userData.user.reraId,
+          favorites: userData.user?.favorites,
+          occupation: userData.user?.occupation,
+          recentlyViewed: userData.user?.recentlyViewed
+        };
+        setUser(userInfo);
+        sessionManager.setUser(userInfo);
       }
     } catch (err) {
-      if (err.response?.status === 401) {
-        localStorage.removeItem('token');
+      if (err.status === 401) {
+        sessionManager.clearSession();
       }
-      setError(err.response?.data?.message || 'Failed to load user');
+      setError(err.message || 'Failed to load user');
     } finally {
       setLoading(false);
     }
@@ -102,15 +63,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('/auth/login', credentials);
+      const response = await mockApiService.login(credentials.email, credentials.password);
       const { token, user: userData } = response.data;
 
       if (!token) {
         throw new Error('Authentication token missing');
       }
 
-      localStorage.setItem('token', token);
-      setUser({
+      const userInfo = {
         email: userData.email,
         id: userData.id || userData._id,
         name: userData.name,
@@ -120,7 +80,12 @@ export const AuthProvider = ({ children }) => {
         favorites: userData?.favorites,
         occupation: userData?.occupation,
         recentlyViewed: userData?.recentlyViewed
-      });
+      };
+
+      sessionManager.setToken(token);
+      sessionManager.setUser(userInfo);
+      setUser(userInfo);
+
       if (userData.role === 'admin') {
         router.push('/admin');
         return { success: true };
@@ -128,9 +93,7 @@ export const AuthProvider = ({ children }) => {
       router.push('/');
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.message || 
-                     err.message || 
-                     'Login failed. Please try again.';
+      const message = err.message || 'Login failed. Please try again.';
       setError(message);
       return { success: false, error: message };
     } finally {
@@ -143,11 +106,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('/auth/register', userData);
+      const response = await mockApiService.register(userData);
       const { token, user: userInfo } = response.data;
 
-      localStorage.setItem('token', token);
-      setUser({
+      const userInfoObj = {
         email: userInfo.email,
         id: userInfo.id || userInfo._id,
         name: userInfo.name,
@@ -157,13 +119,15 @@ export const AuthProvider = ({ children }) => {
         favorites: userData?.favorites,
         occupation: userData?.occupation,
         recentlyViewed: userData?.recentlyViewed
-      });
+      };
+
+      sessionManager.setToken(token);
+      sessionManager.setUser(userInfoObj);
+      setUser(userInfoObj);
       router.push('/');
       return { success: true };
     } catch (err) {
-      const message = err.response?.data?.message || 
-                     err.message || 
-                     'Registration failed';
+      const message = err.message || 'Registration failed';
       setError(message);
       return { success: false, error: message };
     } finally {
@@ -173,7 +137,7 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function - memoized
   const logout = useCallback(() => {
-    localStorage.removeItem('token');
+    sessionManager.clearSession();
     setUser(null);
     setError(null);
     router.push('/login');

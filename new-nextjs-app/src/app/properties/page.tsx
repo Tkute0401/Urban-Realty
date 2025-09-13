@@ -6,7 +6,7 @@ import PriceDropdown from '@/components/property/PriceDropdown';
 import BedBath from '@/components/property/BedBath';
 import HomeType from '@/components/property/HomeType';
 import More from '@/components/property/More';
-import axios from '@/lib/services/axios';
+import { mockApiService } from '@/lib/services/mockApi';
 import {
   Menu as MenuIcon,
   Search as SearchIcon,
@@ -90,8 +90,8 @@ const Properties = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get('/api/properties');
-        setProperties(response.data.data);
+        const response = await mockApiService.getProperties();
+        setProperties(response.data.properties || []);
         setLoading(false);
         setIsLoaded(true);
       } catch (err) {
@@ -146,14 +146,14 @@ const Properties = () => {
             <div className="BuyRentToggle">
               <button 
                 id="BuyBtn" 
-                className={`${activeBtn === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
+                className={`${activeBtn === 'BUY' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-black-400 text-white'}`} 
                 onClick={() => setActiveBtn('BUY')}
               >
                 BUY
               </button>
               <button 
                 id="RentBtn" 
-                className={`${activeBtn === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
+                className={`${activeBtn === 'RENT' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-black-400 text-white'}`}
                 onClick={() => setActiveBtn('RENT')}
               >
                 RENT
@@ -181,7 +181,7 @@ const Properties = () => {
             <div className="BuyRentToggle">
               <button 
                 id="BuyBtn" 
-                className={`${activeBtn === 'BUY' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`} 
+                className={`${activeBtn === 'BUY' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-black-400 text-white'}`} 
                 onClick={() => {
                   setActiveBtn('BUY');
                   setShowMobileMenu(false);
@@ -191,7 +191,7 @@ const Properties = () => {
               </button>
               <button 
                 id="RentBtn" 
-                className={`${activeBtn === 'RENT' ? 'bg-[#78cadc] text-black' : 'bg-black-400 text-white'}`}
+                className={`${activeBtn === 'RENT' ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)]' : 'bg-black-400 text-white'}`}
                 onClick={() => {
                   setActiveBtn('RENT');
                   setShowMobileMenu(false);
