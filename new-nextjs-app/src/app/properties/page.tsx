@@ -6,6 +6,8 @@ import PriceDropdown from '@/components/property/PriceDropdown';
 import BedBath from '@/components/property/BedBath';
 import HomeType from '@/components/property/HomeType';
 import More from '@/components/property/More';
+import LocationSearch from '@/components/property/LocationSearch';
+import PropertiesMap from '@/components/property/PropertiesMap';
 import { mockApiService } from '@/lib/services/mockApi';
 import {
   Menu as MenuIcon,
@@ -78,6 +80,9 @@ const Properties = () => {
   const [loading, setLoading] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [searchRadius, setSearchRadius] = useState(5000);
+  const [selectedProperty, setSelectedProperty] = useState(null);
   const amenityOptions = [
     'Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 
     'Security', 'Furnished', 'Fireplace', 'Elevator'
@@ -123,6 +128,28 @@ const Properties = () => {
       ...prev,
       ...newFilters
     }));
+  };
+
+  const handleLocationSelect = (location) => {
+    setSelectedLocation(location);
+    // Filter properties by location if needed
+    if (location) {
+      // This would typically filter properties by location
+      console.log('Searching properties near:', location.name);
+    }
+  };
+
+  const handleRadiusChange = (radius) => {
+    setSearchRadius(radius);
+  };
+
+  const handleMarkerClick = (property) => {
+    setSelectedProperty(property);
+    // Scroll to property card or highlight it
+    const element = document.getElementById(`property-${property.id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -240,6 +267,16 @@ const Properties = () => {
         ))}
       </div>
 
+      {/* Location Search Component */}
+      <div className="location-search-container fade-in-delay-3" style={{ margin: '20px 0' }}>
+        <LocationSearch 
+          onLocationSelect={handleLocationSelect}
+          onRadiusChange={handleRadiusChange}
+          initialLocation={selectedLocation}
+          initialRadius={searchRadius}
+        />
+      </div>
+
       <div className="property-listings fade-in-delay-4">
         <div className="property-grid">
           {loading ? (
@@ -248,14 +285,22 @@ const Properties = () => {
             </div>
           ) : (
             properties.map(property => (
-              <PropertyCard key={property.id} property={property} />
+              <div 
+                key={property.id} 
+                id={`property-${property.id}`}
+                className={selectedProperty?.id === property.id ? 'property-highlighted' : ''}
+              >
+                <PropertyCard property={property} />
+              </div>
             ))
           )}
         </div>
         <div className="map-container">
-          <div className="map-placeholder">
-            <span>View larger map</span>
-          </div>
+          <PropertiesMap 
+            properties={properties}
+            selectedProperty={selectedProperty}
+            onMarkerClick={handleMarkerClick}
+          />
         </div>
       </div>
     </div>

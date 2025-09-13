@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
+import NearbyAmenities from '@/components/property/NearbyAmenities';
 import { formatPrice } from '@/lib/utils/format';
 import { mockApiService } from '@/lib/services/mockApi';
 import { 
@@ -185,38 +186,13 @@ const PropertyDetails = () => {
               </Paper>
             )}
 
-            {/* Nearby Places */}
-            <Paper sx={{ p: 3, mb: 4, bgcolor: 'var(--color-bg-secondary)', border: '1px solid var(--color-primary)' }}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)' }}>
-                Nearby Places
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <School sx={{ color: 'var(--color-primary)', mr: 1 }} />
-                    <Typography variant="body2">Schools nearby</Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <LocalHospital sx={{ color: 'var(--color-primary)', mr: 1 }} />
-                    <Typography variant="body2">Hospitals nearby</Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <ShoppingCart sx={{ color: 'var(--color-primary)', mr: 1 }} />
-                    <Typography variant="body2">Shopping centers</Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <Park sx={{ color: 'var(--color-primary)', mr: 1 }} />
-                    <Typography variant="body2">Parks nearby</Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Paper>
+            {/* Nearby Amenities */}
+            {property.location?.coordinates && (
+              <NearbyAmenities 
+                coordinates={property.location.coordinates}
+                radius={2000}
+              />
+            )}
 
             {/* Map */}
             <Paper sx={{ p: 3, mb: 4, bgcolor: 'var(--color-bg-secondary)', border: '1px solid var(--color-primary)' }}>
@@ -224,7 +200,7 @@ const PropertyDetails = () => {
                 Location
               </Typography>
               <PropertyMap 
-                location={{ coordinates: [property.longitude || 0, property.latitude || 0] }}
+                location={{ coordinates: property.location?.coordinates ? [property.location.coordinates.lng, property.location.coordinates.lat] : [0, 0] }}
                 address={property.location}
               />
             </Paper>
