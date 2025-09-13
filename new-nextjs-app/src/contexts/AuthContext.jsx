@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { mockApiService } from '@/lib/services/mockApi';
+import { apiService } from '@/lib/services/apiService';
 import { sessionManager } from '@/lib/utils/sessionManager';
 import { useRouter } from 'next/navigation';
 
@@ -11,10 +11,10 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  // Mock API doesn't need interceptors, but we'll keep the structure for future real API integration
+  // API service handles authentication internally
   useEffect(() => {
-    // Mock API service handles authentication internally
-    // No interceptors needed for mock data
+    // Real API service will handle authentication tokens automatically
+    // No interceptors needed as we handle tokens in the API service
   }, []);
 
   // Load user function - memoized
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await mockApiService.getMe(token);
+      const response = await apiService.getMe();
       const userData = response.data?.data || response.data;
       if (userData && userData.success) {
         const userInfo = {
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await mockApiService.login(credentials.email, credentials.password);
+      const response = await apiService.login(credentials.email, credentials.password);
       const { token, user: userData } = response.data;
 
       if (!token) {
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await mockApiService.register(userData);
+      const response = await apiService.register(userData);
       const { token, user: userInfo } = response.data;
 
       const userInfoObj = {
