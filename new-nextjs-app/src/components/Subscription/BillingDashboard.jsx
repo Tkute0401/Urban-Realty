@@ -128,22 +128,22 @@ const BillingDashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ color: '#78CADC', mb: 4 }}>
+      <Typography variant="h3" component="h1" gutterBottom sx={{ color: 'var(--color-primary)', mb: 4 }}>
         Billing Dashboard
       </Typography>
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%', bgcolor: '#f8f9fa' }}>
+          <Card sx={{ height: '100%', bgcolor: 'var(--color-bg-secondary)' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <AccountBalanceIcon sx={{ color: '#78CADC', mr: 1 }} />
+                <AccountBalanceIcon sx={{ color: 'var(--color-primary)', mr: 1 }} />
                 <Typography variant="h6" color="text.secondary">
                   Total Spent
                 </Typography>
               </Box>
-              <Typography variant="h4" component="div" sx={{ color: '#78CADC', fontWeight: 'bold' }}>
+              <Typography variant="h4" component="div" sx={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>
                 ${calculateTotalSpent().toFixed(2)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -154,15 +154,15 @@ const BillingDashboard = () => {
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%', bgcolor: '#f8f9fa' }}>
+          <Card sx={{ height: '100%', bgcolor: 'var(--color-bg-secondary)' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <PaymentIcon sx={{ color: '#4CAF50', mr: 1 }} />
+                <PaymentIcon sx={{ color: 'var(--color-success)', mr: 1 }} />
                 <Typography variant="h6" color="text.secondary">
                   Next Payment
                 </Typography>
               </Box>
-              <Typography variant="h4" component="div" sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
+              <Typography variant="h4" component="div" sx={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
                 ${billingData?.upcomingBilling?.amount || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -173,16 +173,16 @@ const BillingDashboard = () => {
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%', bgcolor: '#f8f9fa' }}>
+          <Card sx={{ height: '100%', bgcolor: 'var(--color-bg-secondary)' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <CalendarIcon sx={{ color: '#FF9800', mr: 1 }} />
+                <CalendarIcon sx={{ color: 'var(--color-warning)', mr: 1 }} />
                 <Typography variant="h6" color="text.secondary">
                   Days Until Billing
                 </Typography>
               </Box>
               <Typography variant="h4" component="div" sx={{ 
-                color: getUpcomingBillingDays() <= 7 ? '#f44336' : '#FF9800', 
+                color: getUpcomingBillingDays() <= 7 ? 'var(--color-error)' : 'var(--color-warning)', 
                 fontWeight: 'bold' 
               }}>
                 {getUpcomingBillingDays() || 'N/A'}
@@ -195,15 +195,15 @@ const BillingDashboard = () => {
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Card sx={{ height: '100%', bgcolor: '#f8f9fa' }}>
+          <Card sx={{ height: '100%', bgcolor: 'var(--color-bg-secondary)' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <TrendingUpIcon sx={{ color: '#9C27B0', mr: 1 }} />
+                <TrendingUpIcon sx={{ color: 'var(--color-primary)', mr: 1 }} />
                 <Typography variant="h6" color="text.secondary">
                   Active Subscriptions
                 </Typography>
               </Box>
-              <Typography variant="h4" component="div" sx={{ color: '#9C27B0', fontWeight: 'bold' }}>
+              <Typography variant="h4" component="div" sx={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>
                 {billingData?.billingHistory?.filter(bill => bill.status === 'paid').length || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -345,7 +345,7 @@ const BillingDashboard = () => {
               <Button 
                 variant="outlined" 
                 href="/subscription-management"
-                sx={{ borderColor: '#78CADC', color: '#78CADC' }}
+                sx={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
               >
                 View All Billing History
               </Button>
@@ -368,7 +368,7 @@ const BillingDashboard = () => {
                 variant="outlined"
                 fullWidth
                 href="/subscription-management"
-                sx={{ borderColor: '#78CADC', color: '#78CADC' }}
+                sx={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
               >
                 Manage Subscription
               </Button>
@@ -378,7 +378,7 @@ const BillingDashboard = () => {
                 variant="outlined"
                 fullWidth
                 href="/subscriptions"
-                sx={{ borderColor: '#4CAF50', color: '#4CAF50' }}
+                sx={{ borderColor: 'var(--color-success)', color: 'var(--color-success)' }}
               >
                 View Plans
               </Button>
@@ -388,7 +388,7 @@ const BillingDashboard = () => {
                 variant="outlined"
                 fullWidth
                 href="/subscription-comparison"
-                sx={{ borderColor: '#FF9800', color: '#FF9800' }}
+                sx={{ borderColor: 'var(--color-warning)', color: 'var(--color-warning)' }}
               >
                 Compare Plans
               </Button>
