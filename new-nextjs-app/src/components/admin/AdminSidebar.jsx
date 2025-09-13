@@ -51,8 +51,8 @@ const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse 
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      bgcolor: theme.palette.background.paper,
-      borderRight: `1px solid ${theme.palette.divider}`
+      bgcolor: 'var(--color-bg-primary)',
+      borderRight: '1px solid var(--color-border-light)'
     }}>
       <Toolbar sx={{ 
         display: 'flex',
@@ -63,7 +63,7 @@ const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse 
       }}>
         {!collapsed && (
           <Typography variant="h6" noWrap component="div" sx={{ 
-            color: theme.palette.text.primary,
+            color: 'var(--color-text-primary)',
             fontWeight: 700
           }}>
             Admin Panel
@@ -85,12 +85,12 @@ const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse 
                 borderRadius: 2,
                 mx: 1,
                 '&.Mui-selected': {
-                  backgroundColor: theme.palette.primary.main,
+                  backgroundColor: 'var(--color-primary)',
                   '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-                    color: theme.palette.primary.contrastText,
+                    color: 'var(--color-white)',
                   },
                   '&:hover': {
-                    backgroundColor: theme.palette.primary.dark,
+                    backgroundColor: 'var(--color-primary-hover)',
                   }
                 }
               }
@@ -98,14 +98,14 @@ const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse 
           >
             <ListItemButton
               component={Link}
-              to={item.path}
+              href={item.path}
               selected={pathname === item.path}
               sx={{
                 py: 1.5,
                 px: collapsed ? 2.5 : 3,
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 '&:hover': {
-                  backgroundColor: theme.palette.action.hover,
+                  backgroundColor: 'var(--color-bg-secondary)',
                 }
               }}
             >
@@ -113,8 +113,8 @@ const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse 
                 minWidth: 'auto',
                 mr: collapsed ? 0 : 2,
                 color: pathname === item.path 
-                  ? theme.palette.primary.contrastText 
-                  : theme.palette.text.secondary
+                  ? 'var(--color-white)' 
+                  : 'var(--color-text-secondary)'
               }}>
                 {item.icon}
               </ListItemIcon>

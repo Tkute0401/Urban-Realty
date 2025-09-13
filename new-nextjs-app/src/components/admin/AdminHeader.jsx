@@ -2,12 +2,13 @@ import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Button
 import { Menu as MenuIcon, AccountCircle } from '@mui/icons-material';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const AdminHeader = ({ onMenuClick }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -20,7 +21,7 @@ const AdminHeader = ({ onMenuClick }) => {
   const handleLogout = () => {
     handleMenuClose();
     logout();
-    navigate('/login');
+    router.push('/login');
   };
 
   return (
@@ -28,10 +29,10 @@ const AdminHeader = ({ onMenuClick }) => {
       position="fixed" 
       sx={{ 
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: (theme) => theme.palette.background.paper,
-        color: (theme) => theme.palette.text.primary,
+        backgroundColor: 'var(--color-bg-primary)',
+        color: 'var(--color-text-primary)',
         boxShadow: 'none',
-        borderBottom: (theme) => `1px solid ${theme.palette.divider}`
+        borderBottom: '1px solid var(--color-border-light)'
       }}
     >
       <Toolbar>
@@ -52,7 +53,7 @@ const AdminHeader = ({ onMenuClick }) => {
           variant="text"
           color="inherit"
           component={Link}
-          to="/"
+          href="/"
           sx={{ mr: 2 }}
         >
           Home
@@ -76,7 +77,7 @@ const AdminHeader = ({ onMenuClick }) => {
           >
             <MenuItem onClick={() => {
               handleMenuClose();
-              navigate('/profile');
+              router.push('/profile');
             }}>
               Profile
             </MenuItem>

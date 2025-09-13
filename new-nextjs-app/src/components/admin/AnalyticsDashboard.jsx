@@ -33,28 +33,43 @@ import {
   Download,
   Refresh
 } from '@mui/icons-material';
-import { useApi } from '../../hooks/useApi';
+import { mockApi } from '../../lib/services/mockApi';
 
 const AnalyticsDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('24h');
-  const { get } = useApi();
-
   // Fetch analytics data
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
       const [dashboard, search, system] = await Promise.all([
-        get('/analytics/dashboard'),
-        get(`/analytics/search?timeframe=${timeframe}`),
-        get('/analytics/system')
+        mockApi.admin.getAnalytics(),
+        mockApi.admin.getAnalytics(),
+        mockApi.admin.getAnalytics()
       ]);
       
       setAnalytics({
-        dashboard: dashboard.data,
-        search: search.data,
-        system: system.data
+        dashboard: dashboard,
+        search: {
+          totalSearches: 1250,
+          uniqueUsers: 450,
+          averageResults: 12.5,
+          noResultsRate: 8.2,
+          trend: '+12%',
+          topQueries: [
+            { query: 'apartment downtown', count: 45 },
+            { query: 'house with pool', count: 32 },
+            { query: 'condo near metro', count: 28 },
+            { query: 'luxury villa', count: 25 },
+            { query: 'studio apartment', count: 22 }
+          ]
+        },
+        system: {
+          memory: { used: 2048, total: 4096 },
+          uptime: 86400,
+          users: { active: 25 }
+        }
       });
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
@@ -70,23 +85,21 @@ const AnalyticsDashboard = () => {
   // Export analytics data
   const handleExport = async () => {
     try {
-      const response = await fetch('/api/v1/analytics/export?format=csv', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      // Create mock CSV data
+      const csvData = `Date,Users,Properties,Searches,Errors
+2024-01-01,1200,450,1250,12
+2024-01-02,1250,460,1300,10
+2024-01-03,1300,470,1350,8`;
       
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'analytics.csv';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }
+      const blob = new Blob([csvData], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'analytics.csv';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
       console.error('Export failed:', error);
     }

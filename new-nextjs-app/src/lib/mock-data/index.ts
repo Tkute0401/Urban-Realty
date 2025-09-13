@@ -148,6 +148,82 @@ export const mockAPI = {
       return mockLocationServicesAPI.getDirections(origin, destination);
     },
   },
+  admin: {
+    getDashboard: (filters?: any) => {
+      return {
+        counts: {
+          users: 5,
+          agents: 2,
+          properties: 5,
+          contacts: 6,
+          subscriptions: 2,
+          revenue: 108
+        },
+        recent: {
+          users: [
+            { _id: '1', name: 'Admin User', email: 'admin@urbanrealty.com', role: 'admin', status: 'active', createdAt: '2024-01-01' },
+            { _id: '2', name: 'John Agent', email: 'john@urbanrealty.com', role: 'agent', status: 'active', createdAt: '2024-01-02' },
+            { _id: '3', name: 'Jane User', email: 'jane@example.com', role: 'user', status: 'active', createdAt: '2024-01-03' }
+          ],
+          properties: [
+            { _id: '1', title: 'Modern Apartment in Downtown', price: 500000, location: 'Downtown, New York', status: 'active', views: 45, agent: { name: 'John Agent' }, images: ['/properties/prop1-1.jpg'] },
+            { _id: '2', title: 'Luxury Villa with Pool', price: 1200000, location: 'Beverly Hills, CA', status: 'active', views: 32, agent: { name: 'Sarah Smith' }, images: ['/properties/prop2-1.jpg'] }
+          ],
+          contacts: [
+            { _id: '1', user: { name: 'Jane User', email: 'jane@example.com' }, property: { title: 'Modern Apartment' }, status: 'new', createdAt: '2024-01-15' },
+            { _id: '2', user: { name: 'Bob Smith', email: 'bob@example.com' }, property: { title: 'Luxury Villa' }, status: 'contacted', createdAt: '2024-01-14' }
+          ]
+        }
+      };
+    },
+    getAnalytics: () => {
+      return {
+        overview: {
+          totalUsers: 5,
+          totalProperties: 5,
+          totalSearches: 1250,
+          totalErrors: 12
+        },
+        trends: {
+          userGrowth: { trend: '+15%' },
+          errorTrend: { trend: '-5%' }
+        },
+        recent: {
+          errors: [
+            { message: 'Database connection timeout', timestamp: new Date().toISOString() },
+            { message: 'API rate limit exceeded', timestamp: new Date(Date.now() - 300000).toISOString() }
+          ]
+        }
+      };
+    },
+    getUsers: (filters?: any) => {
+      const { mockUsers } = require('./users');
+      return {
+        users: Object.values(mockUsers),
+        total: 5,
+        page: 1,
+        limit: 10
+      };
+    },
+    getProperties: (filters?: any) => {
+      const { mockProperties } = require('./properties');
+      return {
+        properties: mockProperties,
+        total: 5,
+        page: 1,
+        limit: 10
+      };
+    },
+    getContacts: (filters?: any) => {
+      const { mockContactRequests } = require('./contacts');
+      return {
+        contacts: mockContactRequests,
+        total: 6,
+        page: 1,
+        limit: 10
+      };
+    }
+  },
 };
 
 // Mock data statistics for dashboard

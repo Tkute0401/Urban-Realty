@@ -32,15 +32,15 @@ import {
     return (
       <Box
         sx={{
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: 'var(--color-bg-primary)',
           borderRadius: 2,
-          boxShadow: theme.shadows[1],
+          boxShadow: 'var(--shadow-sm)',
           p: 2,
           height: '100%'
         }}
       >
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-          <Email sx={{ mr: 1, color: theme.palette.primary.main }} />
+          <Email sx={{ mr: 1, color: 'var(--color-primary)' }} />
           Recent Contacts
         </Typography>
         
@@ -53,8 +53,8 @@ import {
                     alt={contact.user?.name} 
                     src={contact.user?.avatar}
                     sx={{
-                      bgcolor: theme.palette.primary.main,
-                      color: theme.palette.primary.contrastText
+                      bgcolor: 'var(--color-primary)',
+                      color: 'var(--color-white)'
                     }}
                   >
                     {contact.user?.name?.charAt(0)}
@@ -80,7 +80,7 @@ import {
                       <Schedule fontSize="small" sx={{ 
                         fontSize: '0.8rem', 
                         mr: 0.5,
-                        color: theme.palette.text.secondary 
+                        color: 'var(--color-text-secondary)' 
                       }} />
                       <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
                         {formatDistanceToNow(new Date(contact.createdAt), { addSuffix: true })}

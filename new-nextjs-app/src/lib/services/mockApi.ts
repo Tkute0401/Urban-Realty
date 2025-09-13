@@ -359,6 +359,67 @@ export class MockApiService {
     });
   }
 
+  // Admin-specific endpoints
+  async getAdminStats(filters?: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.admin.getDashboard(filters);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
+  async getAdminAnalytics() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.admin.getAnalytics();
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 400);
+    });
+  }
+
+  async getAdminUsers(filters?: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.admin.getUsers(filters);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
+  async getAdminProperties(filters?: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.admin.getProperties(filters);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
+  async getAdminContacts(filters?: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = mockAPI.admin.getContacts(filters);
+        resolve({
+          data: response,
+          status: 200,
+        });
+      }, 300);
+    });
+  }
+
   async getAgentDashboard(agentId: string) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -386,5 +447,57 @@ export class MockApiService {
 // Create singleton instance
 export const mockApiService = new MockApiService();
 
+// Create a structured API object for easier access
+export const mockApi = {
+  auth: {
+    login: (email: string, password: string) => mockApiService.login(email, password),
+    register: (userData: any) => mockApiService.register(userData),
+    getMe: (token: string) => mockApiService.getMe(token),
+  },
+  properties: {
+    list: (filters?: any) => mockApiService.getProperties(filters),
+    get: (id: string) => mockApiService.getProperty(id),
+    featured: () => mockApiService.getFeaturedProperties(),
+    create: (propertyData: any) => mockApiService.createProperty(propertyData),
+    update: (id: string, updates: any) => mockApiService.updateProperty(id, updates),
+    delete: (id: string) => mockApiService.deleteProperty(id),
+  },
+  developers: {
+    list: (filters?: any) => mockApiService.getDevelopers(filters),
+    get: (id: string) => mockApiService.getDeveloper(id),
+    create: (developerData: any) => mockApiService.createDeveloper(developerData),
+    update: (id: string, updates: any) => mockApiService.updateDeveloper(id, updates),
+    delete: (id: string) => mockApiService.deleteDeveloper(id),
+  },
+  subscriptions: {
+    getPlans: () => mockApiService.getSubscriptionPlans(),
+    getPlan: (id: string) => mockApiService.getSubscriptionPlan(id),
+    getUserSubscription: (userId: string) => mockApiService.getUserSubscription(userId),
+    subscribe: (userId: string, planId: string, paymentMethod: string) => mockApiService.subscribe(userId, planId, paymentMethod),
+    cancel: (userId: string) => mockApiService.cancelSubscription(userId),
+    update: (userId: string, planId: string) => mockApiService.updateSubscription(userId, planId),
+  },
+  contacts: {
+    list: (filters?: any) => mockApiService.getContacts(filters),
+    get: (id: string) => mockApiService.getContact(id),
+    create: (contactData: any) => mockApiService.createContact(contactData),
+    update: (id: string, updates: any) => mockApiService.updateContact(id, updates),
+    delete: (id: string) => mockApiService.deleteContact(id),
+    assign: (id: string, agentId: string) => mockApiService.assignContact(id, agentId),
+  },
+  admin: {
+    getDashboard: (filters?: any) => mockApiService.getAdminStats(filters),
+    getAnalytics: () => mockApiService.getAdminAnalytics(),
+    getUsers: (filters?: any) => mockApiService.getAdminUsers(filters),
+    getProperties: (filters?: any) => mockApiService.getAdminProperties(filters),
+    getContacts: (filters?: any) => mockApiService.getAdminContacts(filters),
+  },
+  dashboard: {
+    getStats: () => mockApiService.getDashboardStats(),
+    getAdmin: () => mockApiService.getAdminDashboard(),
+    getAgent: (agentId: string) => mockApiService.getAgentDashboard(agentId),
+  },
+};
+
 // Export for use in components
-export default mockApiService;
+export default mockApi;

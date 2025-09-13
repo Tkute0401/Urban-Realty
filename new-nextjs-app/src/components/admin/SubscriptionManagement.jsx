@@ -43,7 +43,7 @@ import {
   Warning as WarningIcon,
   TrendingUp as TrendingUpIcon
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 
 const SubscriptionManagement = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -82,17 +82,12 @@ const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const [plansRes, subscriptionsRes] = await Promise.all([
-        axios.get('/admin/subscription-plans'),
-        axios.get('/admin/subscriptions')
+        mockApi.subscriptions.getPlans(),
+        mockApi.subscriptions.getUserSubscription('user1') // Mock user ID
       ]);
       
-      if (plansRes.data.success) {
-        setPlans(plansRes.data.data);
-      }
-      
-      if (subscriptionsRes.data.success) {
-        setSubscriptions(subscriptionsRes.data.data);
-      }
+      setPlans(plansRes.data || []);
+      setSubscriptions(subscriptionsRes.data ? [subscriptionsRes.data] : []);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to load data');
@@ -103,11 +98,8 @@ const SubscriptionManagement = () => {
 
   const handlePlanSubmit = async () => {
     try {
-      if (editingPlan) {
-        await axios.put(`/admin/subscription-plans/${editingPlan._id}`, planForm);
-      } else {
-        await axios.post('/admin/subscription-plans', planForm);
-      }
+      // Mock API call - in real implementation, this would call the actual API
+      console.log('Saving plan:', planForm);
       
       setPlanDialog(false);
       setEditingPlan(null);
@@ -121,7 +113,8 @@ const SubscriptionManagement = () => {
   const handleDeletePlan = async (planId) => {
     if (window.confirm('Are you sure you want to delete this plan?')) {
       try {
-        await axios.delete(`/admin/subscription-plans/${planId}`);
+        // Mock API call - in real implementation, this would call the actual API
+        console.log('Deleting plan:', planId);
         fetchData();
       } catch (err) {
         setError('Failed to delete plan');
@@ -131,7 +124,8 @@ const SubscriptionManagement = () => {
 
   const handleUpdateSubscriptionStatus = async (subscriptionId, status) => {
     try {
-      await axios.put(`/admin/subscriptions/${subscriptionId}/status`, { status });
+      // Mock API call - in real implementation, this would call the actual API
+      console.log('Updating subscription status:', subscriptionId, status);
       fetchData();
     } catch (err) {
       setError('Failed to update subscription status');
@@ -202,14 +196,17 @@ const SubscriptionManagement = () => {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ color: '#78CADC' }}>
+        <Typography variant="h4" component="h1" sx={{ color: 'var(--color-primary)' }}>
           Subscription Management
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setPlanDialog(true)}
-          sx={{ bgcolor: '#78CADC' }}
+          sx={{ 
+            backgroundColor: 'var(--color-primary)',
+            '&:hover': { backgroundColor: 'var(--color-primary-hover)' }
+          }}
         >
           Add New Plan
         </Button>
