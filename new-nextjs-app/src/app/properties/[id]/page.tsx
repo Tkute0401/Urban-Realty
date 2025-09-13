@@ -36,7 +36,9 @@ const PropertyDetails = () => {
     const fetchProperty = async () => {
       try {
         setLoadingProperty(true);
-        const response = await mockApiService.getProperty(id);
+        // Ensure id is a string (handle case where it might be an array)
+        const propertyId = Array.isArray(id) ? id[0] : id;
+        const response = await mockApiService.getProperty(propertyId) as { data: any; status: number };
         setProperty(response.data);
       } catch (err) {
         console.error('Error fetching property:', err);
@@ -58,12 +60,14 @@ const PropertyDetails = () => {
     }
 
     try {
+      // Ensure id is a string (handle case where it might be an array)
+      const propertyId = Array.isArray(id) ? id[0] : id;
       if (isFavorite) {
         // Mock API doesn't have favorites endpoint yet, just toggle state
-        console.log('Remove from favorites:', id);
+        console.log('Remove from favorites:', propertyId);
       } else {
         // Mock API doesn't have favorites endpoint yet, just toggle state
-        console.log('Add to favorites:', id);
+        console.log('Add to favorites:', propertyId);
       }
       setIsFavorite(!isFavorite);
     } catch (err) {

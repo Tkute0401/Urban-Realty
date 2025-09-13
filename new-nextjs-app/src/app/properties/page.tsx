@@ -100,7 +100,7 @@ const Properties = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await mockApiService.getProperties();
+        const response = await mockApiService.getProperties() as { data: any; status: number };
         setProperties(response.data.properties || []);
         setLoading(false);
         setIsLoaded(true);

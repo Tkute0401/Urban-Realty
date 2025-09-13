@@ -4,7 +4,7 @@ import { mockAPI } from '@/lib/mock-data';
 // API Service class that uses mock data
 export class MockApiService {
   // Authentication endpoints
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<{ data: any; status: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const response = mockAPI.auth.login(email, password);

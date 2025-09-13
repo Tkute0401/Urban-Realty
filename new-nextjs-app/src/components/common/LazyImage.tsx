@@ -53,7 +53,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
   }, []);
 
   // Optimize image source
-  const optimizedSrc = optimizeImage(src, alt, width, height, quality);
+  const optimizedSrc = optimizeImage(src, width, height, quality);
 
   const handleLoad = () => {
     setIsLoaded(true);
