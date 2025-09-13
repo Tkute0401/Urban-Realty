@@ -37,17 +37,17 @@ const ProfileCard = styled(Paper)(({ theme }) => ({
   maxWidth: 800,
   margin: 'auto',
   padding: theme.spacing(4),
-  backgroundColor: '#0B1011',
-  color: '#fff',
+  backgroundColor: 'var(--color-bg-dark)',
+  color: 'var(--color-text-inverse)',
   borderRadius: '12px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-  border: `2px solid #78CADC`,
+  border: `2px solid var(--color-primary)`,
   fontFamily: '"Poppins", sans-serif',
 }));
 
 const ProfileButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#78CADC',
-  color: '#0B1011',
+  backgroundColor: 'var(--color-primary)',
+  color: 'var(--color-bg-dark)',
   fontWeight: 600,
   padding: theme.spacing(1.5, 3),
   borderRadius: '8px',
@@ -55,7 +55,7 @@ const ProfileButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
   fontSize: '1rem',
   '&:hover': {
-    backgroundColor: '#5fb4c9',
+    backgroundColor: 'var(--color-primary-hover)',
     transform: 'translateY(-2px)',
     boxShadow: '0 4px 8px rgba(120, 202, 220, 0.3)',
   },
@@ -104,7 +104,7 @@ const Profile = () => {
       minHeight: '100vh',
       py: 8,
       px: 2,
-      background: 'linear-gradient(to bottom, #0B1011 0%, #1a2a32 100%)',
+      background: 'linear-gradient(to bottom, var(--color-bg-dark) 0%, var(--color-bg-secondary) 100%)',
       fontFamily: '"Poppins", sans-serif'
     }}>
       <ProfileCard elevation={3}>
@@ -121,14 +121,14 @@ const Profile = () => {
               label="Profile" 
               icon={<Person />} 
               iconPosition="start"
-              sx={{ color: '#78CADC' }}
+              sx={{ color: 'var(--color-primary)' }}
             />
             <Tab 
               value="favorites" 
               label="Favorites" 
               icon={<Favorite />} 
               iconPosition="start"
-              sx={{ color: '#78CADC' }}
+              sx={{ color: 'var(--color-primary)' }}
             />
           </Tabs>
         </Box>
@@ -146,7 +146,7 @@ const Profile = () => {
                 sx={{ 
                   width: 120, 
                   height: 120, 
-                  border: '3px solid #78CADC',
+                  border: '3px solid var(--color-primary)',
                   boxShadow: '0 4px 20px rgba(120, 202, 220, 0.4)',
                 }}
                 src={user?.avatar}
@@ -161,8 +161,8 @@ const Profile = () => {
                   <Chip 
                     label={user?.role} 
                     sx={{ 
-                      backgroundColor: '#78CADC', 
-                      color: '#0B1011',
+                      backgroundColor: 'var(--color-primary)', 
+                      color: 'var(--color-bg-dark)',
                       fontWeight: 600,
                     }} 
                   />
@@ -194,8 +194,8 @@ const Profile = () => {
                 startIcon={<ExitToApp />}
                 onClick={handleLogout}
                 sx={{
-                  backgroundColor: '#e74c3c',
-                  '&:hover': { backgroundColor: '#c0392b' }
+                  backgroundColor: 'var(--color-error)',
+                  '&:hover': { backgroundColor: 'var(--color-error-hover)' }
                 }}
               >
                 Logout
@@ -205,7 +205,7 @@ const Profile = () => {
                 variant="contained"
                 startIcon={<Edit />}
                 onClick={handleEditProfile}
-                sx={{ backgroundColor: '#78CADC', color: '#0B1011' }}
+                sx={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-dark)' }}
               >
                 Edit Profile
               </Button>
@@ -219,7 +219,7 @@ const Profile = () => {
                   <path d="M9 14l3 3 3-3"></path>
                 </svg>}
                 onClick={handleManageSubscription}
-                sx={{ backgroundColor: '#FFD700', color: '#000' }}
+                sx={{ backgroundColor: 'var(--color-warning)', color: 'var(--color-bg-dark)' }}
               >
                 Manage Subscription
               </Button>
@@ -229,7 +229,7 @@ const Profile = () => {
                   variant="contained"
                   startIcon={<AdminPanelSettings />}
                   onClick={handleAdminDashboard}
-                  sx={{ backgroundColor: '#78CADC', color: '#0B1011' }}
+                  sx={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-dark)' }}
                 >
                   Admin Dashboard
                 </Button>
@@ -238,7 +238,7 @@ const Profile = () => {
           </>
         ) : (
           <Box>
-            <Typography variant="h5" sx={{ mb: 3, color: '#78CADC' }}>
+            <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-primary)' }}>
               Your Favorite Properties
             </Typography>
             
@@ -246,9 +246,9 @@ const Profile = () => {
               {favoriteProperties.map((property) => (
                 <Grid item xs={12} sm={6} key={property.id}>
                   <Card sx={{ 
-                    backgroundColor: '#0B1011',
-                    border: '1px solid #78CADC',
-                    color: 'white'
+                    backgroundColor: 'var(--color-bg-dark)',
+                    border: '1px solid var(--color-primary)',
+                    color: 'var(--color-text-inverse)'
                   }}>
                     <CardMedia
                       component="img"
@@ -260,7 +260,7 @@ const Profile = () => {
                       <Typography gutterBottom variant="h6" component="div">
                         {property.title}
                       </Typography>
-                      <Typography variant="body2" color="#78CADC" sx={{ mb: 1 }}>
+                      <Typography variant="body2" color="var(--color-primary)" sx={{ mb: 1 }}>
                         {property.price}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -273,7 +273,7 @@ const Profile = () => {
                     <CardActions>
                       <Button 
                         size="small" 
-                        sx={{ color: '#78CADC' }}
+                        sx={{ color: 'var(--color-primary)' }}
                         onClick={() => handleViewProperty(property.id)}
                       >
                         View Details
@@ -287,7 +287,7 @@ const Profile = () => {
         )}
         {user?.role === 'agent' && (
           <Box sx={{ mt: 4 }}>
-            <Typography variant="h5" sx={{ mb: 3, color: '#78CADC' }}>
+            <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-primary)' }}>
               Your Properties
             </Typography>
             

@@ -9,7 +9,7 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import axios from '@/lib/services/axios';
+import { mockApiService } from '@/lib/services/mockApi';
 import { toast } from 'react-toastify';
 
 const PropertyCard = ({ property, index }) => {
@@ -82,7 +82,7 @@ const PropertyCard = ({ property, index }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      className="bg-[#08171A] rounded-xl sm:rounded-3xl overflow-hidden border border-[#78CADC] cursor-pointer hover:shadow-lg hover:shadow-[#78CADC]/20 transition-shadow"
+      className="bg-[var(--color-bg-dark)] rounded-xl sm:rounded-3xl overflow-hidden border border-[var(--color-primary)] cursor-pointer hover:shadow-lg hover:shadow-[var(--color-primary)]/20 transition-shadow"
       onClick={handleClick}
     >
       <div className="relative aspect-video">
@@ -99,7 +99,7 @@ const PropertyCard = ({ property, index }) => {
           </div>
         )}
         <button 
-          className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1 sm:p-2 bg-[#0c0d0e]/80 rounded-full hover:bg-[#0c0d0e] transition-colors"
+          className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1 sm:p-2 bg-[var(--color-bg-dark)]/80 rounded-full hover:bg-[var(--color-bg-dark)] transition-colors"
           onClick={handleFavoriteClick}
           disabled={loadingFavorite}
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
@@ -164,7 +164,7 @@ const PropertyCard = ({ property, index }) => {
             {property.status === 'For Rent' && '/mo'}
           </p>
           <button 
-            className="w-full bg-transparent border border-[#78cadc] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#78cadc]/20 transition-all text-xs sm:text-sm"
+            className="w-full bg-transparent border border-[var(--color-primary)] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[var(--color-primary)]/20 transition-all text-xs sm:text-sm"
             onClick={(e) => {
               e.stopPropagation();
               handleClick();
