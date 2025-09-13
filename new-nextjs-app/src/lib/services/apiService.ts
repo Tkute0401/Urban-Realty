@@ -581,5 +581,6 @@ export const apiService = new ApiService();
 // Export for use in components
 export default apiService;
 
-// Export types
-export type { ApiResponse, ApiError };
+// Export types and classes
+export type { ApiResponse };
+export { ApiError };
