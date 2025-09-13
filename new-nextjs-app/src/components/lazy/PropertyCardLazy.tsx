@@ -7,14 +7,25 @@ const PropertyCard = React.lazy(() => import('../property/PropertyCard'));
 
 interface PropertyCardLazyProps {
   property: any;
+  index?: any;
+  isSelected?: any;
+  onClick?: any;
+  id?: any;
   className?: string;
 }
 
-const PropertyCardLazy: React.FC<PropertyCardLazyProps> = ({ property, className }) => {
+const PropertyCardLazy: React.FC<PropertyCardLazyProps> = ({ 
+  property, 
+  index, 
+  isSelected, 
+  onClick, 
+  id, 
+  className 
+}) => {
   return (
     <Suspense
       fallback={
-        <div className={`bg-white rounded-lg shadow-md overflow-hidden ${className}`}>
+        <div className={`bg-white rounded-lg shadow-md overflow-hidden ${className || ''}`}>
           <div className="h-48 bg-gray-200 animate-pulse" />
           <div className="p-4">
             <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
@@ -24,7 +35,13 @@ const PropertyCardLazy: React.FC<PropertyCardLazyProps> = ({ property, className
         </div>
       }
     >
-      <PropertyCard property={property} className={className} />
+      <PropertyCard 
+        property={property} 
+        index={index}
+        isSelected={isSelected}
+        onClick={onClick}
+        id={id}
+      />
     </Suspense>
   );
 };

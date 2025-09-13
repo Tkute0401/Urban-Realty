@@ -58,7 +58,7 @@ const SubscriptionPlans = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await mockApiService.getSubscriptionPlans();
+      const response = await mockApiService.getSubscriptionPlans() as { data: any; status: number };
       setPlans(response.data.plans || []);
     } catch (err) {
       setError('Failed to load subscription plans');
@@ -77,7 +77,7 @@ const SubscriptionPlans = () => {
     if (!selectedPlan || !user) return;
 
     try {
-      const response = await mockApiService.subscribe(user.id, selectedPlan.id, paymentData.paymentMethod);
+      const response = await mockApiService.subscribe(user.id, selectedPlan.id, paymentData.paymentMethod) as { data: any; status: number };
       if (response.data.success) {
         setSubscribeDialog(false);
         setSelectedPlan(null);

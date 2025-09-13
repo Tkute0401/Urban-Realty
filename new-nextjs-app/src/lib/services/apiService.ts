@@ -148,7 +148,7 @@ export class ApiService {
   // Authentication endpoints
   async login(email: string, password: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.auth.login(email, password);
+      return await mockApi.auth.login(email, password) as ApiResponse;
     }
 
     try {
@@ -168,7 +168,7 @@ export class ApiService {
 
   async register(userData: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.auth.register(userData);
+      return await mockApi.auth.register(userData) as ApiResponse;
     }
 
     try {
@@ -189,7 +189,7 @@ export class ApiService {
   async getMe(): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
       const token = localStorage.getItem('token') || 'mock-token';
-      return mockApi.auth.getMe(token);
+      return await mockApi.auth.getMe(token) as ApiResponse;
     }
 
     try {
@@ -202,7 +202,7 @@ export class ApiService {
 
   async updateUser(userData: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.auth.updateUser(userData);
+      return await mockApi.auth.updateUser(userData) as ApiResponse;
     }
 
     try {
@@ -221,7 +221,7 @@ export class ApiService {
   // Property endpoints
   async getProperties(filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.properties.list(filters);
+      return await mockApi.properties.list(filters) as ApiResponse;
     }
 
     try {
@@ -234,7 +234,7 @@ export class ApiService {
 
   async getProperty(id: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.properties.get(id);
+      return await mockApi.properties.get(id) as ApiResponse;
     }
 
     try {
@@ -247,7 +247,7 @@ export class ApiService {
 
   async getFeaturedProperties(): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.properties.featured();
+      return await mockApi.properties.featured() as ApiResponse;
     }
 
     try {
@@ -260,7 +260,7 @@ export class ApiService {
 
   async createProperty(propertyData: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.properties.create(propertyData);
+      return await mockApi.properties.create(propertyData) as ApiResponse;
     }
 
     try {
@@ -292,7 +292,7 @@ export class ApiService {
 
   async updateProperty(id: string, updates: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.properties.update(id, updates);
+      return await mockApi.properties.update(id, updates) as ApiResponse;
     }
 
     try {
@@ -324,7 +324,7 @@ export class ApiService {
 
   async deleteProperty(id: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.properties.delete(id);
+      return await mockApi.properties.delete(id) as ApiResponse;
     }
 
     try {
@@ -338,7 +338,7 @@ export class ApiService {
   // Contact endpoints
   async getContacts(filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.contacts.list(filters);
+      return await mockApi.contacts.list(filters) as ApiResponse;
     }
 
     try {
@@ -351,7 +351,7 @@ export class ApiService {
 
   async getContact(id: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.contacts.get(id);
+      return await mockApi.contacts.get(id) as ApiResponse;
     }
 
     try {
@@ -364,7 +364,7 @@ export class ApiService {
 
   async createContact(contactData: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.contacts.create(contactData);
+      return await mockApi.contacts.create(contactData) as ApiResponse;
     }
 
     try {
@@ -377,7 +377,7 @@ export class ApiService {
 
   async updateContact(id: string, updates: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.contacts.update(id, updates);
+      return await mockApi.contacts.update(id, updates) as ApiResponse;
     }
 
     try {
@@ -390,7 +390,7 @@ export class ApiService {
 
   async deleteContact(id: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.contacts.delete(id);
+      return await mockApi.contacts.delete(id) as ApiResponse;
     }
 
     try {
@@ -404,7 +404,7 @@ export class ApiService {
   // Subscription endpoints
   async getSubscriptionPlans(): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.subscriptions.getPlans();
+      return await mockApi.subscriptions.getPlans() as ApiResponse;
     }
 
     try {
@@ -417,7 +417,7 @@ export class ApiService {
 
   async getUserSubscription(userId: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.subscriptions.getUserSubscription(userId);
+      return await mockApi.subscriptions.getUserSubscription(userId) as ApiResponse;
     }
 
     try {
@@ -430,7 +430,7 @@ export class ApiService {
 
   async subscribe(userId: string, planId: string, paymentMethod: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.subscriptions.subscribe(userId, planId, paymentMethod);
+      return await mockApi.subscriptions.subscribe(userId, planId, paymentMethod) as ApiResponse;
     }
 
     try {
@@ -447,7 +447,7 @@ export class ApiService {
 
   async cancelSubscription(userId: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.subscriptions.cancel(userId);
+      return await mockApi.subscriptions.cancel(userId) as ApiResponse;
     }
 
     try {
@@ -461,7 +461,7 @@ export class ApiService {
   // Admin endpoints
   async getAdminDashboard(): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.admin.getDashboard();
+      return await mockApi.admin.getDashboard() as ApiResponse;
     }
 
     try {
@@ -474,7 +474,7 @@ export class ApiService {
 
   async getAdminUsers(filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.admin.getUsers(filters);
+      return await mockApi.admin.getUsers(filters) as ApiResponse;
     }
 
     try {
@@ -487,7 +487,7 @@ export class ApiService {
 
   async getAdminProperties(filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.admin.getProperties(filters);
+      return await mockApi.admin.getProperties(filters) as ApiResponse;
     }
 
     try {
@@ -500,7 +500,7 @@ export class ApiService {
 
   async getAdminContacts(filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.admin.getContacts(filters);
+      return await mockApi.admin.getContacts(filters) as ApiResponse;
     }
 
     try {
@@ -514,7 +514,7 @@ export class ApiService {
   // Agent endpoints
   async getAgentDashboard(agentId: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.agent.getDashboard(agentId);
+      return await mockApi.agent.getDashboard(agentId) as ApiResponse;
     }
 
     try {
@@ -527,7 +527,7 @@ export class ApiService {
 
   async getAgentProperties(agentId: string, filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.agent.getProperties(agentId, filters);
+      return await mockApi.agent.getProperties(agentId, filters) as ApiResponse;
     }
 
     try {
@@ -540,7 +540,7 @@ export class ApiService {
 
   async getAgentLeads(agentId: string, filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.agent.getLeads(agentId, filters);
+      return await mockApi.agent.getLeads(agentId, filters) as ApiResponse;
     }
 
     try {
@@ -553,7 +553,7 @@ export class ApiService {
 
   async getAgentAnalytics(agentId: string): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {
-      return mockApi.agent.getAnalytics(agentId);
+      return await mockApi.agent.getAnalytics(agentId) as ApiResponse;
     }
 
     try {

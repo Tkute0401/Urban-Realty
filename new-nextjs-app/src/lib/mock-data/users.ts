@@ -33,16 +33,16 @@ export interface Admin extends User {
   lastLogin: string;
 }
 
-export const mockUsers: Record<string, User> = {
+export const mockUsers: Record<string, User | Agent | Admin> = {
   admin: {
     id: '1',
     name: 'Admin User',
     email: 'admin@urbanrealty.com',
-    role: 'admin',
+    role: 'admin' as const,
     avatar: '/avatars/admin.jpg',
     phone: '+1-555-0101',
     preferences: {
-      theme: 'light',
+      theme: 'light' as const,
       notifications: true,
       language: 'en',
     },
@@ -54,11 +54,11 @@ export const mockUsers: Record<string, User> = {
     id: '2',
     name: 'John Agent',
     email: 'john@urbanrealty.com',
-    role: 'agent',
+    role: 'agent' as const,
     avatar: '/avatars/agent1.jpg',
     phone: '+1-555-0102',
     preferences: {
-      theme: 'light',
+      theme: 'light' as const,
       notifications: true,
       language: 'en',
     },
@@ -77,11 +77,11 @@ export const mockUsers: Record<string, User> = {
     id: '3',
     name: 'Sarah Smith',
     email: 'sarah@urbanrealty.com',
-    role: 'agent',
+    role: 'agent' as const,
     avatar: '/avatars/agent2.jpg',
     phone: '+1-555-0103',
     preferences: {
-      theme: 'dark',
+      theme: 'dark' as const,
       notifications: true,
       language: 'en',
     },
@@ -100,11 +100,11 @@ export const mockUsers: Record<string, User> = {
     id: '4',
     name: 'Jane User',
     email: 'jane@example.com',
-    role: 'user',
+    role: 'user' as const,
     avatar: '/avatars/user1.jpg',
     phone: '+1-555-0104',
     preferences: {
-      theme: 'light',
+      theme: 'light' as const,
       notifications: false,
       language: 'en',
     },

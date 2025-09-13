@@ -86,7 +86,7 @@ const SubscriptionManagement = () => {
       const [subscriptionResponse, plansResponse] = await Promise.all([
         mockApiService.getUserSubscription(user.id),
         mockApiService.getSubscriptionPlans()
-      ]);
+      ]) as [{ data: any; status: number }, { data: any; status: number }];
 
       if (subscriptionResponse.data.success) {
         setSubscription(subscriptionResponse.data.subscription);
@@ -111,7 +111,7 @@ const SubscriptionManagement = () => {
     if (!user || !subscription) return;
 
     try {
-      const response = await mockApiService.cancelSubscription(user.id);
+      const response = await mockApiService.cancelSubscription(user.id) as { data: any; status: number };
       if (response.data.success) {
         setSubscription({
           ...subscription,
@@ -132,7 +132,7 @@ const SubscriptionManagement = () => {
     if (!user || !subscription) return;
 
     try {
-      const response = await mockApiService.updateSubscription(user.id, newPlanId);
+      const response = await mockApiService.updateSubscription(user.id, newPlanId) as { data: any; status: number };
       if (response.data.success) {
         setSubscription(response.data.subscription);
         
