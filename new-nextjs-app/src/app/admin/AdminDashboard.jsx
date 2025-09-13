@@ -79,7 +79,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
-import axios from '@/lib/services/axios';
+import { mockApi } from '@/lib/services/mockApi';
 import { motion } from 'framer-motion';
 import { formatDate } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
@@ -146,23 +146,17 @@ const AdminDashboard = () => {
     queryKey: ['adminDashboard', filters],
     queryFn: async () => {
       try {
-        const response = await axios.get('/admin/stats', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-          params: filters
-        });
-        return response.data;
+        const response = await mockApi.admin.getDashboard(filters);
+        return response;
       } catch (error) {
         console.error('Error fetching admin dashboard data:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch dashboard data');
+        throw new Error(error.message || 'Failed to fetch dashboard data');
       }
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchInterval: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
       if (failureCount >= 3) return false;
-      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
       return true;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -176,17 +170,16 @@ const AdminDashboard = () => {
     queryKey: ['adminAnalytics'],
     queryFn: async () => {
       try {
-        const response = await axios.get('/admin/analytics');
-        return response.data;
+        const response = await mockApi.admin.getAnalytics();
+        return response;
       } catch (error) {
         console.error('Error fetching admin analytics:', error);
-        throw new Error(error.response?.data?.message || 'Failed to fetch analytics');
+        throw new Error(error.message || 'Failed to fetch analytics');
       }
     },
     staleTime: 5 * 60 * 1000,
     retry: (failureCount, error) => {
       if (failureCount >= 2) return false;
-      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
       return true;
     },
   });
@@ -216,9 +209,9 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    if (dashboardData?.success) {
+    if (dashboardData) {
       setStats({
-        counts: dashboardData.data.counts || {
+        counts: dashboardData.counts || {
           users: 0,
           agents: 0,
           properties: 0,
@@ -226,7 +219,7 @@ const AdminDashboard = () => {
           subscriptions: 0,
           revenue: 0
         },
-        recent: dashboardData.data.recent || {
+        recent: dashboardData.recent || {
           users: [],
           properties: [],
           contacts: []
@@ -284,11 +277,11 @@ const AdminDashboard = () => {
       <Card 
         sx={{ 
           height: '100%',
-          background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-          border: `1px solid ${color}20`,
+          background: 'var(--color-bg-secondary)',
+          border: '1px solid var(--color-border-light)',
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: `0 8px 25px ${color}20`,
+            boxShadow: 'var(--shadow-lg)',
             transition: 'all 0.3s ease'
           }
         }}
@@ -299,7 +292,7 @@ const AdminDashboard = () => {
               <Typography color="text.secondary" gutterBottom variant="body2" fontWeight={500}>
                 {title}
               </Typography>
-              <Typography variant="h3" fontWeight="bold" color={color}>
+              <Typography variant="h3" fontWeight="bold" sx={{ color: 'var(--color-primary)' }}>
                 {value}
               </Typography>
               {subtitle && (
@@ -316,7 +309,7 @@ const AdminDashboard = () => {
                 </Box>
               )}
             </Box>
-            <Avatar sx={{ bgcolor: color, width: 56, height: 56 }}>
+            <Avatar sx={{ bgcolor: 'var(--color-primary)', width: 56, height: 56 }}>
               {icon}
             </Avatar>
           </Box>
@@ -332,12 +325,12 @@ const AdminDashboard = () => {
           <Typography variant="h6" fontWeight="bold">
             {title}
           </Typography>
-          <Avatar sx={{ bgcolor: color, width: 40, height: 40 }}>
+          <Avatar sx={{ bgcolor: 'var(--color-primary)', width: 40, height: 40 }}>
             {icon}
           </Avatar>
         </Box>
         <Box display="flex" alignItems="center" gap={2} mb={1}>
-          <Typography variant="h4" fontWeight="bold" color={color}>
+          <Typography variant="h4" fontWeight="bold" sx={{ color: 'var(--color-primary)' }}>
             {value}%
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -350,9 +343,9 @@ const AdminDashboard = () => {
           sx={{ 
             height: 8, 
             borderRadius: 4,
-            bgcolor: `${color}20`,
+            bgcolor: 'var(--color-bg-tertiary)',
             '& .MuiLinearProgress-bar': {
-              bgcolor: color
+              bgcolor: 'var(--color-primary)'
             }
           }}
         />
@@ -420,10 +413,7 @@ const AdminDashboard = () => {
         <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} mb={4} gap={2}>
           <Box>
             <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
-              background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              color: 'var(--color-primary)'
             }}>
               Admin Dashboard 🚀
             </Typography>
@@ -436,8 +426,11 @@ const AdminDashboard = () => {
               variant="contained"
               startIcon={<DownloadIcon />}
               sx={{ 
-                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
-                '&:hover': { transform: 'translateY(-2px)' }
+                backgroundColor: 'var(--color-primary)',
+                '&:hover': { 
+                  backgroundColor: 'var(--color-primary-hover)',
+                  transform: 'translateY(-2px)' 
+                }
               }}
             >
               Export Report
@@ -469,7 +462,7 @@ const AdminDashboard = () => {
             title="Total Users"
             value={stats.counts.users.toLocaleString()}
             icon={<PeopleIcon />}
-            color="#667eea"
+            color="var(--color-primary)"
             subtitle="Registered users"
             trend="this month"
             trendValue="+15%"
@@ -480,7 +473,7 @@ const AdminDashboard = () => {
             title="Agents"
             value={stats.counts.agents}
             icon={<BusinessIcon />}
-            color="#f093fb"
+            color="var(--color-primary)"
             subtitle="Active agents"
             trend="this month"
             trendValue="+8%"
@@ -491,7 +484,7 @@ const AdminDashboard = () => {
             title="Properties"
             value={stats.counts.properties.toLocaleString()}
             icon={<HomeIcon />}
-            color="#4facfe"
+            color="var(--color-primary)"
             subtitle="Listed properties"
             trend="this month"
             trendValue="+22%"
@@ -502,7 +495,7 @@ const AdminDashboard = () => {
             title="Contacts"
             value={stats.counts.contacts.toLocaleString()}
             icon={<EmailIcon />}
-            color="#43e97b"
+            color="var(--color-primary)"
             subtitle="Total inquiries"
             trend="this month"
             trendValue="+18%"
@@ -513,7 +506,7 @@ const AdminDashboard = () => {
             title="Subscriptions"
             value={stats.counts.subscriptions}
             icon={<TrendingUpIcon />}
-            color="#fa709a"
+            color="var(--color-primary)"
             subtitle="Active plans"
             trend="this month"
             trendValue="+12%"
@@ -524,7 +517,7 @@ const AdminDashboard = () => {
             title="Revenue"
             value={`$${stats.counts.revenue.toLocaleString()}`}
             icon={<MoneyIcon />}
-            color="#a8edea"
+            color="var(--color-primary)"
             subtitle="Monthly revenue"
             trend="this month"
             trendValue="+25%"
@@ -538,7 +531,7 @@ const AdminDashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <Card sx={{ mb: 4, background: 'linear-gradient(135deg, #667eea15 0%, #764ba215 100%)' }}>
+        <Card sx={{ mb: 4, background: 'var(--color-bg-secondary)' }}>
           <CardContent>
             <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
               Quick Actions
@@ -596,7 +589,7 @@ const AdminDashboard = () => {
                     title="CPU Usage"
                     value={stats.analytics.systemHealth.cpu}
                     icon={<SpeedIcon />}
-                    color="#667eea"
+                    color="var(--color-primary)"
                     subtitle="Current load"
                   />
                 </Grid>
@@ -605,7 +598,7 @@ const AdminDashboard = () => {
                     title="Memory"
                     value={stats.analytics.systemHealth.memory}
                     icon={<StorageIcon />}
-                    color="#f093fb"
+                    color="var(--color-primary)"
                     subtitle="RAM usage"
                   />
                 </Grid>
@@ -614,7 +607,7 @@ const AdminDashboard = () => {
                     title="Storage"
                     value={stats.analytics.systemHealth.storage}
                     icon={<StorageIcon />}
-                    color="#4facfe"
+                    color="var(--color-primary)"
                     subtitle="Disk usage"
                   />
                 </Grid>
@@ -623,7 +616,7 @@ const AdminDashboard = () => {
                     title="Network"
                     value={stats.analytics.systemHealth.network}
                     icon={<NetworkIcon />}
-                    color="#43e97b"
+                    color="var(--color-primary)"
                     subtitle="Uptime"
                   />
                 </Grid>

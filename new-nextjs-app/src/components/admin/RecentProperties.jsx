@@ -20,15 +20,15 @@ import {
     return (
       <Box
         sx={{
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: 'var(--color-bg-primary)',
           borderRadius: 2,
-          boxShadow: theme.shadows[1],
+          boxShadow: 'var(--shadow-sm)',
           p: 2,
           height: '100%'
         }}
       >
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-          <Home sx={{ mr: 1, color: theme.palette.primary.main }} />
+          <Home sx={{ mr: 1, color: 'var(--color-primary)' }} />
           Recent Properties
         </Typography>
         
@@ -41,8 +41,8 @@ import {
                     variant="rounded"
                     src={property.images?.[0]?.url}
                     sx={{
-                      bgcolor: theme.palette.grey[200],
-                      color: theme.palette.text.secondary
+                      bgcolor: 'var(--color-bg-tertiary)',
+                      color: 'var(--color-text-secondary)'
                     }}
                   >
                     <Home />
@@ -57,7 +57,7 @@ import {
                       </Typography>
                       {property.featured && (
                         <Star fontSize="small" sx={{ 
-                          color: theme.palette.warning.main,
+                          color: 'var(--color-warning)',
                           fontSize: '1rem'
                         }} />
                       )}
@@ -68,7 +68,7 @@ import {
                       <CalendarToday fontSize="small" sx={{ 
                         fontSize: '0.8rem', 
                         mr: 0.5,
-                        color: theme.palette.text.secondary 
+                        color: 'var(--color-text-secondary)' 
                       }} />
                       <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
                         {formatDistanceToNow(new Date(property.createdAt), { addSuffix: true })}
@@ -76,7 +76,7 @@ import {
                       <AttachMoney fontSize="small" sx={{ 
                         fontSize: '0.8rem', 
                         mr: 0.5,
-                        color: theme.palette.text.secondary 
+                        color: 'var(--color-text-secondary)' 
                       }} />
                       <Typography variant="caption" color="text.secondary">
                         {formatPrice(property.price)}
