@@ -1,4 +1,5 @@
 // SEO Optimization System
+import React from 'react';
 import Head from 'next/head';
 
 // SEO metadata interface
@@ -38,7 +39,7 @@ const defaultSEO: SEOMetadata = {
 // SEO optimizer class
 export class SEOOptimizer {
   private static instance: SEOOptimizer;
-  private baseUrl: string;
+  public baseUrl: string;
   private defaultImage: string;
 
   private constructor() {
@@ -195,7 +196,7 @@ Disallow: /static/`;
   }
 
   // Generate meta tags for Next.js Head component
-  generateMetaTags(metadata: SEOMetadata): JSX.Element {
+  generateMetaTags(metadata: SEOMetadata): React.JSX.Element {
     return (
       <Head>
         {/* Basic Meta Tags */}
@@ -314,7 +315,7 @@ export const generateBlogSEO = (post: any): Partial<SEOMetadata> => {
         name: 'Urban Realty',
         logo: {
           '@type': 'ImageObject',
-          url: `${seoOptimizer.getInstance().baseUrl}/images/logo.png`,
+          url: `${SEOOptimizer.getInstance().baseUrl}/images/logo.png`,
         },
       },
     },

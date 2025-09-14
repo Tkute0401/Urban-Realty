@@ -187,6 +187,18 @@ export const mockAuthResponses = {
       error: 'Invalid token',
     };
   },
+  
+  updateUser: (userData: Partial<User>) => {
+    // In a real scenario, this would update the user in the database
+    // For mock purposes, we'll just return the updated user data
+    return {
+      success: true,
+      user: {
+        ...userData,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+  },
 };
 
 export default mockUsers;

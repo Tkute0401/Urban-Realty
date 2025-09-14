@@ -31,6 +31,10 @@ export const mockAPI = {
       const { mockAuthResponses } = require('./users');
       return mockAuthResponses.me(token);
     },
+    updateUser: (userData: any) => {
+      const { mockAuthResponses } = require('./users');
+      return mockAuthResponses.updateUser(userData);
+    },
   },
   properties: {
     list: (filters?: any) => {
