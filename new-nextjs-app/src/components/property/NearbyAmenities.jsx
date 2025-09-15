@@ -25,7 +25,7 @@ import {
   LocalGasStation as GasIcon,
   LocalPharmacy as PharmacyIcon,
 } from '@mui/icons-material';
-import { mockLocationServicesAPI } from '../../lib/mock-data/location-services';
+import geolocationService from '@/lib/services/geolocationService';
 
 // Icon mapping for amenity types
 const amenityIcons = {
@@ -71,15 +71,14 @@ const NearbyAmenities = ({ coordinates, radius = 2000 }) => {
     try {
       setLoading(true);
       
-      // Get nearby amenities
-      const amenitiesResponse = await mockLocationServicesAPI.getNearbyAmenities(coordinates, radius);
-      if (amenitiesResponse.success) {
+      // Replace mock with real service lookups (implement in geolocationService)
+      const amenitiesResponse = await geolocationService.getNearbyAmenities(coordinates, radius);
+      if (amenitiesResponse?.success) {
         setAmenities(amenitiesResponse.amenities);
       }
-      
-      // Get location info with walkability scores
-      const locationResponse = await mockLocationServicesAPI.getLocationInfo(coordinates);
-      if (locationResponse.success) {
+
+      const locationResponse = await geolocationService.getLocationInfo(coordinates);
+      if (locationResponse?.success) {
         setLocationInfo(locationResponse.locationInfo);
       }
     } catch (error) {

@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation } from '@tanstack/react-query';
-import { mockApi } from '@/lib/services/mockApi';
+// removed mockApi import; using real apiService via context/mutations when needed
 
 const AgentSettings = () => {
   const { user, updateUser } = useAuth();

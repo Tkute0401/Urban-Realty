@@ -43,7 +43,7 @@ import {
   Warning as WarningIcon,
   TrendingUp as TrendingUpIcon
 } from '@mui/icons-material';
-import { mockApi } from '@/lib/services/mockApi';
+import apiService from '@/lib/services/apiService';
 
 const SubscriptionManagement = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -82,8 +82,8 @@ const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const [plansRes, subscriptionsRes] = await Promise.all([
-        mockApi.subscriptions.getPlans(),
-        mockApi.subscriptions.getUserSubscription('user1') // Mock user ID
+        apiService.getSubscriptionPlans(),
+        apiService.getUserSubscription('user1')
       ]);
       
       setPlans(plansRes.data || []);

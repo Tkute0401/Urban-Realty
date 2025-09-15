@@ -33,7 +33,7 @@ import {
   Download,
   Refresh
 } from '@mui/icons-material';
-import { mockApi } from '../../lib/services/mockApi';
+import apiService from '@/lib/services/apiService';
 
 const AnalyticsDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -43,10 +43,8 @@ const AnalyticsDashboard = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const [dashboard, search, system] = await Promise.all([
-        mockApi.admin.getAnalytics(),
-        mockApi.admin.getAnalytics(),
-        mockApi.admin.getAnalytics()
+      const [dashboard] = await Promise.all([
+        apiService.getAdminAnalytics(),
       ]);
       
       setAnalytics({

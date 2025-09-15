@@ -8,7 +8,7 @@ import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import NearbyAmenities from '@/components/property/NearbyAmenities';
 import { formatPrice } from '@/lib/utils/format';
-import { mockApiService } from '@/lib/services/mockApi';
+import apiService from '@/lib/services/apiService';
 import { 
   Box, Typography, Grid, Divider, Chip, Button, Paper, 
   CircularProgress, Alert, IconButton, Stack, Avatar, Container
@@ -38,7 +38,7 @@ const PropertyDetails = () => {
         setLoadingProperty(true);
         // Ensure id is a string (handle case where it might be an array)
         const propertyId = Array.isArray(id) ? id[0] : id;
-        const response = await mockApiService.getProperty(propertyId) as { data: any; status: number };
+        const response = await apiService.getProperty(propertyId) as { data: any; status: number };
         setProperty(response.data);
       } catch (err) {
         console.error('Error fetching property:', err);

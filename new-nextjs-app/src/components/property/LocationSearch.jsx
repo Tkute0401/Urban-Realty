@@ -19,7 +19,7 @@ import {
   Clear as ClearIcon,
   Place as PlaceIcon,
 } from '@mui/icons-material';
-import { mockLocationServicesAPI } from '../../lib/mock-data/location-services';
+import geolocationService from '@/lib/services/geolocationService';
 import { useGeolocation } from '../../hooks/useGeolocation';
 
 // Mock popular cities for autocomplete
@@ -67,7 +67,7 @@ const LocationSearch = ({ onLocationSelect, onRadiusChange, initialLocation = nu
       setLoading(true);
       setError(null);
       
-      const response = await mockLocationServicesAPI.getLocationInfo(selectedLocation);
+      const response = await geolocationService.getLocationInfo?.(selectedLocation);
       if (response.success) {
         setLocationInfo(response.locationInfo);
       }

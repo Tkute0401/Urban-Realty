@@ -4,7 +4,8 @@ import { mockApi } from './mockApi';
 // Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || IS_DEVELOPMENT;
+// Do NOT default to mock data in development; require explicit env flag
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
 // API Response interface
 interface ApiResponse<T = any> {
@@ -474,6 +475,20 @@ export class ApiService {
       return await httpClient.delete(`/subscriptions/user/${userId}`);
     } catch (error) {
       console.error('Cancel subscription error:', error);
+      throw error;
+    }
+  }
+
+  // Update subscription plan
+  async updateSubscription(userId: string, planId: string): Promise<ApiResponse> {
+    if (USE_MOCK_DATA) {
+      return await mockApi.subscriptions.update(userId, planId) as ApiResponse;
+    }
+
+    try {
+      return await httpClient.put(`/subscriptions/user/${userId}`, { planId });
+    } catch (error) {
+      console.error('Update subscription error:', error);
       throw error;
     }
   }
