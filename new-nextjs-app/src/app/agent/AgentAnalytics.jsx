@@ -46,7 +46,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/services/mockApi';
+import { apiService } from '@/lib/services/apiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -60,7 +60,7 @@ const AgentAnalytics = () => {
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
     queryKey: ['agentAnalytics', user?.id],
     queryFn: async () => {
-      const res = await mockApi.agent.getAnalytics(user?.id || 'agent1');
+      const res = await apiService.getAgentAnalytics(user?.id);
       return res.data;
     },
     enabled: !!user?.id

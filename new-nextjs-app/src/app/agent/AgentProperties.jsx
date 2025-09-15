@@ -45,7 +45,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/services/mockApi';
+import { apiService } from '@/lib/services/apiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -66,7 +66,7 @@ const AgentProperties = () => {
   const { data: properties, isLoading, error } = useQuery({
     queryKey: ['agentProperties', user?.id, page, rowsPerPage, searchTerm, statusFilter, priceRange],
     queryFn: async () => {
-      const res = await mockApi.agent.getProperties(user?.id || 'agent1', {
+      const res = await apiService.getAgentProperties(user?.id, {
         page: page + 1,
         limit: rowsPerPage,
         search: searchTerm,
@@ -81,7 +81,7 @@ const AgentProperties = () => {
   // Delete property mutation
   const deletePropertyMutation = useMutation({
     mutationFn: async (propertyId) => {
-      await mockApi.properties.delete(propertyId);
+      await apiService.deleteProperty(propertyId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agentProperties'] });

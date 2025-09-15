@@ -36,6 +36,14 @@ const PropertyMap = ({ location, address }) => {
     setActiveMarker(marker);
   };
 
+  if (!googleMapsApiKey) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Map unavailable. Missing Google Maps API key.
+      </Typography>
+    );
+  }
+
   return (
     <LoadScript 
       googleMapsApiKey={googleMapsApiKey}
