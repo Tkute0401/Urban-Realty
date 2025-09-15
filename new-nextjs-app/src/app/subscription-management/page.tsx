@@ -39,7 +39,7 @@ import {
   Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
-import apiService from '@/lib/services/apiService';
+import { useSubscriptionPlans, useCurrentSubscription, useCancelSubscriptionMutation, useUpdateSubscriptionMutation } from '@/hooks/api/subscriptions';
 
 interface UserSubscription {
   id: string;
@@ -74,80 +74,55 @@ const SubscriptionManagement = () => {
 
   const { user } = useAuth();
 
+  const { data: fetchedPlans, isLoading: isPlansLoading, error: plansError } = useSubscriptionPlans();
+  const { data: currentSubscription } = useCurrentSubscription(user?.id);
+
   useEffect(() => {
-    fetchSubscriptionData();
-  }, []);
-
-  const fetchSubscriptionData = async () => {
-    if (!user) return;
-
-    try {
-      setLoading(true);
-      const [subscriptionResponse, plansResponse] = await Promise.all([
-        apiService.getUserSubscription(user.id),
-        apiService.getSubscriptionPlans()
-      ]) as [{ data: any; status: number }, { data: any; status: number }];
-
-      if (subscriptionResponse.data.success) {
-        setSubscription(subscriptionResponse.data.subscription);
-        
-        // Find the current plan
-        const currentPlan = plansResponse.data.plans.find(
-          (p: SubscriptionPlan) => p.id === subscriptionResponse.data.subscription.planId
+    setLoading(isPlansLoading);
+    if (plansError) {
+      setError('Failed to load subscription data');
+    } else if (fetchedPlans) {
+      setAvailablePlans(fetchedPlans as SubscriptionPlan[]);
+      if (currentSubscription) {
+        setSubscription(currentSubscription as UserSubscription);
+        const currentPlan = (fetchedPlans as SubscriptionPlan[]).find(
+          (p: SubscriptionPlan) => p.id === (currentSubscription as any).planId
         );
         setPlan(currentPlan || null);
       }
-
-      setAvailablePlans(plansResponse.data.plans || []);
-    } catch (err) {
-      setError('Failed to load subscription data');
-      console.error('Error fetching subscription data:', err);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [isPlansLoading, plansError, fetchedPlans, currentSubscription]);
+
+  const cancelMutation = useCancelSubscriptionMutation({
+    onSuccess: () => {
+      if (!subscription) return;
+      setSubscription({ ...subscription, status: 'cancelled', autoRenew: false });
+      setCancelDialog(false);
+      alert('Subscription cancelled successfully');
+    },
+    onError: () => setError('Failed to cancel subscription. Please try again.'),
+  });
 
   const handleCancelSubscription = async () => {
     if (!user || !subscription) return;
-
-    try {
-      const response = await apiService.cancelSubscription(user.id) as { data: any; status: number };
-      if (response.data.success) {
-        setSubscription({
-          ...subscription,
-          status: 'cancelled',
-          autoRenew: false
-        });
-        setCancelDialog(false);
-        alert('Subscription cancelled successfully');
-      } else {
-        setError(response.data.error || 'Failed to cancel subscription');
-      }
-    } catch (err) {
-      setError('Failed to cancel subscription. Please try again.');
-    }
+    cancelMutation.mutate({ userId: user.id });
   };
+
+  const updateMutation = useUpdateSubscriptionMutation({
+    onSuccess: (data, variables) => {
+      if (!subscription) return;
+      setSubscription({ ...subscription, planId: variables.planId });
+      const newPlan = availablePlans.find(p => p.id === variables.planId);
+      setPlan(newPlan || null);
+      setUpgradeDialog(false);
+      alert('Subscription upgraded successfully');
+    },
+    onError: () => setError('Failed to upgrade subscription. Please try again.'),
+  });
 
   const handleUpgradeSubscription = async (newPlanId: string) => {
     if (!user || !subscription) return;
-
-    try {
-      const response = await apiService.updateSubscription(user.id, newPlanId) as { data: any; status: number };
-      if (response.data.success) {
-        setSubscription(response.data.subscription);
-        
-        // Find the new plan
-        const newPlan = availablePlans.find(p => p.id === newPlanId);
-        setPlan(newPlan || null);
-        
-        setUpgradeDialog(false);
-        alert('Subscription upgraded successfully');
-      } else {
-        setError(response.data.error || 'Failed to upgrade subscription');
-      }
-    } catch (err) {
-      setError('Failed to upgrade subscription. Please try again.');
-    }
+    updateMutation.mutate({ userId: user.id, planId: newPlanId });
   };
 
   const getStatusColor = (status: string) => {

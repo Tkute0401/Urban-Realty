@@ -45,6 +45,27 @@
 
 ---
 
+Change ID: 25
+- Files affected: `new-nextjs-app/src/lib/services/api.ts`, `new-nextjs-app/src/hooks/api/subscriptions.ts`
+- Summary: Extended centralized API with subscription endpoints (plans/current/subscribe/cancel/update) and added React Query subscription hooks (plans, current, subscribe, cancel, update).
+- Rationale: Unify subscription flows under the centralized client and domain hooks to remove `apiService` usage and standardize data handling.
+- Audit mapping: Phase 0 — Centralized API Design; Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Endpoint paths assume RESTful routes under `/subscriptions/*`.
+
+Change ID: 26
+- Files affected: `new-nextjs-app/src/app/subscriptions/page.tsx`
+- Summary: Replaced `apiService` with `useSubscriptionPlans` and `useSubscribeMutation`; simplified data flow and error handling; preserved UI/UX.
+- Rationale: Remove legacy service usage and align with React Query-managed data per audit.
+- Audit mapping: Phase 3 — API centralization and React Query integration; Trackable Item: replace direct `apiService` usages.
+- Notes/Risks: Success/alert placeholders remain; consider toast system integration later.
+
+Change ID: 27
+- Files affected: `new-nextjs-app/src/app/subscription-management/page.tsx`
+- Summary: Migrated to subscription hooks for fetching plans/current subscription and performing cancel/upgrade mutations; removed `apiService`.
+- Rationale: Standardize subscription management on centralized API hooks; reduce ad-hoc effects.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Assumes `useCurrentSubscription` returns an object with `planId`; adjust if backend differs.
+
 Change ID: 1
 - Files affected: `report23.md`
 - Summary: Created report and initialized logging template.

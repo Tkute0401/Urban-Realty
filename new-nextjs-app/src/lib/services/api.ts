@@ -42,6 +42,12 @@ export const api = {
 	},
 	subscriptions: {
 		plans: () => unwrap<any[]>(http.get("/subscriptions/plans")),
+		current: (userId: string) => unwrap<any>(http.get(`/subscriptions/${userId}`)),
+		subscribe: (payload: { userId: string; planId: string; paymentMethod: string }) =>
+			unwrap<any>(http.post(`/subscriptions/${payload.userId}/subscribe`, { planId: payload.planId, paymentMethod: payload.paymentMethod })),
+		cancel: (userId: string) => unwrap<any>(http.post(`/subscriptions/${userId}/cancel`, {})),
+		update: (payload: { userId: string; planId: string }) =>
+			unwrap<any>(http.post(`/subscriptions/${payload.userId}/update`, { planId: payload.planId })),
 	},
 };
 
