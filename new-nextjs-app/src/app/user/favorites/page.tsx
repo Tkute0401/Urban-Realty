@@ -1,6 +1,7 @@
 'use client'
 
-import { Box, Typography, Grid, Card, CardMedia, CardContent, CardActions, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import FavoritesGrid from '../../../components/user/FavoritesGrid';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -55,46 +56,7 @@ const Favorites = () => {
           You haven't saved any properties yet.
         </Typography>
       ) : (
-        <Grid container spacing={3} sx={{ px: 2 }}>
-          {favorites.map((property) => (
-            <Grid item xs={12} sm={6} md={4} key={property._id || property.id}>
-              <Card sx={{ 
-                backgroundColor: '#1a2a32',
-                border: '1px solid #78CADC',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={property.images?.[0]?.url || property.image || '/placeholder-property.jpg'}
-                  alt={property.title || property.location}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {property.title || property.location}
-                  </Typography>
-                  <Typography variant="h6" color="#78CADC">
-                    {property.price}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {property.location?.address || property.location}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button 
-                    size="small" 
-                    sx={{ color: '#78CADC' }}
-                    onClick={() => handleViewProperty(property._id || property.id)}
-                  >
-                    View Details
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <FavoritesGrid items={favorites} onView={handleViewProperty} />
       )}
     </Box>
   );
