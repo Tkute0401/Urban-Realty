@@ -79,7 +79,35 @@ class HttpClient {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      // Safely parse response: handle empty bodies and non-JSON
+      let data: any = null;
+      const contentType = response.headers.get('content-type') || '';
+      const contentLength = response.headers.get('content-length');
+
+      // 204 No Content or explicitly empty body
+      if (response.status === 204 || contentLength === '0') {
+        data = null;
+      } else if (contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (parseErr) {
+          // Fallback to text for mislabelled responses
+          const text = await response.text();
+          throw new ApiError(
+            'Invalid JSON response',
+            response.status,
+            { body: text }
+          );
+        }
+      } else {
+        // Not JSON; read as text and throw a helpful error for callers
+        const text = await response.text();
+        throw new ApiError(
+          'Unexpected non-JSON response',
+          response.status,
+          { body: text, contentType }
+        );
+      }
 
       if (!response.ok) {
         throw new ApiError(
@@ -93,10 +121,10 @@ class HttpClient {
       // callers can always read response.data as the actual payload object/array
       // (and not the envelope). Previously, the spread overwrote data.
       return {
-        ...data,
+        ...(data && typeof data === 'object' ? data : {}),
         status: response.status,
-        success: data.success !== false,
-        data: (data && typeof data === 'object' && 'data' in data) ? data.data : data,
+        success: data && typeof data === 'object' && 'success' in data ? data.success !== false : true,
+        data: (data && typeof data === 'object' && 'data' in data) ? (data as any).data : data,
       };
     } catch (error) {
       if (error instanceof ApiError) {
