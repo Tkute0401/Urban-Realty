@@ -1,6 +1,7 @@
 import React from 'react';
-import { Breadcrumbs as MUIBreadcrumbs, Link, Typography, Box } from '@mui/material';
-import { useLocation, Link as RouterLink } from 'react-router-dom';
+import { Breadcrumbs as MUIBreadcrumbs, Link as MUILink, Typography, Box } from '@mui/material';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 function titleCase(segment) {
   return segment
@@ -40,8 +41,8 @@ const breadcrumbStyles = {
 };
 
 const Breadcrumbs = () => {
-  const location = useLocation();
-  const pathnames = location.pathname.split('/').filter(Boolean);
+  const pathname = usePathname();
+  const pathnames = pathname.split('/').filter(Boolean);
 
   if (pathnames.length === 0) {
     return null;
@@ -53,14 +54,9 @@ const Breadcrumbs = () => {
         aria-label="breadcrumb" 
         sx={breadcrumbStyles.breadcrumbs}
       >
-        <Link 
-          component={RouterLink} 
-          underline="hover" 
-          to="/"
-          sx={breadcrumbStyles.link}
-        >
+        <MUILink component={Link} underline="hover" href="/" sx={breadcrumbStyles.link}>
           Home
-        </Link>
+        </MUILink>
         {pathnames.map((value, index) => {
           const to = `/${pathnames.slice(0, index + 1).join('/')}`;
           const isLast = index === pathnames.length - 1;
@@ -71,15 +67,9 @@ const Breadcrumbs = () => {
               {label}
             </Typography>
           ) : (
-            <Link 
-              key={to} 
-              component={RouterLink} 
-              underline="hover" 
-              to={to}
-              sx={breadcrumbStyles.link}
-            >
+            <MUILink key={to} component={Link} underline="hover" href={to} sx={breadcrumbStyles.link}>
               {label}
-            </Link>
+            </MUILink>
           );
         })}
       </MUIBreadcrumbs>
