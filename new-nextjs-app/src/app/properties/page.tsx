@@ -34,7 +34,7 @@ const PropertyCard = ({ property }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="property-image-container">
-        <img src={property.images?.[0] || '/placeholder-property.jpg'} alt={property.title} className="property-image" />
+        <img src={(Array.isArray(property.images) ? (typeof property.images[0] === 'string' ? property.images[0] : property.images[0]?.url) : '') || '/placeholder-property.jpg'} alt={property.title} className="property-image" />
         <div className="property-image-overlay">
           <div className="property-image-actions">
             <button className="image-action-btn">
@@ -48,19 +48,18 @@ const PropertyCard = ({ property }) => {
       </div>
 
       <div className="property-details">
-        <div className="property-price">${property.price?.toLocaleString()}</div>
+        <div className="property-price">${property.price?.toLocaleString?.() || (typeof property.price === 'number' ? property.price.toLocaleString() : '')}</div>
         <div className="property-specs">
-          <div className="property-spec">{property.features?.sqft} sqft</div>
+          <div className="property-spec">{property.area || property.features?.sqft || 'N/A'} sqft</div>
           <div className="property-spec-divider">|</div>
-          <div className="property-spec">{property.features?.bedrooms} Bed</div>
+          <div className="property-spec">{property.bedrooms || property.features?.bedrooms || 0} Bed</div>
           <div className="property-spec-divider">|</div>
-          <div className="property-spec">{property.features?.bathrooms} Bath</div>
+          <div className="property-spec">{property.bathrooms || property.features?.bathrooms || 0} Bath</div>
         </div>
         <div className="property-location">
-          {typeof property.location === 'object' 
+          {property.address ? `${property.address.street || ''}, ${property.address.city || ''}, ${property.address.state || ''}`.replace(/^,\s*|,\s*$/g, '') : (typeof property.location === 'object'
             ? `${property.location.address || ''}, ${property.location.city || ''}, ${property.location.state || ''}`.replace(/^,\s*|,\s*$/g, '')
-            : property.location
-          }
+            : property.location)}
         </div>
       </div>
     </div>
@@ -101,7 +100,9 @@ const Properties = () => {
     const fetchProperties = async () => {
       try {
         const response = await apiService.getProperties() as { data: any; status: number };
-        setProperties(response.data.properties || []);
+        // Real API returns envelope { success, data: [...] }
+        const list = Array.isArray(response.data?.data) ? response.data.data : (Array.isArray(response.data) ? response.data : []);
+        setProperties(list);
         setLoading(false);
         setIsLoaded(true);
       } catch (err) {
@@ -286,9 +287,9 @@ const Properties = () => {
           ) : (
             properties.map(property => (
               <div 
-                key={property.id} 
-                id={`property-${property.id}`}
-                className={selectedProperty?.id === property.id ? 'property-highlighted' : ''}
+                key={property._id || property.id}
+                id={`property-${property._id || property.id}`}
+                className={(selectedProperty?._id || selectedProperty?.id) === (property._id || property.id) ? 'property-highlighted' : ''}
               >
                 <PropertyCard property={property} />
               </div>
