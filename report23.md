@@ -94,3 +94,39 @@ Change ID: 7
 - Audit mapping: Trackable Issue: `src/app/admin/AdminDashboard.jsx`; Phases 2–3.
 - Notes/Risks: `refresh` now uses hook `refetch`; verify data shape matches previous expectations (counts/recent/etc.).
 
+
+Change ID: 8
+- Files affected: `new-nextjs-app/src/components/property/PropertyCard.jsx`
+- Summary: Replaced `react-router-dom` navigation with Next.js `useRouter`; switched axios import to centralized `http` client; updated favorites status and mutation calls accordingly.
+- Rationale: Remove legacy routing and unify HTTP usage per centralized API layer.
+- Audit mapping: Phase 1 — Routing hygiene (remove `react-router-dom`); Phase 0 — Centralized API layer adoption.
+- Notes/Risks: `useAuth` import path remains as-is; ensure AuthContext export path is consistent during later TS conversion.
+
+Change ID: 9
+- Files affected: `new-nextjs-app/src/components/layout/Breadcrumbs.jsx`
+- Summary: Replaced `react-router-dom` `useLocation` and `RouterLink` with Next.js `usePathname` and `next/link`; kept MUI `Link` for styling via `component` prop.
+- Rationale: Align navigation with Next.js App Router and remove legacy router dependencies.
+- Audit mapping: Phase 1 — Routing hygiene; Trackable Issue: replace `react-router-dom` imports.
+- Notes/Risks: None.
+
+Change ID: 10
+- Files affected: `new-nextjs-app/src/hooks/api/properties.ts`
+- Summary: Added `usePropertiesQuery` hook backed by centralized `api` to fetch property lists with React Query.
+- Rationale: Establish domain hook for properties to support new explorer component.
+- Audit mapping: Phase 3 — API centralization and React Query integration; Step 2 of plan.
+- Notes/Risks: Assumes `api.properties.list` returns array or `{ items }`.
+
+Change ID: 11
+- Files affected: `new-nextjs-app/src/components/property/PropertiesExplorer.tsx`, `new-nextjs-app/src/app/properties/page.tsx`
+- Summary: Created `PropertiesExplorer` component leveraging `usePropertiesQuery`, responsive grid + optional map; updated properties page to render it and removed legacy page-local logic/CSS reliance.
+- Rationale: Extract complex UI from page, standardize data loading and composition per audit.
+- Audit mapping: Phase 2 — Component extraction; Trackable Issues: replace `PropertyList.jsx` and update `app/properties/page.tsx`.
+- Notes/Risks: Introduces CSS module import `PropertiesExplorer.module.css` which needs adding or styling adjustments later.
+
+Change ID: 12
+- Files affected: `new-nextjs-app/src/components/property/PropertiesExplorer.module.css`
+- Summary: Added minimal responsive CSS module to support `PropertiesExplorer` grid, map, and pagination layout.
+- Rationale: Ensure component builds without missing style import errors and has basic responsive layout.
+- Audit mapping: Phase 2 — Component extraction and style co-location.
+- Notes/Risks: Styles are minimal and may need refinement to match design system.
+
