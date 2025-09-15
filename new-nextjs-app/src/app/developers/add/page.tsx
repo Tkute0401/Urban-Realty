@@ -17,6 +17,7 @@ import {
   Add, Remove, DateRange
 } from '@mui/icons-material';
 import { useMediaQuery, useTheme } from '@mui/material';
+import sessionManager from '../../../lib/utils/sessionManager';
 import { styled } from '@mui/material/styles';
 
 // Styled components
@@ -245,10 +246,11 @@ const AddDeveloperPage = () => {
         formDataToSend.append('teamPhotos', file);
       });
 
+      const token = sessionManager.getToken();
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         }
       };
 
