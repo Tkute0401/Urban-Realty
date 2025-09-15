@@ -157,3 +157,16 @@ Change ID: 16
 - Rationale: Consolidate HTTP client usage under SSR-safe axios instance with interceptors.
 - Audit mapping: Phase 0 — Centralized API Design; Step 1 migration of axios usage.
 - Notes/Risks: Response envelope assumptions unchanged; future step may normalize via `api` wrappers.
+
+Change ID: 18
+- Files affected: `new-nextjs-app/src/components/Subscription/SubscriptionComparison.jsx`, `new-nextjs-app/src/components/Subscription/BillingDashboard.jsx`, `new-nextjs-app/src/components/admin/SubscriptionAnalytics.jsx`, `new-nextjs-app/src/app/developers/[id]/page.tsx`, `new-nextjs-app/src/app/agent/Inquiries.jsx`
+- Summary: Replaced legacy `@/lib/services/axios` imports with centralized `@/lib/services/http` and updated GET/DELETE calls accordingly.
+- Rationale: Consolidate HTTP client usage under SSR-safe axios instance and prepare for full `api` wrapper migration.
+- Audit mapping: Phase 0 — Centralized API Design; Step 1 migration of axios usage.
+- Notes/Risks: Some modules still assume specific response envelopes; next pass will standardize via `api` wrappers where needed.
+Change ID: 17
+- Files affected: `new-nextjs-app/src/components/property/PropertyList.jsx`
+- Summary: Removed `react-router-dom` by switching to `next/navigation` (`usePathname`, `useSearchParams`, `useRouter`); replaced URL updates with `router.replace` and guarded `window.scrollTo` for SSR safety.
+- Rationale: Align with Next.js App Router and eliminate legacy router usage per audit.
+- Audit mapping: Phase 1 — Routing hygiene; Trackable Issue: `src/components/property/PropertyList.jsx`.
+- Notes/Risks: Initial filter default now uses `pathname` instead of `window.location.pathname`.

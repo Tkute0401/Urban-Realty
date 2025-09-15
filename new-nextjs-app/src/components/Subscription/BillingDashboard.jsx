@@ -32,7 +32,7 @@ import {
   AccountBalance as AccountBalanceIcon,
   Warning as WarningIcon
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { useAuth } from '@/contexts/AuthContext';
 
 const BillingDashboard = () => {
@@ -50,9 +50,9 @@ const BillingDashboard = () => {
     try {
       setLoading(true);
       const [billingHistory, upcomingBilling, subscription] = await Promise.all([
-        axios.get('/subscriptions/billing-history'),
-        axios.get('/subscriptions/upcoming-billing'),
-        axios.get('/subscriptions/my-subscription')
+        http.get('/subscriptions/billing-history'),
+        http.get('/subscriptions/upcoming-billing'),
+        http.get('/subscriptions/my-subscription')
       ]);
       
       setBillingData({
@@ -70,7 +70,7 @@ const BillingDashboard = () => {
 
   const handleDownloadInvoice = async (subscriptionId) => {
     try {
-      const response = await axios.get(`/subscriptions/invoice/${subscriptionId}/download`, {
+      const response = await http.get(`/subscriptions/invoice/${subscriptionId}/download`, {
         responseType: 'blob'
       });
       

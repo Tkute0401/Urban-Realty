@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useProperties } from '../../contexts/PropertiesContext';
-import { useSearchParams } from 'react-router-dom';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 
   Container, Pagination, Stack, useMediaQuery, useTheme,
@@ -23,7 +23,9 @@ import './PropertyList.css';
 
 const PropertyList = () => {
   const { properties, loading, error, getProperties } = useProperties();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const initialLoad = useRef(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -46,7 +48,7 @@ const PropertyList = () => {
     return {
       search: params.search || '',
       propertyType: params.propertyType || 'ALL',
-      type: params.type || (window.location.pathname === '/pg' ? 'PG' : ''),
+      type: params.type || (pathname === '/pg' ? 'PG' : ''),
       city: params.city || '',
       state: params.state || '',
       priceMin: params.priceMin || '',
@@ -120,7 +122,8 @@ const PropertyList = () => {
       Object.entries(apiParams).forEach(([key, value]) => {
         if (value) newSearchParams.set(key, value);
       });
-      setSearchParams(newSearchParams);
+      const queryString = newSearchParams.toString();
+      router.replace(`${pathname}${queryString ? `?${queryString}` : ''}`);
 
       setTimeout(() => setIsLoaded(true), 100);
       initialLoad.current = false;
@@ -339,7 +342,9 @@ const PropertyList = () => {
   const handlePageChange = (event, value) => {
     setPage(value);
     setSelectedProperty(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const activeFilterCount = Object.entries(filters).filter(([key, value]) => 
