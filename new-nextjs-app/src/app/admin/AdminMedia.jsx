@@ -53,7 +53,7 @@ import {
   ViewList,
   Refresh
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const AdminMedia = () => {
   const [loading, setLoading] = useState(true);
@@ -93,7 +93,7 @@ const AdminMedia = () => {
 
   const fetchMedia = async () => {
     try {
-      const response = await axios.get('/admin/media');
+      const response = await http.get('/admin/media');
       if (response.data.success) {
         setMedia(response.data.data || []);
       } else {
@@ -135,7 +135,7 @@ const AdminMedia = () => {
     formData.append('altText', uploadForm.altText);
 
     try {
-      const response = await axios.post('/admin/media/upload', formData, {
+      const response = await http.post('/admin/media/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
@@ -173,7 +173,7 @@ const AdminMedia = () => {
     if (!editingMedia) return;
 
     try {
-      const response = await axios.put(`/admin/media/${editingMedia._id}`, {
+      const response = await http.put(`/admin/media/${editingMedia._id}`, {
         title: editingMedia.title,
         description: editingMedia.description,
         tags: editingMedia.tags,
@@ -200,7 +200,7 @@ const AdminMedia = () => {
 
     try {
       const deletePromises = selectedMedia.map(id => 
-        axios.delete(`/admin/media/${id}`)
+        http.delete(`/admin/media/${id}`)
       );
       
       await Promise.all(deletePromises);

@@ -74,7 +74,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
 
@@ -133,7 +133,7 @@ const AdminReports = () => {
         ...(dateRange === 'custom' && { startDate, endDate })
       };
 
-      const response = await axios.get('/admin/reports', { params });
+      const response = await http.get('/admin/reports', { params });
       if (response.data.success) {
         setReportData(response.data.data);
       } else {
@@ -159,7 +159,7 @@ const AdminReports = () => {
         ...(dateRange === 'custom' && { startDate, endDate })
       };
 
-      const response = await axios.get('/admin/reports/export', { 
+      const response = await http.get('/admin/reports/export', { 
         params,
         responseType: 'blob'
       });
@@ -195,7 +195,7 @@ const AdminReports = () => {
         ...(dateRange === 'custom' && { startDate, endDate })
       };
 
-      const response = await axios.post('/admin/reports/email', {
+      const response = await http.post('/admin/reports/email', {
         ...emailForm,
         ...params
       });

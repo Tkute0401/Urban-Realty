@@ -10,7 +10,7 @@ import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-toastify';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const PropertyCard = ({ property, index }) => {
   const router = useRouter();
@@ -23,7 +23,7 @@ const PropertyCard = ({ property, index }) => {
     const checkFavoriteStatus = async () => {
       if (user && property?._id) {
         try {
-          const response = await axios.get(`/auth/favorites/${property._id}/status`);
+          const response = await http.get(`/auth/favorites/${property._id}/status`);
           setIsFavorite(response.data.isFavorite);
         } catch (err) {
           console.error('Error checking favorite status:', err);
@@ -52,10 +52,10 @@ const PropertyCard = ({ property, index }) => {
     setLoadingFavorite(true);
     try {
       if (isFavorite) {
-        await axios.delete(`/auth/favorites/${property._id}`);
+        await http.delete(`/auth/favorites/${property._id}`);
         toast.success('Removed from favorites');
       } else {
-        await axios.put(`/auth/favorites/${property._id}`);
+        await http.put(`/auth/favorites/${property._id}`);
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);

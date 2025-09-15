@@ -1,6 +1,6 @@
 // src/context/AgentsContext.js
 import { createContext, useState, useEffect, useContext } from 'react';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const AgentsContext = createContext();
 

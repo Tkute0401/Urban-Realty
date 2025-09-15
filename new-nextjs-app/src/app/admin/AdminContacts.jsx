@@ -29,7 +29,7 @@ import {
   Delete
 } from '@mui/icons-material';
 import ContactsTable from './ContactsTable';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const AdminContacts = () => {
   const [loading, setLoading] = useState(false);

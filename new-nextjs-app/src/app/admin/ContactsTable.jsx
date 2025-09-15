@@ -20,7 +20,7 @@ import {
   Avatar
 } from '@mui/material';
 import { MoreVert, Delete, Visibility, Mail, Phone, WhatsApp, Search } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
 import { formatPrice } from '@/lib/utils/format';

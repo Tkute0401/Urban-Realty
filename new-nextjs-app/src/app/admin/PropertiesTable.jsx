@@ -22,7 +22,7 @@ import {
   Button
 } from '@mui/material';
 import { MoreVert, Delete, Visibility, Edit, Search, Add } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
