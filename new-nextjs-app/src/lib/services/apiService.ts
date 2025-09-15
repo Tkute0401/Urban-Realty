@@ -89,11 +89,14 @@ class HttpClient {
         );
       }
 
+      // Important: spread original payload FIRST, then normalize data so
+      // callers can always read response.data as the actual payload object/array
+      // (and not the envelope). Previously, the spread overwrote data.
       return {
-        data: data.data || data,
+        ...data,
         status: response.status,
         success: data.success !== false,
-        ...data,
+        data: (data && typeof data === 'object' && 'data' in data) ? data.data : data,
       };
     } catch (error) {
       if (error instanceof ApiError) {

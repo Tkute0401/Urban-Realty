@@ -39,7 +39,8 @@ const PropertyDetails = () => {
         // Ensure id is a string (handle case where it might be an array)
         const propertyId = Array.isArray(id) ? id[0] : id;
         const response = await apiService.getProperty(propertyId) as { data: any; status: number };
-        setProperty(response.data);
+        const prop = response.data?.data ?? response.data;
+        setProperty(prop);
         // add to recently viewed (best-effort)
         try {
           await apiService.addRecentlyViewed(propertyId as string);
@@ -111,7 +112,7 @@ const PropertyDetails = () => {
           <Grid item xs={12} md={8}>
             {/* Property Images */}
             <Paper sx={{ mb: 4, bgcolor: 'var(--color-bg-secondary)', border: '1px solid var(--color-primary)' }}>
-              <PropertyImageGallery images={property.images || [property.image]} />
+              <PropertyImageGallery images={Array.isArray(property.images) ? property.images : []} />
             </Paper>
 
             {/* Property Header */}
@@ -119,11 +120,11 @@ const PropertyDetails = () => {
               <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                 <Box>
                   <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'var(--color-primary)' }}>
-                    {property.title || property.location}
+                    {property.title || property.address?.street || property.address?.city}
                   </Typography>
                   <Box display="flex" alignItems="center" mb={2}>
                     <LocationOn sx={{ color: 'var(--color-primary)', mr: 1 }} />
-                    <Typography variant="body1">{property.location}</Typography>
+                    <Typography variant="body1">{property.address ? `${property.address.street || ''}, ${property.address.city || ''}, ${property.address.state || ''}`.replace(/^,\s*|,\s*$/g, '') : ''}</Typography>
                   </Box>
                 </Box>
                 <IconButton onClick={handleFavoriteToggle} sx={{ color: isFavorite ? 'var(--color-error)' : 'var(--color-primary)' }}>
@@ -147,25 +148,25 @@ const PropertyDetails = () => {
                 <Grid item xs={6} sm={3}>
                   <Box textAlign="center">
                     <KingBed sx={{ color: 'var(--color-primary)', fontSize: 32, mb: 1 }} />
-                    <Typography variant="body2">{property.beds || 0} Bed</Typography>
+                    <Typography variant="body2">{property.bedrooms || 0} Bed</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={6} sm={3}>
                   <Box textAlign="center">
                     <Bathtub sx={{ color: 'var(--color-primary)', fontSize: 32, mb: 1 }} />
-                    <Typography variant="body2">{property.baths || 0} Bath</Typography>
+                    <Typography variant="body2">{property.bathrooms || 0} Bath</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={6} sm={3}>
                   <Box textAlign="center">
                     <SquareFoot sx={{ color: 'var(--color-primary)', fontSize: 32, mb: 1 }} />
-                    <Typography variant="body2">{property.sqft || 'N/A'} sqft</Typography>
+                    <Typography variant="body2">{property.area || 'N/A'} sqft</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={6} sm={3}>
                   <Box textAlign="center">
                     <Apartment sx={{ color: 'var(--color-primary)', fontSize: 32, mb: 1 }} />
-                    <Typography variant="body2">{property.propertyType || 'N/A'}</Typography>
+                    <Typography variant="body2">{property.type || 'N/A'}</Typography>
                   </Box>
                 </Grid>
               </Grid>
@@ -203,7 +204,7 @@ const PropertyDetails = () => {
             {/* Nearby Amenities */}
             {property.location?.coordinates && (
               <NearbyAmenities 
-                coordinates={property.location.coordinates}
+                coordinates={{ lat: property.location.coordinates[1], lng: property.location.coordinates[0] }}
                 radius={2000}
               />
             )}
@@ -214,8 +215,8 @@ const PropertyDetails = () => {
                 Location
               </Typography>
               <PropertyMap 
-                location={{ coordinates: property.location?.coordinates ? [property.location.coordinates.lng, property.location.coordinates.lat] : [0, 0] }}
-                address={property.location}
+                location={{ coordinates: property.location?.coordinates ? [property.location.coordinates[0], property.location.coordinates[1]] : [0, 0] }}
+                address={property.address?.street ? `${property.address.street}, ${property.address.city}` : ''}
               />
             </Paper>
           </Grid>
