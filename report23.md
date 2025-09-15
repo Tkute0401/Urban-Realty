@@ -45,6 +45,27 @@
 
 ---
 
+Change ID: 35
+- Files affected: `new-nextjs-app/src/lib/services/api.config.ts`
+- Summary: Added centralized API config with SSR-safe base URL resolver and browser token accessor.
+- Rationale: Single source of truth for API base URL and token retrieval; reduces duplication across clients.
+- Audit mapping: Phase 0 — Baseline and safety (step 2 introduction of API config); Centralized API Design notes.
+- Notes/Risks: Looks for `NEXT_PUBLIC_API_URL` in browser and `API_URL` on server; falls back to `/api`.
+
+Change ID: 36
+- Files affected: `new-nextjs-app/src/lib/services/http.ts`
+- Summary: Wired HTTP client to use `api.config` for baseURL and token injection; removed inline helpers.
+- Rationale: Ensure all consumers inherit consistent base URL and SSR-safe token logic via interceptors.
+- Audit mapping: Phase 0 — Centralized API layer; Step 1 of Cursor task plan.
+- Notes/Risks: Behavior unchanged for consumers; config now centralized.
+
+Change ID: 37
+- Files affected: `new-nextjs-app/src/app/developers/add/page.tsx`
+- Summary: Replaced direct `localStorage` token access with `sessionManager.getToken()` and conditional Authorization header.
+- Rationale: Guard SSR and standardize session handling per audit guidance.
+- Audit mapping: Phase 1 — SSR guards for client-only APIs; Phase 3 — Use centralized session utilities.
+- Notes/Risks: If token is absent, request proceeds without Authorization header as before for unauthenticated flows.
+
 Change ID: 34
 - Files affected: `new-nextjs-app/src/components/admin/QuickActions.tsx`, `new-nextjs-app/src/components/admin/SystemHealth.tsx`, `new-nextjs-app/src/components/admin/PlatformMetrics.tsx`, `new-nextjs-app/src/components/admin/tables/RecentUsersTable.tsx`, `new-nextjs-app/src/components/admin/tables/RecentPropertiesTable.tsx`, `new-nextjs-app/src/components/admin/tables/RecentContactsTable.tsx`, `new-nextjs-app/src/components/admin/AdminDashboard.tsx`
 - Summary: Extracted Admin Dashboard subsections into dedicated reusable components (QuickActions, SystemHealth, PlatformMetrics, and recent tables). Updated `AdminDashboard.tsx` to compose these components and removed large inline JSX blocks.

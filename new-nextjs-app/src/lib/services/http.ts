@@ -1,28 +1,13 @@
 import axios, { AxiosInstance } from "axios";
-
-// SSR-safe token accessors
-function getAccessToken(): string | null {
-	if (typeof window === "undefined") return null;
-	try {
-		return window.localStorage.getItem("access_token");
-	} catch {
-		return null;
-	}
-}
-
-function getBaseUrl(): string {
-	// Prefer NEXT_PUBLIC_API_URL for browser, fallback to process.env on server
-	const envUrl = typeof window !== "undefined" ? (process.env.NEXT_PUBLIC_API_URL as string | undefined) : (process.env.API_URL as string | undefined);
-	return envUrl || "/api";
-}
+import { getApiBaseUrl, getBrowserAccessToken } from "./api.config";
 
 const http: AxiosInstance = axios.create({
-	baseURL: getBaseUrl(),
+	baseURL: getApiBaseUrl(),
 	withCredentials: true,
 });
 
 http.interceptors.request.use((config) => {
-	const token = getAccessToken();
+	const token = getBrowserAccessToken();
 	if (token) {
 		config.headers = config.headers ?? {};
 		(config.headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
