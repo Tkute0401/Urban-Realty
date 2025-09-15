@@ -1,59 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import type React from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { 
   Box, Typography, Avatar, Button, Paper, Divider, Chip, 
-  Tabs, Tab, Grid, Card, CardMedia, CardContent, CardActions
+  Tabs, Tab, Grid
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings } from '@mui/icons-material';
 import { useProperties } from '../../../contexts/PropertiesContext';
 import apiService from '@/lib/services/apiService';
 import PropertyCard from '../../../components/home/PropertyCard';
+import FavoritesGrid from '../../../components/user/FavoritesGrid';
   
 
-const FavoriteGrid = ({ items, onView }: any) => (
-  <Grid container spacing={3}>
-    {items.map((property: any) => (
-      <Grid item xs={12} sm={6} key={property._id || property.id}>
-        <Card sx={{ 
-          backgroundColor: 'var(--color-bg-dark)',
-          border: '1px solid var(--color-primary)',
-          color: 'var(--color-text-inverse)'
-        }}>
-          <CardMedia
-            component="img"
-            height="160"
-            image={property.images?.[0]?.url || property.image || '/placeholder-property.jpg'}
-            alt={property.title || property.location}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h6" component="div">
-              {property.title || property.location}
-            </Typography>
-            <Typography variant="body2" color="var(--color-primary)" sx={{ mb: 1 }}>
-              {property.price}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {property.location?.address || property.location}
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button 
-              size="small" 
-              sx={{ color: 'var(--color-primary)' }}
-              onClick={() => onView(property._id || property.id)}
-            >
-              View Details
-            </Button>
-          </CardActions>
-        </Card>
-      </Grid>
-    ))}
-  </Grid>
-);
+// Favorites grid moved to reusable component
 
 const ProfileCard = styled(Paper)(({ theme }) => ({
   maxWidth: 800,
@@ -286,7 +249,7 @@ const Profile = () => {
             {loadingFavorites ? (
               <Typography>Loading...</Typography>
             ) : (
-              <FavoriteGrid items={favorites} onView={handleViewProperty} />
+              <FavoritesGrid items={favorites} onView={handleViewProperty} />
             )}
           </Box>
         )}
