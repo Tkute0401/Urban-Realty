@@ -37,6 +37,8 @@ export const api = {
 	},
 	admin: {
 		stats: () => unwrap<any>(http.get("/admin/stats")),
+		dashboard: () => unwrap<any>(http.get("/admin/dashboard")),
+		analytics: () => unwrap<any>(http.get("/admin/analytics")),
 	},
 	subscriptions: {
 		plans: () => unwrap<any[]>(http.get("/subscriptions/plans")),

@@ -77,9 +77,9 @@ import {
   Storage as StorageIcon,
   NetworkCheck as NetworkIcon
 } from '@mui/icons-material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
-import apiService from '@/lib/services/apiService';
+import { useAdminAnalytics, useAdminDashboard } from '@/hooks/api/admin';
 import { motion } from 'framer-motion';
 import { formatDate } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
@@ -137,52 +137,9 @@ const AdminDashboard = () => {
   });
 
   // Enhanced queries with TanStack Query v5 object syntax and better error handling
-  const { 
-    data: dashboardData, 
-    isLoading, 
-    error,
-    refetch: refetchDashboard
-  } = useQuery({
-    queryKey: ['adminDashboard', filters],
-    queryFn: async () => {
-      try {
-        const response = await apiService.getAdminDashboard();
-        return response;
-      } catch (error) {
-        console.error('Error fetching admin dashboard data:', error);
-        throw new Error(error.message || 'Failed to fetch dashboard data');
-      }
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchInterval: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error) => {
-      if (failureCount >= 3) return false;
-      return true;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
+  const { data: dashboardData, isLoading, error, refetch: refetchDashboard } = useAdminDashboard();
 
-  const { 
-    data: analyticsData, 
-    isLoading: analyticsLoading,
-    error: analyticsError
-  } = useQuery({
-    queryKey: ['adminAnalytics'],
-    queryFn: async () => {
-      try {
-        const response = await apiService.getAdminAnalytics();
-        return response;
-      } catch (error) {
-        console.error('Error fetching admin analytics:', error);
-        throw new Error(error.message || 'Failed to fetch analytics');
-      }
-    },
-    staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error) => {
-      if (failureCount >= 2) return false;
-      return true;
-    },
-  });
+  const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useAdminAnalytics();
 
   // Refresh mutation with better error handling
   const refreshMutation = useMutation({
