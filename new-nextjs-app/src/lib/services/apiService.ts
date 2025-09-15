@@ -1,13 +1,10 @@
 // Real API Service - Connects to Express.js backend
-import { mockApi } from './mockApi';
+
+import { c } from "node_modules/framer-motion/dist/types.d-Cjd591yU";
 
 // Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
-const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
-// Do NOT default to mock data in development; require explicit env flag
-const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
-
-// API Response interface
+const API_BASE_URL = "https://urban-realty-production.up.railway.app/api/v1";
+// API response interface
 interface ApiResponse<T = any> {
   data: T;
   status: number;
@@ -79,47 +76,36 @@ class HttpClient {
 
     try {
       const response = await fetch(url, config);
-      // Safely parse response: handle empty bodies and non-JSON
-      let data: any = null;
       const contentType = response.headers.get('content-type') || '';
       const contentLength = response.headers.get('content-length');
+      let data: any = null;
 
-      // 204 No Content or explicitly empty body
+      if (!response.ok) {
+        if (contentType.includes('application/json')) {
+          data = await response.json().catch(() => null);
+        } else {
+          data = await response.text().catch(() => null);
+        }
+        throw new ApiError(
+          (data && (data.error || data.message)) || 'Request failed',
+          response.status,
+          data
+        );
+      }
+
       if (response.status === 204 || contentLength === '0') {
         data = null;
       } else if (contentType.includes('application/json')) {
         try {
           data = await response.json();
         } catch (parseErr) {
-          // Fallback to text for mislabelled responses
           const text = await response.text();
-          throw new ApiError(
-            'Invalid JSON response',
-            response.status,
-            { body: text }
-          );
+          throw new ApiError('Invalid JSON response', response.status, { body: text });
         }
       } else {
-        // Not JSON; read as text and throw a helpful error for callers
-        const text = await response.text();
-        throw new ApiError(
-          'Unexpected non-JSON response',
-          response.status,
-          { body: text, contentType }
-        );
+        data = await response.text();
       }
 
-      if (!response.ok) {
-        throw new ApiError(
-          data.error || data.message || 'Request failed',
-          response.status,
-          data
-        );
-      }
-
-      // Important: spread original payload FIRST, then normalize data so
-      // callers can always read response.data as the actual payload object/array
-      // (and not the envelope). Previously, the spread overwrote data.
       return {
         ...(data && typeof data === 'object' ? data : {}),
         status: response.status,
@@ -131,7 +117,6 @@ class HttpClient {
         throw error;
       }
       
-      // Network or other errors
       throw new ApiError(
         error instanceof Error ? error.message : 'Network error',
         0,
@@ -146,16 +131,22 @@ class HttpClient {
   }
 
   async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+    let finalEndpoint = endpoint;
+    
     if (params) {
+      const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value));
+          searchParams.append(key, String(value));
         }
       });
+      
+      if (searchParams.toString()) {
+        finalEndpoint += `?${searchParams.toString()}`;
+      }
     }
     
-    return this.request<T>(url.pathname + url.search);
+    return this.request<T>(finalEndpoint);
   }
 
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
@@ -185,32 +176,21 @@ class HttpClient {
       method: 'POST',
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
-        // Don't set Content-Type for FormData, let browser set it with boundary
       },
       body: formData,
     });
   }
 }
 
-// Create HTTP client instance
 const httpClient = new HttpClient(API_BASE_URL);
 
-// Real API Service class
 export class ApiService {
-  // Authentication endpoints
   async login(email: string, password: string): Promise<ApiResponse<LoginResponse>> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.auth.login(email, password) as ApiResponse<LoginResponse>;
-    }
-
     try {
       const response = await httpClient.post<LoginResponse>('/auth/login', { email, password });
-      
-      // Store token if login successful
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      
       return response;
     } catch (error) {
       console.error('Login error:', error);
@@ -219,18 +199,11 @@ export class ApiService {
   }
 
   async register(userData: any): Promise<ApiResponse<RegisterResponse>> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.auth.register(userData) as ApiResponse<RegisterResponse>;
-    }
-
     try {
       const response = await httpClient.post<RegisterResponse>('/auth/register', userData);
-      
-      // Store token if registration successful
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      
       return response;
     } catch (error) {
       console.error('Registration error:', error);
@@ -239,11 +212,6 @@ export class ApiService {
   }
 
   async getMe(): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      const token = localStorage.getItem('token') || 'mock-token';
-      return await mockApi.auth.getMe(token) as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/auth/me');
     } catch (error) {
@@ -253,10 +221,6 @@ export class ApiService {
   }
 
   async updateUser(userData: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.auth.updateUser(userData) as ApiResponse;
-    }
-
     try {
       return await httpClient.put('/auth/update', userData);
     } catch (error) {
@@ -270,13 +234,10 @@ export class ApiService {
     localStorage.removeItem('user');
   }
 
-  // Property endpoints
   async getProperties(filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.properties.list(filters) as ApiResponse;
-    }
-
     try {
+      console.log("API Service - Get Properties with filters:", filters);
+      console.log("API Base URL:", API_BASE_URL);
       return await httpClient.get('/properties', filters);
     } catch (error) {
       console.error('Get properties error:', error);
@@ -285,10 +246,6 @@ export class ApiService {
   }
 
   async getProperty(id: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.properties.get(id) as ApiResponse;
-    }
-
     try {
       return await httpClient.get(`/properties/${id}`);
     } catch (error) {
@@ -298,10 +255,6 @@ export class ApiService {
   }
 
   async getFeaturedProperties(): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.properties.featured() as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/properties/featured');
     } catch (error) {
@@ -311,27 +264,17 @@ export class ApiService {
   }
 
   async createProperty(propertyData: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.properties.create(propertyData) as ApiResponse;
-    }
-
     try {
-      // Handle file uploads
       if (propertyData.images && propertyData.images.length > 0) {
         const formData = new FormData();
-        
-        // Add property data
         Object.keys(propertyData).forEach(key => {
           if (key !== 'images') {
             formData.append(key, propertyData[key]);
           }
         });
-        
-        // Add images
-        propertyData.images.forEach((image: File, index: number) => {
+        propertyData.images.forEach((image: File) => {
           formData.append('images', image);
         });
-        
         return await httpClient.postFormData('/properties', formData);
       } else {
         return await httpClient.post('/properties', propertyData);
@@ -343,27 +286,17 @@ export class ApiService {
   }
 
   async updateProperty(id: string, updates: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.properties.update(id, updates) as ApiResponse;
-    }
-
     try {
-      // Handle file uploads
       if (updates.images && updates.images.length > 0) {
         const formData = new FormData();
-        
-        // Add property data
         Object.keys(updates).forEach(key => {
           if (key !== 'images') {
             formData.append(key, updates[key]);
           }
         });
-        
-        // Add images
-        updates.images.forEach((image: File, index: number) => {
+        updates.images.forEach((image: File) => {
           formData.append('images', image);
         });
-        
         return await httpClient.put(`/properties/${id}`, formData);
       } else {
         return await httpClient.put(`/properties/${id}`, updates);
@@ -375,10 +308,6 @@ export class ApiService {
   }
 
   async deleteProperty(id: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.properties.delete(id) as ApiResponse;
-    }
-
     try {
       return await httpClient.delete(`/properties/${id}`);
     } catch (error) {
@@ -387,13 +316,7 @@ export class ApiService {
     }
   }
 
-  // Favorites endpoints
   async getFavorites(): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      // No mock endpoint defined; return empty structure to avoid UI breaks
-      return { data: [], status: 200, success: true } as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/auth/favorites');
     } catch (error) {
@@ -403,10 +326,6 @@ export class ApiService {
   }
 
   async addFavorite(propertyId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return { data: { propertyId }, status: 200, success: true } as ApiResponse;
-    }
-
     try {
       return await httpClient.put(`/auth/favorites/${propertyId}`, {});
     } catch (error) {
@@ -416,10 +335,6 @@ export class ApiService {
   }
 
   async removeFavorite(propertyId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return { data: { propertyId }, status: 200, success: true } as ApiResponse;
-    }
-
     try {
       return await httpClient.delete(`/auth/favorites/${propertyId}`);
     } catch (error) {
@@ -429,10 +344,6 @@ export class ApiService {
   }
 
   async getFavoriteStatus(propertyId: string): Promise<ApiResponse<{ favorited: boolean }>> {
-    if (USE_MOCK_DATA) {
-      return { data: { favorited: false }, status: 200, success: true } as ApiResponse<{ favorited: boolean }>;
-    }
-
     try {
       return await httpClient.get(`/auth/favorites/${propertyId}/status`);
     } catch (error) {
@@ -441,12 +352,7 @@ export class ApiService {
     }
   }
 
-  // Recently viewed endpoints
   async getRecentlyViewed(): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return { data: [], status: 200, success: true } as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/auth/recently-viewed');
     } catch (error) {
@@ -456,10 +362,6 @@ export class ApiService {
   }
 
   async addRecentlyViewed(propertyId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return { data: { propertyId }, status: 200, success: true } as ApiResponse;
-    }
-
     try {
       return await httpClient.post(`/auth/recently-viewed/${propertyId}`);
     } catch (error) {
@@ -468,12 +370,7 @@ export class ApiService {
     }
   }
 
-  // Contact endpoints
   async getContacts(filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.contacts.list(filters) as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/contacts', filters);
     } catch (error) {
@@ -483,10 +380,6 @@ export class ApiService {
   }
 
   async getContact(id: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.contacts.get(id) as ApiResponse;
-    }
-
     try {
       return await httpClient.get(`/contacts/${id}`);
     } catch (error) {
@@ -496,10 +389,6 @@ export class ApiService {
   }
 
   async createContact(contactData: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.contacts.create(contactData) as ApiResponse;
-    }
-
     try {
       return await httpClient.post('/contacts', contactData);
     } catch (error) {
@@ -509,10 +398,6 @@ export class ApiService {
   }
 
   async updateContact(id: string, updates: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.contacts.update(id, updates) as ApiResponse;
-    }
-
     try {
       return await httpClient.put(`/contacts/${id}`, updates);
     } catch (error) {
@@ -522,10 +407,6 @@ export class ApiService {
   }
 
   async deleteContact(id: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.contacts.delete(id) as ApiResponse;
-    }
-
     try {
       return await httpClient.delete(`/contacts/${id}`);
     } catch (error) {
@@ -534,12 +415,7 @@ export class ApiService {
     }
   }
 
-  // Subscription endpoints
   async getSubscriptionPlans(): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.subscriptions.getPlans() as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/subscriptions/plans');
     } catch (error) {
@@ -549,10 +425,6 @@ export class ApiService {
   }
 
   async getUserSubscription(userId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.subscriptions.getUserSubscription(userId) as ApiResponse;
-    }
-
     try {
       return await httpClient.get(`/subscriptions/user/${userId}`);
     } catch (error) {
@@ -562,16 +434,8 @@ export class ApiService {
   }
 
   async subscribe(userId: string, planId: string, paymentMethod: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.subscriptions.subscribe(userId, planId, paymentMethod) as ApiResponse;
-    }
-
     try {
-      return await httpClient.post('/subscriptions/subscribe', {
-        userId,
-        planId,
-        paymentMethod,
-      });
+      return await httpClient.post('/subscriptions/subscribe', { userId, planId, paymentMethod });
     } catch (error) {
       console.error('Subscribe error:', error);
       throw error;
@@ -579,10 +443,6 @@ export class ApiService {
   }
 
   async cancelSubscription(userId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.subscriptions.cancel(userId) as ApiResponse;
-    }
-
     try {
       return await httpClient.delete(`/subscriptions/user/${userId}`);
     } catch (error) {
@@ -591,12 +451,7 @@ export class ApiService {
     }
   }
 
-  // Update subscription plan
   async updateSubscription(userId: string, planId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.subscriptions.update(userId, planId) as ApiResponse;
-    }
-
     try {
       return await httpClient.put(`/subscriptions/user/${userId}`, { planId });
     } catch (error) {
@@ -605,12 +460,7 @@ export class ApiService {
     }
   }
 
-  // Admin endpoints
   async getAdminDashboard(): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.admin.getDashboard() as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/admin/dashboard');
     } catch (error) {
@@ -620,10 +470,6 @@ export class ApiService {
   }
 
   async getAdminUsers(filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.admin.getUsers(filters) as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/admin/users', filters);
     } catch (error) {
@@ -633,10 +479,6 @@ export class ApiService {
   }
 
   async getAdminProperties(filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.admin.getProperties(filters) as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/admin/properties', filters);
     } catch (error) {
@@ -646,10 +488,6 @@ export class ApiService {
   }
 
   async getAdminContacts(filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.admin.getContacts(filters) as ApiResponse;
-    }
-
     try {
       return await httpClient.get('/admin/contacts', filters);
     } catch (error) {
@@ -658,12 +496,16 @@ export class ApiService {
     }
   }
 
-  // Agent endpoints
-  async getAgentDashboard(agentId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.agent.getDashboard(agentId) as ApiResponse;
+  async getAdminAnalytics(): Promise<ApiResponse> {
+    try {
+      return await httpClient.get('/admin/analytics');
+    } catch (error) {
+      console.error('Get admin analytics error:', error);
+      throw error;
     }
+  }
 
+  async getAgentDashboard(agentId: string): Promise<ApiResponse> {
     try {
       return await httpClient.get(`/agent/${agentId}/dashboard`);
     } catch (error) {
@@ -673,10 +515,6 @@ export class ApiService {
   }
 
   async getAgentProperties(agentId: string, filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.agent.getProperties(agentId, filters) as ApiResponse;
-    }
-
     try {
       return await httpClient.get(`/properties/agent/${agentId}`, filters);
     } catch (error) {
@@ -686,10 +524,6 @@ export class ApiService {
   }
 
   async getAgentLeads(agentId: string, filters?: any): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.agent.getLeads(agentId, filters) as ApiResponse;
-    }
-
     try {
       return await httpClient.get(`/agent/${agentId}/leads`, filters);
     } catch (error) {
@@ -699,10 +533,6 @@ export class ApiService {
   }
 
   async getAgentAnalytics(agentId: string): Promise<ApiResponse> {
-    if (USE_MOCK_DATA) {
-      return await mockApi.agent.getAnalytics(agentId) as ApiResponse;
-    }
-
     try {
       return await httpClient.get(`/agent/${agentId}/analytics`);
     } catch (error) {
@@ -711,7 +541,6 @@ export class ApiService {
     }
   }
 
-  // Health check
   async healthCheck(): Promise<ApiResponse> {
     try {
       return await httpClient.get('/health');
@@ -722,12 +551,8 @@ export class ApiService {
   }
 }
 
-// Create singleton instance
 export const apiService = new ApiService();
-
-// Export for use in components
 export default apiService;
 
-// Export types and classes
 export type { ApiResponse };
 export { ApiError };

@@ -59,7 +59,8 @@ export const PropertiesProvider = ({ children }) => {
           delete backendParams[key];
         }
       });
-      
+      console.log("Backend Params:=",backendParams);
+      console.log("Cache Key:=",axios.get('/properties', { params: backendParams }));
       const response = await axios.get('/properties', { params: backendParams });
       const { data, pagination: paginationData } = response.data;
       

@@ -10,6 +10,7 @@ import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-toastify';
+import axios from '@/lib/services/axios';
 
 const PropertyCard = ({ property, index }) => {
   const router = useRouter();

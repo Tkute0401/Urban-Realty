@@ -1,14 +1,7 @@
 import axios from 'axios';
 
 // Resolve base URL from environment variables with sensible fallbacks
-const apiBaseUrl =
-  // Next.js public env var
-  (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_URL)
-    ? process.env.NEXT_PUBLIC_API_URL
-    : // Vite env (in case of reuse)
-    ((typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL)
-      ? import.meta.env.VITE_API_BASE_URL
-      : 'https://urban-realty-production.up.railway.app/api/v1');
+const apiBaseUrl ='https://urban-realty-production.up.railway.app/api/v1/';
 
 const instance = axios.create({
   baseURL: apiBaseUrl,

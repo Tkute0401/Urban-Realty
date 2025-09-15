@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useProperties } from '../../context/PropertiesContext';
+import { useProperties } from '../../contexts/PropertiesContext';
 import { useSearchParams } from 'react-router-dom';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 
