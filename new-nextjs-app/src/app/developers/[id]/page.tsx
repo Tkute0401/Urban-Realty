@@ -20,7 +20,7 @@ import { useDevelopers } from '../../../contexts/DevelopersContext';
 //import ImageGallery from '../../components/common/ImageGallery';
 //import MapComponent from '../../components/common/MapComponent';
 import { formatNumber } from '../../../lib/utils/format';
-import axios from '../../../lib/services/axios';
+import http from '../../../lib/services/http';
 import { styled, keyframes } from '@mui/material/styles';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
@@ -83,7 +83,7 @@ const DeveloperDetails = () => {
         }
         
         // If not, fetch from API
-        const response = await axios.get(`/developers/${id}`);
+        const response = await http.get(`/developers/${id}`);
         setDeveloper(response.data.data || response.data);
       } catch (err) {
         console.error('Error fetching developer:', err);
@@ -135,7 +135,7 @@ const DeveloperDetails = () => {
     try {
       setDeleting(true);
       setDeleteError(null);
-      await axios.delete(`/developers/${id}`);
+      await http.delete(`/developers/${id}`);
       toast.success('Developer deleted successfully');
       getDevelopers(); // Refresh developers list
       router.push('/developers');

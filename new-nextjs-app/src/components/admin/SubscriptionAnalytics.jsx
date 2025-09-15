@@ -30,7 +30,7 @@ import {
   Error as ErrorIcon
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const SubscriptionAnalytics = () => {
   // Enhanced query with TanStack Query v5 object syntax and better error handling
@@ -43,7 +43,7 @@ const SubscriptionAnalytics = () => {
     queryKey: ['subscriptionAnalytics'],
     queryFn: async () => {
       try {
-        const response = await axios.get('/admin/subscription-analytics', {
+        const response = await http.get('/admin/subscription-analytics', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }

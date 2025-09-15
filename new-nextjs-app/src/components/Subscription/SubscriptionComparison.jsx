@@ -26,7 +26,7 @@ import {
   Star as StarIcon,
   TrendingUp as TrendingUpIcon
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SubscriptionComparison = () => {
@@ -46,7 +46,7 @@ const SubscriptionComparison = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/subscriptions');
+      const response = await http.get('/subscriptions');
       setPlans(response.data.data);
     } catch (err) {
       setError('Failed to load subscription plans');

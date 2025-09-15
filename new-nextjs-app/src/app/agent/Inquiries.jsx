@@ -30,7 +30,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { formatDate } from '../../utils/format';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -45,7 +45,7 @@ const AgentInquiries = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['agentInquiries', page, rowsPerPage, searchTerm],
     queryFn: async () => {
-      const res = await axios.get(
+      const res = await http.get(
         `/inquiries/my-inquiries?page=${page + 1}&limit=${rowsPerPage}&search=${searchTerm}`
       );
       return res.data;
