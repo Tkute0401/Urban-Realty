@@ -59,3 +59,17 @@ Change ID: 2
 - Audit mapping: "Phased Refactor Plan" and "Step-by-step Cursor task plan" consolidation
 - Notes/Risks: Order may adjust as dependencies surface during migration
 
+Change ID: 3
+- Files affected: `new-nextjs-app/src/lib/services/api.types.ts`, `new-nextjs-app/src/lib/services/http.ts`, `new-nextjs-app/src/lib/services/api.ts`
+- Summary: Added centralized API layer with SSR-safe axios client, normalized response types, and typed endpoint wrappers.
+- Rationale: Unify API access, error handling, and prepare for React Query domain hooks.
+- Audit mapping: Phase 0 — Baseline and safety (steps 2–4)
+- Notes/Risks: Base URL sourced from `NEXT_PUBLIC_API_URL` (browser) or `API_URL` (server) with `/api` fallback.
+
+Change ID: 4
+- Files affected: `new-nextjs-app/src/components/common/Header.jsx`
+- Summary: Replaced `react-router-dom` `Link` with `next/link`, added `useRouter` for logout navigation, and guarded `window` usage by moving to `useEffect` + responsive state.
+- Rationale: Align routing with Next.js App Router and ensure SSR safety.
+- Audit mapping: Phase 1 — Routing hygiene (items 1–2); Trackable Issue: `src/components/common/Header.jsx`.
+- Notes/Risks: Component assumes `useAuth` path is `../../context/AuthContext`; verify actual location under `src/contexts` during further cleanup.
+
