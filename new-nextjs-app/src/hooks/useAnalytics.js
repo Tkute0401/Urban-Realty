@@ -1,12 +1,13 @@
 // React hook for analytics tracking
 
 import { useEffect, useCallback, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname, useSearchParams } from 'next/navigation';
 import analyticsService from '../services/analyticsService';
 import { useAuth } from './useAuth';
 
 export const useAnalytics = () => {
-  const location = useLocation();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const previousLocation = useRef();
 
@@ -17,38 +18,39 @@ export const useAnalytics = () => {
 
   // Track page views on route changes
   useEffect(() => {
-    if (previousLocation.current !== location.pathname) {
-      analyticsService.trackPageView(location.pathname, {
-        search: location.search,
-        hash: location.hash
+    const search = searchParams ? `?${searchParams.toString()}` : '';
+    if (previousLocation.current !== pathname) {
+      analyticsService.trackPageView(pathname || '/', {
+        search,
+        hash: ''
       });
-      previousLocation.current = location.pathname;
+      previousLocation.current = pathname;
     }
-  }, [location]);
+  }, [pathname, searchParams]);
 
   // Track property view
   const trackPropertyView = useCallback((propertyId, propertyData = {}) => {
     analyticsService.trackPropertyInteraction(propertyId, 'view', {
       ...propertyData,
-      page: location.pathname
+      page: pathname || '/'
     });
-  }, [location.pathname]);
+  }, [pathname]);
 
   // Track property favorite
   const trackPropertyFavorite = useCallback((propertyId, isFavorited) => {
     analyticsService.trackPropertyInteraction(propertyId, 'favorite', {
       action: isFavorited ? 'add' : 'remove',
-      page: location.pathname
+      page: pathname || '/'
     });
-  }, [location.pathname]);
+  }, [pathname]);
 
   // Track property contact
   const trackPropertyContact = useCallback((propertyId, contactData = {}) => {
     analyticsService.trackPropertyInteraction(propertyId, 'contact', {
       ...contactData,
-      page: location.pathname
+      page: pathname || '/'
     });
-  }, [location.pathname]);
+  }, [pathname]);
 
   // Track search
   const trackSearch = useCallback((query, filters = {}, results = 0) => {
@@ -62,16 +64,16 @@ export const useAnalytics = () => {
 
   // Track button click
   const trackButtonClick = useCallback((buttonName, data = {}) => {
-    analyticsService.trackButtonClick(buttonName, location.pathname, data);
-  }, [location.pathname]);
+    analyticsService.trackButtonClick(buttonName, pathname || '/', data);
+  }, [pathname]);
 
   // Track error
   const trackError = useCallback((error, context = {}) => {
     analyticsService.trackError(error, {
       ...context,
-      page: location.pathname
+      page: pathname || '/'
     });
-  }, [location.pathname]);
+  }, [pathname]);
 
   // Track conversion
   const trackConversion = useCallback((conversionType, value = 0, data = {}) => {
@@ -82,9 +84,9 @@ export const useAnalytics = () => {
   const trackEngagement = useCallback((action, data = {}) => {
     analyticsService.trackEngagement(action, {
       ...data,
-      page: location.pathname
+      page: pathname || '/'
     });
-  }, [location.pathname]);
+  }, [pathname]);
 
   // Track performance
   const trackPerformance = useCallback((metricName, value, data = {}) => {

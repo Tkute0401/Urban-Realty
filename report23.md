@@ -136,3 +136,24 @@ Change ID: 13
 - Rationale: Keep page files thin and improve reuse/maintainability per audit plan.
 - Audit mapping: Trackable Issue: `src/app/page.tsx` (extract service blocks); Phase 2 — Component extraction and reuse.
 - Notes/Risks: Ensure `ServiceBlock` remains client component; no behavior change intended.
+
+Change ID: 14
+- Files affected: `new-nextjs-app/src/components/common/AgentRoute.jsx`
+- Summary: Replaced `react-router-dom` `Navigate`/`useLocation` with Next.js `useRouter`/`usePathname`; performs client-side role checks and redirects using `router.replace`, returning null during redirect.
+- Rationale: Align route guarding with Next.js App Router and remove legacy dependency.
+- Audit mapping: Phase 1 — Routing hygiene; Trackable Issue cleanup for guard components.
+- Notes/Risks: Preserves redirect-to-login with `from` query param; ensure AuthContext remains client-safe.
+
+Change ID: 15
+- Files affected: `new-nextjs-app/src/hooks/useAnalytics.js`
+- Summary: Migrated from `react-router-dom` `useLocation` to Next.js `usePathname`/`useSearchParams`; updated all analytics events to use pathname string and derived search query.
+- Rationale: Remove legacy routing dependency and ensure compatibility with Next.js App Router.
+- Audit mapping: Phase 1 — Routing hygiene; Trackable Issue: replace `react-router-dom` imports.
+- Notes/Risks: `hash` tracking set to empty string; add if hash usage is required later.
+
+Change ID: 16
+- Files affected: `new-nextjs-app/src/app/admin/AdminAnalytics.jsx`, `new-nextjs-app/src/app/admin/AdminProperties.jsx`, `new-nextjs-app/src/app/admin/UsersTable.jsx`
+- Summary: Replaced imports of legacy `@/lib/services/axios` with centralized `@/lib/services/http` and updated GET/PUT/DELETE calls accordingly.
+- Rationale: Consolidate HTTP client usage under SSR-safe axios instance with interceptors.
+- Audit mapping: Phase 0 — Centralized API Design; Step 1 migration of axios usage.
+- Notes/Risks: Response envelope assumptions unchanged; future step may normalize via `api` wrappers.
