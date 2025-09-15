@@ -10,28 +10,50 @@ import {
 import { styled } from '@mui/material/styles';
 import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings } from '@mui/icons-material';
 import { useProperties } from '../../../contexts/PropertiesContext';
+import apiService from '@/lib/services/apiService';
 import PropertyCard from '../../../components/home/PropertyCard';
   
 
-// Mock data for favorites
-const favoriteProperties = [
-  {
-    id: 1,
-    image: "/building_1.jpg",
-    title: "Luxury Apartment",
-    price: "₹85.0 L",
-    location: "Hinjewadi, Pune",
-    seller: "XYZ Realty"
-  },
-  {
-    id: 2,
-    image: "/building_5.jpg",
-    title: "Modern Villa",
-    price: "₹1.2 Cr",
-    location: "Baner, Pune",
-    seller: "ABC Builders"
-  }
-];
+const FavoriteGrid = ({ items, onView }: any) => (
+  <Grid container spacing={3}>
+    {items.map((property: any) => (
+      <Grid item xs={12} sm={6} key={property._id || property.id}>
+        <Card sx={{ 
+          backgroundColor: 'var(--color-bg-dark)',
+          border: '1px solid var(--color-primary)',
+          color: 'var(--color-text-inverse)'
+        }}>
+          <CardMedia
+            component="img"
+            height="160"
+            image={property.images?.[0]?.url || property.image || '/placeholder-property.jpg'}
+            alt={property.title || property.location}
+          />
+          <CardContent>
+            <Typography gutterBottom variant="h6" component="div">
+              {property.title || property.location}
+            </Typography>
+            <Typography variant="body2" color="var(--color-primary)" sx={{ mb: 1 }}>
+              {property.price}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {property.location?.address || property.location}
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button 
+              size="small" 
+              sx={{ color: 'var(--color-primary)' }}
+              onClick={() => onView(property._id || property.id)}
+            >
+              View Details
+            </Button>
+          </CardActions>
+        </Card>
+      </Grid>
+    ))}
+  </Grid>
+);
 
 const ProfileCard = styled(Paper)(({ theme }) => ({
   maxWidth: 800,
@@ -67,12 +89,32 @@ const Profile = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('profile');
   const { properties, getAgentProperties, agentProperties } = useProperties();
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [loadingFavorites, setLoadingFavorites] = useState<boolean>(false);
 
   useEffect(() => {
     if (user) {
       getAgentProperties(user);
     }
   }, [user, getAgentProperties]);
+
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (!user) return;
+      setLoadingFavorites(true);
+      try {
+        const res = await apiService.getFavorites() as { data: any };
+        // Normalize API shape
+        const items = Array.isArray(res?.data?.data) ? res.data.data : (res?.data || []);
+        setFavorites(items);
+      } catch (e) {
+        setFavorites([]);
+      } finally {
+        setLoadingFavorites(false);
+      }
+    };
+    loadFavorites();
+  }, [user]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
@@ -241,48 +283,11 @@ const Profile = () => {
             <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-primary)' }}>
               Your Favorite Properties
             </Typography>
-            
-            <Grid container spacing={3}>
-              {favoriteProperties.map((property) => (
-                <Grid item xs={12} sm={6} key={property.id}>
-                  <Card sx={{ 
-                    backgroundColor: 'var(--color-bg-dark)',
-                    border: '1px solid var(--color-primary)',
-                    color: 'var(--color-text-inverse)'
-                  }}>
-                    <CardMedia
-                      component="img"
-                      height="160"
-                      image={property.image}
-                      alt={property.title}
-                    />
-                    <CardContent>
-                      <Typography gutterBottom variant="h6" component="div">
-                        {property.title}
-                      </Typography>
-                      <Typography variant="body2" color="var(--color-primary)" sx={{ mb: 1 }}>
-                        {property.price}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {property.location}
-                      </Typography>
-                      <Typography variant="caption" display="block" color="text.secondary">
-                        Listed by: {property.seller}
-                      </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button 
-                        size="small" 
-                        sx={{ color: 'var(--color-primary)' }}
-                        onClick={() => handleViewProperty(property.id)}
-                      >
-                        View Details
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+            {loadingFavorites ? (
+              <Typography>Loading...</Typography>
+            ) : (
+              <FavoriteGrid items={favorites} onView={handleViewProperty} />
+            )}
           </Box>
         )}
         {user?.role === 'agent' && (

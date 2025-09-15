@@ -40,6 +40,17 @@ const PropertyDetails = () => {
         const propertyId = Array.isArray(id) ? id[0] : id;
         const response = await apiService.getProperty(propertyId) as { data: any; status: number };
         setProperty(response.data);
+        // add to recently viewed (best-effort)
+        try {
+          await apiService.addRecentlyViewed(propertyId as string);
+        } catch (_) {}
+        // fetch favorite status if authenticated
+        if (isAuthenticated) {
+          try {
+            const favRes = await apiService.getFavoriteStatus(propertyId as string) as { data: any };
+            setIsFavorite(Boolean(favRes?.data?.favorited));
+          } catch (_) {}
+        }
       } catch (err) {
         console.error('Error fetching property:', err);
         setErrorProperty('Failed to load property details');
@@ -51,7 +62,7 @@ const PropertyDetails = () => {
     if (id) {
       fetchProperty();
     }
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   const handleFavoriteToggle = async () => {
     if (!isAuthenticated) {
@@ -63,13 +74,12 @@ const PropertyDetails = () => {
       // Ensure id is a string (handle case where it might be an array)
       const propertyId = Array.isArray(id) ? id[0] : id;
       if (isFavorite) {
-        // Mock API doesn't have favorites endpoint yet, just toggle state
-        console.log('Remove from favorites:', propertyId);
+        await apiService.removeFavorite(propertyId as string);
+        setIsFavorite(false);
       } else {
-        // Mock API doesn't have favorites endpoint yet, just toggle state
-        console.log('Add to favorites:', propertyId);
+        await apiService.addFavorite(propertyId as string);
+        setIsFavorite(true);
       }
-      setIsFavorite(!isFavorite);
     } catch (err) {
       console.error('Error toggling favorite:', err);
     }

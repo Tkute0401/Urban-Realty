@@ -356,6 +356,87 @@ export class ApiService {
     }
   }
 
+  // Favorites endpoints
+  async getFavorites(): Promise<ApiResponse> {
+    if (USE_MOCK_DATA) {
+      // No mock endpoint defined; return empty structure to avoid UI breaks
+      return { data: [], status: 200, success: true } as ApiResponse;
+    }
+
+    try {
+      return await httpClient.get('/auth/favorites');
+    } catch (error) {
+      console.error('Get favorites error:', error);
+      throw error;
+    }
+  }
+
+  async addFavorite(propertyId: string): Promise<ApiResponse> {
+    if (USE_MOCK_DATA) {
+      return { data: { propertyId }, status: 200, success: true } as ApiResponse;
+    }
+
+    try {
+      return await httpClient.put(`/auth/favorites/${propertyId}`, {});
+    } catch (error) {
+      console.error('Add favorite error:', error);
+      throw error;
+    }
+  }
+
+  async removeFavorite(propertyId: string): Promise<ApiResponse> {
+    if (USE_MOCK_DATA) {
+      return { data: { propertyId }, status: 200, success: true } as ApiResponse;
+    }
+
+    try {
+      return await httpClient.delete(`/auth/favorites/${propertyId}`);
+    } catch (error) {
+      console.error('Remove favorite error:', error);
+      throw error;
+    }
+  }
+
+  async getFavoriteStatus(propertyId: string): Promise<ApiResponse<{ favorited: boolean }>> {
+    if (USE_MOCK_DATA) {
+      return { data: { favorited: false }, status: 200, success: true } as ApiResponse<{ favorited: boolean }>;
+    }
+
+    try {
+      return await httpClient.get(`/auth/favorites/${propertyId}/status`);
+    } catch (error) {
+      console.error('Favorite status error:', error);
+      throw error;
+    }
+  }
+
+  // Recently viewed endpoints
+  async getRecentlyViewed(): Promise<ApiResponse> {
+    if (USE_MOCK_DATA) {
+      return { data: [], status: 200, success: true } as ApiResponse;
+    }
+
+    try {
+      return await httpClient.get('/auth/recently-viewed');
+    } catch (error) {
+      console.error('Get recently viewed error:', error);
+      throw error;
+    }
+  }
+
+  async addRecentlyViewed(propertyId: string): Promise<ApiResponse> {
+    if (USE_MOCK_DATA) {
+      return { data: { propertyId }, status: 200, success: true } as ApiResponse;
+    }
+
+    try {
+      return await httpClient.post(`/auth/recently-viewed/${propertyId}`);
+    } catch (error) {
+      console.error('Add recently viewed error:', error);
+      throw error;
+    }
+  }
+
   // Contact endpoints
   async getContacts(filters?: any): Promise<ApiResponse> {
     if (USE_MOCK_DATA) {

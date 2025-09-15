@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProperties } from '@/contexts/PropertiesContext';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
+import apiService from '@/lib/services/apiService';
 
 const AccountSidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
@@ -96,31 +97,23 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     }
   }, [user?.favorites, isOpen, getProperty]);
 
-  // Mock data for recently viewed properties
-  const recentlyViewed = [
-    {
-      id: 1,
-      image: "/building_1.jpg",
-      price: "8500000",
-      title: "3 BHK Apartment",
-      address: {
-        line1: "Flat 301",
-        street: "Skyline Tower",
-        city: "Hinjewadi",
-        state: "Maharashtra",
-        zipCode: "411057"
-      },
-      seller: "XYZ Realty"
-    },
-    {
-      id: 2,
-      image: "/building_5.jpg",
-      price: "12000000",
-      title: "4 BHK Villa",
-      address: "Baner Road, Pune, Maharashtra 411045",
-      seller: "ABC Builders"
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
+
+  useEffect(() => {
+    const loadRecentlyViewed = async () => {
+      if (!user) return setRecentlyViewed([]);
+      try {
+        const res = await apiService.getRecentlyViewed();
+        const items = Array.isArray(res?.data?.data) ? res.data.data : (res?.data || []);
+        setRecentlyViewed(items);
+      } catch (e) {
+        setRecentlyViewed([]);
+      }
+    };
+    if (isOpen) {
+      loadRecentlyViewed();
     }
-  ];
+  }, [user, isOpen]);
 
   // Format price with Indian Rupee symbol
   const formatPrice = (price) => {
@@ -242,7 +235,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                         <div className="w-20 h-20 rounded-full border-2 border-[#78CADC] overflow-hidden  mt-7">
                           {property.images ? (
                             <img 
-                              src={property.images[0].url} 
+                              src={property.images[0]?.url || property.image || '/placeholder-property.jpg'} 
                               //alt={property.title}
                               className="w-full h-full object-cover"
                             />
