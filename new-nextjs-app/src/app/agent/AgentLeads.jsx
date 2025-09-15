@@ -57,7 +57,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/services/mockApi';
+import { apiService } from '@/lib/services/apiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -85,7 +85,7 @@ const AgentLeads = () => {
   const { data: leads, isLoading, error } = useQuery({
     queryKey: ['agentLeads', user?.id, page, rowsPerPage, searchTerm, statusFilter, contactMethodFilter],
     queryFn: async () => {
-      const res = await mockApi.agent.getLeads(user?.id || 'agent1', {
+      const res = await apiService.getAgentLeads(user?.id, {
         page: page + 1,
         limit: rowsPerPage,
         search: searchTerm,
@@ -100,7 +100,8 @@ const AgentLeads = () => {
   // Update lead status mutation
   const updateLeadStatusMutation = useMutation({
     mutationFn: async ({ leadId, status }) => {
-      await mockApi.agent.updateLeadStatus(leadId, status);
+      // Assuming contacts endpoint is used for leads status update
+      await apiService.updateContact(leadId, { status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agentLeads'] });

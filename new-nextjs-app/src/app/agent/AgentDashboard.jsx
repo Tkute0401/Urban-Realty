@@ -78,7 +78,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import { mockApi } from '@/lib/services/mockApi';
+import { apiService } from '@/lib/services/apiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 import { motion } from 'framer-motion';
@@ -126,7 +126,7 @@ const AgentDashboard = () => {
     queryKey: ['agentDashboard', user?.id, filters],
     queryFn: async () => {
       try {
-        const res = await mockApi.agent.getDashboard(user?.id || 'agent1');
+        const res = await apiService.getAgentDashboard(user?.id);
         return res.data;
       } catch (error) {
         console.error('Error fetching dashboard:', error);
@@ -152,7 +152,7 @@ const AgentDashboard = () => {
     queryKey: ['agentAnalytics', user?.id],
     queryFn: async () => {
       try {
-        const res = await mockApi.agent.getAnalytics(user?.id || 'agent1');
+        const res = await apiService.getAgentAnalytics(user?.id);
         return res.data;
       } catch (error) {
         console.error('Error fetching analytics:', error);

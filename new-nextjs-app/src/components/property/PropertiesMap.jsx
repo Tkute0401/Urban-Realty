@@ -59,6 +59,16 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     setIsLoaded(false);
   };
 
+  if (!googleMapsApiKey) {
+    return (
+      <Box className="map-empty">
+        <Typography variant="body2" color="text.secondary">
+          Map unavailable. Missing Google Maps API key.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <LoadScript 
       googleMapsApiKey={googleMapsApiKey}
