@@ -28,7 +28,7 @@ import {
   Delete
 } from '@mui/icons-material';
 import PropertiesTable from './PropertiesTable';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const AdminProperties = () => {
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ const AdminProperties = () => {
   const fetchPropertyStats = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/admin/properties/stats');
+      const response = await http.get('/admin/properties/stats');
       if (response.data.success) {
         setStats(response.data.data);
       }

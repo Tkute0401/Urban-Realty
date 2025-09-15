@@ -32,7 +32,7 @@ import {
   Close, 
   Save 
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -55,7 +55,7 @@ const UsersTable = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/admin/users');
+      const response = await http.get('/admin/users');
       if (response.data.success) {
         setUsers(response.data.data || []);
       } else {
@@ -107,7 +107,7 @@ const UsersTable = () => {
     }
 
     try {
-      const response = await axios.put(
+      const response = await http.put(
         `/admin/users/${selectedUser._id}`, 
         editFormData
       );
@@ -130,7 +130,7 @@ const UsersTable = () => {
     if (!selectedUser) return;
 
     try {
-      await axios.delete(`/admin/users/${selectedUser._id}`);
+      await http.delete(`/admin/users/${selectedUser._id}`);
       setUsers(users.filter(user => user._id !== selectedUser._id));
     } catch (err) {
       console.error('Error deleting user:', err);
@@ -144,7 +144,7 @@ const UsersTable = () => {
     if (!selectedUser || selectedUser.role !== 'agent') return;
 
     try {
-      const response = await axios.put(`/admin/agents/${selectedUser._id}/verify`);
+      const response = await http.put(`/admin/agents/${selectedUser._id}/verify`);
       setUsers(users.map(user => 
         user._id === selectedUser._id ? response.data.data : user
       ));

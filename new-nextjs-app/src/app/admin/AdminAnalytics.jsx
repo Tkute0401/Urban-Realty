@@ -49,7 +49,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -76,7 +76,7 @@ const AdminAnalytics = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get('/admin/analytics');
+      const response = await http.get('/admin/analytics');
       if (response.data.success) {
         setAnalytics(response.data.data);
       } else {

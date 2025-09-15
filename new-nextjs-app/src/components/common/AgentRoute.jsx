@@ -1,17 +1,26 @@
 // src/components/common/AgentRoute.jsx
-import { Navigate, useLocation } from 'react-router-dom';
+'use client';
+import { useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 
 const AgentRoute = ({ children }) => {
   const { user } = useAuth();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  useEffect(() => {
+    if (!user) {
+      router.replace(`/login?from=${encodeURIComponent(pathname || '/')}`);
+      return;
+    }
+    if (user.role !== 'agent' && user.role !== 'admin') {
+      router.replace('/');
+    }
+  }, [user, router, pathname]);
 
-  if (user.role !== 'agent' && user.role !== 'admin') {
-    return <Navigate to="/" replace />;
+  if (!user || (user.role !== 'agent' && user.role !== 'admin')) {
+    return null;
   }
 
   return children;
