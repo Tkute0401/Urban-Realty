@@ -198,3 +198,17 @@ Change ID: 22
 - Rationale: Enforce single source of truth for HTTP and interceptors.
 - Audit mapping: Phase 0 — Baseline and safety (step 3) and Step 5 — Remove duplicates and dead code.
 - Notes/Risks: None.
+
+Change ID: 23
+- Files affected: `new-nextjs-app/src/components/admin/AdminDashboard.tsx`, `new-nextjs-app/src/app/admin/page.tsx`, `new-nextjs-app/src/components/lazy/AdminDashboardLazy.tsx`, `new-nextjs-app/src/app/admin/AdminDashboard.jsx`
+- Summary: Moved AdminDashboard into `components/admin` and converted to TSX; updated admin page and lazy loader imports; removed old JSX file.
+- Rationale: Extract feature UI from `app` into reusable components and align with TS as per refactor plan.
+- Audit mapping: Phase 2 — Component extraction and reuse; Trackable Issue: move `src/app/admin/AdminDashboard.jsx` to `components/admin/*`.
+- Notes/Risks: Type annotations are minimal and may be refined later with domain models.
+
+Change ID: 24
+- Files affected: `new-nextjs-app/.eslintrc.json`
+- Summary: Added ESLint `no-restricted-imports` rule to ban `react-router-dom` and guide usage of Next.js App Router primitives.
+- Rationale: Prevent reintroduction of legacy routing library per audit guidance.
+- Audit mapping: Phase 4 — Clean-up and type hardening; Add ESLint rule to prevent `react-router-dom` imports.
+- Notes/Risks: Rule applies within `new-nextjs-app` package; adjust root config if monorepo-wide enforcement is needed.

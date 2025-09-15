@@ -1,0 +1,16 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-router-dom",
+            "message": "Use Next.js App Router primitives (next/link, next/navigation) instead."
+          }
+        ]
+      }
+    ]
+  }
+}
