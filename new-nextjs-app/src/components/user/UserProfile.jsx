@@ -30,7 +30,7 @@ import {
   Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from '../../lib/services/axios';
+import http from '../../lib/services/http';
 
 const UserProfile = () => {
   const { user, updateUser } = useAuth();
@@ -56,7 +56,7 @@ const UserProfile = () => {
 
   const fetchSubscription = async () => {
     try {
-      const response = await axios.get('/subscriptions/my-subscription');
+      const response = await http.get('/subscriptions/my-subscription');
       setSubscription(response.data.data);
     } catch (err) {
       if (err.response?.status !== 404) {
@@ -74,7 +74,7 @@ const UserProfile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const response = await axios.put('/api/auth/update', editData);
+      const response = await http.put('/api/auth/update', editData);
       
       // Update local user state
       updateUser({
@@ -96,7 +96,7 @@ const UserProfile = () => {
   const handleCancelSubscription = async () => {
     if (window.confirm('Are you sure you want to cancel your subscription?')) {
       try {
-        await axios.put('/subscriptions/cancel');
+        await http.put('/subscriptions/cancel');
         fetchSubscription();
         // Refresh user data
         window.location.reload();

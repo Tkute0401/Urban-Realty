@@ -177,3 +177,24 @@ Change ID: 19
 - Rationale: Consolidate HTTP client usage under SSR-safe axios instance with interceptors; align routing with Next.js App Router.
 - Audit mapping: Phase 0 — Centralized API Design; Phase 1 — Routing hygiene; Trackable Items: migrate `axios.js` usage and remove `react-router-dom` patterns.
 - Notes/Risks: Some modules still rely on specific response shapes; will standardize via `api` wrappers in a subsequent pass.
+
+Change ID: 20
+- Files affected: `new-nextjs-app/src/components/user/UserProfile.jsx`
+- Summary: Switched from legacy `lib/services/axios` to centralized `lib/services/http`; updated GET/PUT calls accordingly.
+- Rationale: Complete migration to SSR-safe HTTP client with shared interceptors.
+- Audit mapping: Phase 0 — Centralized API Design; Phase 1 — Routing/SSR safety considerations.
+- Notes/Risks: Uses window.confirm; acceptable client-only usage.
+
+Change ID: 21
+- Files affected: `new-nextjs-app/src/hooks/useApi.js`, `new-nextjs-app/src/lib/constants/api.js`
+- Summary: Removed deprecated legacy helper and constants after verifying no remaining references.
+- Rationale: Reduce duplication and prevent drift with new centralized API and domain hooks.
+- Audit mapping: Phase 4 — Clean-up and type hardening; Step 5 — Remove duplicates and dead code.
+- Notes/Risks: None.
+
+Change ID: 22
+- Files affected: `new-nextjs-app/src/lib/services/axios.js`
+- Summary: Deleted legacy axios instance after confirming last reference migrated; centralized `http.ts` is the single client.
+- Rationale: Enforce single source of truth for HTTP and interceptors.
+- Audit mapping: Phase 0 — Baseline and safety (step 3) and Step 5 — Remove duplicates and dead code.
+- Notes/Risks: None.
