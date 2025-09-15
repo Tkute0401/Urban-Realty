@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
@@ -57,8 +58,20 @@ const PersonIcon = () => (
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isMobile = window.innerWidth <= 768;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth <= 768);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -73,7 +86,7 @@ const Header = () => {
       <div className="header-container">
         {/* Logo */}
         <div className="logo-container">
-          <Link to="/" className="logo-link">
+          <Link href="/" className="logo-link">
             <img 
                 src="/vite.png" 
                 alt="Logo" 
@@ -85,7 +98,7 @@ const Header = () => {
 
         {/* Admin Link */}
         {user?.role === 'admin' && (
-          <Link to="/admin" className="nav-item nav-item-outlined">
+          <Link href="/admin" className="nav-item nav-item-outlined">
             ADMIN
           </Link>
         )}
@@ -100,12 +113,12 @@ const Header = () => {
             {/* Mobile Menu */}
             {mobileMenuOpen && (
               <div className="mobile-menu">
-                <Link to="/properties" className="menu-item" onClick={handleMenuClose}>
+                <Link href="/properties" className="menu-item" onClick={handleMenuClose}>
                   <ListIcon className="menu-item-icon" />
                   <span>Browse Properties</span>
                 </Link>
                 
-                <Link to="/subscriptions" className="menu-item" onClick={handleMenuClose}>
+                <Link href="/subscriptions" className="menu-item" onClick={handleMenuClose}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="menu-item-icon">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -116,7 +129,7 @@ const Header = () => {
                 </Link>
                 
                 {user?.role === 'agent' && (
-                  <Link to="/add-property" className="menu-item" onClick={handleMenuClose}>
+                  <Link href="/add-property" className="menu-item" onClick={handleMenuClose}>
                     <AddIcon className="menu-item-icon" />
                     <span>Add Property</span>
                   </Link>
@@ -124,7 +137,7 @@ const Header = () => {
                 
                 {user ? (
                   <>
-                    <Link to="/profile" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/profile" className="menu-item" onClick={handleMenuClose}>
                       <PersonIcon className="menu-item-icon" />
                       <span>Profile</span>
                     </Link>
@@ -140,11 +153,11 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <Link to="/login" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/login" className="menu-item" onClick={handleMenuClose}>
                       <LoginIcon className="menu-item-icon" />
                       <span>Login</span>
                     </Link>
-                    <Link to="/register" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/register" className="menu-item" onClick={handleMenuClose}>
                       <RegisterIcon className="menu-item-icon" />
                       <span>Register</span>
                     </Link>
@@ -156,12 +169,12 @@ const Header = () => {
         ) : (
           /* Desktop Navigation */
           <nav className="nav-container">
-            <Link to="/properties" className="nav-item">
+            <Link href="/properties" className="nav-item">
               <ListIcon />
               <span>Browse</span>
             </Link>
 
-            <Link to="/subscriptions" className="nav-item">
+            <Link href="/subscriptions" className="nav-item">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -172,7 +185,7 @@ const Header = () => {
             </Link>
 
             {user?.role === 'agent' && (
-              <Link to="/add-property" className="nav-item nav-item-outlined">
+              <Link href="/add-property" className="nav-item nav-item-outlined">
                 <AddIcon />
                 <span>Add Property</span>
               </Link>
@@ -180,11 +193,14 @@ const Header = () => {
 
             {user ? (
               <>
-                <Link to="/profile" className="user-avatar">
+                <Link href="/profile" className="user-avatar">
                   {user.name.charAt(0).toUpperCase()}
                 </Link>
                 <button 
-                  onClick={logout} 
+                  onClick={() => {
+                    logout();
+                    router.push('/');
+                  }} 
                   className="nav-item button-link"
                 >
                   Logout
@@ -192,11 +208,11 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="nav-item">
+                <Link href="/login" className="nav-item">
                   <LoginIcon />
                   <span>Login</span>
                 </Link>
-                <Link to="/register" className="nav-item nav-item-outlined">
+                <Link href="/register" className="nav-item nav-item-outlined">
                   <RegisterIcon />
                   <span>Register</span>
                 </Link>
