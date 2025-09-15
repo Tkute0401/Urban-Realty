@@ -39,7 +39,7 @@ import {
   Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockApiService } from '@/lib/services/mockApi';
+import apiService from '@/lib/services/apiService';
 
 interface UserSubscription {
   id: string;
@@ -84,8 +84,8 @@ const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const [subscriptionResponse, plansResponse] = await Promise.all([
-        mockApiService.getUserSubscription(user.id),
-        mockApiService.getSubscriptionPlans()
+        apiService.getUserSubscription(user.id),
+        apiService.getSubscriptionPlans()
       ]) as [{ data: any; status: number }, { data: any; status: number }];
 
       if (subscriptionResponse.data.success) {
@@ -111,7 +111,7 @@ const SubscriptionManagement = () => {
     if (!user || !subscription) return;
 
     try {
-      const response = await mockApiService.cancelSubscription(user.id) as { data: any; status: number };
+      const response = await apiService.cancelSubscription(user.id) as { data: any; status: number };
       if (response.data.success) {
         setSubscription({
           ...subscription,
@@ -132,7 +132,7 @@ const SubscriptionManagement = () => {
     if (!user || !subscription) return;
 
     try {
-      const response = await mockApiService.updateSubscription(user.id, newPlanId) as { data: any; status: number };
+      const response = await apiService.updateSubscription(user.id, newPlanId) as { data: any; status: number };
       if (response.data.success) {
         setSubscription(response.data.subscription);
         

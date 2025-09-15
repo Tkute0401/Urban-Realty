@@ -79,7 +79,7 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
-import { mockApi } from '@/lib/services/mockApi';
+import apiService from '@/lib/services/apiService';
 import { motion } from 'framer-motion';
 import { formatDate } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
     queryKey: ['adminDashboard', filters],
     queryFn: async () => {
       try {
-        const response = await mockApi.admin.getDashboard(filters);
+        const response = await apiService.getAdminDashboard();
         return response;
       } catch (error) {
         console.error('Error fetching admin dashboard data:', error);
@@ -170,7 +170,7 @@ const AdminDashboard = () => {
     queryKey: ['adminAnalytics'],
     queryFn: async () => {
       try {
-        const response = await mockApi.admin.getAnalytics();
+        const response = await apiService.getAdminAnalytics();
         return response;
       } catch (error) {
         console.error('Error fetching admin analytics:', error);

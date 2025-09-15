@@ -9,7 +9,6 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockApiService } from '@/lib/services/mockApi';
 import { toast } from 'react-toastify';
 
 const PropertyCard = ({ property, index }) => {

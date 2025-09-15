@@ -8,7 +8,7 @@ import HomeType from '@/components/property/HomeType';
 import More from '@/components/property/More';
 import LocationSearch from '@/components/property/LocationSearch';
 import PropertiesMap from '@/components/property/PropertiesMap';
-import { mockApiService } from '@/lib/services/mockApi';
+import apiService from '@/lib/services/apiService';
 import {
   Menu as MenuIcon,
   Search as SearchIcon,
@@ -100,7 +100,7 @@ const Properties = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await mockApiService.getProperties() as { data: any; status: number };
+        const response = await apiService.getProperties() as { data: any; status: number };
         setProperties(response.data.properties || []);
         setLoading(false);
         setIsLoaded(true);

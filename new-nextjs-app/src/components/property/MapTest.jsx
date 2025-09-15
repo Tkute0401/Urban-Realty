@@ -12,12 +12,24 @@ import PropertyMap from './PropertyMap';
 import PropertiesMap from './PropertiesMap';
 import LocationSearch from './LocationSearch';
 import NearbyAmenities from './NearbyAmenities';
-import { mockProperties } from '../../lib/mock-data/properties';
+import apiService from '@/lib/services/apiService';
 
 // Test component for Phase 4 Maps & Location Services
 const MapTest = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [testProperty] = useState(mockProperties[0]); // Use first mock property
+  const [testProperty, setTestProperty] = useState(null);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiService.getProperties();
+        const list = res?.data?.properties || [];
+        setTestProperty(list[0] || null);
+      } catch (e) {
+        setTestProperty(null);
+      }
+    })();
+  }, []);
 
   const handleLocationSelect = (location) => {
     setSelectedLocation(location);
@@ -80,7 +92,7 @@ const MapTest = () => {
                 Multiple Properties Map
               </Typography>
               <PropertiesMap 
-                properties={mockProperties}
+                properties={testProperty ? [testProperty] : []}
                 selectedProperty={testProperty}
                 onMarkerClick={(property) => console.log('Marker clicked:', property.title)}
               />
