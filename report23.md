@@ -130,6 +130,13 @@ Change ID: 9
 - Audit mapping: Phase 1 — Routing hygiene; Trackable Issue: replace `react-router-dom` imports.
 - Notes/Risks: None.
 
+Change ID: 33
+- Files affected: `new-nextjs-app/src/components/property/PropertyList.jsx`, `new-nextjs-app/src/components/property/PropertyList.css`, `new-nextjs-app/src/app/properties/MainPage.css`
+- Summary: Removed deprecated `PropertyList` component and related CSS after replacing with `PropertiesExplorer`; no remaining references.
+- Rationale: Eliminate duplicate UI and page-scoped styles per audit; favor component-scoped CSS modules.
+- Audit mapping: Phase 2 — Component extraction and reuse; Step 5 — Remove duplicates and dead code.
+- Notes/Risks: Confirmed no imports remained before deletion.
+
 Change ID: 10
 - Files affected: `new-nextjs-app/src/hooks/api/properties.ts`
 - Summary: Added `usePropertiesQuery` hook backed by centralized `api` to fetch property lists with React Query.
@@ -233,3 +240,38 @@ Change ID: 24
 - Rationale: Prevent reintroduction of legacy routing library per audit guidance.
 - Audit mapping: Phase 4 — Clean-up and type hardening; Add ESLint rule to prevent `react-router-dom` imports.
 - Notes/Risks: Rule applies within `new-nextjs-app` package; adjust root config if monorepo-wide enforcement is needed.
+
+Change ID: 28
+- Files affected: `new-nextjs-app/src/hooks/api/auth.ts`
+- Summary: Added auth domain React Query hooks (`useProfileQuery`, `useLoginMutation`, `useRegisterMutation`) backed by centralized `api`.
+- Rationale: Move auth network logic into reusable hooks to standardize data flow and caching.
+- Audit mapping: Phase 3 — API centralization and React Query integration; Step 2 — Introduce domain hooks.
+- Notes/Risks: Assumes `api.auth.profile` returns `{ user }` and login/register return `{ token, user }`.
+
+Change ID: 29
+- Files affected: `new-nextjs-app/src/contexts/AuthContext.jsx`
+- Summary: Rewired context to use new auth hooks and `sessionManager`; removed direct `apiService` calls; synchronized profile via React Query.
+- Rationale: Decouple context from service implementation and align with centralized API/hooks approach.
+- Audit mapping: Phase 3 — API centralization and React Query; Trackable Item: `src/contexts/AuthContext.jsx`.
+- Notes/Risks: File not yet converted to TypeScript; full TS migration and type-safe context value pending.
+
+Change ID: 30
+- Files affected: `new-nextjs-app/src/contexts/AuthContext.tsx`, `new-nextjs-app/src/contexts/AuthContext.jsx`, `new-nextjs-app/src/app/providers.tsx`
+- Summary: Converted AuthContext to TypeScript with strong types, deleted old JSX file, and ensured providers import the TSX version.
+- Rationale: Type hardening and alignment with centralized hooks per audit.
+- Audit mapping: Phase 4 — Cleanup and type hardening; Phase 3 — API centralization usage in context.
+- Notes/Risks: Context consumer imports remain `@/contexts/AuthContext` and resolve to TSX.
+
+Change ID: 31
+- Files affected: `new-nextjs-app/src/lib/services/apiService.ts`
+- Summary: Thinned legacy apiService to wrap centralized `api`/`http`, removing custom fetch client and invalid framer-motion type import.
+- Rationale: Single source of truth for HTTP and endpoints; maintain backward compatibility for remaining imports until fully removed.
+- Audit mapping: Phase 3 — API centralization; Step 5 — Remove duplicates and dead code.
+- Notes/Risks: Response shapes normalized to `{ data, status }` with success/message where available.
+
+Change ID: 32
+- Files affected: `new-nextjs-app` (codebase-wide)
+- Summary: Purged remaining `react-router-dom` imports; only a commented line remained in `ServiceBlock.jsx` which is harmless.
+- Rationale: Enforce Next.js App Router usage and prevent SSR issues per audit.
+- Audit mapping: Phase 1 — Routing hygiene; ESLint rule complemented by code cleanup.
+- Notes/Risks: None.
