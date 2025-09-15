@@ -59,3 +59,10 @@ Change ID: 2
 - Audit mapping: "Phased Refactor Plan" and "Step-by-step Cursor task plan" consolidation
 - Notes/Risks: Order may adjust as dependencies surface during migration
 
+Change ID: 3
+- Files affected: `new-nextjs-app/src/lib/services/api.config.ts`, `new-nextjs-app/src/lib/services/api.types.ts`, `new-nextjs-app/src/lib/services/http.ts`, `new-nextjs-app/src/lib/services/api.ts`
+- Summary: Created centralized API layer with SSR-safe config, axios instance, normalized response envelope, and typed endpoint wrapper.
+- Rationale: Unify API access and error handling; prepare for React Query hooks.
+- Audit mapping: Phase 0 — Baseline and safety (Create centralized API layer); Centralized API Design; Step 1
+- Notes/Risks: Downstream imports must be updated to use `api`/`http`; legacy `axios.js` and `apiService.ts` will be deprecated after consumers migrate.
+
