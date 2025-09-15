@@ -73,3 +73,24 @@ Change ID: 4
 - Audit mapping: Phase 1 — Routing hygiene (items 1–2); Trackable Issue: `src/components/common/Header.jsx`.
 - Notes/Risks: Component assumes `useAuth` path is `../../context/AuthContext`; verify actual location under `src/contexts` during further cleanup.
 
+Change ID: 5
+- Files affected: `new-nextjs-app/src/lib/services/api.ts`
+- Summary: Added admin endpoints `dashboard` and `analytics` to centralized API under `api.admin`.
+- Rationale: Provide unified, typed access for admin data to back new domain hooks.
+- Audit mapping: Phase 0 — Centralized API Design; Step 1 of Cursor task plan.
+- Notes/Risks: Endpoint paths assume `/admin/dashboard` and `/admin/analytics` exist on backend.
+
+Change ID: 6
+- Files affected: `new-nextjs-app/src/hooks/api/admin.ts`
+- Summary: Created admin React Query hooks `useAdminDashboard` and `useAdminAnalytics` backed by centralized API.
+- Rationale: Migrate components away from `apiService` to standardized hooks with caching.
+- Audit mapping: Phase 3 — API centralization and React Query integration; Step 2 of Cursor plan.
+- Notes/Risks: Query keys standardized; stale times added.
+
+Change ID: 7
+- Files affected: `new-nextjs-app/src/app/admin/AdminDashboard.jsx`
+- Summary: Refactored to consume `useAdminDashboard` and `useAdminAnalytics` hooks; removed direct `apiService` usage and `useQuery` inline configs.
+- Rationale: Align with centralized API and domain hooks for consistency and caching.
+- Audit mapping: Trackable Issue: `src/app/admin/AdminDashboard.jsx`; Phases 2–3.
+- Notes/Risks: `refresh` now uses hook `refetch`; verify data shape matches previous expectations (counts/recent/etc.).
+
