@@ -50,7 +50,7 @@ import {
   Delete,
   Add
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -142,7 +142,7 @@ const AdminSettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get('/admin/settings');
+      const response = await http.get('/admin/settings');
       if (response.data.success) {
         setSettings(response.data.data);
       } else {
@@ -172,7 +172,7 @@ const AdminSettings = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.put('/admin/settings', settings);
+      const response = await http.put('/admin/settings', settings);
       if (response.data.success) {
         setSuccess('Settings saved successfully!');
         setTimeout(() => setSuccess(null), 3000);
@@ -189,7 +189,7 @@ const AdminSettings = () => {
 
   const handleBackup = async () => {
     try {
-      const response = await axios.post('/admin/backup');
+      const response = await http.post('/admin/backup');
       if (response.data.success) {
         setSuccess('Backup created successfully!');
         setBackupDialog(false);
@@ -204,7 +204,7 @@ const AdminSettings = () => {
 
   const handleRestore = async (backupId) => {
     try {
-      const response = await axios.post(`/admin/restore/${backupId}`);
+      const response = await http.post(`/admin/restore/${backupId}`);
       if (response.data.success) {
         setSuccess('System restored successfully!');
         setRestoreDialog(false);

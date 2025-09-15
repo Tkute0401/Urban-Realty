@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 
 const DevelopersContext = createContext();
 

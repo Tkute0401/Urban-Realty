@@ -170,3 +170,10 @@ Change ID: 17
 - Rationale: Align with Next.js App Router and eliminate legacy router usage per audit.
 - Audit mapping: Phase 1 — Routing hygiene; Trackable Issue: `src/components/property/PropertyList.jsx`.
 - Notes/Risks: Initial filter default now uses `pathname` instead of `window.location.pathname`.
+
+Change ID: 19
+- Files affected: `new-nextjs-app/src/app/admin/AdminSettings.jsx`, `new-nextjs-app/src/app/admin/AdminReports.jsx`, `new-nextjs-app/src/app/admin/AgentsPage.jsx`, `new-nextjs-app/src/app/admin/AdminInquiries.jsx`, `new-nextjs-app/src/app/admin/AdminMedia.jsx`, `new-nextjs-app/src/components/home/PropertyCard.jsx`, `new-nextjs-app/src/app/admin/ContactsTable.jsx`, `new-nextjs-app/src/app/admin/AdminContacts.jsx`, `new-nextjs-app/src/app/admin/PropertiesTable.jsx`, `new-nextjs-app/src/app/admin/InquiryDetails.jsx`, `new-nextjs-app/src/app/admin/InquiriesPage.jsx`, `new-nextjs-app/src/contexts/PropertiesContext.jsx`, `new-nextjs-app/src/contexts/AgentsContext.jsx`, `new-nextjs-app/src/contexts/DevelopersContext.jsx`
+- Summary: Replaced all remaining imports of legacy `@/lib/services/axios` with centralized `@/lib/services/http`; updated method calls accordingly. Also migrated `useNavigate` usages in admin pages to Next.js `useRouter` where encountered.
+- Rationale: Consolidate HTTP client usage under SSR-safe axios instance with interceptors; align routing with Next.js App Router.
+- Audit mapping: Phase 0 — Centralized API Design; Phase 1 — Routing hygiene; Trackable Items: migrate `axios.js` usage and remove `react-router-dom` patterns.
+- Notes/Risks: Some modules still rely on specific response shapes; will standardize via `api` wrappers in a subsequent pass.

@@ -11,7 +11,7 @@ import {
   Mail, Delete, Search, Refresh, 
   CheckCircle, Pending, Cancel
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
 
@@ -23,7 +23,7 @@ const AdminInquiries = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const fetchInquiries = async () => {
     try {
@@ -35,7 +35,7 @@ const AdminInquiries = () => {
         url += `?status=${statusFilter}`;
       }
       
-      const response = await axios.get(url);
+      const response = await http.get(url);
       setInquiries(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load inquiries');
@@ -50,7 +50,7 @@ const AdminInquiries = () => {
 
   const handleDeleteInquiry = async () => {
     try {
-      await axios.delete(`/admin/inquiries/${selectedInquiry._id}`);
+      await http.delete(`/admin/inquiries/${selectedInquiry._id}`);
       setOpenDeleteDialog(false);
       fetchInquiries();
     } catch (err) {
@@ -60,7 +60,7 @@ const AdminInquiries = () => {
 
   const updateInquiryStatus = async (inquiryId, newStatus) => {
     try {
-      await axios.patch(`/admin/inquiries/${inquiryId}/status`, {
+      await http.patch(`/admin/inquiries/${inquiryId}/status`, {
         status: newStatus
       });
       fetchInquiries();
@@ -153,7 +153,7 @@ const AdminInquiries = () => {
                   key={inquiry._id} 
                   hover
                   sx={{ cursor: 'pointer' }}
-                  onClick={() => navigate(`/admin/inquiries/${inquiry._id}`)}
+                  onClick={() => router.push(`/admin/inquiries/${inquiry._id}`)}
                 >
                   <TableCell>
                     <Typography fontWeight="500">

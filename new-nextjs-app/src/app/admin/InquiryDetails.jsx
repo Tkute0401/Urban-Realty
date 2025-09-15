@@ -10,7 +10,7 @@ import {
   ArrowBack, Mail, Phone, Home, 
   CheckCircle, Pending, Cancel
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { formatDate } from '@/lib/utils/format';
 
 const InquiryDetails = () => {

@@ -11,7 +11,7 @@ import {
   Edit, Delete, Search, Refresh, 
   Person, CheckCircle, Cancel, Email, Phone
 } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
 
@@ -22,14 +22,14 @@ const AgentsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const fetchAgents = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get('/admin/users?role=agent');
+      const response = await http.get('/admin/users?role=agent');
       setAgents(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load agents');
@@ -44,7 +44,7 @@ const AgentsPage = () => {
 
   const handleDeleteAgent = async () => {
     try {
-      await axios.delete(`/admin/users/${selectedAgent._id}`);
+      await http.delete(`/admin/users/${selectedAgent._id}`);
       setOpenDeleteDialog(false);
       fetchAgents();
     } catch (err) {
@@ -54,7 +54,7 @@ const AgentsPage = () => {
 
   const toggleAgentStatus = async (agentId, isActive) => {
     try {
-      await axios.patch(`/admin/users/${agentId}/status`, {
+      await http.patch(`/admin/users/${agentId}/status`, {
         active: !isActive
       });
       fetchAgents();
@@ -84,7 +84,7 @@ const AgentsPage = () => {
         <Box display="flex" gap={2}>
           <Button 
             variant="contained" 
-            onClick={() => navigate('/admin/users/new-agent')}
+            onClick={() => router.push('/admin/users/new-agent')}
           >
             Add New Agent
           </Button>
@@ -191,7 +191,7 @@ const AgentsPage = () => {
                   </TableCell>
                   <TableCell>{formatDate(agent.createdAt)}</TableCell>
                   <TableCell align="right">
-                    <IconButton onClick={() => navigate(`/admin/users/${agent._id}/edit`)}>
+                    <IconButton onClick={() => router.push(`/admin/users/${agent._id}/edit`)}>
                       <Edit color="primary" />
                     </IconButton>
                     <IconButton 

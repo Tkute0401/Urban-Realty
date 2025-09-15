@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Chip } from '@mui/material';
 import { Mail, Phone, Check, Close } from '@mui/icons-material';
-import axios from '@/lib/services/axios';
+import http from '@/lib/services/http';
 import { formatDate } from '../../utils/format';
 
 const InquiriesPage = () => {
