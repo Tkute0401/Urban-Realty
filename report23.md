@@ -129,4 +129,10 @@ Change ID: 12
 - Rationale: Ensure component builds without missing style import errors and has basic responsive layout.
 - Audit mapping: Phase 2 — Component extraction and style co-location.
 - Notes/Risks: Styles are minimal and may need refinement to match design system.
-
+ 
+Change ID: 13
+- Files affected: `new-nextjs-app/src/components/home/ServiceBlocksGroup.tsx`, `new-nextjs-app/src/app/page.tsx`
+- Summary: Extracted three inline `ServiceBlock` usages from home page into a new reusable `ServiceBlocksGroup` component and updated the home page to render it.
+- Rationale: Keep page files thin and improve reuse/maintainability per audit plan.
+- Audit mapping: Trackable Issue: `src/app/page.tsx` (extract service blocks); Phase 2 — Component extraction and reuse.
+- Notes/Risks: Ensure `ServiceBlock` remains client component; no behavior change intended.
