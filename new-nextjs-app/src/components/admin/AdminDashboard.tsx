@@ -85,6 +85,12 @@ import { motion } from 'framer-motion';
 import { formatDate } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
 import SubscriptionAnalytics from '@/components/admin/SubscriptionAnalytics';
+import QuickActions from '@/components/admin/QuickActions';
+import SystemHealthSection from '@/components/admin/SystemHealth';
+import PlatformMetrics from '@/components/admin/PlatformMetrics';
+import RecentUsersTable from '@/components/admin/tables/RecentUsersTable';
+import RecentPropertiesTable from '@/components/admin/tables/RecentPropertiesTable';
+import RecentContactsTable from '@/components/admin/tables/RecentContactsTable';
 import LoadingSkeleton from '@/components/common/LoadingSkeleton';
 
 const AdminDashboard: React.FC = () => {
@@ -475,152 +481,16 @@ const AdminDashboard: React.FC = () => {
         </Grid>
       </Grid>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <Card sx={{ mb: 4, background: 'var(--color-bg-secondary)' }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ mb: 3 }}>
-              Quick Actions
-            </Typography>
-            <Grid container spacing={2}>
-              {quickActions.map((action, index) => (
-                <Grid item xs={6} sm={4} md={2} key={action.id}>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      startIcon={action.icon}
-                      onClick={action.action}
-                      sx={{
-                        height: 80,
-                        flexDirection: 'column',
-                        gap: 1,
-                        borderColor: `${action.color}.main`,
-                        color: `${action.color}.main`,
-                        '&:hover': {
-                          backgroundColor: `${action.color}.main`,
-                          color: 'white',
-                          transform: 'translateY(-2px)',
-                          boxShadow: `0 4px 12px ${action.color}40`
-                        }
-                      }}
-                    >
-                      <Typography variant="body2" fontWeight="bold">
-                        {action.title}
-                      </Typography>
-                    </Button>
-                  </motion.div>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+        <QuickActions actions={quickActions} />
       </motion.div>
 
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                System Health
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <SystemHealthCard
-                    title="CPU Usage"
-                    value={stats.analytics.systemHealth.cpu}
-                    icon={<SpeedIcon />}
-                    color="var(--color-primary)"
-                    subtitle="Current load"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <SystemHealthCard
-                    title="Memory"
-                    value={stats.analytics.systemHealth.memory}
-                    icon={<StorageIcon />}
-                    color="var(--color-primary)"
-                    subtitle="RAM usage"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <SystemHealthCard
-                    title="Storage"
-                    value={stats.analytics.systemHealth.storage}
-                    icon={<StorageIcon />}
-                    color="var(--color-primary)"
-                    subtitle="Disk usage"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <SystemHealthCard
-                    title="Network"
-                    value={stats.analytics.systemHealth.network}
-                    icon={<NetworkIcon />}
-                    color="var(--color-primary)"
-                    subtitle="Uptime"
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+          <SystemHealthSection health={stats.analytics.systemHealth} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                Platform Metrics
-              </Typography>
-              <Box display="flex" flexDirection="column" gap={3}>
-                <Box>
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Growth Rate</Typography>
-                    <Typography variant="body2" fontWeight="bold">
-                      {stats.analytics.growthRate}%
-                    </Typography>
-                  </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={stats.analytics.growthRate} 
-                    sx={{ height: 8, borderRadius: 4 }}
-                  />
-                </Box>
-                <Box>
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Conversion Rate</Typography>
-                    <Typography variant="body2" fontWeight="bold">
-                      {stats.analytics.conversionRate}%
-                    </Typography>
-                  </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={stats.analytics.conversionRate} 
-                    sx={{ height: 8, borderRadius: 4 }}
-                  />
-                </Box>
-                <Box>
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2">Avg Response Time</Typography>
-                    <Typography variant="body2" fontWeight="bold">
-                      {stats.analytics.avgResponseTime}h
-                    </Typography>
-                  </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={Math.min((24 - stats.analytics.avgResponseTime) / 24 * 100, 100)} 
-                    sx={{ height: 8, borderRadius: 4 }}
-                  />
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
+          <PlatformMetrics growthRate={stats.analytics.growthRate} conversionRate={stats.analytics.conversionRate} avgResponseTime={stats.analytics.avgResponseTime} />
         </Grid>
       </Grid>
 
@@ -775,213 +645,15 @@ const AdminDashboard: React.FC = () => {
         </Box>
         <CardContent>
           {selectedTab === 0 && (
-            <Box>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6" fontWeight="bold">Recent Users</Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => router.push('/admin/users')}
-                >
-                  View All
-                </Button>
-              </Box>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>User</TableCell>
-                      <TableCell>Type</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Joined</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {stats.recent.users?.slice(0, 5).map((user: any) => (
-                      <TableRow key={user._id} hover>
-                        <TableCell>
-                          <Box display="flex" alignItems="center" gap={2}>
-                            <Avatar>{user.name?.charAt(0)}</Avatar>
-                            <Box>
-                              <Typography fontWeight="500">{user.name}</Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                {user.email}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Chip 
-                            label={user.role} 
-                            color={user.role === 'admin' ? 'error' : user.role === 'agent' ? 'warning' : 'default'}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Chip 
-                            label={user.status || 'active'} 
-                            color={user.status === 'active' ? 'success' : 'default'}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {formatDate(user.createdAt)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <IconButton size="small">
-                            <MoreVertIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+            <RecentUsersTable users={stats.recent.users as any} />
           )}
 
           {selectedTab === 1 && (
-            <Box>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6" fontWeight="bold">Recent Properties</Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => router.push('/admin/properties')}
-                >
-                  View All
-                </Button>
-              </Box>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Property</TableCell>
-                      <TableCell>Agent</TableCell>
-                      <TableCell>Price</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Views</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {stats.recent.properties?.slice(0, 5).map((property: any) => (
-                      <TableRow key={property._id} hover>
-                        <TableCell>
-                          <Box display="flex" alignItems="center" gap={2}>
-                            <Avatar
-                              src={property.images?.[0]}
-                              variant="rounded"
-                              sx={{ width: 50, height: 50 }}
-                            >
-                              <HomeIcon />
-                            </Avatar>
-                            <Box>
-                              <Typography fontWeight="500">{property.title}</Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                <LocationIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                {property.location}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">{property.agent?.name}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography fontWeight="500">
-                            ₹{property.price?.toLocaleString()}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={property.status || 'active'}
-                            color={property.status === 'active' ? 'success' : 'warning'}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography>{property.views || 0}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <IconButton size="small">
-                            <MoreVertIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+            <RecentPropertiesTable properties={stats.recent.properties as any} />
           )}
 
           {selectedTab === 2 && (
-            <Box>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6" fontWeight="bold">Recent Contacts</Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => router.push('/admin/contacts')}
-                >
-                  View All
-                </Button>
-              </Box>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>User</TableCell>
-                      <TableCell>Property</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {stats.recent.contacts?.slice(0, 5).map((contact: any) => (
-                      <TableRow key={contact._id} hover>
-                        <TableCell>
-                          <Box display="flex" alignItems="center" gap={2}>
-                            <Avatar>{contact.user?.name?.charAt(0)}</Avatar>
-                            <Box>
-                              <Typography fontWeight="500">{contact.user?.name}</Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                {contact.user?.email}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">{contact.property?.title}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={contact.status}
-                            color={contact.status === 'pending' ? 'warning' : 'success'}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {formatDate(contact.createdAt)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <IconButton size="small">
-                            <MoreVertIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+            <RecentContactsTable contacts={stats.recent.contacts as any} />
           )}
 
           {selectedTab === 3 && (

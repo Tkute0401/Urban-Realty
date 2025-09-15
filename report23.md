@@ -45,6 +45,13 @@
 
 ---
 
+Change ID: 34
+- Files affected: `new-nextjs-app/src/components/admin/QuickActions.tsx`, `new-nextjs-app/src/components/admin/SystemHealth.tsx`, `new-nextjs-app/src/components/admin/PlatformMetrics.tsx`, `new-nextjs-app/src/components/admin/tables/RecentUsersTable.tsx`, `new-nextjs-app/src/components/admin/tables/RecentPropertiesTable.tsx`, `new-nextjs-app/src/components/admin/tables/RecentContactsTable.tsx`, `new-nextjs-app/src/components/admin/AdminDashboard.tsx`
+- Summary: Extracted Admin Dashboard subsections into dedicated reusable components (QuickActions, SystemHealth, PlatformMetrics, and recent tables). Updated `AdminDashboard.tsx` to compose these components and removed large inline JSX blocks.
+- Rationale: Align with plan to keep pages/components thin, improve reuse and maintainability, and prepare for further type hardening and testing.
+- Audit mapping: Phase 2 — Component extraction and reuse; Trackable Issue: `src/app/admin/AdminDashboard.jsx` split into `components/admin/*` parts.
+- Notes/Risks: Minimal behavior changes; props are typed loosely (`any`) for recent lists and can be tightened later.
+
 Change ID: 25
 - Files affected: `new-nextjs-app/src/lib/services/api.ts`, `new-nextjs-app/src/hooks/api/subscriptions.ts`
 - Summary: Extended centralized API with subscription endpoints (plans/current/subscribe/cancel/update) and added React Query subscription hooks (plans, current, subscribe, cancel, update).
