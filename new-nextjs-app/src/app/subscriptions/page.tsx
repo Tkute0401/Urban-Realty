@@ -24,7 +24,7 @@ import {
   Support as SupportIcon
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
-import apiService from '@/lib/services/apiService';
+import { useSubscriptionPlans, useSubscribeMutation } from '@/hooks/api/subscriptions';
 import PaymentForm from '@/components/Subscription/PaymentForm';
 
 interface SubscriptionPlan {
@@ -51,22 +51,26 @@ const SubscriptionPlans = () => {
 
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchPlans();
-  }, []);
+  const { data: fetchedPlans, isLoading: isPlansLoading, error: plansError } = useSubscriptionPlans();
+  const subscribeMutation = useSubscribeMutation({
+    onSuccess: () => {
+      setSubscribeDialog(false);
+      setSelectedPlan(null);
+      alert('Subscription successful!');
+    },
+    onError: () => {
+      setError('Subscription failed. Please try again.');
+    },
+  });
 
-  const fetchPlans = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.getSubscriptionPlans() as { data: any; status: number };
-      setPlans(response.data.plans || []);
-    } catch (err) {
+  useEffect(() => {
+    setLoading(isPlansLoading);
+    if (plansError) {
       setError('Failed to load subscription plans');
-      console.error('Error fetching plans:', err);
-    } finally {
-      setLoading(false);
+    } else if (fetchedPlans) {
+      setPlans(fetchedPlans as SubscriptionPlan[]);
     }
-  };
+  }, [isPlansLoading, plansError, fetchedPlans]);
 
   const handleSubscribe = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
@@ -75,20 +79,7 @@ const SubscriptionPlans = () => {
 
   const handleSubscribeConfirm = async (paymentData: any) => {
     if (!selectedPlan || !user) return;
-
-    try {
-      const response = await apiService.subscribe(user.id, selectedPlan.id, paymentData.paymentMethod) as { data: any; status: number };
-      if (response.data.success) {
-        setSubscribeDialog(false);
-        setSelectedPlan(null);
-        // Show success message or redirect
-        alert('Subscription successful!');
-      } else {
-        setError(response.data.error || 'Subscription failed');
-      }
-    } catch (err) {
-      setError('Subscription failed. Please try again.');
-    }
+    subscribeMutation.mutate({ userId: user.id, planId: selectedPlan.id, paymentMethod: paymentData.paymentMethod });
   };
 
   const getPrice = (plan: SubscriptionPlan) => {
