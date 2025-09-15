@@ -3,7 +3,7 @@ import React, { Suspense } from 'react';
 import LoadingSpinner from '../common/LoadingSpinner';
 
 // Lazy load the actual AdminDashboard component
-const AdminDashboard = React.lazy(() => import('../../app/admin/AdminDashboard'));
+const AdminDashboard = React.lazy(() => import('@/components/admin/AdminDashboard'));
 
 const AdminDashboardLazy: React.FC = () => {
   return (

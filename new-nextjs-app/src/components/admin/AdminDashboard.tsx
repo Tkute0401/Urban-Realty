@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 import {
   Grid, 
@@ -86,26 +87,26 @@ import { useRouter } from 'next/navigation';
 import SubscriptionAnalytics from '@/components/admin/SubscriptionAnalytics';
 import LoadingSkeleton from '@/components/common/LoadingSkeleton';
 
-const AdminDashboard = () => {
+const AdminDashboard: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTab, setSelectedTab] = useState(0);
   const [filterDialog, setFilterDialog] = useState(false);
-  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'warning' | 'info' });
   const [filters, setFilters] = useState({
     dateRange: '30',
     userType: 'all',
     status: 'all'
   });
   const [quickActions, setQuickActions] = useState([
-    { id: 1, title: 'Manage Users', icon: <PeopleIcon />, action: () => router.push('/admin/users'), color: 'primary' },
-    { id: 2, title: 'View Properties', icon: <HomeIcon />, action: () => router.push('/admin/properties'), color: 'success' },
-    { id: 3, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/admin/analytics'), color: 'info' },
-    { id: 4, title: 'Settings', icon: <SettingsIcon />, action: () => router.push('/admin/settings'), color: 'warning' },
-    { id: 5, title: 'Reports', icon: <AssessmentIcon />, action: () => router.push('/admin/reports'), color: 'secondary' },
-    { id: 6, title: 'Media', icon: <StorageIcon />, action: () => router.push('/admin/media'), color: 'error' }
+    { id: 1, title: 'Manage Users', icon: <PeopleIcon />, action: () => router.push('/admin/users'), color: 'primary' as const },
+    { id: 2, title: 'View Properties', icon: <HomeIcon />, action: () => router.push('/admin/properties'), color: 'success' as const },
+    { id: 3, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/admin/analytics'), color: 'info' as const },
+    { id: 4, title: 'Settings', icon: <SettingsIcon />, action: () => router.push('/admin/settings'), color: 'warning' as const },
+    { id: 5, title: 'Reports', icon: <AssessmentIcon />, action: () => router.push('/admin/reports'), color: 'secondary' as const },
+    { id: 6, title: 'Media', icon: <StorageIcon />, action: () => router.push('/admin/media'), color: 'error' as const }
   ]);
 
   const [stats, setStats] = useState({
@@ -118,15 +119,15 @@ const AdminDashboard = () => {
       revenue: 0
     },
     recent: {
-      users: [],
-      properties: [],
-      contacts: []
+      users: [] as any[],
+      properties: [] as any[],
+      contacts: [] as any[]
     },
     analytics: {
       growthRate: 0,
       conversionRate: 0,
       avgResponseTime: 0,
-      topPerformingAgents: [],
+      topPerformingAgents: [] as { name: string; properties: number; revenue: number }[],
       systemHealth: {
         cpu: 0,
         memory: 0,
@@ -136,12 +137,9 @@ const AdminDashboard = () => {
     }
   });
 
-  // Enhanced queries with TanStack Query v5 object syntax and better error handling
   const { data: dashboardData, isLoading, error, refetch: refetchDashboard } = useAdminDashboard();
-
   const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useAdminAnalytics();
 
-  // Refresh mutation with better error handling
   const refreshMutation = useMutation({
     mutationFn: async () => {
       await Promise.all([
@@ -156,10 +154,10 @@ const AdminDashboard = () => {
         severity: 'success'
       });
     },
-    onError: (error) => {
+    onError: (err: any) => {
       setNotification({
         open: true,
-        message: error.message || 'Failed to refresh data',
+        message: err?.message || 'Failed to refresh data',
         severity: 'error'
       });
     }
@@ -201,7 +199,6 @@ const AdminDashboard = () => {
     }
   }, [dashboardData]);
 
-  // Chart data
   const monthlyData = [
     { month: 'Jan', users: 1200, properties: 450, revenue: 45000, leads: 180 },
     { month: 'Feb', users: 1400, properties: 520, revenue: 52000, leads: 210 },
@@ -225,7 +222,7 @@ const AdminDashboard = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-  const StatCard = ({ title, value, icon, color, subtitle, trend, trendValue }) => (
+  const StatCard: React.FC<{ title: string; value: React.ReactNode; icon: React.ReactNode; color: string; subtitle?: string; trend?: string; trendValue?: string }> = ({ title, value, icon, color, subtitle, trend, trendValue }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -275,7 +272,7 @@ const AdminDashboard = () => {
     </motion.div>
   );
 
-  const SystemHealthCard = ({ title, value, icon, color, subtitle }) => (
+  const SystemHealthCard: React.FC<{ title: string; value: number; icon: React.ReactNode; color: string; subtitle: string }> = ({ title, value, icon, color, subtitle }) => (
     <Card sx={{ height: '100%' }}>
       <CardContent>
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
@@ -310,14 +307,12 @@ const AdminDashboard = () => {
     </Card>
   );
 
-  // Enhanced loading state with skeleton
   if (isLoading) {
     return <LoadingSkeleton.Dashboard />;
   }
 
-  // Enhanced error handling with retry options
   if (error) {
-    const errorMessage = error?.message || 'Failed to load dashboard data';
+    const errorMessage = (error as any)?.message || 'Failed to load dashboard data';
     
     return (
       <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -361,7 +356,6 @@ const AdminDashboard = () => {
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
-      {/* Enhanced Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -412,7 +406,6 @@ const AdminDashboard = () => {
         </Box>
       </motion.div>
 
-      {/* Enhanced Stats Cards */}
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
@@ -482,7 +475,6 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Quick Actions */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -532,7 +524,6 @@ const AdminDashboard = () => {
         </Card>
       </motion.div>
 
-      {/* System Health & Performance */}
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} md={6}>
           <Card>
@@ -633,7 +624,6 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Charts Section */}
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} lg={8}>
           <Card>
@@ -687,7 +677,6 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Top Performing Agents */}
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} md={6}>
           <Card>
@@ -771,12 +760,10 @@ const AdminDashboard = () => {
         </Grid>
       </Grid>
 
-      {/* Subscription Analytics Section */}
       <Box sx={{ mb: 4 }}>
         <SubscriptionAnalytics />
       </Box>
 
-      {/* Tabs for different views */}
       <Card sx={{ mb: 4 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
@@ -811,7 +798,7 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {stats.recent.users?.slice(0, 5).map((user) => (
+                    {stats.recent.users?.slice(0, 5).map((user: any) => (
                       <TableRow key={user._id} hover>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={2}>
@@ -881,7 +868,7 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {stats.recent.properties?.slice(0, 5).map((property) => (
+                    {stats.recent.properties?.slice(0, 5).map((property: any) => (
                       <TableRow key={property._id} hover>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={2}>
@@ -956,7 +943,7 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {stats.recent.contacts?.slice(0, 5).map((contact) => (
+                    {stats.recent.contacts?.slice(0, 5).map((contact: any) => (
                       <TableRow key={contact._id} hover>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={2}>
@@ -1035,7 +1022,6 @@ const AdminDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Notification Snackbar */}
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}
@@ -1055,3 +1041,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
