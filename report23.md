@@ -303,3 +303,10 @@ Change ID: 32
 - Rationale: Enforce Next.js App Router usage and prevent SSR issues per audit.
 - Audit mapping: Phase 1 — Routing hygiene; ESLint rule complemented by code cleanup.
 - Notes/Risks: None.
+
+Change ID: 38
+- Files affected: `new-nextjs-app/src/components/home/PropertyCard.tsx`, `new-nextjs-app/src/components/home/PropertyCard.jsx`
+- Summary: Converted Home `PropertyCard` to TypeScript with typed props, replaced window-based login redirect with Next.js `usePathname` query param (`/login?from=...`), and deleted the old JSX file so imports resolve to TSX.
+- Rationale: Type hardening and SSR-safe routing; aligns with centralized HTTP client usage and removes legacy window dependency during navigation.
+- Audit mapping: Phase 1 — Routing hygiene (SSR/window guards); Phase 2 — Component extraction/cleanup; Phase 4 — Type hardening.
+- Notes/Risks: Downstream imports without extension will now resolve to TSX. Verified references in `PropertiesSection.jsx` and `app/user/profile/page.tsx` target the folder and will pick up the TSX version.
