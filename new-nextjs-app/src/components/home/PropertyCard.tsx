@@ -1,22 +1,51 @@
 'use client'
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartFilled } from "@heroicons/react/24/solid";
 import LocalHotelOutlinedIcon from '@mui/icons-material/LocalHotelOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-toastify';
 import http from '@/lib/services/http';
 
-const PropertyCard = ({ property, index }) => {
+interface PropertyImage {
+  url: string;
+}
+
+interface PropertyAddress {
+  city?: string;
+  state?: string;
+}
+
+interface PropertyModel {
+  _id: string;
+  images?: PropertyImage[];
+  title?: string;
+  buildingName?: string;
+  address?: PropertyAddress;
+  description?: string;
+  area?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  price?: number;
+  status?: string;
+}
+
+type PropertyCardProps = {
+  property: PropertyModel;
+  index: number;
+};
+
+const PropertyCard: React.FC<PropertyCardProps> = ({ property, index }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [loadingFavorite, setLoadingFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [loadingFavorite, setLoadingFavorite] = useState<boolean>(false);
   
   // Check if property is in favorites when component mounts or user changes
   useEffect(() => {
@@ -24,8 +53,9 @@ const PropertyCard = ({ property, index }) => {
       if (user && property?._id) {
         try {
           const response = await http.get(`/auth/favorites/${property._id}/status`);
-          setIsFavorite(response.data.isFavorite);
+          setIsFavorite(Boolean(response.data?.isFavorite));
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error('Error checking favorite status:', err);
         }
       } else {
@@ -40,11 +70,12 @@ const PropertyCard = ({ property, index }) => {
     router.push(`/properties/${property._id}`);
   };
 
-  const handleFavoriteClick = async (e) => {
+  const handleFavoriteClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     
     if (!user) {
-      router.push('/login', { state: { from: window.location.pathname } });
+      const from = encodeURIComponent(pathname || '/');
+      router.push(`/login?from=${from}`);
       toast.info('Please login to save favorites');
       return;
     }
@@ -59,15 +90,16 @@ const PropertyCard = ({ property, index }) => {
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);
-    } catch (err) {
+    } catch (err: any) {
+      // eslint-disable-next-line no-console
       console.error('Error updating favorite:', err);
-      toast.error(err.response?.data?.message || 'Failed to update favorites');
+      toast.error(err?.response?.data?.message || 'Failed to update favorites');
     } finally {
       setLoadingFavorite(false);
     }
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = (price?: number): string => {
     if (!price) return 'Price not available';
     if (price >= 10000000) {
       return `₹ ${(price / 10000000).toFixed(2)} Cr`;
@@ -86,10 +118,10 @@ const PropertyCard = ({ property, index }) => {
       onClick={handleClick}
     >
       <div className="relative aspect-video">
-        {property.images?.length > 0 ? (
+        {property.images?.length ? (
           <img 
             src={property.images[0].url} 
-            alt={property.title} 
+            alt={property.title || 'Property image'} 
             className="w-full h-full object-cover" 
             loading="lazy"
           />
@@ -179,3 +211,4 @@ const PropertyCard = ({ property, index }) => {
 };
 
 export default PropertyCard;
+
