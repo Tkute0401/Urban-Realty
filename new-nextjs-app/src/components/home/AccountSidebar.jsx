@@ -46,6 +46,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
   };
   
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if (isOpen) {
       // scroll will be disable when sidebar is open
       document.body.style.overflow = 'hidden';
@@ -65,10 +67,12 @@ const AccountSidebar = ({ isOpen, onClose }) => {
 
     // Cleanup function to reset styles when component unmounts
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
+      if (typeof window !== 'undefined') {
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+      }
     };
   }, [isOpen]);
 

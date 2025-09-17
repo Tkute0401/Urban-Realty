@@ -4,7 +4,9 @@ import { StarIcon, ChatBubbleLeftRightIcon, ArrowLeftIcon, ArrowRightIcon } from
 
 const Reviews = () => {
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
   }, []);
 
   const testimonials = [
