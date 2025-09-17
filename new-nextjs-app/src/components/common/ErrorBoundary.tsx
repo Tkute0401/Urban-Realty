@@ -1,129 +1,166 @@
-// Error Boundary Component
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { errorHandler } from '@/lib/utils/errorHandler';
+import React from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Alert,
+  Paper
+} from '@mui/material';
+import {
+  Error as ErrorIcon,
+  Refresh as RefreshIcon,
+  Home as HomeIcon
+} from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-}
-
-interface State {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
-}
-
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+class ErrorBoundary extends React.Component {
+  constructor(props) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
+    this.state = { 
+      hasError: false, 
+      error: null, 
+      errorInfo: null 
     };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-      errorInfo: null,
-    };
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error, errorInfo) {
     this.setState({
-      error,
-      errorInfo,
+      error: error,
+      errorInfo: errorInfo
     });
-
-    // Log error to error handler
-    errorHandler.handleError(error, 'error_boundary');
-
-    // Call custom error handler if provided
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo);
-    }
+    
+    // Log error to console for debugging
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // You can also log to an error reporting service here
+    // logErrorToService(error, errorInfo);
   }
-
-  handleRetry = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
-  };
 
   render() {
     if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-              <svg
-                className="w-6 h-6 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            
-            <h2 className="text-xl font-semibold text-gray-900 text-center mb-2">
-              Something went wrong
-            </h2>
-            
-            <p className="text-gray-600 text-center mb-6">
-              We're sorry, but something unexpected happened. Please try again.
-            </p>
-            
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <div className="mb-6 p-4 bg-gray-100 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2">Error Details:</h3>
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {this.state.error.toString()}
-                </pre>
-                {this.state.errorInfo && (
-                  <pre className="text-sm text-gray-700 whitespace-pre-wrap mt-2">
-                    {this.state.errorInfo.componentStack}
-                  </pre>
-                )}
-              </div>
-            )}
-            
-            <div className="flex space-x-3">
-              <button
-                onClick={this.handleRetry}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-              >
-                Try Again
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
-              >
-                Reload Page
-              </button>
-            </div>
-          </div>
-        </div>
-      );
+      return <ErrorFallback 
+        error={this.state.error} 
+        errorInfo={this.state.errorInfo}
+        resetError={() => this.setState({ hasError: false, error: null, errorInfo: null })}
+      />;
     }
 
     return this.props.children;
   }
 }
+
+const ErrorFallback = ({ error, errorInfo, resetError }) => {
+  const router = useRouter();
+
+  const handleReset = () => {
+    resetError();
+    window.location.reload();
+  };
+
+  const handleGoHome = () => {
+    router.push('/');
+  };
+
+  return (
+    <Box 
+      sx={{ 
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 3,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}
+    >
+      <Card sx={{ maxWidth: 600, width: '100%' }}>
+        <CardContent sx={{ textAlign: 'center', p: 4 }}>
+          <ErrorIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
+          
+          <Typography variant="h4" gutterBottom fontWeight="bold" color="error.main">
+            Oops! Something went wrong
+          </Typography>
+          
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            We encountered an unexpected error. Don't worry, our team has been notified and is working to fix it.
+          </Typography>
+
+          {process.env.NODE_ENV === 'development' && error && (
+            <Paper sx={{ p: 2, mb: 3, textAlign: 'left', maxHeight: 200, overflow: 'auto' }}>
+              <Typography variant="h6" gutterBottom color="error.main">
+                Error Details (Development Only):
+              </Typography>
+              <Typography variant="body2" component="pre" sx={{ 
+                fontSize: '0.75rem', 
+                color: 'text.secondary',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word'
+              }}>
+                {error.toString()}
+              </Typography>
+              {errorInfo && (
+                <Typography variant="body2" component="pre" sx={{ 
+                  fontSize: '0.75rem', 
+                  color: 'text.secondary',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  mt: 1
+                }}>
+                  {errorInfo.componentStack}
+                </Typography>
+              )}
+            </Paper>
+          )}
+
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>What you can do:</strong>
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              • Try refreshing the page
+            </Typography>
+            <Typography variant="body2">
+              • Go back to the home page
+            </Typography>
+            <Typography variant="body2">
+              • Contact support if the problem persists
+            </Typography>
+          </Alert>
+
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant="contained"
+              startIcon={<RefreshIcon />}
+              onClick={handleReset}
+              sx={{ 
+                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                '&:hover': { transform: 'translateY(-2px)' }
+              }}
+            >
+              Refresh Page
+            </Button>
+            
+            <Button
+              variant="outlined"
+              startIcon={<HomeIcon />}
+              onClick={handleGoHome}
+            >
+              Go Home
+            </Button>
+          </Box>
+
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 3, display: 'block' }}>
+            Error ID: {Date.now()}
+          </Typography>
+        </CardContent>
+      </Card>
+    </Box>
+  );
+};
 
 export default ErrorBoundary;
