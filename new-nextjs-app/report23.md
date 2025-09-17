@@ -82,6 +82,41 @@ This report tracks the implementation of the refactoring plan outlined in `REFAC
   - Added ESLint rule to prevent `react-router-dom` imports
   - Verified no dead code files need removal
 
+### Change ID: 39
+- Files affected: `src/lib/services/api.ts`
+- Summary: Added favorites and recently-viewed endpoints to centralized API (`favoritesList`, `addFavorite`, `removeFavorite`, `favoriteStatus`, `recentlyViewedList`, `addRecentlyViewed`).
+- Rationale: Replace remaining `apiService` favorites/recently-viewed calls with unified API to complete Phase 3.
+- Audit mapping: Phase 3 — API centralization and React Query integration; Trackable Items around removing `apiService` usages.
+- Notes/Risks: Endpoint paths align with existing `apiService` routes under `/auth/*`.
+
+### Change ID: 40
+- Files affected: `src/app/user/profile/page.tsx`
+- Summary: Replaced `apiService.getFavorites()` with `api.auth.favoritesList()` and normalized data handling.
+- Rationale: Migrate to centralized API and reduce legacy dependency.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Keeps fallback normalization for `{ data: { data: [] } }` envelopes.
+
+### Change ID: 41
+- Files affected: `src/app/user/favorites/page.tsx`
+- Summary: Replaced `apiService.getFavorites()` with `api.auth.favoritesList()` and updated state handling.
+- Rationale: Continue migration away from `apiService` to centralized API.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Preserves defensive normalization of array data.
+
+### Change ID: 42
+- Files affected: `src/app/properties/[id]/page.tsx`
+- Summary: Migrated property details page from `apiService` to centralized `api` for get-by-id, add recently viewed, favorite status, and toggle favorite actions.
+- Rationale: Eliminate `apiService` usage in a core page and standardize responses.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Maintains best-effort behavior for recently viewed and favorite status.
+
+### Change ID: 43
+- Files affected: `src/lib/utils/errorHandler.tsx`
+- Summary: Switched `ApiError` import to `@/lib/services/api.types` and adapted to `statusCode` property; added compatibility for `status`.
+- Rationale: Align error handling with centralized API error type and remove coupling to `apiService`.
+- Audit mapping: Phase 0 — Baseline/type safety; Phase 3 — Centralized error shape.
+- Notes/Risks: Backward compatible with errors carrying `status`.
+
 ## Issues and Blockers
 - None currently identified
 
