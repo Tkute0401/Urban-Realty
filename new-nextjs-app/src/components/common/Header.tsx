@@ -70,6 +70,10 @@ interface AuthContextType {
 
 const Header: React.FC = () => {
   console.log('🔧 Header component rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 Header mounted on client side!');
+  }, []);
   const { user, logout } = useAuth() as AuthContextType;
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);

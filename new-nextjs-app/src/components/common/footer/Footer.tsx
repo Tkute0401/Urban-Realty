@@ -10,6 +10,10 @@ import YoutubeIcon from '@mui/icons-material/YouTube';
 
 const Footer = () => {
   console.log('🔧 Footer component rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 Footer mounted on client side!');
+  }, []);
 
   return (
     <footer className="bg-gray-800 text-white py-8 border-t">
