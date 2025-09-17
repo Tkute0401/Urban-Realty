@@ -14,7 +14,7 @@ export const DevelopersProvider = ({ children }) => {
   const updateDeveloper = useCallback(async (id, formData, config) => {
   try {
     setLoading(true);
-    const response = await axios.put(
+    const response = await http.put(
       `/developers/${id}`,
       formData,
       config
@@ -35,7 +35,7 @@ export const DevelopersProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/developers');
+      const response = await http.get('/developers');
       console.log(response);
       setDevelopers(response.data.data || response.data);
     } catch (err) {
@@ -50,7 +50,7 @@ export const DevelopersProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`/developers/${id}`);
+      const response = await http.get(`/developers/${id}`);
       console.log(response);
       
       setDevelopers(response.data.data || response.data);

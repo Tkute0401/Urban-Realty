@@ -12,7 +12,7 @@ export const AgentsProvider = ({ children }) => {
   const getAgents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/admin/agents');
+      const response = await http.get('/admin/agents');
       if (response.data.success) {
         setAgents(response.data.data || []);
       }
