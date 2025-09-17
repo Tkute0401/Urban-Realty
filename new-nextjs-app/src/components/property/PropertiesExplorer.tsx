@@ -22,7 +22,7 @@ export default function PropertiesExplorer() {
   }, [searchParams]);
 
   const { data, isLoading, error } = usePropertiesQuery(params);
-  const properties = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
+  const properties = Array.isArray((data as any)?.items) ? (data as any).items : Array.isArray(data) ? data : [];
 
   const paginated = useMemo(() => {
     const start = (page - 1) * itemsPerPage;
@@ -56,6 +56,7 @@ export default function PropertiesExplorer() {
               property={property}
               index={0}
               isSelected={false}
+              onClick={() => {}}
             />
           ))}
         </div>
