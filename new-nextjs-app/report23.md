@@ -138,6 +138,34 @@ This report tracks the implementation of the refactoring plan outlined in `REFAC
 - Audit mapping: Phase 3 — API centralization and React Query integration.
 - Notes/Risks: Local mock sections for search/system remain.
 
+### Change ID: 53
+- Files affected: `src/components/property/MapTest.jsx`
+- Summary: Replaced legacy `apiService.getProperties()` with centralized `http.get('/properties')` and normalized response handling.
+- Rationale: Remove remaining `apiService` usage; align with centralized HTTP client and SSR-safe interceptors.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Limits fetch to 1 for preview; adjust as needed.
+
+### Change ID: 54
+- Files affected: `src/components/admin/SubscriptionAnalytics.jsx`
+- Summary: Removed direct `localStorage` token header; now relies on axios interceptors via `http` client.
+- Rationale: Ensure SSR safety and centralized auth management.
+- Audit mapping: Phase 1 — SSR guards; Phase 0 — Centralized client usage.
+- Notes/Risks: Requires interceptor to inject Authorization header.
+
+### Change ID: 55
+- Files affected: `src/contexts/PropertiesContext.jsx`
+- Summary: Migrated all axios calls to centralized `http`; removed direct token header usage; kept multipart headers explicit.
+- Rationale: Consolidate network layer and remove duplication; improve SSR safety.
+- Audit mapping: Phase 0 — Centralized API Design; Phase 3 — Service migration.
+- Notes/Risks: Behavior preserved; console logs trimmed for clarity.
+
+### Change ID: 56
+- Files affected: `src/components/common/footer/TrustSafety.jsx`, `src/components/common/footer/EMICalculator.jsx`
+- Summary: Added SSR guards around `window.scrollTo` in `useEffect`.
+- Rationale: Prevent SSR reference errors in footer pages/components.
+- Audit mapping: Phase 1 — Routing hygiene and SSR guards.
+- Notes/Risks: None.
+
 ## Issues and Blockers
 - None currently identified
 

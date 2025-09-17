@@ -43,11 +43,7 @@ const SubscriptionAnalytics = () => {
     queryKey: ['subscriptionAnalytics'],
     queryFn: async () => {
       try {
-        const response = await http.get('/admin/subscription-analytics', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        const response = await http.get('/admin/subscription-analytics');
         
         if (response.data.success) {
           return response.data.data;
