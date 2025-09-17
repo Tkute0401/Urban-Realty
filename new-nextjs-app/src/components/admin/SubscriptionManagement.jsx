@@ -43,7 +43,7 @@ import {
   Warning as WarningIcon,
   TrendingUp as TrendingUpIcon
 } from '@mui/icons-material';
-import apiService from '@/lib/services/apiService';
+import { api } from '@/lib/services/api';
 
 const SubscriptionManagement = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -82,12 +82,12 @@ const SubscriptionManagement = () => {
     try {
       setLoading(true);
       const [plansRes, subscriptionsRes] = await Promise.all([
-        apiService.getSubscriptionPlans(),
-        apiService.getUserSubscription('user1')
+        api.subscriptions.plans(),
+        api.subscriptions.current('user1')
       ]);
-      
-      setPlans(plansRes.data || []);
-      setSubscriptions(subscriptionsRes.data ? [subscriptionsRes.data] : []);
+
+      setPlans(plansRes?.data || []);
+      setSubscriptions(subscriptionsRes?.data ? [subscriptionsRes.data] : []);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to load data');

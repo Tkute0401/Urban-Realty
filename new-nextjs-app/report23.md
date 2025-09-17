@@ -117,6 +117,27 @@ This report tracks the implementation of the refactoring plan outlined in `REFAC
 - Audit mapping: Phase 0 — Baseline/type safety; Phase 3 — Centralized error shape.
 - Notes/Risks: Backward compatible with errors carrying `status`.
 
+### Change ID: 44
+- Files affected: `src/components/home/AccountSidebar.jsx`
+- Summary: Replaced `apiService.getRecentlyViewed()` with centralized `api.auth.recentlyViewedList()` and simplified data normalization.
+- Rationale: Remove remaining `apiService` usage and align with centralized API per audit.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: None.
+
+### Change ID: 45
+- Files affected: `src/components/admin/SubscriptionManagement.jsx`
+- Summary: Switched data fetching from `apiService.getSubscriptionPlans()` and `getUserSubscription()` to centralized `api.subscriptions.plans()` and `api.subscriptions.current()`. Updated state assignments to use normalized responses.
+- Rationale: Continue removal of legacy `apiService` in admin flows; align with centralized API.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: The create/delete plan actions remain mocked; future enhancement to wire mutations.
+
+### Change ID: 46
+- Files affected: `src/components/admin/AnalyticsDashboard.jsx`
+- Summary: Replaced `apiService.getAdminAnalytics()` with `api.admin.analytics()` and adapted to normalized response shape.
+- Rationale: Standardize analytics fetch on centralized API and remove legacy service.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Local mock sections for search/system remain.
+
 ## Issues and Blockers
 - None currently identified
 

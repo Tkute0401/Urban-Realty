@@ -33,7 +33,7 @@ import {
   Download,
   Refresh
 } from '@mui/icons-material';
-import apiService from '@/lib/services/apiService';
+import { api } from '@/lib/services/api';
 
 const AnalyticsDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -43,12 +43,12 @@ const AnalyticsDashboard = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const [dashboard] = await Promise.all([
-        apiService.getAdminAnalytics(),
+      const [dashboardRes] = await Promise.all([
+        api.admin.analytics(),
       ]);
       
       setAnalytics({
-        dashboard: dashboard,
+        dashboard: dashboardRes?.data,
         search: {
           totalSearches: 1250,
           uniqueUsers: 450,

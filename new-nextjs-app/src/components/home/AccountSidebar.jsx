@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProperties } from '@/contexts/PropertiesContext';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
-import apiService from '@/lib/services/apiService';
+import { api } from '@/lib/services/api';
 
 const AccountSidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
@@ -107,9 +107,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
     const loadRecentlyViewed = async () => {
       if (!user) return setRecentlyViewed([]);
       try {
-        const res = await apiService.getRecentlyViewed();
-        const items = Array.isArray(res?.data?.data) ? res.data.data : (res?.data || []);
-        setRecentlyViewed(items);
+        const res = await api.auth.recentlyViewedList();
+        setRecentlyViewed(Array.isArray(res?.data) ? res.data : []);
       } catch (e) {
         setRecentlyViewed([]);
       }
