@@ -310,3 +310,24 @@ Change ID: 38
 - Rationale: Type hardening and SSR-safe routing; aligns with centralized HTTP client usage and removes legacy window dependency during navigation.
 - Audit mapping: Phase 1 — Routing hygiene (SSR/window guards); Phase 2 — Component extraction/cleanup; Phase 4 — Type hardening.
 - Notes/Risks: Downstream imports without extension will now resolve to TSX. Verified references in `PropertiesSection.jsx` and `app/user/profile/page.tsx` target the folder and will pick up the TSX version.
+
+Change ID: 44
+- Files affected: `new-nextjs-app/src/components/home/AccountSidebar.jsx`
+- Summary: Replaced `apiService.getRecentlyViewed()` with centralized `api.auth.recentlyViewedList()` and simplified data normalization.
+- Rationale: Remove remaining `apiService` usage and align with centralized API per audit.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: None.
+
+Change ID: 45
+- Files affected: `new-nextjs-app/src/components/admin/SubscriptionManagement.jsx`
+- Summary: Switched data fetching from `apiService.getSubscriptionPlans()` and `getUserSubscription()` to centralized `api.subscriptions.plans()` and `api.subscriptions.current()`. Updated state assignments to use normalized responses.
+- Rationale: Continue removal of legacy `apiService` in admin flows; align with centralized API.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Create/delete plan actions still mocked; to be wired later.
+
+Change ID: 46
+- Files affected: `new-nextjs-app/src/components/admin/AnalyticsDashboard.jsx`
+- Summary: Replaced `apiService.getAdminAnalytics()` with `api.admin.analytics()` and adapted to normalized response shape.
+- Rationale: Standardize analytics fetch on centralized API and remove legacy service.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Local mock sections for search/system remain.
