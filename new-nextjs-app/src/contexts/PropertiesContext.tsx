@@ -99,7 +99,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
   const [pagination, setPagination] = useState({});
   const [agentProperties, setAgentProperties] = useState([]);
 
-  const getProperties = useCallback(async (params = {}) => {
+  const getProperties = useCallback(async (params: Record<string, any> = {}) => {
     const cacheKey = JSON.stringify(params);
     
     if (cache[cacheKey]) {
@@ -113,7 +113,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setError(null);
       
       // Convert parameters to backend expected format
-      const backendParams = { 
+      const backendParams: Record<string, any> = { 
         ...params,
         page: params.page || 1,
         limit: params.limit || 12
@@ -264,7 +264,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         } else if (value instanceof File) {
           formDataToSend.append(key, value);
         } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, value);
+          formDataToSend.append(key, String(value));
         }
       });
 
@@ -327,7 +327,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         } else if (value instanceof File) {
           formDataToSend.append(key, value);
         } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, value);
+          formDataToSend.append(key, String(value));
         }
       });
 
