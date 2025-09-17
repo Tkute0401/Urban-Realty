@@ -1,7 +1,7 @@
 
 'use client'
 
-import * as React from 'react';
+import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
