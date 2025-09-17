@@ -1,6 +1,6 @@
 // Comprehensive Error Handling System
 import React from 'react';
-import { ApiError } from '@/lib/services/apiService';
+import { ApiError } from '@/lib/services/api.types';
 
 // Error types
 export enum ErrorType {
@@ -106,12 +106,13 @@ export class ErrorHandler {
       type: ErrorType.UNKNOWN,
       severity: ErrorSeverity.MEDIUM,
       message: error.message,
-      code: error.status,
+      code: (error as any).status ?? error.statusCode,
       timestamp: timestamp || new Date(),
       userMessage: error.message,
     };
 
-    switch (error.status) {
+    const statusCode = (error as any).status ?? error.statusCode;
+    switch (statusCode) {
       case 401:
         return {
           ...baseError,
@@ -160,7 +161,7 @@ export class ErrorHandler {
         };
 
       default:
-        if (error.status >= 400 && error.status < 500) {
+        if (statusCode >= 400 && statusCode < 500) {
           return {
             ...baseError,
             type: ErrorType.VALIDATION,
@@ -168,7 +169,7 @@ export class ErrorHandler {
             userMessage: 'Please check your request and try again.',
             action: 'retry',
           };
-        } else if (error.status >= 500) {
+        } else if (statusCode >= 500) {
           return {
             ...baseError,
             type: ErrorType.SERVER,

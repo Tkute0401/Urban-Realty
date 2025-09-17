@@ -11,7 +11,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings } from '@mui/icons-material';
 import { useProperties } from '../../../contexts/PropertiesContext';
-import apiService from '@/lib/services/apiService';
+import { api } from '@/lib/services/api';
 import PropertyCard from '../../../components/home/PropertyCard';
 import FavoritesGrid from '../../../components/user/FavoritesGrid';
   
@@ -66,10 +66,9 @@ const Profile = () => {
       if (!user) return;
       setLoadingFavorites(true);
       try {
-        const res = await apiService.getFavorites() as { data: any };
-        // Normalize API shape
-        const items = Array.isArray(res?.data?.data) ? res.data.data : (res?.data || []);
-        setFavorites(items);
+        const res = await api.auth.favoritesList();
+        const items = Array.isArray((res as any)?.data?.data) ? (res as any).data.data : (res?.data || []);
+        setFavorites(items as any[]);
       } catch (e) {
         setFavorites([]);
       } finally {

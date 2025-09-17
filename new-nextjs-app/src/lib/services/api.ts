@@ -29,6 +29,14 @@ export const api = {
 		login: (payload: { email: string; password: string }) => unwrap<{ token: string; user: any }>(http.post("/auth/login", payload)),
 		register: (payload: { name: string; email: string; password: string }) => unwrap<{ user: any }>(http.post("/auth/register", payload)),
 		profile: () => unwrap<any>(http.get("/auth/profile")),
+		// Favorites
+		favoritesList: () => unwrap<any[]>(http.get("/auth/favorites")),
+		addFavorite: (propertyId: string) => unwrap<any>(http.put(`/auth/favorites/${propertyId}`, {})),
+		removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/auth/favorites/${propertyId}`)),
+		favoriteStatus: (propertyId: string) => unwrap<{ favorited: boolean }>(http.get(`/auth/favorites/${propertyId}/status`)),
+		// Recently viewed
+		recentlyViewedList: () => unwrap<any[]>(http.get("/auth/recently-viewed")),
+		addRecentlyViewed: (propertyId: string) => unwrap<any>(http.post(`/auth/recently-viewed/${propertyId}`, {})),
 	},
 	properties: {
 		list: (params: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/properties", { params })),

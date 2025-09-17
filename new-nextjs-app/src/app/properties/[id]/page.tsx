@@ -8,7 +8,7 @@ import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import NearbyAmenities from '@/components/property/NearbyAmenities';
 import { formatPrice } from '@/lib/utils/format';
-import apiService from '@/lib/services/apiService';
+import { api } from '@/lib/services/api';
 import { 
   Box, Typography, Grid, Divider, Chip, Button, Paper, 
   CircularProgress, Alert, IconButton, Stack, Avatar, Container
@@ -38,18 +38,18 @@ const PropertyDetails = () => {
         setLoadingProperty(true);
         // Ensure id is a string (handle case where it might be an array)
         const propertyId = Array.isArray(id) ? id[0] : id;
-        const response = await apiService.getProperty(propertyId) as { data: any; status: number };
-        const prop = response.data?.data ?? response.data;
+        const response = await api.properties.getById(propertyId as string);
+        const prop = (response as any).data?.data ?? response.data;
         setProperty(prop);
         // add to recently viewed (best-effort)
         try {
-          await apiService.addRecentlyViewed(propertyId as string);
+          await api.auth.addRecentlyViewed(propertyId as string);
         } catch (_) {}
         // fetch favorite status if authenticated
         if (isAuthenticated) {
           try {
-            const favRes = await apiService.getFavoriteStatus(propertyId as string) as { data: any };
-            setIsFavorite(Boolean(favRes?.data?.favorited));
+            const favRes = await api.auth.favoriteStatus(propertyId as string);
+            setIsFavorite(Boolean((favRes as any)?.data?.favorited));
           } catch (_) {}
         }
       } catch (err) {
@@ -75,10 +75,10 @@ const PropertyDetails = () => {
       // Ensure id is a string (handle case where it might be an array)
       const propertyId = Array.isArray(id) ? id[0] : id;
       if (isFavorite) {
-        await apiService.removeFavorite(propertyId as string);
+        await api.auth.removeFavorite(propertyId as string);
         setIsFavorite(false);
       } else {
-        await apiService.addFavorite(propertyId as string);
+        await api.auth.addFavorite(propertyId as string);
         setIsFavorite(true);
       }
     } catch (err) {
