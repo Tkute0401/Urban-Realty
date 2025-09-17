@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/services/api';
 
 const Favorites = () => {
+  console.log('🔧 User Favorites Page rendering...');
+  
   const { user } = useAuth();
   const router = useRouter();
 

@@ -9,6 +9,12 @@ import PropertiesMap from './PropertiesMap';
 import styles from './PropertiesExplorer.module.css';
 
 export default function PropertiesExplorer() {
+  console.log('🔧 PropertiesExplorer rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 PropertiesExplorer mounted on client side!');
+  }, []);
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const searchParams = useSearchParams();

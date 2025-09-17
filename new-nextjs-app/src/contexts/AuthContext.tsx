@@ -14,6 +14,15 @@ export type AuthUser = {
   occupation?: string;
   recentlyViewed?: any;
   subscriptionStatus?: string;
+  createdAt?: string | Date;
+  professionalInfo?: {
+    licenseNumber?: string;
+    yearsOfExperience?: number | string;
+    businessName?: string;
+    businessAddress?: string;
+    specializations?: string[];
+    certifications?: string[];
+  };
 };
 
 export type AuthContextValue = {

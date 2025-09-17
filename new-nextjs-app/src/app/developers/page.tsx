@@ -17,13 +17,15 @@ import {
 import './DeveloperList.css';
 
 const DeveloperList = () => {
+  console.log('🔧 Developers Page rendering...');
 
   useEffect(() => {
+    console.log('🔧 Developers Page mounted on client side!');
     window.scrollTo(0, 0);
   }, []);
   
   const { developers, loading, error, getDevelopers } = useDevelopers();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const initialLoad = useRef(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -57,7 +59,7 @@ const DeveloperList = () => {
   useEffect(() => {
     const fetchData = async () => {
       let apiParams = {};
-      await getDevelopers(apiParams);
+      await getDevelopers();
       
       const newSearchParams = new URLSearchParams();
       Object.entries(apiParams).forEach(([key, value]) => {
@@ -79,7 +81,7 @@ const DeveloperList = () => {
     };
 
     fetchData();
-  }, [filters, getDevelopers, setSearchParams]);
+  }, [filters, getDevelopers, router]);
 
 
   const paginatedDevelopers = developers.slice(
@@ -115,7 +117,7 @@ const DeveloperList = () => {
         <Typography variant="body2" sx={{ mb: 2, color: 'white' }}>{error}</Typography>
         <Button 
           variant="contained" 
-          onClick={() => getDevelopers({})}
+          onClick={() => getDevelopers()}
           startIcon={<Refresh />}
           size={isMobile ? 'small' : 'medium'}
           sx={{ backgroundColor: '#78CADC', '&:hover': { backgroundColor: '#5cb3c5' } }}
@@ -159,7 +161,7 @@ const DeveloperList = () => {
           </Typography>
           <Button 
             variant="contained" 
-            onClick={() => getDevelopers({})}
+            onClick={() => getDevelopers()}
             startIcon={<Refresh />}
             size={isMobile ? 'small' : 'medium'}
             sx={{ 

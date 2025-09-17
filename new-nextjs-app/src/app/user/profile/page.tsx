@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-import type React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { 
@@ -153,7 +152,6 @@ const Profile = () => {
                   border: '3px solid var(--color-primary)',
                   boxShadow: '0 4px 20px rgba(120, 202, 220, 0.4)',
                 }}
-                src={user?.avatar}
               />
               
               <Box sx={{ flex: 1 }}>
@@ -178,9 +176,9 @@ const Profile = () => {
                   <strong>Email:</strong> {user?.email}
                 </Typography>
                 
-                {user?.phone && (
+                {user?.mobile && (
                   <Typography variant="body1" sx={{ mb: 1 }}>
-                    <strong>Phone:</strong> {user?.phone}
+                    <strong>Phone:</strong> {user?.mobile}
                   </Typography>
                 )}
               </Box>
@@ -261,7 +259,7 @@ const Profile = () => {
             <Grid container spacing={3}>
               {agentProperties.map((property, index) => (
                 <Grid item xs={12} sm={6} key={property._id}>
-                  <PropertyCard property={property} index={index} />
+                  <PropertyCard property={property as any} index={index} />
                 </Grid>
               ))}
             </Grid>

@@ -27,6 +27,11 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps): JSX.Element {
+  console.log('🔧 Button rendering...', { variant, size, loading });
+  
+  React.useEffect(() => {
+    console.log('🔧 Button mounted on client side!', { variant, children });
+  }, [variant, children]);
   const getVariantStyles = () => {
     const baseStyles = {
       fontWeight: 600,

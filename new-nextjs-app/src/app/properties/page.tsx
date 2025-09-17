@@ -1,6 +1,17 @@
 'use client'
 
+import React from 'react';
 import PropertiesExplorer from '@/components/property/PropertiesExplorer';
+
+export default function PropertiesPage() {
+  console.log('🔧 Properties Page rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 Properties Page mounted on client side!');
+  }, []);
+
+  return <PropertiesExplorer />;
+}
 
 // const PropertyCard = ({ property }) => {
 
@@ -49,6 +60,3 @@ import PropertiesExplorer from '@/components/property/PropertiesExplorer';
 //   );
 // };
 
-export default function PropertiesPage() {
-  return <PropertiesExplorer />;
-}

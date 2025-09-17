@@ -32,6 +32,20 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import http from '../../lib/services/http';
 
+interface EditData {
+  name?: string;
+  mobile?: string;
+  occupation?: string;
+  professionalInfo?: {
+    licenseNumber?: string;
+    yearsOfExperience?: number | string;
+    businessName?: string;
+    businessAddress?: string;
+    specializations?: string[];
+    certifications?: string[];
+  };
+}
+
 const UserProfile = () => {
   const { user, updateUser } = useAuth();
   const [subscription, setSubscription] = useState(null);
@@ -39,7 +53,7 @@ const UserProfile = () => {
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
-  const [editData, setEditData] = useState({});
+  const [editData, setEditData] = useState<EditData>({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {

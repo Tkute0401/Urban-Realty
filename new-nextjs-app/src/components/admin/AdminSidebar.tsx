@@ -1,3 +1,4 @@
+import React from 'react';
 import { 
   Box,
   Divider,
@@ -42,6 +43,12 @@ const menuItems = [
 ];
 
 const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse }) => {
+  console.log('🔧 AdminSidebar rendering...', { mobileOpen, collapsed });
+  
+  React.useEffect(() => {
+    console.log('🔧 AdminSidebar mounted on client side!');
+  }, []);
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const pathname = usePathname();

@@ -1,11 +1,20 @@
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Button } from '@mui/material';
 import { Menu as MenuIcon, AccountCircle } from '@mui/icons-material';
-import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const AdminHeader = ({ onMenuClick }) => {
+interface AdminHeaderProps {
+  onMenuClick: () => void;
+}
+
+const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuClick }) => {
+  console.log('🔧 AdminHeader rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 AdminHeader mounted on client side!');
+  }, []);
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -64,8 +73,8 @@ const AdminHeader = ({ onMenuClick }) => {
             onClick={handleMenuOpen}
             color="inherit"
           >
-            {user?.avatar ? (
-              <Avatar src={user.avatar} sx={{ width: 32, height: 32 }} />
+            {user?.name ? (
+              <Avatar sx={{ width: 32, height: 32 }}>{user.name.charAt(0).toUpperCase()}</Avatar>
             ) : (
               <AccountCircle />
             )}

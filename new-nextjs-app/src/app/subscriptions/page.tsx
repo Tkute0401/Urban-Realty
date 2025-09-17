@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+console.log('🔧 Subscriptions Page module loading...');
 import {
   Container,
   Grid,
