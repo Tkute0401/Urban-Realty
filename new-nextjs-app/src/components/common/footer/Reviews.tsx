@@ -1,8 +1,15 @@
+'use client'
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { StarIcon, ChatBubbleLeftRightIcon, ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const Reviews = () => {
+  console.log('🔧 Reviews component rendering...');
+  
+  useEffect(() => {
+    console.log('🔧 Reviews mounted on client side!');
+  }, []);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);

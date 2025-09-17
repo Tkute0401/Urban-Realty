@@ -20,6 +20,11 @@ const ServiceBlock: React.FC<ServiceBlockProps> = ({
   imageRight = false,
   propertyType = 'House'
 }) => {
+  console.log('🔧 ServiceBlock rendering...', { title });
+  
+  React.useEffect(() => {
+    console.log('🔧 ServiceBlock mounted on client side!', { title });
+  }, [title]);
   const router = useRouter();
 
   const handleClick = () => {

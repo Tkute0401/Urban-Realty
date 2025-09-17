@@ -18,6 +18,11 @@ import AccountSidebar from './AccountSidebar';
 import { useProperties } from '@/contexts/PropertiesContext';
 
 const HeroSection = () => {
+  console.log('🔧 HeroSection rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 HeroSection mounted on client side!');
+  }, []);
   const [searchText, setSearchText] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);

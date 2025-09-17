@@ -100,6 +100,11 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
   id,
   animate = true,
 }) => {
+  console.log('🔧 PropertyCard rendering...', { propertyId: property?._id, index });
+  
+  React.useEffect(() => {
+    console.log('🔧 PropertyCard mounted on client side!', { propertyId: property?._id, index });
+  }, [property?._id, index]);
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();

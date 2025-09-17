@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 const OwnerServiceBlock = () => {
+  console.log('🔧 OwnerServiceBlock rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 OwnerServiceBlock mounted on client side!');
+  }, []);
   const router = useRouter();
   const { user } = useAuth();
 

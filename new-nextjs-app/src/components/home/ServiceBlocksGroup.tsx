@@ -4,6 +4,11 @@ import React from "react";
 import ServiceBlock from "@/components/home/ServiceBlock";
 
 const ServiceBlocksGroup: React.FC = () => {
+  console.log('🔧 ServiceBlocksGroup rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 ServiceBlocksGroup mounted on client side!');
+  }, []);
   return (
     <>
       <ServiceBlock 

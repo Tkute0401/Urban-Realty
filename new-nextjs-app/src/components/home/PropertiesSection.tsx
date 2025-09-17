@@ -6,6 +6,11 @@ import { PropertyCard } from "@/components/ui";
 import { useEffect } from "react";
 
 const PropertiesSection = () => {
+  console.log('🔧 PropertiesSection rendering...');
+  
+  useEffect(() => {
+    console.log('🔧 PropertiesSection mounted on client side!');
+  }, []);
   const { featuredProperties, getFeaturedProperties } = useProperties();
   const router = useRouter();
 
