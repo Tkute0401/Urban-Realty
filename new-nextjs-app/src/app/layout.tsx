@@ -1,3 +1,4 @@
+import React from 'react'
 import './globals.css'
 import 'leaflet/dist/leaflet.css'
 import Providers from './providers'
