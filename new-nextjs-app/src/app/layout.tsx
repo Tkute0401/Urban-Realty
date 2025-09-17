@@ -1,4 +1,7 @@
+'use client'
+
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import './globals.css'
 import 'leaflet/dist/leaflet.css'
 import Providers from './providers'
@@ -12,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <Providers>
-          <Header />
+          <ConditionalHeader />
           <main>
             {children}
           </main>
@@ -21,4 +24,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </body>
     </html>
   )
+}
+
+function ConditionalHeader() {
+  const pathname = usePathname()
+  console.log('🔧 ConditionalHeader - Current path:', pathname)
+  
+  // Don't show header on homepage
+  if (pathname === '/') {
+    console.log('🔧 ConditionalHeader - Skipping header for homepage')
+    return null
+  }
+  
+  console.log('🔧 ConditionalHeader - Rendering header for path:', pathname)
+  return <Header />
 }
