@@ -44,9 +44,9 @@ import {
   WhatsApp as WhatsAppIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { useQuery } from '@tanstack/react-query';
+import { } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { apiService } from '@/lib/services/apiService';
+import { useAgentAnalytics } from '@/hooks/api/agent';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -57,14 +57,7 @@ const AgentAnalytics = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   // Fetch agent's analytics
-  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['agentAnalytics', user?.id],
-    queryFn: async () => {
-      const res = await apiService.getAgentAnalytics(user?.id);
-      return res.data;
-    },
-    enabled: !!user?.id
-  });
+  const { data: analyticsData, isLoading: analyticsLoading } = useAgentAnalytics(user?.id);
 
   // Use analytics data from mock API
   const analytics = analyticsData || {

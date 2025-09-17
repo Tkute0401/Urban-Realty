@@ -42,11 +42,22 @@ export const api = {
 		list: (params: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/properties", { params })),
 		getById: (id: string) => unwrap<any>(http.get(`/properties/${id}`)),
 		create: (payload: any) => unwrap<any>(http.post("/properties", payload)),
+		delete: (id: string) => unwrap<any>(http.delete(`/properties/${id}`)),
 	},
 	admin: {
 		stats: () => unwrap<any>(http.get("/admin/stats")),
 		dashboard: () => unwrap<any>(http.get("/admin/dashboard")),
 		analytics: () => unwrap<any>(http.get("/admin/analytics")),
+	},
+	agent: {
+		// Agent dashboard & analytics
+		dashboard: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/agent/${agentId}/dashboard`, { params })),
+		analytics: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/agent/${agentId}/analytics`, { params })),
+		// Agent leads
+		leads: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/leads`, { params })),
+		updateLead: (leadId: string, payload: { status?: string }) => unwrap<any>(http.put(`/contacts/${leadId}`, payload)),
+		// Agent properties
+		properties: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/properties`, { params })),
 	},
 	subscriptions: {
 		plans: () => unwrap<any[]>(http.get("/subscriptions/plans")),

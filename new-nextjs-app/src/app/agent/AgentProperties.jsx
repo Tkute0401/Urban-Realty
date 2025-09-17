@@ -43,9 +43,9 @@ import {
   AttachMoney as MoneyIcon,
   CalendarToday as CalendarIcon
 } from '@mui/icons-material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { apiService } from '@/lib/services/apiService';
+import { useAgentProperties, useDeleteProperty } from '@/hooks/api/agent';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -63,31 +63,24 @@ const AgentProperties = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Fetch agent's properties
-  const { data: properties, isLoading, error } = useQuery({
-    queryKey: ['agentProperties', user?.id, page, rowsPerPage, searchTerm, statusFilter, priceRange],
-    queryFn: async () => {
-      const res = await apiService.getAgentProperties(user?.id, {
-        page: page + 1,
-        limit: rowsPerPage,
-        search: searchTerm,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        priceRange: priceRange !== 'all' ? priceRange : undefined
-      });
-      return res.data;
-    },
-    enabled: !!user?.id
-  });
+  const { data: properties, isLoading, error } = useAgentProperties(
+    user?.id,
+    {
+      page: page + 1,
+      limit: rowsPerPage,
+      search: searchTerm,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      priceRange: priceRange !== 'all' ? priceRange : undefined,
+    }
+  );
 
   // Delete property mutation
-  const deletePropertyMutation = useMutation({
-    mutationFn: async (propertyId) => {
-      await apiService.deleteProperty(propertyId);
-    },
+  const deletePropertyMutation = useDeleteProperty({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agentProperties'] });
       setDeleteDialogOpen(false);
       setSelectedProperty(null);
-    }
+    },
   });
 
   const handleChangePage = (event, newPage) => {
@@ -101,7 +94,7 @@ const AgentProperties = () => {
 
   const handleDeleteProperty = () => {
     if (selectedProperty) {
-      deletePropertyMutation.mutate(selectedProperty._id);
+      deletePropertyMutation.mutate({ propertyId: selectedProperty._id });
     }
   };
 
