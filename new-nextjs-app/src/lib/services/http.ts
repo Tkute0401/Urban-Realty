@@ -9,8 +9,10 @@ const http: AxiosInstance = axios.create({
 http.interceptors.request.use((config) => {
         const token = getBrowserAccessToken();
         if (token) {
-                config.headers = config.headers || {};
-                config.headers.Authorization = `Bearer ${token}`;
+                config.headers = { 
+                        ...(config.headers as any), 
+                        Authorization: `Bearer ${token}` 
+                } as any;
         }
         return config;
 });
