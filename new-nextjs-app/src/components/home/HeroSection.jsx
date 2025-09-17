@@ -90,20 +90,24 @@ const HeroSection = () => {
     }
 
     const updateVisibleCount = () => {
-      if (window.innerWidth < 640) {
-        setVisibleLocalitiesCount(3);
-      } else if (window.innerWidth < 768) {
-        setVisibleLocalitiesCount(4);
-      } else if (window.innerWidth < 1024) {
-        setVisibleLocalitiesCount(5);
-      } else {
-        setVisibleLocalitiesCount(6);
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 640) {
+          setVisibleLocalitiesCount(3);
+        } else if (window.innerWidth < 768) {
+          setVisibleLocalitiesCount(4);
+        } else if (window.innerWidth < 1024) {
+          setVisibleLocalitiesCount(5);
+        } else {
+          setVisibleLocalitiesCount(6);
+        }
       }
     };
 
     updateVisibleCount();
-    window.addEventListener('resize', updateVisibleCount);
-    return () => window.removeEventListener('resize', updateVisibleCount);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateVisibleCount);
+      return () => window.removeEventListener('resize', updateVisibleCount);
+    }
   }, [searchParams, availableCities]);
 
   useEffect(() => {

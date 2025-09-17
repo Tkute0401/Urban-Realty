@@ -56,11 +56,21 @@ const PersonIcon = () => (
   </svg>
 );
 
-const Header = () => {
-  const { user, logout } = useAuth();
+interface User {
+  name: string;
+  role: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  logout: () => void;
+}
+
+const Header: React.FC = () => {
+  const { user, logout } = useAuth() as AuthContextType;
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     const handleResize = () => {
