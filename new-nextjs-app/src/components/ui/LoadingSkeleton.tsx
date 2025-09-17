@@ -5,11 +5,23 @@ import {
   CardContent,
   Grid,
   Skeleton,
-  Typography,
   LinearProgress
 } from '@mui/material';
 
-const DashboardSkeleton = () => {
+interface TableSkeletonProps {
+  rows?: number;
+  columns?: number;
+}
+
+interface CardSkeletonProps {
+  height?: number;
+}
+
+interface ChartSkeletonProps {
+  height?: number;
+}
+
+const DashboardSkeleton: React.FC = () => {
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       {/* Header Skeleton */}
@@ -117,7 +129,7 @@ const DashboardSkeleton = () => {
   );
 };
 
-const TableSkeleton = ({ rows = 5, columns = 4 }) => {
+const TableSkeleton: React.FC<TableSkeletonProps> = ({ rows = 5, columns = 4 }) => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -144,7 +156,7 @@ const TableSkeleton = ({ rows = 5, columns = 4 }) => {
   );
 };
 
-const CardSkeleton = ({ height = 200 }) => {
+const CardSkeleton: React.FC<CardSkeletonProps> = ({ height = 200 }) => {
   return (
     <Card>
       <CardContent>
@@ -158,7 +170,7 @@ const CardSkeleton = ({ height = 200 }) => {
   );
 };
 
-const ChartSkeleton = ({ height = 300 }) => {
+const ChartSkeleton: React.FC<ChartSkeletonProps> = ({ height = 300 }) => {
   return (
     <Card>
       <CardContent>
@@ -169,11 +181,16 @@ const ChartSkeleton = ({ height = 300 }) => {
   );
 };
 
-const LoadingSkeleton = {
+// Named exports for tree-shaking
+export const Dashboard = DashboardSkeleton;
+export const Table = TableSkeleton;
+export const LoadingCard = CardSkeleton;  // Renamed to avoid MUI Card conflict
+export const Chart = ChartSkeleton;
+
+// Keep default export for backward compatibility
+export default {
   Dashboard: DashboardSkeleton,
   Table: TableSkeleton,
-  Card: CardSkeleton,
+  Card: CardSkeleton,  // Keep original name in default export
   Chart: ChartSkeleton
 };
-
-export default LoadingSkeleton;

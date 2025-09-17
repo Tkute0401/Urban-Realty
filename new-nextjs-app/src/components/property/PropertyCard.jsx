@@ -6,7 +6,7 @@ import LocalHotelOutlinedIcon from '@mui/icons-material/LocalHotelOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BathtubOutlinedIcon from '@mui/icons-material/BathtubOutlined';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import http from '@/lib/services/http';
 import { toast } from 'react-toastify';
 import { Tooltip } from '@mui/material';

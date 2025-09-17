@@ -2,7 +2,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AgentRoute = ({ children }) => {
   const { user } = useAuth();
