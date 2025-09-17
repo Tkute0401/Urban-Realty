@@ -240,23 +240,8 @@ class AnalyticsService {
   // Send data to server
   async sendToServer(action, data) {
     try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('/api/v1/analytics/track', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` })
-        },
-        body: JSON.stringify({
-          action,
-          data
-        })
-      });
-
-      if (!response.ok) {
-        console.warn('Analytics tracking failed:', response.statusText);
-      }
+      const { api } = await import('./api');
+      await api.analytics.track({ action, data });
     } catch (error) {
       console.warn('Analytics tracking error:', error);
     }
