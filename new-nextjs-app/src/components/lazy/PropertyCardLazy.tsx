@@ -2,8 +2,10 @@
 import React, { Suspense } from 'react';
 import LoadingSpinner from '../common/LoadingSpinner';
 
-// Lazy load the actual PropertyCard component
-const PropertyCard = React.lazy(() => import('../property/PropertyCard'));
+// Lazy load the unified PropertyCard component
+const PropertyCard = React.lazy(() => 
+  import('../ui/PropertyCard').then(module => ({ default: module.PropertyCard }))
+);
 
 interface PropertyCardLazyProps {
   property: any;

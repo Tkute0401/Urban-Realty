@@ -1,9 +1,94 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 import http from '@/lib/services/http';
 
-const PropertiesContext = createContext();
+// Types
+interface Property {
+  _id: string;
+  title?: string;
+  buildingName?: string;
+  description?: string;
+  images?: Array<{ url: string; alt?: string }>;
+  price?: number;
+  area?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  type?: string;
+  status?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  };
+  location?: {
+    coordinates?: [number, number];
+  };
+  developer?: {
+    _id: string;
+    name: string;
+  };
+}
 
-export const PropertiesProvider = ({ children }) => {
+interface Developer {
+  _id: string;
+  name: string;
+  logo?: { url: string };
+  headquarters?: {
+    city?: string;
+    state?: string;
+    country?: string;
+  };
+}
+
+interface PropertiesContextType {
+  properties: Property[];
+  featuredProperties: Property[];
+  property: Property | null;
+  loading: boolean;
+  error: string | null;
+  cache: Record<string, any>;
+  developers: Developer[];
+  pagination: Record<string, any>;
+  agentProperties: Property[];
+  getProperties: (params?: Record<string, any>) => Promise<void>;
+  getFeaturedProperties: () => Promise<Property[]>;
+  getProperty: (id: string) => Promise<Property | null>;
+  getAgentProperties: (user: any) => Promise<void>;
+  getDevelopers: (params?: Record<string, any>) => Promise<void>;
+  setProperties: (properties: Property[]) => void;
+  setFeaturedProperties: (properties: Property[]) => void;
+  setProperty: (property: Property | null) => void;
+  clearError: () => void;
+}
+
+const defaultContextValue: PropertiesContextType = {
+  properties: [],
+  featuredProperties: [],
+  property: null,
+  loading: false,
+  error: null,
+  cache: {},
+  developers: [],
+  pagination: {},
+  agentProperties: [],
+  getProperties: async () => {},
+  getFeaturedProperties: async () => [],
+  getProperty: async () => null,
+  getAgentProperties: async () => {},
+  getDevelopers: async () => {},
+  setProperties: () => {},
+  setFeaturedProperties: () => {},
+  setProperty: () => {},
+  clearError: () => {},
+};
+
+const PropertiesContext = createContext<PropertiesContextType>(defaultContextValue);
+
+interface PropertiesProviderProps {
+  children: ReactNode;
+}
+
+export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children }) => {
   const [properties, setProperties] = useState([]);
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [property, setProperty] = useState(null);

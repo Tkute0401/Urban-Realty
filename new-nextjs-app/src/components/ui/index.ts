@@ -16,5 +16,9 @@ export { default as MobileBottomNav } from './MobileBottomNav';
 export { default as StatCard } from './StatCard';
 export * as LoadingSkeleton from './LoadingSkeleton';
 
-// Type Exports
+// Property Components
+export { PropertyCard } from './PropertyCard';
+
+// Type Exports  
 export type { SelectOption } from './Select';
+export type { Property } from './PropertyCard';

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useProperties } from "@/contexts/PropertiesContext";
-import PropertyCard from "./PropertyCard";
+import { PropertyCard } from "@/components/ui";
 import { useEffect } from "react";
 
 const PropertiesSection = () => {

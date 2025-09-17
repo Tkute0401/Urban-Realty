@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Box, Container, Pagination, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import { usePropertiesQuery } from '@/hooks/api/properties';
-import PropertyCard from './PropertyCard';
+import { PropertyCard } from '@/components/ui';
 import PropertiesMap from './PropertiesMap';
 import styles from './PropertiesExplorer.module.css';
 
