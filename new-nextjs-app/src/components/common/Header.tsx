@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -67,6 +69,7 @@ interface AuthContextType {
 }
 
 const Header: React.FC = () => {
+  console.log('🔧 Header component rendering...');
   const { user, logout } = useAuth() as AuthContextType;
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
