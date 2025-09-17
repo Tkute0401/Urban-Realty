@@ -275,7 +275,7 @@ const SubscriptionPlans = () => {
                   variant="contained"
                   size="large"
                   onClick={() => handleSubscribe(plan)}
-                  disabled={user?.subscriptionStatus === plan.name.toLowerCase()}
+                  disabled={user?.subscriptionStatus?.toLowerCase() === plan.name.toLowerCase()}
                   sx={{ 
                     bgcolor: plan.isPopular ? 'var(--color-primary)' : 'var(--color-primary)',
                     color: 'var(--color-text-inverse)',
@@ -290,7 +290,7 @@ const SubscriptionPlans = () => {
                     width: '100%'
                   }}
                 >
-                  {user?.subscriptionStatus === plan.name.toLowerCase() ? 'Current Plan' : 'Choose Plan'}
+                  {user?.subscriptionStatus?.toLowerCase() === plan.name.toLowerCase() ? 'Current Plan' : 'Choose Plan'}
                 </Button>
 
                 {/* Features List */}

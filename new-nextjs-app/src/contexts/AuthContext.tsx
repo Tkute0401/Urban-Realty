@@ -13,6 +13,7 @@ export type AuthUser = {
   favorites?: any;
   occupation?: string;
   recentlyViewed?: any;
+  subscriptionStatus?: string;
 };
 
 export type AuthContextValue = {
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         favorites: data.user?.favorites,
         occupation: data.user?.occupation,
         recentlyViewed: data.user?.recentlyViewed,
+        subscriptionStatus: data.user?.subscriptionStatus,
       };
       setUser(userInfo);
       sessionManager.setUser(userInfo as any);
@@ -87,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         favorites: userData?.favorites,
         occupation: userData?.occupation,
         recentlyViewed: userData?.recentlyViewed,
+        subscriptionStatus: userData?.subscriptionStatus,
       };
       sessionManager.setToken(token);
       sessionManager.setUser(userInfo as any);
@@ -118,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         favorites: payload?.favorites,
         occupation: payload?.occupation,
         recentlyViewed: payload?.recentlyViewed,
+        subscriptionStatus: userInfo?.subscriptionStatus,
       } as any;
       sessionManager.setToken(token);
       sessionManager.setUser(userInfoObj as any);
