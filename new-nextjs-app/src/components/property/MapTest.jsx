@@ -12,7 +12,7 @@ import PropertyMap from './PropertyMap';
 import PropertiesMap from './PropertiesMap';
 import LocationSearch from './LocationSearch';
 import NearbyAmenities from './NearbyAmenities';
-import apiService from '@/lib/services/apiService';
+import http from '@/lib/services/http';
 
 // Test component for Phase 4 Maps & Location Services
 const MapTest = () => {
@@ -22,8 +22,8 @@ const MapTest = () => {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await apiService.getProperties();
-        const list = res?.data?.properties || [];
+        const res = await http.get('/properties', { params: { limit: 1 } });
+        const list = res?.data?.data || res?.data?.properties || res?.data || [];
         setTestProperty(list[0] || null);
       } catch (e) {
         setTestProperty(null);

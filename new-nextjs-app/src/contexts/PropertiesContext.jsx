@@ -60,8 +60,7 @@ export const PropertiesProvider = ({ children }) => {
         }
       });
       console.log("Backend Params:=",backendParams);
-      console.log("Cache Key:=",axios.get('/properties', { params: backendParams }));
-      const response = await axios.get('/properties', { params: backendParams });
+      const response = await http.get('/properties', { params: backendParams });
       const { data, pagination: paginationData } = response.data;
       
       if (!Array.isArray(data)) {
@@ -96,7 +95,7 @@ export const PropertiesProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/properties/featured');
+      const response = await http.get('/properties/featured');
       const data = response.data?.data ?? response.data;
       
       if (!Array.isArray(data)) {
@@ -126,7 +125,7 @@ export const PropertiesProvider = ({ children }) => {
         return cache[id];
       }
   
-      const response = await axios.get(`/properties/${id}`);
+      const response = await http.get(`/properties/${id}`);
       const propertyData = response.data?.data ?? response.data;
       
       if (!propertyData) {
@@ -154,8 +153,7 @@ export const PropertiesProvider = ({ children }) => {
         ...config,
         headers: {
           ...config.headers,
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'multipart/form-data'
         }
       };
 
@@ -185,7 +183,7 @@ export const PropertiesProvider = ({ children }) => {
         }
       });
 
-      const response = await axios.post('/properties', formDataToSend, finalConfig);
+      const response = await http.post('/properties', formDataToSend, finalConfig);
       
       const newProperty = response.data?.data ?? response.data;
       setProperties(prev => [...prev, newProperty]);
@@ -219,8 +217,7 @@ export const PropertiesProvider = ({ children }) => {
       
       const config = {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'multipart/form-data'
         }
       };
 
@@ -249,7 +246,7 @@ export const PropertiesProvider = ({ children }) => {
         }
       });
 
-      const response = await axios.put(`/properties/${id}`, formDataToSend, config);
+      const response = await http.put(`/properties/${id}`, formDataToSend, config);
       const responseData = response.data?.data || response.data || response;
       
       if (!responseData) {
@@ -285,7 +282,7 @@ export const PropertiesProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      await axios.delete(`/properties/${id}`);
+      await http.delete(`/properties/${id}`);
       setProperties(prev => prev.filter(p => p._id !== id));
       setCache(prev => {
         const newCache = { ...prev };
@@ -307,7 +304,7 @@ export const PropertiesProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/developers');
+      const response = await http.get('/developers');
       const data = response.data?.data ?? response.data;
       
       if (!Array.isArray(data)) {
@@ -331,7 +328,7 @@ export const PropertiesProvider = ({ children }) => {
       setLoading(true);
       setError(null);
   
-      const response = await axios.get(`/properties/agent/${user.id}`);
+      const response = await http.get(`/properties/agent/${user.id}`);
       console.log("Response in context:=",response);
       const data = response.data?.data ?? response.data;
       
