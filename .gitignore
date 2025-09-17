@@ -4,8 +4,12 @@ client/node_modules/
 client/dist/
 
 .DS_Store
-client/.env
-server/.env
-.env
-client/.env
-server/.env
+
+# Environment files - SECURITY CRITICAL
+*.env
+*.env.local
+*.env.development
+*.env.production
+server/.env*
+client/.env*
+new-nextjs-app/.env*

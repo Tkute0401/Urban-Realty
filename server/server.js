@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const connectDB = require('./src/config/db');
 const errorHandler = require('./src/api/middleware/errorHandler');
 const { migrateExistingUsers } = require('./utils/migrateExistingUsers');
@@ -23,10 +24,14 @@ const app = express();
 // Connect to database
 connectDB();
 
-// Migrate existing users to ensure subscription status
+// Migrate existing users to ensure subscription status (only if DB connected)
 setTimeout(async () => {
   try {
-    await migrateExistingUsers();
+    if (mongoose.connection.readyState === 1) {
+      await migrateExistingUsers();
+    } else {
+      console.log('⚠️  Skipping user migration - no database connection');
+    }
   } catch (error) {
     console.error('Migration failed:', error);
   }
@@ -106,27 +111,21 @@ app.get('/api/v1/test', (req, res) => {
   });
 });
 
-// SPA Fallback - MUST BE LAST ROUTE
-app.get('*', (req, res) => {
-  const indexPath = path.join(clientDistDir, 'index.html');
-  console.log(`Attempting to serve SPA from: ${indexPath}`);
-  console.log(`Client dist directory exists: ${fs.existsSync(clientDistDir)}`);
-  console.log(`Index file exists: ${fs.existsSync(indexPath)}`);
-  
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    console.error(`Frontend file not found at: ${indexPath}`);
-    console.error(`Client dist directory contents:`, fs.existsSync(clientDistDir) ? fs.readdirSync(clientDistDir) : 'Directory does not exist');
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
-      success: false,
-      error: ERROR_MESSAGES.INTERNAL_ERROR,
-      path: indexPath,
-      clientDistExists: fs.existsSync(clientDistDir),
-      clientDistContents: fs.existsSync(clientDistDir) ? fs.readdirSync(clientDistDir) : null
-    });
-  }
-});
+// SPA Fallback - Only in production (Next.js handles dev frontend)
+if (config.env === 'production') {
+  app.get('*', (req, res) => {
+    const indexPath = path.join(clientDistDir, 'index.html');
+    
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(HTTP_STATUS.NOT_FOUND).json({ 
+        success: false,
+        error: 'Frontend build not found. Please run npm run build.'
+      });
+    }
+  });
+}
 
 // Error handling
 app.use(trackErrors);
