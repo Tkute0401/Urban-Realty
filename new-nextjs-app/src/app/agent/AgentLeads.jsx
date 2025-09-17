@@ -55,9 +55,9 @@ import {
   Schedule as ScheduleIcon,
   Done as DoneIcon
 } from '@mui/icons-material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { apiService } from '@/lib/services/apiService';
+import { useAgentLeads, useUpdateLeadStatus } from '@/hooks/api/agent';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 
@@ -82,32 +82,24 @@ const AgentLeads = () => {
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
 
   // Fetch agent's contact requests
-  const { data: leads, isLoading, error } = useQuery({
-    queryKey: ['agentLeads', user?.id, page, rowsPerPage, searchTerm, statusFilter, contactMethodFilter],
-    queryFn: async () => {
-      const res = await apiService.getAgentLeads(user?.id, {
-        page: page + 1,
-        limit: rowsPerPage,
-        search: searchTerm,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        contactMethod: contactMethodFilter !== 'all' ? contactMethodFilter : undefined
-      });
-      return res.data;
-    },
-    enabled: !!user?.id
-  });
+  const { data: leads, isLoading, error } = useAgentLeads(
+    user?.id,
+    {
+      page: page + 1,
+      limit: rowsPerPage,
+      search: searchTerm,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      contactMethod: contactMethodFilter !== 'all' ? contactMethodFilter : undefined,
+    }
+  );
 
   // Update lead status mutation
-  const updateLeadStatusMutation = useMutation({
-    mutationFn: async ({ leadId, status }) => {
-      // Assuming contacts endpoint is used for leads status update
-      await apiService.updateContact(leadId, { status });
-    },
+  const updateLeadStatusMutation = useUpdateLeadStatus({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agentLeads'] });
       setStatusUpdateDialog(false);
       setNewStatus('');
-    }
+    },
   });
 
   const handleChangePage = (event, newPage) => {

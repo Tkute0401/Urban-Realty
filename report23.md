@@ -331,3 +331,45 @@ Change ID: 46
 - Rationale: Standardize analytics fetch on centralized API and remove legacy service.
 - Audit mapping: Phase 3 — API centralization and React Query integration.
 - Notes/Risks: Local mock sections for search/system remain.
+
+Change ID: 47
+- Files affected: `new-nextjs-app/src/lib/services/api.ts`
+- Summary: Added `api.agent` endpoints (dashboard, analytics, leads, properties) and `api.properties.delete`. Normalizes agent-related server access via centralized client.
+- Rationale: Replace legacy `apiService` agent methods per audit Phase 3; enable domain hooks.
+- Audit mapping: Phase 3 — API centralization and React Query integration.
+- Notes/Risks: Endpoint paths assume `/agent/:id/*` resources and `/contacts/:id` for lead updates.
+
+Change ID: 48
+- Files affected: `new-nextjs-app/src/hooks/api/agent.ts`
+- Summary: Introduced React Query hooks `useAgentDashboard`, `useAgentAnalytics`, `useAgentLeads`, `useAgentProperties`, and mutations `useUpdateLeadStatus`, `useDeleteProperty`.
+- Rationale: Standardize agent data fetching/mutations and remove ad-hoc `apiService` usage.
+- Audit mapping: Phase 3 — API centralization and hooks; Step 2.
+- Notes/Risks: Query keys follow `['agent*', agentId, params]`; consumers should invalidate accordingly.
+
+Change ID: 49
+- Files affected: `new-nextjs-app/src/app/agent/AgentDashboard.jsx`
+- Summary: Refactored to use `useAgentDashboard` and `useAgentAnalytics`; removed direct `apiService` calls and inline `useQuery` implementations.
+- Rationale: Align with centralized API hooks, reduce duplication, and improve caching control.
+- Audit mapping: Phase 3 — Hooks adoption; Phase 1 — SSR-safe patterns preserved.
+- Notes/Risks: Behavior unchanged; refetch logic now uses hook `refetch` and query invalidation.
+
+Change ID: 50
+- Files affected: `new-nextjs-app/src/app/agent/AgentLeads.jsx`
+- Summary: Switched to `useAgentLeads` and `useUpdateLeadStatus`; removed `apiService.getAgentLeads` and `updateContact` usage.
+- Rationale: Complete migration off legacy services for leads; standardize params and invalidation.
+- Audit mapping: Phase 3 — Hooks integration; Remove `apiService` usage.
+- Notes/Risks: Invalidation uses key `['agentLeads']`; ensure list params included where necessary for precision.
+
+Change ID: 51
+- Files affected: `new-nextjs-app/src/app/agent/AgentProperties.jsx`
+- Summary: Replaced inline queries with `useAgentProperties` and deletion with `useDeleteProperty`.
+- Rationale: Unify properties management for agents using centralized API and hooks.
+- Audit mapping: Phase 3 — Hooks integration; Phase 0 — Single HTTP client usage.
+- Notes/Risks: Delete mutation now calls `api.properties.delete`.
+
+Change ID: 52
+- Files affected: `new-nextjs-app/src/app/agent/AgentAnalytics.jsx`
+- Summary: Migrated analytics fetch to `useAgentAnalytics`; removed legacy `apiService` import.
+- Rationale: Finish agent section migration to hooks.
+- Audit mapping: Phase 3 — Hooks integration.
+- Notes/Risks: None.

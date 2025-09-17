@@ -75,10 +75,10 @@ import {
   BarChart as BarChartIcon,
   Error as ErrorIcon
 } from '@mui/icons-material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import { apiService } from '@/lib/services/apiService';
+import { useAgentAnalytics, useAgentDashboard } from '@/hooks/api/agent';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 import { motion } from 'framer-motion';
@@ -117,54 +117,14 @@ const AgentDashboard = () => {
   });
 
   // Enhanced queries with TanStack Query v5 object syntax and better error handling
-  const { 
-    data: dashboardData, 
-    isLoading: dashboardLoading, 
-    error: dashboardError,
-    refetch: refetchDashboard
-  } = useQuery({
-    queryKey: ['agentDashboard', user?.id, filters],
-    queryFn: async () => {
-      try {
-        const res = await apiService.getAgentDashboard(user?.id);
-        return res.data;
-      } catch (error) {
-        console.error('Error fetching dashboard:', error);
-        throw new Error(error.message || 'Failed to fetch dashboard data');
-      }
-    },
-    enabled: !!user?.id,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchInterval: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error) => {
-      // Retry up to 3 times, but not for 4xx errors
-      if (failureCount >= 3) return false;
-      return true;
-    },
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useAgentDashboard(user?.id, filters, {
+    refetchInterval: 5 * 60 * 1000,
+    retry: (failureCount) => (failureCount < 3),
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const { 
-    data: analytics, 
-    isLoading: analyticsLoading,
-    error: analyticsError
-  } = useQuery({
-    queryKey: ['agentAnalytics', user?.id],
-    queryFn: async () => {
-      try {
-        const res = await apiService.getAgentAnalytics(user?.id);
-        return res.data;
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-        throw new Error(error.message || 'Failed to fetch analytics');
-      }
-    },
-    enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error) => {
-      if (failureCount >= 2) return false;
-      return true;
-    },
+  const { data: analytics, isLoading: analyticsLoading } = useAgentAnalytics(user?.id, undefined, {
+    retry: (failureCount) => (failureCount < 2),
   });
 
   // Refresh mutation with better error handling
