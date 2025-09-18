@@ -1,0 +1,117 @@
+ 
+[Region: asia-southeast1]
+=========================
+Using Detected Dockerfile
+=========================
+
+context: q629-kXuR
+
+internal
+load build definition from Dockerfile
+0ms
+
+internal
+load metadata for docker.io/library/node:18-alpine
+738ms
+
+internal
+load metadata for docker.io/library/node:20-alpine
+751ms
+
+internal
+load .dockerignore
+1ms
+
+frontend-builder
+FROM docker.io/library/node:20-alpine@sha256:eabac870db94f7342d6c33560d6613f188bbcf4bbe1f4eb47d5e2a08e1a37722
+8ms
+
+backend-builder
+FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
+9ms
+
+internal
+load build context
+0ms
+
+backend-builder
+WORKDIR /app cached
+0ms
+
+backend-builder
+COPY package*.json ./ cached
+0ms
+
+backend-builder
+RUN npm install
+5s
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'joi@18.0.1',
+npm warn EBADENGINE   required: { node: '>= 20' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'react-router@7.6.2',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'react-router-dom@7.6.2',
+npm warn EBADENGINE   required: { node: '>=20.0.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'vite@7.1.4',
+npm warn EBADENGINE   required: { node: '^20.19.0 || >=22.12.0' },
+npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+npm warn EBADENGINE }
+npm warn deprecated xss-clean@0.1.4: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+npm warn deprecated
+npm warn deprecated (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+frontend-builder
+COPY client . cached
+0ms
+
+frontend-builder
+COPY client/package*.json ./ cached
+0ms
+
+frontend-builder
+WORKDIR /app/client cached
+0ms
+
+frontend-builder
+RUN npm install cached
+0ms
+
+frontend-builder
+RUN npm run build
+5s
+> client@0.0.0 build
+> vite build
+vite v6.3.5 building for production...
+transforming...
+✓ 508 modules transformed.
+✗ Build failed in 3.84s
+error during build:
+Could not resolve "../../components/home/ServiceBlock" from "src/pages/Home/Home.jsx"
+file: /app/client/src/pages/Home/Home.jsx
+    at getRollupError (file:///app/client/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+    at error (file:///app/client/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+    at ModuleLoader.handleInvalidResolvedId (file:///app/client/node_modules/rollup/dist/es/shared/node-entry.js:21423:24)
+    at file:///app/client/node_modules/rollup/dist/es/shared/node-entry.js:21383:26
+Dockerfile:12
+-------------------
+10 |     ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
+11 |         VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
+12 | >>> RUN npm run build
+13 |
+14 |     # Stage 2: Backend build
+-------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1
