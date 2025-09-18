@@ -271,8 +271,8 @@ const EnhancedSearch = ({
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
           placeholder={placeholder}
-          variant={variant}
-          size={size}
+          variant={variant as any}
+          size={size as any}
           fullWidth={fullWidth}
           InputProps={{
             startAdornment: (
@@ -331,9 +331,9 @@ const EnhancedSearch = ({
                   {recentSearches.map((search, index) => (
                     <ListItem
                       key={index}
-                      button
+                      component="button"
                       onClick={() => handleRecentSearchClick(search)}
-                      sx={{ py: 0.5 }}
+                      sx={{ py: 0.5, cursor: 'pointer', border: 'none', background: 'transparent', width: '100%' }}
                     >
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <HistoryIcon fontSize="small" color="action" />
@@ -387,12 +387,12 @@ const EnhancedSearch = ({
                       </Typography>
                     </Box>
                     <List dense>
-                      {categorySuggestions.map((suggestion, index) => (
+                      {(categorySuggestions as any[]).map((suggestion: any, index: number) => (
                         <ListItem
                           key={`${category}-${index}`}
-                          button
+                          component="button"
                           onClick={() => handleSuggestionClick(suggestion)}
-                          sx={{ py: 0.5 }}
+                          sx={{ py: 0.5, cursor: 'pointer', border: 'none', background: 'transparent', width: '100%' }}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
                             {suggestion.icon}

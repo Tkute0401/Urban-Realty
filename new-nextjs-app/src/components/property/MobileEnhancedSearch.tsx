@@ -323,12 +323,12 @@ const MobileEnhancedSearch = ({
                 {recentSearches.map((search, index) => (
                   <ListItem
                     key={index}
-                    button
+                    component="button"
                     onClick={() => handleRecentSearchClick(search)}
-                    sx={{ py: 0.5, color: 'white' }}
+                    sx={{ py: 0.5, color: 'white', cursor: 'pointer', border: 'none', background: 'transparent', width: '100%' }}
                   >
                     <ListItemIcon sx={{ minWidth: 36 }}>
-                      <HistoryIcon fontSize="small" color="#78CADC" />
+                      <HistoryIcon fontSize="small" sx={{ color: '#78CADC' }} />
                     </ListItemIcon>
                     <ListItemText primary={search} />
                   </ListItem>
@@ -384,12 +384,12 @@ const MobileEnhancedSearch = ({
                     </Typography>
                   </Box>
                   <List dense>
-                    {categorySuggestions.map((suggestion, index) => (
+                    {(categorySuggestions as any[]).map((suggestion: any, index: number) => (
                       <ListItem
                         key={`${category}-${index}`}
-                        button
+                        component="button"
                         onClick={() => handleSuggestionClick(suggestion)}
-                        sx={{ py: 0.5, color: 'white' }}
+                        sx={{ py: 0.5, color: 'white', cursor: 'pointer', border: 'none', background: 'transparent', width: '100%' }}
                       >
                         <ListItemIcon sx={{ minWidth: 36 }}>
                           {suggestion.icon}
