@@ -17,6 +17,12 @@ import {
 import { Login as LoginIcon } from '@mui/icons-material';
 
 const Login = () => {
+  console.log('🔧 Login Page rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 Login Page mounted on client side!');
+  }, []);
+
   const LoginSchema = z.object({
     email: z.string().email('Enter a valid email'),
     password: z.string().min(6, 'Password must be at least 6 characters')

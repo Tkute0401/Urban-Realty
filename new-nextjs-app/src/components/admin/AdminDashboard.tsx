@@ -94,6 +94,12 @@ import RecentContactsTable from '@/components/admin/tables/RecentContactsTable';
 import LoadingSkeleton from '@/components/common/LoadingSkeleton';
 
 const AdminDashboard: React.FC = () => {
+  console.log('🔧 AdminDashboard rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 AdminDashboard mounted on client side!');
+  }, []);
+
   const queryClient = useQueryClient();
   const router = useRouter();
   const theme = useTheme();
