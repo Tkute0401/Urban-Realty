@@ -40,6 +40,11 @@ const EnhancedSearch = ({
   showSuggestions = true,
   className = ""
 }) => {
+  console.log('🔧 EnhancedSearch rendering...', { value, showSuggestions });
+  
+  React.useEffect(() => {
+    console.log('🔧 EnhancedSearch mounted on client side!');
+  }, []);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);

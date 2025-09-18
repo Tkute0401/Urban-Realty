@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import { getMapStyles } from '../../lib/map-styles';
@@ -7,6 +7,11 @@ import './PropertiesMap.css';
 // Styles moved to CSS to avoid inline-style usage
 
 const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
+  console.log('🔧 PropertiesMap rendering...', { propertiesCount: properties?.length, selectedProperty });
+  
+  React.useEffect(() => {
+    console.log('🔧 PropertiesMap mounted on client side!', { propertiesCount: properties?.length });
+  }, []);
   const mapRef = useRef(null);
   const [activeMarker, setActiveMarker] = useState(null);
   const [bounds, setBounds] = useState(null);

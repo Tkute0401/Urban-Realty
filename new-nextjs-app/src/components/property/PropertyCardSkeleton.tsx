@@ -1,7 +1,13 @@
 import Skeleton from '@mui/material/Skeleton';
 import { Card, CardContent, Box } from '@mui/material';
+import React from 'react';
 
 const PropertyCardSkeleton = ({ count = 1 }) => {
+  console.log('🔧 PropertyCardSkeleton rendering...', { count });
+  
+  React.useEffect(() => {
+    console.log('🔧 PropertyCardSkeleton mounted on client side!', { count });
+  }, [count]);
   return (
     <>
       {Array.from(new Array(count)).map((_, index) => (

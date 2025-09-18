@@ -1,7 +1,7 @@
 // Centralized API configuration and SSR-safe helpers
 
 export function getApiBaseUrl(): string {
-        const envUrl = 'https://urban-realty-production.up.railway.app/api/v1';
+        return 'https://urban-realty-production.up.railway.app/api/v1';
 }
 
 export function getBrowserAccessToken(): string | null {

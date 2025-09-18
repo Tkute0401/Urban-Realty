@@ -36,6 +36,11 @@ const MobileEnhancedSearch = ({
   placeholder = "Search location, property type, or amenities...",
   className = ""
 }) => {
+  console.log('🔧 MobileEnhancedSearch rendering...', { expanded, value });
+  
+  React.useEffect(() => {
+    console.log('🔧 MobileEnhancedSearch mounted on client side!', { expanded });
+  }, []);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
