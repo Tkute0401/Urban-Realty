@@ -4,7 +4,10 @@ import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon } from "@he
 import { useEffect } from 'react';
 
 const AboutUs = () => {
+  console.log('🔧 AboutUs component rendering...');
+  
   useEffect(() => {
+    console.log('🔧 AboutUs mounted on client side!');
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
@@ -128,7 +131,7 @@ const AboutUs = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4">
                     <h3 className="text-xl font-bold">{member.name}</h3>
-                    <Link to={member.path}>
+                    <Link href={member.path || '#'}>
                       <p className="text-[#78cadc] text-sm">{member.role}</p>
                     </Link>
                   </div>
