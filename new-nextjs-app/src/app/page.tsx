@@ -8,6 +8,8 @@ import ServiceBlocksGroup from "@/components/home/ServiceBlocksGroup";
 import Reviews from "@/components/common/footer/Reviews";
 
 export default function Page() {
+  console.log('🏠 Home Page rendering...');
+  
   return (
     <div className="font-poppins bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
       <HeroSection/>

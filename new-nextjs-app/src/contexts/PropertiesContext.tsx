@@ -12,13 +12,14 @@ interface Property {
   area?: number;
   bedrooms?: number;
   bathrooms?: number;
-  type?: string;
-  status?: string;
+  type?: 'apartment' | 'villa' | 'land' | 'commercial' | 'house';
+  status?: 'For Sale' | 'For Rent' | 'Sold' | 'Rented';
   address?: {
     street?: string;
     city?: string;
     state?: string;
     country?: string;
+    locality?: string;
   };
   location?: {
     coordinates?: [number, number];
@@ -237,7 +238,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const finalConfig = {
         ...config,
         headers: {
-          ...config.headers,
+          ...(config.headers || {}),
           'Content-Type': 'multipart/form-data'
         }
       };
@@ -430,7 +431,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     } finally {
       setLoading(false);
     }
-  })
+  }, []);
 
   const clearProperty = useCallback(() => setProperty(null), []);
   const clearErrors = useCallback(() => setError(null), []);
@@ -442,6 +443,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     property,
     loading,
     error,
+    cache: {},
     pagination,
     developers,
     getProperties,
@@ -452,7 +454,11 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     updateProperty,
     deleteProperty,
     getDevelopers,
+    setProperties: (props: Property[]) => setProperties(props),
+    setFeaturedProperties: (props: Property[]) => setFeaturedProperties(props),
+    setProperty: (prop: Property | null) => setProperty(prop),
     clearProperty,
+    clearError: () => setError(null),
     clearErrors
   }), [
     properties,

@@ -62,7 +62,7 @@ const HeroSection = () => {
   const availableCities = getAvailableCities();
 
   const filteredCities = availableCities.filter(city =>
-    city.toLowerCase().includes(citySearchQuery.toLowerCase())
+    String(city).toLowerCase().includes(citySearchQuery.toLowerCase())
   );
 
   const getLocalitiesForCity = () => {
@@ -117,7 +117,7 @@ const HeroSection = () => {
 
   useEffect(() => {
     if (!selectedCity && availableCities.length > 0) {
-      setSelectedCity(availableCities[0]);
+      setSelectedCity(String(availableCities[0]));
     }
   }, [availableCities]);
 
@@ -396,12 +396,12 @@ const HeroSection = () => {
                         onClick={() => {
                           const newSearchParams = new URLSearchParams();
                           newSearchParams.set('city', selectedCity);
-                          newSearchParams.set('search', locality);
+                          newSearchParams.set('search', String(locality));
                           if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
                           router.push(`/properties?${newSearchParams.toString()}`);
                         }}
                       >
-                        {locality}
+                        {String(locality)}
                       </motion.button>
                     ))}
                   </AnimatePresence>
@@ -486,12 +486,12 @@ const HeroSection = () => {
                           {filteredCities.length > 0 ? (
                             filteredCities.map((city) => (
                               <button
-                                key={city}
+                                key={String(city)}
                                 type="button"
-                                onClick={() => handleCitySelect(city)}
+                                onClick={() => handleCitySelect(String(city))}
                                 className={`block w-full text-left px-2 sm:px-3 py-1 sm:py-1.5 md:py-2 text-xs sm:text-sm text-white hover:bg-white/25 transition-colors ${selectedCity === city ? 'bg-[var(--color-primary)]/65' : ''}`}
                               >
-                                {city}
+                                {String(city)}
                               </button>
                             ))
                           ) : (

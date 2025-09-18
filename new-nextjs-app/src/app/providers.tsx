@@ -15,6 +15,7 @@ import ErrorBoundary from '@/components/common/ErrorBoundary'
 type ProvidersProps = { children: ReactNode }
 
 export default function Providers({ children }: ProvidersProps) {
+  console.log('🔧 Providers component rendering...');
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light')
 
   const queryClient = useMemo(() => new QueryClient({
