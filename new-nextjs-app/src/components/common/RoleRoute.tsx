@@ -61,7 +61,7 @@ const RoleRoute = ({
               }
             }}
           >
-            Access denied. You don't have permission to view this page.
+            Access denied. You don&apos;t have permission to view this page.
           </Alert>
         </Box>
       );

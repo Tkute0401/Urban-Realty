@@ -1,4 +1,4 @@
-export const formatPrice = (price) => {
+export const formatPrice = (price: number | string | null | undefined): string => {
   if (typeof price !== 'number') {
     return '₹0';
   }
@@ -10,12 +10,16 @@ export const formatPrice = (price) => {
   }).format(price);
 };
 
-export const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+export const formatDate = (dateString: string | Date): string => {
+  const options: Intl.DateTimeFormatOptions = { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  };
   return new Date(dateString).toLocaleDateString('en-IN', options);
 };
 
-export const formatNumber = (num) => {
+export const formatNumber = (num: number | string | null | undefined): string => {
   if (!num) return '0';
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };

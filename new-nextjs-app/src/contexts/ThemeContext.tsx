@@ -1,29 +1,22 @@
 // Create a theme context
-import { createContext, useContext, useMemo, useState } from 'react';
-import { urbanRealtyTheme } from '../Theme/NewTheme';
+import { createContext, useContext, useMemo, useState, ReactNode } from 'react';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { createUrbanRealtyTheme } from '../lib/theme/NewTheme';
 
-const ThemeContext = createContext();
+interface ThemeContextType {
+  toggleColorMode: () => void;
+}
 
-export const ThemeProvider = ({ children }) => {
-  const [mode, setMode] = useState('light');
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
   
-  const theme = useMemo(() => createTheme({
-    ...urbanRealtyTheme,
-    palette: {
-      ...urbanRealtyTheme.palette,
-      mode,
-      ...(mode === 'dark' ? {
-        background: {
-          default: '#121212',
-          paper: '#1E1E1E'
-        },
-        text: {
-          primary: '#FFFFFF',
-          secondary: 'rgba(255, 255, 255, 0.7)'
-        }
-      } : {})
-    }
-  }), [mode]);
+  const theme = useMemo(() => createUrbanRealtyTheme(mode), [mode]);
 
   const toggleColorMode = () => {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
@@ -31,11 +24,17 @@ export const ThemeProvider = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={{ toggleColorMode }}>
-      <ThemeProvider theme={urbanRealtyTheme}>
+      <MuiThemeProvider theme={theme}>
         {children}
-      </ThemeProvider>
+      </MuiThemeProvider>
     </ThemeContext.Provider>
   );
 };
 
-export const useThemeContext = () => useContext(ThemeContext);
+export const useThemeContext = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useThemeContext must be used within a ThemeProvider');
+  }
+  return context;
+};

@@ -459,7 +459,7 @@ const SubscriptionManagement = () => {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 3 }}>
-            Choose a new plan to upgrade your subscription. You'll be charged the prorated amount for the upgrade.
+            Choose a new plan to upgrade your subscription. You&apos;ll be charged the prorated amount for the upgrade.
           </Typography>
           
           <Grid container spacing={2}>

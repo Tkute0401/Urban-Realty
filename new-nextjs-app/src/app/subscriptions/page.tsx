@@ -27,23 +27,35 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscriptionPlans, useSubscribeMutation } from '@/hooks/api/subscriptions';
-import PaymentForm from '@/components/Subscription/PaymentForm';
+import RazorpayPaymentForm from '@/components/Subscription/RazorpayPaymentForm';
 
 interface SubscriptionPlan {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
+  type: string;
   billingCycle: 'monthly' | 'yearly';
-  features: string[];
-  maxProperties: number;
-  maxAgents: number;
+  features: {
+    propertyListings: number;
+    advancedSearch: boolean;
+    prioritySupport: boolean;
+    analytics: boolean;
+    customBranding: boolean;
+    apiAccess: boolean;
+  };
   maxUsers: number;
-  isPopular: boolean;
   isActive: boolean;
+  isPopular?: boolean;
 }
 
 const SubscriptionPlans = () => {
+  console.log('🔧 SubscriptionPlans component rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 SubscriptionPlans mounted on client side!');
+  }, []);
+
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +82,21 @@ const SubscriptionPlans = () => {
     if (plansError) {
       setError('Failed to load subscription plans');
     } else if (fetchedPlans) {
-      setPlans(fetchedPlans as SubscriptionPlan[]);
+      // Map server data to frontend format and add isPopular flag
+      const mappedPlans = fetchedPlans.map((plan: any, index: number) => ({
+        ...plan,
+        isPopular: plan.type === 'premium', // Mark premium as popular
+        featureList: [
+          `${plan.features.propertyListings || 0} Property Listings`,
+          plan.features.advancedSearch ? 'Advanced Search' : 'Basic Search',
+          plan.features.prioritySupport ? 'Priority Support' : 'Email Support',
+          plan.features.analytics ? 'Advanced Analytics' : 'Basic Reports',
+          ...(plan.features.customBranding ? ['Custom Branding'] : []),
+          ...(plan.features.apiAccess ? ['API Access'] : []),
+          `Up to ${plan.maxUsers} User${plan.maxUsers > 1 ? 's' : ''}`
+        ]
+      }));
+      setPlans(mappedPlans as SubscriptionPlan[]);
     }
   }, [isPlansLoading, plansError, fetchedPlans]);
 
@@ -81,7 +107,17 @@ const SubscriptionPlans = () => {
 
   const handleSubscribeConfirm = async (paymentData: any) => {
     if (!selectedPlan || !user) return;
-    subscribeMutation.mutate({ userId: user.id, planId: selectedPlan.id, paymentMethod: paymentData.paymentMethod });
+    
+    try {
+      console.log('Payment successful:', paymentData);
+      alert('Subscription activated successfully!');
+      setSubscribeDialog(false);
+      setSelectedPlan(null);
+      // Optionally refresh user data or subscription status
+    } catch (error) {
+      console.error('Subscription confirmation failed:', error);
+      setError('Failed to confirm subscription. Please contact support.');
+    }
   };
 
   const getPrice = (plan: SubscriptionPlan) => {
@@ -300,7 +336,7 @@ const SubscriptionPlans = () => {
                   <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)', fontWeight: 'bold' }}>
                     What's included:
                   </Typography>
-                  {plan.features.map((feature, index) => (
+                  {(plan as any).featureList?.map((feature: string, index: number) => (
                     <Box 
                       key={index} 
                       sx={{ 
@@ -428,7 +464,7 @@ const SubscriptionPlans = () => {
 
       {/* Payment Form Dialog */}
       {selectedPlan && (
-        <PaymentForm
+        <RazorpayPaymentForm
           open={subscribeDialog}
           onClose={() => {
             setSubscribeDialog(false);

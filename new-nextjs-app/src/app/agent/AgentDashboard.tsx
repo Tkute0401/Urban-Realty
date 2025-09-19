@@ -328,7 +328,7 @@ const AgentDashboard = () => {
               Welcome back, {user?.name}! 👋
             </Typography>
             <Typography variant="h6" color="text.secondary">
-              Here's your real estate performance overview
+              Here&apos;s your real estate performance overview
             </Typography>
           </Box>
           <Box display="flex" gap={2} flexWrap="wrap">

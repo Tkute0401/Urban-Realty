@@ -188,9 +188,11 @@ export const LoadingCard = CardSkeleton;  // Renamed to avoid MUI Card conflict
 export const Chart = ChartSkeleton;
 
 // Keep default export for backward compatibility
-export default {
+const LoadingSkeleton = {
   Dashboard: DashboardSkeleton,
   Table: TableSkeleton,
   Card: CardSkeleton,  // Keep original name in default export
   Chart: ChartSkeleton
 };
+
+export default LoadingSkeleton;

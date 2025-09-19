@@ -23,10 +23,28 @@ class ErrorBoundary extends React.Component {
       error: null, 
       errorInfo: null 
     };
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 ErrorBoundary constructor called');
+    }
   }
 
   static getDerivedStateFromError(error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 ErrorBoundary getDerivedStateFromError called with:', error?.message || 'Unknown error');
+    }
     return { hasError: true };
+  }
+
+  componentDidMount() {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 ErrorBoundary mounted');
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.hasError !== this.state.hasError && process.env.NODE_ENV === 'development') {
+      console.log('🔧 ErrorBoundary state updated - hasError:', this.state.hasError);
+    }
   }
 
   componentDidCatch(error, errorInfo) {
@@ -36,7 +54,13 @@ class ErrorBoundary extends React.Component {
     });
     
     // Log error to console for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('🔧 ErrorBoundary caught an error:', {
+        message: error?.message,
+        stack: error?.stack,
+        componentStack: errorInfo?.componentStack
+      });
+    }
     
     // You can also log to an error reporting service here
     // logErrorToService(error, errorInfo);
@@ -56,14 +80,27 @@ class ErrorBoundary extends React.Component {
 }
 
 const ErrorFallback = ({ error, errorInfo, resetError }) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔧 ErrorFallback rendering with error:', {
+      message: error?.message,
+      componentStack: errorInfo?.componentStack?.slice(0, 200) + '...' // Truncate for readability
+    });
+  }
+  
   const router = useRouter();
 
   const handleReset = () => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 ErrorFallback - Reset button clicked');
+    }
     resetError();
     window.location.reload();
   };
 
   const handleGoHome = () => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 ErrorFallback - Go Home button clicked');
+    }
     router.push('/');
   };
 
@@ -87,7 +124,7 @@ const ErrorFallback = ({ error, errorInfo, resetError }) => {
           </Typography>
           
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            We encountered an unexpected error. Don't worry, our team has been notified and is working to fix it.
+            We encountered an unexpected error. Don&apos;t worry, our team has been notified and is working to fix it.
           </Typography>
 
           {process.env.NODE_ENV === 'development' && error && (

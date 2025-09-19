@@ -1,7 +1,8 @@
 // Centralized API configuration and SSR-safe helpers
 
 export function getApiBaseUrl(): string {
-        return 'https://urban-realty-production.up.railway.app/api/v1';
+        // Use the Next.js API proxy to avoid CORS issues
+        return process.env.NEXT_PUBLIC_API_URL || 'https://urban-realty-production.up.railway.app/api/v1';
 }
 
 export function getBrowserAccessToken(): string | null {

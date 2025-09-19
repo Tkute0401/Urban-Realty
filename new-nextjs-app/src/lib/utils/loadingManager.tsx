@@ -195,7 +195,7 @@ export const withLoading = <P extends object>(
   Component: React.ComponentType<P>,
   operationId: string
 ) => {
-  return (props: P) => {
+  const LoadingWrapper = (props: P) => {
     const { currentLoadingState, startLoading, stopLoading } = useLoading(operationId);
 
     return (
@@ -207,6 +207,9 @@ export const withLoading = <P extends object>(
       />
     );
   };
+  
+  LoadingWrapper.displayName = `withLoading(${Component.displayName || Component.name})`;
+  return LoadingWrapper;
 };
 
 // Loading context for global loading state

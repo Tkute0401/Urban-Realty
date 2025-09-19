@@ -6,17 +6,16 @@ import React, { useEffect } from 'react';
 const isDebugMode = process.env.NEXT_PUBLIC_DEBUG_RENDER === '1';
 
 export const useRenderLogger = (componentName: string, props?: any) => {
-  if (isDebugMode) {
-    console.log(`🔧 ${componentName} rendering...`, props ? { props: Object.keys(props) } : '');
-    
-    useEffect(() => {
+  useEffect(() => {
+    if (isDebugMode) {
+      console.log(`🔧 ${componentName} rendering...`, props ? { props: Object.keys(props) } : '');
       console.log(`🔧 ${componentName} mounted on client side!`);
       
       return () => {
         console.log(`🔧 ${componentName} unmounted`);
       };
-    }, [componentName]);
-  }
+    }
+  }, [componentName, props, isDebugMode]);
 };
 
 export function withRenderLogger<P extends object>(

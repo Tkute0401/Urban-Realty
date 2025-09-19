@@ -2,14 +2,14 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import analyticsService from '../services/analyticsService';
-import { useAuth } from './useAuth';
+import analyticsService from '../lib/services/analyticsService';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useAnalytics = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const previousLocation = useRef();
+  const previousLocation = useRef<string | undefined>(undefined);
 
   // Initialize analytics when user changes
   useEffect(() => {

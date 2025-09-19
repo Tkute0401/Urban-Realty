@@ -2,6 +2,7 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/react';
 import { TextEncoder, TextDecoder } from 'util';
+import { vi } from 'vitest';
 
 // Configure testing library
 configure({ testIdAttribute: 'data-testid' });
@@ -12,11 +13,16 @@ global.TextDecoder = TextDecoder as any;
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+  
   constructor() {}
   disconnect() {}
   observe() {}
   unobserve() {}
-};
+  takeRecords() { return []; }
+} as any;
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
@@ -24,43 +30,47 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
   observe() {}
   unobserve() {}
-};
+} as any;
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
   })),
 });
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  length: 0,
+  key: vi.fn(),
 };
-global.localStorage = localStorageMock;
+global.localStorage = localStorageMock as any;
 
 // Mock sessionStorage
 const sessionStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+  length: 0,
+  key: vi.fn(),
 };
-global.sessionStorage = sessionStorageMock;
+global.sessionStorage = sessionStorageMock as any;
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock console methods to reduce noise in tests
 const originalError = console.error;
@@ -95,7 +105,7 @@ afterAll(() => {
 
 // Clean up after each test
 afterEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   localStorageMock.clear();
   sessionStorageMock.clear();
 });

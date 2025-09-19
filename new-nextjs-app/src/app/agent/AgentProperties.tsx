@@ -361,7 +361,7 @@ const AgentProperties = () => {
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete "{selectedProperty?.title}"? This action cannot be undone.
+          Are you sure you want to delete &ldquo;{selectedProperty?.title}&rdquo;? This action cannot be undone.
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>

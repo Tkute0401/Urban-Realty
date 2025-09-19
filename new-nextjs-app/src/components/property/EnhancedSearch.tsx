@@ -410,7 +410,7 @@ const EnhancedSearch = ({
             {!loading && suggestions.length === 0 && recentSearches.length === 0 && popularSearches.length === 0 && value.length >= 2 && (
               <Box sx={{ p: 2, textAlign: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  No suggestions found for "{value}"
+                  No suggestions found for &ldquo;{value}&rdquo;
                 </Typography>
               </Box>
             )}

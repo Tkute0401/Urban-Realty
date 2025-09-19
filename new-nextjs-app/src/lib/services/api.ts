@@ -69,13 +69,19 @@ export const api = {
                 properties: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/properties`, { params })),
         },
         subscriptions: {
-                plans: () => unwrap<any[]>(http.get("/subscriptions/plans")),
-                current: (userId: string) => unwrap<any>(http.get(`/subscriptions/${userId}`)),
-                subscribe: (payload: { userId: string; planId: string; paymentMethod: string }) =>
-                        unwrap<any>(http.post(`/subscriptions/${payload.userId}/subscribe`, { planId: payload.planId, paymentMethod: payload.paymentMethod })),
-                cancel: (userId: string) => unwrap<any>(http.post(`/subscriptions/${userId}/cancel`, {})),
+                plans: () => unwrap<any[]>(http.get("/v1/subscriptions")),
+                current: (userId: string) => unwrap<any>(http.get(`/v1/subscriptions/my-subscription`)),
+                subscribe: (payload: { userId: string; planId: string; paymentMethod: string; billingCycle: string }) =>
+                        unwrap<any>(http.post(`/v1/subscriptions/subscribe`, { subscriptionId: payload.planId, paymentMethod: payload.paymentMethod, billingCycle: payload.billingCycle })),
+                cancel: (userId: string) => unwrap<any>(http.put(`/v1/subscriptions/cancel`, {})),
                 update: (payload: { userId: string; planId: string }) =>
-                        unwrap<any>(http.post(`/subscriptions/${payload.userId}/update`, { planId: payload.planId })),
+                        unwrap<any>(http.put(`/v1/subscriptions/update`, { subscriptionId: payload.planId })),
+                // Razorpay specific endpoints
+                razorpayKey: () => unwrap<any>(http.get("/v1/subscriptions/razorpay/key")),
+                createRazorpayOrder: (payload: { subscriptionId: string; billingCycle: string }) =>
+                        unwrap<any>(http.post("/v1/subscriptions/razorpay/order", payload)),
+                verifyRazorpayPayment: (payload: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
+                        unwrap<any>(http.post("/v1/subscriptions/razorpay/verify", payload)),
         },
         developers: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/developers", { params })),

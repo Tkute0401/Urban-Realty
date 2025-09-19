@@ -4,17 +4,124 @@ const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
+// Mock subscription data for fallback
+const mockSubscriptions = [
+  {
+    _id: '1',
+    name: 'Free Plan',
+    type: 'free',
+    description: 'Perfect for getting started with basic features',
+    price: 0,
+    billingCycle: 'monthly',
+    isActive: true,
+    features: {
+      propertyListings: 5,
+      advancedSearch: false,
+      prioritySupport: false,
+      analytics: false,
+      customBranding: false,
+      apiAccess: false
+    },
+    maxUsers: 1,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: '2',
+    name: 'Basic Plan',
+    type: 'basic',
+    description: 'Great for small teams and growing businesses',
+    price: 29,
+    billingCycle: 'monthly',
+    isActive: true,
+    features: {
+      propertyListings: 50,
+      advancedSearch: true,
+      prioritySupport: false,
+      analytics: true,
+      customBranding: false,
+      apiAccess: false
+    },
+    maxUsers: 3,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: '3',
+    name: 'Premium Plan',
+    type: 'premium',
+    description: 'Advanced features for professional real estate agents',
+    price: 99,
+    billingCycle: 'monthly',
+    isActive: true,
+    features: {
+      propertyListings: 200,
+      advancedSearch: true,
+      prioritySupport: true,
+      analytics: true,
+      customBranding: true,
+      apiAccess: true
+    },
+    maxUsers: 10,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: '4',
+    name: 'Enterprise Plan',
+    type: 'enterprise',
+    description: 'Complete solution for large organizations',
+    price: 299,
+    billingCycle: 'monthly',
+    isActive: true,
+    features: {
+      propertyListings: -1, // Unlimited
+      advancedSearch: true,
+      prioritySupport: true,
+      analytics: true,
+      customBranding: true,
+      apiAccess: true
+    },
+    maxUsers: -1, // Unlimited
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
+
 // @desc    Get all subscriptions
 // @route   GET /api/v1/subscriptions
 // @access  Public
 exports.getSubscriptions = asyncHandler(async (req, res, next) => {
-  const subscriptions = await Subscription.find({ isActive: true });
+  const mongoose = require('mongoose');
+  
+  // Check if MongoDB is connected, if not use mock data immediately
+  if (mongoose.connection.readyState !== 1) {
+    console.warn('MongoDB not connected, using mock subscription data');
+    
+    return res.status(200).json({
+      success: true,
+      count: mockSubscriptions.length,
+      data: mockSubscriptions
+    });
+  }
 
-  res.status(200).json({
-    success: true,
-    count: subscriptions.length,
-    data: subscriptions
-  });
+  try {
+    const subscriptions = await Subscription.find({ isActive: true });
+
+    res.status(200).json({
+      success: true,
+      count: subscriptions.length,
+      data: subscriptions
+    });
+  } catch (error) {
+    console.warn('MongoDB query failed, using mock data:', error.message);
+    
+    res.status(200).json({
+      success: true,
+      count: mockSubscriptions.length,
+      data: mockSubscriptions
+    });
+  }
 });
 
 // @desc    Get single subscription

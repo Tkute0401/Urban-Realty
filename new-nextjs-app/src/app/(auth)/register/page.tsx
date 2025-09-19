@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { 
@@ -17,6 +17,12 @@ import {
 import { PersonAdd } from '@mui/icons-material';
 
 const Register = () => {
+  console.log('🔧 Register Page rendering...');
+  
+  React.useEffect(() => {
+    console.log('🔧 Register Page mounted on client side!');
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',

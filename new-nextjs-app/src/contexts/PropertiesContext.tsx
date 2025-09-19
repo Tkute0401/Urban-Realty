@@ -90,6 +90,8 @@ interface PropertiesProviderProps {
 }
 
 export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children }) => {
+  console.log('🔧 PropertiesProvider rendering...');
+  
   const [properties, setProperties] = useState([]);
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [property, setProperty] = useState(null);
@@ -99,6 +101,14 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
   const [developers, setDevelopers] = useState([]);
   const [pagination, setPagination] = useState({});
   const [agentProperties, setAgentProperties] = useState([]);
+  
+  // Add useEffect for debugging
+  useMemo(() => {
+    console.log('🔧 PropertiesProvider mounted on client side!');
+    return () => {
+      console.log('🔧 PropertiesProvider unmounted');
+    };
+  }, []);
 
   const getProperties = useCallback(async (params: Record<string, any> = {}) => {
     const cacheKey = JSON.stringify(params);
@@ -178,19 +188,30 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
   }, [cache]);
 
   const getFeaturedProperties = useCallback(async () => {
+    console.log('🔧 PropertiesContext - getFeaturedProperties called');
     try {
       setLoading(true);
       setError(null);
+      console.log('🔧 PropertiesContext - Fetching featured properties');
       const response = await http.get('/properties/featured');
       const data = response.data?.data ?? response.data;
       
+      console.log('🔧 PropertiesContext - Featured properties response:', { 
+        dataType: typeof data,
+        isArray: Array.isArray(data),
+        count: Array.isArray(data) ? data.length : 'N/A'
+      });
+      
       if (!Array.isArray(data)) {
+        console.error('🔧 PropertiesContext - Invalid featured properties data format:', data);
         throw new Error('Received invalid properties data format');
       }
       
+      console.log('🔧 PropertiesContext - Setting featured properties, count:', data.length);
       setFeaturedProperties(data);
       return data;
     } catch (err) {
+      console.error('🔧 PropertiesContext - Error fetching featured properties:', err);
       setError(err.response?.data?.message || err.message || 'Failed to fetch featured properties');
       setFeaturedProperties([]);
       throw err;

@@ -18,33 +18,35 @@ const testTheme = createTheme({
   },
 });
 
+import { vi } from 'vitest';
+
 // Mock API service for tests
 export const mockApiService = {
-  login: jest.fn(),
-  register: jest.fn(),
-  getMe: jest.fn(),
-  getProperties: jest.fn(),
-  getProperty: jest.fn(),
-  createProperty: jest.fn(),
-  updateProperty: jest.fn(),
-  deleteProperty: jest.fn(),
-  getContacts: jest.fn(),
-  createContact: jest.fn(),
-  updateContact: jest.fn(),
-  deleteContact: jest.fn(),
-  getSubscriptionPlans: jest.fn(),
-  getUserSubscription: jest.fn(),
-  subscribe: jest.fn(),
-  cancelSubscription: jest.fn(),
-  getAdminDashboard: jest.fn(),
-  getAdminUsers: jest.fn(),
-  getAdminProperties: jest.fn(),
-  getAdminContacts: jest.fn(),
-  getAgentDashboard: jest.fn(),
-  getAgentProperties: jest.fn(),
-  getAgentLeads: jest.fn(),
-  getAgentAnalytics: jest.fn(),
-  healthCheck: jest.fn(),
+  login: vi.fn(),
+  register: vi.fn(),
+  getMe: vi.fn(),
+  getProperties: vi.fn(),
+  getProperty: vi.fn(),
+  createProperty: vi.fn(),
+  updateProperty: vi.fn(),
+  deleteProperty: vi.fn(),
+  getContacts: vi.fn(),
+  createContact: vi.fn(),
+  updateContact: vi.fn(),
+  deleteContact: vi.fn(),
+  getSubscriptionPlans: vi.fn(),
+  getUserSubscription: vi.fn(),
+  subscribe: vi.fn(),
+  cancelSubscription: vi.fn(),
+  getAdminDashboard: vi.fn(),
+  getAdminUsers: vi.fn(),
+  getAdminProperties: vi.fn(),
+  getAdminContacts: vi.fn(),
+  getAgentDashboard: vi.fn(),
+  getAgentProperties: vi.fn(),
+  getAgentLeads: vi.fn(),
+  getAgentAnalytics: vi.fn(),
+  healthCheck: vi.fn(),
 };
 
 // Mock user data
@@ -123,42 +125,42 @@ export const renderWithProviders = (
 
 // Mock router
 export const mockRouter = {
-  push: jest.fn(),
-  replace: jest.fn(),
-  back: jest.fn(),
-  forward: jest.fn(),
-  refresh: jest.fn(),
-  prefetch: jest.fn(),
+  push: vi.fn(),
+  replace: vi.fn(),
+  back: vi.fn(),
+  forward: vi.fn(),
+  refresh: vi.fn(),
+  prefetch: vi.fn(),
   pathname: '/',
   query: {},
   asPath: '/',
   events: {
-    on: jest.fn(),
-    off: jest.fn(),
-    emit: jest.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
   },
 };
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => mockRouter,
   usePathname: () => '/',
   useSearchParams: () => new URLSearchParams(),
 }));
 
 // Mock API service
-jest.mock('../../lib/services/apiService', () => ({
+vi.mock('../../lib/services/apiService', () => ({
   apiService: mockApiService,
 }));
 
 // Mock session manager
-jest.mock('../../lib/utils/sessionManager', () => ({
+vi.mock('../../lib/utils/sessionManager', () => ({
   sessionManager: {
-    getToken: jest.fn(() => 'mock-token'),
-    setToken: jest.fn(),
-    getUser: jest.fn(() => mockUser),
-    setUser: jest.fn(),
-    clearSession: jest.fn(),
+    getToken: vi.fn(() => 'mock-token'),
+    setToken: vi.fn(),
+    getUser: vi.fn(() => mockUser),
+    setUser: vi.fn(),
+    clearSession: vi.fn(),
   },
 }));
 
@@ -183,7 +185,7 @@ export const createMockError = (message: string, status: number = 500) => {
 
 // Mock fetch responses
 export const mockFetch = (response: any, status: number = 200) => {
-  (global.fetch as jest.Mock).mockResolvedValueOnce({
+  (global.fetch as any).mockResolvedValueOnce({
     ok: status >= 200 && status < 300,
     status,
     json: async () => response,
@@ -191,7 +193,7 @@ export const mockFetch = (response: any, status: number = 200) => {
 };
 
 export const mockFetchError = (message: string, status: number = 500) => {
-  (global.fetch as jest.Mock).mockRejectedValueOnce(
+  (global.fetch as any).mockRejectedValueOnce(
     createMockError(message, status)
   );
 };
@@ -239,7 +241,7 @@ export const measureRenderTime = (renderFn: () => void) => {
   return end - start;
 };
 
-export default {
+const TestUtils = {
   renderWithProviders,
   mockApiService,
   mockUser,
@@ -257,3 +259,5 @@ export default {
   checkAccessibility,
   measureRenderTime,
 };
+
+export default TestUtils;

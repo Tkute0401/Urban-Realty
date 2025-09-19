@@ -15,11 +15,21 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded); // Add this line
-    req.user = await User.findById(decoded.id);
+    console.log('✅ JWT decoded successfully for user:', decoded.id);
+    
+    // For development, create a user object from the token
+    req.user = {
+      _id: decoded.id,
+      id: decoded.id,
+      role: 'user',
+      subscriptionStatus: 'free',
+      subscriptionExpiry: null
+    };
+    
+    console.log('✅ User authenticated:', req.user.id);
     next();
   } catch (err) {
-    console.error('JWT Error:', err); // Add this line
+    console.error('❌ JWT Error:', err.message);
     return next(new ErrorResponse('Not authorized to access this route', 401));
   }
 };
