@@ -66,7 +66,13 @@ const PremiumButton = styled(Button)(({ theme }) => ({
   }
 }));
 
-const AddProperty = () => {
+interface AddPropertyProps {
+  __editMode?: boolean;
+  initialValues?: any;
+  onSubmitEdit?: (values: any) => Promise<any> | any;
+}
+
+const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialValues, onSubmitEdit }) => {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const { addProperty, loading } = useProperties();
@@ -91,6 +97,30 @@ const AddProperty = () => {
     latitude: '',
     longitude: ''
   });
+
+  // Prefill when editing
+  useEffect(() => {
+    if (initialValues) {
+      setFormData(prev => ({
+        ...prev,
+        title: initialValues.title ?? prev.title,
+        description: initialValues.description ?? prev.description,
+        price: initialValues.price?.toString?.() ?? prev.price,
+        location: initialValues.location ?? initialValues.address?.locality ?? prev.location,
+        propertyType: initialValues.propertyType ?? initialValues.type ?? prev.propertyType,
+        status: typeof initialValues.status === 'string' ? initialValues.status : prev.status,
+        beds: (initialValues.beds ?? initialValues.bedrooms ?? prev.beds)?.toString?.() ?? prev.beds,
+        baths: (initialValues.baths ?? initialValues.bathrooms ?? prev.baths)?.toString?.() ?? prev.baths,
+        sqft: (initialValues.sqft ?? initialValues.area ?? prev.sqft)?.toString?.() ?? prev.sqft,
+        yearBuilt: initialValues.yearBuilt?.toString?.() ?? prev.yearBuilt,
+        amenities: Array.isArray(initialValues.amenities) ? initialValues.amenities : prev.amenities,
+        agent: initialValues.agent?._id ?? initialValues.agent ?? prev.agent,
+        developer: initialValues.developer?._id ?? initialValues.developer ?? prev.developer,
+        latitude: (initialValues.location?.coordinates?.[1] ?? initialValues.latitude ?? prev.latitude)?.toString?.() ?? prev.latitude,
+        longitude: (initialValues.location?.coordinates?.[0] ?? initialValues.longitude ?? prev.longitude)?.toString?.() ?? prev.longitude,
+      }));
+    }
+  }, [initialValues]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -219,23 +249,23 @@ const AddProperty = () => {
         longitude: formData.longitude ? parseFloat(formData.longitude) : null
       };
 
-      await addProperty(propertyData, imageFiles);
-      
-      setSnackbar({
-        open: true,
-        message: 'Property added successfully!',
-        severity: 'success'
-      });
+      if (__editMode && onSubmitEdit) {
+        await onSubmitEdit(propertyData);
+        setSnackbar({ open: true, message: 'Property updated successfully!', severity: 'success' });
+      } else {
+        await addProperty(propertyData, imageFiles);
+        setSnackbar({ open: true, message: 'Property added successfully!', severity: 'success' });
+      }
       
       setTimeout(() => {
         router.push('/properties');
-      }, 2000);
+      }, 1200);
       
     } catch (error) {
-      console.error('Error adding property:', error);
+      console.error('Error submitting property:', error);
       setSnackbar({
         open: true,
-        message: 'Failed to add property. Please try again.',
+        message: 'Failed to submit property. Please try again.',
         severity: 'error'
       });
     }

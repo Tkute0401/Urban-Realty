@@ -41,10 +41,17 @@ export class SessionManager {
     this.deleteCookie('token');
   }
 
-  // Set user data in localStorage
+  // Set user data in localStorage and mirror minimal fields to cookies for middleware
   setUser(user: any): void {
     if (this.isClient) {
       localStorage.setItem('user', JSON.stringify(user));
+      // Also set lightweight cookies so Next.js middleware can read role/id
+      try {
+        if (user?.role) this.setCookie('role', String(user.role), 7);
+        if (user?.id || user?._id) this.setCookie('uid', String(user.id || user._id), 7);
+      } catch {
+        // ignore cookie errors in non-browser environments
+      }
     }
   }
 
@@ -68,6 +75,9 @@ export class SessionManager {
   clearSession(): void {
     this.removeToken();
     this.removeUser();
+    // Clean mirrored cookies for middleware
+    this.deleteCookie('role');
+    this.deleteCookie('uid');
   }
 
   // Check if user is authenticated

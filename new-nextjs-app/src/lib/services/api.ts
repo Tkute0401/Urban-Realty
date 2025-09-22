@@ -69,19 +69,26 @@ export const api = {
                 properties: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/properties`, { params })),
         },
         subscriptions: {
-                plans: () => unwrap<any[]>(http.get("/v1/subscriptions")),
-                current: (userId: string) => unwrap<any>(http.get(`/v1/subscriptions/my-subscription`)),
+                plans: () => unwrap<any[]>(http.get("/subscriptions")),
+                current: (userId: string) => unwrap<any>(http.get(`/subscriptions/my-subscription`)),
                 subscribe: (payload: { userId: string; planId: string; paymentMethod: string; billingCycle: string }) =>
-                        unwrap<any>(http.post(`/v1/subscriptions/subscribe`, { subscriptionId: payload.planId, paymentMethod: payload.paymentMethod, billingCycle: payload.billingCycle })),
-                cancel: (userId: string) => unwrap<any>(http.put(`/v1/subscriptions/cancel`, {})),
-                update: (payload: { userId: string; planId: string }) =>
-                        unwrap<any>(http.put(`/v1/subscriptions/update`, { subscriptionId: payload.planId })),
+                        unwrap<any>(http.post(`/subscriptions/subscribe`, { subscriptionId: payload.planId, paymentMethod: payload.paymentMethod, billingCycle: payload.billingCycle })),
+                cancel: (userId: string) => unwrap<any>(http.put(`/subscriptions/cancel`, {})),
+                update: (payload: { userId: string; planId: string; billingCycle?: 'monthly' | 'yearly'; paymentMethod?: string }) =>
+                        // Backend handles plan changes via subscribe endpoint; it cancels existing and creates a new pending/active subscription
+                        unwrap<any>(
+                                http.post(`/subscriptions/subscribe`, {
+                                        subscriptionId: payload.planId,
+                                        billingCycle: payload.billingCycle ?? 'monthly',
+                                        paymentMethod: payload.paymentMethod ?? 'card',
+                                })
+                        ),
                 // Razorpay specific endpoints
-                razorpayKey: () => unwrap<any>(http.get("/v1/subscriptions/razorpay/key")),
+                razorpayKey: () => unwrap<any>(http.get("/subscriptions/razorpay/key")),
                 createRazorpayOrder: (payload: { subscriptionId: string; billingCycle: string }) =>
-                        unwrap<any>(http.post("/v1/subscriptions/razorpay/order", payload)),
+                        unwrap<any>(http.post("/subscriptions/razorpay/order", payload)),
                 verifyRazorpayPayment: (payload: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
-                        unwrap<any>(http.post("/v1/subscriptions/razorpay/verify", payload)),
+                        unwrap<any>(http.post("/subscriptions/razorpay/verify", payload)),
         },
         developers: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/developers", { params })),

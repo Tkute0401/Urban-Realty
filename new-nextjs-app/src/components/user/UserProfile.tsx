@@ -88,7 +88,8 @@ const UserProfile = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const response = await http.put('/api/auth/update', editData);
+      // Use normalized API path (baseURL already includes /api/v1)
+      await http.put('/auth/update', editData);
       
       // Update local user state
       updateUser({
