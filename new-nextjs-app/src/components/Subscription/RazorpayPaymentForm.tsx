@@ -61,16 +61,6 @@ const RazorpayPaymentForm: React.FC<RazorpayPaymentFormProps> = ({
   const verifyPaymentMutation = useVerifyRazorpayPaymentMutation();
 
   useEffect(() => {
-    // Suppress OTP credentials warning in console
-    const originalConsoleError = console.error;
-    console.error = (...args) => {
-      if (typeof args[0] === 'string' && args[0].includes('otp-credentials')) {
-        // Silently ignore otp-credentials warnings
-        return;
-      }
-      originalConsoleError.apply(console, args);
-    };
-
     // Load Razorpay script
     if (!window.Razorpay) {
       const script = document.createElement('script');
@@ -87,10 +77,8 @@ const RazorpayPaymentForm: React.FC<RazorpayPaymentFormProps> = ({
       setRazorpayLoaded(true);
     }
 
-    // Cleanup function to restore console.error
-    return () => {
-      console.error = originalConsoleError;
-    };
+    // No cleanup needed
+    return () => {};
   }, []);
 
   const getTotalPrice = () => {
