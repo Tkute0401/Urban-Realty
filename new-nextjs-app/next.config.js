@@ -86,8 +86,7 @@ const nextConfig = {
               'microphone=()',
               'geolocation=()',
               'interest-cohort=()',
-              'payment=*', // Allow payment API for all origins
-              'otp-credentials=*' // Allow OTP credentials for payment flows
+              'payment=(self)' // Allow Payment Request API only for this origin
             ].join(', '),
           },
         ],
