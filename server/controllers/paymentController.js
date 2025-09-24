@@ -4,6 +4,7 @@ const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const { createRazorpayInstance, verifyRazorpaySignature } = require('../utils/razorpay');
+const { validationResult } = require('express-validator');
 
 // @desc    Get Razorpay public key
 // @route   GET /api/v1/subscriptions/razorpay/key
@@ -16,27 +17,101 @@ exports.getRazorpayKey = asyncHandler(async (req, res) => {
 // @route   POST /api/v1/subscriptions/razorpay/order
 // @access  Private
 exports.createRazorpayOrder = asyncHandler(async (req, res, next) => {
+  console.log('🔵 CREATE RAZORPAY ORDER - Request Body:', req.body);
+  console.log('🔵 CREATE RAZORPAY ORDER - User ID:', req.user?.id);
+  
+  // Check express-validator errors first
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log('❌ Express Validator Errors:', errors.array());
+    return next(new ErrorResponse(`Validation error: ${errors.array().map(e => e.msg).join(', ')}`, 400));
+  }
+  
   const { subscriptionId, billingCycle } = req.body;
   const userId = req.user.id;
+  
+  // Validate input
+  if (!subscriptionId || !billingCycle) {
+    console.log('❌ Validation failed - Missing required fields:', { subscriptionId, billingCycle });
+    return next(new ErrorResponse('Missing required fields: subscriptionId and billingCycle', 400));
+  }
+  
+  if (!['monthly', 'yearly'].includes(billingCycle)) {
+    console.log('❌ Validation failed - Invalid billing cycle:', billingCycle);
+    return next(new ErrorResponse('Invalid billing cycle. Must be monthly or yearly', 400));
+  }
 
+  console.log('🔍 Finding subscription with ID:', subscriptionId);
   const subscription = await Subscription.findById(subscriptionId);
   if (!subscription) {
+    console.log('❌ Subscription not found:', subscriptionId);
     return next(new ErrorResponse('Subscription not found', 404));
   }
+  console.log('✅ Subscription found:', subscription.name, 'Price:', subscription.price);
 
   // Calculate amount
   let amount = subscription.price;
   if (billingCycle === 'yearly') {
     amount = subscription.price * 12 * 0.8; // 20% discount for yearly
   }
+  console.log('💰 Calculated amount:', amount, 'Billing cycle:', billingCycle);
 
-  const instance = createRazorpayInstance();
-  const order = await instance.orders.create({
-    amount: Math.round(amount * 100), // in paise
-    currency: 'INR',
-    receipt: `sub_${subscriptionId}_${Date.now()}`,
-    notes: { userId, subscriptionId, billingCycle }
-  });
+  let order;
+  try {
+    console.log('🔧 Creating Razorpay instance...');
+    const instance = createRazorpayInstance();
+    console.log('✅ Razorpay instance created successfully');
+    
+    // Generate a short receipt (max 40 chars for Razorpay)
+    const shortReceipt = `sub_${Date.now().toString().slice(-8)}`;
+    
+    console.log('📋 Creating Razorpay order with:', {
+      amount: Math.round(amount * 100),
+      currency: 'INR',
+      receipt: shortReceipt,
+      notes: { userId, subscriptionId, billingCycle }
+    });
+    
+    // Use callback approach for Razorpay order creation
+    order = await new Promise((resolve, reject) => {
+      console.log('🔧 About to call instance.orders.create...');
+      instance.orders.create({
+        amount: Math.round(amount * 100), // in paise
+        currency: 'INR',
+        receipt: shortReceipt,
+        notes: { userId, subscriptionId, billingCycle }
+      }, (err, razorpayOrder) => {
+        console.log('📞 Razorpay callback executed!');
+        console.log('📞 Error parameter:', err);
+        console.log('📞 Order parameter:', razorpayOrder);
+        console.log('📞 Error type:', typeof err);
+        console.log('📞 Order type:', typeof razorpayOrder);
+        
+        if (err) {
+          console.error('❌ Razorpay callback has error - rejecting:', err);
+          reject(err);
+        } else if (!razorpayOrder) {
+          console.error('❌ Razorpay callback has no order - rejecting with custom error');
+          reject(new Error('Razorpay order creation returned no order object'));
+        } else {
+          console.log('✅ Razorpay order created successfully, resolving with:', razorpayOrder.id);
+          resolve(razorpayOrder);
+        }
+      });
+      console.log('🔧 instance.orders.create called, waiting for callback...');
+    });
+  } catch (razorpayError) {
+    console.error('❌ Razorpay Error Object:', razorpayError);
+    console.error('❌ Razorpay Error Message:', razorpayError.message);
+    console.error('❌ Razorpay Error Stack:', razorpayError.stack);
+    const errorMessage = razorpayError.message 
+      || razorpayError.error?.description 
+      || razorpayError.error?.code 
+      || (razorpayError.statusCode ? `Status ${razorpayError.statusCode}` : null)
+      || JSON.stringify(razorpayError) 
+      || 'Unknown Razorpay error';
+    return next(new ErrorResponse(`Razorpay order creation failed: ${errorMessage}`, 500));
+  }
 
   // Create pending user subscription linked to order
   const startDate = new Date();

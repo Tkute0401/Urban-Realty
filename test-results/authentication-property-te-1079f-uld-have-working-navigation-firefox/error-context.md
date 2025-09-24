@@ -1,0 +1,314 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - img "City skyline at night" [ref=e6]
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - img "Logo" [ref=e12]
+            - navigation
+            - button "ACCOUNT" [ref=e14] [cursor=pointer]:
+              - img [ref=e15] [cursor=pointer]
+              - generic [ref=e17] [cursor=pointer]: ACCOUNT
+          - generic [ref=e20]:
+            - heading "Find Your Perfect Spot." [level=1] [ref=e21]:
+              - text: Find Your
+              - text: Perfect
+              - generic [ref=e22]: Spot.
+            - paragraph [ref=e23]: Discover your dream property from our extensive collection of homes, apartments, and commercial spaces across the country.
+          - generic [ref=e24]:
+            - img "Map view" [ref=e26]
+            - generic [ref=e28]:
+              - generic [ref=e29]:
+                - generic [ref=e30]: ★
+                - generic [ref=e31]: "4.9"
+              - generic [ref=e32]: FROM 6,900+ CUSTOMERS
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - button "ALL" [ref=e36] [cursor=pointer]:
+              - generic [ref=e37] [cursor=pointer]: ALL
+            - button "BUY" [ref=e39] [cursor=pointer]:
+              - generic [ref=e40] [cursor=pointer]: BUY
+            - button "RENT" [ref=e41] [cursor=pointer]:
+              - generic [ref=e42] [cursor=pointer]: RENT
+            - button "COMMERCIAL" [ref=e43] [cursor=pointer]:
+              - generic [ref=e44] [cursor=pointer]: COMMERCIAL
+          - generic [ref=e46]:
+            - button "Dombivli East" [ref=e48] [cursor=pointer]:
+              - img [ref=e49] [cursor=pointer]
+              - generic [ref=e52] [cursor=pointer]: Dombivli East
+              - img [ref=e53] [cursor=pointer]
+            - textbox "Search in Dombivli East..." [ref=e56]
+            - button [ref=e57] [cursor=pointer]:
+              - img [ref=e58] [cursor=pointer]
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - heading "Properties based on Your Location" [level=2] [ref=e63]:
+            - text: Properties based on
+            - generic [ref=e64]: Your Location
+          - button "View All" [ref=e65] [cursor=pointer]:
+            - generic [ref=e67] [cursor=pointer]:
+              - text: View All
+              - img [ref=e68] [cursor=pointer]
+        - generic [ref=e70]:
+          - generic [ref=e71] [cursor=pointer]:
+            - generic [ref=e74] [cursor=pointer]: For Sale
+            - generic:
+              - img "Shubh Nirvana"
+              - button "Add to favorites" [ref=e78] [cursor=pointer]:
+                - img [ref=e79] [cursor=pointer]
+            - generic [ref=e81] [cursor=pointer]:
+              - generic [ref=e82] [cursor=pointer]:
+                - generic [ref=e83] [cursor=pointer]:
+                  - img [ref=e84] [cursor=pointer]
+                  - img [ref=e86] [cursor=pointer]
+                  - img [ref=e88] [cursor=pointer]
+                  - img [ref=e90] [cursor=pointer]
+                  - img [ref=e92] [cursor=pointer]
+                  - generic [ref=e94] [cursor=pointer]: 5.0 (??)
+                - generic [ref=e95] [cursor=pointer]:
+                  - img [ref=e96] [cursor=pointer]
+                  - generic [ref=e98] [cursor=pointer]: Apartment
+              - heading "Shubh Nirvana" [level=3] [ref=e99] [cursor=pointer]
+              - generic [ref=e100] [cursor=pointer]:
+                - img [ref=e101] [cursor=pointer]
+                - generic [ref=e104] [cursor=pointer]: Plot No.4, S.NO. 227, CTS No.218, New Airport Road, Near Symboisis Law College, Viman Nagar, Pune, Pune, Maharashtra
+              - generic [ref=e105] [cursor=pointer]:
+                - generic "Area" [ref=e106] [cursor=pointer]:
+                  - img [ref=e107] [cursor=pointer]
+                  - generic [ref=e109] [cursor=pointer]: 1,400 sqft
+                - generic "Bedrooms" [ref=e110] [cursor=pointer]:
+                  - img [ref=e111] [cursor=pointer]
+                  - generic [ref=e113] [cursor=pointer]: 3 Bed
+                - generic "Bathrooms" [ref=e114] [cursor=pointer]:
+                  - img [ref=e115] [cursor=pointer]
+                  - generic [ref=e118] [cursor=pointer]: 2 Bath
+              - generic [ref=e120] [cursor=pointer]: ₹ 2.00 Cr
+          - generic [ref=e121] [cursor=pointer]:
+            - generic [ref=e124] [cursor=pointer]: For Sale
+            - generic:
+              - img "Ganga Residency"
+              - button "Add to favorites" [ref=e128] [cursor=pointer]:
+                - img [ref=e129] [cursor=pointer]
+            - generic [ref=e131] [cursor=pointer]:
+              - generic [ref=e132] [cursor=pointer]:
+                - generic [ref=e133] [cursor=pointer]:
+                  - img [ref=e134] [cursor=pointer]
+                  - img [ref=e136] [cursor=pointer]
+                  - img [ref=e138] [cursor=pointer]
+                  - img [ref=e140] [cursor=pointer]
+                  - img [ref=e142] [cursor=pointer]
+                  - generic [ref=e144] [cursor=pointer]: 5.0 (??)
+                - generic [ref=e145] [cursor=pointer]:
+                  - img [ref=e146] [cursor=pointer]
+                  - generic [ref=e148] [cursor=pointer]: Apartment
+              - heading "Ganga Residency" [level=3] [ref=e149] [cursor=pointer]
+              - generic [ref=e150] [cursor=pointer]:
+                - img [ref=e151] [cursor=pointer]
+                - generic [ref=e154] [cursor=pointer]: Ganga Residency, Opposite Nashik Gymkhana, Tidke Colony, Nashik, Maharashtra
+              - generic [ref=e155] [cursor=pointer]:
+                - generic "Area" [ref=e156] [cursor=pointer]:
+                  - img [ref=e157] [cursor=pointer]
+                  - generic [ref=e159] [cursor=pointer]: 1,010 sqft
+                - generic "Bedrooms" [ref=e160] [cursor=pointer]:
+                  - img [ref=e161] [cursor=pointer]
+                  - generic [ref=e163] [cursor=pointer]: 2 Bed
+                - generic "Bathrooms" [ref=e164] [cursor=pointer]:
+                  - img [ref=e165] [cursor=pointer]
+                  - generic [ref=e168] [cursor=pointer]: 0 Bath
+              - generic [ref=e170] [cursor=pointer]: ₹ 70.00 Lac
+          - generic [ref=e171] [cursor=pointer]:
+            - generic [ref=e174] [cursor=pointer]: For Rent
+            - generic:
+              - img "vinayak chaya apt."
+              - button "Add to favorites" [ref=e178] [cursor=pointer]:
+                - img [ref=e179] [cursor=pointer]
+            - generic [ref=e181] [cursor=pointer]:
+              - generic [ref=e182] [cursor=pointer]:
+                - generic [ref=e183] [cursor=pointer]:
+                  - img [ref=e184] [cursor=pointer]
+                  - img [ref=e186] [cursor=pointer]
+                  - img [ref=e188] [cursor=pointer]
+                  - img [ref=e190] [cursor=pointer]
+                  - img [ref=e192] [cursor=pointer]
+                  - generic [ref=e194] [cursor=pointer]: 5.0 (??)
+                - generic [ref=e195] [cursor=pointer]:
+                  - img [ref=e196] [cursor=pointer]
+                  - generic [ref=e198] [cursor=pointer]: Apartment
+              - heading "vinayak chaya apt." [level=3] [ref=e199] [cursor=pointer]
+              - generic [ref=e200] [cursor=pointer]:
+                - img [ref=e201] [cursor=pointer]
+                - generic [ref=e204] [cursor=pointer]: Sonal siddhi chs, Phadke cross road, Dombivli East, Maharashtra
+              - generic [ref=e205] [cursor=pointer]:
+                - generic "Area" [ref=e206] [cursor=pointer]:
+                  - img [ref=e207] [cursor=pointer]
+                  - generic [ref=e209] [cursor=pointer]: 1,050 sqft
+                - generic "Bedrooms" [ref=e210] [cursor=pointer]:
+                  - img [ref=e211] [cursor=pointer]
+                  - generic [ref=e213] [cursor=pointer]: 3 Bed
+                - generic "Bathrooms" [ref=e214] [cursor=pointer]:
+                  - img [ref=e215] [cursor=pointer]
+                  - generic [ref=e218] [cursor=pointer]: 2 Bath
+              - generic [ref=e220] [cursor=pointer]: ₹ 30,000
+      - generic [ref=e224]:
+        - generic [ref=e228]:
+          - img "BUY A HOME"
+        - generic [ref=e230]:
+          - generic [ref=e231]: WANT TO BUY A HOME?
+          - heading "Find, Buy & Own Your Dream Home." [level=2] [ref=e232]:
+            - text: Find, Buy & Own Your
+            - generic [ref=e233]: Dream Home.
+          - paragraph [ref=e234]: EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE.
+          - button "Explore Buying" [ref=e236] [cursor=pointer]:
+            - img [ref=e237] [cursor=pointer]
+            - generic [ref=e239] [cursor=pointer]: Explore Buying
+      - generic [ref=e243]:
+        - generic [ref=e247]:
+          - img "RENT A HOME"
+        - generic [ref=e249]:
+          - generic [ref=e250]: WANT TO RENT A HOME?
+          - heading "Rental Homes for Everyone Dream Home." [level=2] [ref=e251]:
+            - text: Rental Homes for Everyone
+            - generic [ref=e252]: Dream Home.
+          - paragraph [ref=e253]: EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE.
+          - button "Explore Renting" [ref=e255] [cursor=pointer]:
+            - generic [ref=e256] [cursor=pointer]: Explore Renting
+            - img [ref=e257] [cursor=pointer]
+      - generic [ref=e262]:
+        - generic [ref=e266]:
+          - img "BUY PLOTS/LAND"
+        - generic [ref=e268]:
+          - generic [ref=e269]: WANT TO BUY PLOTS/LAND?
+          - heading "Residential & Commercial Dream Land." [level=2] [ref=e270]:
+            - text: Residential & Commercial
+            - generic [ref=e271]: Dream Land.
+          - paragraph [ref=e272]: EXPLORE RESIDENTIAL, AGRICULTURAL, INDUSTRIAL AND COMMERCIAL PLOTS/LAND.
+          - button "Explore Plots/Land" [ref=e274] [cursor=pointer]:
+            - img [ref=e275] [cursor=pointer]
+            - generic [ref=e277] [cursor=pointer]: Explore Plots/Land
+      - generic [ref=e281]:
+        - generic [ref=e285]:
+          - img "Property for sale or rent"
+        - generic [ref=e287]:
+          - generic [ref=e288]: ARE YOU AN OWNER?
+          - heading "Sell or Rent Your Property Faster with SQUAREFOOT" [level=2] [ref=e289]:
+            - text: Sell or Rent
+            - generic [ref=e290]: Your Property
+            - text: Faster with
+            - text: SQUAREFOOT
+          - paragraph [ref=e291]: SELL OR RENT YOUR RESIDENTIAL/COMMERCIAL PROPERTY.
+          - button "Login to Post Property" [ref=e293] [cursor=pointer]:
+            - generic [ref=e294] [cursor=pointer]: Login to Post Property
+            - img [ref=e295] [cursor=pointer]
+      - generic [ref=e297]:
+        - generic [ref=e298]:
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - img [ref=e301]
+              - heading "Client Testimonials" [level=1] [ref=e303]:
+                - text: Client
+                - generic [ref=e304]: Testimonials
+            - paragraph [ref=e305]: We measure our success by the satisfaction of our clients. Here's what some of them have to say about working with us.
+          - generic [ref=e306]:
+            - generic [ref=e307]:
+              - img "Rahul Sharma" [ref=e310]
+              - generic [ref=e312]:
+                - generic [ref=e313]:
+                  - img [ref=e314]
+                  - img [ref=e316]
+                  - img [ref=e318]
+                  - img [ref=e320]
+                  - img [ref=e322]
+                - paragraph [ref=e324]: "\"SQUAREFOOT made my home buying experience seamless. Their team was knowledgeable and helped me find exactly what I was looking for within my budget. The entire process was transparent and stress-free!\""
+                - generic [ref=e325]:
+                  - heading "Rahul Sharma" [level=3] [ref=e326]
+                  - paragraph [ref=e327]: Property Buyer
+            - generic [ref=e328]:
+              - img "Priya Patel" [ref=e331]
+              - generic [ref=e333]:
+                - generic [ref=e334]:
+                  - img [ref=e335]
+                  - img [ref=e337]
+                  - img [ref=e339]
+                  - img [ref=e341]
+                  - img [ref=e343]
+                - paragraph [ref=e345]: "\"Sold my apartment in record time and at a great price! The marketing strategy was excellent, and I received multiple offers within days of listing. Highly recommend their professional services.\""
+                - generic [ref=e346]:
+                  - heading "Priya Patel" [level=3] [ref=e347]
+                  - paragraph [ref=e348]: Property Seller
+            - generic [ref=e349]:
+              - img "Vikram Mehta" [ref=e352]
+              - generic [ref=e354]:
+                - generic [ref=e355]:
+                  - img [ref=e356]
+                  - img [ref=e358]
+                  - img [ref=e360]
+                  - img [ref=e362]
+                  - img [ref=e364]
+                - paragraph [ref=e366]: "\"As an investor, I appreciate their market insights and property recommendations. They helped me build a profitable portfolio with great rental yields. Their after-sales support is exceptional.\""
+                - generic [ref=e367]:
+                  - heading "Vikram Mehta" [level=3] [ref=e368]
+                  - paragraph [ref=e369]: Investor
+            - generic [ref=e370]:
+              - img "Ananya Gupta" [ref=e373]
+              - generic [ref=e375]:
+                - generic [ref=e376]:
+                  - img [ref=e377]
+                  - img [ref=e379]
+                  - img [ref=e381]
+                  - img [ref=e383]
+                  - img [ref=e385]
+                - paragraph [ref=e387]: "\"Being overseas, I was worried about purchasing property in India. SQUAREFOOT handled everything remotely with regular video updates. Their digital documentation process was incredibly convenient.\""
+                - generic [ref=e388]:
+                  - heading "Ananya Gupta" [level=3] [ref=e389]
+                  - paragraph [ref=e390]: NRI Client
+            - generic [ref=e391]:
+              - img "Aditya Joshi" [ref=e394]
+              - generic [ref=e396]:
+                - generic [ref=e397]:
+                  - img [ref=e398]
+                  - img [ref=e400]
+                  - img [ref=e402]
+                  - img [ref=e404]
+                  - img [ref=e406]
+                - paragraph [ref=e408]: "\"The team patiently guided me through every step as a first-time buyer. They explained all the legal aspects and even helped me get the best home loan rates. Truly a customer-first approach!\""
+                - generic [ref=e409]:
+                  - heading "Aditya Joshi" [level=3] [ref=e410]
+                  - paragraph [ref=e411]: First-time Buyer
+          - generic [ref=e412]:
+            - button [ref=e413] [cursor=pointer]:
+              - img [ref=e414] [cursor=pointer]
+            - generic [ref=e416]:
+              - button [ref=e417] [cursor=pointer]
+              - button [ref=e418] [cursor=pointer]
+              - button [ref=e419] [cursor=pointer]
+              - button [ref=e420] [cursor=pointer]
+              - button [ref=e421] [cursor=pointer]
+            - button [ref=e422] [cursor=pointer]:
+              - img [ref=e423] [cursor=pointer]
+        - generic [ref=e427]:
+          - generic [ref=e428]:
+            - generic [ref=e429]: 500+
+            - generic [ref=e430]: Five-Star Reviews
+          - generic [ref=e431]:
+            - generic [ref=e432]: 98%
+            - generic [ref=e433]: Client Satisfaction
+          - generic [ref=e434]:
+            - generic [ref=e435]: 10K+
+            - generic [ref=e436]: Happy Clients
+          - generic [ref=e437]:
+            - generic [ref=e438]: 24/7
+            - generic [ref=e439]: Support Available
+        - generic [ref=e441]:
+          - heading "Ready to Share Your Experience?" [level=2] [ref=e442]
+          - paragraph [ref=e443]: We'd love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
+          - button "Write a Review" [ref=e444] [cursor=pointer]
+  - contentinfo [ref=e445]:
+    - generic [ref=e446]:
+      - paragraph [ref=e447]: © 2025 Urban Realty. All rights reserved.
+      - paragraph [ref=e448]: Simple Footer - Header and Footer are now working!
+  - alert [ref=e449]
+```

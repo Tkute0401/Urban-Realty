@@ -1,0 +1,220 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Logo" [ref=e5]:
+        - /url: /
+        - img "Logo" [ref=e6]
+      - navigation [ref=e7]:
+        - link "Browse" [ref=e8]:
+          - /url: /properties
+          - img [ref=e9]
+          - generic [ref=e10]: Browse
+        - link "Plans" [ref=e11]:
+          - /url: /subscriptions
+          - img [ref=e12]
+          - generic [ref=e16]: Plans
+        - link "Login" [ref=e17]:
+          - /url: /login
+          - img [ref=e18]
+          - generic [ref=e21]: Login
+        - link "Register" [ref=e22]:
+          - /url: /register
+          - img [ref=e23]
+          - generic [ref=e26]: Register
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - heading "Plan Comparison" [level=1] [ref=e29]
+      - heading "Compare our subscription plans to find the perfect fit for your needs" [level=6] [ref=e30]
+      - generic [ref=e32] [cursor=pointer]:
+        - checkbox "Monthly Monthly" [ref=e35] [cursor=pointer]
+        - generic [ref=e39] [cursor=pointer]:
+          - paragraph [ref=e40] [cursor=pointer]: Monthly
+          - paragraph [ref=e41] [cursor=pointer]: Monthly
+      - generic [ref=e42]:
+        - generic [ref=e45]:
+          - heading "Free Plan" [level=2] [ref=e47]
+          - generic [ref=e48]: $0/month
+          - paragraph [ref=e49]: Perfect for getting started with basic features
+          - button "Choose Plan" [ref=e50] [cursor=pointer]
+        - generic [ref=e53]:
+          - heading "Basic Plan" [level=2] [ref=e55]
+          - generic [ref=e56]: $29/month
+          - paragraph [ref=e57]: Great for small teams and growing businesses
+          - button "Choose Plan" [ref=e58] [cursor=pointer]
+        - generic [ref=e60]:
+          - generic [ref=e61]: MOST POPULAR
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - heading "Premium Plan" [level=2] [ref=e66]
+            - generic [ref=e67]: $99/month
+            - paragraph [ref=e68]: Perfect for established real estate professionals
+            - button "Choose Plan" [ref=e69] [cursor=pointer]
+        - generic [ref=e72]:
+          - heading "Enterprise Plan" [level=2] [ref=e74]
+          - generic [ref=e75]: $299/month
+          - paragraph [ref=e76]: Comprehensive solution for large agencies and developers
+          - button "Choose Plan" [ref=e77] [cursor=pointer]
+      - generic [ref=e79]:
+        - heading "Feature Comparison" [level=5] [ref=e80]:
+          - img [ref=e81]
+          - text: Feature Comparison
+        - table [ref=e84]:
+          - rowgroup [ref=e85]:
+            - row "Features Free Plan Basic Plan Premium Plan Enterprise Plan" [ref=e86]:
+              - columnheader "Features" [ref=e87]
+              - columnheader "Free Plan" [ref=e88]
+              - columnheader "Basic Plan" [ref=e89]
+              - columnheader "Premium Plan" [ref=e90]
+              - columnheader "Enterprise Plan" [ref=e91]
+          - rowgroup [ref=e92]:
+            - row "Property Listings Unlimited Unlimited Unlimited Unlimited" [ref=e93]:
+              - cell "Property Listings" [ref=e94]
+              - cell "Unlimited" [ref=e95]:
+                - generic [ref=e96]:
+                  - img [ref=e97]
+                  - paragraph [ref=e99]: Unlimited
+              - cell "Unlimited" [ref=e100]:
+                - generic [ref=e101]:
+                  - img [ref=e102]
+                  - paragraph [ref=e104]: Unlimited
+              - cell "Unlimited" [ref=e105]:
+                - generic [ref=e106]:
+                  - img [ref=e107]
+                  - paragraph [ref=e109]: Unlimited
+              - cell "Unlimited" [ref=e110]:
+                - generic [ref=e111]:
+                  - img [ref=e112]
+                  - paragraph [ref=e114]: Unlimited
+            - row "Advanced Search No No No No" [ref=e115]:
+              - cell "Advanced Search" [ref=e116]
+              - cell "No" [ref=e117]:
+                - generic [ref=e118]:
+                  - img [ref=e119]
+                  - paragraph [ref=e121]: "No"
+              - cell "No" [ref=e122]:
+                - generic [ref=e123]:
+                  - img [ref=e124]
+                  - paragraph [ref=e126]: "No"
+              - cell "No" [ref=e127]:
+                - generic [ref=e128]:
+                  - img [ref=e129]
+                  - paragraph [ref=e131]: "No"
+              - cell "No" [ref=e132]:
+                - generic [ref=e133]:
+                  - img [ref=e134]
+                  - paragraph [ref=e136]: "No"
+            - row "Priority Support No No No No" [ref=e137]:
+              - cell "Priority Support" [ref=e138]
+              - cell "No" [ref=e139]:
+                - generic [ref=e140]:
+                  - img [ref=e141]
+                  - paragraph [ref=e143]: "No"
+              - cell "No" [ref=e144]:
+                - generic [ref=e145]:
+                  - img [ref=e146]
+                  - paragraph [ref=e148]: "No"
+              - cell "No" [ref=e149]:
+                - generic [ref=e150]:
+                  - img [ref=e151]
+                  - paragraph [ref=e153]: "No"
+              - cell "No" [ref=e154]:
+                - generic [ref=e155]:
+                  - img [ref=e156]
+                  - paragraph [ref=e158]: "No"
+            - row "Analytics & Insights No No No No" [ref=e159]:
+              - cell "Analytics & Insights" [ref=e160]
+              - cell "No" [ref=e161]:
+                - generic [ref=e162]:
+                  - img [ref=e163]
+                  - paragraph [ref=e165]: "No"
+              - cell "No" [ref=e166]:
+                - generic [ref=e167]:
+                  - img [ref=e168]
+                  - paragraph [ref=e170]: "No"
+              - cell "No" [ref=e171]:
+                - generic [ref=e172]:
+                  - img [ref=e173]
+                  - paragraph [ref=e175]: "No"
+              - cell "No" [ref=e176]:
+                - generic [ref=e177]:
+                  - img [ref=e178]
+                  - paragraph [ref=e180]: "No"
+            - row "Custom Branding No No No No" [ref=e181]:
+              - cell "Custom Branding" [ref=e182]
+              - cell "No" [ref=e183]:
+                - generic [ref=e184]:
+                  - img [ref=e185]
+                  - paragraph [ref=e187]: "No"
+              - cell "No" [ref=e188]:
+                - generic [ref=e189]:
+                  - img [ref=e190]
+                  - paragraph [ref=e192]: "No"
+              - cell "No" [ref=e193]:
+                - generic [ref=e194]:
+                  - img [ref=e195]
+                  - paragraph [ref=e197]: "No"
+              - cell "No" [ref=e198]:
+                - generic [ref=e199]:
+                  - img [ref=e200]
+                  - paragraph [ref=e202]: "No"
+            - row "API Access No No No No" [ref=e203]:
+              - cell "API Access" [ref=e204]
+              - cell "No" [ref=e205]:
+                - generic [ref=e206]:
+                  - img [ref=e207]
+                  - paragraph [ref=e209]: "No"
+              - cell "No" [ref=e210]:
+                - generic [ref=e211]:
+                  - img [ref=e212]
+                  - paragraph [ref=e214]: "No"
+              - cell "No" [ref=e215]:
+                - generic [ref=e216]:
+                  - img [ref=e217]
+                  - paragraph [ref=e219]: "No"
+              - cell "No" [ref=e220]:
+                - generic [ref=e221]:
+                  - img [ref=e222]
+                  - paragraph [ref=e224]: "No"
+            - row "Monthly Price $0 $29 $99 $299" [ref=e225]:
+              - cell "Monthly Price" [ref=e226]
+              - cell "$0" [ref=e227]:
+                - heading "$0" [level=6] [ref=e228]
+              - cell "$29" [ref=e229]:
+                - heading "$29" [level=6] [ref=e230]
+              - cell "$99" [ref=e231]:
+                - heading "$99" [level=6] [ref=e232]
+              - cell "$299" [ref=e233]:
+                - heading "$299" [level=6] [ref=e234]
+            - row "Yearly Price (20% off) $0 Save $0/year $278 Save $70/year $950 Save $238/year $2870 Save $718/year" [ref=e235]:
+              - cell "Yearly Price (20% off)" [ref=e236]
+              - cell "$0 Save $0/year" [ref=e237]:
+                - heading "$0" [level=6] [ref=e238]
+                - generic [ref=e239]: Save $0/year
+              - cell "$278 Save $70/year" [ref=e240]:
+                - heading "$278" [level=6] [ref=e241]
+                - generic [ref=e242]: Save $70/year
+              - cell "$950 Save $238/year" [ref=e243]:
+                - heading "$950" [level=6] [ref=e244]
+                - generic [ref=e245]: Save $238/year
+              - cell "$2870 Save $718/year" [ref=e246]:
+                - heading "$2870" [level=6] [ref=e247]
+                - generic [ref=e248]: Save $718/year
+      - generic [ref=e250]:
+        - heading "Ready to Get Started?" [level=4] [ref=e251]
+        - paragraph [ref=e252]: Choose the plan that best fits your real estate needs and start exploring premium features today.
+        - link "View All Plans" [ref=e253] [cursor=pointer]:
+          - /url: /subscriptions
+  - contentinfo [ref=e254]:
+    - generic [ref=e255]:
+      - paragraph [ref=e256]: © 2025 Urban Realty. All rights reserved.
+      - paragraph [ref=e257]: Simple Footer - Header and Footer are now working!
+  - generic [ref=e258]:
+    - img [ref=e260]
+    - button "Open Tanstack query devtools" [ref=e328] [cursor=pointer]:
+      - img [ref=e329] [cursor=pointer]
+  - alert [ref=e397]
+```

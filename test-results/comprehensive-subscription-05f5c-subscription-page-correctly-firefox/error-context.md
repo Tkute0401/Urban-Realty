@@ -1,0 +1,197 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Logo" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img "Logo" [ref=e6] [cursor=pointer]
+      - navigation [ref=e7]:
+        - link "Browse" [ref=e8] [cursor=pointer]:
+          - /url: /properties
+          - img [ref=e9] [cursor=pointer]
+          - generic [ref=e16] [cursor=pointer]: Browse
+        - link "Plans" [ref=e17] [cursor=pointer]:
+          - /url: /subscriptions
+          - img [ref=e18] [cursor=pointer]
+          - generic [ref=e23] [cursor=pointer]: Plans
+        - link "Login" [ref=e24] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e25] [cursor=pointer]
+          - generic [ref=e29] [cursor=pointer]: Login
+        - link "Register" [ref=e30] [cursor=pointer]:
+          - /url: /register
+          - img [ref=e31] [cursor=pointer]
+          - generic [ref=e36] [cursor=pointer]: Register
+  - main [ref=e37]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - heading "Choose Your Plan" [level=1] [ref=e40]
+        - heading "Select the perfect subscription plan for your real estate business needs. All plans include our core features with different levels of access." [level=6] [ref=e41]
+        - generic [ref=e42]:
+          - paragraph [ref=e43]: Monthly
+          - checkbox [ref=e46] [cursor=pointer]
+          - generic [ref=e49]:
+            - paragraph [ref=e50]: Yearly
+            - generic [ref=e52]: Save 20%
+      - generic [ref=e53]:
+        - generic [ref=e56]:
+          - heading "Free Plan" [level=2] [ref=e58]
+          - generic [ref=e59]: $0/month
+          - paragraph [ref=e60]: Perfect for getting started with basic features
+          - button "Choose Plan" [ref=e61] [cursor=pointer]
+          - generic [ref=e62]:
+            - heading "What's included:" [level=6] [ref=e63]
+            - generic [ref=e64]:
+              - img [ref=e65]
+              - paragraph [ref=e67]: 0 Property Listings
+            - generic [ref=e68]:
+              - img [ref=e69]
+              - paragraph [ref=e71]: Basic Search
+            - generic [ref=e72]:
+              - img [ref=e73]
+              - paragraph [ref=e75]: Email Support
+            - generic [ref=e76]:
+              - img [ref=e77]
+              - paragraph [ref=e79]: Basic Reports
+            - generic [ref=e80]:
+              - img [ref=e81]
+              - paragraph [ref=e83]: Up to 1 User
+        - generic [ref=e86]:
+          - heading "Basic Plan" [level=2] [ref=e88]
+          - generic [ref=e89]: $29/month
+          - paragraph [ref=e90]: Great for small teams and growing businesses
+          - button "Choose Plan" [ref=e91] [cursor=pointer]
+          - generic [ref=e92]:
+            - heading "What's included:" [level=6] [ref=e93]
+            - generic [ref=e94]:
+              - img [ref=e95]
+              - paragraph [ref=e97]: 0 Property Listings
+            - generic [ref=e98]:
+              - img [ref=e99]
+              - paragraph [ref=e101]: Basic Search
+            - generic [ref=e102]:
+              - img [ref=e103]
+              - paragraph [ref=e105]: Email Support
+            - generic [ref=e106]:
+              - img [ref=e107]
+              - paragraph [ref=e109]: Basic Reports
+            - generic [ref=e110]:
+              - img [ref=e111]
+              - paragraph [ref=e113]: Up to 1 User
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - img [ref=e117]
+            - text: MOST POPULAR
+          - generic [ref=e119]:
+            - generic [ref=e120]:
+              - img [ref=e121]
+              - heading "Premium Plan" [level=2] [ref=e123]
+            - generic [ref=e124]: $99/month
+            - paragraph [ref=e125]: Perfect for established real estate professionals
+            - button "Choose Plan" [ref=e126] [cursor=pointer]
+            - generic [ref=e127]:
+              - heading "What's included:" [level=6] [ref=e128]
+              - generic [ref=e129]:
+                - img [ref=e130]
+                - paragraph [ref=e132]: 0 Property Listings
+              - generic [ref=e133]:
+                - img [ref=e134]
+                - paragraph [ref=e136]: Basic Search
+              - generic [ref=e137]:
+                - img [ref=e138]
+                - paragraph [ref=e140]: Email Support
+              - generic [ref=e141]:
+                - img [ref=e142]
+                - paragraph [ref=e144]: Basic Reports
+              - generic [ref=e145]:
+                - img [ref=e146]
+                - paragraph [ref=e148]: Up to 1 User
+        - generic [ref=e151]:
+          - heading "Enterprise Plan" [level=2] [ref=e153]
+          - generic [ref=e154]: $299/month
+          - paragraph [ref=e155]: Comprehensive solution for large agencies and developers
+          - button "Choose Plan" [ref=e156] [cursor=pointer]
+          - generic [ref=e157]:
+            - heading "What's included:" [level=6] [ref=e158]
+            - generic [ref=e159]:
+              - img [ref=e160]
+              - paragraph [ref=e162]: 0 Property Listings
+            - generic [ref=e163]:
+              - img [ref=e164]
+              - paragraph [ref=e166]: Basic Search
+            - generic [ref=e167]:
+              - img [ref=e168]
+              - paragraph [ref=e170]: Email Support
+            - generic [ref=e171]:
+              - img [ref=e172]
+              - paragraph [ref=e174]: Basic Reports
+            - generic [ref=e175]:
+              - img [ref=e176]
+              - paragraph [ref=e178]: Up to 1 User
+      - generic [ref=e180]:
+        - heading "Feature Comparison" [level=4] [ref=e181]:
+          - img [ref=e182]
+          - text: Feature Comparison
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - heading "All Plans Include:" [level=6] [ref=e186]
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - img [ref=e189]
+                - paragraph [ref=e191]: Mobile app access
+              - generic [ref=e192]:
+                - img [ref=e193]
+                - paragraph [ref=e195]: Email support
+              - generic [ref=e196]:
+                - img [ref=e197]
+                - paragraph [ref=e199]: Basic analytics
+              - generic [ref=e200]:
+                - img [ref=e201]
+                - paragraph [ref=e203]: Standard templates
+          - generic [ref=e204]:
+            - heading "Professional & Enterprise:" [level=6] [ref=e205]
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - img [ref=e208]
+                - paragraph [ref=e210]: Priority support
+              - generic [ref=e211]:
+                - img [ref=e212]
+                - paragraph [ref=e214]: Advanced analytics
+              - generic [ref=e215]:
+                - img [ref=e216]
+                - paragraph [ref=e218]: Lead management
+              - generic [ref=e219]:
+                - img [ref=e220]
+                - paragraph [ref=e222]: CRM integration
+          - generic [ref=e223]:
+            - heading "Enterprise Only:" [level=6] [ref=e224]
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - img [ref=e227]
+                - paragraph [ref=e229]: 24/7 phone support
+              - generic [ref=e230]:
+                - img [ref=e231]
+                - paragraph [ref=e233]: API access
+              - generic [ref=e234]:
+                - img [ref=e235]
+                - paragraph [ref=e237]: White-label options
+              - generic [ref=e238]:
+                - img [ref=e239]
+                - paragraph [ref=e241]: Dedicated account manager
+      - generic [ref=e243]:
+        - heading "Ready to Get Started?" [level=3] [ref=e244]
+        - heading "Join thousands of real estate professionals who trust our platform to grow their business." [level=6] [ref=e245]
+        - link "Compare All Plans" [ref=e246] [cursor=pointer]:
+          - /url: /subscription-comparison
+  - contentinfo [ref=e247]:
+    - generic [ref=e248]:
+      - paragraph [ref=e249]: © 2025 Urban Realty. All rights reserved.
+      - paragraph [ref=e250]: Simple Footer - Header and Footer are now working!
+  - generic [ref=e251]:
+    - img [ref=e253]
+    - button "Open Tanstack query devtools" [ref=e302] [cursor=pointer]:
+      - img [ref=e303] [cursor=pointer]
+  - alert [ref=e352]
+```
