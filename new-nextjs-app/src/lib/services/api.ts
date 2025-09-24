@@ -28,7 +28,7 @@ export const api = {
         auth: {
                 login: (payload: { email: string; password: string }) => unwrap<{ token: string; user: any }>(http.post("/auth/login", payload)),
                 register: (payload: { name: string; email: string; password: string }) => unwrap<{ user: any }>(http.post("/auth/register", payload)),
-                profile: () => unwrap<any>(http.get("/auth/profile")),
+                profile: () => unwrap<any>(http.get("/auth/me")),
                 // Favorites
                 favoritesList: () => unwrap<any[]>(http.get("/auth/favorites")),
                 addFavorite: (propertyId: string) => unwrap<any>(http.put(`/auth/favorites/${propertyId}`, {})),
@@ -51,12 +51,15 @@ export const api = {
         },
         admin: {
                 stats: () => unwrap<any>(http.get("/admin/stats")),
-                dashboard: () => unwrap<any>(http.get("/admin/dashboard")),
+                dashboard: () => unwrap<any>(http.get("/admin/stats")), // Fixed: Use stats endpoint for dashboard data
                 analytics: () => unwrap<any>(http.get("/admin/analytics")),
                 users: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/admin/users", { params })),
                 properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/admin/properties", { params })),
+                contacts: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/admin/contacts", { params })),
                 updateUser: (userId: string, payload: any) => unwrap<any>(http.put(`/admin/users/${userId}`, payload)),
                 deleteUser: (userId: string) => unwrap<any>(http.delete(`/admin/users/${userId}`)),
+                deleteProperty: (propertyId: string) => unwrap<any>(http.delete(`/admin/properties/${propertyId}`)),
+                verifyAgent: (agentId: string) => unwrap<any>(http.put(`/admin/agents/${agentId}/verify`, {})),
         },
         agent: {
                 // Agent dashboard & analytics

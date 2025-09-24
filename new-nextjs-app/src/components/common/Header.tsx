@@ -99,7 +99,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="header">
+    <header>
       <div className="header-container">
         {/* Logo */}
         <div className="logo-container">

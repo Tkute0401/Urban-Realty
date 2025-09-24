@@ -111,9 +111,29 @@ exports.login = asyncHandler(async (req, res, next) => {
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('-password');
 
+  // Ensure user has subscription status (migrate if needed)
+  if (!user.subscriptionStatus) {
+    user.subscriptionStatus = 'free';
+    await user.save();
+  }
+
   res.status(200).json({
     success: true,
-    data: user
+    data: {
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        mobile: user.mobile,
+        role: user.role,
+        occupation: user.occupation,
+        professionalInfo: user.professionalInfo,
+        reraId: user.reraId,
+        subscriptionStatus: user.subscriptionStatus,
+        favorites: user.favorites || [],
+        recentlyViewed: user.recentlyViewed || []
+      }
+    }
   });
 });
 

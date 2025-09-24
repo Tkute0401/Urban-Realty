@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 console.log('🔧 Subscriptions Page module loading...');
 import {
@@ -56,9 +56,6 @@ const SubscriptionPlans = () => {
     console.log('🔧 SubscriptionPlans mounted on client side!');
   }, []);
 
-  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showYearly, setShowYearly] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
@@ -73,32 +70,31 @@ const SubscriptionPlans = () => {
       alert('Subscription successful!');
     },
     onError: () => {
-      setError('Subscription failed. Please try again.');
+      console.error('Subscription failed');
     },
   });
 
-  useEffect(() => {
-    setLoading(isPlansLoading);
-    if (plansError) {
-      setError('Failed to load subscription plans');
-    } else if (fetchedPlans) {
-      // Map server data to frontend format and add isPopular flag
-      const mappedPlans = fetchedPlans.map((plan: any, index: number) => ({
-        ...plan,
-        isPopular: plan.type === 'premium', // Mark premium as popular
-        featureList: [
-          `${plan.features.propertyListings || 0} Property Listings`,
-          plan.features.advancedSearch ? 'Advanced Search' : 'Basic Search',
-          plan.features.prioritySupport ? 'Priority Support' : 'Email Support',
-          plan.features.analytics ? 'Advanced Analytics' : 'Basic Reports',
-          ...(plan.features.customBranding ? ['Custom Branding'] : []),
-          ...(plan.features.apiAccess ? ['API Access'] : []),
-          `Up to ${plan.maxUsers} User${plan.maxUsers > 1 ? 's' : ''}`
-        ]
-      }));
-      setPlans(mappedPlans as SubscriptionPlan[]);
-    }
-  }, [isPlansLoading, plansError, fetchedPlans]);
+  // Memoize the mapped plans to prevent infinite re-renders
+  const plans = useMemo(() => {
+    if (!fetchedPlans) return [];
+    
+    return fetchedPlans.map((plan: any) => ({
+      ...plan,
+      isPopular: plan.type === 'premium', // Mark premium as popular
+      featureList: [
+        `${plan.features.propertyListings || 0} Property Listings`,
+        plan.features.advancedSearch ? 'Advanced Search' : 'Basic Search',
+        plan.features.prioritySupport ? 'Priority Support' : 'Email Support',
+        plan.features.analytics ? 'Advanced Analytics' : 'Basic Reports',
+        ...(plan.features.customBranding ? ['Custom Branding'] : []),
+        ...(plan.features.apiAccess ? ['API Access'] : []),
+        `Up to ${plan.maxUsers} User${plan.maxUsers > 1 ? 's' : ''}`
+      ]
+    })) as SubscriptionPlan[];
+  }, [fetchedPlans]);
+
+  const loading = isPlansLoading;
+  const error = plansError ? 'Failed to load subscription plans' : null;
 
   const handleSubscribe = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
@@ -231,7 +227,7 @@ const SubscriptionPlans = () => {
       {/* Plans Grid */}
       <Grid container spacing={4} sx={{ mb: 6 }}>
         {plans.map((plan) => (
-          <Grid item xs={12} md={4} key={plan.id}>
+          <Grid item xs={12} md={4} key={plan._id}>
             <Card 
               elevation={plan.isPopular ? 8 : 2}
               sx={{ 

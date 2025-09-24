@@ -38,6 +38,42 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 
+// Mount v1 routes for API versioning
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/properties', propertyRoutes);
+app.use('/api/v1/contacts', contactRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/subscriptions', subscriptionRoutes);
+
+// Health check routes
+app.get('/api/health', (req, res) => {
+  const mongoose = require('mongoose');
+  
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    database: {
+      connected: mongoose.connection.readyState === 1,
+      readyState: mongoose.connection.readyState
+    },
+    version: process.env.npm_package_version || '1.0.0'
+  });
+});
+
+app.get('/api/v1/health', (req, res) => {
+  const mongoose = require('mongoose');
+  
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    database: {
+      connected: mongoose.connection.readyState === 1,
+      readyState: mongoose.connection.readyState
+    },
+    version: process.env.npm_package_version || '1.0.0'
+  });
+});
+
 // Simple test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Urban Realty API is working!' });

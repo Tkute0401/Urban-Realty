@@ -56,14 +56,26 @@ const UsersTable = () => {
   const fetchUsers = async () => {
     try {
       const response = await http.get('/admin/users');
-      if (response.data.success) {
-        setUsers(response.data.data || []);
+      console.log('🔧 UsersTable - Response:', response.data);
+      
+      // Handle different response structures
+      if (response.data && response.data.success !== false) {
+        const userData = response.data.data || response.data || [];
+        setUsers(Array.isArray(userData) ? userData : []);
       } else {
-        setError('Failed to fetch users');
+        setError(response.data?.message || 'Failed to fetch users');
       }
-    } catch (err) {
-      console.error('Error fetching users:', err);
-      setError('Failed to load users. Please try again later.');
+    } catch (err: any) {
+      console.error('🔧 UsersTable - Error fetching users:', err);
+      
+      // Handle different error scenarios
+      if (err.response?.status === 503) {
+        setError('Service temporarily unavailable. Using mock data might be available.');
+      } else if (err.response?.status === 401) {
+        setError('Unauthorized. Please login as admin.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to load users. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }

@@ -101,17 +101,45 @@ exports.getSubscriptions = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
       success: true,
       count: mockSubscriptions.length,
-      data: mockSubscriptions
+      data: mockSubscriptions,
+      source: 'mock'
     });
   }
 
   try {
-    const subscriptions = await Subscription.find({ isActive: true });
+    let subscriptions = await Subscription.find({ isActive: true }).sort({ price: 1 });
+
+    // If no subscriptions in database, seed with mock data
+    if (!subscriptions || subscriptions.length === 0) {
+      console.log('No subscriptions found in database, seeding with mock data');
+      
+      // Create subscriptions from mock data
+      for (const mockSub of mockSubscriptions) {
+        try {
+          await Subscription.create({
+            name: mockSub.name,
+            type: mockSub.type,
+            description: mockSub.description,
+            price: mockSub.price,
+            billingCycle: mockSub.billingCycle,
+            isActive: mockSub.isActive,
+            features: mockSub.features,
+            maxUsers: mockSub.maxUsers
+          });
+        } catch (seedError) {
+          console.warn('Error seeding subscription:', mockSub.name, seedError.message);
+        }
+      }
+      
+      // Retry fetching after seeding
+      subscriptions = await Subscription.find({ isActive: true }).sort({ price: 1 });
+    }
 
     res.status(200).json({
       success: true,
       count: subscriptions.length,
-      data: subscriptions
+      data: subscriptions,
+      source: 'database'
     });
   } catch (error) {
     console.warn('MongoDB query failed, using mock data:', error.message);
@@ -119,7 +147,8 @@ exports.getSubscriptions = asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: mockSubscriptions.length,
-      data: mockSubscriptions
+      data: mockSubscriptions,
+      source: 'mock_fallback'
     });
   }
 });

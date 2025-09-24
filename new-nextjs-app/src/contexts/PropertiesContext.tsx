@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
 import http from '@/lib/services/http';
 
 // Types
@@ -103,7 +103,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
   const [agentProperties, setAgentProperties] = useState([]);
   
   // Add useEffect for debugging
-  useMemo(() => {
+  useEffect(() => {
     console.log('🔧 PropertiesProvider mounted on client side!');
     return () => {
       console.log('🔧 PropertiesProvider unmounted');
@@ -157,10 +157,21 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       });
       console.log("Backend Params:=",backendParams);
       const response = await http.get('/properties', { params: backendParams });
-      const { data, pagination: paginationData } = response.data;
+      console.log('🔧 PropertiesContext - Properties response:', response.data);
       
-      if (!Array.isArray(data)) {
-        throw new Error('Received invalid properties data format');
+      // Handle different response structures
+      const responseData = response.data;
+      let data = [];
+      let paginationData = {};
+      
+      if (responseData.data && Array.isArray(responseData.data)) {
+        data = responseData.data;
+        paginationData = responseData.pagination || {};
+      } else if (Array.isArray(responseData)) {
+        data = responseData;
+      } else {
+        console.warn('🔧 PropertiesContext - Unexpected response format:', responseData);
+        data = [];
       }
       
       setProperties(data);
@@ -435,6 +446,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
   
+      // Use the correct endpoint based on backend routes
       const response = await http.get(`/properties/agent/${user.id}`);
       console.log("Response in context:=",response);
       const data = response.data?.data ?? response.data;
@@ -447,7 +459,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       return data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch properties');
-      setProperties([]);
+      setAgentProperties([]); // Fix: was setting wrong state
       //throw err;
     } finally {
       setLoading(false);

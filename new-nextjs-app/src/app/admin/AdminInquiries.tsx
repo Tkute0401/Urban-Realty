@@ -30,14 +30,15 @@ const AdminInquiries = () => {
       setLoading(true);
       setError(null);
       
-      let url = '/admin/inquiries';
+      let url = '/contacts';
+      const params: any = {};
       if (statusFilter !== 'all') {
-        url += `?status=${statusFilter}`;
+        params.status = statusFilter;
       }
       
-      const response = await http.get(url);
-      setInquiries(response.data.data);
-    } catch (err) {
+      const response = await http.get(url, { params });
+      setInquiries(response.data.data || response.data);
+    } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load inquiries');
     } finally {
       setLoading(false);
@@ -50,28 +51,28 @@ const AdminInquiries = () => {
 
   const handleDeleteInquiry = async () => {
     try {
-      await http.delete(`/admin/inquiries/${selectedInquiry._id}`);
+      await http.delete(`/contacts/${(selectedInquiry as any)._id}`);
       setOpenDeleteDialog(false);
       fetchInquiries();
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to delete inquiry');
     }
   };
 
-  const updateInquiryStatus = async (inquiryId, newStatus) => {
+  const updateInquiryStatus = async (inquiryId: string, newStatus: string) => {
     try {
-      await http.patch(`/admin/inquiries/${inquiryId}/status`, {
+      await http.put(`/contacts/${inquiryId}`, {
         status: newStatus
       });
       fetchInquiries();
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update inquiry status');
     }
   };
 
-  const filteredInquiries = inquiries.filter(inquiry => 
-    inquiry.property?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inquiry.from.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInquiries = inquiries.filter((inquiry: any) => 
+    (inquiry.property?.title?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (inquiry.from?.name?.toLowerCase() || inquiry.message?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
 
   const statusIcons = {
@@ -148,7 +149,7 @@ const AdminInquiries = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredInquiries.map((inquiry) => (
+              {filteredInquiries.map((inquiry: any) => (
                 <TableRow 
                   key={inquiry._id} 
                   hover
@@ -157,18 +158,18 @@ const AdminInquiries = () => {
                 >
                   <TableCell>
                     <Typography fontWeight="500">
-                      {inquiry.property?.title || 'N/A'}
+                      {inquiry.property?.title || inquiry.property?.name || 'N/A'}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
                       <Avatar>
-                        {inquiry.from.name.charAt(0)}
+                        {(inquiry.from?.name || inquiry.user?.name || 'U').charAt(0)}
                       </Avatar>
                       <Box>
-                        <Typography>{inquiry.from.name}</Typography>
+                        <Typography>{inquiry.from?.name || inquiry.user?.name || 'Unknown'}</Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {inquiry.from.email}
+                          {inquiry.from?.email || inquiry.user?.email || 'No email'}
                         </Typography>
                       </Box>
                     </Box>
@@ -176,9 +177,9 @@ const AdminInquiries = () => {
                   <TableCell>{formatDate(inquiry.createdAt)}</TableCell>
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
-                      {statusIcons[inquiry.status]}
+                      {statusIcons[inquiry.status] || statusIcons.pending}
                       <Chip 
-                        label={inquiry.status} 
+                        label={inquiry.status || 'pending'} 
                         size="small"
                         sx={{
                           backgroundColor: inquiry.status === 'pending' ? 'warning.light' : 

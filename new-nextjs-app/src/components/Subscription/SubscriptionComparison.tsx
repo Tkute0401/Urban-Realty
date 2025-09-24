@@ -46,11 +46,94 @@ const SubscriptionComparison = () => {
   const fetchPlans = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await http.get('/subscriptions');
-      setPlans(response.data.data);
+      
+      // Handle different response structures
+      if (response.data && response.data.success) {
+        const plansData = response.data.data || [];
+        setPlans(plansData);
+        
+        // Log source of data for debugging
+        if (response.data.source) {
+          console.log(`Plans loaded from ${response.data.source}`);
+        }
+        
+        if (plansData.length === 0) {
+          setError('No subscription plans available');
+        }
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (err) {
-      setError('Failed to load subscription plans');
       console.error('Error fetching plans:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load subscription plans';
+      setError(errorMessage);
+      
+      // Set fallback plans to prevent complete failure
+      const fallbackPlans = [
+        {
+          _id: 'free',
+          name: 'Free Plan',
+          type: 'free',
+          description: 'Perfect for getting started',
+          price: 0,
+          features: {
+            propertyListings: 5,
+            advancedSearch: false,
+            prioritySupport: false,
+            analytics: false,
+            customBranding: false,
+            apiAccess: false
+          }
+        },
+        {
+          _id: 'basic',
+          name: 'Basic Plan',
+          type: 'basic',
+          description: 'Great for small teams',
+          price: 29,
+          features: {
+            propertyListings: 50,
+            advancedSearch: true,
+            prioritySupport: false,
+            analytics: true,
+            customBranding: false,
+            apiAccess: false
+          }
+        },
+        {
+          _id: 'premium',
+          name: 'Premium Plan',
+          type: 'premium',
+          description: 'Advanced features for professionals',
+          price: 99,
+          features: {
+            propertyListings: 200,
+            advancedSearch: true,
+            prioritySupport: true,
+            analytics: true,
+            customBranding: true,
+            apiAccess: true
+          }
+        },
+        {
+          _id: 'enterprise',
+          name: 'Enterprise Plan',
+          type: 'enterprise',
+          description: 'Complete solution for large organizations',
+          price: 299,
+          features: {
+            propertyListings: -1,
+            advancedSearch: true,
+            prioritySupport: true,
+            analytics: true,
+            customBranding: true,
+            apiAccess: true
+          }
+        }
+      ];
+      setPlans(fallbackPlans);
     } finally {
       setLoading(false);
     }

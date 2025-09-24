@@ -17,16 +17,24 @@ const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('✅ JWT decoded successfully for user:', decoded.id);
     
-    // For development, create a user object from the token
+    // Fetch the actual user from database to get correct role
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      console.error('❌ User not found in database:', decoded.id);
+      return next(new ErrorResponse('User not found', 401));
+    }
+    
     req.user = {
-      _id: decoded.id,
-      id: decoded.id,
-      role: 'user',
-      subscriptionStatus: 'free',
-      subscriptionExpiry: null
+      _id: user._id,
+      id: user._id,
+      role: user.role,
+      subscriptionStatus: user.subscriptionStatus || 'free',
+      subscriptionExpiry: user.subscriptionExpiry || null,
+      name: user.name,
+      email: user.email
     };
     
-    console.log('✅ User authenticated:', req.user.id);
+    console.log('✅ User authenticated:', req.user.id, 'Role:', req.user.role);
     next();
   } catch (err) {
     console.error('❌ JWT Error:', err.message);

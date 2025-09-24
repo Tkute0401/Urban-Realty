@@ -50,7 +50,7 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN', // Changed from DENY to allow Razorpay frames
           },
           {
             key: 'X-Content-Type-Options',
@@ -63,6 +63,32 @@ const nextConfig = {
           {
             key: 'X-DNS-Prefetch-Control',
             value: 'on',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: https: blob:",
+              "connect-src 'self' http://localhost:3001 https://api.razorpay.com https://checkout.razorpay.com",
+              "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self' https://api.razorpay.com"
+            ].join('; '),
+          },
+          {
+            key: 'Permissions-Policy',
+            value: [
+              'camera=()',
+              'microphone=()',
+              'geolocation=()',
+              'interest-cohort=()',
+              'payment=*', // Allow payment API for all origins
+              'otp-credentials=*' // Allow OTP credentials for payment flows
+            ].join(', '),
           },
         ],
       },

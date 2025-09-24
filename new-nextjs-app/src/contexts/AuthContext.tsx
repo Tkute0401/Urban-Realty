@@ -83,17 +83,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('🔧 AuthContext - Profile data loaded successfully');
       }
       const data = profileQuery.data as any;
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 AuthContext - Raw profile data:', JSON.stringify(data, null, 2));
+      }
+      
+      // Handle different possible response structures with detailed logging
+      let userData;
+      try {
+        if (data && typeof data === 'object') {
+          // Try different possible structures - check for various response patterns
+          if (data.hasOwnProperty('user') && data.user && typeof data.user === 'object') {
+            userData = data.user;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Using data.user structure');
+            }
+          } else if (data.hasOwnProperty('data') && data.data && typeof data.data === 'object' && (data.data.email || data.data.id || data.data._id)) {
+            // API might return wrapped in data.data structure
+            userData = data.data;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Using data.data structure');
+            }
+          } else if (data.email || data.id || data._id) {
+            userData = data;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Using direct data structure');
+            }
+          } else {
+            // Log all possible keys to help debug
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Available data keys:', Object.keys(data));
+            }
+            throw new Error(`Unrecognized data structure: ${JSON.stringify(data)}`);
+          }
+        } else {
+          throw new Error(`Invalid data type: ${typeof data}`);
+        }
+        
+        if (!userData || (!userData.email && !userData.id && !userData._id)) {
+          throw new Error(`Invalid user data: ${JSON.stringify(userData)}`);
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('🔧 AuthContext - Error processing profile data:', error);
+          console.error('🔧 AuthContext - Raw data was:', data);
+        }
+        sessionManager.clearSession();
+        setError('Invalid user data received');
+        setLoading(false);
+        return;
+      }
+      
       const userInfo: AuthUser = {
-        email: data.user.email,
-        id: data.user._id || data.user.id,
-        name: data.user.name,
-        role: data.user.role,
-        mobile: data.user.mobile,
-        reraId: data.user.reraId,
-        favorites: data.user?.favorites,
-        occupation: data.user?.occupation,
-        recentlyViewed: data.user?.recentlyViewed,
-        subscriptionStatus: data.user?.subscriptionStatus,
+        email: userData.email,
+        id: userData._id || userData.id,
+        name: userData.name,
+        role: userData.role,
+        mobile: userData.mobile,
+        reraId: userData.reraId,
+        favorites: userData?.favorites,
+        occupation: userData?.occupation,
+        recentlyViewed: userData?.recentlyViewed,
+        subscriptionStatus: userData?.subscriptionStatus,
       };
       if (process.env.NODE_ENV === 'development') {
         console.log('🔧 AuthContext - Setting user:', { 
@@ -136,8 +187,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await loginMutation.mutateAsync(credentials) as any;
       if (process.env.NODE_ENV === 'development') {
         console.log('🔧 AuthContext - Login successful, processing response');
+        console.log('🔧 AuthContext - Raw login data:', JSON.stringify(data, null, 2));
       }
-      const { token, user: userData } = data;
+      
+      // Handle different possible login response structures
+      let token, userData;
+      try {
+        if (data && typeof data === 'object') {
+          // Extract token
+          token = data.token || data.accessToken;
+          
+          // Extract user data - try different possible structures
+          if (data.hasOwnProperty('user') && data.user && typeof data.user === 'object') {
+            userData = data.user;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Using data.user structure for login');
+            }
+          } else if (data.hasOwnProperty('data') && data.data && typeof data.data === 'object' && (data.data.email || data.data.id || data.data._id)) {
+            // Check for data.data structure (common in API wrappers)
+            userData = data.data;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Using data.data structure for login');
+            }
+          } else if (data.email || data.id || data._id) {
+            userData = data;
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Using direct data structure for login');
+            }
+          } else {
+            // Log available keys for debugging
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔧 AuthContext - Available login data keys:', Object.keys(data));
+            }
+            throw new Error(`Unrecognized login data structure: ${JSON.stringify(data)}`);
+          }
+        } else {
+          throw new Error(`Invalid login data type: ${typeof data}`);
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('🔧 AuthContext - Error processing login data:', error);
+          console.error('🔧 AuthContext - Raw login data was:', data);
+        }
+        throw new Error('Invalid login response format');
+      }
       if (!token) {
         if (process.env.NODE_ENV === 'development') {
           console.error('🔧 AuthContext - Authentication token missing in response');

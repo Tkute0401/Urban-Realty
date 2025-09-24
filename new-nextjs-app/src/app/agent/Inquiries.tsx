@@ -31,8 +31,8 @@ import {
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import http from '@/lib/services/http';
-import { formatDate } from '../../utils/format';
-import { useAuth } from '../../contexts/AuthContext';
+import { formatDate } from '@/lib/utils/format';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AgentInquiries = () => {
   const [page, setPage] = useState(0);
@@ -45,9 +45,13 @@ const AgentInquiries = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['agentInquiries', page, rowsPerPage, searchTerm],
     queryFn: async () => {
-      const res = await http.get(
-        `/inquiries/my-inquiries?page=${page + 1}&limit=${rowsPerPage}&search=${searchTerm}`
-      );
+      const res = await http.get(`/contacts/agent`, {
+        params: {
+          page: page + 1,
+          limit: rowsPerPage,
+          search: searchTerm
+        }
+      });
       return res.data;
     }
   });
@@ -111,12 +115,12 @@ const AgentInquiries = () => {
                 <TableCell>
                   <Box display="flex" alignItems="center">
                     <Avatar sx={{ width: 40, height: 40, mr: 2 }}>
-                      {inquiry.name.charAt(0)}
+                      {(inquiry.user?.name || inquiry.name || 'U').charAt(0)}
                     </Avatar>
                     <Box>
-                      <Typography fontWeight="bold">{inquiry.name}</Typography>
+                      <Typography fontWeight="bold">{inquiry.user?.name || inquiry.name}</Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {inquiry.email}
+                        {inquiry.user?.email || inquiry.email}
                       </Typography>
                     </Box>
                   </Box>

@@ -47,11 +47,11 @@ const HeroSection = () => {
   }, []);
 
   const getAvailableCities = () => {
-    if (!properties || properties.length === 0) return [];
+    if (!properties || !Array.isArray(properties) || properties.length === 0) return [];
     
     const citiesSet = new Set();
     properties.forEach(property => {
-      if (property.address?.city) {
+      if (property && property.address && property.address.city) {
         citiesSet.add(property.address.city);
       }
     });
@@ -66,11 +66,11 @@ const HeroSection = () => {
   );
 
   const getLocalitiesForCity = () => {
-    if (!properties || properties.length === 0 || !selectedCity) return [];
+    if (!properties || !Array.isArray(properties) || properties.length === 0 || !selectedCity) return [];
     
     const localitiesSet = new Set();
     properties.forEach(property => {
-      if (property.address?.city === selectedCity && property.address?.locality) {
+      if (property && property.address && property.address.city === selectedCity && property.address.locality) {
         localitiesSet.add(property.address.locality);
       }
     });
@@ -84,7 +84,7 @@ const HeroSection = () => {
     if (searchParams) {
       const params = Object.fromEntries(searchParams.entries());
       if (params.search) setSearchText(params.search);
-      if (params.city) {
+      if (params.city && Array.isArray(availableCities)) {
         if (availableCities.includes(params.city)) {
           setSelectedCity(params.city);
         }
@@ -116,10 +116,10 @@ const HeroSection = () => {
   }, [searchParams, availableCities]);
 
   useEffect(() => {
-    if (!selectedCity && availableCities.length > 0) {
+    if (!selectedCity && Array.isArray(availableCities) && availableCities.length > 0) {
       setSelectedCity(String(availableCities[0]));
     }
-  }, [availableCities]);
+  }, [availableCities, selectedCity]);
 
   useEffect(() => {
     setLocalityStartIndex(0);
@@ -157,6 +157,8 @@ const HeroSection = () => {
   };
 
   const handleNextLocalities = () => {
+    if (!Array.isArray(currentCityLocalities)) return;
+    
     const maxStartIndex = Math.max(0, currentCityLocalities.length - visibleLocalitiesCount);
     if (localityStartIndex < maxStartIndex) {
       setLocalityStartIndex(prev => Math.min(prev + 1, maxStartIndex));
@@ -165,7 +167,9 @@ const HeroSection = () => {
     }
   };
 
-  const visibleLocalities = currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount);
+  const visibleLocalities = Array.isArray(currentCityLocalities) 
+    ? currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount)
+    : [];
 
   return (
     <section className="relative h-[70vh] sm:h-screen flex items-center justify-center overflow-visible z-0">

@@ -157,3 +157,6 @@ flutter build ios    # iOS build
 cd mobile
 flutter test
 ```
+
+## Testing Framework Configuration
+**targetFramework**: Playwright

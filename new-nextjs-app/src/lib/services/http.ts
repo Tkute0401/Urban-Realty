@@ -20,7 +20,19 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
         (response) => response,
         (error) => {
-                // Allow consumers to handle uniformly
+                // Handle 401 Unauthorized errors
+                if (error.response?.status === 401) {
+                        // Clear token and redirect to login
+                        if (typeof window !== 'undefined') {
+                                localStorage.removeItem('token');
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('user');
+                                // Don't redirect if we're already on login page
+                                if (!window.location.pathname.includes('/login')) {
+                                        window.location.href = '/login';
+                                }
+                        }
+                }
                 return Promise.reject(error);
         }
 );

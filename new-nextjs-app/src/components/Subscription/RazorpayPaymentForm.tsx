@@ -61,6 +61,16 @@ const RazorpayPaymentForm: React.FC<RazorpayPaymentFormProps> = ({
   const verifyPaymentMutation = useVerifyRazorpayPaymentMutation();
 
   useEffect(() => {
+    // Suppress OTP credentials warning in console
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      if (typeof args[0] === 'string' && args[0].includes('otp-credentials')) {
+        // Silently ignore otp-credentials warnings
+        return;
+      }
+      originalConsoleError.apply(console, args);
+    };
+
     // Load Razorpay script
     if (!window.Razorpay) {
       const script = document.createElement('script');
@@ -76,6 +86,11 @@ const RazorpayPaymentForm: React.FC<RazorpayPaymentFormProps> = ({
     } else {
       setRazorpayLoaded(true);
     }
+
+    // Cleanup function to restore console.error
+    return () => {
+      console.error = originalConsoleError;
+    };
   }, []);
 
   const getTotalPrice = () => {
@@ -168,13 +183,36 @@ const RazorpayPaymentForm: React.FC<RazorpayPaymentFormProps> = ({
         modal: {
           ondismiss: function() {
             setLoading(false);
+          },
+          // Add settings to handle permission policy issues
+          hide_topbar: false,
+          escape: true,
+          confirm_close: true,
+          backdrop_close: true
+        },
+        // Additional options for better compatibility
+        config: {
+          display: {
+            language: 'en'
           }
         }
       };
 
-      // Open Razorpay payment modal
-      const razorpayInstance = new window.Razorpay(options);
-      razorpayInstance.open();
+      try {
+        // Open Razorpay payment modal
+        const razorpayInstance = new window.Razorpay(options);
+        razorpayInstance.on('payment.failed', function (response: any) {
+          console.error('Payment failed:', response.error);
+          setError(`Payment failed: ${response.error.description || 'Unknown error'}`);
+          setLoading(false);
+        });
+        
+        razorpayInstance.open();
+      } catch (razorpayError: any) {
+        console.error('Razorpay initialization error:', razorpayError);
+        setError('Payment system initialization failed. Please refresh the page and try again.');
+        setLoading(false);
+      }
 
     } catch (error: any) {
       console.error('Payment initiation failed:', error);

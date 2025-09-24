@@ -8,6 +8,9 @@ const paymentController = require('../../../controllers/paymentController');
 // Public routes
 router.get('/', subscriptionController.getSubscriptions);
 
+// Razorpay public key endpoint - public as it only returns a public key
+router.get('/razorpay/key', paymentController.getRazorpayKey);
+
 // Protected routes
 router.use(protect);
 
@@ -25,8 +28,7 @@ router.post('/subscribe', [
 router.put('/cancel', subscriptionController.cancelSubscription);
 router.put('/payment-method', subscriptionController.updatePaymentMethod);
 
-// Razorpay payment routes
-router.get('/razorpay/key', paymentController.getRazorpayKey);
+// Razorpay payment routes (protected)
 router.post('/razorpay/order', [
   check('subscriptionId', 'Subscription ID is required').not().isEmpty(),
   check('billingCycle', 'Billing cycle must be monthly or yearly').isIn(['monthly', 'yearly'])
