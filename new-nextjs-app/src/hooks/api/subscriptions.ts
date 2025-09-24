@@ -39,7 +39,7 @@ export function useRazorpayKey(options?: UseQueryOptions<any, Error, any, readon
         queryKey: queryKeys.razorpayKey,
         queryFn: async () => {
             const res = await api.subscriptions.razorpayKey();
-            return res;
+            return res.data; // expose { key }
         },
         staleTime: 10 * 60 * 1000, // 10 minutes
         ...options,
@@ -50,7 +50,7 @@ export function useCreateRazorpayOrderMutation(options?: UseMutationOptions<any,
     return useMutation({
         mutationFn: async ({ subscriptionId, billingCycle }) => {
             const res = await api.subscriptions.createRazorpayOrder({ subscriptionId, billingCycle });
-            return res;
+            return res.data; // expose { order, subscription }
         },
         ...options,
     });
@@ -62,7 +62,7 @@ export function useVerifyRazorpayPaymentMutation(options?: UseMutationOptions<an
     return useMutation({
         mutationFn: async (paymentData) => {
             const res = await api.subscriptions.verifyRazorpayPayment(paymentData);
-            return res;
+            return res.data; // expose verification result
         },
         onSuccess: () => {
             // Invalidate subscription queries to refresh the data

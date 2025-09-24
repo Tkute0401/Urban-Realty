@@ -9,6 +9,12 @@ const { createRazorpayInstance, verifyRazorpaySignature } = require('../utils/ra
 // @route   GET /api/v1/subscriptions/razorpay/key
 // @access  Private
 exports.getRazorpayKey = asyncHandler(async (req, res) => {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    return res.status(500).json({
+      success: false,
+      message: 'Razorpay is not configured on the server. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.'
+    });
+  }
   res.status(200).json({ success: true, key: process.env.RAZORPAY_KEY_ID });
 });
 
