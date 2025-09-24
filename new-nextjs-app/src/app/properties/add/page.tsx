@@ -75,27 +75,58 @@ interface AddPropertyProps {
 const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialValues, onSubmitEdit }) => {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const { addProperty, loading } = useProperties();
-  const { agents } = useAgents();
-  const { developers } = useDevelopers();
+  const { addProperty, loading } = useProperties() as any;
+  const { agents } = useAgents() as any;
+  const { developers } = useDevelopers() as any;
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     title: '',
     description: '',
+    type: 'House',
+    status: 'For Sale',
     price: '',
-    location: '',
-    propertyType: '',
-    status: 'available',
-    beds: '',
-    baths: '',
-    sqft: '',
-    yearBuilt: '',
-    amenities: [] as string[],
-    images: [] as string[],
-    agent: '',
+    bedrooms: '',
+    bathrooms: '',
+    area: '',
+    buildingName: '',
+    floorNumber: '',
+    featured: false,
     developer: '',
-    latitude: '',
-    longitude: ''
+    agent: '',
+    possessionDate: '',
+    constructionStatus: 'Under Construction',
+    ageOfProperty: '',
+    address: {
+      line1: '',
+      street: '',
+      city: '',
+      locality: '',
+      state: '',
+      zipCode: '',
+      country: 'India'
+    },
+    amenities: [] as string[],
+    highlights: ['', '', '', '', ''],
+    nearbyLocalities: {
+      hasSchool: false,
+      school: '',
+      hasHospital: false,
+      hospital: '',
+      hasMall: false,
+      mall: '',
+      hasPark: false,
+      park: '',
+      hasTransport: false,
+      transport: ''
+    },
+    projectDetails: {
+      projectArea: '',
+      totalUnits: '',
+      launchDate: '',
+      reraId: '',
+      configurations: ''
+    },
+    approvals: [] as Array<{ name: string; number: string; date?: string }>
   });
 
   // Prefill when editing
@@ -105,19 +136,40 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
         ...prev,
         title: initialValues.title ?? prev.title,
         description: initialValues.description ?? prev.description,
+        type: initialValues.type ?? initialValues.propertyType ?? prev.type,
+        status: initialValues.status ?? prev.status,
         price: initialValues.price?.toString?.() ?? prev.price,
-        location: initialValues.location ?? initialValues.address?.locality ?? prev.location,
-        propertyType: initialValues.propertyType ?? initialValues.type ?? prev.propertyType,
-        status: typeof initialValues.status === 'string' ? initialValues.status : prev.status,
-        beds: (initialValues.beds ?? initialValues.bedrooms ?? prev.beds)?.toString?.() ?? prev.beds,
-        baths: (initialValues.baths ?? initialValues.bathrooms ?? prev.baths)?.toString?.() ?? prev.baths,
-        sqft: (initialValues.sqft ?? initialValues.area ?? prev.sqft)?.toString?.() ?? prev.sqft,
-        yearBuilt: initialValues.yearBuilt?.toString?.() ?? prev.yearBuilt,
-        amenities: Array.isArray(initialValues.amenities) ? initialValues.amenities : prev.amenities,
-        agent: initialValues.agent?._id ?? initialValues.agent ?? prev.agent,
+        bedrooms: (initialValues.bedrooms ?? initialValues.beds ?? prev.bedrooms)?.toString?.() ?? prev.bedrooms,
+        bathrooms: (initialValues.bathrooms ?? initialValues.baths ?? prev.bathrooms)?.toString?.() ?? prev.bathrooms,
+        area: (initialValues.area ?? initialValues.sqft ?? prev.area)?.toString?.() ?? prev.area,
+        buildingName: initialValues.buildingName ?? prev.buildingName,
+        floorNumber: initialValues.floorNumber ?? prev.floorNumber,
+        featured: !!initialValues.featured,
         developer: initialValues.developer?._id ?? initialValues.developer ?? prev.developer,
-        latitude: (initialValues.location?.coordinates?.[1] ?? initialValues.latitude ?? prev.latitude)?.toString?.() ?? prev.latitude,
-        longitude: (initialValues.location?.coordinates?.[0] ?? initialValues.longitude ?? prev.longitude)?.toString?.() ?? prev.longitude,
+        agent: initialValues.agent?._id ?? initialValues.agent ?? prev.agent,
+        possessionDate: initialValues.possessionDate ?? prev.possessionDate,
+        constructionStatus: initialValues.constructionStatus ?? prev.constructionStatus,
+        ageOfProperty: initialValues.ageOfProperty?.toString?.() ?? prev.ageOfProperty,
+        address: {
+          line1: initialValues.address?.line1 ?? prev.address.line1,
+          street: initialValues.address?.street ?? prev.address.street,
+          city: initialValues.address?.city ?? prev.address.city,
+          locality: initialValues.address?.locality ?? prev.address.locality,
+          state: initialValues.address?.state ?? prev.address.state,
+          zipCode: initialValues.address?.zipCode ?? prev.address.zipCode,
+          country: initialValues.address?.country ?? prev.address.country,
+        },
+        amenities: Array.isArray(initialValues.amenities) ? initialValues.amenities : prev.amenities,
+        projectDetails: {
+          projectArea: initialValues.projectDetails?.projectArea ?? prev.projectDetails.projectArea,
+          totalUnits: initialValues.projectDetails?.totalUnits ?? prev.projectDetails.totalUnits,
+          launchDate: initialValues.projectDetails?.launchDate ?? prev.projectDetails.launchDate,
+          reraId: initialValues.projectDetails?.reraId ?? prev.projectDetails.reraId,
+          configurations: initialValues.projectDetails?.configurations ?? prev.projectDetails.configurations,
+        },
+        highlights: Array.isArray(initialValues.highlights) ? initialValues.highlights : prev.highlights,
+        nearbyLocalities: initialValues.nearbyLocalities ?? prev.nearbyLocalities,
+        approvals: Array.isArray(initialValues.approvals) ? initialValues.approvals : prev.approvals,
       }));
     }
   }, [initialValues]);
@@ -125,6 +177,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [floorPlanFiles, setFloorPlanFiles] = useState<File[]>([]);
+  const [floorPlanPreviews, setFloorPlanPreviews] = useState<string[]>([]);
+  const [brochureFile, setBrochureFile] = useState<File | null>(null);
+  const [virtualTourFile, setVirtualTourFile] = useState<File | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<any>(null);
+  const [selectedDeveloper, setSelectedDeveloper] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'warning' | 'info' }>({ 
     open: false, 
@@ -136,30 +194,31 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const propertyTypes = [
-    { value: 'apartment', label: 'Apartment', icon: <Apartment /> },
-    { value: 'house', label: 'House', icon: <Home /> },
-    { value: 'villa', label: 'Villa', icon: <Villa /> },
-    { value: 'cottage', label: 'Cottage', icon: <Cottage /> },
-    { value: 'commercial', label: 'Commercial', icon: <Factory /> },
-    { value: 'land', label: 'Land', icon: <Landscape /> }
+    { value: 'House', label: 'House', icon: <Home /> },
+    { value: 'Apartment', label: 'Apartment', icon: <Apartment /> },
+    { value: 'Villa', label: 'Villa', icon: <Villa /> },
+    { value: 'Condo', label: 'Condo', icon: <Cottage /> },
+    { value: 'Townhouse', label: 'Townhouse', icon: <Home /> },
+    { value: 'Land', label: 'Land', icon: <Landscape /> },
+    { value: 'Commercial', label: 'Commercial', icon: <Factory /> }
   ];
 
   const amenityOptions = [
-    { value: 'parking', label: 'Parking', icon: <LocalParking /> },
-    { value: 'pool', label: 'Pool', icon: <Pool /> },
-    { value: 'gym', label: 'Gym', icon: <FitnessCenter /> },
-    { value: 'security', label: 'Security', icon: <Security /> },
-    { value: 'spa', label: 'Spa', icon: <Spa /> },
-    { value: 'balcony', label: 'Balcony', icon: <Balcony /> },
-    { value: 'wifi', label: 'WiFi', icon: <Wifi /> },
-    { value: 'ac', label: 'Air Conditioning', icon: <AcUnit /> },
-    { value: 'furnished', label: 'Furnished', icon: <Chair /> },
-    { value: 'pets', label: 'Pet Friendly', icon: <Pets /> },
-    { value: 'elevator', label: 'Elevator', icon: <Elevator /> },
-    { value: 'laundry', label: 'Laundry', icon: <LocalLaundryService /> },
-    { value: 'storage', label: 'Storage', icon: <Storage /> },
-    { value: 'meeting', label: 'Meeting Room', icon: <MeetingRoom /> },
-    { value: 'kitchen', label: 'Kitchen', icon: <Kitchen /> }
+    { value: 'Parking', label: 'Parking', icon: <LocalParking /> },
+    { value: 'Swimming Pool', label: 'Swimming Pool', icon: <Pool /> },
+    { value: 'Gym', label: 'Gym', icon: <FitnessCenter /> },
+    { value: 'Security', label: 'Security', icon: <Security /> },
+    { value: 'Garden', label: 'Garden', icon: <Spa /> },
+    { value: 'Balcony', label: 'Balcony', icon: <Balcony /> },
+    { value: 'WiFi', label: 'WiFi', icon: <Wifi /> },
+    { value: 'Air Conditioning', label: 'Air Conditioning', icon: <AcUnit /> },
+    { value: 'Furnished', label: 'Furnished', icon: <Chair /> },
+    { value: 'Pet Friendly', label: 'Pet Friendly', icon: <Pets /> },
+    { value: 'Elevator', label: 'Elevator', icon: <Elevator /> },
+    { value: 'Laundry', label: 'Laundry', icon: <LocalLaundryService /> },
+    { value: 'Storage', label: 'Storage', icon: <Storage /> },
+    { value: 'Conference Room', label: 'Conference Room', icon: <MeetingRoom /> },
+    { value: 'Kitchen', label: 'Kitchen', icon: <Kitchen /> }
   ];
 
   useEffect(() => {
@@ -193,7 +252,7 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
+    const files = Array.from(event.target.files || []).slice(0, 10 - imageFiles.length);
     const newImageFiles = [...imageFiles, ...files];
     const newImagePreviews = [...imagePreviews, ...files.map(file => URL.createObjectURL(file as Blob))];
     
@@ -215,11 +274,15 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (!formData.price) newErrors.price = 'Price is required';
-    if (!formData.location.trim()) newErrors.location = 'Location is required';
-    if (!formData.propertyType) newErrors.propertyType = 'Property type is required';
-    if (!formData.beds) newErrors.beds = 'Number of beds is required';
-    if (!formData.baths) newErrors.baths = 'Number of baths is required';
-    if (!formData.sqft) newErrors.sqft = 'Square footage is required';
+    if (!formData.bedrooms) newErrors.bedrooms = 'Bedrooms count is required';
+    if (!formData.bathrooms) newErrors.bathrooms = 'Bathrooms count is required';
+    if (!formData.area) newErrors.area = 'Area is required';
+    if (!formData.address?.street?.trim()) newErrors.street = 'Street address is required';
+    if (!formData.address?.city?.trim()) newErrors.city = 'City is required';
+    if (!formData.address?.locality?.trim()) newErrors.locality = 'Locality is required';
+    if (!formData.address?.state?.trim()) newErrors.state = 'State is required';
+    if (!formData.address?.zipCode?.trim()) newErrors.zipCode = 'Zip code is required';
+    if (imagePreviews.length === 0) newErrors.images = 'At least one image is required';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -238,22 +301,33 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
     }
 
     try {
-      const propertyData = {
+      const propertyData: any = {
         ...formData,
         price: parseFloat(formData.price),
-        beds: parseInt(formData.beds),
-        baths: parseInt(formData.baths),
-        sqft: parseInt(formData.sqft),
-        yearBuilt: formData.yearBuilt ? parseInt(formData.yearBuilt) : null,
-        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-        longitude: formData.longitude ? parseFloat(formData.longitude) : null
+        bedrooms: parseInt(formData.bedrooms),
+        bathrooms: parseInt(formData.bathrooms),
+        area: parseInt(formData.area),
       };
 
+      if (user?.role === 'admin' && selectedAgent?._id) {
+        propertyData.agent = selectedAgent._id;
+      } else if (user?.id) {
+        propertyData.agent = user.id;
+      }
+
+      if (selectedDeveloper?._id) {
+        propertyData.developer = selectedDeveloper._id;
+      }
+
       if (__editMode && onSubmitEdit) {
+        propertyData.images = imageFiles as any;
+        propertyData.floorPlans = floorPlanFiles as any;
+        if (brochureFile) propertyData.brochure = brochureFile as any;
+        if (virtualTourFile) propertyData.virtualTour = virtualTourFile as any;
         await onSubmitEdit(propertyData);
         setSnackbar({ open: true, message: 'Property updated successfully!', severity: 'success' });
       } else {
-        await addProperty(propertyData, imageFiles);
+        await addProperty(propertyData, imageFiles, { floorPlans: floorPlanFiles, brochure: brochureFile, virtualTour: virtualTourFile });
         setSnackbar({ open: true, message: 'Property added successfully!', severity: 'success' });
       }
       
@@ -279,11 +353,65 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
     <Container maxWidth="lg" sx={{ py: 4, bgcolor: 'var(--color-bg-dark)', minHeight: '100vh' }}>
       <PremiumPaper>
         <Typography variant="h4" component="h1" gutterBottom sx={{ color: 'var(--color-primary)', textAlign: 'center', mb: 4 }}>
-          Add New Property
+          {__editMode ? 'Edit Property' : 'Add New Property'}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={3}>
+            {/* Agent (Admin only) */}
+            {user?.role === 'admin' && (
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                  Assign to Agent
+                </Typography>
+                <Autocomplete
+                  options={agents || []}
+                  getOptionLabel={(option: any) => `${option.name} (${option.email})`}
+                  value={selectedAgent}
+                  onChange={(e, val) => setSelectedAgent(val)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Agent" fullWidth />
+                  )}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  renderOption={(props, option: any) => (
+                    <li {...props} key={option._id}>
+                      <Box display="flex" alignItems="center">
+                        <Avatar src={option.photo} sx={{ width: 24, height: 24, mr: 1 }} />
+                        <Box>
+                          <Typography variant="body1">{option.name}</Typography>
+                          <Typography variant="body2" color="text.secondary">{option.email}</Typography>
+                        </Box>
+                      </Box>
+                    </li>
+                  )}
+                />
+              </Grid>
+            )}
+
+            {/* Developer */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                Developer Information
+              </Typography>
+              <Autocomplete
+                options={developers || []}
+                getOptionLabel={(option: any) => option.name}
+                value={selectedDeveloper}
+                onChange={(e, val) => setSelectedDeveloper(val)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Select Developer" fullWidth />
+                )}
+                renderOption={(props, option: any) => (
+                  <li {...props} key={option._id}>
+                    <Box display="flex" alignItems="center">
+                      {option.logo?.url ? <Avatar src={option.logo.url} sx={{ width: 24, height: 24, mr: 1 }} /> : null}
+                      <Typography>{option.name}</Typography>
+                    </Box>
+                  </li>
+                )}
+              />
+            </Grid>
+
             {/* Basic Information */}
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2 }}>
@@ -318,10 +446,8 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                 fullWidth
                 select
                 label="Property Type"
-                value={formData.propertyType}
-                onChange={(e) => handleChange('propertyType', e.target.value)}
-                error={!!errors.propertyType}
-                helperText={errors.propertyType}
+                value={formData.type}
+                onChange={(e) => handleChange('type', e.target.value)}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
@@ -405,11 +531,36 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Location"
-                value={formData.location}
-                onChange={(e) => handleChange('location', e.target.value)}
-                error={!!errors.location}
-                helperText={errors.location}
+                select
+                label="Status"
+                value={formData.status}
+                onChange={(e) => handleChange('status', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#1a1a1a',
+                    color: 'white',
+                    '& fieldset': { borderColor: '#78CADC' },
+                    '&:hover fieldset': { borderColor: '#78CADC' },
+                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'white' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                }}
+              >
+                <MenuItem value="For Sale">For Sale</MenuItem>
+                <MenuItem value="For Rent">For Rent</MenuItem>
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Bedrooms"
+                type="number"
+                value={formData.bedrooms}
+                onChange={(e) => handleChange('bedrooms', e.target.value)}
+                error={!!errors.bedrooms}
+                helperText={errors.bedrooms}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
@@ -427,61 +578,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
             <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                select
-                label="Status"
-                value={formData.status}
-                onChange={(e) => handleChange('status', e.target.value)}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#1a1a1a',
-                    color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
-                  },
-                  '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
-                }}
-              >
-                <MenuItem value="available">Available</MenuItem>
-                <MenuItem value="sold">Sold</MenuItem>
-                <MenuItem value="rented">Rented</MenuItem>
-                <MenuItem value="pending">Pending</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                label="Bedrooms"
-                type="number"
-                value={formData.beds}
-                onChange={(e) => handleChange('beds', e.target.value)}
-                error={!!errors.beds}
-                helperText={errors.beds}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#1a1a1a',
-                    color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
-                  },
-                  '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
                 label="Bathrooms"
                 type="number"
-                value={formData.baths}
-                onChange={(e) => handleChange('baths', e.target.value)}
-                error={!!errors.baths}
-                helperText={errors.baths}
+                value={formData.bathrooms}
+                onChange={(e) => handleChange('bathrooms', e.target.value)}
+                error={!!errors.bathrooms}
+                helperText={errors.bathrooms}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
@@ -496,15 +598,15 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Square Feet"
+                label="Area (sqft)"
                 type="number"
-                value={formData.sqft}
-                onChange={(e) => handleChange('sqft', e.target.value)}
-                error={!!errors.sqft}
-                helperText={errors.sqft}
+                value={formData.area}
+                onChange={(e) => handleChange('area', e.target.value)}
+                error={!!errors.area}
+                helperText={errors.area}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
@@ -519,13 +621,32 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <TextField
                 fullWidth
-                label="Year Built"
-                type="number"
-                value={formData.yearBuilt}
-                onChange={(e) => handleChange('yearBuilt', e.target.value)}
+                label="Building Name (optional)"
+                value={formData.buildingName}
+                onChange={(e) => handleChange('buildingName', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#1a1a1a',
+                    color: 'white',
+                    '& fieldset': { borderColor: '#78CADC' },
+                    '&:hover fieldset': { borderColor: '#78CADC' },
+                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'white' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="Floor Number (optional)"
+                value={formData.floorNumber}
+                onChange={(e) => handleChange('floorNumber', e.target.value)}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
@@ -632,6 +753,170 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   ))}
                 </Box>
               )}
+            </Grid>
+
+            {/* Address Details */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                Address Details
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField fullWidth label="Apartment/Room Details (optional)" value={formData.address.line1} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, line1: e.target.value } }))} />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField fullWidth label="Street Address" value={formData.address.street} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, street: e.target.value } }))} error={!!errors.street} helperText={errors.street} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField fullWidth label="City" value={formData.address.city} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, city: e.target.value } }))} error={!!errors.city} helperText={errors.city} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField fullWidth label="Locality" value={formData.address.locality} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, locality: e.target.value } }))} error={!!errors.locality} helperText={errors.locality} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField fullWidth label="State" value={formData.address.state} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, state: e.target.value } }))} error={!!errors.state} helperText={errors.state} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField fullWidth label="Zip Code" value={formData.address.zipCode} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, zipCode: e.target.value } }))} error={!!errors.zipCode} helperText={errors.zipCode} />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField fullWidth label="Country" value={formData.address.country} onChange={(e) => setFormData((p:any)=>({ ...p, address: { ...p.address, country: e.target.value } }))} />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* Possession / Age / Construction */}
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth type="date" label="Possession Date" InputLabelProps={{ shrink: true }} value={formData.possessionDate} onChange={(e)=> handleChange('possessionDate', e.target.value)} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth type="number" label="Age of Property (years)" value={formData.ageOfProperty} onChange={(e)=> handleChange('ageOfProperty', e.target.value)} />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField fullWidth select label="Construction Status" value={formData.constructionStatus} onChange={(e)=> handleChange('constructionStatus', e.target.value)}>
+                {['Under Construction','Ready to Move','New Launch','Almost Ready'].map(s => (<MenuItem key={s} value={s}>{s}</MenuItem>))}
+              </TextField>
+            </Grid>
+
+            {/* Highlights */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                Property Highlights
+              </Typography>
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <Box key={idx} mb={2}>
+                  <TextField fullWidth label={`Highlight ${idx + 1}`} value={formData.highlights[idx] || ''} onChange={(e) => {
+                    const next = [...formData.highlights]; next[idx] = e.target.value; setFormData((p:any)=>({ ...p, highlights: next }));
+                  }} />
+                </Box>
+              ))}
+            </Grid>
+
+            {/* Nearby Localities */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                Nearby Localities
+              </Typography>
+              {[
+                { flag: 'hasSchool', field: 'school', label: 'School Nearby', input: 'School Name' },
+                { flag: 'hasHospital', field: 'hospital', label: 'Hospital Nearby', input: 'Hospital Name' },
+                { flag: 'hasMall', field: 'mall', label: 'Shopping Mall Nearby', input: 'Mall Name' },
+                { flag: 'hasPark', field: 'park', label: 'Park Nearby', input: 'Park Name' },
+                { flag: 'hasTransport', field: 'transport', label: 'Public Transport Nearby', input: 'Transport Details' },
+              ].map((cfg) => (
+                <Box key={cfg.flag} mb={2}>
+                  <FormControlLabel control={<Checkbox checked={formData.nearbyLocalities[cfg.flag]} onChange={(e)=> setFormData((p:any)=> ({ ...p, nearbyLocalities: { ...p.nearbyLocalities, [cfg.flag]: e.target.checked, [cfg.field]: e.target.checked ? p.nearbyLocalities[cfg.field] : '' } }))} />} label={cfg.label} />
+                  {formData.nearbyLocalities[cfg.flag] && (
+                    <TextField fullWidth label={cfg.input} value={formData.nearbyLocalities[cfg.field]} onChange={(e)=> setFormData((p:any)=> ({ ...p, nearbyLocalities: { ...p.nearbyLocalities, [cfg.field]: e.target.value } }))} sx={{ mt: 1 }} />
+                  )}
+                </Box>
+              ))}
+            </Grid>
+
+            {/* Project Details */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                Project Details
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}><TextField fullWidth label="Total Project Area (acres)" value={formData.projectDetails.projectArea} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, projectArea: e.target.value } }))} /></Grid>
+                <Grid item xs={12} md={6}><TextField fullWidth label="Total Units in Project" value={formData.projectDetails.totalUnits} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, totalUnits: e.target.value } }))} /></Grid>
+                <Grid item xs={12} md={6}><TextField fullWidth type="date" InputLabelProps={{ shrink: true }} label="Project Launch Date" value={formData.projectDetails.launchDate} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, launchDate: e.target.value } }))} /></Grid>
+                <Grid item xs={12} md={6}><TextField fullWidth label="RERA ID" value={formData.projectDetails.reraId} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, reraId: e.target.value } }))} /></Grid>
+                <Grid item xs={12}><TextField fullWidth label="Available Configurations" helperText="List available configurations (e.g., 1BHK, 2BHK, 3BHK)" value={formData.projectDetails.configurations} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, configurations: e.target.value } }))} /></Grid>
+              </Grid>
+            </Grid>
+
+            {/* Approvals */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                Approvals & Certifications
+              </Typography>
+              {formData.approvals.map((approval: any, index: number) => (
+                <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #78CADC', borderRadius: '8px' }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={4}><TextField fullWidth label="Approval Name" value={approval.name} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], name:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
+                    <Grid item xs={12} md={4}><TextField fullWidth label="Approval Number" value={approval.number} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], number:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
+                    <Grid item xs={12} md={3}><TextField fullWidth type="date" InputLabelProps={{ shrink: true }} label="Approval Date" value={approval.date || ''} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], date:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
+                    <Grid item xs={12} md={1}><IconButton onClick={()=>{ const next=[...formData.approvals]; next.splice(index,1); setFormData((p:any)=>({...p, approvals: next})); }} sx={{ color: '#ff6b6b' }}><Remove /></IconButton></Grid>
+                  </Grid>
+                </Box>
+              ))}
+              <Button variant="outlined" startIcon={<Add />} onClick={()=> setFormData((p:any)=> ({ ...p, approvals: [...p.approvals, { name:'', number:'', date:'' }] }))} sx={{ color: '#78CADC', borderColor: '#78CADC' }}>Add Approval</Button>
+            </Grid>
+
+            {/* Floor Plans */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Floor Plans</Typography>
+              <Box sx={{ border: '2px dashed #78CADC', borderRadius: 2, p: 3, textAlign: 'center', cursor: 'pointer', '&:hover': { borderColor: '#6bb6c7' } }} onClick={() => document.getElementById('floorPlanInput')?.click()}>
+                <CloudUpload sx={{ fontSize: 48, color: '#78CADC', mb: 2 }} />
+                <Typography variant="body1" sx={{ color: '#78CADC', mb: 1 }}>Upload floor plans</Typography>
+                <input id="floorPlanInput" type="file" multiple accept="image/*" onChange={(e:any)=>{
+                  const files = Array.from(e.target.files || []).slice(0, 5 - floorPlanFiles.length) as File[];
+                  setFloorPlanFiles(prev => [...prev, ...files]);
+                  setFloorPlanPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+                }} style={{ display: 'none' }} />
+              </Box>
+              {floorPlanPreviews.length > 0 && (
+                <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+                  {floorPlanPreviews.map((preview, index) => (
+                    <Box key={index} position="relative">
+                      <img src={preview} alt={`Floor ${index+1}`} style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, border: '2px solid #78CADC' }} />
+                      <IconButton size="small" onClick={()=>{ setFloorPlanPreviews(prev => prev.filter((_,i)=> i!==index)); setFloorPlanFiles(prev => prev.filter((_,i)=> i!==index)); }} sx={{ position: 'absolute', top: -8, right: -8, bgcolor: '#ff6b6b', color: 'white' }}><Close fontSize="small" /></IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Grid>
+
+            {/* Brochure */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Property Brochure</Typography>
+              <Button variant="contained" component="label" startIcon={<CloudUpload />} sx={{ bgcolor: '#78CADC', color: '#0B1011' }}>
+                Upload Brochure
+                <input type="file" hidden accept=".pdf,.doc,.docx" onChange={(e:any)=> setBrochureFile(e.target.files?.[0] || null)} />
+              </Button>
+              {brochureFile ? (
+                <Box mt={2} display="flex" alignItems="center" justifyContent="space-between" p={1} sx={{ border: '1px solid #78CADC', borderRadius: '4px' }}>
+                  <Typography variant="body2" sx={{ color: '#fff' }}>{brochureFile.name}</Typography>
+                  <IconButton size="small" onClick={()=> setBrochureFile(null)} sx={{ color: '#ff6b6b' }}><Delete fontSize="small" /></IconButton>
+                </Box>
+              ) : null}
+            </Grid>
+
+            {/* Virtual Tour */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Virtual Tour</Typography>
+              <Button variant="contained" component="label" startIcon={<CloudUpload />} sx={{ bgcolor: '#78CADC', color: '#0B1011' }}>
+                Upload Virtual Tour
+                <input type="file" hidden accept="video/*" onChange={(e:any)=> setVirtualTourFile(e.target.files?.[0] || null)} />
+              </Button>
+              {virtualTourFile ? (
+                <Box mt={2} display="flex" alignItems="center" justifyContent="space-between" p={1} sx={{ border: '1px solid #78CADC', borderRadius: '4px' }}>
+                  <Typography variant="body2" sx={{ color: '#fff' }}>{virtualTourFile.name}</Typography>
+                  <IconButton size="small" onClick={()=> setVirtualTourFile(null)} sx={{ color: '#ff6b6b' }}><Delete fontSize="small" /></IconButton>
+                </Box>
+              ) : null}
             </Grid>
 
             {/* Submit Button */}
