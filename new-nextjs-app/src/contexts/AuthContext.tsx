@@ -29,6 +29,7 @@ export type AuthContextValue = {
   user: AuthUser | null;
   loading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   register: (payload: { name: string; email: string; password: string; mobile?: string; favorites?: any; occupation?: string; recentlyViewed?: any }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -341,20 +342,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(prev => ({ ...(prev as AuthUser), ...(updatedUser as Partial<AuthUser>) }));
   }, []);
 
+  const isAuthenticated = useMemo(() => !!user && !!sessionManager.getToken(), [user]);
+
   const value: AuthContextValue = useMemo(() => ({
     user,
     loading,
     error,
+    isAuthenticated,
     login,
     register,
     logout,
     clearError,
     updateUser,
-  }), [user, loading, error, login, register, logout, clearError, updateUser]);
+  }), [user, loading, error, isAuthenticated, login, register, logout, clearError, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

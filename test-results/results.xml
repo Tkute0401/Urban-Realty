@@ -1,0 +1,476 @@
+<testsuites id="" name="" tests="12" failures="11" skipped="0" errors="0" time="69.83140300000001">
+<testsuite name="agent-add-property-access.spec.js" timestamp="2025-09-24T16:27:11.008Z" hostname="chromium" tests="4" failures="4" skipped="0" time="140.275" errors="0">
+<testcase name="Agent Add Property Access › agent should access add-property page via direct URL without login redirect" classname="agent-add-property-access.spec.js" time="37.236">
+<failure message="agent-add-property-access.spec.js:6:3 agent should access add-property page via direct URL without login redirect" type="FAILURE">
+<![CDATA[  [chromium] › agent-add-property-access.spec.js:6:3 › Agent Add Property Access › agent should access add-property page via direct URL without login redirect 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('form')
+    Expected: visible
+    Received: <element(s) not found>
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('form')
+
+
+      15 |     
+      16 |     // Wait for login form to be visible
+    > 17 |     await expect(page.locator('form')).toBeVisible();
+         |                                        ^
+      18 |     
+      19 |     // Fill in agent credentials (using typical agent test credentials)
+      20 |     await page.fill('input[type="email"], input[name="email"]', 'agent@test.com');
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:17:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--32ee7--URL-without-login-redirect-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--32ee7--URL-without-login-redirect-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--32ee7--URL-without-login-redirect-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--32ee7--URL-without-login-redirect-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--32ee7--URL-without-login-redirect-chromium\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--32ee7--URL-without-login-redirect-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Agent Add Property Access › regular user should be redirected from add-property page" classname="agent-add-property-access.spec.js" time="34.377">
+<failure message="agent-add-property-access.spec.js:67:3 regular user should be redirected from add-property page" type="FAILURE">
+<![CDATA[  [chromium] › agent-add-property-access.spec.js:67:3 › Agent Add Property Access › regular user should be redirected from add-property page 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:5173/login", waiting until "load"
+
+
+      70 |     
+      71 |     // Navigate to login page
+    > 72 |     await page.goto('http://localhost:5173/login');
+         |                ^
+      73 |     
+      74 |     // Wait for login form
+      75 |     await expect(page.locator('form')).toBeVisible();
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:72:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-chromium\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Agent Add Property Access › unauthenticated user should be redirected to login from add-property page" classname="agent-add-property-access.spec.js" time="34.333">
+<failure message="agent-add-property-access.spec.js:98:3 unauthenticated user should be redirected to login from add-property page" type="FAILURE">
+<![CDATA[  [chromium] › agent-add-property-access.spec.js:98:3 › Agent Add Property Access › unauthenticated user should be redirected to login from add-property page 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:5173/add-property", waiting until "load"
+
+
+      102 |     
+      103 |     // Try to access add-property page directly without authentication
+    > 104 |     await page.goto('http://localhost:5173/add-property');
+          |                ^
+      105 |     
+      106 |     // Should be redirected to login page
+      107 |     await expect(page).toHaveURL(/.*\/login/);
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:104:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--bef2e-ogin-from-add-property-page-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--bef2e-ogin-from-add-property-page-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--bef2e-ogin-from-add-property-page-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--bef2e-ogin-from-add-property-page-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--bef2e-ogin-from-add-property-page-chromium\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--bef2e-ogin-from-add-property-page-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Agent Add Property Access › admin should access add-property page via direct URL" classname="agent-add-property-access.spec.js" time="34.329">
+<failure message="agent-add-property-access.spec.js:116:3 admin should access add-property page via direct URL" type="FAILURE">
+<![CDATA[  [chromium] › agent-add-property-access.spec.js:116:3 › Agent Add Property Access › admin should access add-property page via direct URL 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:5173/login", waiting until "load"
+
+
+      119 |     
+      120 |     // Navigate to login page
+    > 121 |     await page.goto('http://localhost:5173/login');
+          |                ^
+      122 |     
+      123 |     // Wait for login form
+      124 |     await expect(page.locator('form')).toBeVisible();
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:121:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-chromium\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="agent-add-property-access.spec.js" timestamp="2025-09-24T16:27:11.008Z" hostname="firefox" tests="4" failures="4" skipped="0" time="131.786" errors="0">
+<testcase name="Agent Add Property Access › agent should access add-property page via direct URL without login redirect" classname="agent-add-property-access.spec.js" time="30.061">
+<failure message="agent-add-property-access.spec.js:6:3 agent should access add-property page via direct URL without login redirect" type="FAILURE">
+<![CDATA[  [firefox] › agent-add-property-access.spec.js:6:3 › Agent Add Property Access › agent should access add-property page via direct URL without login redirect 
+
+    Test timeout of 30000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 30000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Agent Add Property Access › regular user should be redirected from add-property page" classname="agent-add-property-access.spec.js" time="40.498">
+<failure message="agent-add-property-access.spec.js:67:3 regular user should be redirected from add-property page" type="FAILURE">
+<![CDATA[  [firefox] › agent-add-property-access.spec.js:67:3 › Agent Add Property Access › regular user should be redirected from add-property page 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:5173/", waiting until "load"
+
+
+      67 |   test('regular user should be redirected from add-property page', async ({ page }) => {
+      68 |     // Navigate to home page first
+    > 69 |     await page.goto('http://localhost:5173');
+         |                ^
+      70 |     
+      71 |     // Navigate to login page
+      72 |     await page.goto('http://localhost:5173/login');
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:69:16
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-firefox\video.webm]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Agent Add Property Access › unauthenticated user should be redirected to login from add-property page" classname="agent-add-property-access.spec.js" time="30.731">
+<failure message="agent-add-property-access.spec.js:98:3 unauthenticated user should be redirected to login from add-property page" type="FAILURE">
+<![CDATA[  [firefox] › agent-add-property-access.spec.js:98:3 › Agent Add Property Access › unauthenticated user should be redirected to login from add-property page 
+
+    Test timeout of 30000ms exceeded while setting up "page".
+
+    Error: browserContext.newPage: Test timeout of 30000ms exceeded.
+]]>
+</failure>
+</testcase>
+<testcase name="Agent Add Property Access › admin should access add-property page via direct URL" classname="agent-add-property-access.spec.js" time="30.496">
+<failure message="agent-add-property-access.spec.js:116:3 admin should access add-property page via direct URL" type="FAILURE">
+<![CDATA[  [firefox] › agent-add-property-access.spec.js:116:3 › Agent Add Property Access › admin should access add-property page via direct URL 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")')
+        - locator resolved to <button tabindex="0" type="submit" class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButton-colorPrimary MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButton-colorPrimary MuiButton-fullWidth css-1t8a1ad-MuiButtonBase-root-MuiButton-root">…</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <p class="tagline">Redefining real estate experiences</p> from <div id="splash-screen">…</div> subtree intercepts pointer events
+        - retrying click action
+        - waiting 20ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - <h1 class="shuffle-text">URBAN R?(%=%&&=_</h1> from <div id="splash-screen">…</div> subtree intercepts pointer events
+      2 × retrying click action
+          - waiting 100ms
+          - waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <div class="background-pattern"></div> from <div id="splash-screen">…</div> subtree intercepts pointer events
+      - retrying click action
+        - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - <p class="tagline">Redefining real estate experiences</p> from <div id="splash-screen">…</div> subtree intercepts pointer events
+      - retrying click action
+        - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - <h1 class="shuffle-text">URBAN REALTY 360</h1> from <div id="splash-screen">…</div> subtree intercepts pointer events
+      - retrying click action
+        - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - <div class="header-container">…</div> from <header class="header">…</header> subtree intercepts pointer events
+      - retrying click action
+        - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+
+
+      129 |     
+      130 |     // Submit login
+    > 131 |     await page.click('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")');
+          |                ^
+      132 |     
+      133 |     // Wait for admin redirect
+      134 |     await page.waitForTimeout(3000);
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:131:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-firefox\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-firefox\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-firefox\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-firefox\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-firefox\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-firefox\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="agent-add-property-access.spec.js" timestamp="2025-09-24T16:27:11.008Z" hostname="webkit" tests="4" failures="3" skipped="0" time="107.242" errors="0">
+<testcase name="Agent Add Property Access › agent should access add-property page via direct URL without login redirect" classname="agent-add-property-access.spec.js" time="35.979">
+<failure message="agent-add-property-access.spec.js:6:3 agent should access add-property page via direct URL without login redirect" type="FAILURE">
+<![CDATA[  [webkit] › agent-add-property-access.spec.js:6:3 › Agent Add Property Access › agent should access add-property page via direct URL without login redirect 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('form')
+    Expected: visible
+    Received: <element(s) not found>
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('form')
+
+
+      15 |     
+      16 |     // Wait for login form to be visible
+    > 17 |     await expect(page.locator('form')).toBeVisible();
+         |                                        ^
+      18 |     
+      19 |     // Fill in agent credentials (using typical agent test credentials)
+      20 |     await page.fill('input[type="email"], input[name="email"]', 'agent@test.com');
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:17:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--32ee7--URL-without-login-redirect-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--32ee7--URL-without-login-redirect-webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--32ee7--URL-without-login-redirect-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--32ee7--URL-without-login-redirect-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--32ee7--URL-without-login-redirect-webkit\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--32ee7--URL-without-login-redirect-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Agent Add Property Access › regular user should be redirected from add-property page" classname="agent-add-property-access.spec.js" time="35.795">
+<failure message="agent-add-property-access.spec.js:67:3 regular user should be redirected from add-property page" type="FAILURE">
+<![CDATA[  [webkit] › agent-add-property-access.spec.js:67:3 › Agent Add Property Access › regular user should be redirected from add-property page 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('form')
+    Expected: visible
+    Received: <element(s) not found>
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('form')
+
+
+      73 |     
+      74 |     // Wait for login form
+    > 75 |     await expect(page.locator('form')).toBeVisible();
+         |                                        ^
+      76 |     
+      77 |     // Login as regular user (non-agent)
+      78 |     await page.fill('input[type="email"], input[name="email"]', 'user@test.com');
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:75:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--27cf3-cted-from-add-property-page-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-webkit\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--27cf3-cted-from-add-property-page-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Agent Add Property Access › unauthenticated user should be redirected to login from add-property page" classname="agent-add-property-access.spec.js" time="4.718">
+</testcase>
+<testcase name="Agent Add Property Access › admin should access add-property page via direct URL" classname="agent-add-property-access.spec.js" time="30.75">
+<failure message="agent-add-property-access.spec.js:116:3 admin should access add-property page via direct URL" type="FAILURE">
+<![CDATA[  [webkit] › agent-add-property-access.spec.js:116:3 › Agent Add Property Access › admin should access add-property page via direct URL 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")')
+        - locator resolved to <button tabindex="0" type="submit" class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButton-colorPrimary MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButton-colorPrimary MuiButton-fullWidth css-1t8a1ad-MuiButtonBase-root-MuiButton-root">…</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+        - retrying click action
+          - waiting 100ms
+        34 × waiting for element to be visible, enabled and stable
+           - element is visible, enabled and stable
+           - scrolling into view if needed
+           - done scrolling
+           - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+         - retrying click action
+           - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+
+
+      129 |     
+      130 |     // Submit login
+    > 131 |     await page.click('button[type="submit"], button:has-text("Login"), button:has-text("Sign In")');
+          |                ^
+      132 |     
+      133 |     // Wait for admin redirect
+      134 |     await page.waitForTimeout(3000);
+        at C:\Users\Kutet\New folder\urban-realty\tests\e2e\agent-add-property-access.spec.js:131:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\agent-add-property-access--e9fe9-roperty-page-via-direct-URL-webkit\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-webkit\test-failed-1.png]]
+
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-webkit\video.webm]]
+
+[[ATTACHMENT|agent-add-property-access--e9fe9-roperty-page-via-direct-URL-webkit\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

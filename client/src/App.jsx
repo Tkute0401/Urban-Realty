@@ -134,10 +134,14 @@ function App() {
                     <Route path="settings" element={<AgentSettings />} />
                   </Route>
                 </Route>
-                {/* Protected Routes */}
-                <Route element={<ProtectedRoute />}>
+                {/* Protected Routes for agents and property management */}
+                <Route element={<ProtectedRoute allowedRoles={['agent', 'admin']} />}>
                   <Route path="/properties/:id/edit" element={<EditProperty />} />
                   <Route path="/add-property" element={<AddProperty />} />
+                </Route>
+                
+                {/* General authenticated routes */}
+                <Route element={<ProtectedRoute />}>
                   <Route path="/profile" element={<Profile />} />
                 </Route>
               </Routes>

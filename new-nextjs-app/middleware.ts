@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
   const isAdminPath = pathname.startsWith('/admin')
   const isAgentPath = pathname.startsWith('/agent')
   const isSubscriptionPath = pathname.startsWith('/subscriptions')
+  const isAddPropertyPath = pathname === '/add-property' || pathname.startsWith('/properties/add')
 
   // Helper: redirect to login with return path
   const redirectToLogin = () => {
@@ -39,6 +40,13 @@ export function middleware(request: NextRequest) {
 
   // Agent guard (allow admin as well)
   if (isAgentPath) {
+    if (!token) return redirectToLogin()
+    if (role !== 'agent' && role !== 'admin') return NextResponse.redirect(new URL('/', origin))
+    return createResponse(NextResponse.next())
+  }
+
+  // Add Property guard (agents and admins only)
+  if (isAddPropertyPath) {
     if (!token) return redirectToLogin()
     if (role !== 'agent' && role !== 'admin') return NextResponse.redirect(new URL('/', origin))
     return createResponse(NextResponse.next())

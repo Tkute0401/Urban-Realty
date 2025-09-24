@@ -1,0 +1,267 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Logo" [ref=e6]:
+          - /url: /
+          - img "Logo" [ref=e7]
+        - navigation [ref=e8]:
+          - link "Browse" [ref=e9]:
+            - /url: /properties
+            - img [ref=e10]
+            - generic [ref=e11]: Browse
+          - link "Plans" [ref=e12]:
+            - /url: /subscriptions
+            - img [ref=e13]
+            - generic [ref=e17]: Plans
+          - link "Login" [ref=e18]:
+            - /url: /login
+            - img [ref=e19]
+            - generic [ref=e22]: Login
+          - link "Register" [ref=e23]:
+            - /url: /register
+            - img [ref=e24]
+            - generic [ref=e27]: Register
+    - generic [ref=e28]:
+      - navigation "breadcrumb" [ref=e30]:
+        - list [ref=e31]:
+          - listitem [ref=e32]:
+            - link "Home" [ref=e33]:
+              - /url: /
+          - listitem [ref=e34]: /
+          - listitem [ref=e35]:
+            - paragraph [ref=e36]: Login
+      - generic [ref=e38]:
+        - heading "Login" [level=1] [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - text: Email Address
+              - generic [ref=e44]: "*"
+            - generic [ref=e45]:
+              - textbox "Email Address" [ref=e46]: admin@test.com
+              - group:
+                - generic: Email Address *
+          - generic [ref=e47]:
+            - generic [ref=e48]:
+              - text: Password
+              - generic [ref=e49]: "*"
+            - generic [ref=e50]:
+              - textbox "Password" [active] [ref=e51]: admin123
+              - group:
+                - generic: Password *
+          - button "Login" [ref=e52] [cursor=pointer]:
+            - img [ref=e54] [cursor=pointer]
+            - text: Login
+    - contentinfo [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - heading "Popular Cities" [level=3] [ref=e60]
+            - list [ref=e61]:
+              - listitem [ref=e62]:
+                - link "Nashik Real Estate" [ref=e63]:
+                  - /url: /properties?city=Nashik
+              - listitem [ref=e64]:
+                - link "Delhi Real Estate" [ref=e65]:
+                  - /url: /properties?city=Delhi
+              - listitem [ref=e66]:
+                - link "Mumbai Real Estate" [ref=e67]:
+                  - /url: /properties?city=Mumbai
+              - listitem [ref=e68]:
+                - link "Pune Real Estate" [ref=e69]:
+                  - /url: /properties?city=Pune
+              - listitem [ref=e70]:
+                - link "Bangalore Real Estate" [ref=e71]:
+                  - /url: /properties?city=Bangalore
+              - listitem [ref=e72]:
+                - link "New York Real Estate" [ref=e73]:
+                  - /url: /properties?city=New York
+              - listitem [ref=e74]:
+                - link "Los Angeles Real Estate" [ref=e75]:
+                  - /url: /properties?city=Los Angeles
+              - listitem [ref=e76]:
+                - link "Chicago Real Estate" [ref=e77]:
+                  - /url: /properties?city=Chicago
+              - listitem [ref=e78]:
+                - link "Houston Real Estate" [ref=e79]:
+                  - /url: /properties?city=Houston
+              - listitem [ref=e80]:
+                - link "Phoenix Real Estate" [ref=e81]:
+                  - /url: /properties?city=Phoenix
+              - listitem [ref=e82]:
+                - link "Philadelphia Real Estate" [ref=e83]:
+                  - /url: /properties?city=Philadelphia
+          - generic [ref=e84]:
+            - heading "Resources" [level=3] [ref=e85]
+            - list [ref=e86]:
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem [ref=e87]:
+                - link "Help Center" [ref=e88]:
+                  - /url: /help
+              - listitem [ref=e89]:
+                - link "Privacy Policy" [ref=e90]:
+                  - /url: /privacy-policy
+              - listitem [ref=e91]:
+                - link "Terms & Conditions" [ref=e92]:
+                  - /url: /terms
+              - listitem [ref=e93]:
+                - link "Developers" [ref=e94]:
+                  - /url: /developers
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+          - generic [ref=e95]:
+            - heading "About" [level=3] [ref=e96]
+            - list [ref=e97]:
+              - listitem [ref=e98]:
+                - link "About Us" [ref=e99]:
+                  - /url: /about
+              - listitem [ref=e100]:
+                - link "Career" [ref=e101]:
+                  - /url: /career
+              - listitem [ref=e102]:
+                - link "Contact Us" [ref=e103]:
+                  - /url: /contact
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem [ref=e104]:
+                - link "Trust & Safety" [ref=e105]:
+                  - /url: /trust
+              - listitem [ref=e106]:
+                - link "How We Work" [ref=e107]:
+                  - /url: /how-we-work
+          - generic [ref=e108]:
+            - heading "Services" [level=3] [ref=e109]
+            - list [ref=e110]:
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem [ref=e111]:
+                - link "Loan Calculator" [ref=e112]:
+                  - /url: /emi-calculator
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem:
+                - link:
+                  - /url: /login
+              - listitem [ref=e113]:
+                - link "Interior Design" [ref=e114]:
+                  - /url: /interior-design
+              - listitem [ref=e115]:
+                - link "Lawyer Consultancy" [ref=e116]:
+                  - /url: /lawyer-consultancy
+              - listitem [ref=e117]:
+                - link "Packers and Movers" [ref=e118]:
+                  - /url: /packers-and-movers
+        - generic [ref=e119]:
+          - heading "Our Partners" [level=3] [ref=e120]
+          - list [ref=e121]:
+            - listitem [ref=e122]:
+              - link "Digital Supremacy" [ref=e123]:
+                - /url: https://digitalsupremacy.in/
+            - listitem [ref=e124]:
+              - link "FireFist Solutions" [ref=e125]:
+                - /url: https://firefist.co.in/
+            - listitem [ref=e126]:
+              - link "CodeHub India" [ref=e127]:
+                - /url: https://www.codehubindia.in/
+        - generic [ref=e129]:
+          - heading "Connect with Us" [level=3] [ref=e130]
+          - generic [ref=e131]:
+            - link [ref=e132]:
+              - /url: https://www.facebook.com/share/16U1BQ69Un/?mibextid=wwXIfr
+              - img [ref=e133]
+            - link [ref=e135]:
+              - /url: https://www.instagram.com/urbanrealty360?igsh=cmUyOXdweDd2ZjVr
+              - img [ref=e136]
+            - link [ref=e138]:
+              - /url: https://www.linkedin.com/company/uraban-realty-360
+              - img [ref=e139]
+        - generic [ref=e142]:
+          - generic [ref=e143]:
+            - img "Logo" [ref=e144]
+            - generic [ref=e145]: SQUAREFOOT
+          - generic [ref=e146]:
+            - paragraph [ref=e147]: © 2025 SQUAREFOOT, Inc. All rights reserved.
+            - paragraph [ref=e148]: SQUAREFOOT® is a registered trademark of SQUAREFOOT, Inc.
+    - generic [ref=e149]:
+      - img [ref=e151]
+      - button "Open Tanstack query devtools" [ref=e219] [cursor=pointer]:
+        - img [ref=e220] [cursor=pointer]
+  - generic [ref=e290]:
+    - generic [ref=e291]:
+      - generic [ref=e292]: "[plugin:vite:import-analysis]"
+      - generic [ref=e293]: Failed to resolve import "../../components/home/ServiceBlock" from "src/pages/Home/Home.jsx". Does the file exist?
+    - generic [ref=e294]:
+      - text: "C:"
+      - generic [ref=e295] [cursor=pointer]: /Users/Kutet/New folder/urban-realty/client/src/pages/Home/Home.jsx:5:25
+    - generic [ref=e296]: "19 | import PropertiesSection from \"../../components/home/PropertiesSection\"; 20 | import OwnerServiceBlock from \"../../components/home/OwnerServiceBox\"; 21 | import ServiceBlock from \"../../components/home/ServiceBlock\"; | ^ 22 | import Reviews from \"../../components/common/footer/Reviews\"; 23 | import { Button } from \"@mui/material\";"
+    - generic [ref=e297]:
+      - text: "at TransformPluginContext._formatLog (file:"
+      - generic [ref=e298] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:42499:41
+      - text: ") at TransformPluginContext.error (file:"
+      - generic [ref=e299] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:42496:16
+      - text: ") at normalizeUrl (file:"
+      - generic [ref=e300] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:40475:23
+      - text: ) at process.processTicksAndRejections (node:internal
+      - generic [ref=e301] [cursor=pointer]: /process/task_queues:105:5
+      - text: ") at async file:"
+      - generic [ref=e302] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:40594:37
+      - text: "at async Promise.all (index 7) at async TransformPluginContext.transform (file:"
+      - generic [ref=e303] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:40521:7
+      - text: ") at async EnvironmentPluginContainer.transform (file:"
+      - generic [ref=e304] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:42294:18
+      - text: ") at async loadAndTransform (file:"
+      - generic [ref=e305] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:35735:27
+      - text: ") at async viteTransformMiddleware (file:"
+      - generic [ref=e306] [cursor=pointer]: ///C:/Users/Kutet/New%20folder/urban-realty/client/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:37250:24
+    - generic [ref=e307]:
+      - text: Click outside, press
+      - generic [ref=e308]: Esc
+      - text: key, or fix the code to dismiss.
+      - text: You can also disable this overlay by setting
+      - code [ref=e309]: server.hmr.overlay
+      - text: to
+      - code [ref=e310]: "false"
+      - text: in
+      - code [ref=e311]: vite.config.js
+      - text: .
+```
