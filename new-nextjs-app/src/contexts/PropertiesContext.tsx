@@ -60,6 +60,12 @@ interface PropertiesContextType {
   setFeaturedProperties: (properties: Property[]) => void;
   setProperty: (property: Property | null) => void;
   clearError: () => void;
+  // New alias with richer signature matching client app usage
+  addProperty?: (
+    data: Record<string, any>, 
+    images?: File[], 
+    extras?: { floorPlans?: File[]; brochure?: File | null; virtualTour?: File | null }
+  ) => Promise<any>;
 }
 
 const defaultContextValue: PropertiesContextType = {
@@ -328,6 +334,54 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     }
   }, []);
 
+  // Aliased helper to match client app API: addProperty(data, imageFiles, extras)
+  const addProperty = useCallback(async (
+    data: Record<string, any>, 
+    images: File[] = [], 
+    extras: { floorPlans?: File[]; brochure?: File | null; virtualTour?: File | null } = {}
+  ) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Normalize nested structures to strings where necessary (server expects FormData + JSON strings for objects)
+      const normalized: Record<string, any> = { ...data };
+      if (normalized.address && typeof normalized.address !== 'string') normalized.address = JSON.stringify(normalized.address);
+      if (normalized.nearbyLocalities && typeof normalized.nearbyLocalities !== 'string') normalized.nearbyLocalities = JSON.stringify(normalized.nearbyLocalities);
+      if (normalized.projectDetails && typeof normalized.projectDetails !== 'string') normalized.projectDetails = JSON.stringify(normalized.projectDetails);
+      if (normalized.approvals && typeof normalized.approvals !== 'string') normalized.approvals = JSON.stringify(normalized.approvals);
+
+      const formDataToSend = new FormData();
+      Object.entries(normalized).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(item => formDataToSend.append(`${key}[]`, item as any));
+        } else if (value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (value !== null && value !== undefined) {
+          formDataToSend.append(key, String(value));
+        }
+      });
+
+      // Append images and optional assets using keys aligned with client app
+      images?.forEach(file => formDataToSend.append('images', file));
+      extras.floorPlans?.forEach(file => formDataToSend.append('floorPlans', file));
+      if (extras.brochure) formDataToSend.append('brochure', extras.brochure);
+      if (extras.virtualTour) formDataToSend.append('virtualTour', extras.virtualTour);
+
+      const response = await http.post('/properties', formDataToSend, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const newProperty = response.data?.data ?? response.data;
+      setProperties(prev => [...prev, newProperty]);
+      setCache({});
+      return newProperty;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to create property';
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const updateProperty = useCallback(async (id, formData) => {
     try {
       setLoading(true);
@@ -356,7 +410,17 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (Array.isArray(value)) {
-          value.forEach(item => formDataToSend.append(`${key}[]`, item));
+          // Special handling for existingImages parity with client app
+          if (key === 'existingImages') {
+            (value as any[]).forEach((item: any) => {
+              const payload = typeof item === 'string' ? item : JSON.stringify(item);
+              formDataToSend.append('existingImages', payload);
+            });
+          } else if (key === 'images' || key === 'floorPlans') {
+            (value as any[]).forEach((item: any) => formDataToSend.append(key, item));
+          } else {
+            (value as any[]).forEach((item: any) => formDataToSend.append(`${key}[]`, item));
+          }
         } else if (value instanceof File) {
           formDataToSend.append(key, value);
         } else if (value !== null && value !== undefined) {
