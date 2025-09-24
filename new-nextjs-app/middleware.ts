@@ -23,7 +23,8 @@ export function middleware(request: NextRequest) {
   const createResponse = (response: NextResponse) => {
     // Add payment-specific headers for subscription pages
     if (isSubscriptionPath) {
-      response.headers.set('Permissions-Policy', 'payment=*, otp-credentials=*')
+      // Remove unsupported otp-credentials directive to avoid console warnings
+      response.headers.set('Permissions-Policy', 'payment=(self)')
       response.headers.set('X-Frame-Options', 'SAMEORIGIN')
     }
     return response
