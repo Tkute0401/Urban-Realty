@@ -102,12 +102,16 @@ const PropertyDetails = () => {
     try {
       // Ensure id is a string (handle case where it might be an array)
       const propertyId = Array.isArray(id) ? id[0] : id;
-      // Use toggle endpoint and update state from response
-      const res = await api.auth.addFavorite(propertyId as string);
+      const res = await api.auth.toggleFavorite(propertyId as string, !isFavorite);
       const toggled = Boolean((res as any)?.data?.isFavorite ?? !isFavorite);
       setIsFavorite(toggled);
     } catch (err) {
       console.error('Error toggling favorite:', err);
+      try {
+        const propertyId = Array.isArray(id) ? id[0] : id;
+        const status = await api.auth.favoriteStatus(propertyId as string);
+        setIsFavorite(Boolean((status as any)?.data?.isFavorite));
+      } catch (_) {}
     }
   };
 
