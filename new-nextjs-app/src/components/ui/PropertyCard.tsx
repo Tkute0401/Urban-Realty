@@ -152,9 +152,9 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
 
     setLoadingFavorite(true);
     try {
-      // Use the toggle favorite endpoint which handles both add and remove
-      const response = await api.auth.addFavorite(property._id);
-      const newFavoriteStatus = Boolean(response.data?.isFavorite);
+      const response = await api.auth.toggleFavorite(property._id, !isFavorite);
+      // Prefer server-provided state, fallback to local toggle
+      const newFavoriteStatus = Boolean(response.data?.isFavorite ?? !isFavorite);
       
       setIsFavorite(newFavoriteStatus);
       onFavoriteToggle?.(property, newFavoriteStatus);
@@ -164,6 +164,11 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
       toast.success(message);
     } catch (err: any) {
       console.error('Error updating favorite:', err);
+      try {
+        const status = await api.auth.favoriteStatus(property._id);
+        const serverState = Boolean(status.data?.isFavorite);
+        setIsFavorite(serverState);
+      } catch (_) {}
       toast.error(err?.message || 'Failed to update favorites');
     } finally {
       setLoadingFavorite(false);

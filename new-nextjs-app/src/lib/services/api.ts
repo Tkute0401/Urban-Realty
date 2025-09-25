@@ -30,10 +30,33 @@ export const api = {
                 register: (payload: { name: string; email: string; password: string }) => unwrap<{ user: any }>(http.post("/auth/register", payload)),
                 profile: () => unwrap<any>(http.get("/auth/me")),
                 // Favorites
-                favoritesList: () => unwrap<any[]>(http.get("/auth/favorites")),
-                addFavorite: (propertyId: string) => unwrap<any>(http.put(`/auth/favorites/${propertyId}`, {})),
-                removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/auth/favorites/${propertyId}`)),
-                favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/auth/favorites/${propertyId}/status`)), 
+				favoritesList: () => unwrap<any[]>(http.get("/auth/favorites")),
+				addFavorite: (propertyId: string) => unwrap<any>(http.put(`/auth/favorites/${propertyId}`, {})),
+				removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/auth/favorites/${propertyId}`)),
+				favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/auth/favorites/${propertyId}/status`)), 
+				/**
+				 * Toggle favorite state safely. If desiredState is provided, it enforces that state.
+				 * If not provided, it tries PUT first and on 400 falls back to DELETE.
+				 */
+				toggleFavorite: async (propertyId: string, desiredState?: boolean) => {
+					try {
+						if (desiredState === true) {
+							return await api.auth.addFavorite(propertyId);
+						}
+						if (desiredState === false) {
+							return await api.auth.removeFavorite(propertyId);
+						}
+						// Unknown state: attempt PUT as default, then fallback to DELETE on 400
+						const res = await api.auth.addFavorite(propertyId);
+						return res;
+					} catch (err: any) {
+						// If server returns 400 for duplicate add, try DELETE as fallback
+						if (err?.statusCode === 400 || err?.options?.statusCode === 400) {
+							return await api.auth.removeFavorite(propertyId);
+						}
+						throw err;
+					}
+				},
                 // Recently viewed
                 recentlyViewedList: () => unwrap<any[]>(http.get("/auth/recently-viewed")),
                 addRecentlyViewed: (propertyId: string) => unwrap<any>(http.post(`/auth/recently-viewed/${propertyId}`, {})),
