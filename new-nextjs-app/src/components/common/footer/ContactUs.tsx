@@ -36,7 +36,7 @@ const ContactUs = () => {
   };
 
   return (
-    <section className="bg-[#08171A] min-h-screen text-white">
+    <section className="bg-[color:var(--color-surface)] min-h-screen text-white">
       {/* Header Section */}
       <div className="relative h-96 overflow-hidden">
         <div className="absolute inset-0 bg-black/40 z-10 flex items-center justify-center">
@@ -47,10 +47,10 @@ const ContactUs = () => {
             className="text-center px-4"
           >
             <h1 className="font-poppins text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
-              Get In <span className="text-[#78cadc]">Touch</span>
+              Get In <span className="text-[var(--color-primary)]">Touch</span>
             </h1>
             <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-              We're here to help you with all your real estate needs. Reach out to our team for personalized assistance.
+              We&apos;re here to help you with all your real estate needs. Reach out to our team for personalized assistance.
             </p>
           </motion.div>
         </div>
@@ -65,10 +65,10 @@ const ContactUs = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         <motion.div
           whileHover={{ y: -10 }}
-          className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+          className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
         >
-          <div className="bg-[#78cadc] w-14 h-14 rounded-full flex items-center justify-center mb-6">
-            <PhoneIcon className="w-6 h-6 text-[#08171A]" />
+          <div className="bg-[color:var(--color-primary)] w-14 h-14 rounded-full flex items-center justify-center mb-6">
+            <PhoneIcon className="w-6 h-6 text-[var(--color-bg-dark)]" />
           </div>
           <h3 className="font-poppins text-xl font-bold mb-3">Phone</h3>
           <p className="text-gray-400 mb-2">Main Office</p>
@@ -79,10 +79,10 @@ const ContactUs = () => {
 
         <motion.div
           whileHover={{ y: -10 }}
-          className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+          className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
         >
-          <div className="bg-[#78cadc] w-14 h-14 rounded-full flex items-center justify-center mb-6">
-            <EnvelopeIcon className="w-6 h-6 text-[#08171A]" />
+          <div className="bg-[color:var(--color-primary)] w-14 h-14 rounded-full flex items-center justify-center mb-6">
+            <EnvelopeIcon className="w-6 h-6 text-[var(--color-bg-dark)]" />
           </div>
           <h3 className="font-poppins text-xl font-bold mb-3">Email</h3>
           <p className="text-gray-400 mb-2">General Inquiries</p>
@@ -93,10 +93,10 @@ const ContactUs = () => {
 
         <motion.div
           whileHover={{ y: -10 }}
-          className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+          className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
         >
-          <div className="bg-[#78cadc] w-14 h-14 rounded-full flex items-center justify-center mb-6">
-            <MapPinIcon className="w-6 h-6 text-[#08171A]" />
+          <div className="bg-[color:var(--color-primary)] w-14 h-14 rounded-full flex items-center justify-center mb-6">
+            <MapPinIcon className="w-6 h-6 text-[var(--color-bg-dark)]" />
           </div>
           <h3 className="font-poppins text-xl font-bold mb-3">Office</h3>
           <p className="text-lg mb-6">Anupama Apt., Pandit Colony, <br/>
@@ -116,7 +116,7 @@ const ContactUs = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="bg-[#0c2327] p-8 sm:p-12 rounded-xl border border-[#78cadc]/20"
+          className="bg-[color:var(--color-surface-elevated)] p-8 sm:p-12 rounded-xl border border-[color:var(--color-primary)]/20"
         >
           <h2 className="font-poppins text-3xl font-bold mb-2">Send Us a Message</h2>
           <p className="text-gray-400 mb-8">We typically respond within 24 hours</p>
@@ -128,7 +128,7 @@ const ContactUs = () => {
                 type="text"
                 id="name"
                 {...register("name")}
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
+                className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
                 placeholder="Your name"
                 aria-invalid={!!errors.name}
               />
@@ -142,7 +142,7 @@ const ContactUs = () => {
                 type="email"
                 id="email"
                 {...register("email")}
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
+                className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
                 placeholder="your.email@example.com"
                 aria-invalid={!!errors.email}
               />
@@ -156,7 +156,7 @@ const ContactUs = () => {
                 type="text"
                 id="subject"
                 {...register("subject")}
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
+                className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
                 placeholder="How can we help?"
                 aria-invalid={!!errors.subject}
               />
@@ -170,7 +170,7 @@ const ContactUs = () => {
                 id="message"
                 rows="5"
                 {...register("message")}
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
+                className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
                 placeholder="Your message here..."
                 aria-invalid={!!errors.message}
               ></textarea>
@@ -182,7 +182,7 @@ const ContactUs = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[#78cadc] hover:bg-[#8DD9E5] disabled:opacity-60 disabled:cursor-not-allowed text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+                className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:opacity-60 disabled:cursor-not-allowed text-[var(--color-bg-dark)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
               </button>

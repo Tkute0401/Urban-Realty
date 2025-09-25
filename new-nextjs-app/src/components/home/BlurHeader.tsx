@@ -55,13 +55,13 @@ const BlurHeader = () => {
             <nav className="hidden xl:flex gap-8 xl:gap-10">
               {navigation.map((item) => (
                 <div key={item.name} className="relative group">
-                  <button className="flex items-center gap-1 font-poppins text-base xl:text-lg font-medium text-white hover:text-[#78cadc] transition-colors duration-300">
+                  <button className="flex items-center gap-1 font-poppins text-base xl:text-lg font-medium text-white hover:text-[var(--color-primary)] transition-colors duration-300">
                     {item.name}
                     <ChevronDownIcon className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
                   </button>
 
                   <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                    <div className="bg-[#08171A]/95 backdrop-blur-lg rounded-xl shadow-2xl border border-white/10 overflow-hidden">
+                    <div className="bg-[color:var(--color-surface)]/95 backdrop-blur-lg rounded-xl shadow-2xl border border-white/10 overflow-hidden">
                       {item.items.map((subItem) => (
                         <a
                           key={subItem}
@@ -78,8 +78,8 @@ const BlurHeader = () => {
             </nav>
 
             <div className="flex items-center gap-3 sm:gap-4">
-              <button className="hidden xl:flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-[#78cadc]/10 hover:border-[#78cadc] transition-colors duration-300 group">
-                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:text-[#78cadc] transition-colors" />
+              <button className="hidden xl:flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-white bg-transparent border border-white hover:bg-[var(--color-primary)]/10 hover:border-[var(--color-primary)] transition-colors duration-300 group">
+                <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:text-[var(--color-primary)] transition-colors" />
                 <span className="font-poppins font-semibold text-sm sm:text-base">ACCOUNT</span>
               </button>
 
@@ -106,20 +106,20 @@ const BlurHeader = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-20 sm:top-24 left-4 right-4 z-40 bg-[#08171A]/95 backdrop-blur-lg rounded-2xl border border-[#78cadc]/30 shadow-xl xl:hidden"
+            className="fixed top-20 sm:top-24 left-4 right-4 z-40 bg-[var(--color-bg-dark)]/95 backdrop-blur-lg rounded-2xl border border-[var(--color-primary)]/30 shadow-xl xl:hidden"
           >
             <div className="flex flex-col p-4 sm:p-5">
               {navigation.map((item) => (
                 <div key={item.name} className="mb-2 last:mb-0">
                   <button
                     onClick={() => toggleMobileDropdown(item.name)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-white hover:bg-[#78cadc]/10 rounded-lg transition-colors duration-200"
+                    className="w-full flex items-center justify-between px-4 py-3 text-white hover:bg-[var(--color-primary)]/10 rounded-lg transition-colors duration-200"
                   >
                     <span className="font-poppins text-lg sm:text-xl font-medium">{item.name}</span>
                     {mobileActiveDropdown === item.name ? (
-                      <ChevronUpIcon className="w-5 h-5 text-[#78cadc]" />
+                      <ChevronUpIcon className="w-5 h-5 text-[var(--color-primary)]" />
                     ) : (
-                      <ChevronDownIcon className="w-5 h-5 text-[#78cadc]" />
+                      <ChevronDownIcon className="w-5 h-5 text-[var(--color-primary)]" />
                     )}
                   </button>
 
@@ -137,7 +137,7 @@ const BlurHeader = () => {
                             <a
                               key={subItem}
                               href="#"
-                              className="block px-4 py-2 text-white/80 hover:text-white hover:bg-[#78cadc]/10 rounded-lg transition-colors duration-200"
+                              className="block px-4 py-2 text-white/80 hover:text-white hover:bg-[var(--color-primary)]/10 rounded-lg transition-colors duration-200"
                             >
                               {subItem}
                             </a>
@@ -149,9 +149,9 @@ const BlurHeader = () => {
                 </div>
               ))}
               <button 
-                className="xl:hidden flex items-center justify-center gap-2 px-4 py-3 mt-2 rounded-lg text-white bg-[#78cadc]/10 border border-[#78cadc]/30 hover:bg-[#78cadc]/20 transition-colors"
+                className="xl:hidden flex items-center justify-center gap-2 px-4 py-3 mt-2 rounded-lg text-white bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/20 transition-colors"
               >
-                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#78cadc]" />
+                <UserIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
                 <span className="font-poppins font-semibold">ACCOUNT</span>
               </button>
             </div>

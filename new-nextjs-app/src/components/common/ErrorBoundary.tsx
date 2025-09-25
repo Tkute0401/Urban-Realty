@@ -112,7 +112,7 @@ const ErrorFallback = ({ error, errorInfo, resetError }) => {
         alignItems: 'center',
         justifyContent: 'center',
         p: 3,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        background: 'var(--chart-gradient-1)'
       }}
     >
       <Card sx={{ maxWidth: 600, width: '100%' }}>
@@ -175,7 +175,7 @@ const ErrorFallback = ({ error, errorInfo, resetError }) => {
               startIcon={<RefreshIcon />}
               onClick={handleReset}
               sx={{ 
-                background: 'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',
+                background: 'var(--chart-gradient-1)',
                 '&:hover': { transform: 'translateY(-2px)' }
               }}
             >

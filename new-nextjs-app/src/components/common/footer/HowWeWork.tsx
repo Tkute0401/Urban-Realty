@@ -12,7 +12,7 @@ const HowWeWork = () => {
     {
       step: "01",
       title: "Discovery",
-      icon: <LightBulbIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <LightBulbIcon className="w-8 h-8 text-[var(--color-primary)]" />,
       description: "We begin by deeply understanding your unique needs, preferences, and goals through comprehensive consultations and advanced matching algorithms.",
       features: [
         "Needs assessment questionnaire",
@@ -101,7 +101,7 @@ const HowWeWork = () => {
           className="relative z-20 text-center px-4"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-poppins">
-            How We <span className="text-[#78cadc]">Work</span>
+            How We <span className="text-[var(--color-primary)]">Work</span>
           </h1>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
             A transparent look at our client-focused process that delivers exceptional results
@@ -118,7 +118,7 @@ const HowWeWork = () => {
           className="mb-16 text-center"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-            Our <span className="text-[#78cadc]">Process</span>
+            Our <span className="text-[var(--color-primary)]">Process</span>
           </h2>
           <p className="text-gray-400 max-w-4xl mx-auto text-lg">
             SQUAREFOOT has reimagined the real estate experience with a streamlined, technology-enhanced approach 
@@ -139,8 +139,8 @@ const HowWeWork = () => {
             >
               <div className="lg:w-1/4">
                 <div className="flex items-center">
-                  <span className="text-4xl font-bold text-[#78cadc] mr-4">{step.step}</span>
-                  <div className="bg-[#78cadc] p-3 rounded-lg">
+                  <span className="text-4xl font-bold text-[var(--color-primary)] mr-4">{step.step}</span>
+                  <div className="bg-[var(--color-primary)] p-3 rounded-lg">
                     {step.icon}
                   </div>
                 </div>
@@ -170,7 +170,7 @@ const HowWeWork = () => {
             className="mb-12 text-center"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-              What Makes Us <span className="text-[#78cadc]">Different</span>
+              What Makes Us <span className="text-[var(--color-primary)]">Different</span>
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -193,15 +193,15 @@ const HowWeWork = () => {
 
         {/* CTA Section */}
         <div className="relative rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#78cadc] to-[#8DD9E5] opacity-90"></div>
-          <div className="relative z-10 p-8 sm:p-12 text-[#08171A] text-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-light)] opacity-90"></div>
+          <div className="relative z-10 p-8 sm:p-12 text-[var(--color-bg-dark)] text-center">
             <h3 className="text-2xl sm:text-3xl font-bold mb-6">
               Ready to Experience the SQUAREFOOT Difference?
             </h3>
             <p className="mb-8 max-w-2xl mx-auto">
-              Whether you're buying, selling, or investing, our proven process delivers better results with less stress.
+              Whether you&apos;re buying, selling, or investing, our proven process delivers better results with less stress.
             </p>
-            <button className="bg-[#08171A] hover:bg-[#0c2327] text-[#78cadc] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+            <button className="bg-[var(--color-bg-dark)] hover:bg-[#0c2327] text-[var(--color-primary)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
               Get Started Today
             </button>
           </div>

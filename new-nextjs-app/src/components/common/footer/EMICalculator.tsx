@@ -489,8 +489,8 @@ const unitData = {
         {/* Login Prompt Modal */}
         {showLoginPrompt && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#0c2227] border border-[#78CADC] rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold text-[#78CADC] mb-4">Login Required</h3>
+            <div className="bg-[#0c2227] border border-[color:var(--color-primary)] rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold text-[var(--color-primary)] mb-4">Login Required</h3>
               <p className="text-gray-300 mb-6">
                 Please login to calculate EMI with your custom values and view detailed charts.
               </p>      
@@ -502,7 +502,7 @@ const unitData = {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 bg-[#08171A] border border-[#78CADC]/30 rounded-md text-white placeholder-gray-400 focus:border-[#78CADC] focus:outline-none"
+                    className="w-full p-3 bg-[#08171A] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
                     required
                   />
                 </div>
@@ -512,7 +512,7 @@ const unitData = {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 bg-[#08171A] border border-[#78CADC]/30 rounded-md text-white placeholder-gray-400 focus:border-[#78CADC] focus:outline-none"
+                    className="w-full p-3 bg-[#08171A] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
                     required
                   />
                 </div>
@@ -528,13 +528,13 @@ const unitData = {
                       setShowLoginPrompt(false);
                       setLoginError('');
                     }}
-                    className="px-4 py-2 border border-[#78CADC] text-[#78CADC] rounded-lg hover:bg-[#78CADC]/10"
+                    className="px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary)]/10"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#78CADC] text-[#08171A] font-semibold rounded-lg hover:bg-[#78CADC]/90"
+                    className="px-4 py-2 bg-[color:var(--color-primary)] text-[#08171A] font-semibold rounded-lg hover:bg-[color:var(--color-primary)]/90"
                   >
                     Login
                   </button>
@@ -543,10 +543,10 @@ const unitData = {
 
               <div className="mt-4 text-center">
                 <p className="text-gray-400 text-sm">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <button 
                     onClick={() => router.push('/register')}
-                    className="text-[#78CADC] hover:underline"
+                    className="text-[color:var(--color-primary)] hover:underline"
                   >
                     Register
                   </button>
@@ -558,9 +558,9 @@ const unitData = {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Panel - Calculator (always visible) */}
-          <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-6">
+          <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-[#78CADC] mb-2">EMI Calculator</h2>
+              <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-2">EMI Calculator</h2>
             </div>
 
             {/* Loan Amount */}
@@ -570,7 +570,7 @@ const unitData = {
                 type="number"
                 value={loanAmount}
                 onChange={(e) => setLoanAmount(parseInt(e.target.value) || 0)}
-                className="w-full p-3 bg-[#0c2227] border border-[#78CADC]/30 rounded-md text-white placeholder-gray-400 focus:border-[#78CADC] focus:outline-none"
+                className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
                 placeholder="Enter loan amount"
               />
               <div className="text-xs text-gray-400 mt-1 italic">
@@ -584,18 +584,18 @@ const unitData = {
                 <label className="block text-gray-300 text-sm mb-2">Loan Tenure</label>
                 <div className="relative">
                   <div 
-                    className="w-full p-3 bg-[#0c2227] border border-[#78CADC]/30 rounded-md text-white placeholder-gray-400 focus:border-[#78CADC] focus:outline-none cursor-pointer flex justify-between items-center"
+                    className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none cursor-pointer flex justify-between items-center"
                     onClick={() => setShowTenureDropdown(!showTenureDropdown)}
                   >
                     <span>{loanTenure} yrs</span>
                     <ExpandMoreIcon className={`w-5 h-5 text-gray-400 transition-transform ${showTenureDropdown ? 'transform rotate-180' : ''}`} />
                   </div>
                   {showTenureDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[#78CADC]/30 rounded-md shadow-lg">
+                    <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md shadow-lg">
                       {tenureOptions.map((option) => (
                         <div
                           key={option}
-                          className="px-4 py-2 text-white hover:bg-[#78CADC]/10 cursor-pointer"
+                          className="px-4 py-2 text-white hover:bg-[color:var(--color-primary)]/10 cursor-pointer"
                           onClick={() => {
                             setLoanTenure(option);
                             setShowTenureDropdown(false);
@@ -615,7 +615,7 @@ const unitData = {
                   step="0.01"
                   value={interestRate}
                   onChange={(e) => setInterestRate(parseFloat(e.target.value) || 0)}
-                  className="w-full p-3 bg-[#0c2227] border border-[#78CADC]/30 rounded-md text-white placeholder-gray-400 focus:border-[#78CADC] focus:outline-none"
+                  className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
                   placeholder="8.15"
                 />
               </div>
@@ -624,7 +624,7 @@ const unitData = {
             {/* Calculate Button */}
             <button 
               onClick={handleCalculate}
-              className="w-full bg-[#78CADC] hover:bg-[#78CADC]/90 text-[#08171A] font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="w-full bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/90 text-[#08171A] font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               Calculate EMI
             </button>
@@ -638,7 +638,7 @@ const unitData = {
                 className="absolute inset-0 bg-black bg-opacity-30 z-10 flex items-center justify-center cursor-pointer"
                 onClick={() => setShowLoginPrompt(true)}
               >
-                <div className="text-[#78CADC] font-semibold text-lg">
+                <div className="text-[color:var(--color-primary)] font-semibold text-lg">
                   Login to view custom calculations
                 </div>
               </div>
@@ -646,18 +646,18 @@ const unitData = {
 
             {/* Default message for non-logged users */}
             {!user && !hasCalculatedWithChanges && (
-              <div className="bg-[#08171A] border border-[#78CADC]/50 rounded-lg p-4 mb-4">
-                <p className="text-[#78CADC] text-sm text-center">
+              <div className="bg-[#08171A] border border-[color:var(--color-primary)]/50 rounded-lg p-4 mb-4">
+                <p className="text-[color:var(--color-primary)] text-sm text-center">
                   Showing default calculation. Login to calculate with your custom values.
                 </p>
               </div>
             )}
 
             {/* EMI Result - Always show (either default or calculated) */}
-            <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-6">
+            <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
               <div className="text-center mb-6">
                 <p className="text-gray-300 text-lg mb-2">Your Monthly EMI Amount</p>
-                <p className="text-3xl font-bold text-[#78CADC]">{formatCurrency(displayValues.emi)}</p>
+                <p className="text-3xl font-bold text-[color:var(--color-primary)]">{formatCurrency(displayValues.emi)}</p>
               </div>
 
               {/* Donut Chart */}
@@ -677,7 +677,7 @@ const unitData = {
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="#78CADC"
+                      stroke="var(--color-primary)"
                       strokeWidth="8"
                       strokeDasharray={`${(displayValues.principalPercentage / 100) * 251.33} 251.33`}
                       strokeLinecap="round"
@@ -709,7 +709,7 @@ const unitData = {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-[#78CADC] rounded-sm mr-3"></div>
+                    <div className="w-4 h-4 bg-[color:var(--color-primary)] rounded-sm mr-3"></div>
                     <span className="text-gray-300">Principal Amount</span>
                   </div>
                   <span className="font-semibold text-white">{formatIndianNumber(displayValues.loanAmount)}</span>
@@ -725,13 +725,13 @@ const unitData = {
             </div>
 
             {/* Loan Summary */}
-            <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-[#78CADC] mb-4">Loan Summary</h3>
+            <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-[color:var(--color-primary)] mb-4">Loan Summary</h3>
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-[#0c2227] rounded-lg">
                   <span className="text-gray-300">Monthly EMI</span>
-                  <span className="font-semibold text-[#78CADC]">{formatCurrency(displayValues.emi)}</span>
+                  <span className="font-semibold text-[color:var(--color-primary)]">{formatCurrency(displayValues.emi)}</span>
                 </div>
                 
                 <div className="flex justify-between items-center p-3 bg-[#0c2227] rounded-lg">
@@ -754,13 +754,13 @@ const unitData = {
             {/* Action Buttons */}
             <div className="space-y-3">
               <button 
-                className="w-full bg-[#78CADC] hover:bg-[#78CADC]/90 text-[#08171A] font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="w-full bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/90 text-[#08171A] font-semibold py-3 px-6 rounded-lg transition-colors"
                 disabled={!user}
               >
                 Apply for Loan
               </button>
               <button 
-                className="w-full border border-[#78CADC] text-[#78CADC] hover:bg-[#78CADC]/10 font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="w-full border border-[color:var(--color-primary)] text-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/10 font-semibold py-3 px-6 rounded-lg transition-colors"
                 disabled={!user}
               >
                 Download EMI Schedule
@@ -770,47 +770,47 @@ const unitData = {
         </div>
         {/* Information Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-[#78CADC] mb-4">About Home Loan EMI Calculator</h2>
+          <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">About Home Loan EMI Calculator</h2>
             <p className="text-gray-300 mb-4">
-              Easily plan your home loan with our Home Loan EMI Calculator. Whether you're a first-time homebuyer or refinancing your mortgage, this tool helps you estimate your monthly EMI (Equated Monthly Installment) based on the loan amount, interest rate, and loan tenure. Just enter the values, and the calculator will instantly show your monthly repayment amount, helping you make informed financial decisions and manage your budget effectively.
+              Easily plan your home loan with our Home Loan EMI Calculator. Whether you&apos;re a first-time homebuyer or refinancing your mortgage, this tool helps you estimate your monthly EMI (Equated Monthly Installment) based on the loan amount, interest rate, and loan tenure. Just enter the values, and the calculator will instantly show your monthly repayment amount, helping you make informed financial decisions and manage your budget effectively.
             </p>
             <p className="text-gray-300">
               Our calculator provides a detailed breakdown of your payment schedule, showing the principal and interest components of each EMI, the total interest payable over the loan tenure, and the total amount payable (principal + interest). You can adjust the loan parameters to see how different loan amounts, tenures, or interest rates affect your monthly payments.
             </p>
           </div>
           
-          <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-[#78CADC] mb-4">What is a Home Loan?</h2>
+          <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">What is a Home Loan?</h2>
             <p className="text-gray-300 mb-4">
               A home loan is a sum of money borrowed from a financial institution or bank to purchase or construct a house. The loan is repaid through Equated Monthly Installments (EMIs) over a predetermined period, which typically ranges from 5 to 30 years. The EMI consists of both the principal amount and the interest charged by the lender.
             </p>
             <p className="text-gray-300">
-              Home loans are secured loans, meaning the property being purchased serves as collateral. Interest rates can be fixed or floating, and borrowers may be eligible for tax benefits on both the principal repayment and interest payments under various sections of the Income Tax Act. The loan amount is determined based on factors like the property value, borrower's income, credit score, and existing financial obligations.
+              Home loans are secured loans, meaning the property being purchased serves as collateral. Interest rates can be fixed or floating, and borrowers may be eligible for tax benefits on both the principal repayment and interest payments under various sections of the Income Tax Act. The loan amount is determined based on factors like the property value, borrower&apos;s income, credit score, and existing financial obligations.
             </p>
           </div>
         </div>
       {/* Unit Converter Section */}
-      <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-6 mt-8">
-        <h2 className="text-2xl font-bold text-[#78CADC] mb-4">Area Converter</h2>
+      <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6 mt-8">
+        <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">Area Converter</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {/* From Unit Dropdown */}
           <div className="relative">
             <label className="block text-gray-300 text-sm mb-2">From Unit</label>
             <div 
-              className="w-full p-3 bg-[#0c2227] border border-[#78CADC]/30 rounded-md text-white cursor-pointer flex justify-between items-center"
+              className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white cursor-pointer flex justify-between items-center"
               onClick={() => setShowFromUnitDropdown(!showFromUnitDropdown)}
             >
               <span>{converterState.fromUnit}</span>
               <ExpandMoreIcon className={`w-5 h-5 text-gray-400 transition-transform ${showFromUnitDropdown ? 'transform rotate-180' : ''}`} />
             </div>
             {showFromUnitDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[#78CADC]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
                 {Object.keys(unitData).map((unit) => (
                   <div
                     key={`from-${unit}`}
-                    className="px-4 py-2 text-white hover:bg-[#78CADC]/10 cursor-pointer"
+                    className="px-4 py-2 text-white hover:bg-[color:var(--color-primary)]/10 cursor-pointer"
                     onClick={() => selectFromUnit(unit)}
                   >
                     {unit}
@@ -828,7 +828,7 @@ const unitData = {
               name="fromValue"
               value={converterState.fromValue}
               onChange={handleConverterChange}
-              className="w-full p-3 bg-[#0c2227] border border-[#78CADC]/30 rounded-md text-white focus:border-[#78CADC] focus:outline-none"
+              className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white focus:border-[color:var(--color-primary)] focus:outline-none"
             />
           </div>
           
@@ -836,18 +836,18 @@ const unitData = {
           <div className="relative">
             <label className="block text-gray-300 text-sm mb-2">To Unit</label>
             <div 
-              className="w-full p-3 bg-[#0c2227] border border-[#78CADC]/30 rounded-md text-white cursor-pointer flex justify-between items-center"
+              className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white cursor-pointer flex justify-between items-center"
               onClick={() => setShowToUnitDropdown(!showToUnitDropdown)}
             >
               <span>{converterState.toUnit}</span>
               <ExpandMoreIcon className={`w-5 h-5 text-gray-400 transition-transform ${showToUnitDropdown ? 'transform rotate-180' : ''}`} />
             </div>
             {showToUnitDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[#78CADC]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
                 {Object.keys(unitData).map((unit) => (
                   <div
                     key={`to-${unit}`}
-                    className="px-4 py-2 text-white hover:bg-[#78CADC]/10 cursor-pointer"
+                    className="px-4 py-2 text-white hover:bg-[color:var(--color-primary)]/10 cursor-pointer"
                     onClick={() => selectToUnit(unit)}
                   >
                     {unit}
@@ -868,8 +868,8 @@ const unitData = {
 
         {/* Information Sections */}
         <div className="flex flex-col md:flex-row gap-8 mt-8">
-        <div className="bg-[#08171A] border border-[#78CADC] rounded-lg p-8 md:w-full">
-          <h2 className="text-2xl font-bold text-[#78CADC] mb-4">About {selectedUnitInfo.name}</h2>
+        <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-8 md:w-full">
+          <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">About {selectedUnitInfo.name}</h2>
           <p className="text-gray-300">
             {selectedUnitInfo.description}
           </p>

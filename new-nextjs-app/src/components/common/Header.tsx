@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 import './Header.css';
 
 // Icon components
@@ -58,6 +59,26 @@ const PersonIcon = ({ className = "menu-item-icon" }: { className?: string }) =>
   </svg>
 );
 
+const SunIcon = ({ className = "nav-icon" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="5"></circle>
+    <line x1="12" y1="1" x2="12" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="23"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="1" y1="12" x2="3" y2="12"></line>
+    <line x1="21" y1="12" x2="23" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+);
+
+const MoonIcon = ({ className = "nav-icon" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+);
+
 interface User {
   name: string;
   role: string;
@@ -75,6 +96,7 @@ const Header: React.FC = () => {
     console.log('🔧 Header mounted on client side!');
   }, []);
   const { user, logout } = useAuth() as AuthContextType;
+  const { theme, toggle: toggleTheme } = useContext(ThemeContext);
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -145,6 +167,14 @@ const Header: React.FC = () => {
                   <span>Subscription Plans</span>
                 </Link>
                 
+                <div className="menu-item" onClick={toggleTheme}>
+                  {theme === 'light' ? 
+                    <MoonIcon className="menu-item-icon" /> : 
+                    <SunIcon className="menu-item-icon" />
+                  }
+                  <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                </div>
+                
                 {user?.role === 'agent' && (
                   <Link href="/add-property" className="menu-item" onClick={handleMenuClose}>
                     <AddIcon className="menu-item-icon" />
@@ -200,6 +230,11 @@ const Header: React.FC = () => {
               </svg>
               <span>Plans</span>
             </Link>
+
+            <button onClick={toggleTheme} className="nav-item theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+              {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+              <span className="theme-label">{theme === 'light' ? 'Dark' : 'Light'}</span>
+            </button>
 
             {user?.role === 'agent' && (
               <Link href="/add-property" className="nav-item nav-item-outlined">

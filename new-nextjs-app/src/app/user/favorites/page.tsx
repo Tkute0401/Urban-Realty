@@ -42,10 +42,10 @@ const Favorites = () => {
       minHeight: '100vh',
       py: 4,
       px: 2,
-      backgroundColor: '#0B1011',
-      color: 'white'
+      backgroundColor: 'var(--color-surface)',
+      color: 'var(--color-text)'
     }}>
-      <Typography variant="h3" sx={{ mb: 4, textAlign: 'center', color: '#78CADC' }}>
+      <Typography variant="h3" sx={{ mb: 4, textAlign: 'center', color: 'var(--color-primary)' }}>
         Your Favorite Properties
       </Typography>
       
@@ -55,7 +55,7 @@ const Favorites = () => {
         </Typography>
       ) : favorites.length === 0 ? (
         <Typography variant="h6" sx={{ textAlign: 'center', mt: 4 }}>
-          You haven't saved any properties yet.
+          You haven&apos;t saved any properties yet.
         </Typography>
       ) : (
         <FavoritesGrid items={favorites} onView={handleViewProperty} />

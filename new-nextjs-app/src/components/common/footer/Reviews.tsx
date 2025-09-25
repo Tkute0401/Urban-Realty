@@ -97,7 +97,7 @@ const Reviews = () => {
   };
 
   return (
-    <div className="bg-[#08171A] text-white min-h-screen">
+    <div className="bg-[var(--color-surface)] text-[var(--color-text)] min-h-screen">
       {/* Testimonials Section */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <motion.div 
@@ -107,13 +107,13 @@ const Reviews = () => {
           className="relative z-20 text-center px-2 sm:px-4"
         >
           <div className="flex flex-col sm:flex-row items-center justify-center mb-4">
-            <ChatBubbleLeftRightIcon className="w-8 h-8 sm:w-10 sm:h-10 text-[#78cadc] sm:mr-3 mb-3 sm:mb-0" />
+            <ChatBubbleLeftRightIcon className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--color-primary)] sm:mr-3 mb-3 sm:mb-0" />
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins">
-              Client <span className="text-[#78cadc]">Testimonials</span>
+              Client <span className="text-[var(--color-primary)]">Testimonials</span>
             </h1>
           </div>
-          <p className="text-gray-400 max-w-3xl mx-auto text-sm sm:text-base md:text-lg px-2">
-            We measure our success by the satisfaction of our clients. Here's what some of them have to say about working with us.
+          <p className="text-[var(--color-text-muted)] max-w-3xl mx-auto text-sm sm:text-base md:text-lg px-2">
+            We measure our success by the satisfaction of our clients. Here&apos;s what some of them have to say about working with us.
           </p>
           <br/><br/>
         </motion.div>
@@ -130,28 +130,28 @@ const Reviews = () => {
                 scale: index === currentIndex ? 1 : 0.9
               }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[#0c2327] rounded-xl border border-[#78cadc]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
+              className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[var(--color-bg-dark)] rounded-xl border border-[var(--color-primary)]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
             >
               <div className="w-full md:w-1/3 flex justify-center">
-                <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[#78cadc]/30 mt-2">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[var(--color-primary)]/30 mt-2">
                   <img 
                     src={testimonial.image} 
                     alt={testimonial.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-[#78cadc]/10" />
+                  <div className="absolute inset-0 bg-[var(--color-primary)]/10" />
                 </div>
               </div>
               <div className="w-full md:w-2/3 text-center md:text-left">
                 <div className="flex justify-center md:justify-start mb-3 sm:mb-4">
                   {renderStars(testimonial.rating)}
                 </div>
-                <p className="text-gray-300 italic text-sm sm:text-base md:text-lg mb-4 sm:mb-6">
-                  "{testimonial.content}"
+                <p className="text-[var(--color-text-muted)] italic text-sm sm:text-base md:text-lg mb-4 sm:mb-6">
+                  &quot;{testimonial.content}&quot;
                 </p>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold">{testimonial.name}</h3>
-                  <p className="text-[#78cadc] text-sm sm:text-base">{testimonial.role}</p>
+                  <h3 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">{testimonial.name}</h3>
+                  <p className="text-[var(--color-primary)] text-sm sm:text-base">{testimonial.role}</p>
                 </div>
               </div>
             </motion.div>
@@ -162,9 +162,9 @@ const Reviews = () => {
         <div className="flex justify-center mt-6 sm:mt-8 gap-3 sm:gap-4">
           <button 
             onClick={prevTestimonial}
-            className="p-2 sm:p-3 rounded-full bg-[#0c2327] border border-[#78cadc]/30 hover:bg-[#78cadc]/10 transition-colors"
+            className="p-2 sm:p-3 rounded-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/10 transition-colors"
           >
-            <ArrowLeftIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#78cadc]" />
+            <ArrowLeftIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
           </button>
           <div className="flex items-center gap-1 sm:gap-2">
             {testimonials.map((_, index) => (
@@ -174,15 +174,15 @@ const Reviews = () => {
                   setDirection(index > currentIndex ? 1 : -1);
                   setCurrentIndex(index);
                 }}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors ${index === currentIndex ? 'bg-[#78cadc]' : 'bg-[#78cadc]/30'}`}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors ${index === currentIndex ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-primary)]/30'}`}
               />
             ))}
           </div>
           <button 
             onClick={nextTestimonial}
-            className="p-2 sm:p-3 rounded-full bg-[#0c2327] border border-[#78cadc]/30 hover:bg-[#78cadc]/10 transition-colors"
+            className="p-2 sm:p-3 rounded-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/10 transition-colors"
           >
-            <ArrowRightIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#78cadc]" />
+            <ArrowRightIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
           </button>
         </div>
       </section>
@@ -247,7 +247,7 @@ const Reviews = () => {
             Ready to Share Your Experience?
           </h2>
           <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
-            We'd love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
+            We&apos;d love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
           </p>
           <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
             Write a Review

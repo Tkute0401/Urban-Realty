@@ -29,10 +29,10 @@
 .fs-16 { font-size: 16px; }
 
 /* Color utilities */
-.text-muted { color: #B8C4C8; }
-.text-error { color: #ff6b6b; }
-.text-dark { color: #0B1011; }
-.text-accent { color: #78CADC; }
+.text-muted { color: var(--color-text-muted); }
+.text-error { color: var(--color-error); }
+.text-dark { color: var(--color-text); }
+.text-accent { color: var(--color-primary); }
 
 /* Text style utilities */
 .italic { font-style: italic; }

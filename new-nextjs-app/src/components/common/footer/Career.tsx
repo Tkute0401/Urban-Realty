@@ -42,24 +42,24 @@ const Career = () => {
 
   const perks = [
     {
-      icon: <RocketLaunchIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <RocketLaunchIcon className="w-8 h-8 text-[var(--color-primary)]" />,
       title: "Growth Opportunities",
       description: "Clear career paths with mentorship and training programs"
     },
     {
-      icon: <BuildingOfficeIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <BuildingOfficeIcon className="w-8 h-8 text-[var(--color-primary)]" />,
       title: "Modern Workspaces",
       description: "Beautiful offices designed for collaboration and creativity"
     },
     {
-      icon: <UserGroupIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <UserGroupIcon className="w-8 h-8 text-[var(--color-primary)]" />,
       title: "Diverse Team",
       description: "Work with talented professionals from various backgrounds"
     }
   ];
 
   return (
-    <div className="bg-[#08171A] text-white min-h-screen">
+    <div className="bg-[color:var(--color-surface)] text-white min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/30 z-10" />
@@ -75,23 +75,23 @@ const Career = () => {
           className="relative z-20 text-center px-4"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 font-poppins">
-            Build Your <span className="text-[#78cadc]">Career</span> With Us
+            Build Your <span className="text-[var(--color-primary)]">Career</span> With Us
           </h1>
           <p className="text-xl sm:text-2xl max-w-3xl mx-auto text-gray-300 mb-10">
-            Join a team that's redefining real estate through innovation, integrity, and exceptional service.
+            Join a team that&apos;s redefining real estate through innovation, integrity, and exceptional service.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-4 px-8 rounded-lg transition-colors shadow-lg flex items-center justify-center"
+              className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-bg-dark)] font-bold py-4 px-8 rounded-lg transition-colors shadow-lg flex items-center justify-center"
             >
               Search Jobs <ArrowRightIcon className="w-5 h-5 ml-2" />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-transparent border-2 border-[#78cadc] text-[#78cadc] hover:bg-[#78cadc]/10 font-bold py-4 px-8 rounded-lg transition-colors flex items-center justify-center"
+              className="bg-transparent border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 font-bold py-4 px-8 rounded-lg transition-colors flex items-center justify-center"
             >
               Join Talent Network <ArrowRightIcon className="w-5 h-5 ml-2" />
             </motion.button>
@@ -108,7 +108,7 @@ const Career = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-            Our <span className="text-[#78cadc]">Culture</span>
+            Our <span className="text-[var(--color-primary)]">Culture</span>
           </h2>
           <p className="text-gray-400 max-w-4xl mx-auto text-lg">
             At SQUAREFOOT, we foster an environment where creativity meets professionalism. 
@@ -124,7 +124,7 @@ const Career = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+              className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
             >
               <div className="mb-4">{perk.icon}</div>
               <h3 className="text-xl font-bold mb-3">{perk.title}</h3>
@@ -135,17 +135,17 @@ const Career = () => {
 
         <div className="relative">
           <div className="absolute -inset-4 border-2 border-[#78cadc]/30 rounded-2xl"></div>
-          <div className="relative bg-[#0c2327] p-8 sm:p-12 rounded-xl overflow-hidden">
+          <div className="relative bg-[color:var(--color-surface-elevated)] p-8 sm:p-12 rounded-xl overflow-hidden">
             <div className="absolute inset-0 bg-[url('/team-pattern.png')] opacity-10"></div>
             <div className="relative z-10">
               <h3 className="text-2xl sm:text-3xl font-bold mb-6">
-                We're Building the Future of <span className="text-[#78cadc]">Real Estate</span>
+                We&apos;re Building the Future of <span className="text-[var(--color-primary)]">Real Estate</span>
               </h3>
               <p className="text-gray-400 mb-8 max-w-3xl">
                 Our team combines industry veterans with fresh perspectives to create a dynamic workplace where 
-                everyone's voice matters. We invest in our people through continuous learning and leadership development.
+                everyone&apos;s voice matters. We invest in our people through continuous learning and leadership development.
               </p>
-              <button className="bg-transparent border-2 border-[#78cadc] text-[#78cadc] hover:bg-[#78cadc]/10 font-bold py-3 px-8 rounded-lg transition-colors">
+              <button className="bg-transparent border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 font-bold py-3 px-8 rounded-lg transition-colors">
                 Learn About Our Values
               </button>
             </div>
@@ -154,7 +154,7 @@ const Career = () => {
       </section>
 
       {/* Job Openings */}
-      <section className="py-16 px-4 sm:px-8 bg-[#0c2327]">
+      <section className="py-16 px-4 sm:px-8 bg-[color:var(--color-surface-elevated)]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -163,7 +163,7 @@ const Career = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-poppins">
-              Current <span className="text-[#78cadc]">Openings</span>
+              Current <span className="text-[var(--color-primary)]">Openings</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Explore opportunities to join our growing team across various departments.
@@ -178,12 +178,12 @@ const Career = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-[#08171A] rounded-xl overflow-hidden border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+                className="bg-[color:var(--color-surface)] rounded-xl overflow-hidden border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
               >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-bold">{job.title}</h3>
-                    <span className="bg-[#78cadc]/20 text-[#78cadc] text-sm px-3 py-1 rounded-full">
+                    <span className="bg-[var(--color-primary)]/20 text-[var(--color-primary)] text-sm px-3 py-1 rounded-full">
                       {job.type}
                     </span>
                   </div>
@@ -192,7 +192,7 @@ const Career = () => {
                     {job.department} • {job.location}
                   </div>
                   <p className="text-gray-300 mb-6">{job.description}</p>
-                  <button className="text-[#78cadc] hover:text-[#8DD9E5] font-medium flex items-center transition-colors">
+                  <button className="text-[var(--color-primary)] hover:text-[var(--color-primary-light)] font-medium flex items-center transition-colors">
                     View Details <ArrowRightIcon className="w-4 h-4 ml-2" />
                   </button>
                 </div>
@@ -201,7 +201,7 @@ const Career = () => {
           </div>
 
           <div className="text-center">
-            <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg inline-flex items-center">
+            <button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-[var(--color-bg-dark)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg inline-flex items-center">
               View All Openings <ArrowRightIcon className="w-5 h-5 ml-2" />
             </button>
           </div>
@@ -210,25 +210,25 @@ const Career = () => {
 
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-8 max-w-5xl mx-auto">
-        <div className="bg-gradient-to-r from-[#78cadc] to-[#8DD9E5] rounded-2xl p-8 sm:p-12 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[#08171A]">
+        <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-light)] rounded-2xl p-8 sm:p-12 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[var(--color-bg-dark)]">
             Ready to Start Your Journey With Us?
           </h2>
-          <p className="text-[#08171A]/90 mb-8 max-w-2xl mx-auto">
-            Whether you're an experienced professional or just starting your career, we have opportunities to grow with our team.
+          <p className="text-[var(--color-bg-dark)]/90 mb-8 max-w-2xl mx-auto">
+            Whether you&apos;re an experienced professional or just starting your career, we have opportunities to grow with our team.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-[#08171A] text-[#78cadc] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+              className="bg-[var(--color-bg-dark)] text-[var(--color-primary)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
             >
               Search Jobs
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-transparent border-2 border-[#08171A] text-[#08171A] hover:bg-[#08171A]/10 font-bold py-3 px-8 rounded-lg transition-colors"
+              className="bg-transparent border-2 border-[var(--color-bg-dark)] text-[var(--color-bg-dark)] hover:bg-[var(--color-bg-dark)]/10 font-bold py-3 px-8 rounded-lg transition-colors"
             >
               Join Talent Network
             </motion.button>

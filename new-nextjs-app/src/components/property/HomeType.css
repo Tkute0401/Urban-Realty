@@ -142,15 +142,15 @@
 }
 
 .type-option input[type="checkbox"]:hover {
-  border-color: #78CADC;
+  border-color: var(--color-primary);
   background: linear-gradient(145deg, rgba(120, 202, 220, 0.08) 0%, rgba(120, 202, 220, 0.03) 100%);
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(120, 202, 220, 0.15);
 }
 
 .type-option input[type="checkbox"]:checked {
-  background: linear-gradient(135deg, #78CADC 0%, #6BB8CA 100%);
-  border-color: #78CADC;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  border-color: var(--color-primary);
   box-shadow: 
     0 0 0 2px rgba(120, 202, 220, 0.2),
     0 2px 8px rgba(120, 202, 220, 0.3),

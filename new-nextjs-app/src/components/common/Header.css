@@ -3,12 +3,15 @@
 
 .header {
   width: 100%;
-  background-color: var(--color-primary-contrast);
+  background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 1100;
+  transition: background-color 0.3s ease;
 }
+
+
 
 .header-container {
   display: flex;
@@ -30,17 +33,19 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
   transition: transform 0.3s ease;
 }
+
+
 
 .logo-link:hover {
   transform: translateY(-2px);
 }
 
 .logo-icon {
-  color: #78CADC;
+  color: var(--color-primary);
   font-size: 1.8rem;
 }
 
@@ -48,7 +53,7 @@
   font-weight: 700;
   font-size: 1.5rem;
   letter-spacing: 0.5px;
-  color: white;
+  color: var(--color-text);
 }
 
 /* Navigation */
@@ -63,7 +68,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
   padding: 0.6rem 1.2rem;
   border-radius: 4px;
@@ -73,34 +78,36 @@
   font-size: 0.9rem;
 }
 
+
+
 .nav-item:hover {
-  background-color: rgba(120, 202, 220, 0.1);
+  background-color: var(--color-accent);
   transform: translateY(-2px);
 }
 
 .nav-item-active {
-  background-color: #78CADC;
-  color: #08171A;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
 }
 
 .nav-item-active:hover {
-  background-color: #5cb3c5;
+  background-color: var(--color-primary-hover);
 }
 
 .nav-item-outlined {
-  border: 1px solid #78CADC;
+  border: 1px solid var(--color-primary);
 }
 
 .nav-icon {
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 /* Avatar */
 .user-avatar {
   width: 38px;
   height: 38px;
-  background-color: #78CADC;
-  color: #08171A;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,28 +115,34 @@
   font-weight: 600;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .user-avatar:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(120, 202, 220, 0.4);
+  box-shadow: 0 0 10px var(--color-primary);
 }
 
 /* Mobile menu */
 .menu-button {
-  color: white;
+  color: var(--color-text);
   padding: 0.5rem;
   border-radius: 4px;
   transition: background-color 0.3s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
+
+
 .menu-button:hover {
-  background-color: rgba(120, 202, 220, 0.1);
+  background-color: var(--color-accent);
 }
 
 .mobile-menu {
-  background-color: #0B1011;
-  border: 1px solid #333;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
   min-width: 220px;
@@ -137,29 +150,35 @@
   position: absolute;
   right: 1rem;
   top: 4rem;
+  transition: all 0.3s ease;
 }
+
+
 
 .menu-item {
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: white;
+  color: var(--color-text);
   text-decoration: none;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--color-border);
   transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
+
+
 .menu-item:hover {
-  background-color: rgba(120, 202, 220, 0.1);
+  background-color: var(--color-accent);
 }
 
 .menu-item-icon {
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .menu-logout {
-  color: #ff6b6b;
+  color: var(--color-danger);
 }
 
 /* Button-like nav item without default button styles */
@@ -167,7 +186,59 @@
   border: none;
   cursor: pointer;
   background-color: transparent;
-  color: #ff6b6b;
+  color: var(--color-danger);
+}
+
+/* Theme Toggle Styles */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-primary);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-accent);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px var(--color-primary);
+}
+
+.theme-toggle:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.theme-icon {
+  transition: all 0.3s ease;
+  color: inherit;
+}
+
+.theme-toggle:hover .theme-icon {
+  transform: rotate(15deg);
+}
+
+.theme-label {
+  transition: opacity 0.3s ease;
+}
+
+/* Theme toggle responsive behavior */
+@media (max-width: 1024px) {
+  .theme-label {
+    display: none;
+  }
+  
+  .theme-toggle {
+    padding: 0.6rem;
+    min-width: auto;
+  }
 }
 
 /* Animation Keyframes - from PropertyList.css */

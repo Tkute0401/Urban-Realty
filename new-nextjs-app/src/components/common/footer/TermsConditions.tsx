@@ -315,7 +315,7 @@ const TermsConditions = () => {
           className="mb-16 text-center"
         >
           <p className="text-gray-400 max-w-4xl mx-auto text-lg leading-relaxed">
-            These Terms of Service govern your use of SQUAREFOOT's website, mobile applications, 
+            These Terms of Service govern your use of SQUAREFOOT&apos;s website, mobile applications, 
             and related services. By accessing our platform, you agree to comply with these terms, 
             our Privacy Policy, and all applicable laws and regulations.
           </p>
@@ -364,7 +364,7 @@ const TermsConditions = () => {
               </p>
               <p>
                 Any disputes arising under these Terms shall be resolved through binding arbitration in Wilmington, Delaware, 
-                in accordance with the rules of the American Arbitration Association. The arbitrator's award shall be final and binding.
+                in accordance with the rules of the American Arbitration Association. The arbitrator&apos;s award shall be final and binding.
               </p>
               <p>
                 Notwithstanding the above, we may seek injunctive relief in any court of competent jurisdiction to protect 

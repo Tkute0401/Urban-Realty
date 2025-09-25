@@ -33,7 +33,7 @@ export const api = {
                 favoritesList: () => unwrap<any[]>(http.get("/auth/favorites")),
                 addFavorite: (propertyId: string) => unwrap<any>(http.put(`/auth/favorites/${propertyId}`, {})),
                 removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/auth/favorites/${propertyId}`)),
-                favoriteStatus: (propertyId: string) => unwrap<{ favorited: boolean }>(http.get(`/auth/favorites/${propertyId}/status`)),
+                favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/auth/favorites/${propertyId}/status`)), 
                 // Recently viewed
                 recentlyViewedList: () => unwrap<any[]>(http.get("/auth/recently-viewed")),
                 addRecentlyViewed: (propertyId: string) => unwrap<any>(http.post(`/auth/recently-viewed/${propertyId}`, {})),

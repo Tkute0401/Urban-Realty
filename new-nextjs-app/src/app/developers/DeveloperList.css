@@ -1,9 +1,13 @@
 /* Reuse PropertyList styles with some adjustments */
 .main-container {
-  background-color: #08171A;
-  color: white;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   min-height: 100vh;
   padding-bottom: 40px;
+}
+
+[data-theme="dark"] .main-container {
+  background-color: var(--color-bg-dark);
 }
 
 .Navbar {
@@ -11,15 +15,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 5%;
-  background-color: #0B1011;
-  border-bottom: 1px solid #1a2a32;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .search-container {
   display: flex;
   align-items: center;
-  background-color: #0B1011;
-  border: 1px solid #78CADC;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-primary);
   border-radius: 30px;
   padding: 5px 15px;
   width: 40%;
@@ -29,7 +33,7 @@
 .search-container input {
   background: transparent;
   border: none;
-  color: white;
+  color: var(--color-text);
   width: 100%;
   padding: 8px;
   outline: none;
@@ -38,7 +42,7 @@
 .search-button {
   background: transparent;
   border: none;
-  color: #78CADC;
+  color: var(--color-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -52,9 +56,9 @@
 }
 
 .btn-animate {
-  background-color: #0B1011;
-  color: #78CADC;
-  border: 1px solid #78CADC;
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
   border-radius: 5px;
   padding: 8px 20px;
   cursor: pointer;
@@ -65,14 +69,14 @@
 }
 
 .btn-animate:hover {
-  background-color: #78CADC;
-  color: #0B1011;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   transform: translateY(-2px);
 }
 
 .filter-badge {
-  background-color: #78CADC;
-  color: #0B1011;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -87,11 +91,11 @@
 .breadcrumb {
   padding: 15px 5%;
   font-size: 14px;
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .breadcrumb a {
-  color: #78CADC;
+  color: var(--color-primary);
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -102,7 +106,7 @@
 
 .separator {
   margin: 0 10px;
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .page-title {
@@ -119,12 +123,12 @@
 }
 
 .highlight-words {
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .listings-count {
-  background-color: #78CADC;
-  color: #0B1011;
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
   padding: 5px 15px;
   border-radius: 20px;
   font-weight: bold;
@@ -139,8 +143,8 @@
 }
 
 .filter-tag {
-  background-color: #0B1011;
-  border: 1px solid #78CADC;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-primary);
   border-radius: 20px;
   padding: 5px 10px;
   display: flex;
@@ -150,7 +154,7 @@
 }
 
 .filter-label {
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .filter-tag button {
@@ -165,7 +169,7 @@
 .clear-all-filters {
   background: none;
   border: none;
-  color: #78CADC;
+  color: var(--color-primary);
   cursor: pointer;
   font-size: 12px;
   text-decoration: underline;
@@ -190,7 +194,7 @@
 }
 
 .pagination-count {
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .empty-state {
@@ -205,8 +209,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 15px;
-  background-color: #0B1011;
-  border-bottom: 1px solid #1a2a32;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -223,7 +227,7 @@
   left: 0;
   right: 0;
   padding: 10px;
-  background-color: #0B1011;
+  background-color: var(--color-surface);
   z-index: 101;
 }
 
@@ -240,7 +244,7 @@
   color: white;
   padding: 8px;
   outline: none;
-  border-bottom: 1px solid #78CADC;
+  border-bottom: 1px solid var(--color-primary);
 }
 
 .mobile-search-button {
@@ -249,7 +253,7 @@
   gap: 5px;
   background: transparent;
   border: none;
-  color: #78CADC;
+  color: var(--color-primary);
   padding: 8px;
   font-size: 14px;
 }
@@ -259,10 +263,10 @@
   align-items: center;
   gap: 5px;
   background: transparent;
-  border: 1px solid #78CADC;
+  border: 1px solid var(--color-primary);
   border-radius: 20px;
   padding: 8px 15px;
-  color: #78CADC;
+  color: var(--color-primary);
   font-size: 14px;
 }
 
@@ -277,13 +281,13 @@
   padding: 8px;
   background: transparent;
   border: none;
-  color: #78CADC;
+  color: var(--color-primary);
   font-size: 14px;
   border-bottom: 2px solid transparent;
 }
 
 .mobile-toggle-button.active {
-  border-bottom: 2px solid #78CADC;
+  border-bottom: 2px solid var(--color-primary);
   font-weight: bold;
 }
 
@@ -299,7 +303,7 @@
 .show-more-filters, .show-less-filters {
   background: none;
   border: none;
-  color: #78CADC;
+  color: var(--color-primary);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -352,7 +356,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #1a2a32;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .mobile-drawer-title {
@@ -361,7 +365,7 @@
 }
 
 .close-drawer-btn {
-  color: #78CADC;
+  color: var(--color-primary);
 }
 
 .mobile-drawer-content {
@@ -376,7 +380,7 @@
 
 .mobile-filter-section-title {
   font-size: 14px;
-  color: #78CADC;
+  color: var(--color-primary);
   margin-bottom: 10px;
   font-weight: bold;
 }
@@ -388,11 +392,11 @@
 
 .mobile-filter-input {
   flex: 1;
-  background: #0B1011;
-  border: 1px solid #1a2a32;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px 12px;
-  color: white;
+  color: var(--color-text);
   font-size: 14px;
 }
 
@@ -400,27 +404,27 @@
   display: flex;
   justify-content: space-between;
   padding: 15px;
-  border-top: 1px solid #1a2a32;
+  border-top: 1px solid var(--color-border);
   position: sticky;
   bottom: 0;
-  background-color: #0B1011;
+  background-color: var(--color-surface);
 }
 
 .mobile-clear-filters {
   background: none;
-  border: 1px solid #78CADC;
+  border: 1px solid var(--color-primary);
   border-radius: 20px;
   padding: 10px 15px;
-  color: #78CADC;
+  color: var(--color-primary);
   font-size: 14px;
 }
 
 .mobile-apply-filters {
-  background: #78CADC;
+  background: var(--color-primary);
   border: none;
   border-radius: 20px;
   padding: 10px 20px;
-  color: #0B1011;
+  color: var(--color-primary-contrast);
   font-size: 14px;
   font-weight: bold;
 }
@@ -449,11 +453,11 @@
 
 .desktop-filter-input {
   width: 100%;
-  background: #0B1011;
-  border: 1px solid #1a2a32;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 10px 15px;
-  color: white;
+  color: var(--color-text);
   font-size: 14px;
   margin-bottom: 10px;
 }

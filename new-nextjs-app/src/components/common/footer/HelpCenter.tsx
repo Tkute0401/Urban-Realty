@@ -31,7 +31,7 @@ const HelpCenter = () => {
   // Support options
   const supportOptions = [
     {
-      icon: <DocumentTextIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <DocumentTextIcon className="w-8 h-8 text-[var(--color-primary)]" />,
       title: "Knowledge Base",
       description: "Browse our comprehensive library of articles and guides",
       cta: "Explore Articles"
@@ -139,9 +139,9 @@ const HelpCenter = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex items-center justify-center mb-4">
-            <LifebuoyIcon className="w-10 h-10 text-[#78cadc] mr-3" />
+            <LifebuoyIcon className="w-10 h-10 text-[var(--color-primary)] mr-3" />
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
-              Help <span className="text-[#78cadc]">Center</span>
+              Help <span className="text-[var(--color-primary)]">Center</span>
             </h1>
           </div>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300 mb-8">
@@ -151,10 +151,10 @@ const HelpCenter = () => {
             <input
               type="text"
               placeholder="Search help articles..."
-              className="w-full bg-[#0c2327]/90 border border-[#78cadc]/30 rounded-full px-6 py-4 pr-14 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#78cadc]"
+              className="w-full bg-[#0c2327]/90 border border-[var(--color-primary)]/30 rounded-full px-6 py-4 pr-14 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
-            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[#78cadc] p-2 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#08171A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[var(--color-primary)] p-2 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[var(--color-bg-dark)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
@@ -169,12 +169,12 @@ const HelpCenter = () => {
             <motion.div
               key={index}
               whileHover={{ y: -5 }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+              className="bg-[#0c2327] p-8 rounded-xl border border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/50 transition-all"
             >
               <div className="mb-4">{option.icon}</div>
               <h3 className="text-xl font-bold mb-2">{option.title}</h3>
               <p className="text-gray-400 mb-6">{option.description}</p>
-              <button className="text-[#78cadc] font-semibold hover:text-[#8DD9E5] transition-colors flex items-center">
+              <button className="text-[var(--color-primary)] font-semibold hover:text-[var(--color-primary-hover)] transition-colors flex items-center">
                 {option.cta}
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -187,11 +187,11 @@ const HelpCenter = () => {
         {/* Updated FAQ Section */}
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center font-poppins">
-            Frequently Asked <span className="text-[#78cadc]">Questions</span>
+            Frequently Asked <span className="text-[var(--color-primary)]">Questions</span>
           </h2>
 
           {/* Role Selection */}
-          <div className="mb-8 bg-[#0c2327] p-6 rounded-xl border border-[#78cadc]/20">
+          <div className="mb-8 bg-[#0c2327] p-6 rounded-xl border border-[var(--color-primary)]/20">
             <h3 className="text-xl font-bold mb-4">Select your role to see relevant questions:</h3>
             <div className="flex flex-wrap gap-3">
               {roles.map((role) => (
@@ -201,8 +201,8 @@ const HelpCenter = () => {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg border transition-colors ${
                     selectedRole === role.id
-                      ? 'bg-[#78cadc] text-[#08171A] border-[#78cadc]'
-                      : 'bg-transparent border-[#78cadc]/50 text-[#78cadc] hover:bg-[#78cadc]/10'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg-dark)] border-[var(--color-primary)]'
+                      : 'bg-transparent border-[var(--color-primary)]/50 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
                   }`}
                   onClick={() => setSelectedRole(selectedRole === role.id ? null : role.id)}
                 >
@@ -221,12 +221,12 @@ const HelpCenter = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-[#0c2327] rounded-xl overflow-hidden border border-[#78cadc]/20"
+                className="bg-[#0c2327] rounded-xl overflow-hidden border border-[var(--color-primary)]/20"
               >
                 <details className="group">
                   <summary className="list-none p-6 cursor-pointer flex justify-between items-center">
                     <h3 className="text-lg font-semibold">{faq.question}</h3>
-                    <svg className="w-5 h-5 text-[#78cadc] transform group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 text-[var(--color-primary)] transform group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </summary>
@@ -239,8 +239,8 @@ const HelpCenter = () => {
           </div>
 
           {/* Ask Question Form */}
-          <div className="bg-[#0c2327] p-6 rounded-xl border border-[#78cadc]/20">
-            <h3 className="text-xl font-bold mb-4">Can't find what you're looking for?</h3>
+          <div className="bg-[#0c2327] p-6 rounded-xl border border-[var(--color-primary)]/20">
+            <h3 className="text-xl font-bold mb-4">Can&apos;t find what you&apos;re looking for?</h3>
             <form onSubmit={handleSubmit(handleQuestionSubmit)}>
               <div className="mb-4">
                 <label htmlFor="userQuestion" className="block text-sm font-medium text-gray-300 mb-2">
@@ -250,7 +250,7 @@ const HelpCenter = () => {
                   id="userQuestion"
                   rows="3"
                   {...register("userQuestion")}
-                  className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-3 focus:border-[#78cadc] focus:ring-1 focus:ring-[#78cadc] outline-none transition-all"
+                  className="w-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] outline-none transition-all"
                   placeholder="Type your question here..."
                 ></textarea>
                 {errors.userQuestion && (
@@ -259,7 +259,7 @@ const HelpCenter = () => {
               </div>
               <button
                 type="submit"
-                className="bg-[#78cadc] hover:bg-[#8DD9E5] disabled:opacity-60 disabled:cursor-not-allowed text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+                className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:opacity-60 disabled:cursor-not-allowed text-[var(--color-bg-dark)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Submitting..." : "Submit Question"}
@@ -272,7 +272,7 @@ const HelpCenter = () => {
                 <h4 className="text-lg font-semibold mb-2">Your submitted questions:</h4>
                 <ul className="space-y-2">
                   {submittedQuestions.map((question, index) => (
-                    <li key={index} className="text-gray-300 border-l-2 border-[#78cadc] pl-3 py-1">
+                    <li key={index} className="text-gray-300 border-l-2 border-[var(--color-primary)] pl-3 py-1">
                       {question}
                     </li>
                   ))}
@@ -293,7 +293,7 @@ const HelpCenter = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             {support.map((item, index) => (
               <Link key={index} to={item.path}>
-                <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+                <button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-bg-dark)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
                   {item.label}
                 </button>
               </Link>

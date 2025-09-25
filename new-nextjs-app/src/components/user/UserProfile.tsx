@@ -153,7 +153,7 @@ const UserProfile = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 4, color: '#78CADC' }}>
+      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 4, color: 'var(--color-primary)' }}>
         User Profile
       </Typography>
 
@@ -169,7 +169,7 @@ const UserProfile = () => {
           <Card elevation={3}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <Avatar sx={{ bgcolor: '#78CADC', mr: 2, width: 56, height: 56 }}>
+                <Avatar sx={{ bgcolor: 'var(--color-primary)', mr: 2, width: 56, height: 56 }}>
                   <PersonIcon />
                 </Avatar>
                 <Box>
@@ -230,7 +230,7 @@ const UserProfile = () => {
           <Card elevation={3}>
             <CardContent>
               <Typography variant="h6" component="h3" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                <StarIcon sx={{ mr: 1, color: '#78CADC' }} />
+                <StarIcon sx={{ mr: 1, color: 'var(--color-primary)' }} />
                 Subscription Status
               </Typography>
 
@@ -296,7 +296,7 @@ const UserProfile = () => {
                   <Chip label="FREE PLAN" color="default" />
                   <Button
                     variant="contained"
-                    sx={{ mt: 2, bgcolor: '#78CADC' }}
+                    sx={{ mt: 2, bgcolor: 'var(--color-primary)' }}
                     href="/subscriptions"
                   >
                     View Plans
@@ -313,7 +313,7 @@ const UserProfile = () => {
             <Card elevation={3}>
               <CardContent>
                 <Typography variant="h6" component="h3" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                  <BusinessIcon sx={{ mr: 1, color: '#78CADC' }} />
+                  <BusinessIcon sx={{ mr: 1, color: 'var(--color-primary)' }} />
                   Professional Information
                 </Typography>
 
@@ -430,7 +430,7 @@ const UserProfile = () => {
             {['painter', 'interior_designer', 'lawyer', 'agent'].includes(user?.role) && (
               <>
                 <Grid item xs={12}>
-                  <Typography variant="h6" sx={{ mt: 2, mb: 2, color: '#78CADC' }}>
+                  <Typography variant="h6" sx={{ mt: 2, mb: 2, color: 'var(--color-primary)' }}>
                     Professional Information
                   </Typography>
                 </Grid>

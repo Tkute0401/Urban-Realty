@@ -42,7 +42,7 @@ const AboutUs = () => {
           className="relative z-20 text-center px-4"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-poppins">
-            Redefining <span className="text-[#78cadc]">Real Estate</span>
+            Redefining <span className="text-[var(--color-primary)]">Real Estate</span>
           </h1>
           <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
             SQUAREFOOT combines cutting-edge technology with unparalleled market expertise to transform your property journey.
@@ -61,13 +61,13 @@ const AboutUs = () => {
             className="lg:w-1/2"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-              Our <span className="text-[#78cadc]">Story</span>
+              Our <span className="text-[var(--color-primary)]">Story</span>
             </h2>
             <p className="text-gray-300 mb-4">
               Founded in 2015, SQUAREFOOT began as a boutique real estate firm with a vision to revolutionize property transactions through transparency and innovation.
             </p>
             <p className="text-gray-300 mb-6">
-              Today, we're a market leader with a national presence, recognized for our client-first approach and data-driven solutions that simplify buying, selling, and renting properties.
+              Today, we&apos;re a market leader with a national presence, recognized for our client-first approach and data-driven solutions that simplify buying, selling, and renting properties.
             </p>
             <div className="relative">
               <div className="absolute -left-4 -top-4 w-24 h-24 border-t-2 border-l-2 border-[#78cadc]" />
@@ -85,7 +85,7 @@ const AboutUs = () => {
           >
             {stats.map((stat, index) => (
               <div key={index} className="bg-[#0c2327] p-6 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all">
-                <div className="text-[#78cadc] mb-3">{stat.icon}</div>
+                <div className="text-[var(--color-primary)] mb-3">{stat.icon}</div>
                 <h3 className="text-2xl font-bold mb-1">{stat.value}</h3>
                 <p className="text-gray-400 text-sm">{stat.label}</p>
               </div>
@@ -105,10 +105,10 @@ const AboutUs = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-poppins">
-              Meet Our <span className="text-[#78cadc]">Leadership</span>
+              Meet Our <span className="text-[var(--color-primary)]">Leadership</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              The brilliant minds behind SQUAREFOOT's success, combining decades of experience with fresh perspectives.
+              The brilliant minds behind SQUAREFOOT&apos;s success, combining decades of experience with fresh perspectives.
             </p>
           </motion.div>
 
@@ -132,7 +132,7 @@ const AboutUs = () => {
                   <div className="absolute bottom-4 left-4">
                     <h3 className="text-xl font-bold">{member.name}</h3>
                     <Link href={member.path || '#'}>
-                      <p className="text-[#78cadc] text-sm">{member.role}</p>
+                      <p className="text-[var(--color-primary)] text-sm">{member.role}</p>
                     </Link>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ const AboutUs = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-poppins">
-            Our Core <span className="text-[#78cadc]">Values</span>
+            Our Core <span className="text-[var(--color-primary)]">Values</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
             The principles that guide every decision we make and every interaction we have.
@@ -167,7 +167,7 @@ const AboutUs = () => {
             viewport={{ once: true }}
             className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
           >
-            <div className="text-[#78cadc] text-4xl mb-4">01</div>
+            <div className="text-[var(--color-primary)] text-4xl mb-4">01</div>
             <h3 className="text-xl font-bold mb-3">Client-Centric Approach</h3>
             <p className="text-gray-400">
               We prioritize your needs above all else, offering personalized solutions tailored to your unique property goals.
@@ -181,10 +181,10 @@ const AboutUs = () => {
             viewport={{ once: true }}
             className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
           >
-            <div className="text-[#78cadc] text-4xl mb-4">02</div>
+            <div className="text-[var(--color-primary)] text-4xl mb-4">02</div>
             <h3 className="text-xl font-bold mb-3">Market Intelligence</h3>
             <p className="text-gray-400">
-              Our proprietary analytics provide insights that give you a competitive edge in today's dynamic real estate market.
+              Our proprietary analytics provide insights that give you a competitive edge in today&apos;s dynamic real estate market.
             </p>
           </motion.div>
 
@@ -195,7 +195,7 @@ const AboutUs = () => {
             viewport={{ once: true }}
             className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
           >
-            <div className="text-[#78cadc] text-4xl mb-4">03</div>
+            <div className="text-[var(--color-primary)] text-4xl mb-4">03</div>
             <h3 className="text-xl font-bold mb-3">Ethical Practices</h3>
             <p className="text-gray-400">
               Transparency and integrity form the foundation of every transaction, ensuring trust at every step of your journey.

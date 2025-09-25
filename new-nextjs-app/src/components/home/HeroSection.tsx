@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { 
   MagnifyingGlassIcon, 
   UserIcon, 
@@ -16,6 +16,28 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
 import AccountSidebar from './AccountSidebar';
 import { useProperties } from '@/contexts/PropertiesContext';
+import { ThemeContext } from '@/contexts/ThemeProvider';
+
+// Theme toggle icons
+const SunIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="5"></circle>
+    <line x1="12" y1="1" x2="12" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="23"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="1" y1="12" x2="3" y2="12"></line>
+    <line x1="21" y1="12" x2="23" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+);
+
+const MoonIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+);
 
 const HeroSection = () => {
   console.log('🔧 HeroSection rendering...');
@@ -34,6 +56,7 @@ const HeroSection = () => {
   const [selectedTab, setSelectedTab] = useState('ALL');
   const [citySearchQuery, setCitySearchQuery] = useState("");
   const { user } = useAuth();
+  const { theme, toggle: toggleTheme } = useContext(ThemeContext);
   const { properties, loading: propertiesLoading, getProperties } = useProperties();
   const router = useRouter();
   const [searchParams] = useSearchParams();
@@ -239,6 +262,15 @@ const HeroSection = () => {
             </nav>
 
             <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+              {/* Theme Toggle Button */}
+              <button 
+                onClick={toggleTheme} 
+                className="hidden sm:flex items-center justify-center w-8 h-8 md:w-10 md:h-10 border border-white/50 rounded-full bg-transparent text-white hover:bg-white/10 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all duration-300" 
+                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? <MoonIcon className="w-4 h-4 md:w-5 md:h-5" /> : <SunIcon className="w-4 h-4 md:w-5 md:h-5" />}
+              </button>
+              
               <button 
                 onClick={() => setIsAccountSidebarOpen(true)} 
                 className="hidden lg:flex items-center gap-1 sm:gap-1 md:gap-2 px-2 sm:px-2 md:px-3 py-1 sm:py-1 md:py-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors duration-300 text-xs sm:text-sm md:text-base"
@@ -248,7 +280,7 @@ const HeroSection = () => {
               </button>
 
               <button 
-                className="lg:hidden p-1 sm:p-1.5 text-white hover:bg-white/10 rounded-lg transition-colors duration-300"
+                className="lg:hidden p-1 sm:p-1.5 text-[var(--color-text)] hover:bg-[var(--color-accent)] rounded-lg transition-colors duration-300"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
@@ -264,12 +296,12 @@ const HeroSection = () => {
           <div className="flex-1 flex flex-col justify-center">
             <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
               <div className="text-center mb-2 sm:mb-3 md:mb-4 lg:mb-6">
-                <h1 className="font-poppins text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight font-bold mb-1 sm:mb-2 md:mb-4 lg:mb-6 text-white">
+                <h1 className="font-poppins text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight font-bold mb-1 sm:mb-2 md:mb-4 lg:mb-6 text-[var(--color-text)]">
                   Find Your <br />Perfect <span className="text-[var(--color-primary)]">Spot.</span>
                 </h1>
                 <br/>
                 
-                <p className="text-white mb-2 sm:mb-3 md:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-sm md:text-base">
+                <p className="text-[var(--color-text)] mb-2 sm:mb-3 md:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-sm md:text-base">
                   Discover your dream property from our extensive collection of 
                   homes, apartments, and commercial spaces across the country.
                 </p>
@@ -280,7 +312,7 @@ const HeroSection = () => {
           {/* Map and Rating positioned at bottom corners */}
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-10">
             {/* Map thumbnail on left */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-gray-700/50 hover:border-[var(--color-primary)] transition-colors duration-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 rounded-full overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-colors duration-300">
               <img 
                 src="/building_1.jpg" 
                 alt="Map view" 
@@ -290,13 +322,13 @@ const HeroSection = () => {
             </div>
 
             {/* Rating on right */}
-            <div className="bg-white/0 p-1 sm:p-1.5 rounded-xl">
+            <div className="bg-transparent p-1 sm:p-1.5 rounded-xl">
               <div className="flex flex-col items-end">
                 <div className="flex gap-1 items-center">
                   <span className="text-yellow-400 text-base sm:text-lg md:text-xl lg:text-2xl">★</span>
-                  <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
+                  <span className="text-[var(--color-text)] text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
                 </div>
-                <span className="text-[0.5rem] sm:text-xs font-poppins text-gray-300 text-right mt-0.5">
+                <span className="text-[0.5rem] sm:text-xs font-poppins text-[var(--color-text-muted)] text-right mt-0.5">
                   FROM 6,900+ CUSTOMERS
                 </span>
               </div>
@@ -355,6 +387,21 @@ const HeroSection = () => {
                   </AnimatePresence>
                 </div>
               ))}
+              
+              {/* Theme Toggle for Mobile */}
+              <button 
+                onClick={() => {
+                  toggleTheme();
+                  setIsMenuOpen(false);
+                }} 
+                className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 mt-1 sm:mt-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-xs sm:text-sm"
+              >
+                {theme === 'light' ? <MoonIcon className="w-3 h-3 sm:w-4 sm:h-4" /> : <SunIcon className="w-3 h-3 sm:w-4 sm:h-4" />}
+                <span className="font-poppins font-semibold">
+                  {theme === 'light' ? 'DARK MODE' : 'LIGHT MODE'}
+                </span>
+              </button>
+              
               <button 
                 onClick={() => {
                   setIsAccountSidebarOpen(true);

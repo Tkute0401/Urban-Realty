@@ -43,7 +43,7 @@ const ServiceBlock: React.FC<ServiceBlockProps> = ({
   const isPlots = title === "BUY PLOTS/LAND";
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[var(--color-bg-dark)]">
+    <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[var(--color-surface)]">
       {/* Divider line with enhanced responsive behavior */}
       <div className="flex justify-center px-4 sm:px-6 lg:px-8">
         <motion.div 
@@ -86,16 +86,16 @@ const ServiceBlock: React.FC<ServiceBlockProps> = ({
             transition={{ duration: 0.6, delay: 0.2 }}
             className={imageRight ? "text-left" : "text-right"}
           >
-            <span className="text-gray-400 font-poppins font-bold mb-2 sm:mb-3 md:mb-4 block tracking-wide text-xs sm:text-sm md:text-base lg:text-lg">
+            <span className="text-[var(--color-text-muted)] font-poppins font-bold mb-2 sm:mb-3 md:mb-4 block tracking-wide text-xs sm:text-sm md:text-base lg:text-lg">
               {isBuyHome ? "WANT TO BUY A HOME?" : isRentHome ? "WANT TO RENT A HOME?" : "WANT TO BUY PLOTS/LAND?"}
             </span>
             
-            <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold mb-3 sm:mb-4 md:mb-5 text-white leading-tight">
+            <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold mb-3 sm:mb-4 md:mb-5 text-[var(--color-text)] leading-tight">
               {subtitle} <br className="hidden sm:block" />
               <span className="text-[var(--color-primary)]">Dream {propertyType}.</span>
             </h2>
             
-            <p className="font-poppins text-gray-300 mb-6 sm:mb-8 md:mb-10 tracking-wide text-xs sm:text-sm md:text-base">
+            <p className="font-poppins text-[var(--color-text-muted)] mb-6 sm:mb-8 md:mb-10 tracking-wide text-xs sm:text-sm md:text-base">
               {isBuyHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
                isRentHome ? "EXPLORE FROM APARTMENTS, ROW HOUSES, BUNGALOW AND MANY MORE." :
                "EXPLORE RESIDENTIAL, AGRICULTURAL, INDUSTRIAL AND COMMERCIAL PLOTS/LAND."}

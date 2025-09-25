@@ -53,7 +53,7 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="relative transform overflow-hidden rounded-2xl bg-gradient-to-br from-[#08171A] to-[#0c2327] p-8 text-left shadow-xl border border-[#78cadc]/30"
+              className="relative transform overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--color-bg-dark)] to-[#0c2327] p-8 text-left shadow-xl border border-[var(--color-primary)]/30"
             >
               {/* Close button */}
               <button
@@ -72,7 +72,7 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="h-8 w-8 text-[#78cadc]"
+                    className="h-8 w-8 text-[var(--color-primary)]"
                   >
                     <path
                       strokeLinecap="round"
@@ -86,20 +86,20 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm sm:text-base text-white/80 mb-6">
-                    We're working hard to bring you this amazing feature. 
-                    Stay tuned for updates - it'll be worth the wait!
+                    We&apos;re working hard to bring you this amazing feature. 
+                    Stay tuned for updates - it&apos;ll be worth the wait!
                   </p>
                 </div>
                 <div className="mt-6 flex justify-center">
                   <button
                     onClick={handleClose} // Updated to use handleClose
-                    className="inline-flex items-center rounded-md bg-[#78cadc] px-4 py-2 text-sm font-medium text-[#08171A] hover:bg-[#8DD9E5] transition-colors"
+                    className="inline-flex items-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-bg-dark)] hover:bg-[var(--color-primary-hover)] transition-colors"
                   >
                     Got it!
                   </button>
                 </div>
                 <div className="mt-8 pt-4 border-t border-[#78cadc]/20">
-                  <p className="text-xs text-[#78cadc]/70">
+                  <p className="text-xs text-[var(--color-primary)]/70">
                     Want early access? Contact us at info@urbanrealty360.com
                   </p>
                 </div>

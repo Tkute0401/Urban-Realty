@@ -51,23 +51,50 @@ import {
 } from 'recharts';
 import http from '@/lib/services/http';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ['var(--chart-color-3)', 'var(--chart-color-4)', 'var(--color-warning)', 'var(--color-primary)', 'var(--chart-color-1)'];
 
 const AdminAnalytics = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [analytics, setAnalytics] = useState({
-    overview: {},
+    overview: {
+      totalUsers: 0,
+      userGrowth: 0,
+      totalProperties: 0,
+      propertyGrowth: 0,
+      totalRevenue: 0,
+      revenueGrowth: 0,
+      totalAgents: 0,
+      agentGrowth: 0,
+      totalInquiries: 0,
+      inquiryGrowth: 0
+    },
     userGrowth: [],
-    propertyStats: {},
+    propertyStats: {
+      activeProperties: 0,
+      pendingProperties: 0,
+      soldProperties: 0,
+      totalViews: 0,
+      types: [],
+      priceRanges: []
+    },
     revenueData: [],
     topAgents: [],
     topProperties: [],
     contactTrends: [],
-    subscriptionStats: {},
+    subscriptionStats: {
+      activeSubscriptions: 0,
+      expiredSubscriptions: 0,
+      totalRevenue: 0,
+      revenue: []
+    },
     locationStats: [],
-    activityLog: []
+    activityLog: [],
+    userStats: {
+      byRole: [],
+      activity: []
+    }
   });
 
   useEffect(() => {
@@ -114,7 +141,7 @@ const AdminAnalytics = () => {
     <Grid container spacing={3} sx={{ mb: 4 }}>
       <Grid item xs={12} sm={6} md={3}>
         <Card sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'var(--chart-gradient-1)',
           color: 'white'
         }}>
           <CardContent>
@@ -139,7 +166,7 @@ const AdminAnalytics = () => {
 
       <Grid item xs={12} sm={6} md={3}>
         <Card sx={{ 
-          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          background: 'var(--chart-gradient-2)',
           color: 'white'
         }}>
           <CardContent>
@@ -164,7 +191,7 @@ const AdminAnalytics = () => {
 
       <Grid item xs={12} sm={6} md={3}>
         <Card sx={{ 
-          background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          background: 'var(--chart-gradient-3)',
           color: 'white'
         }}>
           <CardContent>
@@ -189,7 +216,7 @@ const AdminAnalytics = () => {
 
       <Grid item xs={12} sm={6} md={3}>
         <Card sx={{ 
-          background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+          background: 'var(--chart-gradient-4)',
           color: 'white'
         }}>
           <CardContent>
@@ -225,8 +252,8 @@ const AdminAnalytics = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="users" stroke="#8884d8" strokeWidth={2} />
-            <Line type="monotone" dataKey="agents" stroke="#82ca9d" strokeWidth={2} />
+            <Line type="monotone" dataKey="users" stroke="var(--chart-color-1)" strokeWidth={2} />
+            <Line type="monotone" dataKey="agents" stroke="var(--chart-color-2)" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </CardContent>
@@ -244,8 +271,8 @@ const AdminAnalytics = () => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Area type="monotone" dataKey="revenue" stackId="1" stroke="#8884d8" fill="#8884d8" />
-            <Area type="monotone" dataKey="subscriptions" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+            <Area type="monotone" dataKey="revenue" stackId="1" stroke="var(--chart-color-1)" fill="var(--chart-color-1)" />
+            <Area type="monotone" dataKey="subscriptions" stackId="1" stroke="var(--chart-color-2)" fill="var(--chart-color-2)" />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>
@@ -289,16 +316,16 @@ const AdminAnalytics = () => {
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={analytics.propertyStats.types}
+                  data={analytics.propertyStats.types || []}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={(entry: any) => `${entry.name} ${(entry.percent * 100).toFixed(0)}%`}
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="var(--chart-color-1)"
                   dataKey="value"
                 >
-                  {analytics.propertyStats.types?.map((entry, index) => (
+                  {(analytics.propertyStats.types || []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -314,12 +341,12 @@ const AdminAnalytics = () => {
           <CardContent>
             <Typography variant="h6" gutterBottom>Price Range Distribution</Typography>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analytics.propertyStats.priceRanges}>
+              <BarChart data={analytics.propertyStats.priceRanges || []}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="range" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" />
+                <Bar dataKey="count" fill="var(--chart-color-1)" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -418,7 +445,7 @@ const AdminAnalytics = () => {
                           <XAxis dataKey="role" />
                           <YAxis />
                           <Tooltip />
-                          <Bar dataKey="count" fill="#8884d8" />
+                          <Bar dataKey="count" fill="var(--chart-color-1)" />
                         </BarChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -434,7 +461,7 @@ const AdminAnalytics = () => {
                           <XAxis dataKey="date" />
                           <YAxis />
                           <Tooltip />
-                          <Line type="monotone" dataKey="active" stroke="#8884d8" />
+                          <Line type="monotone" dataKey="active" stroke="var(--chart-color-1)" />
                         </LineChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -466,9 +493,9 @@ const AdminAnalytics = () => {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            label={(entry: any) => `${entry.name} ${(entry.percent * 100).toFixed(0)}%`}
                             outerRadius={80}
-                            fill="#8884d8"
+                            fill="var(--chart-color-1)"
                             dataKey="value"
                           >
                             {analytics.subscriptionStats?.revenue?.map((entry, index) => (
@@ -491,7 +518,7 @@ const AdminAnalytics = () => {
                           <XAxis dataKey="month" />
                           <YAxis />
                           <Tooltip />
-                          <Area type="monotone" dataKey="revenue" stroke="#8884d8" fill="#8884d8" />
+                          <Area type="monotone" dataKey="revenue" stroke="var(--chart-color-1)" fill="var(--chart-color-1)" />
                         </AreaChart>
                       </ResponsiveContainer>
                     </CardContent>

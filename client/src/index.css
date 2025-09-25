@@ -11,10 +11,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
-  color: #212121;
-  background-color: #08171A;
+  color: var(--color-text);
+  background-color: var(--color-bg);
   overflow-x: hidden;
-  
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Typography */

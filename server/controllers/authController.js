@@ -217,18 +217,33 @@ exports.addToFavorites = asyncHandler(async (req, res, next) => {
 exports.removeFromFavorites = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   
-  // Check if property is in favorites
-  if (!user.favorites.includes(req.params.propertyId)) {
-    return next(new ErrorResponse('Property not in favorites', 400));
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
   }
+
+  // Ensure favorites array exists
+  if (!Array.isArray(user.favorites)) {
+    user.favorites = [];
+  }
+
+  // Normalize ObjectId comparison by using string values
+  const propertyId = req.params.propertyId.toString();
+  const initialFavoritesCount = user.favorites.length;
   
+  // Remove the property from favorites (if it exists)
   user.favorites = user.favorites.filter(
-    id => id.toString() !== req.params.propertyId
+    id => id.toString() !== propertyId
   );
+  
+  // Check if property was actually removed
+  const wasRemoved = user.favorites.length < initialFavoritesCount;
+  
   await user.save();
   
   res.status(200).json({
     success: true,
+    wasRemoved,
+    message: wasRemoved ? 'Property removed from favorites' : 'Property was not in favorites',
     data: user.favorites
   });
 });
@@ -260,7 +275,10 @@ exports.checkFavoriteStatus = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('User not found', 404));
   }
 
-  const isFavorite = user.favorites.includes(req.params.propertyId);
+  // Normalize ObjectId comparison by using string values
+  const propertyId = req.params.propertyId.toString();
+  const favorites = (user.favorites || []).map(id => id.toString());
+  const isFavorite = favorites.includes(propertyId);
   
   res.status(200).json({
     success: true,
@@ -278,21 +296,32 @@ exports.toggleFavorite = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('User not found', 404));
   }
 
-  const propertyIndex = user.favorites.indexOf(req.params.propertyId);
-  
-  if (propertyIndex === -1) {
-    // Add to favorites
-    user.favorites.push(req.params.propertyId);
+  // Ensure favorites array exists
+  if (!Array.isArray(user.favorites)) {
+    user.favorites = [];
+  }
+
+  // Normalize ObjectId comparison by using string values
+  const propertyId = req.params.propertyId.toString();
+  const favorites = user.favorites;
+  const index = favorites.findIndex(id => id.toString() === propertyId);
+
+  let isFavorite;
+  if (index === -1) {
+    // Add to favorites (Mongoose will cast string to ObjectId)
+    user.favorites.push(propertyId);
+    isFavorite = true;
   } else {
     // Remove from favorites
-    user.favorites.splice(propertyIndex, 1);
+    user.favorites.splice(index, 1);
+    isFavorite = false;
   }
   
   await user.save();
   
   res.status(200).json({
     success: true,
-    isFavorite: propertyIndex === -1,
+    isFavorite,
     favorites: user.favorites
   });
 });

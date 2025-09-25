@@ -27,7 +27,12 @@ const DeveloperCard = ({ developer, isMobile }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`relative bg-[#08171A] rounded-xl sm:rounded-3xl overflow-hidden border border-[#78CADC]/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-[#78CADC]/20 group`}
+      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group`}
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderColor: 'var(--color-primary)',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+      }}
       onClick={handleClick}
       whileHover={{ y: -5 }}
     >
@@ -36,21 +41,34 @@ const DeveloperCard = ({ developer, isMobile }) => {
         {developer.logo?.url ? (
           <>
             {!imageLoaded && (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0B1011] to-[#1a2a32] flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-transparent border-t-[#78CADC] border-l-[#78CADC] rounded-full animate-spin" />
+              <div 
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)' }}
+              >
+                <div 
+                  className="w-8 h-8 border-2 border-transparent rounded-full animate-spin"
+                  style={{ 
+                    borderTopColor: 'var(--color-primary)',
+                    borderLeftColor: 'var(--color-primary)' 
+                  }}
+                />
               </div>
             )}
             <img 
               src={developer.logo.url} 
               alt={developer.name} 
-              className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'} bg-[#0B1011]`}
+              className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              style={{ backgroundColor: 'var(--color-surface)' }}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
             />
           </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#0B1011] to-[#1a2a32] flex items-center justify-center">
-            <BuildingOfficeIcon className="text-[#78CADC]/50 w-12 h-12" />
+          <div 
+            className="w-full h-full flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)' }}
+          >
+            <BuildingOfficeIcon className="text-[var(--color-primary)]/50 w-12 h-12" />
           </div>
         )}
       </div>
@@ -71,7 +89,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
         </h3>
         
         {/* Location */}
-        <div className="flex items-center gap-1 sm:gap-2 text-[#78CADC] mb-2 sm:mb-3">
+        <div className="flex items-center gap-1 sm:gap-2 text-[var(--color-primary)] mb-2 sm:mb-3">
           <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
           <span className="font-poppins text-xs sm:text-sm line-clamp-1">
             {developer.headquarters?.city && `${developer.headquarters.city}, `}
@@ -89,7 +107,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
         <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
           <Tooltip title="Founded Year" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <BuildingOfficeIcon className="text-[#78CADC] w-4 h-4" />
+              <BuildingOfficeIcon className="text-[var(--color-primary)] w-4 h-4" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {developer.foundedYear || 'N/A'}
               </span>
@@ -98,7 +116,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
           
           <Tooltip title="Completed Projects" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
-              <BuildingOfficeIcon className="text-[#78CADC] w-4 h-4" />
+              <BuildingOfficeIcon className="text-[var(--color-primary)] w-4 h-4" />
               <span className="text-gray-300 text-xs sm:text-sm">
                 {formatProjectsCount(developer.completedProjects)} Projects
               </span>
@@ -112,12 +130,12 @@ const DeveloperCard = ({ developer, isMobile }) => {
             <div className="text-xs text-gray-400 mb-1">Specializations:</div>
             <div className="flex flex-wrap gap-1">
               {developer.specializations.slice(0, 3).map((spec, index) => (
-                <span key={index} className="text-xs bg-[#78CADC]/10 text-[#78CADC] px-2 py-1 rounded">
+                <span key={index} className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
                   {spec.name}
                 </span>
               ))}
               {developer.specializations.length > 3 && (
-                <span className="text-xs bg-[#78CADC]/10 text-[#78CADC] px-2 py-1 rounded">
+                <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
                   +{developer.specializations.length - 3} more
                 </span>
               )}
@@ -128,8 +146,8 @@ const DeveloperCard = ({ developer, isMobile }) => {
         {/* CTA */}
         <div className="pt-3 border-t border-gray-800">
           <motion.button 
-            className="w-full bg-transparent border border-[#78cadc] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#78cadc]/20 transition-all text-xs sm:text-sm
-                      group-hover:bg-[#78cadc] group-hover:text-[#0B1011] group-hover:font-bold"
+            className="w-full bg-transparent border border-[var(--color-primary)] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[var(--color-primary)]/20 transition-all text-xs sm:text-sm
+                      group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-bg-dark)] group-hover:font-bold"
             onClick={(e) => {
               e.stopPropagation();
               handleClick();

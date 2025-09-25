@@ -330,7 +330,7 @@ const SubscriptionPlans = () => {
                 {/* Features List */}
                 <Box sx={{ textAlign: 'left' }}>
                   <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)', fontWeight: 'bold' }}>
-                    What's included:
+                    What&apos;s included:
                   </Typography>
                   {(plan as any).featureList?.map((feature: string, index: number) => (
                     <Box 

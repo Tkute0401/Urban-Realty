@@ -11,29 +11,29 @@ function titleCase(segment) {
 
 const breadcrumbStyles = {
   container: {
-    backgroundColor: '#08171A',
+    backgroundColor: 'var(--color-surface)',
     padding: '8px 0',
   },
   breadcrumbs: {
     padding: '8px 16px',
     '& .MuiBreadcrumbs-separator': {
-      color: 'rgba(255, 255, 255, 0.7)',
+      color: 'var(--color-text-muted)',
     }
   },
   link: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'var(--color-text-muted)',
     textDecoration: 'none',
     fontSize: '14px',
     fontFamily: "'Poppins', sans-serif",
     fontWeight: 500,
     transition: 'color 0.3s ease',
     '&:hover': {
-      color: '#78cadc',
+      color: 'var(--color-primary)',
       textDecoration: 'underline',
     },
   },
   typography: {
-    color: '#ffffff',
+    color: 'var(--color-text)',
     fontSize: '14px',
     fontFamily: "'Poppins', sans-serif",
     fontWeight: 'bold',

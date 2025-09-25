@@ -124,7 +124,7 @@ const AdminContacts = () => {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'var(--chart-gradient-1)',
             color: 'white'
           }}>
             <CardContent>
@@ -135,7 +135,7 @@ const AdminContacts = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card sx={{ 
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            background: 'var(--chart-gradient-2)',
             color: 'white'
           }}>
             <CardContent>

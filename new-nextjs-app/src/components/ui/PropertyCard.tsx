@@ -119,7 +119,7 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
       if (user && property?._id && showFavorite) {
         try {
           const response = await api.auth.favoriteStatus(property._id);
-          setIsFavorite(response.data.favorited);
+          setIsFavorite(Boolean(response.data?.isFavorite));
         } catch (err) {
           console.error('Error checking favorite status:', err);
         }
@@ -152,16 +152,16 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
 
     setLoadingFavorite(true);
     try {
-      if (isFavorite) {
-        await api.auth.removeFavorite(property._id);
-        toast.success('Removed from favorites');
-      } else {
-        await api.auth.addFavorite(property._id);
-        toast.success('Added to favorites');
-      }
-      const newFavoriteStatus = !isFavorite;
+      // Use the toggle favorite endpoint which handles both add and remove
+      const response = await api.auth.addFavorite(property._id);
+      const newFavoriteStatus = Boolean(response.data?.isFavorite);
+      
       setIsFavorite(newFavoriteStatus);
       onFavoriteToggle?.(property, newFavoriteStatus);
+      
+      // Show appropriate toast message
+      const message = newFavoriteStatus ? 'Added to favorites' : 'Removed from favorites';
+      toast.success(message);
     } catch (err: any) {
       console.error('Error updating favorite:', err);
       toast.error(err?.message || 'Failed to update favorites');

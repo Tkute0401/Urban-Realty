@@ -2,8 +2,8 @@
 .bedbath-dropdown-content {
   width: min(380px, calc(100vw - 32px));
   padding: 24px;
-  background: linear-gradient(145deg, #0F1719 0%, #0B1215 100%);
-  border: 1px solid rgba(120, 202, 220, 0.2);
+  background: linear-gradient(145deg, var(--color-bg-dark) 0%, var(--color-surface) 100%);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.4),
@@ -11,6 +11,14 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   position: relative;
+}
+
+[data-theme="light"] .bedbath-dropdown-content {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 .bedbath-dropdown-content::before {
@@ -21,9 +29,9 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, 
-    rgba(120, 202, 220, 0.03) 0%, 
+    var(--color-accent) 0%, 
     transparent 50%, 
-    rgba(120, 202, 220, 0.03) 100%);
+    var(--color-accent) 100%);
   border-radius: 16px;
   pointer-events: none;
 }
@@ -36,8 +44,8 @@
   gap: 12px;
   margin: 16px 0 24px 0;
   padding: 12px 20px;
-  background: linear-gradient(135deg, rgba(120, 202, 220, 0.1) 0%, rgba(120, 202, 220, 0.05) 100%);
-  border: 1px solid rgba(120, 202, 220, 0.2);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
+  border: 1px solid var(--color-border);
   border-radius: 50px;
   position: relative;
   z-index: 1;
@@ -51,7 +59,7 @@
 
 .summary-label {
   font-size: 11px;
-  color: #B8C4C8;
+  color: var(--color-text-muted);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -59,16 +67,16 @@
 
 .summary-value {
   font-size: 13px;
-  color: #78CADC;
+  color: var(--color-primary);
   font-weight: 600;
-  background: linear-gradient(135deg, rgba(120, 202, 220, 0.15) 0%, rgba(120, 202, 220, 0.08) 100%);
+  background: var(--color-accent);
   padding: 4px 10px;
   border-radius: 12px;
-  border: 1px solid rgba(120, 202, 220, 0.2);
+  border: 1px solid var(--color-border);
 }
 
 .summary-divider {
-  color: rgba(120, 202, 220, 0.4);
+  color: var(--color-border);
   font-weight: 600;
   font-size: 16px;
 }
@@ -84,7 +92,7 @@
 .section-title {
   font-size: 15px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: var(--color-text);
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -116,8 +124,8 @@
 }
 
 .active-indicator {
-  background: linear-gradient(135deg, #78CADC 0%, #6BB8CA 100%);
-  color: #0B1215;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  color: var(--color-primary-contrast);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 11px;
@@ -170,8 +178,8 @@
 }
 
 .option-btn:hover {
-  border-color: #78CADC;
-  color: #78CADC;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   background: linear-gradient(145deg, rgba(120, 202, 220, 0.08) 0%, rgba(120, 202, 220, 0.04) 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(120, 202, 220, 0.15);
@@ -182,9 +190,9 @@
 }
 
 .option-btn.active-option {
-  background: linear-gradient(135deg, #78CADC 0%, #6BB8CA 100%);
-  color: #0B1215;
-  border-color: #78CADC;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  color: var(--color-primary-contrast);
+  border-color: var(--color-primary);
   font-weight: 700;
   transform: translateY(-3px);
   box-shadow: 
@@ -239,7 +247,7 @@
 .presets-label {
   font-size: 13px;
   font-weight: 600;
-  color: #78CADC;
+  color: var(--color-primary);
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -283,8 +291,8 @@
 }
 
 .combo-btn:hover {
-  border-color: #78CADC;
-  color: #78CADC;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   background: linear-gradient(145deg, rgba(120, 202, 220, 0.08) 0%, rgba(120, 202, 220, 0.04) 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(120, 202, 220, 0.15);

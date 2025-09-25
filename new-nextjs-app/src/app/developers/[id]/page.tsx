@@ -161,12 +161,12 @@ const DeveloperDetails = () => {
         justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)'
+        background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)'
       }}>
         <CircularProgress 
           size={80} 
           thickness={4}
-          sx={{ color: '#78CADC', animation: `${pulse} 2s infinite` }} 
+          sx={{ color: 'var(--color-primary)', animation: `${pulse} 2s infinite` }} 
         />
       </Box>
     );
@@ -177,7 +177,7 @@ const DeveloperDetails = () => {
       <Box sx={{ 
         p: 3, 
         textAlign: 'center',
-        background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+        background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)',
         minHeight: '100vh'
       }}>
         <Alert severity="error" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
@@ -196,7 +196,7 @@ const DeveloperDetails = () => {
 
   return (
     <Box sx={{ 
-      background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+      background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)',
       minHeight: '100vh',
       color: 'white'
     }}>
@@ -230,7 +230,7 @@ const DeveloperDetails = () => {
                     className="w-100 h-auto"
                   />
                 ) : (
-                  <Apartment sx={{ fontSize: 100, color: '#78CADC' }} />
+                  <Apartment sx={{ fontSize: 100, color: 'var(--color-primary)' }} />
                 )}
               </Box>
             </Grid>
@@ -239,14 +239,14 @@ const DeveloperDetails = () => {
               <Typography variant="h2" sx={{ 
                 fontWeight: 700,
                 mb: 2,
-                color: '#78CADC'
+                color: 'var(--color-primary)'
               }}>
                 {developer.name}
               </Typography>
               
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <LocationOn sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                   {getHeadquarters()}
                 </Typography>
               </Box>
@@ -254,7 +254,7 @@ const DeveloperDetails = () => {
               {developer.foundedYear && (
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <CalendarToday sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                  <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                     Established in {developer.foundedYear}
                   </Typography>
                 </Box>
@@ -267,7 +267,7 @@ const DeveloperDetails = () => {
                     href={developer.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    sx={{ color: '#78CADC' }}
+                    sx={{ color: 'var(--color-primary)' }}
                   >
                     Visit Website
                   </Link>
@@ -276,7 +276,7 @@ const DeveloperDetails = () => {
               
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Business sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
-                <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                   {formatNumber(developer.completedProjects || 0)} Completed Projects •{' '}
                   {formatNumber(developer.ongoingProjects || 0)} Ongoing •{' '}
                   {formatNumber(developer.upcomingProjects || 0)} Upcoming
@@ -329,7 +329,7 @@ const DeveloperDetails = () => {
             scrollButtons="auto"
             sx={{
               '& .MuiTabs-indicator': {
-                backgroundColor: '#78CADC'
+                backgroundColor: 'var(--color-primary)'
               }
             }}
           >
@@ -337,31 +337,31 @@ const DeveloperDetails = () => {
               label="Overview" 
               value="overview" 
               onClick={() => scrollToSection(overviewRef)}
-              sx={{ color: activeTab === 'overview' ? '#78CADC' : 'white' }}
+              sx={{ color: activeTab === 'overview' ? 'var(--color-primary)' : 'var(--color-text)' }}
             />
             <Tab 
               label="Projects" 
               value="projects" 
               onClick={() => scrollToSection(projectsRef)}
-              sx={{ color: activeTab === 'projects' ? '#78CADC' : 'white' }}
+              sx={{ color: activeTab === 'projects' ? 'var(--color-primary)' : 'var(--color-text)' }}
             />
             <Tab 
               label="Team" 
               value="team" 
               onClick={() => scrollToSection(teamRef)}
-              sx={{ color: activeTab === 'team' ? '#78CADC' : 'white' }}
+              sx={{ color: activeTab === 'team' ? 'var(--color-primary)' : 'var(--color-text)' }}
             />
             <Tab 
               label="Specializations" 
               value="specializations" 
               onClick={() => scrollToSection(specializationsRef)}
-              sx={{ color: activeTab === 'specializations' ? '#78CADC' : 'white' }}
+              sx={{ color: activeTab === 'specializations' ? 'var(--color-primary)' : 'var(--color-text)' }}
             />
             <Tab 
               label="Contact" 
               value="contact" 
               onClick={() => scrollToSection(contactRef)}
-              sx={{ color: activeTab === 'contact' ? '#78CADC' : 'white' }}
+              sx={{ color: activeTab === 'contact' ? 'var(--color-primary)' : 'var(--color-text)' }}
             />
           </Tabs>
         </Container>
@@ -373,7 +373,7 @@ const DeveloperDetails = () => {
           <Grid item xs={12} md={8}>
             {/* Overview Section */}
             <Box ref={overviewRef} sx={{ mb: 6 }}>
-              <Typography variant="h4" sx={{ mb: 3, color: '#78CADC' }}>
+              <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
                 About {developer.name}
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8 }}>
@@ -382,7 +382,7 @@ const DeveloperDetails = () => {
               
               {developer.headquarters && (
                 <Box sx={{ mb: 4 }}>
-                  <Typography variant="h5" sx={{ mb: 2, color: '#78CADC' }}>
+                  <Typography variant="h5" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                     Headquarters
                   </Typography>
                   {/* <MapComponent 
@@ -395,14 +395,14 @@ const DeveloperDetails = () => {
 
             {/* Projects Section */}
             <Box ref={projectsRef} sx={{ mb: 6 }}>
-              <Typography variant="h4" sx={{ mb: 3, color: '#78CADC' }}>
+              <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
                 Projects
               </Typography>
               
               <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ p: 3, backgroundColor: 'rgba(120, 202, 220, 0.1)' }}>
-                    <Typography variant="h6" sx={{ color: '#78CADC' }}>
+                    <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>
                       Completed
                     </Typography>
                     <Typography variant="h3" sx={{ fontWeight: 700  ,color: 'white'}}>
@@ -413,7 +413,7 @@ const DeveloperDetails = () => {
                 
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ p: 3, backgroundColor: 'rgba(120, 202, 220, 0.1)' }}>
-                    <Typography variant="h6" sx={{ color: '#78CADC' }}>
+                    <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>
                       Ongoing
                     </Typography>
                     <Typography variant="h3" sx={{ fontWeight: 700  ,color: 'white'}}>
@@ -424,7 +424,7 @@ const DeveloperDetails = () => {
                 
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ p: 3, backgroundColor: 'rgba(120, 202, 220, 0.1)' }}>
-                    <Typography variant="h6" sx={{ color: '#78CADC' }}>
+                    <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>
                       Upcoming
                     </Typography>
                     <Typography variant="h3" sx={{ fontWeight: 700  ,color: 'white'}}>
@@ -436,7 +436,7 @@ const DeveloperDetails = () => {
               
               {developer.flagshipProjects?.length > 0 && (
                 <Box sx={{ mt: 4 }}>
-                  <Typography variant="h5" sx={{ mb: 2, color: '#78CADC' }}>
+                  <Typography variant="h5" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                     Flagship Projects
                   </Typography>
                   
@@ -449,7 +449,7 @@ const DeveloperDetails = () => {
                           backgroundColor: 'rgba(120, 202, 220, 0.1)',
                           border: '1px solid rgba(120, 202, 220, 0.3)'
                         }}>
-                          <Typography variant="h6" sx={{ mb: 1, color: '#78CADC' }}>
+                          <Typography variant="h6" sx={{ mb: 1, color: 'var(--color-primary)' }}>
                             {project.name}
                           </Typography>
                           <Typography variant="body2" sx={{ color: 'white' }}>
@@ -466,7 +466,7 @@ const DeveloperDetails = () => {
             {/* Team Section */}
             {developer.team?.length > 0 && (
               <Box ref={teamRef} sx={{ mb: 6 }}>
-                <Typography variant="h4" sx={{ mb: 3, color: '#78CADC' }}>
+                <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
                   Key Team Members
                 </Typography>
                 
@@ -506,7 +506,7 @@ const DeveloperDetails = () => {
                         <Typography variant="h6" sx={{ mb: 1, color: 'white' }}>
                           {member.name}
                         </Typography>
-                        <Typography variant="body2" sx={{ mb: 2, color: '#78CADC' }}>
+                        <Typography variant="body2" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                           {member.designation}
                         </Typography>
                       </Paper>
@@ -519,7 +519,7 @@ const DeveloperDetails = () => {
             {/* Specializations Section */}
             {developer.specializations?.length > 0 && (
               <Box ref={specializationsRef} sx={{ mb: 6 }}>
-                <Typography variant="h4" sx={{ mb: 3, color: '#78CADC' }}>
+                <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
                   Specializations
                 </Typography>
                 
@@ -532,7 +532,7 @@ const DeveloperDetails = () => {
                         backgroundColor: 'rgba(120, 202, 220, 0.1)',
                         border: '1px solid rgba(120, 202, 220, 0.3)'
                       }}>
-                        <Typography variant="h6" sx={{ mb: 1, color: '#78CADC' }}>
+                        <Typography variant="h6" sx={{ mb: 1, color: 'var(--color-primary)' }}>
                           {spec.name}
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'white' }}>
@@ -547,7 +547,7 @@ const DeveloperDetails = () => {
 
             {/* Contact Section */}
             <Box ref={contactRef} sx={{ mb: 6 }}>
-              <Typography variant="h4" sx={{ mb: 3, color: '#78CADC' }}>
+              <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
                 Contact Information
               </Typography>
               
@@ -560,7 +560,7 @@ const DeveloperDetails = () => {
                       backgroundColor: 'rgba(120, 202, 220, 0.1)',
                       border: '1px solid rgba(120, 202, 220, 0.3)'
                     }}>
-                      <Typography variant="h6" sx={{ mb: 2, color: '#78CADC' }}>
+                      <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                         Get in Touch
                       </Typography>
                       
@@ -602,7 +602,7 @@ const DeveloperDetails = () => {
                       backgroundColor: 'rgba(120, 202, 220, 0.1)',
                       border: '1px solid rgba(120, 202, 220, 0.3)'
                     }}>
-                      <Typography variant="h6" sx={{ mb: 2, color: '#78CADC' }}>
+                      <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                         Social Media
                       </Typography>
                       
@@ -662,7 +662,7 @@ const DeveloperDetails = () => {
                 backgroundColor: 'rgba(120, 202, 220, 0.1)',
                 border: '1px solid rgba(120, 202, 220, 0.3)'
               }}>
-                <Typography variant="h6" sx={{ mb: 2, color: '#78CADC' }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                   Developer Summary
                 </Typography>
                 
@@ -670,7 +670,7 @@ const DeveloperDetails = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Founded
                   </Typography>
-                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                  <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                     {developer.foundedYear || 'Not specified'}
                   </Typography>
                 </Box>
@@ -679,7 +679,7 @@ const DeveloperDetails = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Headquarters
                   </Typography>
-                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                  <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                     {getHeadquarters() || 'Not specified'}
                   </Typography>
                 </Box>
@@ -688,7 +688,7 @@ const DeveloperDetails = () => {
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                     Total Projects
                   </Typography>
-                  <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                  <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                     {formatNumber((developer.completedProjects || 0) + 
                      (developer.ongoingProjects || 0) + 
                      (developer.upcomingProjects || 0))}
@@ -700,7 +700,7 @@ const DeveloperDetails = () => {
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                       Awards
                     </Typography>
-                    <Typography variant="body1" sx={{ color: '#78CADC' }}>
+                    <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
                       {developer.awards.length} awards received
                     </Typography>
                   </Box>
@@ -714,7 +714,7 @@ const DeveloperDetails = () => {
                   backgroundColor: 'rgba(120, 202, 220, 0.1)',
                   border: '1px solid rgba(120, 202, 220, 0.3)'
                 }}>
-                  <Typography variant="h6" sx={{ mb: 2, color: '#78CADC' }}>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-primary)' }}>
                     Recent Awards
                   </Typography>
                   
@@ -724,7 +724,7 @@ const DeveloperDetails = () => {
                         <Typography variant="body1" sx={{ color: 'white' }}>
                           {award.name}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#78CADC' }}>
+                        <Typography variant="body2" sx={{ color: 'var(--color-primary)' }}>
                           {award.year} • {award.category}
                         </Typography>
                       </Box>
@@ -737,9 +737,9 @@ const DeveloperDetails = () => {
                 variant="contained" 
                 fullWidth
                 sx={{ 
-                  backgroundColor: '#78CADC',
-                  color: '#0B1011',
-                  '&:hover': { backgroundColor: '#5fb4c9' }
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)',
+                  '&:hover': { backgroundColor: 'var(--color-primary-hover)' }
                 }}
                 onClick={() => {
                   if (developer.contact?.email || developer.contact?.phone) {
@@ -767,9 +767,9 @@ const DeveloperDetails = () => {
             position: 'fixed',
             bottom: 30,
             right: 30,
-            backgroundColor: '#78CADC',
-            color: '#0B1011',
-            '&:hover': { backgroundColor: '#5fb4c9' }
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-primary-contrast)',
+            '&:hover': { backgroundColor: 'var(--color-primary-hover)' }
           }}
         >
           <KeyboardArrowUp />
@@ -783,10 +783,10 @@ const DeveloperDetails = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle sx={{ backgroundColor: '#0B1011', color: 'white' }}>
+        <DialogTitle sx={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}>
           Confirm Delete
         </DialogTitle>
-        <DialogContent sx={{ backgroundColor: '#0B1011', color: 'white' }}>
+        <DialogContent sx={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}>
           <Typography>
             Are you sure you want to delete {developer.name}? This action cannot be undone.
           </Typography>

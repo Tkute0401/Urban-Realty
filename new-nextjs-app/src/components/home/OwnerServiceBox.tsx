@@ -34,14 +34,14 @@ const OwnerServiceBlock = () => {
     router.push('/register');
   };
   return (
-    <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[#08171A]">
+    <section className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-[var(--color-surface)]">
       {/* Divider line - Enhanced responsiveness */}
       <div className="flex justify-center px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ width: 0, marginRight: 'auto' }}
           animate={{ width: "60%", marginRight: 'auto' }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="h-0.5 bg-[#78CADC] w-full mb-8 sm:mb-10 lg:mb-12" 
+          className="h-0.5 bg-[var(--color-primary)] w-full mb-8 sm:mb-10 lg:mb-12" 
         />
       </div>
       
@@ -78,19 +78,19 @@ const OwnerServiceBlock = () => {
           className="lg:w-1/2 xl:w-[52%] flex flex-col justify-center"
         >
           <div className="text-left">
-            <span className="text-gray-400 font-poppins font-bold block tracking-wide text-xs sm:text-sm md:text-base lg:text-lg">
+            <span className="text-[var(--color-text-muted)] font-poppins font-bold block tracking-wide text-xs sm:text-sm md:text-base lg:text-lg">
               ARE YOU AN OWNER?
             </span>
-            <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold text-white leading-tight mt-2 sm:mt-3 md:mt-4">
-              Sell or Rent <span className="text-[#78cadc]">Your Property</span> Faster with
+            <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-bold text-[var(--color-text)] leading-tight mt-2 sm:mt-3 md:mt-4">
+              Sell or Rent <span className="text-[var(--color-primary)]">Your Property</span> Faster with
               <br className="hidden sm:block" />SQUAREFOOT
             </h2>
-            <p className="font-poppins text-gray-300 mt-3 sm:mt-4 tracking-wide text-xs sm:text-sm md:text-base mb-6 sm:mb-8 md:mb-10">
+            <p className="font-poppins text-[var(--color-text-muted)] mt-3 sm:mt-4 tracking-wide text-xs sm:text-sm md:text-base mb-6 sm:mb-8 md:mb-10">
               SELL OR RENT YOUR RESIDENTIAL/COMMERCIAL PROPERTY.
             </p>
             
             <div className="flex justify-start">
-              <button onClick={handlePostClick} className="flex items-center gap-2 bg-[#78cadc] text-[#0c0d0e] font-bold px-4 sm:px-5 md:px-6 py-2 sm:py-3 md:py-3.5 rounded-lg md:rounded-xl hover:bg-sky-300 transition-colors duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base md:text-lg">
+              <button onClick={handlePostClick} className="flex items-center gap-2 bg-[var(--color-primary)] text-[var(--color-bg-dark)] font-bold px-4 sm:px-5 md:px-6 py-2 sm:py-3 md:py-3.5 rounded-lg md:rounded-xl hover:bg-[var(--color-primary-hover)] transition-colors duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base md:text-lg">
                 <span>{canPostProperty ? 'Post Your Property' : (user ? 'Switch to a posting account' : 'Login to Post Property')}</span>
                 <ChevronRightIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </button>

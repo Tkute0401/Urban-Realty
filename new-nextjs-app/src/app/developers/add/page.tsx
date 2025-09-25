@@ -22,11 +22,11 @@ import { styled } from '@mui/material/styles';
 
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#0B1011',
-  color: '#fff',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
   borderRadius: '16px',
   boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
-  border: `2px solid #78CADC`,
+  border: `2px solid var(--color-primary)`,
   padding: theme.spacing(3),
   fontFamily: '"Poppins", sans-serif',
   position: 'relative',
@@ -38,13 +38,13 @@ const PremiumPaper = styled(Paper)(({ theme }) => ({
     left: 0,
     right: 0,
     height: '4px',
-    background: 'linear-gradient(90deg, #78CADC 0%, #0B1011 100%)',
+    background: 'linear-gradient(90deg, var(--color-primary) 0%, var(--color-surface) 100%)',
   }
 }));
 
 const PremiumButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#78CADC',
-  color: '#0B1011',
+  backgroundColor: 'var(--color-primary)',
+  color: 'var(--color-primary-contrast)',
   fontWeight: 600,
   padding: theme.spacing(1.8, 4),
   borderRadius: '12px',
@@ -433,7 +433,7 @@ const AddDeveloperPage = () => {
   return (
     <Container maxWidth="lg" sx={{ 
       py: { xs: 2, md: 3 },
-      background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+      background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)',
       minHeight: '100vh'
     }}>
       <Box 
@@ -443,9 +443,9 @@ const AddDeveloperPage = () => {
           maxWidth: 1200, 
           mx: 'auto',
           p: { xs: 1, sm: 2, md: 3 },
-          backgroundColor: '#0B1011',
+          backgroundColor: 'var(--color-surface)',
           borderRadius: '16px',
-          border: '2px solid #78CADC',
+          border: '2px solid var(--color-primary)',
           boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)'
         }}
       >
@@ -455,7 +455,7 @@ const AddDeveloperPage = () => {
           sx={{ 
             mb: { xs: 2, sm: 3 },
             fontSize: { xs: '1.5rem', sm: '2rem' },
-            color: '#78CADC',
+            color: 'var(--color-primary)',
             fontFamily: '"Poppins", sans-serif',
             fontWeight: 700
           }}

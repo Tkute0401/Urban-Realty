@@ -189,6 +189,19 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
     message: '', 
     severity: 'success' 
   });
+  const [sectionVisibility, setSectionVisibility] = useState<{
+    developer: boolean;
+    projectDetails: boolean;
+    approvals: boolean;
+    floorPlans: boolean;
+    brochure: boolean;
+  }>({
+    developer: true,
+    projectDetails: true,
+    approvals: true,
+    floorPlans: true,
+    brochure: true
+  });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -200,7 +213,8 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
     { value: 'Condo', label: 'Condo', icon: <Cottage /> },
     { value: 'Townhouse', label: 'Townhouse', icon: <Home /> },
     { value: 'Land', label: 'Land', icon: <Landscape /> },
-    { value: 'Commercial', label: 'Commercial', icon: <Factory /> }
+    { value: 'Commercial', label: 'Commercial', icon: <Factory /> },
+    { value: 'PG', label: 'PG', icon: <Home /> }
   ];
 
   const amenityOptions = [
@@ -226,6 +240,27 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
       router.push('/login');
     }
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user.role === 'individual_seller') {
+      setSectionVisibility({
+        developer: false,
+        projectDetails: false,
+        approvals: false,
+        floorPlans: false,
+        brochure: false
+      });
+    } else {
+      setSectionVisibility({
+        developer: true,
+        projectDetails: true,
+        approvals: true,
+        floorPlans: true,
+        brochure: true
+      });
+    }
+  }, [user]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -390,26 +425,40 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
 
             {/* Developer */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2 }}>
-                Developer Information
-              </Typography>
-              <Autocomplete
-                options={developers || []}
-                getOptionLabel={(option: any) => option.name}
-                value={selectedDeveloper}
-                onChange={(e, val) => setSelectedDeveloper(val)}
-                renderInput={(params) => (
-                  <TextField {...params} label="Select Developer" fullWidth />
-                )}
-                renderOption={(props, option: any) => (
-                  <li {...props} key={option._id}>
-                    <Box display="flex" alignItems="center">
-                      {option.logo?.url ? <Avatar src={option.logo.url} sx={{ width: 24, height: 24, mr: 1 }} /> : null}
-                      <Typography>{option.name}</Typography>
-                    </Box>
-                  </li>
-                )}
-              />
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2 }}>
+                  Developer Information
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.developer}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, developer: e.target.checked }))}
+                      sx={{ color: 'var(--color-primary)', '&.Mui-checked': { color: 'var(--color-primary)' } }}
+                    />
+                  }
+                  label={<Typography sx={{ color: 'var(--color-text-inverse)' }}>Include Developer</Typography>}
+                />
+              </Box>
+              {(user?.role !== 'individual_seller' || sectionVisibility.developer) && (
+                <Autocomplete
+                  options={developers || []}
+                  getOptionLabel={(option: any) => option.name}
+                  value={selectedDeveloper}
+                  onChange={(e, val) => setSelectedDeveloper(val)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Developer" fullWidth />
+                  )}
+                  renderOption={(props, option: any) => (
+                    <li {...props} key={option._id}>
+                      <Box display="flex" alignItems="center">
+                        {option.logo?.url ? <Avatar src={option.logo.url} sx={{ width: 24, height: 24, mr: 1 }} /> : null}
+                        <Typography>{option.name}</Typography>
+                      </Box>
+                    </li>
+                  )}
+                />
+              )}
             </Grid>
 
             {/* Basic Information */}
@@ -431,12 +480,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
@@ -452,12 +501,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               >
                 {propertyTypes.map((type) => (
@@ -485,19 +534,19 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
 
             {/* Property Details */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: '#78CADC', mb: 2, mt: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
                 Property Details
               </Typography>
             </Grid>
@@ -518,12 +567,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
@@ -539,12 +588,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               >
                 <MenuItem value="For Sale">For Sale</MenuItem>
@@ -565,12 +614,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
@@ -588,12 +637,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
@@ -611,12 +660,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
@@ -631,12 +680,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
@@ -651,19 +700,19 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#1a1a1a',
                     color: 'white',
-                    '& fieldset': { borderColor: '#78CADC' },
-                    '&:hover fieldset': { borderColor: '#78CADC' },
-                    '&.Mui-focused fieldset': { borderColor: '#78CADC' },
+                    '& fieldset': { borderColor: 'var(--color-primary)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
                   },
                   '& .MuiInputLabel-root': { color: 'white' },
-                  '& .MuiInputLabel-root.Mui-focused': { color: '#78CADC' },
+                  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--color-primary)' },
                 }}
               />
             </Grid>
 
             {/* Amenities */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: '#78CADC', mb: 2, mt: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
                 Amenities
               </Typography>
               <Box display="flex" flexWrap="wrap" gap={1}>
@@ -679,7 +728,7 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                       color: formData.amenities.includes(amenity.value) ? '#0c0d0e' : 'white',
                       border: '1px solid #78CADC',
                       '&:hover': {
-                        bgcolor: formData.amenities.includes(amenity.value) ? '#6bb6c7' : '#2a2a2a',
+                        bgcolor: formData.amenities.includes(amenity.value) ? 'var(--color-primary)' : 'var(--color-surface)',
                       }
                     }}
                   />
@@ -689,7 +738,7 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
 
             {/* Image Upload */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: '#78CADC', mb: 2, mt: 2 }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
                 Property Images
               </Typography>
               <Box
@@ -699,12 +748,12 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
                   p: 3,
                   textAlign: 'center',
                   cursor: 'pointer',
-                  '&:hover': { borderColor: '#6bb6c7' }
+                  '&:hover': { borderColor: 'var(--color-primary-hover)' }
                 }}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <CloudUpload sx={{ fontSize: 48, color: '#78CADC', mb: 2 }} />
-                <Typography variant="body1" sx={{ color: '#78CADC', mb: 1 }}>
+                <CloudUpload sx={{ fontSize: 48, color: 'var(--color-primary)', mb: 2 }} />
+                <Typography variant="body1" sx={{ color: 'var(--color-primary)', mb: 1 }}>
                   Click to upload images
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'white' }}>
@@ -835,79 +884,141 @@ const AddProperty: React.FC<AddPropertyProps> = ({ __editMode = false, initialVa
 
             {/* Project Details */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
-                Project Details
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}><TextField fullWidth label="Total Project Area (acres)" value={formData.projectDetails.projectArea} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, projectArea: e.target.value } }))} /></Grid>
-                <Grid item xs={12} md={6}><TextField fullWidth label="Total Units in Project" value={formData.projectDetails.totalUnits} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, totalUnits: e.target.value } }))} /></Grid>
-                <Grid item xs={12} md={6}><TextField fullWidth type="date" InputLabelProps={{ shrink: true }} label="Project Launch Date" value={formData.projectDetails.launchDate} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, launchDate: e.target.value } }))} /></Grid>
-                <Grid item xs={12} md={6}><TextField fullWidth label="RERA ID" value={formData.projectDetails.reraId} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, reraId: e.target.value } }))} /></Grid>
-                <Grid item xs={12}><TextField fullWidth label="Available Configurations" helperText="List available configurations (e.g., 1BHK, 2BHK, 3BHK)" value={formData.projectDetails.configurations} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, configurations: e.target.value } }))} /></Grid>
-              </Grid>
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                  Project Details
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.projectDetails}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, projectDetails: e.target.checked }))}
+                      sx={{ color: 'var(--color-primary)', '&.Mui-checked': { color: 'var(--color-primary)' } }}
+                    />
+                  }
+                  label={<Typography sx={{ color: 'var(--color-text-inverse)' }}>Show</Typography>}
+                />
+              </Box>
+              {sectionVisibility.projectDetails && (
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}><TextField fullWidth label="Total Project Area (acres)" value={formData.projectDetails.projectArea} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, projectArea: e.target.value } }))} /></Grid>
+                  <Grid item xs={12} md={6}><TextField fullWidth label="Total Units in Project" value={formData.projectDetails.totalUnits} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, totalUnits: e.target.value } }))} /></Grid>
+                  <Grid item xs={12} md={6}><TextField fullWidth type="date" InputLabelProps={{ shrink: true }} label="Project Launch Date" value={formData.projectDetails.launchDate} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, launchDate: e.target.value } }))} /></Grid>
+                  <Grid item xs={12} md={6}><TextField fullWidth label="RERA ID" value={formData.projectDetails.reraId} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, reraId: e.target.value } }))} /></Grid>
+                  <Grid item xs={12}><TextField fullWidth label="Available Configurations" helperText="List available configurations (e.g., 1BHK, 2BHK, 3BHK)" value={formData.projectDetails.configurations} onChange={(e)=> setFormData((p:any)=> ({ ...p, projectDetails: { ...p.projectDetails, configurations: e.target.value } }))} /></Grid>
+                </Grid>
+              )}
             </Grid>
 
             {/* Approvals */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
-                Approvals & Certifications
-              </Typography>
-              {formData.approvals.map((approval: any, index: number) => (
-                <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #78CADC', borderRadius: '8px' }}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} md={4}><TextField fullWidth label="Approval Name" value={approval.name} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], name:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
-                    <Grid item xs={12} md={4}><TextField fullWidth label="Approval Number" value={approval.number} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], number:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
-                    <Grid item xs={12} md={3}><TextField fullWidth type="date" InputLabelProps={{ shrink: true }} label="Approval Date" value={approval.date || ''} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], date:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
-                    <Grid item xs={12} md={1}><IconButton onClick={()=>{ const next=[...formData.approvals]; next.splice(index,1); setFormData((p:any)=>({...p, approvals: next})); }} sx={{ color: '#ff6b6b' }}><Remove /></IconButton></Grid>
-                  </Grid>
-                </Box>
-              ))}
-              <Button variant="outlined" startIcon={<Add />} onClick={()=> setFormData((p:any)=> ({ ...p, approvals: [...p.approvals, { name:'', number:'', date:'' }] }))} sx={{ color: '#78CADC', borderColor: '#78CADC' }}>Add Approval</Button>
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>
+                  Approvals & Certifications
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.approvals}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, approvals: e.target.checked }))}
+                      sx={{ color: 'var(--color-primary)', '&.Mui-checked': { color: 'var(--color-primary)' } }}
+                    />
+                  }
+                  label={<Typography sx={{ color: 'var(--color-text-inverse)' }}>Show</Typography>}
+                />
+              </Box>
+              {sectionVisibility.approvals && (
+                <>
+                  {formData.approvals.map((approval: any, index: number) => (
+                    <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #78CADC', borderRadius: '8px' }}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={4}><TextField fullWidth label="Approval Name" value={approval.name} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], name:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
+                        <Grid item xs={12} md={4}><TextField fullWidth label="Approval Number" value={approval.number} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], number:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
+                        <Grid item xs={12} md={3}><TextField fullWidth type="date" InputLabelProps={{ shrink: true }} label="Approval Date" value={approval.date || ''} onChange={(e)=>{ const next=[...formData.approvals]; next[index]={...next[index], date:e.target.value}; setFormData((p:any)=>({...p, approvals: next})); }} /></Grid>
+                        <Grid item xs={12} md={1}><IconButton onClick={()=>{ const next=[...formData.approvals]; next.splice(index,1); setFormData((p:any)=>({...p, approvals: next})); }} sx={{ color: '#ff6b6b' }}><Remove /></IconButton></Grid>
+                      </Grid>
+                    </Box>
+                  ))}
+                  <Button variant="outlined" startIcon={<Add />} onClick={()=> setFormData((p:any)=> ({ ...p, approvals: [...p.approvals, { name:'', number:'', date:'' }] }))} sx={{ color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>Add Approval</Button>
+                </>
+              )}
             </Grid>
 
             {/* Floor Plans */}
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Floor Plans</Typography>
-              <Box sx={{ border: '2px dashed #78CADC', borderRadius: 2, p: 3, textAlign: 'center', cursor: 'pointer', '&:hover': { borderColor: '#6bb6c7' } }} onClick={() => document.getElementById('floorPlanInput')?.click()}>
-                <CloudUpload sx={{ fontSize: 48, color: '#78CADC', mb: 2 }} />
-                <Typography variant="body1" sx={{ color: '#78CADC', mb: 1 }}>Upload floor plans</Typography>
-                <input id="floorPlanInput" type="file" multiple accept="image/*" onChange={(e:any)=>{
-                  const files = Array.from(e.target.files || []).slice(0, 5 - floorPlanFiles.length) as File[];
-                  setFloorPlanFiles(prev => [...prev, ...files]);
-                  setFloorPlanPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
-                }} style={{ display: 'none' }} />
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Floor Plans</Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.floorPlans}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, floorPlans: e.target.checked }))}
+                      sx={{ color: 'var(--color-primary)', '&.Mui-checked': { color: 'var(--color-primary)' } }}
+                    />
+                  }
+                  label={<Typography sx={{ color: 'var(--color-text-inverse)' }}>Show</Typography>}
+                />
               </Box>
-              {floorPlanPreviews.length > 0 && (
-                <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
-                  {floorPlanPreviews.map((preview, index) => (
-                    <Box key={index} position="relative">
-                      <img src={preview} alt={`Floor ${index+1}`} style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, border: '2px solid #78CADC' }} />
-                      <IconButton size="small" onClick={()=>{ setFloorPlanPreviews(prev => prev.filter((_,i)=> i!==index)); setFloorPlanFiles(prev => prev.filter((_,i)=> i!==index)); }} sx={{ position: 'absolute', top: -8, right: -8, bgcolor: '#ff6b6b', color: 'white' }}><Close fontSize="small" /></IconButton>
+              {sectionVisibility.floorPlans && (
+                <>
+                  <Box sx={{ border: '2px dashed var(--color-primary)', borderRadius: 2, p: 3, textAlign: 'center', cursor: 'pointer', '&:hover': { borderColor: 'var(--color-primary-hover)' } }} onClick={() => document.getElementById('floorPlanInput')?.click()}>
+                    <CloudUpload sx={{ fontSize: 48, color: 'var(--color-primary)', mb: 2 }} />
+                    <Typography variant="body1" sx={{ color: 'var(--color-primary)', mb: 1 }}>Upload floor plans</Typography>
+                    <input id="floorPlanInput" type="file" multiple accept="image/*" onChange={(e:any)=>{
+                      const files = Array.from(e.target.files || []).slice(0, 5 - floorPlanFiles.length) as File[];
+                      setFloorPlanFiles(prev => [...prev, ...files]);
+                      setFloorPlanPreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+                    }} style={{ display: 'none' }} />
+                  </Box>
+                  {floorPlanPreviews.length > 0 && (
+                    <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+                      {floorPlanPreviews.map((preview, index) => (
+                        <Box key={index} position="relative">
+                          <img src={preview} alt={`Floor ${index+1}`} style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8, border: '2px solid #78CADC' }} />
+                          <IconButton size="small" onClick={()=>{ setFloorPlanPreviews(prev => prev.filter((_,i)=> i!==index)); setFloorPlanFiles(prev => prev.filter((_,i)=> i!==index)); }} sx={{ position: 'absolute', top: -8, right: -8, bgcolor: '#ff6b6b', color: 'white' }}><Close fontSize="small" /></IconButton>
+                        </Box>
+                      ))}
                     </Box>
-                  ))}
-                </Box>
+                  )}
+                </>
               )}
             </Grid>
 
             {/* Brochure */}
             <Grid item xs={12} md={6}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Property Brochure</Typography>
-              <Button variant="contained" component="label" startIcon={<CloudUpload />} sx={{ bgcolor: '#78CADC', color: '#0B1011' }}>
-                Upload Brochure
-                <input type="file" hidden accept=".pdf,.doc,.docx" onChange={(e:any)=> setBrochureFile(e.target.files?.[0] || null)} />
-              </Button>
-              {brochureFile ? (
-                <Box mt={2} display="flex" alignItems="center" justifyContent="space-between" p={1} sx={{ border: '1px solid #78CADC', borderRadius: '4px' }}>
-                  <Typography variant="body2" sx={{ color: '#fff' }}>{brochureFile.name}</Typography>
-                  <IconButton size="small" onClick={()=> setBrochureFile(null)} sx={{ color: '#ff6b6b' }}><Delete fontSize="small" /></IconButton>
-                </Box>
-              ) : null}
+              <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Property Brochure</Typography>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.brochure}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, brochure: e.target.checked }))}
+                      sx={{ color: 'var(--color-primary)', '&.Mui-checked': { color: 'var(--color-primary)' } }}
+                    />
+                  }
+                  label={<Typography sx={{ color: 'var(--color-text-inverse)' }}>Show</Typography>}
+                />
+              </Box>
+              {sectionVisibility.brochure && (
+                <>
+                  <Button variant="contained" component="label" startIcon={<CloudUpload />} sx={{ bgcolor: 'var(--color-primary)', color: 'var(--color-primary-contrast)' }}>
+                    Upload Brochure
+                    <input type="file" hidden accept=".pdf,.doc,.docx" onChange={(e:any)=> setBrochureFile(e.target.files?.[0] || null)} />
+                  </Button>
+                  {brochureFile ? (
+                    <Box mt={2} display="flex" alignItems="center" justifyContent="space-between" p={1} sx={{ border: '1px solid #78CADC', borderRadius: '4px' }}>
+                      <Typography variant="body2" sx={{ color: '#fff' }}>{brochureFile.name}</Typography>
+                      <IconButton size="small" onClick={()=> setBrochureFile(null)} sx={{ color: '#ff6b6b' }}><Delete fontSize="small" /></IconButton>
+                    </Box>
+                  ) : null}
+                </>
+              )}
             </Grid>
 
             {/* Virtual Tour */}
             <Grid item xs={12} md={6}>
               <Typography variant="h6" gutterBottom sx={{ color: 'var(--color-primary)', mb: 2, mt: 2 }}>Virtual Tour</Typography>
-              <Button variant="contained" component="label" startIcon={<CloudUpload />} sx={{ bgcolor: '#78CADC', color: '#0B1011' }}>
+              <Button variant="contained" component="label" startIcon={<CloudUpload />} sx={{ bgcolor: 'var(--color-primary)', color: 'var(--color-primary-contrast)' }}>
                 Upload Virtual Tour
                 <input type="file" hidden accept="video/*" onChange={(e:any)=> setVirtualTourFile(e.target.files?.[0] || null)} />
               </Button>

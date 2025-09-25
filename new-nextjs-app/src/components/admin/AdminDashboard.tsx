@@ -221,18 +221,18 @@ const AdminDashboard: React.FC = () => {
   ];
 
   const userTypeData = [
-    { name: 'Regular Users', value: stats.counts.users - stats.counts.agents, color: '#0088FE' },
-    { name: 'Agents', value: stats.counts.agents, color: '#00C49F' },
-    { name: 'Admins', value: 5, color: '#FFBB28' }
+    { name: 'Regular Users', value: stats.counts.users - stats.counts.agents, color: 'var(--chart-color-3)' },
+    { name: 'Agents', value: stats.counts.agents, color: 'var(--chart-color-4)' },
+    { name: 'Admins', value: 5, color: 'var(--color-warning)' }
   ];
 
   const propertyStatusData = [
-    { name: 'Active', value: Math.floor(stats.counts.properties * 0.7), color: '#00C49F' },
-    { name: 'Pending', value: Math.floor(stats.counts.properties * 0.2), color: '#FFBB28' },
-    { name: 'Sold', value: Math.floor(stats.counts.properties * 0.1), color: '#FF8042' }
+    { name: 'Active', value: Math.floor(stats.counts.properties * 0.7), color: 'var(--chart-color-4)' },
+    { name: 'Pending', value: Math.floor(stats.counts.properties * 0.2), color: 'var(--color-warning)' },
+    { name: 'Sold', value: Math.floor(stats.counts.properties * 0.1), color: 'var(--color-danger)' }
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  const COLORS = ['var(--chart-color-3)', 'var(--chart-color-4)', 'var(--color-warning)', 'var(--color-danger)', 'var(--chart-color-1)'];
 
   const StatCard: React.FC<{ title: string; value: React.ReactNode; icon: React.ReactNode; color: string; subtitle?: string; trend?: string; trendValue?: string }> = ({ title, value, icon, color, subtitle, trend, trendValue }) => (
     <motion.div
@@ -515,9 +515,9 @@ const AdminDashboard: React.FC = () => {
                   <YAxis yAxisId="right" orientation="right" />
                   <RechartsTooltip />
                   <Legend />
-                  <Area yAxisId="left" type="monotone" dataKey="users" stackId="1" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                  <Area yAxisId="left" type="monotone" dataKey="properties" stackId="1" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
-                  <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="#ff7300" strokeWidth={3} />
+                  <Area yAxisId="left" type="monotone" dataKey="users" stackId="1" stroke="var(--chart-color-1)" fill="var(--chart-color-1)" fillOpacity={0.6} />
+                  <Area yAxisId="left" type="monotone" dataKey="properties" stackId="1" stroke="var(--chart-color-2)" fill="var(--chart-color-2)" fillOpacity={0.6} />
+                  <Line yAxisId="right" type="monotone" dataKey="revenue" stroke="var(--color-primary)" strokeWidth={3} />
                 </ComposedChart>
               </ResponsiveContainer>
             </CardContent>
@@ -538,7 +538,7 @@ const AdminDashboard: React.FC = () => {
                     labelLine={false}
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={100}
-                    fill="#8884d8"
+                    fill="var(--chart-color-1)"
                     dataKey="value"
                   >
                     {userTypeData.map((entry, index) => (
@@ -621,7 +621,7 @@ const AdminDashboard: React.FC = () => {
                     labelLine={false}
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
-                    fill="#8884d8"
+                    fill="var(--chart-color-1)"
                     dataKey="value"
                   >
                     {propertyStatusData.map((entry, index) => (

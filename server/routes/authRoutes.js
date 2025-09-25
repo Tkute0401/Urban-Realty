@@ -41,15 +41,12 @@ router.put(
 );
 // Favorites routes
 router.route('/favorites/:propertyId')
-  .put(protect, authController.addToFavorites)
+  .put(protect, authController.toggleFavorite)
   .delete(protect, authController.removeFromFavorites);
 
 // Add these routes to your auth routes file
 router.route('/favorites/:propertyId/status')
-  .get(protect, authController.checkFavoriteStatus);
-
-router.route('/favorites/:propertyId')
-  .put(protect, authController.toggleFavorite);  
+  .get(protect, authController.checkFavoriteStatus);  
 
 router.get('/favorites', protect, authController.getFavorites);
 

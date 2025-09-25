@@ -165,7 +165,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
             <div className="p-4 border-b border-white/20">
               {user ? (
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[#78cadc] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[color:var(--color-primary)] flex items-center justify-center">
                     <UserIcon className="w-6 h-6 text-black" />
                   </div>
                   <div>
@@ -177,7 +177,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                       onClose();
                       router.push('/profile');
                     }}
-                    className="ml-auto bg-[#08171A]/70 text-white border border-[#78CADC] py-1 px-3 rounded-lg hover:bg-[#78CADC] hover:text-black transition-colors font-poppins text-sm"
+                    className="ml-auto bg-[var(--color-bg-dark)]/70 text-white border border-[var(--color-primary)] py-1 px-3 rounded-lg hover:bg-[var(--color-primary)] hover:text-black transition-colors font-poppins text-sm"
                   >
                     Profile
                   </button>
@@ -192,7 +192,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                       onClose();
                       router.push('/login');
                     }}
-                    className="w-full bg-[#78cadc] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[#5fb4c9] transition-colors font-poppins"
+                    className="w-full bg-[color:var(--color-primary)] text-white font-semibold py-2 px-4 rounded-lg hover:bg-[color:var(--color-primary-hover)] transition-colors font-poppins"
                   >
                     Login / Sign Up
                   </button>
@@ -208,8 +208,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   onClick={() => setActiveTab('viewed')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors font-poppins ${
                     activeTab === 'viewed'
-                      ? 'bg-[#78cadc] text-black'
-                      : 'bg-[#08171A]/70 text-white border border-[#78CADC]/90 hover:bg-[#78CADC] hover:text-black'
+                      ? 'bg-[color:var(--color-primary)] text-[color:var(--color-primary-contrast)]'
+                      : 'bg-[color:var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-contrast)]'
                   }`}
                 >
                   <EyeIcon className="w-4 h-4" />
@@ -219,8 +219,8 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   onClick={() => setActiveTab('favourites')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors font-poppins ${
                     activeTab === 'favourites'
-                      ? 'bg-[#78cadc] text-black'
-                      : 'bg-[#08171A]/70 text-white border border-[#78CADC]/90 hover:bg-[#78CADC] hover:text-black'
+                      ? 'bg-[color:var(--color-primary)] text-[color:var(--color-primary-contrast)]'
+                      : 'bg-[color:var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)] hover:text-[color:var(--color-primary-contrast)]'
                   }`}
                 >
                   <HeartIcon className="w-4 h-4" />
@@ -233,9 +233,9 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                   <div className="text-white text-center py-4">Loading favorites...</div>
                 ) : (
                   (activeTab === 'viewed' ? recentlyViewed : favoriteProperties).map((property) => (
-                    <div key={property._id || property.id} onClick={() => handlePropertyClick(property)} className="bg-[#08171A]/70 border border-[#78CADC] rounded-lg p-3 hover:bg-gray-200/20 transition-colors overflow-hidden">
+                    <div key={property._id || property.id} onClick={() => handlePropertyClick(property)} className="bg-[color:var(--color-surface)] border border-[color:var(--color-primary)] rounded-lg p-3 hover:bg-[color:var(--color-accent)] transition-colors overflow-hidden">
                       <div className="flex gap-3">
-                        <div className="w-20 h-20 rounded-full border-2 border-[#78CADC] overflow-hidden  mt-7">
+                        <div className="w-20 h-20 rounded-full border-2 border-[color:var(--color-primary)] overflow-hidden  mt-7">
                           {property.images ? (
                             <img 
                               src={property.images[0]?.url || property.image || '/placeholder-property.jpg'} 
@@ -251,7 +251,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-[#78cadc] font-semibold text-sm">
+                              <p className="text-[var(--color-primary)] font-semibold text-sm">
                                 {formatPrice(property.price)}
                               </p>
                               <p className="text-white text-sm font-medium truncate mt-1">
@@ -265,7 +265,7 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                               </p>
                             </div>
                           </div>
-                          <button className="mt-2 w-full bg-[#78cadc] text-black py-1 px-3 rounded text-xs font-medium transition-colors font-poppins">
+                          <button className="mt-2 w-full bg-[color:var(--color-primary)] text-black py-1 px-3 rounded text-xs font-medium transition-colors font-poppins">
                             View
                           </button>
                         </div>

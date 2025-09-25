@@ -1,0 +1,159 @@
+
+> urban-realty@1.0.0 server
+> nodemon server/server.js
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node server/server.js`[39m
+dir:C:\Users\Kutet\New folder\urban-realty\server\constants
+Attempting MongoDB connection to: urbanrealty.rbqbb.mongodb.net
+(node:12076) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12076) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+Server running in development mode on port 3001
+Serving static files from: C:\Users\Kutet\New folder\urban-realty\client\dist
+Uploads directory: C:\Users\Kutet\New folder\urban-realty\server\uploads
+Frontend files: []
+MongoDB Connected: urbanrealty-shard-00-00.rbqbb.mongodb.net
+🔄 Starting migration of existing users...
+📊 Found 0 users to migrate
+✅ No users need migration
+API Usage: {
+  endpoint: '/api/v1/properties',
+  method: 'GET',
+  timestamp: '2025-09-25T18:58:16.958Z',
+  userId: 'anonymous',
+  apiKey: 'none',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"'
+}
+API Usage: {
+  endpoint: '/api/v1/properties/featured',
+  method: 'GET',
+  timestamp: '2025-09-25T18:58:16.969Z',
+  userId: 'anonymous',
+  apiKey: 'none',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"'
+}
+Property View: {
+  propertyId: undefined,
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:58:16.969Z',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  referrer: 'http://localhost:5000/'
+}
+API Usage: {
+  endpoint: '/api/v1/properties',
+  method: 'GET',
+  timestamp: '2025-09-25T18:58:16.971Z',
+  userId: 'anonymous',
+  apiKey: 'none',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"'
+}
+API Usage: {
+  endpoint: '/api/v1/properties/featured',
+  method: 'GET',
+  timestamp: '2025-09-25T18:58:16.971Z',
+  userId: 'anonymous',
+  apiKey: 'none',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"'
+}
+Property View: {
+  propertyId: undefined,
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:58:16.972Z',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  referrer: 'http://localhost:5000/'
+}
+{
+  requestId: 'cd5ee6b4-06f9-4a27-a191-e3f04f2e7198',
+  method: 'GET',
+  url: '/featured',
+  statusCode: 200,
+  duration: '121ms',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  ip: '::ffff:127.0.0.1',
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:58:17.090Z'
+}
+{
+  requestId: '5ccdf658-2887-44e1-b540-b473ac00512b',
+  method: 'GET',
+  url: '/featured',
+  statusCode: 200,
+  duration: '134ms',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  ip: '::ffff:127.0.0.1',
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:58:17.105Z'
+}
+{
+  requestId: 'd9097d7d-9f7a-4428-b570-aea51f35f486',
+  method: 'GET',
+  url: '/?page=1&limit=12',
+  statusCode: 200,
+  duration: '160ms',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  ip: '::ffff:127.0.0.1',
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:58:17.119Z'
+}
+{
+  requestId: '143c041d-dc00-4901-8489-4978abd30238',
+  method: 'GET',
+  url: '/?page=1&limit=12',
+  statusCode: 200,
+  duration: '177ms',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  ip: '::ffff:127.0.0.1',
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:58:17.147Z'
+}
+API Usage: {
+  endpoint: '/api/v1/auth/login',
+  method: 'POST',
+  timestamp: '2025-09-25T18:59:00.074Z',
+  userId: 'anonymous',
+  apiKey: 'none',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"'
+}
+Auth Event: {
+  eventType: 'login',
+  timestamp: '2025-09-25T18:59:00.075Z',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  success: true
+}
+Error occurred: {
+  message: 'Invalid credentials',
+  stack: 'Error: Invalid credentials\n' +
+    '    at C:\\Users\\Kutet\\New folder\\urban-realty\\server\\controllers\\authController.js:83:17',
+  url: '/api/v1/auth/login',
+  method: 'POST',
+  userId: 'anonymous',
+  ip: '::ffff:127.0.0.1',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  timestamp: '2025-09-25T18:59:00.254Z',
+  requestId: '1dbc7aee-3a38-4995-a871-168965db7af1'
+}
+Error: Invalid credentials
+    at C:\Users\Kutet\New folder\urban-realty\server\controllers\authController.js:83:17
+{
+  requestId: '1dbc7aee-3a38-4995-a871-168965db7af1',
+  method: 'POST',
+  url: '/api/v1/auth/login',
+  statusCode: 401,
+  duration: '181ms',
+  userAgent: '"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36"',
+  ip: '::ffff:127.0.0.1',
+  userId: 'anonymous',
+  timestamp: '2025-09-25T18:59:00.255Z'
+}
