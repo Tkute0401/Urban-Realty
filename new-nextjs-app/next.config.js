@@ -8,7 +8,6 @@ const nextConfig = {
     optimizeServerReact: true,
     gzipSize: true,
     esmExternals: true,
-    staticPageGenerationTimeout: 60,
   },
 
   // Image optimization

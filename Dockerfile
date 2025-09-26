@@ -5,8 +5,8 @@ WORKDIR /app/new-nextjs-app
 COPY new-nextjs-app/package*.json ./
 
 # Set npm cache and install with optimizations
-RUN npm config set cache /tmp/npm-cache && \
-    npm ci --only=production --no-audit --no-fund && \
+RUN npm config set cache /tmp/npm-cache --global && \
+    npm config set registry https://registry.npmjs.org/ --global && \
     npm ci --no-audit --no-fund
 
 COPY new-nextjs-app .
@@ -16,7 +16,9 @@ ARG NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY \
     NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
-    NODE_ENV=production
+    NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    DISABLE_ESLINT_PLUGIN=true
 
 RUN npm run build
 
@@ -27,8 +29,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install with optimizations
-RUN npm config set cache /tmp/npm-cache && \
-    npm ci --only=production --no-audit --no-fund
+RUN npm config set cache /tmp/npm-cache --global && \
+    npm config set registry https://registry.npmjs.org/ --global && \
+    npm ci --omit=dev --no-audit --no-fund
 
 # Copy everything to preserve the exact folder structure
 COPY . .
