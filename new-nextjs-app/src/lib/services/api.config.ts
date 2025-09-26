@@ -10,14 +10,21 @@ export function getApiBaseUrl(): string {
         
         // For production on Railway, optimize for SSR
         if (nodeEnv === 'production') {
-                if (nextPublicApiUrl) {
+                // Client-side requests should use the public API URL
+                if (isClient && nextPublicApiUrl) {
                         return nextPublicApiUrl;
                 }
                 
-                // Fallback for server-side rendering in production
+                // Server-side rendering - use internal container communication for speed
                 if (!isClient) {
-                        return process.env.API_URL || 'http://localhost:5000/api/v1';
+                        // Railway internal container communication (faster than external)
+                        return process.env.RAILWAY_PRIVATE_DOMAIN 
+                                ? `http://${process.env.RAILWAY_PRIVATE_DOMAIN}:5000/api/v1`
+                                : process.env.API_URL || nextPublicApiUrl || 'http://localhost:5000/api/v1';
                 }
+                
+                // Fallback to public URL
+                return nextPublicApiUrl || 'http://localhost:5000/api/v1';
         }
         
         // For development, use localhost with correct port

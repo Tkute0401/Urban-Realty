@@ -1,9 +1,38 @@
 import { MetadataRoute } from 'next'
+import { getApiBaseUrl, withPerformanceMonitoring } from '@/lib/services/api.config'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-production.up.railway.app'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+// Helper function to fetch dynamic URLs
+async function fetchDynamicUrls() {
+  try {
+    const apiUrl = getApiBaseUrl()
+    
+    // Fetch latest properties for sitemap
+    const propertiesResponse = await fetch(`${apiUrl}/properties?limit=100&sort=-createdAt`, {
+      next: { revalidate: 86400 }, // Revalidate every 24 hours
+    })
+    const propertiesData = await propertiesResponse.json()
+    const properties = propertiesData.success ? propertiesData.data : []
+    
+    // Fetch developers for sitemap
+    const developersResponse = await fetch(`${apiUrl}/developers?limit=50&sort=-createdAt`, {
+      next: { revalidate: 86400 }, // Revalidate every 24 hours
+    })
+    const developersData = await developersResponse.json()
+    const developers = developersData.success ? developersData.data : []
+    
+    return { properties, developers }
+  } catch (error) {
+    console.error('Error fetching dynamic URLs for sitemap:', error)
+    return { properties: [], developers: [] }
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { properties, developers } = await fetchDynamicUrls()
+  
+  const staticUrls: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -71,4 +100,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
   ]
+
+  // Add dynamic property URLs
+  const propertyUrls: MetadataRoute.Sitemap = properties.map((property: any) => ({
+    url: `${baseUrl}/properties/${property._id}`,
+    lastModified: new Date(property.updatedAt || property.createdAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  // Add dynamic developer URLs  
+  const developerUrls: MetadataRoute.Sitemap = developers.map((developer: any) => ({
+    url: `${baseUrl}/developers/${developer._id}`,
+    lastModified: new Date(developer.updatedAt || developer.createdAt),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }))
+
+  return [...staticUrls, ...propertyUrls, ...developerUrls]
 }

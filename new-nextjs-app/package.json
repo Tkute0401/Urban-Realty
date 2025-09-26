@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
-    "build:railway": "NEXT_TELEMETRY_DISABLED=1 SKIP_ENV_VALIDATION=true NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build:railway": "cross-env NEXT_TELEMETRY_DISABLED=1 SKIP_ENV_VALIDATION=true NODE_OPTIONS=\"--max-old-space-size=4096 --enable-source-maps=false\" next build",
     "build:analyze": "ANALYZE=true npm run build",
     "start": "next start -p ${PORT:-3000} -H 0.0.0.0",
     "start:prod": "NODE_ENV=production next start -p ${PORT:-3000} -H 0.0.0.0",
@@ -66,6 +66,7 @@
     "@vitejs/plugin-react": "^5.0.3",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "10.4.16",
+    "cross-env": "^10.0.0",
     "eslint": "8.57.1",
     "eslint-config-next": "14.2.14",
     "happy-dom": "^18.0.1",

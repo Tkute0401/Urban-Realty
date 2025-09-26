@@ -1,4 +1,4 @@
-import { getCLS, getFID, getFCP, getLCP, getTTFB, Metric } from 'web-vitals'
+import { onCLS, onFID, onFCP, onLCP, onTTFB, Metric } from 'web-vitals'
 
 function sendToAnalytics(metric: Metric) {
   // Send to your analytics service
@@ -23,11 +23,11 @@ function sendToAnalytics(metric: Metric) {
 
 export function reportWebVitals() {
   try {
-    getCLS(sendToAnalytics)
-    getFID(sendToAnalytics)
-    getFCP(sendToAnalytics)
-    getLCP(sendToAnalytics)
-    getTTFB(sendToAnalytics)
+    onCLS(sendToAnalytics)
+    onFID(sendToAnalytics)
+    onFCP(sendToAnalytics)
+    onLCP(sendToAnalytics)
+    onTTFB(sendToAnalytics)
   } catch (err) {
     console.error('Web Vitals reporting failed:', err)
   }

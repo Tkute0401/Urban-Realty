@@ -6,12 +6,14 @@ module.exports = {
       cwd: './',
       instances: 1,
       exec_mode: 'cluster',
-      max_memory_restart: '800M',
+      max_memory_restart: '1G',
       node_args: [
-        '--max-old-space-size=512',
+        '--max-old-space-size=768',
         '--enable-source-maps=false',
         '--max-semi-space-size=64',
-        '--optimize-for-size'
+        '--optimize-for-size',
+        '--gc-interval=100',
+        '--expose-gc'
       ].join(' '),
       env: {
         NODE_ENV: 'production',
@@ -20,7 +22,10 @@ module.exports = {
         NEXT_SHARP: '0',
         NEXT_TELEMETRY_DISABLED: '1',
         SQUAREFOOOT_SERVICE: 'frontend',
-        TZ: 'UTC'
+        TZ: 'UTC',
+        RAILWAY_ENVIRONMENT: 'production',
+        UV_THREADPOOL_SIZE: '128',
+        NODE_ENV_OVERRIDE: 'production'
       },
       error_file: './logs/nextjs-error.log',
       out_file: './logs/nextjs-out.log',
@@ -46,19 +51,24 @@ module.exports = {
       cwd: './',
       instances: 1,
       exec_mode: 'cluster',
-      max_memory_restart: '800M',
+      max_memory_restart: '1G',
       node_args: [
-        '--max-old-space-size=512',
+        '--max-old-space-size=768',
         '--enable-source-maps=false',
         '--max-semi-space-size=64',
-        '--optimize-for-size'
+        '--optimize-for-size',
+        '--gc-interval=100',
+        '--expose-gc'
       ].join(' '),
       env: {
         NODE_ENV: 'production',
         PORT: 5000,
         API_PORT: 5000,
         SQUAREFOOOT_SERVICE: 'api',
-        TZ: 'UTC'
+        TZ: 'UTC',
+        RAILWAY_ENVIRONMENT: 'production',
+        UV_THREADPOOL_SIZE: '128',
+        NODE_ENV_OVERRIDE: 'production'
       },
       error_file: './logs/server-error.log',
       out_file: './logs/server-out.log',
