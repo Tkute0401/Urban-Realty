@@ -8,13 +8,14 @@ RUN apk add --no-cache libc6-compat
 
 COPY new-nextjs-app/package*.json ./
 
-# Set npm cache and install with optimizations
+# Set npm cache and install with optimizations - include ALL dependencies for build
 RUN npm config set cache /tmp/npm-cache --global && \
     npm config set registry https://registry.npmjs.org/ --global && \
     npm config set fetch-retries 3 --global && \
     npm config set fetch-retry-mintimeout 10000 --global && \
     npm config set fetch-retry-maxtimeout 60000 --global && \
-    npm ci --only=production --no-audit --no-fund --silent
+    npm ci --no-audit --no-fund --silent && \
+    echo "Squarefooot Next.js dependencies installed successfully"
 
 COPY new-nextjs-app .
 
@@ -31,8 +32,8 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
     NODE_OPTIONS="--max-old-space-size=4096" \
     SKIP_ENV_VALIDATION=true
 
-# Build with optimizations
-RUN npm run build
+# Build with Railway optimizations and enhanced error handling
+RUN npm run build:railway || npm run build
 
 # Stage 2: Backend build
 FROM node:20-alpine AS backend-builder

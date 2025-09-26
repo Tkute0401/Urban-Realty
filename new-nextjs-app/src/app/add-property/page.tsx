@@ -2,9 +2,9 @@
 
 import dynamic from "next/dynamic";
 
-// Reuse the existing Add Property form under /properties/add
-const AddPropertyImpl = dynamic(() => import("@/app/properties/add/page"), { ssr: false });
+// Import the AddProperty component directly instead of using dynamic import to avoid build issues
+import AddProperty from "@/app/properties/add/page";
 
 export default function AddPropertyShallow() {
-  return <AddPropertyImpl />;
+  return <AddProperty />;
 }

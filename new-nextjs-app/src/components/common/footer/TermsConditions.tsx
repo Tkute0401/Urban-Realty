@@ -184,7 +184,7 @@ const TermsConditions = () => {
       title: "Acceptance of Terms",
       icon: <ShieldCheckIcon className="w-5 h-5 text-[#08171A]" />,
       content: [
-        "By accessing or using SQUAREFOOT's services, you agree to be bound by these Terms and Conditions. If you do not agree with any part, you must not use our services.",
+        "By accessing or using SQUAREFOOT&apos;s services, you agree to be bound by these Terms and Conditions. If you do not agree with any part, you must not use our services.",
         "We reserve the right to modify these terms at any time. Your continued use after changes constitutes acceptance of the modified terms."
       ]
     },
