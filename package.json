@@ -17,7 +17,8 @@
     "test": "cd new-nextjs-app && npm run test",
     "test:client": "cd client && npm run test",
     "heroku-postbuild": "npm run build",
-    "prepare": "husky"
+    "prepare": "if [ -d \".git\" ] && [ \"$NODE_ENV\" != \"production\" ]; then husky; fi",
+    "postinstall": "echo 'Installation complete'"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",

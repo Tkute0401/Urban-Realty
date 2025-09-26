@@ -5,8 +5,11 @@ const DatabaseUtils = require('../src/database/utils/databaseUtils');
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(config.database.uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // Remove deprecated options for MongoDB Driver v4+
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4 // Use IPv4, skip trying IPv6
     });
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);

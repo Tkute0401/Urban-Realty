@@ -1,13 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable experimental features
+  // Enable experimental features for optimal SSR and performance
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'react-icons', 'lodash'],
+    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'react-icons', 'lodash', 'framer-motion', 'axios'],
     serverMinification: true,
     optimizeServerReact: true,
     gzipSize: true,
     esmExternals: true,
+    serverComponentsExternalPackages: ['mongoose', 'bcryptjs'],
+    webpackBuildWorker: true,
+    parallelServerBuildTraces: true,
+    parallelServerCompiles: true,
+
+    optimisticClientCache: true,
+    middlewarePrefetch: 'strict',
+    serverSourceMaps: false,
+    instrumentationHook: false,
   },
 
   // Image optimization
@@ -25,10 +34,27 @@ const nextConfig = {
   // Compression
   compress: true,
 
-  // Performance optimizations
+  // Performance optimizations for SSR and speed
   swcMinify: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
+    styledComponents: true,
+  },
+  
+  // Optimize for Railway deployment and SSR
+  modularizeImports: {
+    '@mui/material': {
+      transform: '@mui/material/{{member}}',
+    },
+    '@mui/icons-material': {
+      transform: '@mui/icons-material/{{member}}',
+    },
+    'lodash': {
+      transform: 'lodash/{{member}}',
+    },
   },
   
   // Static Site Generation optimization
@@ -157,6 +183,10 @@ const nextConfig = {
             key: 'Cache-Control',
             value: 'public, max-age=300, s-maxage=1800, stale-while-revalidate=86400',
           },
+          {
+            key: 'X-Robots-Tag',
+            value: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+          },
         ],
       },
       {
@@ -165,6 +195,23 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+          },
+        ],
+      },
+      {
+        source: '/search/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=180, s-maxage=900, stale-while-revalidate=3600',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
           },
         ],
       },
@@ -231,30 +278,80 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // Webpack configuration
+  // Webpack configuration for optimal SSR and performance
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Optimize bundle size
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+    // Production optimizations
+    if (!dev) {
+      // Optimize bundle size and splitting
+      if (!isServer) {
+        config.optimization.splitChunks = {
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 244000,
+          cacheGroups: {
+            default: {
+              minChunks: 1,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: -10,
+              chunks: 'all',
+            },
+            mui: {
+              test: /[\\/]node_modules[\\/]@mui[\\/]/,
+              name: 'mui',
+              priority: 10,
+              chunks: 'all',
+            },
+            react: {
+              test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+              name: 'react',
+              priority: 20,
+              chunks: 'all',
+            },
+            common: {
+              test: /[\\/]node_modules[\\/](lodash|axios|framer-motion)[\\/]/,
+              name: 'common',
+              priority: 5,
+              chunks: 'all',
+            },
           },
-          mui: {
-            test: /[\\/]node_modules[\\/]@mui[\\/]/,
-            name: 'mui',
-            chunks: 'all',
-          },
-        },
+        };
+      }
+
+      // Minimize bundle size
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
+      
+      // Add compression plugins
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'process.env.SQUAREFOOOT_BUILD_ID': JSON.stringify(buildId),
+          'process.env.SQUAREFOOOT_BUILD_TIME': JSON.stringify(Date.now()),
+        })
+      );
+    }
+
+    // Development optimizations
+    if (dev) {
+      config.devtool = 'eval-source-map';
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
       };
     }
 
-    // Add source maps in development
-    if (dev) {
-      config.devtool = 'eval-source-map';
+    // SSR optimizations
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        'aws-sdk': 'aws-sdk',
+        'canvas': 'canvas',
+        'sharp': 'sharp',
+      });
     }
 
     return config;

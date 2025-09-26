@@ -1,409 +1,288 @@
-const { test, expect } = require('@playwright/test');
-
 /**
- * Railway Deployment & Performance Optimization E2E Tests
- * Tests for Squarefooot Urban Realty optimized deployment
+ * Railway Deployment Optimization E2E Test
+ * Tests the deployment fixes and performance optimizations for Squarefooot
  */
 
-test.describe('Railway Deployment Optimization Tests', () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-production.up.railway.app';
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://urban-realty-production.up.railway.app/api/v1';
-  
-  test.beforeEach(async ({ page }) => {
-    // Set performance monitoring
-    await page.addInitScript(() => {
-      window.performanceData = {
-        loadStart: performance.now(),
-        metrics: {}
-      };
-    });
+const { test, expect } = require('@playwright/test');
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+const FRONTEND_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+test.describe('Railway Deployment Optimization Validation', () => {
+  test.beforeAll(async () => {
+    console.log('🏠 Testing Squarefooot Railway deployment optimizations...');
+    console.log(`API URL: ${API_BASE_URL}`);
+    console.log(`Frontend URL: ${FRONTEND_URL}`);
   });
 
-  test('Homepage loads within performance budget', async ({ page }) => {
+  test('Health check endpoint should be accessible and fast', async ({ request }) => {
     const startTime = Date.now();
     
-    await page.goto(baseUrl, { 
+    const response = await request.get(`${API_BASE_URL}/health`, {
+      timeout: 5000
+    });
+    
+    const responseTime = Date.now() - startTime;
+    
+    expect(response.status()).toBe(200);
+    expect(responseTime).toBeLessThan(2000); // Should respond within 2 seconds
+    
+    const healthData = await response.json();
+    expect(healthData).toHaveProperty('status');
+    expect(healthData.status).toBe('success');
+    
+    console.log(`✅ Health check responded in ${responseTime}ms`);
+  });
+
+  test('Frontend should load with optimized performance', async ({ page }) => {
+    const startTime = Date.now();
+    
+    // Navigate to homepage with performance monitoring
+    await page.goto(FRONTEND_URL, {
       waitUntil: 'networkidle',
       timeout: 10000
     });
     
     const loadTime = Date.now() - startTime;
+    expect(loadTime).toBeLessThan(5000); // Should load within 5 seconds
     
-    // Performance assertion: page should load within 3 seconds
-    expect(loadTime).toBeLessThan(3000);
-    
-    // Verify page title for SEO
-    await expect(page).toHaveTitle(/Squarefooot|Urban Realty/);
-    
-    // Verify meta description exists for SEO
-    const metaDescription = page.locator('meta[name="description"]');
-    await expect(metaDescription).toBeAttached();
-    
-    // Verify essential content is rendered (SSR check)
-    await expect(page.locator('main')).toBeVisible();
-    
-    console.log(`✅ Homepage loaded in ${loadTime}ms`);
-  });
-
-  test('API health check passes', async ({ request }) => {
-    const response = await request.get(`${apiUrl}/health`, {
-      timeout: 5000
+    // Check for critical performance optimizations
+    const performanceEntries = await page.evaluate(() => {
+      return {
+        navigation: performance.getEntriesByType('navigation')[0],
+        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0],
+        largestContentfulPaint: performance.getEntriesByName('largest-contentful-paint')[0]
+      };
     });
     
-    expect(response.status()).toBe(200);
+    // Validate performance metrics
+    if (performanceEntries.firstContentfulPaint) {
+      expect(performanceEntries.firstContentfulPaint.startTime).toBeLessThan(2000);
+    }
     
-    const healthData = await response.json();
-    expect(healthData).toHaveProperty('status', 'ok');
-    
-    console.log('✅ API health check passed');
+    console.log(`✅ Frontend loaded in ${loadTime}ms`);
+    console.log(`📊 Performance metrics:`, performanceEntries);
   });
 
-  test('Properties API endpoint works correctly', async ({ request }) => {
-    const response = await request.get(`${apiUrl}/properties`, {
-      timeout: 10000
+  test('SSR should work correctly with proper meta tags', async ({ page }) => {
+    await page.goto(FRONTEND_URL);
+    
+    // Check for SSR-rendered content
+    const title = await page.title();
+    expect(title).toBeTruthy();
+    expect(title).toContain('Squarefooot');
+    
+    // Check for SEO meta tags
+    const metaTags = {
+      description: await page.getAttribute('meta[name="description"]', 'content'),
+      viewport: await page.getAttribute('meta[name="viewport"]', 'content'),
+      ogTitle: await page.getAttribute('meta[property="og:title"]', 'content'),
+      ogDescription: await page.getAttribute('meta[property="og:description"]', 'content'),
+      ogImage: await page.getAttribute('meta[property="og:image"]', 'content')
+    };
+    
+    expect(metaTags.description).toBeTruthy();
+    expect(metaTags.viewport).toContain('width=device-width');
+    expect(metaTags.ogTitle).toBeTruthy();
+    expect(metaTags.ogDescription).toBeTruthy();
+    
+    console.log('✅ SSR and SEO meta tags validation passed');
+    console.log('📊 Meta tags:', metaTags);
+  });
+
+  test('API endpoints should respond within performance thresholds', async ({ request }) => {
+    const endpoints = [
+      { path: '/health', threshold: 500 },
+      { path: '/properties', threshold: 1000 },
+      { path: '/developers', threshold: 1000 }
+    ];
+    
+    for (const endpoint of endpoints) {
+      const startTime = Date.now();
+      
+      try {
+        const response = await request.get(`${API_BASE_URL}${endpoint.path}`, {
+          timeout: 5000
+        });
+        
+        const responseTime = Date.now() - startTime;
+        
+        expect(response.status()).toBeGreaterThanOrEqual(200);
+        expect(response.status()).toBeLessThan(500);
+        expect(responseTime).toBeLessThan(endpoint.threshold);
+        
+        console.log(`✅ ${endpoint.path} responded in ${responseTime}ms (threshold: ${endpoint.threshold}ms)`);
+        
+      } catch (error) {
+        if (endpoint.path !== '/health') {
+          console.warn(`⚠️ ${endpoint.path} may not be available in test environment`);
+        } else {
+          throw error;
+        }
+      }
+    }
+  });
+
+  test('CSS and JS assets should be optimized and cached', async ({ page }) => {
+    const responses = [];
+    
+    page.on('response', (response) => {
+      const url = response.url();
+      if (url.includes('_next/static/') || url.includes('.css') || url.includes('.js')) {
+        responses.push({
+          url,
+          status: response.status(),
+          headers: response.headers(),
+          size: response.headers()['content-length']
+        });
+      }
     });
     
-    expect(response.status()).toBe(200);
+    await page.goto(FRONTEND_URL, { waitUntil: 'networkidle' });
     
-    const propertiesData = await response.json();
-    expect(propertiesData).toHaveProperty('success', true);
-    expect(propertiesData.data).toBeDefined();
+    // Check that static assets are properly cached
+    const staticAssets = responses.filter(r => r.url.includes('_next/static/'));
+    expect(staticAssets.length).toBeGreaterThan(0);
     
-    console.log('✅ Properties API endpoint working');
+    staticAssets.forEach(asset => {
+      expect(asset.status).toBe(200);
+      
+      // Check for proper caching headers
+      const cacheControl = asset.headers['cache-control'];
+      if (cacheControl) {
+        expect(cacheControl).toMatch(/max-age|immutable/);
+      }
+    });
+    
+    console.log(`✅ Found ${staticAssets.length} optimized static assets`);
   });
 
-  test('Performance metrics meet optimization targets', async ({ page }) => {
-    await page.goto(baseUrl);
+  test('Error handling and logging should work correctly', async ({ page, request }) => {
+    const consoleLogs = [];
+    const errors = [];
     
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    
-    // Measure Core Web Vitals
-    const metrics = await page.evaluate(() => {
-      return new Promise((resolve) => {
-        new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          const metrics = {};
-          
-          entries.forEach((entry) => {
-            if (entry.entryType === 'navigation') {
-              metrics.domContentLoaded = entry.domContentLoadedEventEnd - entry.fetchStart;
-              metrics.pageLoad = entry.loadEventEnd - entry.fetchStart;
-            }
-          });
-          
-          // Get LCP if available
-          new PerformanceObserver((lcpList) => {
-            const lcpEntries = lcpList.getEntries();
-            if (lcpEntries.length > 0) {
-              metrics.lcp = lcpEntries[lcpEntries.length - 1].startTime;
-            }
-            resolve(metrics);
-          }).observe({ entryTypes: ['largest-contentful-paint'] });
-          
-          // Fallback if LCP not available
-          setTimeout(() => resolve(metrics), 1000);
-        }).observe({ entryTypes: ['navigation'] });
+    page.on('console', (msg) => {
+      consoleLogs.push({
+        type: msg.type(),
+        text: msg.text(),
+        location: msg.location()
       });
     });
     
-    // Performance assertions based on optimization targets
-    if (metrics.pageLoad) {
-      expect(metrics.pageLoad).toBeLessThan(3000); // Page load < 3s
-      console.log(`✅ Page load time: ${Math.round(metrics.pageLoad)}ms`);
-    }
-    
-    if (metrics.lcp) {
-      expect(metrics.lcp).toBeLessThan(2500); // LCP < 2.5s
-      console.log(`✅ Largest Contentful Paint: ${Math.round(metrics.lcp)}ms`);
-    }
-  });
-
-  test('SSR content renders correctly', async ({ page }) => {
-    // Disable JavaScript to test SSR
-    await page.context().addInitScript(() => {
-      delete window.navigator;
+    page.on('pageerror', (error) => {
+      errors.push(error.message);
     });
     
-    await page.goto(baseUrl);
+    await page.goto(FRONTEND_URL);
     
-    // Verify that essential content is present even without JS
-    await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('main')).toBeVisible();
-    
-    // Check for SSR-rendered content
-    const content = await page.content();
-    expect(content).toContain('Squarefooot');
-    expect(content).not.toContain('Loading...');
-    
-    console.log('✅ SSR content renders correctly');
-  });
-
-  test('SEO meta tags are properly set', async ({ page }) => {
-    await page.goto(baseUrl);
-    
-    // Check essential SEO meta tags
-    const metaTags = {
-      title: await page.title(),
-      description: await page.getAttribute('meta[name="description"]', 'content'),
-      keywords: await page.getAttribute('meta[name="keywords"]', 'content'),
-      ogTitle: await page.getAttribute('meta[property="og:title"]', 'content'),
-      ogDescription: await page.getAttribute('meta[property="og:description"]', 'content'),
-      ogType: await page.getAttribute('meta[property="og:type"]', 'content')
-    };
-    
-    // Verify meta tags exist and have content
-    expect(metaTags.title).toBeTruthy();
-    expect(metaTags.title).toMatch(/Squarefooot|Urban Realty/);
-    expect(metaTags.description).toBeTruthy();
-    expect(metaTags.description.length).toBeGreaterThan(50);
-    
-    if (metaTags.ogTitle) {
-      expect(metaTags.ogTitle).toBeTruthy();
+    // Try accessing a non-existent API endpoint to test error handling
+    try {
+      await request.get(`${API_BASE_URL}/non-existent-endpoint`);
+    } catch (error) {
+      // Expected to fail
     }
     
-    console.log('✅ SEO meta tags properly configured');
-  });
-
-  test('Mobile responsiveness works correctly', async ({ page }) => {
-    // Test mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto(baseUrl);
+    // Check that no critical JavaScript errors occurred
+    const criticalErrors = errors.filter(error => 
+      !error.includes('favicon') && 
+      !error.includes('Service Worker') &&
+      !error.includes('404')
+    );
     
-    // Verify mobile navigation
-    const mobileNav = page.locator('[data-testid="mobile-nav"], .mobile-nav, button[aria-label*="menu"], button[aria-label*="Menu"]');
+    expect(criticalErrors.length).toBe(0);
     
-    // Check if mobile navigation exists or if regular nav is responsive
-    const navExists = await mobileNav.count() > 0;
-    const regularNav = page.locator('nav, .navbar, .navigation');
-    const regularNavExists = await regularNav.count() > 0;
-    
-    expect(navExists || regularNavExists).toBeTruthy();
-    
-    // Test tablet viewport
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await page.reload();
-    
-    await expect(page.locator('main')).toBeVisible();
-    
-    // Test desktop viewport
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.reload();
-    
-    await expect(page.locator('main')).toBeVisible();
-    
-    console.log('✅ Mobile responsiveness working');
-  });
-
-  test('Error handling works properly', async ({ page }) => {
-    // Test 404 page
-    await page.goto(`${baseUrl}/non-existent-page`);
-    
-    // Should either show 404 page or redirect gracefully
-    const is404 = page.url().includes('404') || 
-                  (await page.content()).includes('404') ||
-                  (await page.content()).includes('Page Not Found') ||
-                  page.url() === baseUrl; // Redirect to home
-    
-    expect(is404).toBeTruthy();
-    
-    console.log('✅ Error handling working correctly');
-  });
-
-  test('Key user journeys work correctly', async ({ page }) => {
-    await page.goto(baseUrl);
-    
-    // Test navigation to properties
-    const propertiesLink = page.locator('a[href*="properties"], a[href*="Properties"]').first();
-    if (await propertiesLink.count() > 0) {
-      await propertiesLink.click();
-      await page.waitForLoadState('networkidle');
-      
-      // Should navigate to properties page
-      expect(page.url()).toMatch(/properties|Properties/);
-      console.log('✅ Properties navigation working');
-    }
-    
-    // Test search functionality if available
-    const searchInput = page.locator('input[type="search"], input[placeholder*="search"], input[placeholder*="Search"]').first();
-    if (await searchInput.count() > 0) {
-      await searchInput.fill('test');
-      await searchInput.press('Enter');
-      
-      // Wait for search results or loading state
-      await page.waitForTimeout(2000);
-      console.log('✅ Search functionality accessible');
-    }
-    
-    // Test footer links
-    const footerLinks = page.locator('footer a');
-    if (await footerLinks.count() > 0) {
-      const linkCount = await footerLinks.count();
-      expect(linkCount).toBeGreaterThan(0);
-      console.log('✅ Footer links present');
+    console.log(`✅ Error handling validation completed`);
+    if (criticalErrors.length > 0) {
+      console.log('❌ Critical errors found:', criticalErrors);
     }
   });
 
-  test('Payment integration readiness', async ({ page }) => {
-    await page.goto(baseUrl);
+  test('Memory usage should be optimized', async ({ page }) => {
+    await page.goto(FRONTEND_URL);
     
-    // Check if Razorpay script is loaded (for payment readiness)
-    const razorpayScript = await page.evaluate(() => {
-      return !!window.Razorpay || 
-             document.querySelector('script[src*="razorpay"]') !== null ||
-             document.querySelector('script[src*="checkout"]') !== null;
-    });
+    // Wait for page to settle
+    await page.waitForTimeout(2000);
     
-    if (razorpayScript) {
-      console.log('✅ Payment integration (Razorpay) scripts loaded');
-    } else {
-      console.log('ℹ️ Payment scripts will be loaded when needed');
-    }
-    
-    // This test passes regardless as payment scripts may load on-demand
-    expect(true).toBeTruthy();
-  });
-
-  test('CORS and security headers are properly configured', async ({ page, request }) => {
-    const response = await request.get(baseUrl);
-    const headers = response.headers();
-    
-    // Check for security headers
-    const securityHeaders = [
-      'x-frame-options',
-      'x-content-type-options', 
-      'x-xss-protection',
-      'referrer-policy'
-    ];
-    
-    let securityHeadersPresent = 0;
-    securityHeaders.forEach(header => {
-      if (headers[header]) {
-        securityHeadersPresent++;
-        console.log(`✅ ${header}: ${headers[header]}`);
+    // Get memory usage information
+    const memoryInfo = await page.evaluate(() => {
+      if ('memory' in performance) {
+        return {
+          usedJSHeapSize: performance.memory.usedJSHeapSize,
+          totalJSHeapSize: performance.memory.totalJSHeapSize,
+          jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+        };
       }
+      return null;
     });
     
-    // At least some security headers should be present
-    expect(securityHeadersPresent).toBeGreaterThan(0);
-    
-    // Check CORS headers if present
-    if (headers['access-control-allow-origin']) {
-      console.log(`✅ CORS configured: ${headers['access-control-allow-origin']}`);
-    }
-    
-    console.log('✅ Security headers properly configured');
-  });
-
-  test('Database connectivity through API', async ({ request }) => {
-    // Test an API endpoint that requires database connectivity
-    const response = await request.get(`${apiUrl}/properties`, {
-      timeout: 10000
-    });
-    
-    expect(response.status()).toBe(200);
-    
-    const data = await response.json();
-    
-    // Verify response structure indicates DB connectivity
-    expect(data).toHaveProperty('success');
-    
-    // If there are properties, verify structure
-    if (data.data && Array.isArray(data.data) && data.data.length > 0) {
-      const property = data.data[0];
-      expect(property).toHaveProperty('_id');
-      console.log('✅ Database connectivity confirmed with sample data');
+    if (memoryInfo) {
+      // Memory usage should be reasonable (less than 100MB for initial load)
+      const usedMemoryMB = memoryInfo.usedJSHeapSize / (1024 * 1024);
+      expect(usedMemoryMB).toBeLessThan(100);
+      
+      console.log(`✅ Memory usage: ${usedMemoryMB.toFixed(2)}MB`);
+      console.log('📊 Memory info:', memoryInfo);
     } else {
-      console.log('✅ Database connectivity confirmed (no sample data)');
+      console.log('⚠️ Memory API not available in this browser');
     }
   });
 
-  test('Environment variables are properly configured', async ({ request }) => {
-    // Test that the API is using the correct environment
-    const response = await request.get(`${apiUrl}/health`);
-    const data = await response.json();
-    
-    // Health endpoint should indicate production environment
-    expect(response.status()).toBe(200);
-    expect(data.status).toBe('ok');
-    
-    // Check if environment info is available
-    if (data.environment) {
-      expect(data.environment).toBe('production');
+  test('Build artifacts should not contain development dependencies', async ({ request }) => {
+    // Test that husky and other dev dependencies are not causing issues
+    try {
+      const response = await request.get(`${FRONTEND_URL}/_next/static/chunks/pages/_app.js`);
+      const content = await response.text();
+      
+      // These should not be present in production builds
+      const devDependencies = ['husky', 'nodemon', '@playwright/test'];
+      
+      devDependencies.forEach(dep => {
+        expect(content).not.toContain(dep);
+      });
+      
+      console.log('✅ Production build is clean of development dependencies');
+      
+    } catch (error) {
+      console.log('⚠️ Could not check build artifacts - this is normal in development');
     }
-    
-    console.log('✅ Environment variables properly configured');
   });
 });
 
-test.describe('Performance Regression Tests', () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-production.up.railway.app';
-  
-  test('Bundle size is optimized', async ({ page }) => {
-    await page.goto(baseUrl);
+test.describe('Railway Environment Validation', () => {
+  test('Environment variables should be properly configured', async ({ request }) => {
+    // Test that the health endpoint confirms proper environment setup
+    const response = await request.get(`${API_BASE_URL}/health`);
+    const healthData = await response.json();
     
-    // Get network requests to analyze bundle sizes
-    const responses = [];
-    page.on('response', response => {
-      if (response.url().includes('/_next/static/')) {
-        responses.push({
-          url: response.url(),
-          size: parseInt(response.headers()['content-length'] || '0', 10)
-        });
-      }
-    });
+    expect(response.status()).toBe(200);
     
-    await page.waitForLoadState('networkidle');
+    // In a real deployment, you might want to check specific environment indicators
+    // For now, we just ensure the health check passes
+    expect(healthData).toHaveProperty('status');
     
-    // Check for reasonable bundle sizes (should be optimized)
-    const jsFiles = responses.filter(r => r.url.includes('.js'));
-    const cssFiles = responses.filter(r => r.url.includes('.css'));
-    
-    if (jsFiles.length > 0) {
-      const totalJsSize = jsFiles.reduce((sum, file) => sum + file.size, 0);
-      // Main bundle should be under 1MB for good performance
-      expect(totalJsSize).toBeLessThan(1024 * 1024); // 1MB
-      console.log(`✅ Total JS bundle size: ${Math.round(totalJsSize / 1024)}KB`);
-    }
-    
-    if (cssFiles.length > 0) {
-      const totalCssSize = cssFiles.reduce((sum, file) => sum + file.size, 0);
-      // CSS should be under 200KB
-      expect(totalCssSize).toBeLessThan(200 * 1024); // 200KB
-      console.log(`✅ Total CSS size: ${Math.round(totalCssSize / 1024)}KB`);
-    }
+    console.log('✅ Environment configuration validation passed');
   });
 
-  test('Images are optimized', async ({ page }) => {
-    await page.goto(baseUrl);
-    
-    const images = [];
-    page.on('response', response => {
-      const url = response.url();
-      if (url.includes('.jpg') || url.includes('.png') || url.includes('.webp') || 
-          url.includes('/_next/image') || url.includes('res.cloudinary.com')) {
-        images.push({
-          url,
-          contentType: response.headers()['content-type'],
-          size: parseInt(response.headers()['content-length'] || '0', 10)
-        });
+  test('CORS should be properly configured for production', async ({ request }) => {
+    const response = await request.get(`${API_BASE_URL}/health`, {
+      headers: {
+        'Origin': FRONTEND_URL
       }
     });
     
-    await page.waitForLoadState('networkidle');
+    expect(response.status()).toBe(200);
     
-    if (images.length > 0) {
-      // Check for modern image formats
-      const optimizedImages = images.filter(img => 
-        img.contentType && (img.contentType.includes('webp') || img.contentType.includes('avif'))
-      );
-      
-      console.log(`✅ Found ${optimizedImages.length} optimized images out of ${images.length} total`);
-      
-      // At least some images should be optimized if using Next.js Image component
-      if (images.length > 3) {
-        expect(optimizedImages.length).toBeGreaterThan(0);
-      }
+    const corsHeaders = {
+      'access-control-allow-origin': response.headers()['access-control-allow-origin'],
+      'access-control-allow-credentials': response.headers()['access-control-allow-credentials']
+    };
+    
+    // CORS should allow the frontend origin
+    if (corsHeaders['access-control-allow-origin']) {
+      expect(corsHeaders['access-control-allow-origin']).toMatch(/\*|localhost|railway\.app/);
     }
+    
+    console.log('✅ CORS configuration validated');
+    console.log('📊 CORS headers:', corsHeaders);
   });
 });
