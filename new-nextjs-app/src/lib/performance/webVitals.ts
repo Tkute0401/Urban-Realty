@@ -1,4 +1,4 @@
-import { onCLS, onFID, onFCP, onLCP, onTTFB, Metric } from 'web-vitals'
+import { onCLS, onINP, onFCP, onLCP, onTTFB, Metric } from 'web-vitals'
 
 function sendToAnalytics(metric: Metric) {
   // Send to your analytics service
@@ -24,7 +24,7 @@ function sendToAnalytics(metric: Metric) {
 export function reportWebVitals() {
   try {
     onCLS(sendToAnalytics)
-    onFID(sendToAnalytics)
+    onINP(sendToAnalytics) // onFID has been replaced with onINP (Interaction to Next Paint)
     onFCP(sendToAnalytics)
     onLCP(sendToAnalytics)
     onTTFB(sendToAnalytics)

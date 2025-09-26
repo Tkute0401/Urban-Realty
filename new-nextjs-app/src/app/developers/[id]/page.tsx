@@ -2,20 +2,28 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import DeveloperDetailsClient from '@/components/developer/DeveloperDetailsClient';
+import { getApiBaseUrl } from '@/lib/services/api.config';
 
-// Fetch developer data server-side
+// Fetch developer data server-side with Railway-optimized configuration
 async function getDeveloper(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+    const baseUrl = getApiBaseUrl();
     const response = await fetch(`${baseUrl}/developers/${id}`, {
       next: { revalidate: 3600 }, // Revalidate every hour
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
       },
+      // Add timeout for Railway deployment
+      signal: AbortSignal.timeout(10000),
     });
     
     if (!response.ok) {
-      throw new Error('Developer not found');
+      if (response.status === 404) {
+        return null; // Developer not found
+      }
+      throw new Error(`Failed to fetch developer: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
@@ -179,27 +187,49 @@ export default async function DeveloperPage({ params }: { params: { id: string }
   );
 }
 
-// Generate static params for popular developers (optional)
+// Generate static params for popular developers (Railway deployment optimized)
 export async function generateStaticParams() {
+  // For Railway deployment, skip static generation during build to avoid connection issues
+  // This allows the app to build successfully and use dynamic rendering instead
+  const nodeEnv = process.env.NODE_ENV;
+  const isRailwayBuild = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+  
+  // Skip static generation during Railway build to prevent connection errors
+  if (nodeEnv === 'production' && isRailwayBuild) {
+    console.log('Skipping static params generation for Railway deployment - using dynamic rendering');
+    return [];
+  }
+  
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+    const baseUrl = getApiBaseUrl();
     const response = await fetch(`${baseUrl}/developers`, {
       next: { revalidate: 86400 }, // Revalidate daily
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      // Short timeout to fail fast during build
+      signal: AbortSignal.timeout(5000),
     });
     
     if (!response.ok) {
+      console.warn(`Failed to fetch developers for static generation: ${response.status}`);
       return [];
     }
     
     const data = await response.json();
     const developers = data.data || data;
     
-    // Generate static paths for the first 10 developers
-    return developers.slice(0, 10).map((developer: any) => ({
+    // Generate static paths for the first 10 developers only
+    const staticParams = developers.slice(0, 10).map((developer: any) => ({
       id: developer._id,
     }));
+    
+    console.log(`Generated ${staticParams.length} static params for developers`);
+    return staticParams;
   } catch (error) {
-    console.error('Error generating static params for developers:', error);
+    // This is expected during Railway build - log but don't fail
+    console.warn('Error generating static params for developers (expected during Railway build):', error.message);
     return [];
   }
 }

@@ -7,24 +7,32 @@ export function getApiBaseUrl(): string {
         // Get API URL from environment variables
         const nextPublicApiUrl = process.env.NEXT_PUBLIC_API_URL;
         const nodeEnv = process.env.NODE_ENV;
+        const isRailwayBuild = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
         
-        // For production on Railway, optimize for SSR
+        // For production on Railway, optimize for SSR and deployment
         if (nodeEnv === 'production') {
-                // Client-side requests should use the public API URL
+                // Client-side requests should always use the public API URL
                 if (isClient && nextPublicApiUrl) {
                         return nextPublicApiUrl;
                 }
                 
-                // Server-side rendering - use internal container communication for speed
+                // Server-side rendering optimizations
                 if (!isClient) {
+                        // During Railway build process, API might not be available
+                        // Use a fallback that won't cause connection errors
+                        if (isRailwayBuild && !nextPublicApiUrl) {
+                                console.warn('Railway build detected: using fallback API URL for build process');
+                                return 'https://urban-realty-production.up.railway.app/api/v1';
+                        }
+                        
                         // Railway internal container communication (faster than external)
                         return process.env.RAILWAY_PRIVATE_DOMAIN 
                                 ? `http://${process.env.RAILWAY_PRIVATE_DOMAIN}:5000/api/v1`
-                                : process.env.API_URL || nextPublicApiUrl || 'http://localhost:5000/api/v1';
+                                : nextPublicApiUrl || 'https://urban-realty-production.up.railway.app/api/v1';
                 }
                 
                 // Fallback to public URL
-                return nextPublicApiUrl || 'http://localhost:5000/api/v1';
+                return nextPublicApiUrl || 'https://urban-realty-production.up.railway.app/api/v1';
         }
         
         // For development, use localhost with correct port

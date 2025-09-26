@@ -81,9 +81,12 @@ const nextConfig = {
     },
   }),
 
-  // Environment variables
+  // Environment variables - optimized for Railway deployment
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
+    RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT,
+    RAILWAY_PROJECT_ID: process.env.RAILWAY_PROJECT_ID,
+    RAILWAY_PRIVATE_DOMAIN: process.env.RAILWAY_PRIVATE_DOMAIN,
   },
 
   // Headers for security and performance

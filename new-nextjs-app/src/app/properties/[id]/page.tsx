@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import { getPropertySocialAssets, getOptimizedImageUrl } from '@/lib/socialAssets';
+import { getApiBaseUrl } from '@/lib/services/api.config';
 import { 
   Box, Grid, Container
 } from '@mui/material';
@@ -26,18 +27,28 @@ import {
 // Import client component for interactive functionality
 import PropertyDetailsClient from './PropertyDetailsClient';
 
-// Server-side data fetching function
+// Server-side data fetching function - Railway optimized
 async function getProperty(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/properties/${id}`, {
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/properties/${id}`, {
       next: { 
         revalidate: 3600 // Revalidate every hour for ISR
-      }
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+      },
+      // Add timeout for Railway deployment
+      signal: AbortSignal.timeout(10000),
     });
     
     if (!response.ok) {
-      return null;
+      if (response.status === 404) {
+        return null; // Property not found
+      }
+      throw new Error(`Failed to fetch property: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
@@ -166,19 +177,46 @@ function generatePropertyStructuredData(property: any) {
   };
 }
 
-// Static generation for popular properties
+// Static generation for popular properties (Railway deployment optimized)
 export async function generateStaticParams() {
+  // For Railway deployment, skip static generation during build to avoid connection issues
+  const nodeEnv = process.env.NODE_ENV;
+  const isRailwayBuild = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+  
+  // Skip static generation during Railway build to prevent connection errors
+  if (nodeEnv === 'production' && isRailwayBuild) {
+    console.log('Skipping property static params generation for Railway deployment - using dynamic rendering');
+    return [];
+  }
+  
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/properties?limit=10&featured=true`);
+    const baseUrl = getApiBaseUrl();
+    const response = await fetch(`${baseUrl}/properties?limit=10&featured=true`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      // Short timeout to fail fast during build
+      signal: AbortSignal.timeout(5000),
+    });
+    
+    if (!response.ok) {
+      console.warn(`Failed to fetch properties for static generation: ${response.status}`);
+      return [];
+    }
+    
     const data = await response.json();
     const properties = data?.data || data?.items || [];
     
-    return properties.map((property: any) => ({
+    const staticParams = properties.slice(0, 10).map((property: any) => ({
       id: property._id?.toString() || property.id?.toString()
     }));
+    
+    console.log(`Generated ${staticParams.length} static params for properties`);
+    return staticParams;
   } catch (error) {
-    console.error('Error generating static params:', error);
+    // This is expected during Railway build - log but don't fail
+    console.warn('Error generating static params for properties (expected during Railway build):', error.message);
     return [];
   }
 }
