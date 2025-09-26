@@ -12,6 +12,7 @@ import { AgentsProvider } from '@/contexts/AgentsContext'
 import { DevelopersProvider } from '@/contexts/DevelopersContext'
 import ErrorBoundary from '@/components/common/ErrorBoundary'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
+import { reportWebVitals, setupPerformanceObserver } from '@/lib/performance/webVitals'
 
 type ProvidersProps = { children: ReactNode }
 
@@ -29,6 +30,14 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
       },
     },
   }), [])
+
+  // Initialize web vitals and performance monitoring
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      reportWebVitals()
+      setupPerformanceObserver()
+    }
+  }, [])
 
   const muiTheme = useMemo(() => createUrbanRealtyTheme(theme as 'light' | 'dark'), [theme])
 

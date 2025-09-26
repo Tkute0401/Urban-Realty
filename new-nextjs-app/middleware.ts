@@ -1,63 +1,51 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Role-based route protection at the edge
 export function middleware(request: NextRequest) {
-  const { pathname, origin, search } = request.nextUrl
-
-  const token = request.cookies.get('token')?.value
-  const role = request.cookies.get('role')?.value
-
-  const isAdminPath = pathname.startsWith('/admin')
-  const isAgentPath = pathname.startsWith('/agent')
-  const isSubscriptionPath = pathname.startsWith('/subscriptions')
-  const isAddPropertyPath = pathname === '/add-property' || pathname.startsWith('/properties/add')
-
-  // Helper: redirect to login with return path
-  const redirectToLogin = () => {
-    const url = new URL('/login', origin)
-    url.searchParams.set('next', pathname + (search || ''))
-    return NextResponse.redirect(url)
+  const start = Date.now()
+  const response = NextResponse.next()
+  
+  // Security headers
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('X-DNS-Prefetch-Control', 'on')
+  response.headers.set('X-XSS-Protection', '1; mode=block')
+  
+  // Performance headers
+  response.headers.set('X-Response-Time', `${Date.now() - start}ms`)
+  
+  // Enable GZIP compression hint
+  response.headers.set('Vary', 'Accept-Encoding')
+  
+  // Cache control for static assets
+  if (request.nextUrl.pathname.startsWith('/_next/static/')) {
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
   }
-
-  // Create response with proper headers
-  const createResponse = (response: NextResponse) => {
-    // Add payment-specific headers for subscription pages
-    if (isSubscriptionPath) {
-      // Remove unsupported otp-credentials directive to avoid console warnings
-      response.headers.set('Permissions-Policy', 'payment=(self)')
-      response.headers.set('X-Frame-Options', 'SAMEORIGIN')
-    }
-    return response
+  
+  // Cache control for images
+  if (request.nextUrl.pathname.startsWith('/images/') || 
+      request.nextUrl.pathname.match(/\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$/)) {
+    response.headers.set('Cache-Control', 'public, max-age=86400, s-maxage=31536000')
   }
-
-  // Admin guard
-  if (isAdminPath) {
-    if (!token) return redirectToLogin()
-    if (role !== 'admin') return NextResponse.redirect(new URL('/', origin))
-    return createResponse(NextResponse.next())
+  
+  // Preload critical resources for main pages
+  if (request.nextUrl.pathname === '/') {
+    response.headers.set('Link', '</images/hero-bg.jpg>; rel=preload; as=image')
   }
-
-  // Agent guard (allow admin as well)
-  if (isAgentPath) {
-    if (!token) return redirectToLogin()
-    if (role !== 'agent' && role !== 'admin') return NextResponse.redirect(new URL('/', origin))
-    return createResponse(NextResponse.next())
-  }
-
-  // Add Property guard (agents and admins only)
-  if (isAddPropertyPath) {
-    if (!token) return redirectToLogin()
-    if (role !== 'agent' && role !== 'admin') return NextResponse.redirect(new URL('/', origin))
-    return createResponse(NextResponse.next())
-  }
-
-  return createResponse(NextResponse.next())
+  
+  return response
 }
 
-// Apply to all routes except assets and API
 export const config = {
   matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }

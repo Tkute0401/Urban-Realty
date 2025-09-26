@@ -2,20 +2,28 @@ module.exports = {
   apps: [
     {
       name: 'nextjs-frontend',
-      script: 'npm',
-      args: 'start',
-      cwd: './new-nextjs-app',
+      script: './nextjs/server.js',
+      cwd: './',
       instances: 1,
       exec_mode: 'cluster',
+      max_memory_restart: '1G',
+      node_args: '--max-old-space-size=1024',
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '0.0.0.0'
+        HOSTNAME: '0.0.0.0',
+        NEXT_SHARP: '0',
+        NEXT_TELEMETRY_DISABLED: '1'
       },
       error_file: './logs/nextjs-error.log',
       out_file: './logs/nextjs-out.log',
       log_file: './logs/nextjs-combined.log',
-      time: true
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      time: true,
+      autorestart: true,
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s'
     },
     {
       name: 'express-backend',
@@ -23,6 +31,8 @@ module.exports = {
       cwd: './',
       instances: 1,
       exec_mode: 'cluster',
+      max_memory_restart: '1G',
+      node_args: '--max-old-space-size=1024',
       env: {
         NODE_ENV: 'production',
         PORT: 5000
@@ -30,7 +40,12 @@ module.exports = {
       error_file: './logs/server-error.log',
       out_file: './logs/server-out.log',
       log_file: './logs/server-combined.log',
-      time: true
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      time: true,
+      autorestart: true,
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s'
     }
   ]
 };

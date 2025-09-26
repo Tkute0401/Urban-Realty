@@ -3,17 +3,24 @@ const nextConfig = {
   // Enable experimental features
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['@mui/material', '@mui/icons-material'],
+    optimizePackageImports: ['@mui/material', '@mui/icons-material', 'react-icons', 'lodash'],
     serverMinification: true,
     optimizeServerReact: true,
+    gzipSize: true,
+    esmExternals: true,
+    staticPageGenerationTimeout: 60,
   },
 
   // Image optimization
   images: {
-    domains: ['localhost', 'res.cloudinary.com', 'images.unsplash.com'],
+    domains: ['localhost', 'res.cloudinary.com', 'images.unsplash.com', 'urban-realty-production.up.railway.app'],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 86400,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Compression
@@ -21,6 +28,16 @@ const nextConfig = {
 
   // Performance optimizations
   swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Static Site Generation optimization
+  generateEtags: true,
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
   
   // Bundle analyzer (only in development)
   ...(process.env.ANALYZE === 'true' && {
@@ -78,7 +95,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://maps.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com https://maps.gstatic.com",
               "img-src 'self' data: https: blob: https://maps.googleapis.com https://maps.gstatic.com https://*.googletile.com",
-              "connect-src 'self' http://localhost:3001 https://urban-realty-production.up.railway.app https://api.razorpay.com https://checkout.razorpay.com https://maps.googleapis.com https://maps.gstatic.com",
+              "connect-src 'self' http://localhost:5000 https://urban-realty-production.up.railway.app https://api.razorpay.com https://checkout.razorpay.com https://maps.googleapis.com https://maps.gstatic.com",
               "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
               "object-src 'none'",
               "base-uri 'self'",
