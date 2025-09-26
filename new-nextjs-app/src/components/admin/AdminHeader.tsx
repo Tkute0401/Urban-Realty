@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Button } from '@mui/material';
 import { Menu as MenuIcon, AccountCircle } from '@mui/icons-material';

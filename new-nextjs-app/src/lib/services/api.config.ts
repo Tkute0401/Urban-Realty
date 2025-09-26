@@ -11,11 +11,9 @@ export function getApiBaseUrl(): string {
         if (nextPublicApiUrl) {
                 return nextPublicApiUrl;
         }
-        else{
-                return 'http://localhost:3001/api/v1';
-        }
-        // For development, use localhost
         
+        // For development, use localhost
+        return 'http://localhost:3001/api/v1';
 }
 
 export function getBrowserAccessToken(): string | null {

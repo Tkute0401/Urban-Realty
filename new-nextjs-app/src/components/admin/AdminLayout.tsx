@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, CssBaseline, Toolbar } from '@mui/material';
 import { useState } from 'react';
 import AdminSidebar from './AdminSidebar';

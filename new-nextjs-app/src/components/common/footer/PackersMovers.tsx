@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TruckIcon, CubeIcon, ShieldCheckIcon, HomeIcon, ClockIcon } from '@heroicons/react/24/outline';

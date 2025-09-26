@@ -157,6 +157,8 @@
 
 // export default TermsConditions;
 
+"use client";
+
 import { motion } from "framer-motion";
 import { 
   ScaleIcon, 

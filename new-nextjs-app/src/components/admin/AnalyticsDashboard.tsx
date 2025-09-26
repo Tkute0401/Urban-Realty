@@ -1,4 +1,5 @@
 // Analytics Dashboard component for admin users
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import {

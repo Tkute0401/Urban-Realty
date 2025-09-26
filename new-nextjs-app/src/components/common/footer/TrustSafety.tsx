@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { ShieldCheckIcon, LockClosedIcon, CheckBadgeIcon, HandRaisedIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
