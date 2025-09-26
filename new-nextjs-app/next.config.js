@@ -6,8 +6,6 @@ const nextConfig = {
     optimizePackageImports: ['@mui/material', '@mui/icons-material'],
     serverMinification: true,
     optimizeServerReact: true,
-    useDeploymentId: true,
-    useDeploymentIdServerActions: true,
   },
 
   // Image optimization
@@ -80,7 +78,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://maps.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com https://maps.gstatic.com",
               "img-src 'self' data: https: blob: https://maps.googleapis.com https://maps.gstatic.com https://*.googletile.com",
-              "connect-src 'self' http://localhost:3001 https://api.razorpay.com https://checkout.razorpay.com https://maps.googleapis.com https://maps.gstatic.com",
+              "connect-src 'self' http://localhost:3001 https://urban-realty-production.up.railway.app https://api.razorpay.com https://checkout.razorpay.com https://maps.googleapis.com https://maps.gstatic.com",
               "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com",
               "object-src 'none'",
               "base-uri 'self'",

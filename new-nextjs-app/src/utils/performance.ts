@@ -328,5 +328,4 @@ declare global {
   }
 }
 
-// Export utilities
-export { RealEstatePerformanceMonitor, RealEstatePrefetcher };
+// Utilities are already exported above

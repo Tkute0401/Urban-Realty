@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { HomeModernIcon, SwatchIcon, ArrowsPointingOutIcon, PaintBrushIcon, LightBulbIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
