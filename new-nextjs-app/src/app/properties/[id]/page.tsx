@@ -1,13 +1,11 @@
-'use client'
-
-import { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import React from 'react';
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
-import { api } from '@/lib/services/api';
+import { getPropertySocialAssets, getOptimizedImageUrl } from '@/lib/socialAssets';
 import { 
-  Box, Grid, CircularProgress, Alert, Container, useMediaQuery
+  Box, Grid, Container
 } from '@mui/material';
 
 // Import the new modular components
@@ -25,217 +23,187 @@ import {
   PropertySidebar
 } from '@/components/property/PropertyDetailsComponents';
 
-const PropertyDetails = () => {
-  const { id } = useParams();
-  const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
-  const isMobile = useMediaQuery('(max-width:900px)');
-  
-  const [property, setProperty] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [loadingProperty, setLoadingProperty] = useState(true);
-  const [errorProperty, setErrorProperty] = useState(null);
-  const [activeSection, setActiveSection] = useState('overview');
+// Import client component for interactive functionality
+import PropertyDetailsClient from './PropertyDetailsClient';
 
-  // Refs for section navigation
-  const overviewRef = useRef(null);
-  const highlightsRef = useRef(null);
-  const nearbyRef = useRef(null);
-  const moreRef = useRef(null);
-  const floorplanRef = useRef(null);
-  const amenitiesRef = useRef(null);
-  const developerRef = useRef(null);
-  const similarRef = useRef(null);
-
-  const sections = [
-    { id: 'overview', label: 'Overview', ref: overviewRef },
-    { id: 'highlights', label: 'Highlights', ref: highlightsRef },
-    { id: 'nearby', label: 'Around', ref: nearbyRef },
-    { id: 'more', label: 'More Info', ref: moreRef },
-    { id: 'floorplan', label: 'Floor Plan', ref: floorplanRef },
-    { id: 'amenities', label: 'Amenities', ref: amenitiesRef },
-    { id: 'developer', label: 'Developer', ref: developerRef },
-    { id: 'similar', label: 'Similar', ref: similarRef }
-  ];
-
-  useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        setLoadingProperty(true);
-        // Ensure id is a string (handle case where it might be an array)
-        const propertyId = Array.isArray(id) ? id[0] : id;
-        const response = await api.properties.getById(propertyId as string);
-        const prop = (response as any).data?.data ?? response.data;
-        setProperty(prop);
-        
-        // add to recently viewed (best-effort)
-        try {
-          await api.auth.addRecentlyViewed(propertyId as string);
-        } catch (_) {}
-        
-        // fetch favorite status if authenticated
-        if (isAuthenticated) {
-          try {
-            const favRes = await api.auth.favoriteStatus(propertyId as string);
-            setIsFavorite(Boolean((favRes as any)?.data?.isFavorite));
-          } catch (_) {}
-        }
-      } catch (err) {
-        console.error('Error fetching property:', err);
-        setErrorProperty('Failed to load property details');
-      } finally {
-        setLoadingProperty(false);
+// Server-side data fetching function
+async function getProperty(id: string) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/properties/${id}`, {
+      next: { 
+        revalidate: 3600 // Revalidate every hour for ISR
       }
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const data = await response.json();
+    return data?.data?.data || data?.data || data;
+  } catch (error) {
+    console.error('Error fetching property:', error);
+    return null;
+  }
+}
+
+// Dynamic metadata generation
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const property = await getProperty(params.id);
+  
+  if (!property) {
+    return {
+      title: 'Property Not Found | Squarefooot',
+      description: 'The requested property could not be found.',
     };
-
-    if (id) {
-      fetchProperty();
-    }
-  }, [id, isAuthenticated]);
-
-  const handleFavoriteToggle = async () => {
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-
-    try {
-      // Ensure id is a string (handle case where it might be an array)
-      const propertyId = Array.isArray(id) ? id[0] : id;
-      const res = await api.auth.toggleFavorite(propertyId as string, !isFavorite);
-      const toggled = Boolean((res as any)?.data?.isFavorite ?? !isFavorite);
-      setIsFavorite(toggled);
-    } catch (err) {
-      console.error('Error toggling favorite:', err);
-      try {
-        const propertyId = Array.isArray(id) ? id[0] : id;
-        const status = await api.auth.favoriteStatus(propertyId as string);
-        setIsFavorite(Boolean((status as any)?.data?.isFavorite));
-      } catch (_) {}
-    }
-  };
-
-  const handleSectionChange = (section: string) => {
-    setActiveSection(section);
-  };
-
-  if (loadingProperty) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-      </Box>
-    );
   }
 
-  if (errorProperty || !property) {
-    return (
-      <Box p={4}>
-        <Alert severity="error">
-          {errorProperty || 'Property not found'}
-        </Alert>
-      </Box>
-    );
+  const title = `${property.title || `${property.bedrooms || 'N/A'} BR ${property.propertyType || 'Property'}`} in ${property.address?.city || 'Prime Location'} | Squarefooot`;
+  const description = `${property.description || `Discover this ${property.bedrooms || 'N/A'} bedroom ${property.propertyType || 'property'} in ${property.address?.city || 'prime location'}. Price: $${property.price?.toLocaleString() || 'Contact for pricing'}. ${property.area || property.sqft ? `Size: ${property.area || property.sqft} sqft.` : ''} ${property.amenities?.length ? `Features: ${property.amenities.slice(0, 3).join(', ')}.` : ''}`}`.slice(0, 160);
+  
+  const propertyImage = property.images?.[0];
+  const optimizedImage = propertyImage ? getOptimizedImageUrl(propertyImage, 1200, 630) : undefined;
+  
+  // Get optimized social media assets
+  const socialAssets = getPropertySocialAssets(
+    property.title || `${property.bedrooms} BR ${property.propertyType}`,
+    property.price ? `$${property.price.toLocaleString()}` : 'Contact for pricing',
+    property.address?.city || 'Prime Location',
+    optimizedImage
+  );
+  
+  return {
+    title,
+    description,
+    keywords: [
+      property.propertyType,
+      `${property.bedrooms} bedroom`,
+      property.address?.city,
+      property.address?.state,
+      'property for sale',
+      'property for rent',
+      'real estate',
+      ...(property.amenities || []).slice(0, 5)
+    ].filter(Boolean),
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: [
+        {
+          url: socialAssets.facebook.url,
+          width: socialAssets.facebook.width,
+          height: socialAssets.facebook.height,
+          alt: socialAssets.facebook.alt,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [{
+        url: socialAssets.twitter.url,
+        alt: socialAssets.twitter.alt,
+      }],
+    },
+    alternates: {
+      canonical: `/properties/${params.id}`,
+    },
+  };
+}
+
+// Generate structured data for property
+function generatePropertyStructuredData(property: any) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "name": property.title || `${property.bedrooms} BR ${property.propertyType} in ${property.address?.city}`,
+    "description": property.description || `Beautiful ${property.bedrooms} bedroom ${property.propertyType} in ${property.address?.city}`,
+    "url": `${baseUrl}/properties/${property._id}`,
+    "image": property.images?.[0] || `${baseUrl}/default-property-image.jpg`,
+    "datePosted": property.createdAt || new Date().toISOString(),
+    "validThrough": property.validThrough || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days from now
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "price": property.price || 0,
+      "priceCurrency": "USD"
+    },
+    "availabilityStarts": property.availableFrom || new Date().toISOString(),
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": property.address?.street || "",
+      "addressLocality": property.address?.city || "",
+      "addressRegion": property.address?.state || "",
+      "postalCode": property.address?.zipCode || "",
+      "addressCountry": "US"
+    },
+    "geo": property.location?.coordinates ? {
+      "@type": "GeoCoordinates",
+      "latitude": property.location.coordinates[1],
+      "longitude": property.location.coordinates[0]
+    } : undefined,
+    "floorSize": {
+      "@type": "QuantitativeValue",
+      "value": property.area || property.sqft || 0,
+      "unitCode": "SQF"
+    },
+    "numberOfRooms": property.bedrooms || 0,
+    "numberOfBathroomsTotal": property.bathrooms || 0,
+    "amenityFeature": (property.amenities || []).map((amenity: string) => ({
+      "@type": "LocationFeatureSpecification",
+      "name": amenity
+    })),
+    "category": property.propertyType || "Residential",
+    "yearBuilt": property.yearBuilt,
+    "occupancy": {
+      "@type": "Occupancy",
+      "occupancyType": property.listingType === 'rent' ? 'rental' : 'owner'
+    }
+  };
+}
+
+// Static generation for popular properties
+export async function generateStaticParams() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/properties?limit=10&featured=true`);
+    const data = await response.json();
+    const properties = data?.data || data?.items || [];
+    
+    return properties.map((property: any) => ({
+      id: property._id?.toString() || property.id?.toString()
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
   }
+}
+
+export default async function PropertyDetailsPage({ params }: { params: { id: string } }) {
+  const property = await getProperty(params.id);
+  
+  if (!property) {
+    notFound();
+  }
+
+  const structuredData = generatePropertyStructuredData(property);
 
   return (
-    <Box sx={{ bgcolor: 'var(--color-bg)', color: 'var(--color-text)', minHeight: '100vh' }}>
-      {/* Property Images Gallery */}
-      <Box sx={{ mb: 2 }}>
-        <PropertyImageGallery images={Array.isArray(property.images) ? property.images : []} />
-      </Box>
-
-      <Container maxWidth="lg" sx={{ py: 2 }}>
-        {/* Property Header */}
-        <Box sx={{ mb: 4 }}>
-          <PropertyHeader 
-            property={property}
-            isFavorite={isFavorite}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
-        </Box>
-
-        {/* Navigation */}
-        <PropertyNavigation 
-          activeSection={activeSection}
-          onSectionChange={handleSectionChange}
-          sections={sections}
-          isSticky={!isMobile}
-        />
-
-        <Grid container spacing={4}>
-          {/* Main Content */}
-          <Grid item xs={12} md={8}>
-            {/* Property Overview */}
-            <PropertyOverview 
-              property={property} 
-              sectionRef={overviewRef}
-            />
-
-            {/* Property Highlights */}
-            <PropertyHighlights 
-              property={property} 
-              sectionRef={highlightsRef}
-            />
-
-            {/* Nearby Amenities */}
-            <PropertyNearby 
-              property={property} 
-              sectionRef={nearbyRef}
-            />
-
-            {/* Additional Information */}
-            <PropertyMoreInfo 
-              property={property} 
-              sectionRef={moreRef}
-            />
-
-            {/* Floor Plans */}
-            <PropertyFloorPlan 
-              property={property} 
-              sectionRef={floorplanRef}
-            />
-
-            {/* Amenities */}
-            <PropertyAmenities 
-              property={property} 
-              sectionRef={amenitiesRef}
-            />
-
-            {/* Developer Info */}
-            <PropertyDeveloper 
-              property={property} 
-              sectionRef={developerRef}
-            />
-
-            {/* Map */}
-            <Box sx={{ mb: 4 }}>
-              <Box 
-                sx={{ 
-                  p: 3, 
-                  bgcolor: 'var(--color-surface)', 
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 2
-                }}
-              >
-                <PropertyMap location={property.location} address={property.address} />
-              </Box>
-            </Box>
-
-            {/* Similar Properties */}
-            <PropertySimilar 
-              property={property} 
-              sectionRef={similarRef}
-            />
-          </Grid>
-
-          {/* Sidebar */}
-          <Grid item xs={12} md={4}>
-            <PropertySidebar property={property} />
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+    <>
+      {/* Structured Data for Property */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+      
+      {/* Client Component for Interactive Features */}
+      <PropertyDetailsClient property={property} />
+    </>
   );
-};
-
-export default PropertyDetails;
+}

@@ -11,17 +11,15 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartFilled } from '@heroicons/react/24/solid';
 import {
-  LocalHotelOutlined,
-  BathtubOutlined,
-  SquareFootOutlined
+  LocalHotelOutlined as LocalHotelOutlinedIcon,
+  HomeOutlined as HomeOutlinedIcon,
+  BathtubOutlined as BathtubOutlinedIcon
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-toastify';
 import { api } from '@/lib/services/api';
-import { Badge } from './Badge';
-import IconButton from './IconButton';
 
 // Types
 interface PropertyImage {
@@ -187,17 +185,17 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
   };
 
   const getPropertyTypeIcon = () => {
-    const iconProps = { className: 'w-4 h-4 text-[var(--color-primary)]' };
     switch (property.type?.toLowerCase()) {
       case 'apartment':
-        return <BuildingOfficeIcon {...iconProps} />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'villa':
-      case 'house':
-        return <HomeIcon {...iconProps} />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
+      case 'land':
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'commercial':
-        return <BuildingOfficeIcon {...iconProps} />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       default:
-        return <HomeIcon {...iconProps} />;
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
     }
   };
 
@@ -232,98 +230,78 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
       initial={animate ? { opacity: 0, y: 50 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      className={`
-        relative bg-[var(--color-surface)] rounded-xl overflow-hidden 
-        border transition-all duration-300 cursor-pointer 
-        hover:shadow-lg hover:shadow-[var(--color-primary)]/20 
-        group ${className || ''}
-        ${isSelected 
-          ? 'border-2 border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/30' 
-          : 'border-[var(--color-border)]'
-        }
-      `}
+      className={`relative bg-[var(--color-surface)] rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/20 group
+        ${isSelected ? 'border-2 border-[var(--color-primary)] shadow-lg shadow-primary/30' : 'border-[var(--color-border)]'} ${className || ''}`}
       onClick={handleClick}
       whileHover={animate ? { y: -5 } : undefined}
     >
       {/* Status Badge */}
       {showStatus && property.status && (
-        <div className="absolute top-3 left-3 z-10">
-          <Badge
-            content={property.status}
-            variant="chip"
-            color={getStatusColor(property.status) as any}
-            size="small"
-          />
+        <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-md text-xs font-bold ${
+          property.status === 'For Sale' ? 'bg-[var(--color-primary)] text-[var(--color-primary-contrast)]' : 'bg-[var(--color-danger)] text-white'
+        }`}>
+          {property.status}
         </div>
       )}
 
       {/* Image Section */}
       <div className={`relative ${variant === 'compact' ? 'aspect-square' : 'aspect-video'}`}>
-        {property.images?.length ? (
+{property.images?.length > 0 ? (
           <>
             {!imageLoaded && (
-              <div className="absolute inset-0 bg-[var(--color-surface-elevated)] flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface-elevated)] flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-transparent border-t-[var(--color-primary)] border-l-[var(--color-primary)] rounded-full animate-spin" />
               </div>
             )}
             <img 
               src={property.images[0].url} 
-              alt={property.images[0].alt || displayTitle}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
+              alt={property.title} 
+              className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
             />
           </>
         ) : (
-          <div className="w-full h-full bg-[var(--color-surface-elevated)] flex items-center justify-center">
-            <HomeIcon className="w-12 h-12 text-[var(--color-text-muted)]" />
+          <div className="w-full h-full bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-surface-elevated)] flex items-center justify-center">
+            <HomeOutlinedIcon className="text-[var(--color-primary)]/50 icon-lg" />
           </div>
         )}
         
         {/* Favorite Button */}
         {showFavorite && (
-          <div className="absolute top-2 right-2">
-            <IconButton
+          <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
+            <button 
+              className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1.5 sm:p-2 bg-[var(--color-surface)]/90 rounded-full hover:bg-[var(--color-surface)] transition-all
+                        backdrop-blur-sm shadow-md group-hover:opacity-100 border border-[var(--color-border)]"
               onClick={handleFavoriteClick}
-              loading={loadingFavorite}
-              variant={isFavorite ? 'favorite' : 'default'}
-              size="small"
-              animate={animate}
-              aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              disabled={loadingFavorite}
             >
-              {isFavorite ? (
-                <HeartFilled className="w-4 h-4 text-red-500" />
+              {loadingFavorite ? (
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-transparent border-t-[var(--color-primary)] border-l-[var(--color-primary)] rounded-full animate-spin" />
+              ) : isFavorite ? (
+                <HeartFilled className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-danger)] transition-all" />
               ) : (
-                <HeartOutline className="w-4 h-4 text-white hover:text-red-500 transition-colors" />
+                <HeartOutline className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-text)] hover:text-[var(--color-danger)] transition-all" />
               )}
-            </IconButton>
-          </div>
+            </button>
+          </Tooltip>
         )}
       </div>
 
       {/* Content Section */}
-      <div className={variant === 'compact' ? 'p-3' : 'p-4'}>
+      <div className="p-3 sm:p-5">
         {/* Rating and Type */}
         {showRating && (
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-2 sm:mb-3">
             <div className="flex items-center">
               {[...Array(5)].map((_, i) => (
-                <StarIcon 
-                  key={i} 
-                  className={`w-3 h-3 ${
-                    i < Math.floor(property.rating || 5) ? 'text-yellow-400' : 'text-gray-300'
-                  }`} 
-                />
+                <StarIcon key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
               ))}
-              <span className="text-xs text-[var(--color-text-muted)] ml-1">
-                {property.rating || '5.0'} ({property.reviews || '??'})
-              </span>
+              <span className="text-xs sm:text-sm text-[var(--color-text-muted)] ml-1">5.0 (??)</span>
             </div>
             <div className="flex items-center gap-1">
               {getPropertyTypeIcon()}
-              <span className="text-xs text-[var(--color-primary)] capitalize">
+              <span className="text-xs sm:text-sm text-[var(--color-primary)] capitalize">
                 {property.type || 'Property'}
               </span>
             </div>
@@ -331,80 +309,91 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
         )}
         
         {/* Title */}
-        <h3 className={`font-semibold text-[var(--color-text)] mb-1 line-clamp-1 ${
-          variant === 'compact' ? 'text-sm' : 'text-lg'
-        }`}>
-          {displayTitle}
+        <h3 className="font-poppins text-lg sm:text-xl font-bold text-[var(--color-text)] mb-1 sm:mb-2 line-clamp-1">
+          {property.buildingName || property.title}
         </h3>
         
         {/* Location */}
-        <div className="flex items-center gap-1 text-[var(--color-text-muted)] mb-2">
-          <MapPinIcon className="w-3 h-3" />
-          <span className="text-xs line-clamp-1">
-            {displayAddress || 'Location not available'}
+        <div className="flex items-center gap-1 sm:gap-2 text-[var(--color-primary)] mb-2 sm:mb-3">
+          <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="font-poppins text-xs sm:text-sm line-clamp-1">
+            {property.address?.street && `${property.address.street}, `}
+            {property.address?.city}, {property.address?.state}
           </span>
         </div>
         
         {/* Description */}
-        {shouldShowDescription && (
-          <p className="text-[var(--color-text-muted)] text-sm mb-3 line-clamp-2">
-            {property.description}
-          </p>
-        )}
+        <p className="text-[var(--color-text-muted)] text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
+          {property.description || 'No description available'}
+        </p>
         
         {/* Features */}
-        {shouldShowFeatures && (
-          <div className="flex gap-4 mb-3">
-            {property.area && (
-              <Tooltip title="Area" arrow>
-                <div className="flex items-center gap-1">
-                  <SquareFootOutlined className="w-4 h-4 text-[var(--color-primary)]" />
-                  <span className="text-xs text-[var(--color-text)]">
-                    {property.area.toLocaleString()} sqft
-                  </span>
-                </div>
-              </Tooltip>
-            )}
-            
-            {property.bedrooms !== undefined && (
-              <Tooltip title="Bedrooms" arrow>
-                <div className="flex items-center gap-1">
-                  <LocalHotelOutlined className="w-4 h-4 text-[var(--color-primary)]" />
-                  <span className="text-xs text-[var(--color-text)]">
-                    {property.bedrooms} Bed
-                  </span>
-                </div>
-              </Tooltip>
-            )}
-            
-            {property.bathrooms !== undefined && (
-              <Tooltip title="Bathrooms" arrow>
-                <div className="flex items-center gap-1">
-                  <BathtubOutlined className="w-4 h-4 text-[var(--color-primary)]" />
-                  <span className="text-xs text-[var(--color-text)]">
-                    {property.bathrooms} Bath
-                  </span>
-                </div>
-              </Tooltip>
+        <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
+          <Tooltip title="Area" arrow>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
+              <span className="text-[var(--color-text-muted)] text-xs sm:text-sm">
+                {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
+              </span>
+            </div>
+          </Tooltip>
+          
+          <Tooltip title="Bedrooms" arrow>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <LocalHotelOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
+              <span className="text-[var(--color-text-muted)] text-xs sm:text-sm">
+                {property.bedrooms || '0'} Bed
+              </span>
+            </div>
+          </Tooltip>
+          
+          <Tooltip title="Bathrooms" arrow>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <BathtubOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
+              <span className="text-[var(--color-text-muted)] text-xs sm:text-sm">
+                {property.bathrooms || '0'} Bath
+              </span>
+            </div>
+          </Tooltip>
+        </div>
+        
+        {/* Price and CTA */}
+        <div className="pt-3 border-t border-[var(--color-border)]">
+          <div className="flex justify-between items-center mb-2 sm:mb-3">
+            <p className="text-xl sm:text-2xl font-bold text-[var(--color-text)]">
+              {formatPrice(property.price)}
+              {property.status === 'For Rent' && <span className="text-sm text-[var(--color-text-muted)]">/mo</span>}
+            </p>
+            {property.projectDetails?.launchDate && (
+              <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
+                {new Date(property.projectDetails.launchDate) > new Date() ? 
+                  `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
+                  'Ready to Move'}
+              </span>
             )}
           </div>
-        )}
-        
-        {/* Price */}
-        <div className="flex justify-between items-center">
-          <span className={`font-bold text-[var(--color-primary)] ${
-            variant === 'compact' ? 'text-sm' : 'text-lg'
-          }`}>
-            {formatPrice(property.price)}
-          </span>
           
-          {property.developer && variant === 'detailed' && (
-            <span className="text-xs text-[var(--color-text-muted)]">
-              by {property.developer.name}
-            </span>
-          )}
+          <motion.button 
+            className="w-full bg-transparent border border-[var(--color-primary)] text-[var(--color-text)] px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[var(--color-primary)]/20 transition-all text-xs sm:text-sm
+                      group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-primary-contrast)] group-hover:font-bold"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick();
+            }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <span className="font-poppins">View Details</span>
+          </motion.button>
         </div>
       </div>
+
+      {/* Highlight animation when selected */}
+      {isSelected && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 border-2 border-[var(--color-primary)] rounded-xl sm:rounded-3xl opacity-0 animate-ping-slow" />
+        </div>
+      )}
     </motion.div>
   );
 };

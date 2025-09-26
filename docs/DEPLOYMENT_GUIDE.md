@@ -1,12 +1,12 @@
-# Urban Realty Deployment Guide
+# Squarefooot Deployment Guide
 
 ## Overview
 
-This guide provides comprehensive instructions for deploying the Urban Realty application across different environments and platforms.
+This guide provides comprehensive instructions for deploying the Squarefooot application across different environments and platforms.
 
 ## Architecture
 
-The Urban Realty application consists of three main components:
+The Squarefooot application consists of three main components:
 
 - **Server**: Node.js/Express API server
 - **Client**: React web application

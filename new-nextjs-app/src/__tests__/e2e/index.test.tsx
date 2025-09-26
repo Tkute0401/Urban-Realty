@@ -1,5 +1,5 @@
 /**
- * E2E Test Suite Runner - Urban Realty Next.js App
+ * E2E Test Suite Runner - Squarefooot Next.js App
  * Comprehensive testing suite for all application functionality
  */
 
@@ -13,10 +13,10 @@ import './admin-functionality.test'
 import './agent-functionality.test'
 import './subscription-functionality.test'
 
-describe('🚀 Urban Realty E2E Test Suite', () => {
+describe('🚀 Squarefooot E2E Test Suite', () => {
   beforeAll(async () => {
     console.log('🧪 Starting comprehensive E2E test suite...')
-    console.log('📍 Testing Next.js Urban Realty Application')
+    console.log('📍 Testing Next.js Squarefooot Application')
     console.log('🌐 Server should be running on http://localhost:5000')
   })
 

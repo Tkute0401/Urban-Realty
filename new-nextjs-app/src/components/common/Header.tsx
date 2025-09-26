@@ -59,6 +59,23 @@ const PersonIcon = ({ className = "menu-item-icon" }: { className?: string }) =>
   </svg>
 );
 
+const DashboardIcon = ({ className = "nav-icon" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+  </svg>
+);
+
+const BuildingIcon = ({ className = "nav-icon" }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
+    <path d="M6 12h4"></path>
+    <path d="M6 20h4"></path>
+    <path d="M10 4h4"></path>
+    <path d="M10 8h4"></path>
+  </svg>
+);
+
 const SunIcon = ({ className = "nav-icon" }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <circle cx="12" cy="12" r="5"></circle>
@@ -175,11 +192,38 @@ const Header: React.FC = () => {
                   <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
                 </div>
                 
-                {user?.role === 'agent' && (
-                  <Link href="/add-property" className="menu-item" onClick={handleMenuClose}>
-                    <AddIcon className="menu-item-icon" />
-                    <span>Add Property</span>
+                {/* Role-specific menu items */}
+                {user?.role === 'admin' && (
+                  <Link href="/admin" className="menu-item" onClick={handleMenuClose}>
+                    <DashboardIcon className="menu-item-icon" />
+                    <span>Admin Panel</span>
                   </Link>
+                )}
+                
+                {user?.role === 'agent' && (
+                  <>
+                    <Link href="/agent" className="menu-item" onClick={handleMenuClose}>
+                      <DashboardIcon className="menu-item-icon" />
+                      <span>Agent Dashboard</span>
+                    </Link>
+                    <Link href="/add-property" className="menu-item" onClick={handleMenuClose}>
+                      <AddIcon className="menu-item-icon" />
+                      <span>Add Property</span>
+                    </Link>
+                  </>
+                )}
+                
+                {user?.role === 'developer' && (
+                  <>
+                    <Link href="/developers" className="menu-item" onClick={handleMenuClose}>
+                      <BuildingIcon className="menu-item-icon" />
+                      <span>Developer Dashboard</span>
+                    </Link>
+                    <Link href="/developers/add" className="menu-item" onClick={handleMenuClose}>
+                      <AddIcon className="menu-item-icon" />
+                      <span>Add Project</span>
+                    </Link>
+                  </>
                 )}
                 
                 {user ? (
@@ -236,11 +280,38 @@ const Header: React.FC = () => {
               <span className="theme-label">{theme === 'light' ? 'Dark' : 'Light'}</span>
             </button>
 
-            {user?.role === 'agent' && (
-              <Link href="/add-property" className="nav-item nav-item-outlined">
-                <AddIcon />
-                <span>Add Property</span>
+            {/* Role-specific navigation items */}
+            {user?.role === 'admin' && (
+              <Link href="/admin" className="nav-item nav-item-outlined">
+                <DashboardIcon />
+                <span>Admin Panel</span>
               </Link>
+            )}
+
+            {user?.role === 'agent' && (
+              <>
+                <Link href="/agent" className="nav-item">
+                  <DashboardIcon />
+                  <span>Dashboard</span>
+                </Link>
+                <Link href="/add-property" className="nav-item nav-item-outlined">
+                  <AddIcon />
+                  <span>Add Property</span>
+                </Link>
+              </>
+            )}
+
+            {user?.role === 'developer' && (
+              <>
+                <Link href="/developers" className="nav-item">
+                  <BuildingIcon />
+                  <span>Dashboard</span>
+                </Link>
+                <Link href="/developers/add" className="nav-item nav-item-outlined">
+                  <AddIcon />
+                  <span>Add Project</span>
+                </Link>
+              </>
             )}
 
             {user ? (

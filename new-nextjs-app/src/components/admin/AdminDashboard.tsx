@@ -191,39 +191,29 @@ const AdminDashboard: React.FC = () => {
           properties: [],
           contacts: []
         },
-        analytics: {
-          growthRate: 15.5,
-          conversionRate: 8.2,
-          avgResponseTime: 2.3,
-          topPerformingAgents: [
-            { name: 'John Doe', properties: 25, revenue: 150000 },
-            { name: 'Jane Smith', properties: 22, revenue: 135000 },
-            { name: 'Mike Johnson', properties: 18, revenue: 120000 }
-          ],
+        analytics: dashboardData.analytics || {
+          growthRate: 0,
+          conversionRate: 0,
+          avgResponseTime: 0,
+          topPerformingAgents: [],
           systemHealth: {
-            cpu: 45,
-            memory: 62,
-            storage: 78,
-            network: 92
+            cpu: 0,
+            memory: 0,
+            storage: 0,
+            network: 0
           }
         }
       });
     }
   }, [dashboardData]);
 
-  const monthlyData = [
-    { month: 'Jan', users: 1200, properties: 450, revenue: 45000, leads: 180 },
-    { month: 'Feb', users: 1400, properties: 520, revenue: 52000, leads: 210 },
-    { month: 'Mar', users: 1600, properties: 580, revenue: 58000, leads: 240 },
-    { month: 'Apr', users: 1800, properties: 650, revenue: 65000, leads: 270 },
-    { month: 'May', users: 2000, properties: 720, revenue: 72000, leads: 300 },
-    { month: 'Jun', users: 2200, properties: 800, revenue: 80000, leads: 330 }
-  ];
+  // Get monthly data from analytics API or use empty array
+  const monthlyData = analyticsData?.monthlyData || [];
 
   const userTypeData = [
     { name: 'Regular Users', value: stats.counts.users - stats.counts.agents, color: 'var(--chart-color-3)' },
     { name: 'Agents', value: stats.counts.agents, color: 'var(--chart-color-4)' },
-    { name: 'Admins', value: 5, color: 'var(--color-warning)' }
+    { name: 'Admins', value: stats.counts.admins || 0, color: 'var(--color-warning)' }
   ];
 
   const propertyStatusData = [
@@ -270,7 +260,7 @@ const AdminDashboard: React.FC = () => {
                 <Box display="flex" alignItems="center" mt={1}>
                   <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main', mr: 0.5 }} />
                   <Typography variant="caption" color="success.main">
-                    {trendValue || '+12%'} {trend}
+                    {trendValue || ''} {trend}
                   </Typography>
                 </Box>
               )}
@@ -427,7 +417,7 @@ const AdminDashboard: React.FC = () => {
             color="var(--color-primary)"
             subtitle="Registered users"
             trend="this month"
-            trendValue="+15%"
+            trendValue={dashboardData?.trends?.users || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
@@ -438,7 +428,7 @@ const AdminDashboard: React.FC = () => {
             color="var(--color-primary)"
             subtitle="Active agents"
             trend="this month"
-            trendValue="+8%"
+            trendValue={dashboardData?.trends?.agents || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
@@ -449,7 +439,7 @@ const AdminDashboard: React.FC = () => {
             color="var(--color-primary)"
             subtitle="Listed properties"
             trend="this month"
-            trendValue="+22%"
+            trendValue={dashboardData?.trends?.properties || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
@@ -460,7 +450,7 @@ const AdminDashboard: React.FC = () => {
             color="var(--color-primary)"
             subtitle="Total inquiries"
             trend="this month"
-            trendValue="+18%"
+            trendValue={dashboardData?.trends?.contacts || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
@@ -471,7 +461,7 @@ const AdminDashboard: React.FC = () => {
             color="var(--color-primary)"
             subtitle="Active plans"
             trend="this month"
-            trendValue="+12%"
+            trendValue={dashboardData?.trends?.subscriptions || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
@@ -482,7 +472,7 @@ const AdminDashboard: React.FC = () => {
             color="var(--color-primary)"
             subtitle="Monthly revenue"
             trend="this month"
-            trendValue="+25%"
+            trendValue={dashboardData?.trends?.revenue || null}
           />
         </Grid>
       </Grid>

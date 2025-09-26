@@ -242,7 +242,7 @@ const AgentAnalytics = () => {
                     {analytics.totalLeads}
                   </Typography>
                   <Typography variant="body2" color="primary.main">
-                    +12% this month
+                    {analytics?.trends?.views ? `${analytics.trends.views > 0 ? '+' : ''}${analytics.trends.views}% this month` : 'No trend data'}
                   </Typography>
                 </Box>
                 <Avatar sx={{ bgcolor: 'success.main' }}>

@@ -1,5 +1,5 @@
 /**
- * E2E Agent Functionality Tests - Urban Realty Next.js App
+ * E2E Agent Functionality Tests - Squarefooot Next.js App
  * Tests agent dashboard, property management, lead handling, and analytics
  */
 

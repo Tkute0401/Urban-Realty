@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Urban Realty Deployment Script
+# Squarefooot Deployment Script
 
 set -e
 
@@ -322,7 +322,7 @@ main() {
 # Handle script arguments
 case ${1:-help} in
     "help"|"-h"|"--help")
-        echo "Urban Realty Deployment Script"
+        echo "Squarefooot Deployment Script"
         echo ""
         echo "Usage: $0 [environment]"
         echo ""

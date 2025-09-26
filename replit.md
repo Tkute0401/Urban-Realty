@@ -1,4 +1,4 @@
-# Urban Realty Project
+# Squarefooot Project
 
 ## Overview
 This is a full-stack realty website built with NextJS frontend and Node.js backend. The project is hosted on Railway and consists of multiple platforms (web, mobile).

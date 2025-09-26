@@ -28,8 +28,8 @@ export interface SEOMetadata {
 
 // Default SEO configuration
 const defaultSEO: SEOMetadata = {
-  title: 'Urban Realty - Premium Real Estate Platform',
-  description: 'Find your dream home with Urban Realty. Premium properties, expert agents, and comprehensive real estate services.',
+  title: 'Squarefooot - Premium Real Estate Platform',
+  description: 'Find your dream home with Squarefooot. Premium properties, expert agents, and comprehensive real estate services.',
   keywords: ['real estate', 'properties', 'homes', 'apartments', 'buy', 'sell', 'rent'],
   ogType: 'website',
   twitterCard: 'summary_large_image',
@@ -118,7 +118,7 @@ export class SEOOptimizer {
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'Urban Realty',
+      name: 'Squarefooot',
       url: this.baseUrl,
       logo: `${this.baseUrl}/images/logo.png`,
       description: 'Premium real estate platform offering comprehensive property services',
@@ -264,7 +264,7 @@ export const SEOHead: React.FC<{ metadata: Partial<SEOMetadata> }> = ({ metadata
 // Utility functions for common SEO scenarios
 export const generatePropertySEO = (property: any): Partial<SEOMetadata> => {
   return {
-    title: `${property.title} - ${property.city} | Urban Realty`,
+    title: `${property.title} - ${property.city} | Squarefooot`,
     description: `${property.description.substring(0, 160)}... Find this ${property.type} in ${property.city} for ${property.status.toLowerCase()}.`,
     keywords: [
       property.type.toLowerCase(),
@@ -283,7 +283,7 @@ export const generatePropertySEO = (property: any): Partial<SEOMetadata> => {
 
 export const generatePageSEO = (pageName: string, description: string): Partial<SEOMetadata> => {
   return {
-    title: `${pageName} | Urban Realty`,
+    title: `${pageName} | Squarefooot`,
     description,
     keywords: [pageName.toLowerCase(), 'real estate', 'urban realty'],
   };
@@ -291,7 +291,7 @@ export const generatePageSEO = (pageName: string, description: string): Partial<
 
 export const generateBlogSEO = (post: any): Partial<SEOMetadata> => {
   return {
-    title: `${post.title} | Urban Realty Blog`,
+    title: `${post.title} | Squarefooot Blog`,
     description: post.excerpt || post.content.substring(0, 160) + '...',
     keywords: post.tags || [],
     ogType: 'article',
@@ -308,11 +308,11 @@ export const generateBlogSEO = (post: any): Partial<SEOMetadata> => {
       dateModified: post.updatedAt,
       author: {
         '@type': 'Organization',
-        name: 'Urban Realty',
+        name: 'Squarefooot',
       },
       publisher: {
         '@type': 'Organization',
-        name: 'Urban Realty',
+        name: 'Squarefooot',
         logo: {
           '@type': 'ImageObject',
           url: `${SEOOptimizer.getInstance().baseUrl}/images/logo.png`,

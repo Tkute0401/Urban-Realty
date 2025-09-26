@@ -1,4 +1,4 @@
-# Production Docker Compose configuration for Urban Realty
+# Production Docker Compose configuration for Squarefooot
 
 version: '3.8'
 

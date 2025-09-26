@@ -128,7 +128,7 @@ const RazorpayPaymentForm: React.FC<RazorpayPaymentFormProps> = ({
         key: razorpayKeyData.key,
         amount: order.amount,
         currency: order.currency,
-        name: 'Urban Realty',
+        name: 'Squarefooot',
         description: `${plan.name} Subscription (${billingCycle})`,
         order_id: order.id,
         handler: async function (response: any) {

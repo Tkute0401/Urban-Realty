@@ -2,12 +2,12 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 
 function Hello() {
-  return <div>Hello Urban Realty</div>;
+  return <div>Hello Squarefooot</div>;
 }
 
 describe('smoke', () => {
   it('renders without crashing', () => {
     render(<Hello />);
-    expect(screen.getByText('Hello Urban Realty')).toBeInTheDocument();
+    expect(screen.getByText('Hello Squarefooot')).toBeInTheDocument();
   });
 });

@@ -107,6 +107,7 @@ const AgentDashboard = () => {
 
   const [stats, setStats] = useState({
     totalProperties: 0,
+    activeProperties: 0,
     activeLeads: 0,
     totalViews: 0,
     monthlyRevenue: 0,
@@ -117,13 +118,13 @@ const AgentDashboard = () => {
   });
 
   // Enhanced queries with TanStack Query v5 object syntax and better error handling
-  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useAgentDashboard(user?.id, filters, {
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useAgentDashboard(filters, {
     refetchInterval: 5 * 60 * 1000,
     retry: (failureCount) => (failureCount < 3),
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const { data: analytics, isLoading: analyticsLoading } = useAgentAnalytics(user?.id, undefined, {
+  const { data: analytics, isLoading: analyticsLoading } = useAgentAnalytics(undefined, {
     retry: (failureCount) => (failureCount < 2),
   });
 
@@ -132,7 +133,7 @@ const AgentDashboard = () => {
     mutationFn: async () => {
       await Promise.all([
         refetchDashboard(),
-        queryClient.invalidateQueries({ queryKey: ['agentAnalytics', user?.id] })
+        queryClient.invalidateQueries({ queryKey: ['agentAnalytics'] })
       ]);
     },
     onSuccess: () => {
@@ -153,17 +154,17 @@ const AgentDashboard = () => {
 
   // Calculate enhanced dashboard stats
   useEffect(() => {
-    if (dashboardData) {
+    if (dashboardData && dashboardData.stats) {
       const { stats: dashboardStats, properties, leads } = dashboardData;
       
       setStats({
-        totalProperties: dashboardStats.totalProperties,
-        activeProperties: dashboardStats.activeProperties,
-        activeLeads: dashboardStats.activeLeads,
-        totalViews: dashboardStats.totalViews,
-        monthlyRevenue: dashboardStats.monthlyRevenue,
-        conversionRate: dashboardStats.conversionRate,
-        avgResponseTime: dashboardStats.avgResponseTime,
+        totalProperties: dashboardStats?.totalProperties || 0,
+        activeProperties: dashboardStats?.activeProperties || 0,
+        activeLeads: dashboardStats?.activeLeads || 0,
+        totalViews: dashboardStats?.totalViews || 0,
+        monthlyRevenue: dashboardStats?.monthlyRevenue || 0,
+        conversionRate: dashboardStats?.conversionRate || 0,
+        avgResponseTime: dashboardStats?.avgResponseTime || 0,
         topPerformingProperty: properties?.[0] || null,
         recentActivity: leads?.slice(0, 10) || []
       });
@@ -182,14 +183,8 @@ const AgentDashboard = () => {
     return acc;
   }, {}) || {};
 
-  const monthlyData = [
-    { month: 'Jan', views: 1200, leads: 45, revenue: 12000 },
-    { month: 'Feb', views: 1800, leads: 62, revenue: 15000 },
-    { month: 'Mar', views: 2100, leads: 78, revenue: 18000 },
-    { month: 'Apr', views: 1900, leads: 71, revenue: 16500 },
-    { month: 'May', views: 2400, leads: 89, revenue: 22000 },
-    { month: 'Jun', views: 2800, leads: 95, revenue: 25000 }
-  ];
+  // Get monthly data from analytics API or use empty array
+  const monthlyData = analytics?.monthlyData || [];
 
   const COLORS = ['var(--color-primary)', 'var(--color-success)', 'var(--color-warning)', 'var(--color-error)', 'var(--color-info)'];
 
@@ -371,7 +366,7 @@ const AgentDashboard = () => {
             value={stats.totalProperties}
             icon={<HomeIcon />}
             subtitle={`${stats.activeProperties} active`}
-            trend="+12% this month"
+            trend={dashboardData?.trends?.properties || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -380,7 +375,7 @@ const AgentDashboard = () => {
             value={stats.activeLeads}
             icon={<PeopleIcon />}
             subtitle="Require attention"
-            trend="+8% this week"
+            trend={dashboardData?.trends?.leads || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -389,7 +384,7 @@ const AgentDashboard = () => {
             value={stats.totalViews.toLocaleString()}
             icon={<VisibilityIcon />}
             subtitle="Property impressions"
-            trend="+15% this month"
+            trend={dashboardData?.trends?.views || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -398,7 +393,7 @@ const AgentDashboard = () => {
             value={`₹${stats.monthlyRevenue.toLocaleString()}`}
             icon={<MoneyIcon />}
             subtitle="Commission earned"
-            trend="+22% this month"
+            trend={dashboardData?.trends?.revenue || null}
           />
         </Grid>
       </Grid>
@@ -629,7 +624,7 @@ const AgentDashboard = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {dashboardData.properties.slice(0, 5).map((property) => (
+                      {dashboardData?.properties?.slice(0, 5).map((property) => (
                         <TableRow key={property._id} hover>
                           <TableCell>
                             <Box display="flex" alignItems="center" gap={2}>
@@ -670,7 +665,7 @@ const AgentDashboard = () => {
                             <Box display="flex" alignItems="center" gap={1}>
                               <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
                               <Typography variant="body2">
-                                {((property.views || 0) / Math.max(...dashboardData.properties.map(p => p.views || 0)) * 100).toFixed(0)}%
+                                {((property.views || 0) / Math.max(...(dashboardData?.properties?.map(p => p.views || 0) || [0])) * 100).toFixed(0)}%
                               </Typography>
                             </Box>
                           </TableCell>
@@ -719,7 +714,7 @@ const AgentDashboard = () => {
 
               {dashboardData?.leads?.length > 0 ? (
                 <List>
-                  {dashboardData.leads.slice(0, 5).map((lead) => (
+                  {dashboardData?.leads?.slice(0, 5).map((lead) => (
                     <React.Fragment key={lead.id}>
                       <ListItem alignItems="flex-start">
                         <ListItemAvatar>

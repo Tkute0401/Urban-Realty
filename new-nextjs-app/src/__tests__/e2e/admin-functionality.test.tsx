@@ -1,5 +1,5 @@
 /**
- * E2E Admin Functionality Tests - Urban Realty Next.js App
+ * E2E Admin Functionality Tests - Squarefooot Next.js App
  * Tests admin dashboard, user management, property oversight, and analytics
  */
 

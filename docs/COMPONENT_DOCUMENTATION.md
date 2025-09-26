@@ -1,8 +1,8 @@
-# Urban Realty Component Documentation
+# Squarefooot Component Documentation
 
 ## Overview
 
-This document provides comprehensive documentation for all React components in the Urban Realty client application. Components are organized by category and include usage examples, props, and styling information.
+This document provides comprehensive documentation for all React components in the Squarefooot client application. Components are organized by category and include usage examples, props, and styling information.
 
 ## Component Architecture
 

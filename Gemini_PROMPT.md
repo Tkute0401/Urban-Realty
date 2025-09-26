@@ -1,4 +1,4 @@
-# Urban Realty – Mobile Migration Prompt (Copy/Paste for AI Codegen)
+# Squarefooot – Mobile Migration Prompt (Copy/Paste for AI Codegen)
 _Date: 2025-09-01 09:35 UTC_
 
 You are an expert **Flutter** engineer integrating with a **Node.js/Express** backend. Your task is to **achieve feature parity** between the React web app (`/client`) and the Flutter app (`/mobile`) **reusing the same REST API** served by `/server`.

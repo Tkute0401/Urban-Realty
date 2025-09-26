@@ -83,13 +83,17 @@ const AnalyticsDashboard = () => {
   // Export analytics data
   const handleExport = async () => {
     try {
-      // Create mock CSV data
-      const csvData = `Date,Users,Properties,Searches,Errors
-2024-01-01,1200,450,1250,12
-2024-01-02,1250,460,1300,10
-2024-01-03,1300,470,1350,8`;
+      if (!analytics?.chartData?.length) {
+        console.warn('No analytics data to export');
+        return;
+      }
       
-      const blob = new Blob([csvData], { type: 'text/csv' });
+      const csvHeaders = 'Date,Users,Properties,Revenue,Leads\n';
+      const csvData = analytics.chartData.map(item => 
+        `${item.month || item.date},${item.users || 0},${item.properties || 0},${item.revenue || 0},${item.leads || 0}`
+      ).join('\n');
+      
+      const blob = new Blob([csvHeaders + csvData], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

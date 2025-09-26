@@ -47,8 +47,10 @@ export const api = {
 							return await api.auth.removeFavorite(propertyId);
 						}
 						// Unknown state: attempt PUT as default, then fallback to DELETE on 400
-						const res = await api.auth.addFavorite(propertyId);
-						return res;
+						else {
+                                                        const res = await api.auth.addFavorite(propertyId);
+						        return res;
+                                                }
 					} catch (err: any) {
 						// If server returns 400 for duplicate add, try DELETE as fallback
 						if (err?.statusCode === 400 || err?.options?.statusCode === 400) {
@@ -85,14 +87,18 @@ export const api = {
                 verifyAgent: (agentId: string) => unwrap<any>(http.put(`/admin/agents/${agentId}/verify`, {})),
         },
         agent: {
-                // Agent dashboard & analytics
-                dashboard: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/agent/${agentId}/dashboard`, { params })),
-                analytics: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/agent/${agentId}/analytics`, { params })),
-                // Agent leads
-                leads: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/leads`, { params })),
+                // Agent self-access endpoints (logged-in agent accessing their own data)
+                dashboard: (params?: Record<string, any>) => unwrap<any>(http.get(`/agent/dashboard`, { params })),
+                analytics: (params?: Record<string, any>) => unwrap<any>(http.get(`/agent/analytics`, { params })),
+                leads: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/leads`, { params })),
+                properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/properties`, { params })),
                 updateLead: (leadId: string, payload: { status?: string }) => unwrap<any>(http.put(`/contacts/${leadId}`, payload)),
-                // Agent properties
-                properties: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/properties`, { params })),
+                
+                // Admin endpoints for accessing any agent's data (admin only)
+                adminDashboard: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/agent/${agentId}/dashboard`, { params })),
+                adminAnalytics: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/agent/${agentId}/analytics`, { params })),
+                adminLeads: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/leads`, { params })),
+                adminProperties: (agentId: string, params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/agent/${agentId}/properties`, { params })),
         },
         subscriptions: {
                 plans: () => unwrap<any[]>(http.get("/subscriptions")),

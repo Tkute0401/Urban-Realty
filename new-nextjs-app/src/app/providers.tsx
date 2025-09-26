@@ -11,6 +11,7 @@ import { PropertiesProvider } from '@/contexts/PropertiesContext'
 import { AgentsProvider } from '@/contexts/AgentsContext'
 import { DevelopersProvider } from '@/contexts/DevelopersContext'
 import ErrorBoundary from '@/components/common/ErrorBoundary'
+import PerformanceMonitor from '@/components/PerformanceMonitor'
 
 type ProvidersProps = { children: ReactNode }
 
@@ -41,6 +42,19 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
               <AgentsProvider>
                 <DevelopersProvider>
                   {children}
+                  
+                  {/* Performance monitoring - only in production */}
+                  {process.env.NODE_ENV === 'production' && (
+                    <PerformanceMonitor enableReporting={true} />
+                  )}
+                  
+                  {/* Development performance monitoring with console logging */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <PerformanceMonitor 
+                      enableReporting={false} 
+                      enableConsoleLogging={true} 
+                    />
+                  )}
                 </DevelopersProvider>
               </AgentsProvider>
             </PropertiesProvider>

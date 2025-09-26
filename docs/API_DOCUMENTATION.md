@@ -1,8 +1,8 @@
-# Urban Realty API Documentation
+# Squarefooot API Documentation
 
 ## Overview
 
-The Urban Realty API provides comprehensive endpoints for managing real estate properties, users, subscriptions, and administrative functions. This RESTful API is built with Node.js, Express, and MongoDB.
+The Squarefooot API provides comprehensive endpoints for managing real estate properties, users, subscriptions, and administrative functions. This RESTful API is built with Node.js, Express, and MongoDB.
 
 ## Base URL
 

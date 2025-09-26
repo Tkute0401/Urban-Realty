@@ -101,7 +101,7 @@ const Header = () => {
                 alt="Logo" 
                 className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 transition-all duration-300 hover:scale-105" 
               />
-            {/* <span className="logo-text">Urban Realty</span> */}
+            {/* <span className="logo-text">Squarefooot</span> */}
           </Link>
         </div>
 

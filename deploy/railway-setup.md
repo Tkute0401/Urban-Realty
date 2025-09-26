@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for deploying the Urban Realty application to Railway.
+This guide provides step-by-step instructions for deploying the Squarefooot application to Railway.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This guide provides step-by-step instructions for deploying the Urban Realty app
 1. Go to [Railway](https://railway.app/)
 2. Click "New Project"
 3. Select "Deploy from GitHub repo"
-4. Choose your Urban Realty repository
+4. Choose your Squarefooot repository
 5. Select the main branch
 
 ## Step 2: Configure Environment Variables

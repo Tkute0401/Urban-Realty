@@ -1,426 +1,165 @@
-'use client'
-
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import {
-  Menu as MenuIcon,
-  Search as SearchIcon,
-  Close as CloseIcon,
-  FilterAlt as FilterIcon
-} from '@mui/icons-material';
+import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
+import { CircularProgress, Box } from '@mui/material';
 import styles from './Properties.module.css';
 
-// Import the components similar to React version
-import PriceDropdown from '@/components/property/filters/PriceDropdown';
-import BedBath from '@/components/property/filters/BedBath';
-import HomeType from '@/components/property/filters/HomeType';
-import More from '@/components/property/filters/More';
-import PropertiesMap from '@/components/property/PropertiesMap';
-import { PropertyCard as UnifiedPropertyCard } from '@/components/ui';
-import type { Property } from '@/components/ui';
+// Import components
+import PropertiesPageClient from './PropertiesPageClient';
 
-const PropertyGridCard = ({ property, index, onClick }: { property: Property; index: number; onClick: (property: Property) => void }) => {
-  return (
-    <UnifiedPropertyCard
-      property={property}
-      index={index}
-      showFavorite
-      showStatus
-      showRating
-      showFeatures
-      onClick={onClick}
-    />
-  );
-};
-
-export default function PropertiesPage() {
-  const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeBtn, setActiveBtn] = useState('BUY');
-  const [filters, setFilters] = useState<Record<string, any>>({});
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [properties, setProperties] = useState<any[]>([]);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<any>(null);
-  
-  const amenityOptions = [
-    'Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 
-    'Security', 'Furnished', 'Fireplace', 'Elevator'
-  ];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    setIsLoaded(true);
-    
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = await fetch('/api/properties');
-        const data = await response.json();
-        const propertyList = Array.isArray(data.data) ? data.data : data.items || [];
-        setProperties(propertyList);
-        setFilteredProperties(propertyList as Property[]);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching properties:', err);
-        setLoading(false);
+// Server-side data fetching
+async function getInitialProperties() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/properties`, {
+      next: { 
+        revalidate: 300 // Revalidate every 5 minutes for fresh listings
       }
-    };
-
-    fetchProperties();
-  }, []);
-
-  // Filter properties whenever filters, search term, or activeBtn change
-  useEffect(() => {
-    let filtered = properties;
-
-    // Filter by property type (buy/rent)
-    if (activeBtn === 'BUY') {
-      filtered = filtered.filter(property => 
-        property.listingType?.toLowerCase() === 'sale' || 
-        property.type?.toLowerCase() === 'sale' ||
-        !property.listingType // Default to sale if no type specified
-      );
-    } else {
-      filtered = filtered.filter(property => 
-        property.listingType?.toLowerCase() === 'rent' || 
-        property.type?.toLowerCase() === 'rent'
-      );
+    });
+    
+    if (!response.ok) {
+      return [];
     }
+    
+    const data = await response.json();
+    return Array.isArray(data.data) ? data.data : data.items || [];
+  } catch (error) {
+    console.error('Error fetching properties:', error);
+    return [];
+  }
+}
 
-    // Filter by search term (location)
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(property => {
-        const address = property.address || {};
-        const location = property.location || '';
-        return (
-          address.city?.toLowerCase().includes(searchLower) ||
-          address.state?.toLowerCase().includes(searchLower) ||
-          address.street?.toLowerCase().includes(searchLower) ||
-          (typeof location === 'string' && location.toLowerCase().includes(searchLower)) ||
-          property.title?.toLowerCase().includes(searchLower)
-        );
-      });
-    }
-
-    // Apply price filters
-    if (filters.minPrice || filters.maxPrice) {
-      filtered = filtered.filter(property => {
-        const price = property.price || 0;
-        const minPrice = filters.minPrice ? Number(filters.minPrice) : 0;
-        const maxPrice = filters.maxPrice ? Number(filters.maxPrice) : Infinity;
-        return price >= minPrice && price <= maxPrice;
-      });
-    }
-
-    // Apply bed/bath filters
-    if (filters.bedrooms) {
-      const bedroomCount = filters.bedrooms.toString().replace('+', '');
-      const minBedrooms = Number(bedroomCount);
-      filtered = filtered.filter(property => 
-        (property.bedrooms || 0) >= minBedrooms
-      );
-    }
-
-    if (filters.bathrooms) {
-      const bathroomCount = filters.bathrooms.toString().replace('+', '');
-      const minBathrooms = Number(bathroomCount);
-      filtered = filtered.filter(property => 
-        (property.bathrooms || 0) >= minBathrooms
-      );
-    }
-
-    // Apply home type filter
-    if (filters.propertyTypes && filters.propertyTypes.length > 0) {
-      filtered = filtered.filter(property => {
-        const propertyType = property.propertyType || property.type || '';
-        return filters.propertyTypes.some((filterType: string) => {
-          // Map common property types to filter labels
-          const typeMapping: Record<string, string[]> = {
-            'Houses': ['house', 'single-family', 'home'],
-            'Apartments': ['apartment', 'flat'],
-            'Condos/Co-ops': ['condo', 'co-op', 'condominium'],
-            'Townhomes': ['townhome', 'townhouse'],
-            'Multi-family': ['multi-family', 'multifamily', 'duplex'],
-            'Lots/Land': ['lot', 'land', 'plot'],
-            'Manufactured': ['manufactured', 'mobile']
-          };
-          
-          const mappedTypes = typeMapping[filterType] || [filterType.toLowerCase()];
-          return mappedTypes.some(mapped => 
-            propertyType.toLowerCase().includes(mapped)
-          );
-        });
-      });
-    }
-
-    // Apply amenities filter
-    if (filters.amenities && filters.amenities.length > 0) {
-      filtered = filtered.filter(property => {
-        const propertyAmenities = property.amenities || [];
-        return filters.amenities.some((amenity: string) => 
-          propertyAmenities.some((propAmenity: string) => 
-            propAmenity.toLowerCase().includes(amenity.toLowerCase())
-          )
-        );
-      });
-    }
-
-    // Apply additional location filters
-    if (filters.city) {
-      const cityFilter = filters.city.toLowerCase();
-      filtered = filtered.filter(property => {
-        const address = property.address || {};
-        return address.city?.toLowerCase().includes(cityFilter) || 
-               (typeof property.location === 'string' && property.location.toLowerCase().includes(cityFilter));
-      });
-    }
-
-    if (filters.state) {
-      const stateFilter = filters.state.toLowerCase();
-      filtered = filtered.filter(property => {
-        const address = property.address || {};
-        return address.state?.toLowerCase().includes(stateFilter);
-      });
-    }
-
-    // Apply area filters
-    if (filters.minArea || filters.maxArea) {
-      filtered = filtered.filter(property => {
-        const area = property.area || property.sqft || 0;
-        const minArea = filters.minArea ? Number(filters.minArea) : 0;
-        const maxArea = filters.maxArea ? Number(filters.maxArea) : Infinity;
-        return area >= minArea && area <= maxArea;
-      });
-    }
-
-    setFilteredProperties(filtered);
-  }, [properties, filters, searchTerm, activeBtn]);
-
-  const removeFilter = (filterKey: string) => {
-    const updatedFilters = { ...filters };
-    delete updatedFilters[filterKey];
-    setFilters(updatedFilters);
+// Dynamic metadata generation based on search params
+export async function generateMetadata({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }): Promise<Metadata> {
+  const listingType = searchParams.type || 'all';
+  const location = searchParams.location || '';
+  const page = searchParams.page || '1';
+  
+  let title = 'Properties for Sale & Rent | Squarefooot Real Estate Listings';
+  let description = 'Browse thousands of properties for sale and rent. Find your dream home, apartment, or commercial space with Squarefooot. Expert agents and competitive prices.';
+  
+  // Customize based on search parameters
+  if (listingType === 'sale' || listingType === 'buy') {
+    title = `Properties for Sale${location ? ` in ${location}` : ''} | Squarefooot`;
+    description = `Find properties for sale${location ? ` in ${location}` : ''}. Browse homes, apartments, and commercial spaces with competitive prices and expert guidance.`;
+  } else if (listingType === 'rent') {
+    title = `Properties for Rent${location ? ` in ${location}` : ''} | Squarefooot`;
+    description = `Discover rental properties${location ? ` in ${location}` : ''}. Find apartments, houses, and commercial spaces for rent with flexible terms.`;
+  }
+  
+  if (location) {
+    description += ` Serving ${location} and surrounding areas.`;
+  }
+  
+  return {
+    title,
+    description,
+    keywords: [
+      'properties for sale',
+      'properties for rent',
+      'real estate listings',
+      'property search',
+      'homes for sale',
+      'apartments for rent',
+      'commercial real estate',
+      'property finder',
+      ...(location ? [location, `properties in ${location}`] : [])
+    ].filter(Boolean),
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: [
+        {
+          url: '/og-properties-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Squarefooot Properties Listings',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/twitter-properties-image.jpg'],
+    },
+    alternates: {
+      canonical: `/properties${page !== '1' ? `?page=${page}` : ''}`,
+    },
   };
+}
 
-  const toggleMobileMenu = () => {
-    setShowMobileMenu(!showMobileMenu);
+// Generate structured data for properties listing
+function generatePropertiesListingStructuredData(properties: any[]) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+  
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Urban Realty Property Listings",
+    "description": "Browse our comprehensive collection of properties for sale and rent",
+    "url": `${baseUrl}/properties`,
+    "numberOfItems": properties.length,
+    "itemListElement": properties.slice(0, 20).map((property, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "RealEstateListing",
+        "name": property.title || `${property.bedrooms} BR ${property.propertyType} in ${property.address?.city}`,
+        "url": `${baseUrl}/properties/${property._id}`,
+        "image": property.images?.[0] || `${baseUrl}/default-property-image.jpg`,
+        "priceSpecification": {
+          "@type": "PriceSpecification",
+          "price": property.price || 0,
+          "priceCurrency": "USD"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": property.address?.city || "",
+          "addressRegion": property.address?.state || "",
+          "addressCountry": "US"
+        },
+        "floorSize": {
+          "@type": "QuantitativeValue",
+          "value": property.area || property.sqft || 0,
+          "unitCode": "SQF"
+        },
+        "numberOfRooms": property.bedrooms || 0,
+        "numberOfBathroomsTotal": property.bathrooms || 0
+      }
+    }))
   };
+}
 
-  const handleMoreFiltersApply = (newFilters: Record<string, any>) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
-  };
-
-  const handlePriceFilterApply = (min: string, max: string) => {
-    setFilters(prev => ({
-      ...prev,
-      minPrice: min,
-      maxPrice: max
-    }));
-  };
-
-  const handleBedBathFilterApply = (bedrooms: string, bathrooms: string) => {
-    setFilters(prev => ({
-      ...prev,
-      bedrooms,
-      bathrooms
-    }));
-  };
-
-  const handleHomeTypeFilterApply = (propertyTypes: string[]) => {
-    setFilters(prev => ({
-      ...prev,
-      propertyTypes
-    }));
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled automatically via useEffect
-  };
-
-  const handleMarkerClick = (property: any) => {
-    setSelectedProperty(property);
-  };
-
+// Loading component
+function PropertiesLoading() {
   return (
-    <div className={`${styles.mainContainer} ${isLoaded ? styles.fadeIn : ''}`}>
-      {/* NavBar */}
-      <div className={styles.navbar}>
-        <form className={`${styles.searchContainer} ${styles.slideInLeft}`} onSubmit={handleSearchSubmit}>
-          <input 
-            type="text" 
-            placeholder="SEARCH BY LOCATION (STATE OR CITY)" 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-          />
-          <button type="submit" className={styles.searchButton}>
-            <SearchIcon className={styles.searchIcon} />
-          </button>
-        </form>
-        
-        {isMobile ? (
-          <button className={styles.mobileMenuButton} onClick={toggleMobileMenu}>
-            <FilterIcon fontSize="small" />
-            <span>Filters</span>
-          </button>
-        ) : (
-          <div className={`${styles.navbarBtn} ${styles.slideInRight}`}>
-            <div className={styles.buyRentToggle}>
-              <button 
-                className={`${styles.toggleBtn} ${activeBtn === 'BUY' ? styles.active : styles.inactive}`}
-                onClick={() => setActiveBtn('BUY')}
-              >
-                BUY
-              </button>
-              <button 
-                className={`${styles.toggleBtn} ${activeBtn === 'RENT' ? styles.active : styles.inactive}`}
-                onClick={() => setActiveBtn('RENT')}
-              >
-                RENT
-              </button>
-            </div>
-            <div className={styles.otherNavbarBtn}>
-              <HomeType onApply={handleHomeTypeFilterApply} />
-              <PriceDropdown 
-                activeBtn={activeBtn} 
-                onApply={handlePriceFilterApply}
-                currentMin={filters.minPrice || ''}
-                currentMax={filters.maxPrice || ''}
-              />
-              <BedBath onApply={handleBedBathFilterApply} />
-              <More
-                onApply={handleMoreFiltersApply} 
-                amenityOptions={amenityOptions}
-                currentFilters={filters}
-              />
-              <button className={`${styles.saveBtn} ${styles.btnAnimate}`}>SAVE SEARCH</button>
-            </div>
-          </div>
-        )}
-      </div>
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+      <CircularProgress sx={{ color: 'var(--color-primary)' }} />
+    </Box>
+  );
+}
 
-      {/* Mobile Menu */}
-      {isMobile && showMobileMenu && (
-        <div className={styles.mobileMenu}>
-          <div className={styles.mobileMenuContent}>
-            <div className={styles.buyRentToggle}>
-              <button 
-                className={`${styles.toggleBtn} ${activeBtn === 'BUY' ? styles.active : styles.inactive}`}
-                onClick={() => {
-                  setActiveBtn('BUY');
-                  setShowMobileMenu(false);
-                }}
-              >
-                BUY
-              </button>
-              <button 
-                className={`${styles.toggleBtn} ${activeBtn === 'RENT' ? styles.active : styles.inactive}`}
-                onClick={() => {
-                  setActiveBtn('RENT');
-                  setShowMobileMenu(false);
-                }}
-              >
-                RENT
-              </button>
-            </div>
-            <div className={styles.mobileMenuFilters}>
-              <HomeType onApply={handleHomeTypeFilterApply} />
-              <PriceDropdown 
-                activeBtn={activeBtn} 
-                onApply={handlePriceFilterApply}
-                currentMin={filters.minPrice || ''}
-                currentMax={filters.maxPrice || ''}
-              />
-              <BedBath onApply={handleBedBathFilterApply} />
-              <More
-                onApply={handleMoreFiltersApply}
-                amenityOptions={amenityOptions}
-                currentFilters={filters}
-              />
-              <button className={`${styles.saveBtn} ${styles.btnAnimate}`}>SAVE SEARCH</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className={`${styles.breadcrumb} ${styles.fadeInDelay1}`}>
-        <a href="/">HOME</a>
-        <span className={styles.separator}>&gt;</span>
-        <a href="#">{activeBtn}</a>
-        <span className={styles.separator}>&gt;</span>
-        <a href="#">PROPERTIES</a>
-      </div>
-
-      <div className={`${styles.pageTitle} ${styles.fadeInDelay2}`}>
-        <h1>Available Properties <span>Listings</span></h1>
-        <div className={styles.listingsCount}>{filteredProperties.length} LISTINGS</div>
-      </div>
-
-      <div className={`${styles.filterTags} ${styles.fadeInDelay3}`}>
-        {Object.entries(filters).map(([key, value]) => (
-          <div key={key} className={styles.filterTag}>
-            <span className={styles.filterLabel}>{key.toUpperCase()}: {value}</span>
-            <button onClick={() => removeFilter(key)}>
-              <CloseIcon fontSize="small" />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <div className={`${styles.propertyListings} ${styles.fadeInDelay4}`}>
-        <div className={styles.propertyGrid}>
-          {loading ? (
-            <div className={styles.mapPlaceholder}>
-              <span>Loading properties...</span>
-            </div>
-          ) : (
-            filteredProperties.map((property, index) => (
-              <div
-                key={property._id || index}
-                onMouseEnter={() => setSelectedProperty(property)}
-                onMouseLeave={() => setSelectedProperty(null)}
-              >
-                <PropertyGridCard
-                  property={property}
-                  index={index}
-                  onClick={(p) => setSelectedProperty(p)}
-                />
-              </div>
-            ))
-          )}
-        </div>
-        <div className={styles.mapContainer}>
-          {!loading && filteredProperties.length > 0 ? (
-            <PropertiesMap 
-              properties={filteredProperties} 
-              selectedProperty={selectedProperty}
-              onMarkerClick={handleMarkerClick}
-            />
-          ) : (
-            <div className={styles.mapPlaceholder}>
-              <span>{loading ? 'Loading map...' : 'No properties to show on map'}</span>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+export default async function PropertiesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+  const initialProperties = await getInitialProperties();
+  const structuredData = generatePropertiesListingStructuredData(initialProperties);
+  
+  return (
+    <>
+      {/* Structured Data for Properties Listing */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+      
+      <Suspense fallback={<PropertiesLoading />}>
+        <PropertiesPageClient 
+          initialProperties={initialProperties}
+          initialSearchParams={searchParams}
+        />
+      </Suspense>
+    </>
   );
 }

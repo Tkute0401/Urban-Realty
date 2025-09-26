@@ -1,5 +1,6 @@
 // MainPage.jsx (updated)
 import { React, useState, useEffect } from 'react';
+import { PropertyCard } from '@/components/ui';
 import './MainPage.css';
 
 const CloseIcon = () => (
@@ -26,41 +27,33 @@ const GalleryIcon = () => (
   </svg>
 );
 
-const PropertyCard = ({ property }) => {
-  const [isHovered, setIsHovered] = useState(false);
+const MainPagePropertyCard = ({ property }) => {
+  // Convert legacy property format to modern format
+  const modernProperty = {
+    _id: property.id,
+    title: property.location,
+    price: parseFloat(property.price.replace(/[^0-9]/g, '')),
+    area: parseFloat(property.sqft.replace(/[^0-9]/g, '')),
+    bedrooms: property.beds,
+    bathrooms: property.baths,
+    images: [{ url: property.image }],
+    address: {
+      city: 'Nashik',
+      state: 'Maharashtra'
+    },
+    type: 'apartment',
+    status: 'For Sale'
+  };
 
   return (
-    <div
-      className="property-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="property-image-container">
-        <img src={property.image} alt={property.location} className="property-image" />
-        <div className="property-image-overlay">
-          <div className="property-image-actions">
-            <button className="image-action-btn">
-              <ZoomIcon />
-            </button>
-            <button className="image-action-btn">
-              <GalleryIcon />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="property-details">
-        <div className="property-price">{property.price}</div>
-        <div className="property-specs">
-          <div className="property-spec">{property.sqft}</div>
-          <div className="property-spec-divider">|</div>
-          <div className="property-spec">{property.beds} Bed</div>
-          <div className="property-spec-divider">|</div>
-          <div className="property-spec">{property.baths} Bath</div>
-        </div>
-        <div className="property-location">Location of the Property...</div>
-      </div>
-    </div>
+    <PropertyCard 
+      property={modernProperty}
+      showFavorite={true}
+      showStatus={true}
+      showRating={false}
+      showFeatures={true}
+      variant="default"
+    />
   );
 };
 
@@ -158,7 +151,7 @@ const MainPage = () => {
       <div className="property-listings fade-in-delay-4">
         <div className="property-grid">
           {properties.map(property => (
-            <PropertyCard key={property.id} property={property} />
+            <MainPagePropertyCard key={property.id} property={property} />
           ))}
         </div>
         <div className="map-container">

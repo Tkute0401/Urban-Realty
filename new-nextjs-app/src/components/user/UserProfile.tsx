@@ -183,6 +183,100 @@ const UserProfile = () => {
                     size="small"
                   />
                 </Box>
+                
+                {/* Role-specific Action Buttons */}
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2 }}>
+                  {user?.role === 'admin' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      href="/admin"
+                      sx={{ 
+                        bgcolor: 'var(--color-primary)', 
+                        color: '#0B1011',
+                        '&:hover': { 
+                          bgcolor: 'var(--color-primary)', 
+                          opacity: 0.9 
+                        }
+                      }}
+                    >
+                      Admin Panel
+                    </Button>
+                  )}
+                  
+                  {user?.role === 'agent' && (
+                    <>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        href="/agent"
+                        sx={{ 
+                          bgcolor: 'var(--color-primary)', 
+                          color: '#0B1011',
+                          '&:hover': { 
+                            bgcolor: 'var(--color-primary)', 
+                            opacity: 0.9 
+                          }
+                        }}
+                      >
+                        Agent Dashboard
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        href="/add-property"
+                        sx={{ 
+                          borderColor: 'var(--color-primary)', 
+                          color: 'var(--color-primary)',
+                          '&:hover': { 
+                            borderColor: 'var(--color-primary)',
+                            bgcolor: 'var(--color-primary)',
+                            color: '#0B1011'
+                          }
+                        }}
+                      >
+                        Add Property
+                      </Button>
+                    </>
+                  )}
+                  
+                  {user?.role === 'developer' && (
+                    <>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        href="/developers"
+                        sx={{ 
+                          bgcolor: 'var(--color-primary)', 
+                          color: '#0B1011',
+                          '&:hover': { 
+                            bgcolor: 'var(--color-primary)', 
+                            opacity: 0.9 
+                          }
+                        }}
+                      >
+                        Developer Dashboard
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        href="/developers/add"
+                        sx={{ 
+                          borderColor: 'var(--color-primary)', 
+                          color: 'var(--color-primary)',
+                          '&:hover': { 
+                            borderColor: 'var(--color-primary)',
+                            bgcolor: 'var(--color-primary)',
+                            color: '#0B1011'
+                          }
+                        }}
+                      >
+                        Add Project
+                      </Button>
+                    </>
+                  )}
+                </Box>
+                
                 <Button
                   startIcon={<EditIcon />}
                   onClick={handleEdit}

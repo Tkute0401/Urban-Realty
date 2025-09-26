@@ -1,5 +1,5 @@
 # Complete Frontend Migration Audit Report
-## Urban Realty - React to Next.js Migration
+## Squarefooot - React to Next.js Migration
 
 ### Executive Summary
 This comprehensive audit analyzes the current React-based realty application and provides a detailed migration plan to Next.js. The project consists of three main components: a React client (Vite-based), an Express.js server, and a partially migrated Next.js application. The primary focus is on addressing the critical inline CSS color issues and creating a systematic, phase-dependent migration approach.

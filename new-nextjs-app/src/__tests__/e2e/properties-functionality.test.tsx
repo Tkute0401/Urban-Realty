@@ -1,5 +1,5 @@
 /**
- * E2E Properties Functionality Tests - Urban Realty Next.js App
+ * E2E Properties Functionality Tests - Squarefooot Next.js App
  * Tests property listing, filtering, viewing, and management
  */
 

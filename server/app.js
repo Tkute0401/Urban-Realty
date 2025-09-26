@@ -76,7 +76,7 @@ app.get('/api/v1/health', (req, res) => {
 
 // Simple test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Urban Realty API is working!' });
+  res.json({ message: 'Squarefooot API is working!' });
 });
 
 // Error handling middleware

@@ -59,7 +59,7 @@ const AdminSettings = () => {
   const [success, setSuccess] = useState(null);
   const [settings, setSettings] = useState({
     general: {
-      siteName: 'Urban Realty',
+      siteName: 'Squarefooot',
       siteDescription: 'Premium Real Estate Platform',
       maintenanceMode: false,
       allowRegistration: true,
@@ -72,8 +72,8 @@ const AdminSettings = () => {
       smtpPort: 587,
       smtpUser: '',
       smtpPassword: '',
-      fromEmail: 'noreply@urbanrealty.com',
-      fromName: 'Urban Realty',
+      fromEmail: 'noreply@squarefooot.com',
+      fromName: 'Squarefooot',
       enableEmailNotifications: true
     },
     security: {

@@ -57,7 +57,7 @@ const AgentAnalytics = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   // Fetch agent's analytics
-  const { data: analyticsData, isLoading: analyticsLoading } = useAgentAnalytics(user?.id);
+  const { data: analyticsData, isLoading: analyticsLoading } = useAgentAnalytics();
 
   // Use analytics data from mock API
   const analytics = analyticsData || {
@@ -175,7 +175,7 @@ const AgentAnalytics = () => {
                     {analytics.overview.totalLeads}
                   </Typography>
                   <Typography variant="body2" color="primary.main">
-                    +12% this month
+                    {analytics?.trends?.views ? `${analytics.trends.views > 0 ? '+' : ''}${analytics.trends.views}% this month` : 'No trend data'}
                   </Typography>
                 </Box>
                 <Avatar sx={{ bgcolor: 'success.main' }}>

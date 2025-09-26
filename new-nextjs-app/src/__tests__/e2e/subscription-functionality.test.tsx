@@ -1,5 +1,5 @@
 /**
- * E2E Subscription Functionality Tests - Urban Realty Next.js App
+ * E2E Subscription Functionality Tests - Squarefooot Next.js App
  * Tests subscription plans, billing, payment processing, and plan management
  */
 

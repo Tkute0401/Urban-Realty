@@ -1,7 +1,7 @@
-# Urban Realty Refactoring - Phase 2 Complete
+# Squarefooot Refactoring - Phase 2 Complete
 
 ## Overview
-This document outlines the completion of Phase 2 of the Urban Realty project refactoring, which focused on server-side restructuring and optimization.
+This document outlines the completion of Phase 2 of the Squarefooot project refactoring, which focused on server-side restructuring and optimization.
 
 ## Phase 2 Completed Steps
 

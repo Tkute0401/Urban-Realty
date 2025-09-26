@@ -1,5 +1,5 @@
 /**
- * E2E Authentication Flow Tests - Urban Realty Next.js App
+ * E2E Authentication Flow Tests - Squarefooot Next.js App
  * Tests login, registration, and authentication state management
  */
 

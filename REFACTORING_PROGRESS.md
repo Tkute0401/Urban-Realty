@@ -1,4 +1,4 @@
-# Urban Realty Refactoring Progress Tracker
+# Squarefooot Refactoring Progress Tracker
 
 ## PHASE 1 COMPLETION SUMMARY
 

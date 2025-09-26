@@ -29,7 +29,7 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
-        <img src="/about-us.jpg" alt="Urban Realty Team" className="absolute inset-0 w-full h-full object-cover" />
+        <img src="/about-us.jpg" alt="Squarefooot Team" className="absolute inset-0 w-full h-full object-cover" />
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

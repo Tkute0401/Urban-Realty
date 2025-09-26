@@ -123,7 +123,7 @@ const SubscriptionPlans = () => {
         key,
         amount: order.amount,
         currency: order.currency,
-        name: 'Urban Realty',
+        name: 'Squarefooot',
         description: `${selectedPlan.name} - ${billingCycle} subscription`,
         order_id: order.id,
         prefill: {

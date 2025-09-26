@@ -1,13 +1,14 @@
-# Urban Realty
+# Squarefooot
 
 A comprehensive real estate platform built with modern web technologies, featuring property listings, user management, subscription services, and mobile applications.
 
 ## 🏗️ Architecture
 
-Urban Realty is a full-stack monorepo application consisting of:
+Squarefooot is a full-stack monorepo application consisting of:
 
 - **Server**: Node.js/Express API with MongoDB
-- **Client**: React web application with Vite
+- **Frontend**: Next.js web application (SEO-optimized)
+- **Client**: React web application with Vite (legacy)
 - **Mobile**: Flutter cross-platform mobile app
 - **Shared**: Common utilities, constants, and models
 
@@ -30,18 +31,48 @@ cd urban-realty
 npm run install-all
 
 # Set up environment variables
+cp .env.example .env
 cp server/.env.example server/.env
-cp client/.env.example client/.env
+cp new-nextjs-app/.env.example new-nextjs-app/.env.local
 
-# Start development servers
+# Start development servers (Next.js + Express)
 npm run dev
+
+# OR start legacy React client
+npm run dev:client
 ```
 
 ### Access the Application
 
-- **Web App**: http://localhost:3000
-- **API**: http://localhost:5000
+#### Next.js + Express (Default)
+- **Frontend (Next.js)**: http://localhost:3000
+- **Backend (Express API)**: http://localhost:5000
 - **API Health**: http://localhost:5000/api/v1/health
+
+#### Legacy React Client (Alternative)
+- **Frontend (React)**: http://localhost:3000 (when using `npm run dev:client`)
+
+### Production Deployment
+
+#### Railway + Docker Deployment
+
+This project is configured for deployment on Railway with Docker containerization using PM2 process management.
+
+```bash
+# Validate deployment configuration
+node validate-deployment.js
+
+# Build and start production
+npm run build
+npm start
+```
+
+**Architecture**: 
+- Next.js frontend (port 3000) with SSR/ISR optimization
+- Express API backend (port 5000) 
+- PM2 process manager for production scaling
+
+📚 See `RAILWAY_DEPLOYMENT_GUIDE.md` and `DEPLOYMENT_STATUS.md` for detailed instructions.
 
 ## 📁 Project Structure
 
@@ -302,7 +333,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Urban Realty** - Building the future of real estate technology 🏠✨
+**Squarefooot** - Building the future of real estate technology 🏠✨
 
 ## 📋 Refactoring Progress
 

@@ -4,6 +4,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Icon sizes */
+.icon-sm {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+.icon-lg {
+  width: 3rem !important;
+  height: 3rem !important;
+}
+
+@media (min-width: 640px) {
+  .icon-sm {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+}
+
+/* Animation for selected property cards */
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 /* Base Styles */
 body {
   margin: 0;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Grid,
@@ -27,13 +28,17 @@ import {
   Business as BusinessIcon,
   Star as StarIcon,
   Edit as EditIcon,
-  Cancel as CancelIcon
+  Cancel as CancelIcon,
+  Dashboard as DashboardIcon,
+  Add as AddIcon,
+  AdminPanelSettings as AdminIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import axios from '../../services/axios';
 
 const UserProfile = () => {
   const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -206,6 +211,109 @@ const UserProfile = () => {
                   />
                 </ListItem>
               </List>
+
+              {/* Role-specific Action Buttons */}
+              {user?.role && (
+                <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid #e0e0e0' }}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Quick Actions
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {user.role === 'admin' && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<AdminIcon />}
+                        size="small"
+                        onClick={() => navigate('/admin')}
+                        sx={{ 
+                          borderColor: '#78CADC', 
+                          color: '#78CADC',
+                          '&:hover': {
+                            borderColor: '#5ba8b5',
+                            backgroundColor: 'rgba(120, 202, 220, 0.08)'
+                          }
+                        }}
+                      >
+                        Admin Panel
+                      </Button>
+                    )}
+                    
+                    {user.role === 'agent' && (
+                      <>
+                        <Button
+                          variant="outlined"
+                          startIcon={<DashboardIcon />}
+                          size="small"
+                          onClick={() => navigate('/agent')}
+                          sx={{ 
+                            borderColor: '#78CADC', 
+                            color: '#78CADC',
+                            '&:hover': {
+                              borderColor: '#5ba8b5',
+                              backgroundColor: 'rgba(120, 202, 220, 0.08)'
+                            }
+                          }}
+                        >
+                          Agent Dashboard
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<AddIcon />}
+                          size="small"
+                          onClick={() => navigate('/add-property')}
+                          sx={{ 
+                            borderColor: '#78CADC', 
+                            color: '#78CADC',
+                            '&:hover': {
+                              borderColor: '#5ba8b5',
+                              backgroundColor: 'rgba(120, 202, 220, 0.08)'
+                            }
+                          }}
+                        >
+                          Add Property
+                        </Button>
+                      </>
+                    )}
+                    
+                    {user.role === 'developer' && (
+                      <>
+                        <Button
+                          variant="outlined"
+                          startIcon={<DashboardIcon />}
+                          size="small"
+                          onClick={() => navigate('/developers')}
+                          sx={{ 
+                            borderColor: '#78CADC', 
+                            color: '#78CADC',
+                            '&:hover': {
+                              borderColor: '#5ba8b5',
+                              backgroundColor: 'rgba(120, 202, 220, 0.08)'
+                            }
+                          }}
+                        >
+                          Developer Dashboard
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<AddIcon />}
+                          size="small"
+                          onClick={() => navigate('/developers/add')}
+                          sx={{ 
+                            borderColor: '#78CADC', 
+                            color: '#78CADC',
+                            '&:hover': {
+                              borderColor: '#5ba8b5',
+                              backgroundColor: 'rgba(120, 202, 220, 0.08)'
+                            }
+                          }}
+                        >
+                          Add Project
+                        </Button>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>

@@ -268,14 +268,8 @@ const AgentDashboard = () => {
     return acc;
   }, {}) || {};
 
-  const monthlyData = [
-    { month: 'Jan', views: 1200, leads: 45, revenue: 12000 },
-    { month: 'Feb', views: 1800, leads: 62, revenue: 15000 },
-    { month: 'Mar', views: 2100, leads: 78, revenue: 18000 },
-    { month: 'Apr', views: 1900, leads: 71, revenue: 16500 },
-    { month: 'May', views: 2400, leads: 89, revenue: 22000 },
-    { month: 'Jun', views: 2800, leads: 95, revenue: 25000 }
-  ];
+  // Get monthly data from analytics API or use empty array
+  const monthlyData = analytics?.monthlyData || [];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
@@ -458,7 +452,7 @@ const AgentDashboard = () => {
             icon={<HomeIcon />}
             color="#667eea"
             subtitle={`${stats.activeProperties} active`}
-            trend="+12% this month"
+            trend={dashboardData?.trends?.properties || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -478,7 +472,7 @@ const AgentDashboard = () => {
             icon={<VisibilityIcon />}
             color="#4facfe"
             subtitle="Property impressions"
-            trend="+15% this month"
+            trend={dashboardData?.trends?.leads || null}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -488,7 +482,7 @@ const AgentDashboard = () => {
             icon={<MoneyIcon />}
             color="#43e97b"
             subtitle="Commission earned"
-            trend="+22% this month"
+            trend={dashboardData?.trends?.revenue || null}
           />
         </Grid>
       </Grid>

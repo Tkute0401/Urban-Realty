@@ -1,5 +1,5 @@
 /**
- * E2E Navigation Tests - Urban Realty Next.js App
+ * E2E Navigation Tests - Squarefooot Next.js App
  * Tests comprehensive navigation and page accessibility
  */
 

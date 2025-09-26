@@ -1,4 +1,4 @@
-# Urban Realty – Codebase Overview (Generated)
+# Squarefooot – Codebase Overview (Generated)
 _Date: 2025-09-01 09:35 UTC_
 
 This document summarizes the uploaded Urban-Realty project (server, client, mobile) to help optimization tooling (e.g., Gemini CLI) understand **every feature, major component, and module**.

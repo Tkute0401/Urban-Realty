@@ -1,8 +1,8 @@
-# Urban Realty Troubleshooting Guide
+# Squarefooot Troubleshooting Guide
 
 ## Common Issues and Solutions
 
-This guide covers the most common issues developers and users encounter with the Urban Realty application and their solutions.
+This guide covers the most common issues developers and users encounter with the Squarefooot application and their solutions.
 
 ## Server Issues
 

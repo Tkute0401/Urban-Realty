@@ -1,4 +1,4 @@
-## Urban Realty Next.js App – Codebase Audit and Refactor Plan
+## Squarefooot Next.js App – Codebase Audit and Refactor Plan
 
 ### Executive Summary
 

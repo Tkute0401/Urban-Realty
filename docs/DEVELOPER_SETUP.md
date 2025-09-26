@@ -1,8 +1,8 @@
-# Urban Realty Developer Setup Guide
+# Squarefooot Developer Setup Guide
 
 ## Quick Start
 
-Get the Urban Realty project running locally in under 10 minutes.
+Get the Squarefooot project running locally in under 10 minutes.
 
 ### Prerequisites
 

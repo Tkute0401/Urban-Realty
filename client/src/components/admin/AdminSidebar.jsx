@@ -133,7 +133,7 @@ const AdminSidebar = ({ mobileOpen, collapsed, onDrawerToggle, onToggleCollapse 
       <Box sx={{ p: 2 }}>
         {!collapsed && (
           <Typography variant="body2" color="text.secondary" align="center">
-            Urban Realty Admin
+            Squarefooot Admin
           </Typography>
         )}
       </Box>

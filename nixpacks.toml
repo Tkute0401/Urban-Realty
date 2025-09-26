@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ['nodejs-22.13.0', 'nodePackages.npm']
+nixPkgs = ['nodejs-18.19.0', 'nodePackages.npm']
 
 [phases.install]
-cmds = ['npm install', 'cd client && npm install']
+cmds = ['npm install', 'cd new-nextjs-app && npm install', 'cd server && npm install', 'npm install pm2 -g']
 
 [phases.build]
-cmds = ['cd client && npm run build']
+cmds = ['cd new-nextjs-app && npm run build']
 
 [start]
 cmd = 'npm start'

@@ -130,7 +130,7 @@ const Register = () => {
             Create Account
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Join Urban Realty as buyer, individual seller, agent, or developer
+            Join Squarefooot as buyer, individual seller, agent, or developer
           </Typography>
         </Box>
 
