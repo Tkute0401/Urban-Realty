@@ -1,31 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation';
-import PropertyImageGallery from '@/components/property/PropertyImageGallery';
-import PropertyMap from '@/components/property/PropertyMap';
 import { getPropertySocialAssets, getOptimizedImageUrl } from '@/lib/socialAssets';
 import { getApiBaseUrl } from '@/lib/services/api.config';
-import { 
-  Box, Grid, Container
-} from '@mui/material';
 
-// Import the new modular components
-import {
-  PropertyHeader,
-  PropertyNavigation,
-  PropertyOverview,
-  PropertyHighlights,
-  PropertyNearby,
-  PropertyMoreInfo,
-  PropertyFloorPlan,
-  PropertyAmenities,
-  PropertyDeveloper,
-  PropertySimilar,
-  PropertySidebar
-} from '@/components/property/PropertyDetailsComponents';
-
-// Import client component for interactive functionality
-import PropertyDetailsClient from './PropertyDetailsClient';
+// Import client component for interactive functionality - Railway Build Fix
+import PropertyInteractiveWrapper from './PropertyInteractiveWrapper';
 
 // Server-side data fetching function - Railway optimized
 async function getProperty(id: string) {
@@ -178,49 +158,64 @@ function generatePropertyStructuredData(property: any) {
 }
 
 // Static generation for popular properties (Railway deployment optimized)
+
 export async function generateStaticParams() {
-  // For Railway deployment, skip static generation during build to avoid connection issues
-  const nodeEnv = process.env.NODE_ENV;
-  const isRailwayBuild = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+  // Force skip static generation during Railway builds to prevent event handler serialization
+  const isRailwayBuild = 
+    process.env.RAILWAY_ENVIRONMENT ||
+    process.env.RAILWAY_PROJECT_ID ||
+    process.env.SKIP_BUILD_STATIC_GENERATION === 'true' ||
+    process.env.NODE_ENV === 'production';  // Skip all production builds for now
   
-  // Skip static generation during Railway build to prevent connection errors
-  if (nodeEnv === 'production' && isRailwayBuild) {
-    console.log('Skipping property static params generation for Railway deployment - using dynamic rendering');
+  console.log('🚆 Railway Static Generation Check:', {
+    nodeEnv: process.env.NODE_ENV,
+    railwayEnv: process.env.RAILWAY_ENVIRONMENT,
+    railwayProject: process.env.RAILWAY_PROJECT_ID,
+    skipFlag: process.env.SKIP_BUILD_STATIC_GENERATION,
+    isRailwayBuild
+  });
+  
+  // Always skip static generation to prevent event handler serialization errors
+  if (isRailwayBuild) {
+    console.log('🚆 Skipping static generation to prevent event handler serialization errors');
     return [];
   }
-  
+
+  // Development or non-Railway production builds
   try {
     const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}/properties?limit=10&featured=true`, {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    
+    const response = await fetch(`${baseUrl}/properties/featured`, {
+      signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
       },
-      // Short timeout to fail fast during build
-      signal: AbortSignal.timeout(5000),
     });
     
+    clearTimeout(timeoutId);
+    
     if (!response.ok) {
-      console.warn(`Failed to fetch properties for static generation: ${response.status}`);
+      console.log('Failed to fetch properties for static generation, using dynamic rendering');
       return [];
     }
     
     const data = await response.json();
-    const properties = data?.data || data?.items || [];
+    const properties = data?.data?.data || data?.data || data || [];
     
-    const staticParams = properties.slice(0, 10).map((property: any) => ({
-      id: property._id?.toString() || property.id?.toString()
+    console.log(`Generating static params for ${properties.length} properties`);
+    
+    return properties.slice(0, 20).map((property: any) => ({
+      id: property._id || property.id,
     }));
-    
-    console.log(`Generated ${staticParams.length} static params for properties`);
-    return staticParams;
   } catch (error) {
-    // This is expected during Railway build - log but don't fail
-    console.warn('Error generating static params for properties (expected during Railway build):', error.message);
+    console.log('Error generating static params for properties, using dynamic rendering:', error);
     return [];
   }
 }
 
+// Main page component - Server Component
 export default async function PropertyDetailsPage({ params }: { params: { id: string } }) {
   const property = await getProperty(params.id);
   
@@ -240,8 +235,8 @@ export default async function PropertyDetailsPage({ params }: { params: { id: st
         }}
       />
       
-      {/* Client Component for Interactive Features */}
-      <PropertyDetailsClient property={property} />
+      {/* Client Component for Interactive Features - Railway Build Fix */}
+      <PropertyInteractiveWrapper property={property} />
     </>
   );
 }

@@ -1,87 +1,64 @@
-import { onCLS, onINP, onFCP, onLCP, onTTFB, Metric } from 'web-vitals'
+import { onCLS, onINP, onFCP, onLCP, onTTFB, Metric } from 'web-vitals';
 
-function sendToAnalytics(metric: Metric) {
-  // Send to your analytics service
-  const body = JSON.stringify(metric)
+// Railway-safe web vitals implementation
+const sendToAnalytics = (metric: Metric) => {
+  // Skip analytics in Railway build environment
+  if (process.env.RAILWAY_ENVIRONMENT && typeof window === 'undefined') {
+    return;
+  }
   
-  // Use `navigator.sendBeacon()` if available, falling back to `fetch()`
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon('/api/analytics/web-vitals', body)
-  } else {
-    fetch('/api/analytics/web-vitals', {
-      body,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      keepalive: true,
-    }).catch((error) => {
-      console.error('Failed to send web vitals:', error)
-    })
-  }
-}
-
-export function reportWebVitals() {
-  try {
-    onCLS(sendToAnalytics)
-    onINP(sendToAnalytics) // onFID has been replaced with onINP (Interaction to Next Paint)
-    onFCP(sendToAnalytics)
-    onLCP(sendToAnalytics)
-    onTTFB(sendToAnalytics)
-  } catch (err) {
-    console.error('Web Vitals reporting failed:', err)
-  }
-}
-
-// Performance observer for monitoring
-export function setupPerformanceObserver() {
-  if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
-    return
-  }
-
-  try {
-    // Monitor resource loading performance
-    const resourceObserver = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry.duration > 1000) { // Resources taking longer than 1s
-          console.warn('Slow resource detected:', {
-            name: entry.name,
-            duration: entry.duration,
-            type: (entry as any).initiatorType,
-          })
-        }
-      }
-    })
+  // Only send analytics if window is available (client-side)
+  if (typeof window !== 'undefined') {
+    // Send to your analytics service
+    console.log('Web Vital:', metric);
     
-    resourceObserver.observe({ entryTypes: ['resource'] })
-
-    // Monitor long tasks
-    const longTaskObserver = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        console.warn('Long task detected:', {
-          duration: entry.duration,
-          startTime: entry.startTime,
-        })
-      }
-    })
-
-    longTaskObserver.observe({ entryTypes: ['longtask'] })
-
-    // Monitor layout shifts
-    const layoutShiftObserver = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if ((entry as any).value > 0.1) { // Significant layout shift
-          console.warn('Layout shift detected:', {
-            value: (entry as any).value,
-            sources: (entry as any).sources,
-          })
-        }
-      }
-    })
-
-    layoutShiftObserver.observe({ entryTypes: ['layout-shift'] })
-
-  } catch (err) {
-    console.error('Performance observer setup failed:', err)
+    // Example: Send to Google Analytics
+    if (window.gtag) {
+      window.gtag('event', metric.name, {
+        custom_parameter_1: metric.value,
+        custom_parameter_2: metric.id,
+        custom_parameter_3: metric.name,
+      });
+    }
   }
-}
+};
+
+// Initialize web vitals with Railway safety checks
+export const initWebVitals = () => {
+  // Only initialize on client-side
+  if (typeof window === 'undefined') return;
+  
+  try {
+    onCLS(sendToAnalytics);
+    onINP(sendToAnalytics); // Updated from onFID to onINP
+    onFCP(sendToAnalytics);
+    onLCP(sendToAnalytics);
+    onTTFB(sendToAnalytics);
+  } catch (error) {
+    console.warn('Failed to initialize web vitals:', error);
+  }
+};
+
+// Legacy exports for compatibility
+export const reportWebVitals = initWebVitals;
+
+export const setupPerformanceObserver = () => {
+  if (typeof window === 'undefined') return;
+  
+  // Performance observer setup for Railway-safe monitoring
+  try {
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          console.log('Performance entry:', entry.name, entry.startTime);
+        }
+      });
+      
+      observer.observe({ entryTypes: ['measure', 'navigation', 'resource'] });
+    }
+  } catch (error) {
+    console.warn('Performance observer setup failed:', error);
+  }
+};
+
+export default initWebVitals;

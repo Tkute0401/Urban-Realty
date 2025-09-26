@@ -189,26 +189,37 @@ export default async function DeveloperPage({ params }: { params: { id: string }
 
 // Generate static params for popular developers (Railway deployment optimized)
 export async function generateStaticParams() {
-  // For Railway deployment, skip static generation during build to avoid connection issues
-  // This allows the app to build successfully and use dynamic rendering instead
-  const nodeEnv = process.env.NODE_ENV;
-  const isRailwayBuild = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+  // Force skip static generation during Railway builds to prevent event handler serialization
+  const isRailwayBuild = 
+    process.env.RAILWAY_ENVIRONMENT ||
+    process.env.RAILWAY_PROJECT_ID ||
+    process.env.SKIP_BUILD_STATIC_GENERATION === 'true' ||
+    process.env.NODE_ENV === 'production';  // Skip all production builds for now
   
-  // Skip static generation during Railway build to prevent connection errors
-  if (nodeEnv === 'production' && isRailwayBuild) {
-    console.log('Skipping static params generation for Railway deployment - using dynamic rendering');
+  console.log('🚆 Railway Static Generation Check:', {
+    nodeEnv: process.env.NODE_ENV,
+    railwayEnv: process.env.RAILWAY_ENVIRONMENT,
+    railwayProject: process.env.RAILWAY_PROJECT_ID,
+    skipFlag: process.env.SKIP_BUILD_STATIC_GENERATION,
+    isRailwayBuild
+  });
+  
+  // Always skip static generation to prevent event handler serialization errors
+  if (isRailwayBuild) {
+    console.log('🚆 Skipping static generation to prevent event handler serialization errors');
     return [];
   }
-  
+
+  // Development or non-Railway production builds
   try {
     const baseUrl = getApiBaseUrl();
     const response = await fetch(`${baseUrl}/developers`, {
-      next: { revalidate: 86400 }, // Revalidate daily
+      next: { revalidate: 3600 },
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
       },
-      // Short timeout to fail fast during build
       signal: AbortSignal.timeout(5000),
     });
     
@@ -218,17 +229,15 @@ export async function generateStaticParams() {
     }
     
     const data = await response.json();
-    const developers = data.data || data;
+    const developers = data?.data || data?.items || [];
     
-    // Generate static paths for the first 10 developers only
     const staticParams = developers.slice(0, 10).map((developer: any) => ({
-      id: developer._id,
+      id: developer._id?.toString() || developer.id?.toString()
     }));
     
     console.log(`Generated ${staticParams.length} static params for developers`);
     return staticParams;
   } catch (error) {
-    // This is expected during Railway build - log but don't fail
     console.warn('Error generating static params for developers (expected during Railway build):', error.message);
     return [];
   }

@@ -25,7 +25,15 @@ import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
 import { formatPrice } from '@/lib/utils/format';
 
-const ContactsTable = () => {
+interface ContactsTableProps {
+  filters?: {
+    status: string;
+    type: string;
+    dateRange: string;
+  };
+}
+
+const ContactsTable: React.FC<ContactsTableProps> = ({ filters }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -38,7 +46,7 @@ const ContactsTable = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await axios.get('/admin/contacts');
+        const response = await http.get('/admin/contacts');
         setContacts(response.data.data);
       } catch (err) {
         console.error('Error fetching contacts:', err);
@@ -62,7 +70,7 @@ const ContactsTable = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/admin/contacts/${selectedContact._id}`);
+      await http.delete(`/admin/contacts/${selectedContact._id}`);
       setContacts(contacts.filter(contact => contact._id !== selectedContact._id));
     } catch (err) {
       console.error('Error deleting contact:', err);

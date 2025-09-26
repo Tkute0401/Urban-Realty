@@ -253,7 +253,7 @@ const AdminMedia = () => {
       case 'size':
         return b.size - a.size;
       case 'date':
-        return new Date(b.createdAt) - new Date(a.createdAt);
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       default:
         return 0;
     }
@@ -471,8 +471,11 @@ const AdminMedia = () => {
               {sortedMedia.map((item) => (
                 <ListItem
                   key={item._id}
-                  button
-                  selected={selectedMedia.includes(item._id)}
+                  sx={{
+                    backgroundColor: selectedMedia.includes(item._id) ? 'action.selected' : 'inherit',
+                    '&:hover': { backgroundColor: 'action.hover' },
+                    cursor: 'pointer'
+                  }}
                   onClick={() => handleSelectMedia(item._id)}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>

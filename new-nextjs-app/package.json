@@ -5,11 +5,11 @@
   "scripts": {
     "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
-    "build:railway": "cross-env NEXT_TELEMETRY_DISABLED=1 SKIP_ENV_VALIDATION=true NODE_OPTIONS=\"--max-old-space-size=4096 --enable-source-maps=false\" next build",
-    "build:optimized": "node railway-build-optimization.js",
+    "build:railway": "cross-env NEXT_TELEMETRY_DISABLED=1 SKIP_ENV_VALIDATION=true SKIP_BUILD_STATIC_GENERATION=true NODE_OPTIONS=\"--max-old-space-size=4096 --enable-source-maps=false\" next build",
+    "build:optimized": "node railway-build-fix.js",
     "build:analyze": "cross-env ANALYZE=true npm run build",
-    "start": "next start -p ${PORT:-3000} -H 0.0.0.0",
-    "start:prod": "cross-env NODE_ENV=production next start -p ${PORT:-3000} -H 0.0.0.0",
+    "start": "next start -p 3000 -H 0.0.0.0",
+    "start:prod": "cross-env NODE_ENV=production next start -p 3000 -H 0.0.0.0",
     "lint": "next lint --fix",
     "lint:check": "next lint",
     "type-check": "tsc --noEmit",
@@ -17,7 +17,9 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:run": "vitest run",
-    "postinstall": "echo 'Squarefooot Next.js dependencies installed successfully'"
+    "postinstall": "echo 'Squarefooot Next.js dependencies installed successfully'",
+    "start:railway": "NODE_ENV=production next start -p $PORT",
+    "validate:build": "node ../validate-railway-deployment.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -53,7 +55,7 @@
     "recharts": "^3.1.2",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.2.6",
-    "web-vitals": "^5.1.0",
+    "web-vitals": "^5.0.0",
     "yup": "^1.6.1",
     "zod": "^3.23.8"
   },

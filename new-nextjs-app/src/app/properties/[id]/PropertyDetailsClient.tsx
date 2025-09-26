@@ -3,26 +3,69 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import dynamic from 'next/dynamic';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import { api } from '@/lib/services/api';
 import { 
-  Box, Grid, useMediaQuery, Container
+  Box, Grid, useMediaQuery, Container, CircularProgress
 } from '@mui/material';
 
-// Import the modular components
+// Dynamic import all interactive components to prevent SSR serialization issues during Railway builds
+const PropertyHeader = dynamic(
+  () => import('@/components/property/PropertyDetailsComponents/PropertyHeader').then(mod => ({ default: mod.default })),
+  { 
+    ssr: false, // Critical: Prevent SSR to avoid event handler serialization during static generation
+    loading: () => <CircularProgress size={24} />
+  }
+);
+
+const PropertySidebar = dynamic(
+  () => import('@/components/property/PropertyDetailsComponents/PropertySidebar').then(mod => ({ default: mod.default })),
+  { 
+    ssr: false, // Critical: Prevent SSR to avoid event handler serialization during static generation
+    loading: () => <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <CircularProgress />
+    </Box>
+  }
+);
+
+const PropertyNavigation = dynamic(
+  () => import('@/components/property/PropertyDetailsComponents/PropertyNavigation').then(mod => ({ default: mod.default })),
+  { 
+    ssr: false, // Critical: Prevent SSR to avoid event handler serialization during static generation
+    loading: () => <Box sx={{ height: 64, bgcolor: 'var(--color-surface)' }} />
+  }
+);
+
+const PropertyFloorPlan = dynamic(
+  () => import('@/components/property/PropertyDetailsComponents/PropertyFloorPlan').then(mod => ({ default: mod.default })),
+  { 
+    ssr: false, // Critical: Prevent SSR for download buttons with onClick handlers
+    loading: () => <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <CircularProgress />
+    </Box>
+  }
+);
+
+const PropertySimilar = dynamic(
+  () => import('@/components/property/PropertyDetailsComponents/PropertySimilar').then(mod => ({ default: mod.default })),
+  { 
+    ssr: false, // Critical: Prevent SSR for property navigation with onClick handlers
+    loading: () => <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <CircularProgress />
+    </Box>
+  }
+);
+
+// Import the static components normally (no event handlers)
 import {
-  PropertyHeader,
-  PropertyNavigation,
   PropertyOverview,
   PropertyHighlights,
   PropertyNearby,
   PropertyMoreInfo,
-  PropertyFloorPlan,
   PropertyAmenities,
   PropertyDeveloper,
-  PropertySimilar,
-  PropertySidebar
 } from '@/components/property/PropertyDetailsComponents';
 
 interface PropertyDetailsClientProps {

@@ -36,7 +36,16 @@ const formatPrice = (price) => {
   }).format(price);
 };
 
-const PropertiesTable = () => {
+interface PropertiesTableProps {
+  filters?: {
+    status: string;
+    type: string;
+    priceRange: string;
+    location: string;
+  };
+}
+
+const PropertiesTable = ({ filters }: PropertiesTableProps) => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,7 +61,7 @@ const PropertiesTable = () => {
     const fetchProperties = async () => {
       try {
         const endpoint = user?.role === 'admin' ? '/admin/properties' : '/properties';
-        const response = await axios.get(endpoint);
+        const response = await http.get(endpoint);
         if (response.data.success) {
           setProperties(response.data.data || []);
         } else {

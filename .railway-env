@@ -1,0 +1,16 @@
+# Railway Environment Configuration
+RAILWAY_ENVIRONMENT=production
+NODE_ENV=production
+NEXT_TELEMETRY_DISABLED=1
+SKIP_ENV_VALIDATION=true
+SKIP_BUILD_STATIC_GENERATION=true
+
+# Build Optimizations
+NODE_OPTIONS=--max-old-space-size=4096 --enable-source-maps=false
+
+# API Configuration
+NEXT_PUBLIC_API_URL=https://urban-realty-production.up.railway.app/api/v1
+NEXT_PUBLIC_BASE_URL=https://urban-realty-production.up.railway.app
+
+# Performance
+DISABLE_ESLINT_PLUGIN=true
