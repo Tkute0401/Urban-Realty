@@ -72,7 +72,11 @@ COPY --from=builder /app/server ./server
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/uploads ./uploads
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package-lock.json* ./
 COPY --from=builder /app/ecosystem.config.js ./
+
+# Copy root node_modules for backend dependencies
+COPY --from=builder /app/node_modules ./node_modules
 
 # Install PM2 globally for process management
 RUN npm install -g pm2
