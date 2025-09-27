@@ -21,6 +21,7 @@ interface DevelopersContextType {
   loading: boolean;
   error: string | null;
   clearErrors: () => void;
+  createDeveloper: (formData: FormData, config?: any) => Promise<any>;
   updateDeveloper: (id: string, formData: FormData, config?: any) => Promise<any>;
   getDevelopers: () => Promise<void>;
   getDeveloper: (id: string) => Promise<Developer>;
@@ -39,6 +40,26 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   const clearErrors = (): void => setError(null);
+
+  const createDeveloper = useCallback(async (formData: FormData, config?: any): Promise<any> => {
+    try {
+      setLoading(true);
+      const response = await http.post(
+        '/developers',
+        formData,
+        config
+      );
+      console.log(response);
+      
+      getDevelopers();
+      return response.data;
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Failed to create developer');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const updateDeveloper = useCallback(async (id: string, formData: FormData, config?: any): Promise<any> => {
     try {
@@ -95,10 +116,11 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
     loading,
     error,
     clearErrors,
+    createDeveloper,
     updateDeveloper,
     getDevelopers,
     getDeveloper
-  }), [developers, loading, error, updateDeveloper, getDevelopers, getDeveloper]);
+  }), [developers, loading, error, createDeveloper, updateDeveloper, getDevelopers, getDeveloper]);
 
   return (
     <DevelopersContext.Provider value={value}>

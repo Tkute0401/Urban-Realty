@@ -32,10 +32,10 @@ const AgentSettings = () => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: user?.phone || '',
+    phone: user?.mobile || '',
     mobile: user?.mobile || '',
-    licenseNumber: user?.licenseNumber || '',
-    specializations: user?.specializations || []
+    licenseNumber: user?.professionalInfo?.licenseNumber || '',
+    specializations: user?.professionalInfo?.specializations || []
   });
   const [notifications, setNotifications] = useState({
     emailNotifications: true,
@@ -45,15 +45,15 @@ const AgentSettings = () => {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (data: any) => {
       // Mock API call - in real app this would update the user profile
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ success: true, data: { ...user, ...data } });
+          resolve({ success: true, data: { ...(user || {}), ...(data || {}) } });
         }, 1000);
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       updateUser(data.data);
       setIsEditing(false);
     }
@@ -74,10 +74,10 @@ const AgentSettings = () => {
     setFormData({
       name: user?.name || '',
       email: user?.email || '',
-      phone: user?.phone || '',
+      phone: user?.mobile || '',
       mobile: user?.mobile || '',
-      licenseNumber: user?.licenseNumber || '',
-      specializations: user?.specializations || []
+      licenseNumber: user?.professionalInfo?.licenseNumber || '',
+      specializations: user?.professionalInfo?.specializations || []
     });
     setIsEditing(false);
   };
@@ -205,9 +205,9 @@ const AgentSettings = () => {
                     variant="contained"
                     startIcon={<SaveIcon />}
                     onClick={handleSave}
-                    disabled={updateProfileMutation.isLoading}
+                    disabled={updateProfileMutation.isPending}
                   >
-                    {updateProfileMutation.isLoading ? 'Saving...' : 'Save Changes'}
+                    {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </Button>
                   <Button
                     variant="outlined"
@@ -230,7 +230,6 @@ const AgentSettings = () => {
               </Typography>
               <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
                 <Avatar
-                  src={user?.avatar}
                   sx={{ width: 120, height: 120 }}
                 >
                   {user?.name?.charAt(0) || 'A'}

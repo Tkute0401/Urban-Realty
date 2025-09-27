@@ -58,13 +58,11 @@ export default function PerformanceMonitor({
 
 // Hook for manual performance tracking in components
 export function usePerformanceTracking() {
-  useEffect(() => {
-    const monitor = getPerformanceMonitor();
-    
-    return {
-      markStart: (name: string) => monitor.markUserTiming(name),
-      markEnd: (name: string, startMark: string) => monitor.measureUserTiming(name, startMark),
-      getMetrics: () => monitor.getMetrics(),
-    };
-  }, []);
+  const monitor = getPerformanceMonitor();
+  
+  return {
+    markStart: (name: string) => monitor.markUserTiming(name),
+    markEnd: (name: string, startMark: string) => monitor.measureUserTiming(name, startMark),
+    getMetrics: () => monitor.getMetrics(),
+  };
 }

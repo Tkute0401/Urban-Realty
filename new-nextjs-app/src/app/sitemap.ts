@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { getApiBaseUrl, withPerformanceMonitoring } from '@/lib/services/api.config'
+import { getApiBaseUrl } from '@/lib/services/api.config'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-production.up.railway.app'
 

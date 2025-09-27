@@ -283,7 +283,7 @@ const AgentAnalytics = () => {
                         </TableCell>
                         <TableCell>
                           <Typography>
-                            {contacts?.data?.filter(c => c.property?._id === property._id).length || 0}
+                            {0}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -322,7 +322,7 @@ const AgentAnalytics = () => {
                       secondary={`${count} leads`}
                     />
                     <Typography variant="h6" color="primary">
-                      {((count / analytics.overview.totalLeads) * 100).toFixed(1)}%
+                      {analytics.overview.totalLeads > 0 ? ((Number(count) / Number(analytics.overview.totalLeads)) * 100).toFixed(1) : 0}%
                     </Typography>
                   </ListItem>
                 ))}

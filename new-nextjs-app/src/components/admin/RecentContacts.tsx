@@ -95,9 +95,6 @@ import {
                       </Typography>
                     </Box>
                   }
-                  components={{
-                    secondary: 'div'
-                  }}
                   sx={{ my: 0 }}
                 />
                 

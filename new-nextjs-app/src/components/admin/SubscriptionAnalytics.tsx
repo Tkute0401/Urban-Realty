@@ -58,7 +58,7 @@ const SubscriptionAnalytics = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
       if (failureCount >= 2) return false;
-      if (error?.response?.status >= 400 && error?.response?.status < 500) return false;
+      if ((error as any)?.response?.status >= 400 && (error as any)?.response?.status < 500) return false;
       return true;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -70,7 +70,7 @@ const SubscriptionAnalytics = () => {
       case 'cancelled': return 'error';
       case 'expired': return 'warning';
       case 'pending': return 'info';
-      default: return 'default';
+      default: return 'primary';
     }
   };
 

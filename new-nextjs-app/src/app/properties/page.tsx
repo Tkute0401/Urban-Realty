@@ -62,7 +62,7 @@ export async function generateMetadata({ searchParams }: { searchParams: { [key:
       'apartments for rent',
       'commercial real estate',
       'property finder',
-      ...(location ? [location, `properties in ${location}`] : [])
+      ...(location ? [Array.isArray(location) ? location[0] : location, `properties in ${Array.isArray(location) ? location[0] : location}`] : [])
     ].filter(Boolean),
     openGraph: {
       title,

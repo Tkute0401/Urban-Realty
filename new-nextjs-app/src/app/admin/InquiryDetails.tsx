@@ -15,7 +15,7 @@ import { formatDate } from '@/lib/utils/format';
 
 const InquiryDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [inquiry, setInquiry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +26,7 @@ const InquiryDetails = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`/admin/inquiries/${id}`);
+      const response = await http.get(`/admin/inquiries/${id}`);
       setInquiry(response.data.data);
       setStatus(response.data.data.status);
     } catch (err) {
@@ -42,7 +42,7 @@ const InquiryDetails = () => {
 
   const updateStatus = async () => {
     try {
-      await axios.patch(`/admin/inquiries/${id}/status`, { status });
+      await http.patch(`/admin/inquiries/${id}/status`, { status });
       fetchInquiry();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update status');
@@ -71,7 +71,7 @@ const InquiryDetails = () => {
         <Button 
           variant="contained" 
           startIcon={<ArrowBack />}
-          onClick={() => navigate('/admin/inquiries')}
+          onClick={() => router.push('/admin/inquiries')}
         >
           Back to Inquiries
         </Button>
@@ -83,7 +83,7 @@ const InquiryDetails = () => {
     <Box sx={{ p: 3 }}>
       <Button
         startIcon={<ArrowBack />}
-        onClick={() => navigate('/admin/inquiries')}
+        onClick={() => router.push('/admin/inquiries')}
         sx={{ mb: 3 }}
       >
         Back to Inquiries
