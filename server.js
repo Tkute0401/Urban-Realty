@@ -72,7 +72,7 @@ setTimeout(async () => {
   } catch (error) {
     console.error('Migration failed:', error);
   }
-}, 5000); // Wait 5 seconds for DB connection to stabilize
+}, 3000); // Wait 3 seconds for DB connection to stabilize
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -154,28 +154,50 @@ async function startServer() {
 
     const PORT = process.env.PORT || 3000;
     const HOST = process.env.HOSTNAME || '0.0.0.0';
+    
+    // Create server with better error handling
     const server = app.listen(PORT, HOST, () => {
       console.log(`🚀 Server running in ${config.env} mode on port ${PORT}`);
       console.log(`📁 Uploads directory: ${uploadsDir}`);
       console.log(`🌐 Application ready at http://${HOST}:${PORT}`);
+      
+      // Signal PM2 that the app is ready
+      if (process.send) {
+        process.send('ready');
+      }
     });
 
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('SIGTERM received, shutting down gracefully');
-      server.close(() => {
+    // Enhanced error handling for Railway
+    server.on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use`);
+      } else {
+        console.error('❌ Server error:', error);
+      }
+      process.exit(1);
+    });
+
+    // Graceful shutdown with Railway compatibility
+    const gracefulShutdown = (signal) => {
+      console.log(`${signal} received, shutting down gracefully`);
+      server.close((err) => {
+        if (err) {
+          console.error('Error during shutdown:', err);
+          process.exit(1);
+        }
         console.log('Process terminated');
         process.exit(0);
       });
-    });
+      
+      // Force exit after 10 seconds
+      setTimeout(() => {
+        console.error('Forced shutdown after timeout');
+        process.exit(1);
+      }, 10000);
+    };
 
-    process.on('SIGINT', () => {
-      console.log('SIGINT received, shutting down gracefully');
-      server.close(() => {
-        console.log('Process terminated');
-        process.exit(0);
-      });
-    });
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
   } catch (error) {
     console.error('❌ Failed to start server:', error);
@@ -189,5 +211,7 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-// Start the server
-startServer();
+// Start the server with a small delay to ensure DB connection
+setTimeout(() => {
+  startServer();
+}, 2000); // Wait 2 seconds for DB connection to establish

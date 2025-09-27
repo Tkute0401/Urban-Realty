@@ -22,50 +22,38 @@ module.exports = {
         DISABLE_ESLINT_PLUGIN: 'true',
         SKIP_ENV_VALIDATION: 'true'
       },
-      // Health check configuration
-      health_check_grace_period: 30000,
-      health_check_interval: 30000,
       
-      // Logging configuration
+      // Railway-optimized logging configuration
       log_file: '/app/logs/app-combined.log',
       out_file: '/app/logs/app-out.log',
       error_file: '/app/logs/app-error.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
       
-      // Restart configuration
-      max_restarts: 10,
-      min_uptime: '10s',
-      restart_delay: 4000,
+      // Railway-optimized restart configuration
+      max_restarts: 5,
+      min_uptime: '30s',
+      restart_delay: 2000,
       
       // Memory management
       max_memory_restart: '1G',
       
-      // Advanced PM2 features
+      // Railway-optimized process management
       watch: false,
-      ignore_watch: ['node_modules', 'logs', 'uploads'],
-      
-      // Process management
       kill_timeout: 5000,
       wait_ready: true,
-      listen_timeout: 10000,
+      listen_timeout: 15000,
       
       // Error handling
       autorestart: true,
-      max_restarts: 10,
-      min_uptime: '10s'
+      
+      // Railway-specific optimizations
+      node_args: '--max-old-space-size=1024',
+      source_map_support: false,
+      
+      // Health check configuration for Railway
+      health_check_grace_period: 60000,
+      health_check_interval: 30000
     }
-  ],
-
-  // Deployment configuration
-  deploy: {
-    production: {
-      user: 'node',
-      host: 'railway.app',
-      ref: 'origin/main',
-      repo: 'git@github.com:your-username/urban-realty.git',
-      path: '/app',
-      'post-deploy': 'npm install && cd new-nextjs-app && npm install && npm run build && pm2 reload ecosystem.config.js --env production',
-      'pre-setup': 'apt-get update && apt-get install git -y'
-    }
-  }
+  ]
 };
