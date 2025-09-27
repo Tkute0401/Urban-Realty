@@ -3,22 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "pm2-runtime start ecosystem.config.js",
+    "start": "node server/server.js",
     "run": "node server/server.js",
     "server": "nodemon server/server.js",
     "client": "npm run dev --prefix client",
-    "nextjs": "npm run dev --prefix new-nextjs-app",
-    "build": "cd new-nextjs-app && npm install && npm run build",
-    "build:client": "cd client && npm install && npm run build",
-    "dev": "concurrently \"npm run server\" \"npm run nextjs\"",
-    "dev:client": "concurrently \"npm run server\" \"npm run client\"",
-    "install-all": "npm install && npm install --prefix new-nextjs-app && npm install --prefix server",
-    "install-all:client": "npm install && npm install --prefix client",
-    "test": "cd new-nextjs-app && npm run test",
-    "test:client": "cd client && npm run test",
-    "heroku-postbuild": "npm run build",
-    "prepare": "if [ -d \".git\" ] && [ \"$NODE_ENV\" != \"production\" ]; then husky; fi",
-    "postinstall": "echo 'Installation complete'"
+    "build": "cd client && npm install && npm run build",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && npm install --prefix client",
+    "test": "cd client && npm run test",
+    "heroku-postbuild": "npm run build --prefix client && npm install --prefix server",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
@@ -51,7 +45,7 @@
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.0",
     "morgan": "^1.10.0",
-    "multer": "^2.0.0",
+    "multer": "^1.4.5-lts.2",
     "node-geocoder": "^4.4.1",
     "nodemailer": "^6.10.0",
     "pug": "^3.0.3",
@@ -66,18 +60,17 @@
     "slugify": "^1.6.6",
     "uuid": "^11.1.0",
     "web-vitals": "^5.1.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "xss-clean": "^0.1.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "@vitest/coverage-v8": "latest",
     "concurrently": "^8.2.2",
     "husky": "^9.1.7",
-    "nodemon": "^3.0.2",
-    "pm2": "^5.3.0"
+    "nodemon": "^3.0.2"
   },
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "node": ">=18.0.0"
   }
 }

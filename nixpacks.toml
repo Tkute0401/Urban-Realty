@@ -1,23 +1,11 @@
 [phases.setup]
-nixPkgs = ['nodejs-20_x', 'nodePackages.npm', 'python3', 'gcc', 'g++', 'make', 'pkg-config', 'libtool', 'autoconf', 'automake']
+nixPkgs = ['nodejs-22.13.0', 'nodePackages.npm']
 
 [phases.install]
-dependsOn = ["setup"]
-cmds = [
-    'npm ci --only=production --no-audit --no-fund',
-    'cd new-nextjs-app && npm ci --only=production --no-audit --no-fund && npm ci --no-audit --no-fund',
-    'npm install pm2@latest -g --no-audit --no-fund'
-]
+cmds = ['npm install', 'cd client && npm install']
 
 [phases.build]
-dependsOn = ["install"]
-cmds = ['cd new-nextjs-app && npm run build']
+cmds = ['cd client && npm run build']
 
 [start]
-cmd = 'pm2-runtime start ecosystem.config.js'
-
-[variables]
-NODE_ENV = "production"
-NPM_CONFIG_PRODUCTION = "true"
-NEXT_TELEMETRY_DISABLED = "1"
-NEXT_SHARP = "0"
+cmd = 'npm start'

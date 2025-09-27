@@ -39,10 +39,10 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-// For production with Next.js, we don't serve static files from Express
-// Next.js runs as a separate service and handles all frontend routes
-const nextjsDir = process.env.NEXTJS_DIR || path.join(__dirname, '..', 'nextjs');
-const clientDistDir = process.env.CLIENT_DIST_DIR || path.join(__dirname, '..', 'client', 'dist');
+// Prefer env override; fall back to repo-relative client dist. Avoid absolute container path.
+const clientDistDir = process.env.CLIENT_DIST_DIR
+  ? process.env.CLIENT_DIST_DIR
+  : path.join(__dirname, '..', 'client', 'dist');
 
 // Ensure uploads directory exists (do not attempt to create client dist)
 try {
@@ -73,9 +73,11 @@ app.use(trackPerformance);
 
 // Static files
 app.use('/uploads', express.static(uploadsDir));
-
-// Note: Next.js frontend runs as a separate service on port 3000
-// Express server only handles API routes on port 5000
+if (fs.existsSync(clientDistDir)) {
+  app.use(express.static(clientDistDir)); // Serve React build
+} else {
+  console.warn(`Client dist directory not found, skipping static serve: ${clientDistDir}`);
+}
 
 // API Routes
 app.use('/api/v1/auth', require('./src/api/routes/authRoutes'));
@@ -93,7 +95,7 @@ app.get('/api/v1/health', (req, res) => {
   res.status(HTTP_STATUS.OK).json({ 
     status: 'healthy',
     environment: config.env,
-    frontend: 'Next.js (separate service on port 3000)',
+    staticFilesPath: clientDistDir,
     uploadsPath: uploadsDir,
     timestamp: new Date().toISOString()
   });
@@ -104,11 +106,27 @@ app.get('/api/v1/test', (req, res) => {
     status: 'success',
     message: 'API is working',
     environment: config.env,
-    frontend: 'Next.js service'
+    staticFiles: fs.existsSync(path.join(clientDistDir, 'index.html')) 
+      ? 'Found' 
+      : 'Not found'
   });
 });
 
-// No SPA fallback needed - Next.js handles all frontend routes
+// SPA Fallback - Only in production (Next.js handles dev frontend)
+if (config.env === 'production') {
+  app.get('*', (req, res) => {
+    const indexPath = path.join(clientDistDir, 'index.html');
+    
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(HTTP_STATUS.NOT_FOUND).json({ 
+        success: false,
+        error: 'Frontend build not found. Please run npm run build.'
+      });
+    }
+  });
+}
 
 // Error handling
 app.use(trackErrors);
@@ -121,10 +139,16 @@ app.use((req, res) => res.status(HTTP_STATUS.NOT_FOUND).json({
 // Server
 const PORT = config.port;
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Express API Server running in ${config.env} mode on port ${PORT}`);
-  console.log(`📁 Uploads directory: ${uploadsDir}`);
-  console.log(`🎯 Frontend: Next.js service (port 3000)`);
-  console.log(`📡 API Health Check: http://localhost:${PORT}/api/v1/health`);
+  console.log(`Server running in ${config.env} mode on port ${PORT}`);
+  console.log(`Serving static files from: ${clientDistDir}`);
+  console.log(`Uploads directory: ${uploadsDir}`);
+  
+  // Verify frontend files
+  if (fs.existsSync(clientDistDir)) {
+    console.log('Frontend files:', fs.readdirSync(clientDistDir));
+  } else {
+    console.log('Frontend files: client dist directory not found');
+  }
 });
 
 process.on('unhandledRejection', (err) => {

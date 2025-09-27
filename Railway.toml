@@ -1,57 +1,11 @@
-# Railway Configuration for Squarefooot - Optimized for Speed, SEO, and SSR
-
 [build]
-# Multi-stage build configuration
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
-
-# Build optimizations for faster deployments
-nixpacksVersion = "1.21.0"
+builder = "docker"
 
 [deploy]
-# Railway deployment settings
-numReplicas = 1
-startCommand = "pm2-runtime start ecosystem.config.js --env production"
-restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 3
-
-# Health check configuration
+startCommand = "npm start"
 healthcheckPath = "/api/v1/health"
-healthcheckTimeout = 30
-healthcheckInterval = 15
+healthcheckTimeout = 100
 
-# Resource limits optimized for Railway
-[deploy.resources]
-# Memory optimized for Node.js applications with PM2
-memory = "2Gi"
-cpu = "1000m"
-# Persistent volume for uploads and logs
-[deploy.volumes]
-uploads = "/app/uploads"
-logs = "/app/logs"
-
-# Environment-specific settings
-[environments.production]
-# Production-specific build args
-[environments.production.build]
-NEXT_PUBLIC_API_URL = "https://urban-realty-production.up.railway.app/api/v1"
-NEXT_PUBLIC_BASE_URL = "https://urban-realty-production.up.railway.app"
-
-# Network configuration
-[networking]
-# Enable Railway's edge network for faster global access
-edge = true
-# Enable HTTP/2 for better performance
-http2 = true
-# Enable compression
-compress = true
-
-# Monitoring and observability
-[observability]
-# Enable basic metrics
-metrics = true
-# Log configuration
-[observability.logs]
-# Structured logging for better monitoring
-format = "json"
-level = "info"
+[environments]
+NODE_ENV = "production"
+CLIENT_DIST_DIR = "/app/client/dist"
