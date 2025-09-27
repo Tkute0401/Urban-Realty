@@ -47,6 +47,7 @@ COPY server ./server
 COPY shared ./shared
 COPY uploads ./uploads
 COPY ecosystem.config.js ./
+COPY server.js ./
 
 # Build the Next.js application
 WORKDIR /app/new-nextjs-app
@@ -64,8 +65,7 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copy the built Next.js application
 COPY --from=builder /app/new-nextjs-app/public ./new-nextjs-app/public
-COPY --from=builder /app/new-nextjs-app/.next/standalone ./
-COPY --from=builder /app/new-nextjs-app/.next/static ./new-nextjs-app/.next/static
+COPY --from=builder /app/new-nextjs-app/.next ./new-nextjs-app/.next
 
 # Copy backend files
 COPY --from=builder /app/server ./server
@@ -74,6 +74,7 @@ COPY --from=builder /app/uploads ./uploads
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json* ./
 COPY --from=builder /app/ecosystem.config.js ./
+COPY --from=builder /app/server.js ./
 
 # Copy root node_modules for backend dependencies
 COPY --from=builder /app/node_modules ./node_modules
@@ -86,6 +87,7 @@ RUN mkdir -p /app/logs
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
+RUN chmod +x /app/server.js
 USER nextjs
 
 EXPOSE 3000

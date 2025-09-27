@@ -108,8 +108,8 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
 
-  // Output optimization for Railway
-  output: 'standalone',
+  // Output optimization for Railway - removed standalone since we use unified server
+  // output: 'standalone',
   
   // Enhanced headers for Railway
   async headers() {
