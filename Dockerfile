@@ -27,8 +27,24 @@ COPY package.json package-lock.json* ./
 COPY --from=deps /app/new-nextjs-app/node_modules ./new-nextjs-app/node_modules
 COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./new-nextjs-app/
 
-# Copy all source code
-COPY . .
+# Copy Next.js source code
+COPY new-nextjs-app/src ./new-nextjs-app/src
+COPY new-nextjs-app/public ./new-nextjs-app/public
+COPY new-nextjs-app/next.config.js ./new-nextjs-app/
+COPY new-nextjs-app/next-env.d.ts ./new-nextjs-app/
+COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
+COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
+COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
+COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
+COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
+COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
+COPY new-nextjs-app/setupTests.ts ./new-nextjs-app/
+
+# Copy backend files
+COPY server ./server
+COPY shared ./shared
+COPY uploads ./uploads
 
 # Build the Next.js application
 WORKDIR /app/new-nextjs-app
