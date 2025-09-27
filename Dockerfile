@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Install root dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Install Next.js app dependencies
 WORKDIR /app/new-nextjs-app
