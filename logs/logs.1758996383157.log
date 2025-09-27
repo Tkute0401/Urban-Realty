@@ -1,0 +1,140 @@
+2025-09-27T17:42:52.192927086Z [inf]  
+2025-09-27T17:42:55.827659912Z [inf]  [35m[Region: asia-southeast1][0m
+2025-09-27T17:42:55.844734747Z [inf]  [35m=========================
+2025-09-27T17:42:55.844769084Z [inf]  Using Detected Dockerfile
+2025-09-27T17:42:55.844773714Z [inf]  =========================
+2025-09-27T17:42:55.844777437Z [inf]  [0m
+2025-09-27T17:42:55.844790647Z [inf]  context: x4sf-0zUh
+2025-09-27T17:42:56.015678464Z [inf]  [internal] load build definition from Dockerfile
+2025-09-27T17:42:56.015793261Z [inf]  [internal] load build definition from Dockerfile
+2025-09-27T17:42:56.015838097Z [inf]  [internal] load build definition from Dockerfile
+2025-09-27T17:42:56.029619270Z [inf]  [internal] load build definition from Dockerfile
+2025-09-27T17:42:56.032948940Z [inf]  [internal] load metadata for docker.io/library/node:20-alpine
+2025-09-27T17:42:56.037176812Z [inf]  [auth] library/node:pull token for registry-1.docker.io
+2025-09-27T17:42:56.037222311Z [inf]  [auth] library/node:pull token for registry-1.docker.io
+2025-09-27T17:42:57.518535470Z [inf]  [internal] load metadata for docker.io/library/node:20-alpine
+2025-09-27T17:42:57.518802403Z [inf]  [internal] load .dockerignore
+2025-09-27T17:42:57.518843494Z [inf]  [internal] load .dockerignore
+2025-09-27T17:42:57.519096280Z [inf]  [internal] load .dockerignore
+2025-09-27T17:42:57.533842400Z [inf]  [internal] load .dockerignore
+2025-09-27T17:42:57.544592149Z [inf]  [runner  3/19] RUN adduser --system --uid 1001 nextjs
+2025-09-27T17:42:57.544654623Z [inf]  [runner  2/19] RUN addgroup --system --gid 1001 nodejs
+2025-09-27T17:42:57.544667928Z [inf]  [builder  1/24] WORKDIR /app
+2025-09-27T17:42:57.544676549Z [inf]  [base 1/1] FROM docker.io/library/node:20-alpine@sha256:eabac870db94f7342d6c33560d6613f188bbcf4bbe1f4eb47d5e2a08e1a37722
+2025-09-27T17:42:57.544747369Z [inf]  [builder  3/24] COPY package.json package-lock.json* ./
+2025-09-27T17:42:57.544764361Z [inf]  [builder  2/24] COPY --from=deps /app/node_modules ./node_modules
+2025-09-27T17:42:57.544774409Z [inf]  [deps 7/7] RUN npm install --frozen-lockfile --only=production || npm install --only=production
+2025-09-27T17:42:57.544786686Z [inf]  [deps 6/7] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./
+2025-09-27T17:42:57.544805436Z [inf]  [deps 5/7] WORKDIR /app/new-nextjs-app
+2025-09-27T17:42:57.544815456Z [inf]  [deps 4/7] RUN npm install --frozen-lockfile || npm install
+2025-09-27T17:42:57.544824144Z [inf]  [deps 3/7] COPY package.json package-lock.json* ./
+2025-09-27T17:42:57.544834892Z [inf]  [internal] load build context
+2025-09-27T17:42:57.544844701Z [inf]  [deps 2/7] WORKDIR /app
+2025-09-27T17:42:57.544856688Z [inf]  [deps 1/7] RUN apk add --no-cache libc6-compat
+2025-09-27T17:42:57.545071569Z [inf]  [builder 15/24] COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
+2025-09-27T17:42:57.545128581Z [inf]  [builder 14/24] COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.545149649Z [inf]  [builder 13/24] COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
+2025-09-27T17:42:57.545168169Z [inf]  [builder  4/24] COPY --from=deps /app/new-nextjs-app/node_modules ./new-nextjs-app/node_modules
+2025-09-27T17:42:57.545182221Z [inf]  [builder  7/24] COPY new-nextjs-app/public ./new-nextjs-app/public
+2025-09-27T17:42:57.545195209Z [inf]  [builder 17/24] COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
+2025-09-27T17:42:57.545206403Z [inf]  [builder 19/24] COPY shared ./shared
+2025-09-27T17:42:57.545226957Z [inf]  [builder  8/24] COPY new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.545239769Z [inf]  [builder 11/24] COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
+2025-09-27T17:42:57.545251416Z [inf]  [builder  6/24] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-09-27T17:42:57.545265546Z [inf]  [builder  5/24] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./new-nextjs-app/
+2025-09-27T17:42:57.545276522Z [inf]  [builder 16/24] COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
+2025-09-27T17:42:57.545294173Z [inf]  [builder 18/24] COPY server ./server
+2025-09-27T17:42:57.545313532Z [inf]  [builder 10/24] COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.545325122Z [inf]  [builder  9/24] COPY new-nextjs-app/next-env.d.ts ./new-nextjs-app/
+2025-09-27T17:42:57.545340679Z [inf]  [builder 12/24] COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
+2025-09-27T17:42:57.545376585Z [inf]  [builder 20/24] COPY uploads ./uploads
+2025-09-27T17:42:57.545468976Z [inf]  [runner 11/19] COPY --from=builder /app/package.json ./
+2025-09-27T17:42:57.545487726Z [inf]  [runner 10/19] COPY --from=builder /app/uploads ./uploads
+2025-09-27T17:42:57.545498214Z [inf]  [runner  9/19] COPY --from=builder /app/shared ./shared
+2025-09-27T17:42:57.545507412Z [inf]  [runner  8/19] COPY --from=builder /app/server ./server
+2025-09-27T17:42:57.545527627Z [inf]  [runner  7/19] COPY --from=builder /app/new-nextjs-app/package.json ./new-nextjs-app/
+2025-09-27T17:42:57.545537810Z [inf]  [runner 13/19] COPY --from=builder /app/ecosystem.config.js ./
+2025-09-27T17:42:57.545550886Z [inf]  [runner  5/19] COPY --from=builder /app/new-nextjs-app/.next ./new-nextjs-app/.next
+2025-09-27T17:42:57.545563596Z [inf]  [runner  4/19] COPY --from=builder /app/new-nextjs-app/public ./new-nextjs-app/public
+2025-09-27T17:42:57.545574584Z [inf]  [builder 24/24] RUN npm run build
+2025-09-27T17:42:57.545585379Z [inf]  [builder 23/24] WORKDIR /app/new-nextjs-app
+2025-09-27T17:42:57.545605332Z [inf]  [builder 22/24] COPY server.js ./
+2025-09-27T17:42:57.545618822Z [inf]  [runner 12/19] COPY --from=builder /app/package-lock.json* ./
+2025-09-27T17:42:57.545633486Z [inf]  [runner 14/19] COPY --from=builder /app/server.js ./
+2025-09-27T17:42:57.545649426Z [inf]  [builder 21/24] COPY ecosystem.config.js ./
+2025-09-27T17:42:57.545659671Z [inf]  [runner  6/19] COPY --from=builder /app/new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.545723037Z [inf]  [runner 19/19] RUN chmod +x /app/server.js
+2025-09-27T17:42:57.545740364Z [inf]  [runner 18/19] RUN chown -R nextjs:nodejs /app
+2025-09-27T17:42:57.545756536Z [inf]  [runner 17/19] RUN mkdir -p /app/logs
+2025-09-27T17:42:57.545770560Z [inf]  [runner 16/19] RUN npm install -g pm2
+2025-09-27T17:42:57.545784381Z [inf]  [runner 15/19] COPY --from=builder /app/node_modules ./node_modules
+2025-09-27T17:42:57.545810996Z [inf]  [internal] load build context
+2025-09-27T17:42:57.545836278Z [inf]  [base 1/1] FROM docker.io/library/node:20-alpine@sha256:eabac870db94f7342d6c33560d6613f188bbcf4bbe1f4eb47d5e2a08e1a37722
+2025-09-27T17:42:57.553784922Z [inf]  [base 1/1] FROM docker.io/library/node:20-alpine@sha256:eabac870db94f7342d6c33560d6613f188bbcf4bbe1f4eb47d5e2a08e1a37722
+2025-09-27T17:42:57.555927011Z [inf]  [internal] load build context
+2025-09-27T17:42:57.753718397Z [inf]  [internal] load build context
+2025-09-27T17:42:57.777528019Z [inf]  [builder  1/24] WORKDIR /app
+2025-09-27T17:42:57.777591769Z [inf]  [runner  2/19] RUN addgroup --system --gid 1001 nodejs
+2025-09-27T17:42:57.777619060Z [inf]  [runner  3/19] RUN adduser --system --uid 1001 nextjs
+2025-09-27T17:42:57.777631180Z [inf]  [deps 1/7] RUN apk add --no-cache libc6-compat
+2025-09-27T17:42:57.777642933Z [inf]  [deps 2/7] WORKDIR /app
+2025-09-27T17:42:57.777656193Z [inf]  [deps 3/7] COPY package.json package-lock.json* ./
+2025-09-27T17:42:57.777668394Z [inf]  [deps 4/7] RUN npm install --frozen-lockfile || npm install
+2025-09-27T17:42:57.777680325Z [inf]  [deps 5/7] WORKDIR /app/new-nextjs-app
+2025-09-27T17:42:57.777692443Z [inf]  [deps 6/7] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./
+2025-09-27T17:42:57.777704685Z [inf]  [deps 7/7] RUN npm install --frozen-lockfile --only=production || npm install --only=production
+2025-09-27T17:42:57.777714639Z [inf]  [builder  2/24] COPY --from=deps /app/node_modules ./node_modules
+2025-09-27T17:42:57.777725532Z [inf]  [builder  3/24] COPY package.json package-lock.json* ./
+2025-09-27T17:42:57.777736907Z [inf]  [builder  4/24] COPY --from=deps /app/new-nextjs-app/node_modules ./new-nextjs-app/node_modules
+2025-09-27T17:42:57.777746639Z [inf]  [builder  5/24] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./new-nextjs-app/
+2025-09-27T17:42:57.777763939Z [inf]  [builder  6/24] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-09-27T17:42:57.777775074Z [inf]  [builder  7/24] COPY new-nextjs-app/public ./new-nextjs-app/public
+2025-09-27T17:42:57.777785754Z [inf]  [builder  8/24] COPY new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.777795139Z [inf]  [builder  9/24] COPY new-nextjs-app/next-env.d.ts ./new-nextjs-app/
+2025-09-27T17:42:57.777840046Z [inf]  [builder 10/24] COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.777852547Z [inf]  [builder 11/24] COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
+2025-09-27T17:42:57.777864131Z [inf]  [builder 12/24] COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
+2025-09-27T17:42:57.777884943Z [inf]  [builder 13/24] COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
+2025-09-27T17:42:57.777896436Z [inf]  [builder 14/24] COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.777907375Z [inf]  [builder 15/24] COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
+2025-09-27T17:42:57.777918184Z [inf]  [builder 16/24] COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
+2025-09-27T17:42:57.777929520Z [inf]  [builder 17/24] COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
+2025-09-27T17:42:57.777940409Z [inf]  [builder 18/24] COPY server ./server
+2025-09-27T17:42:57.777952014Z [inf]  [builder 19/24] COPY shared ./shared
+2025-09-27T17:42:57.777962029Z [inf]  [builder 20/24] COPY uploads ./uploads
+2025-09-27T17:42:57.777971722Z [inf]  [builder 21/24] COPY ecosystem.config.js ./
+2025-09-27T17:42:57.777978545Z [inf]  [builder 22/24] COPY server.js ./
+2025-09-27T17:42:57.777985350Z [inf]  [builder 23/24] WORKDIR /app/new-nextjs-app
+2025-09-27T17:42:57.777991288Z [inf]  [builder 24/24] RUN npm run build
+2025-09-27T17:42:57.777997660Z [inf]  [runner  4/19] COPY --from=builder /app/new-nextjs-app/public ./new-nextjs-app/public
+2025-09-27T17:42:57.778005059Z [inf]  [runner  5/19] COPY --from=builder /app/new-nextjs-app/.next ./new-nextjs-app/.next
+2025-09-27T17:42:57.778011287Z [inf]  [runner  6/19] COPY --from=builder /app/new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-09-27T17:42:57.778017322Z [inf]  [runner  7/19] COPY --from=builder /app/new-nextjs-app/package.json ./new-nextjs-app/
+2025-09-27T17:42:57.778023381Z [inf]  [runner  8/19] COPY --from=builder /app/server ./server
+2025-09-27T17:42:57.778029289Z [inf]  [runner  9/19] COPY --from=builder /app/shared ./shared
+2025-09-27T17:42:57.778035055Z [inf]  [runner 10/19] COPY --from=builder /app/uploads ./uploads
+2025-09-27T17:42:57.778040727Z [inf]  [runner 11/19] COPY --from=builder /app/package.json ./
+2025-09-27T17:42:57.778049224Z [inf]  [runner 12/19] COPY --from=builder /app/package-lock.json* ./
+2025-09-27T17:42:57.778055672Z [inf]  [runner 13/19] COPY --from=builder /app/ecosystem.config.js ./
+2025-09-27T17:42:57.778061650Z [inf]  [runner 14/19] COPY --from=builder /app/server.js ./
+2025-09-27T17:42:57.778068553Z [inf]  [runner 15/19] COPY --from=builder /app/node_modules ./node_modules
+2025-09-27T17:42:57.778074367Z [inf]  [runner 16/19] RUN npm install -g pm2
+2025-09-27T17:42:57.778096227Z [inf]  [runner 17/19] RUN mkdir -p /app/logs
+2025-09-27T17:42:57.778104259Z [inf]  [runner 18/19] RUN chown -R nextjs:nodejs /app
+2025-09-27T17:42:57.778110206Z [inf]  [runner 19/19] RUN chmod +x /app/server.js
+2025-09-27T17:42:57.778130277Z [inf]  exporting to docker image format
+2025-09-27T17:42:57.778136560Z [inf]  exporting to image
+2025-09-27T17:42:57.932518557Z [inf]  [auth] sharing credentials for production-asia-southeast1-eqsg3a.railway-registry.com
+2025-09-27T17:42:57.932593497Z [inf]  [auth] sharing credentials for production-asia-southeast1-eqsg3a.railway-registry.com
+2025-09-27T17:43:00.722810612Z [inf]  importing to docker
+2025-09-27T17:43:44.700695896Z [inf]  importing to docker
+2025-09-27T17:43:44.924593351Z [inf]  [92mBuild time: 49.08 seconds[0m
+2025-09-27T17:44:21.978078242Z [inf]  
+2025-09-27T17:44:21.978176840Z [inf]  [35m====================
+Starting Healthcheck
+====================
+[0m
+2025-09-27T17:44:21.978181302Z [inf]  [37mPath: /api/v1/health[0m
+2025-09-27T17:44:21.978183957Z [inf]  [37mRetry window: 5m0s[0m
+2025-09-27T17:44:21.978186074Z [inf]  
+2025-09-27T17:44:26.374590701Z [inf]  [92m[1/1] Healthcheck succeeded![0m
