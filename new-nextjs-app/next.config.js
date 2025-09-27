@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Railway Production Optimizations
@@ -19,6 +21,19 @@ const nextConfig = {
 
   // Webpack optimizations for Railway
   webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
+    // Add path mapping for @ imports
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+      '@/components': path.resolve(__dirname, 'src/components'),
+      '@/contexts': path.resolve(__dirname, 'src/contexts'),
+      '@/lib': path.resolve(__dirname, 'src/lib'),
+      '@/app': path.resolve(__dirname, 'src/app'),
+      '@/hooks': path.resolve(__dirname, 'src/hooks'),
+      '@/utils': path.resolve(__dirname, 'src/utils'),
+      '@/types': path.resolve(__dirname, 'src/types'),
+    };
+
     if (isServer) {
       // Server-side optimizations for Railway
       config.externals.push({
