@@ -66,6 +66,8 @@ RUN adduser --system --uid 1001 nextjs
 # Copy the built Next.js application
 COPY --from=builder /app/new-nextjs-app/public ./new-nextjs-app/public
 COPY --from=builder /app/new-nextjs-app/.next ./new-nextjs-app/.next
+COPY --from=builder /app/new-nextjs-app/next.config.js ./new-nextjs-app/
+COPY --from=builder /app/new-nextjs-app/package.json ./new-nextjs-app/
 
 # Copy backend files
 COPY --from=builder /app/server ./server
