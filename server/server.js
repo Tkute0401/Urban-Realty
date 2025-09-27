@@ -179,7 +179,8 @@ app.use((req, res) => res.status(HTTP_STATUS.NOT_FOUND).json({
 
 // Server
 const PORT = config.port;
-const server = app.listen(PORT, () => {
+const HOST = process.env.HOSTNAME || '0.0.0.0';
+const server = app.listen(PORT, HOST, () => {
   console.log(`Server running in ${config.env} mode on port ${PORT}`);
   console.log(`Serving static files from: ${clientDistDir}`);
   console.log(`Uploads directory: ${uploadsDir}`);

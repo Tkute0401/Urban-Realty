@@ -12,6 +12,7 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const HOST = process.env.HOSTNAME || '0.0.0.0';
+app.listen(PORT, HOST, () => {
   console.log(`Server listening on port ${PORT}`);
 });

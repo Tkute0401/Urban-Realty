@@ -153,10 +153,11 @@ async function startServer() {
     });
 
     const PORT = process.env.PORT || 3000;
-    const server = app.listen(PORT, () => {
+    const HOST = process.env.HOSTNAME || '0.0.0.0';
+    const server = app.listen(PORT, HOST, () => {
       console.log(`🚀 Server running in ${config.env} mode on port ${PORT}`);
       console.log(`📁 Uploads directory: ${uploadsDir}`);
-      console.log(`🌐 Application ready at http://localhost:${PORT}`);
+      console.log(`🌐 Application ready at http://${HOST}:${PORT}`);
     });
 
     // Graceful shutdown
