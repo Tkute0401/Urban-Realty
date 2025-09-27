@@ -39,7 +39,7 @@ COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
 COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
 COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
 COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
-COPY new-nextjs-app/setupTests.ts ./new-nextjs-app/
+COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
 
 # Copy backend files
 COPY server ./server
