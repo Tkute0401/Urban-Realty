@@ -8,12 +8,12 @@ WORKDIR /app
 
 # Install root dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install --frozen-lockfile || npm install
 
 # Install Next.js app dependencies
 WORKDIR /app/new-nextjs-app
 COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./
-RUN npm ci --only=production
+RUN npm install --frozen-lockfile --only=production || npm install --only=production
 
 # Rebuild the source code only when needed
 FROM base AS builder
