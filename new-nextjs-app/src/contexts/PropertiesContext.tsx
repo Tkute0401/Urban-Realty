@@ -54,8 +54,8 @@ interface PropertiesContextType {
   getProperties: (params?: Record<string, any>) => Promise<void>;
   getFeaturedProperties: () => Promise<Property[]>;
   getProperty: (id: string) => Promise<Property | null>;
-  getAgentProperties: (user: any) => Promise<void>;
-  getDevelopers: (params?: Record<string, any>) => Promise<void>;
+  getAgentProperties: (user: any) => Promise<any[]>;
+  getDevelopers: (params?: Record<string, any>) => Promise<any[]>;
   setProperties: (properties: Property[]) => void;
   setFeaturedProperties: (properties: Property[]) => void;
   setProperty: (property: Property | null) => void;
@@ -81,8 +81,8 @@ const defaultContextValue: PropertiesContextType = {
   getProperties: async () => {},
   getFeaturedProperties: async () => [],
   getProperty: async () => null,
-  getAgentProperties: async () => {},
-  getDevelopers: async () => {},
+  getAgentProperties: async () => [],
+  getDevelopers: async () => [],
   setProperties: () => {},
   setFeaturedProperties: () => {},
   setProperty: () => {},
@@ -276,7 +276,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const finalConfig = {
         ...config,
         headers: {
-          ...(config.headers || {}),
+          ...((config as any).headers || {}),
           'Content-Type': 'multipart/form-data'
         }
       };

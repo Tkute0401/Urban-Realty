@@ -239,11 +239,11 @@ const NearbyAmenities = ({ coordinates, radius = 2000 }) => {
                 gap: 1
               }}>
                 {getAmenityIcon(type)}
-                {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')} ({typeAmenities.length})
+                {type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')} ({(typeAmenities as any[]).length})
               </Typography>
               
               <Grid container spacing={2}>
-                {typeAmenities.map(amenity => (
+                {(typeAmenities as any[]).map(amenity => (
                   <Grid item xs={12} sm={6} md={4} key={amenity.id}>
                     <Card variant="outlined" sx={{ height: '100%' }}>
                       <CardContent sx={{ p: 2 }}>

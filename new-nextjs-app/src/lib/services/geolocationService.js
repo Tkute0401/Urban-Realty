@@ -192,6 +192,56 @@ class GeolocationService {
       formatted: 'New York, NY, USA'
     };
   }
+
+  // Get location info for a selected location
+  async getLocationInfo(location) {
+    try {
+      // This would typically use a geocoding service
+      // For now, return mock data
+      return {
+        success: true,
+        locationInfo: {
+          name: location || 'Selected Location',
+          address: 'Mock Address',
+          city: 'Mock City',
+          state: 'Mock State',
+          country: 'Mock Country',
+          coordinates: {
+            latitude: 40.7128,
+            longitude: -74.0060
+          }
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  async getNearbyAmenities(coordinates, radius = 5000) {
+    try {
+      // This would typically use a places API
+      // For now, return mock data
+      return {
+        success: true,
+        amenities: [
+          { name: 'Hospital', type: 'healthcare', distance: 0.5 },
+          { name: 'School', type: 'education', distance: 0.8 },
+          { name: 'Shopping Mall', type: 'shopping', distance: 1.2 },
+          { name: 'Restaurant', type: 'food', distance: 0.3 },
+          { name: 'Bank', type: 'finance', distance: 0.6 },
+          { name: 'Gym', type: 'fitness', distance: 0.9 }
+        ]
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
 }
 
 // Create singleton instance

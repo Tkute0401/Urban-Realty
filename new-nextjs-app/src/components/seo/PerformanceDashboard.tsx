@@ -27,7 +27,7 @@ export default function PerformanceDashboard() {
     const updateMetrics = () => {
       if (window.realEstatePerformance) {
         const report = window.realEstatePerformance.getPerformanceReport();
-        setMetrics(report);
+        setMetrics(report as any);
       }
     };
 

@@ -168,7 +168,7 @@ const ContactUs = () => {
               <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
               <textarea
                 id="message"
-                rows="5"
+                rows={5}
                 {...register("message")}
                 className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
                 placeholder="Your message here..."

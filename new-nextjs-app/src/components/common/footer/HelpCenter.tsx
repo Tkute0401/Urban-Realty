@@ -250,7 +250,7 @@ const HelpCenter = () => {
                 </label>
                 <textarea
                   id="userQuestion"
-                  rows="3"
+                  rows={3}
                   {...register("userQuestion")}
                   className="w-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] outline-none transition-all"
                   placeholder="Type your question here..."
@@ -294,7 +294,7 @@ const HelpCenter = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             {support.map((item, index) => (
-              <Link key={index} to={item.path}>
+              <Link key={index} href={item.path}>
                 <button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-[var(--color-bg-dark)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
                   {item.label}
                 </button>

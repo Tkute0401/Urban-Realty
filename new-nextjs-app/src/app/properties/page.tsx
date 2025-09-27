@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { CircularProgress, Box } from '@mui/material';
 import styles from './Properties.module.css';
 
 // Import components
 import PropertiesPageClient from './PropertiesPageClient';
+import PropertiesLoading from './PropertiesLoading';
 
 // Server-side data fetching
 async function getInitialProperties() {
@@ -131,14 +131,6 @@ function generatePropertiesListingStructuredData(properties: any[]) {
   };
 }
 
-// Loading component
-function PropertiesLoading() {
-  return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-      <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-    </Box>
-  );
-}
 
 export default async function PropertiesPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const initialProperties = await getInitialProperties();

@@ -76,3 +76,8 @@ export const formatStatus = (status: string): string => {
   if (!status) return '';
   return status.split('_').map(word => capitalizeFirst(word)).join(' ');
 };
+
+export const formatNumber = (num: number): string => {
+  if (typeof num !== 'number') return '';
+  return num.toLocaleString();
+};

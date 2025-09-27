@@ -364,10 +364,10 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
               {formatPrice(property.price)}
               {property.status === 'For Rent' && <span className="text-sm text-[var(--color-text-muted)]">/mo</span>}
             </p>
-            {property.projectDetails?.launchDate && (
+            {(property as any).projectDetails?.launchDate && (
               <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
-                {new Date(property.projectDetails.launchDate) > new Date() ? 
-                  `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
+                {new Date((property as any).projectDetails.launchDate) > new Date() ? 
+                  `Launch ${new Date((property as any).projectDetails.launchDate).toLocaleDateString()}` : 
                   'Ready to Move'}
               </span>
             )}

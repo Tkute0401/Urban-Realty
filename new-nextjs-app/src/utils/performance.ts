@@ -220,8 +220,8 @@ export class RealEstatePerformanceMonitor {
   public trackOperation(name: string, operation: () => Promise<any> | any) {
     const startTime = performance.now();
     
-    if (operation instanceof Promise || (operation && typeof operation.then === 'function')) {
-      return operation.then((result: any) => {
+    if (operation instanceof Promise || (operation && typeof (operation as any).then === 'function')) {
+      return (operation as any).then((result: any) => {
         const endTime = performance.now();
         this.reportMetric(name, endTime - startTime, 'ms');
         return result;
