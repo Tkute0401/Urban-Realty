@@ -83,8 +83,8 @@ const AgentLeads = () => {
 
   // Fetch agent's contact requests
   const { data: leads, isLoading, error } = useAgentLeads(
-    user?.id,
     {
+      agentId: user?.id,
       page: page + 1,
       limit: rowsPerPage,
       search: searchTerm,
@@ -688,9 +688,9 @@ const AgentLeads = () => {
           <Button
             onClick={handleStatusUpdate}
             variant="contained"
-            disabled={updateLeadStatusMutation.isLoading}
+            disabled={updateLeadStatusMutation.isPending}
           >
-            {updateLeadStatusMutation.isLoading ? 'Updating...' : 'Update'}
+            {updateLeadStatusMutation.isPending ? 'Updating...' : 'Update'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -721,9 +721,9 @@ const AgentLeads = () => {
           <Button
             onClick={handleBulkStatusUpdate}
             variant="contained"
-            disabled={updateLeadStatusMutation.isLoading || !bulkStatus}
+            disabled={updateLeadStatusMutation.isPending || !bulkStatus}
           >
-            {updateLeadStatusMutation.isLoading ? 'Updating...' : 'Update All'}
+            {updateLeadStatusMutation.isPending ? 'Updating...' : 'Update All'}
           </Button>
         </DialogActions>
       </Dialog>

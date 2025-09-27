@@ -2,10 +2,14 @@
 builder = "docker"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "pm2-runtime start ecosystem.config.js --env production"
 healthcheckPath = "/api/v1/health"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 
 [environments]
 NODE_ENV = "production"
-CLIENT_DIST_DIR = "/app/client/dist"
+PORT = "3000"
+HOSTNAME = "0.0.0.0"
+NEXT_TELEMETRY_DISABLED = "1"
+DISABLE_ESLINT_PLUGIN = "true"
+SKIP_ENV_VALIDATION = "true"

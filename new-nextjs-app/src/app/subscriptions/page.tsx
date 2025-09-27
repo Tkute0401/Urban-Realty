@@ -59,6 +59,7 @@ const SubscriptionPlans = () => {
   const [showYearly, setShowYearly] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [subscribeDialog, setSubscribeDialog] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
 
   const { user } = useAuth();
 
@@ -112,7 +113,7 @@ const SubscriptionPlans = () => {
       // Optionally refresh user data or subscription status
     } catch (error) {
       console.error('Subscription confirmation failed:', error);
-      setError('Failed to confirm subscription. Please contact support.');
+      setSubscriptionError('Failed to confirm subscription. Please contact support.');
     }
   };
 

@@ -18,9 +18,11 @@
         "NEXT_TELEMETRY_DISABLED": "1",
         "DISABLE_ESLINT_PLUGIN": "true",
         "SKIP_ENV_VALIDATION": "true",
+        "PORT": "3000",
+        "HOSTNAME": "0.0.0.0",
         "PM2_PUBLIC_KEY": "",
         "PM2_SECRET_KEY": "",
-        "PM2_MACHINE_NAME": "squarefooot-production"
+        "PM2_MACHINE_NAME": "urban-realty-nextjs-production"
       }
     }
   }

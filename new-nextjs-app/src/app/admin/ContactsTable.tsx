@@ -80,7 +80,7 @@ const ContactsTable: React.FC<ContactsTableProps> = ({ filters }) => {
   };
 
   const handleViewProperty = () => {
-    navigate(`/properties/${selectedContact.property._id}`);
+    router.push(`/properties/${selectedContact.property._id}`);
     handleMenuClose();
   };
 

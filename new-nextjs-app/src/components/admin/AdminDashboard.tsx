@@ -213,7 +213,7 @@ const AdminDashboard: React.FC = () => {
   const userTypeData = [
     { name: 'Regular Users', value: stats.counts.users - stats.counts.agents, color: 'var(--chart-color-3)' },
     { name: 'Agents', value: stats.counts.agents, color: 'var(--chart-color-4)' },
-    { name: 'Admins', value: stats.counts.admins || 0, color: 'var(--color-warning)' }
+    { name: 'Admins', value: 0, color: 'var(--color-warning)' }
   ];
 
   const propertyStatusData = [
@@ -339,10 +339,10 @@ const AdminDashboard: React.FC = () => {
             <Button 
               variant="contained" 
               onClick={() => refreshMutation.mutate()}
-              disabled={refreshMutation.isLoading}
-              startIcon={refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+              disabled={refreshMutation.isPending}
+              startIcon={refreshMutation.isPending ? <CircularProgress size={20} /> : <RefreshIcon />}
             >
-              {refreshMutation.isLoading ? 'Retrying...' : 'Retry'}
+              {refreshMutation.isPending ? 'Retrying...' : 'Retry'}
             </Button>
             <Button 
               variant="outlined"
@@ -390,13 +390,13 @@ const AdminDashboard: React.FC = () => {
             </Button>
             <IconButton 
               onClick={() => refreshMutation.mutate()}
-              disabled={refreshMutation.isLoading}
+              disabled={refreshMutation.isPending}
               sx={{ 
                 bgcolor: 'background.paper',
                 '&:hover': { transform: 'rotate(180deg)', transition: 'transform 0.3s ease' }
               }}
             >
-              {refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+              {refreshMutation.isPending ? <CircularProgress size={20} /> : <RefreshIcon />}
             </IconButton>
             <IconButton sx={{ bgcolor: 'background.paper' }}>
               <NotificationsIcon />
@@ -526,7 +526,7 @@ const AdminDashboard: React.FC = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, value }) => `${name} ${value}`}
                     outerRadius={100}
                     fill="var(--chart-color-1)"
                     dataKey="value"
@@ -582,9 +582,6 @@ const AdminDashboard: React.FC = () => {
                             </Typography>
                           </Box>
                         }
-                        components={{
-                          secondary: 'div'
-                        }}
                       />
                     </ListItem>
                     {index < stats.analytics.topPerformingAgents.length - 1 && (
@@ -609,7 +606,7 @@ const AdminDashboard: React.FC = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, value }) => `${name} ${value}`}
                     outerRadius={80}
                     fill="var(--chart-color-1)"
                     dataKey="value"

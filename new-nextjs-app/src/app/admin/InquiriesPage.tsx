@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Box, Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Chip } from '@mui/material';
 import { Mail, Phone, Check, Close } from '@mui/icons-material';
 import http from '@/lib/services/http';
-import { formatDate } from '../../utils/format';
+import { formatDate } from '@/lib/utils/format';
 
 const InquiriesPage = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -14,7 +14,7 @@ const InquiriesPage = () => {
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
-        const response = await axios.get('/admin/inquiries');
+        const response = await http.get('/admin/inquiries');
         setInquiries(response.data.data);
       } catch (err) {
         console.error('Error fetching inquiries:', err);
@@ -37,7 +37,7 @@ const InquiriesPage = () => {
 
   const handleStatusChange = async (inquiryId, newStatus) => {
     try {
-      await axios.patch(`/admin/inquiries/${inquiryId}/status`, { status: newStatus });
+      await http.patch(`/admin/inquiries/${inquiryId}/status`, { status: newStatus });
       setInquiries(inquiries.map(inquiry => 
         inquiry._id === inquiryId ? { ...inquiry, status: newStatus } : inquiry
       ));

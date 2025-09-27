@@ -92,7 +92,7 @@ const AgentDashboard = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTab, setSelectedTab] = useState(0);
   const [filterDialog, setFilterDialog] = useState(false);
-  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  const [notification, setNotification] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: '30',
@@ -290,10 +290,10 @@ const AgentDashboard = () => {
             <Button 
               variant="contained" 
               onClick={() => refreshMutation.mutate()}
-              disabled={refreshMutation.isLoading}
-              startIcon={refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+              disabled={refreshMutation.isPending}
+              startIcon={refreshMutation.isPending ? <CircularProgress size={20} /> : <RefreshIcon />}
             >
-              {refreshMutation.isLoading ? 'Retrying...' : 'Retry'}
+              {refreshMutation.isPending ? 'Retrying...' : 'Retry'}
             </Button>
             <Button 
               variant="outlined"
@@ -330,7 +330,7 @@ const AgentDashboard = () => {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => navigate('/add-property')}
+              onClick={() => router.push('/add-property')}
               sx={{ 
                 backgroundColor: 'var(--color-primary)',
                 '&:hover': { 
@@ -343,13 +343,13 @@ const AgentDashboard = () => {
             </Button>
             <IconButton 
               onClick={() => refreshMutation.mutate()}
-              disabled={refreshMutation.isLoading}
+              disabled={refreshMutation.isPending}
               sx={{ 
                 bgcolor: 'background.paper',
                 '&:hover': { transform: 'rotate(180deg)', transition: 'transform 0.3s ease' }
               }}
             >
-              {refreshMutation.isLoading ? <CircularProgress size={20} /> : <RefreshIcon />}
+              {refreshMutation.isPending ? <CircularProgress size={20} /> : <RefreshIcon />}
             </IconButton>
             <IconButton sx={{ bgcolor: 'background.paper' }}>
               <NotificationsIcon />
@@ -365,6 +365,7 @@ const AgentDashboard = () => {
             title="Total Properties"
             value={stats.totalProperties}
             icon={<HomeIcon />}
+            color="primary"
             subtitle={`${stats.activeProperties} active`}
             trend={dashboardData?.trends?.properties || null}
           />
@@ -374,6 +375,7 @@ const AgentDashboard = () => {
             title="Active Leads"
             value={stats.activeLeads}
             icon={<PeopleIcon />}
+            color="secondary"
             subtitle="Require attention"
             trend={dashboardData?.trends?.leads || null}
           />
@@ -383,6 +385,7 @@ const AgentDashboard = () => {
             title="Total Views"
             value={stats.totalViews.toLocaleString()}
             icon={<VisibilityIcon />}
+            color="success"
             subtitle="Property impressions"
             trend={dashboardData?.trends?.views || null}
           />
@@ -392,6 +395,7 @@ const AgentDashboard = () => {
             title="Monthly Revenue"
             value={`₹${stats.monthlyRevenue.toLocaleString()}`}
             icon={<MoneyIcon />}
+            color="warning"
             subtitle="Commission earned"
             trend={dashboardData?.trends?.revenue || null}
           />
@@ -565,7 +569,7 @@ const AgentDashboard = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, value }) => `${name} ${value}`}
                     outerRadius={80}
                     fill="var(--color-primary)"
                     dataKey="value"
@@ -745,9 +749,6 @@ const AgentDashboard = () => {
                               </Typography>
                             </Box>
                           }
-                          components={{
-                            secondary: 'div'
-                          }}
                         />
                         <IconButton size="small">
                           <MoreVertIcon />

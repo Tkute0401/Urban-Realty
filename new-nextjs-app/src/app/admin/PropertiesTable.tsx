@@ -90,7 +90,7 @@ const PropertiesTable = ({ filters }: PropertiesTableProps) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/admin/properties/${selectedProperty._id}`);
+      await http.delete(`/admin/properties/${selectedProperty._id}`);
       setProperties(properties.filter(property => property._id !== selectedProperty._id));
     } catch (err) {
       console.error('Error deleting property:', err);
@@ -101,17 +101,17 @@ const PropertiesTable = ({ filters }: PropertiesTableProps) => {
   };
 
   const handleView = () => {
-    navigate(`/properties/${selectedProperty._id}`);
+    router.push(`/properties/${selectedProperty._id}`);
     handleMenuClose();
   };
 
   const handleEdit = () => {
-    navigate(`/properties/${selectedProperty._id}/edit`);
+    router.push(`/properties/${selectedProperty._id}/edit`);
     handleMenuClose();
   };
 
   const handleAddProperty = () => {
-    navigate('/add-property');
+    router.push('/add-property');
   };
 
   const handleChangePage = (event, newPage) => {

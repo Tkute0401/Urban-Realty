@@ -64,8 +64,8 @@ const AgentProperties = () => {
 
   // Fetch agent's properties
   const { data: properties, isLoading, error } = useAgentProperties(
-    user?.id,
     {
+      agentId: user?.id,
       page: page + 1,
       limit: rowsPerPage,
       search: searchTerm,
@@ -369,9 +369,9 @@ const AgentProperties = () => {
             onClick={handleDeleteProperty}
             color="error"
             variant="contained"
-            disabled={deletePropertyMutation.isLoading}
+            disabled={deletePropertyMutation.isPending}
           >
-            {deletePropertyMutation.isLoading ? 'Deleting...' : 'Delete'}
+            {deletePropertyMutation.isPending ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>

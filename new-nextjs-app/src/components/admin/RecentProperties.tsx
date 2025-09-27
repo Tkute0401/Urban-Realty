@@ -12,7 +12,7 @@ import {
   } from '@mui/material';
   import { Home, Star, CalendarToday, AttachMoney } from '@mui/icons-material';
   import { formatDistanceToNow } from 'date-fns';
-  import { formatPrice } from '../../utils/format';
+  import { formatPrice } from '@/lib/utils/format';
   
   const RecentProperties = ({ properties }) => {
     const theme = useTheme();
@@ -83,9 +83,6 @@ import {
                       </Typography>
                     </Box>
                   }
-                  components={{
-                    secondary: 'div'
-                  }}
                   sx={{ my: 0 }}
                 />
                 

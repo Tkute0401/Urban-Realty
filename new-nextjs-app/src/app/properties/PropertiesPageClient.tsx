@@ -264,7 +264,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
   };
 
   const handlePropertyClick = (property: Property) => {
-    router.push(`/properties/${property._id || property.id}`);
+    router.push(`/properties/${property._id}`);
   };
 
   return (
@@ -404,7 +404,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
             ) : filteredProperties.length > 0 ? (
               filteredProperties.map((property, index) => (
                 <PropertyGridCard
-                  key={property._id || property.id || index}
+                  key={property._id || index}
                   property={property}
                   index={index}
                   onClick={handlePropertyClick}
@@ -425,7 +425,6 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
               properties={filteredProperties}
               onMarkerClick={handleMarkerClick}
               selectedProperty={selectedProperty}
-              onPropertyClick={handlePropertyClick}
             />
           </div>
         </div>
