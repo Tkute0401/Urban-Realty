@@ -39,6 +39,7 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
+const clientDistDir = path.join(__dirname, '..', 'new-nextjs-app', 'public');
 // Next.js server configuration
 const NEXTJS_PORT = process.env.NEXTJS_PORT || 3001;
 const NEXTJS_URL = `http://localhost:${NEXTJS_PORT}`;
