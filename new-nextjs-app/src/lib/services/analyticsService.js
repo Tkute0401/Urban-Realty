@@ -215,22 +215,27 @@ class AnalyticsService {
 
     // Track clicks on external links
     document.addEventListener('click', (event) => {
-      const link = event.target.closest('a');
-      if (link && link.hostname !== window.location.hostname) {
-        this.trackEvent('external_link_click', {
-          url: link.href,
-          text: link.textContent,
-          category: 'navigation'
-        });
+      if (event.target && typeof event.target.closest === 'function') {
+        const link = event.target.closest('a');
+        if (link && link.hostname !== window.location.hostname) {
+          this.trackEvent('external_link_click', {
+            url: link.href,
+            text: link.textContent,
+            category: 'navigation'
+          });
+        }
       }
     });
 
     // Track form field interactions
     document.addEventListener('focus', (event) => {
       if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+        const formName = (event.target && typeof event.target.closest === 'function') 
+          ? event.target.closest('form')?.name || 'unknown'
+          : 'unknown';
         this.trackEvent('form_field_focus', {
           fieldName: event.target.name || event.target.id,
-          formName: event.target.closest('form')?.name || 'unknown',
+          formName: formName,
           category: 'form'
         });
       }

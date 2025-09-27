@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = 'http://localhost:3001/api/v1';
+const BACKEND_URL = process.env.NODE_ENV === 'production' 
+  ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com'}/api/v1`
+  : 'http://localhost:3001/api/v1';
 
 // Mock data for fallback when backend is unavailable
 const mockData = {
@@ -263,11 +265,18 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
       });
     }
     
-    if (path === 'properties') {
+    if (path === 'properties' || path === 'properties/featured') {
       return NextResponse.json({
         success: true,
         data: mockData.properties,
-        total: mockData.properties.length
+        total: mockData.properties.length,
+        count: mockData.properties.length,
+        pagination: {
+          currentPage: 1,
+          limit: 25,
+          totalPages: 1,
+          total: mockData.properties.length
+        }
       });
     }
     

@@ -63,7 +63,7 @@ export default function RealEstateSEO({ children }: RealEstateSEOProps) {
 
   // Preload nearby property images for faster navigation
   const preloadNearbyPropertyImages = (currentImg: HTMLImageElement) => {
-    const propertyCard = currentImg.closest('[data-property-card]');
+    const propertyCard = currentImg.closest ? currentImg.closest('[data-property-card]') : null;
     if (!propertyCard) return;
 
     // Find nearby property cards
@@ -91,7 +91,9 @@ export default function RealEstateSEO({ children }: RealEstateSEOProps) {
     
     document.addEventListener('mouseenter', (event) => {
       const target = event.target as HTMLElement;
-      const propertyLink = target.closest('a[href*="/properties/"]') as HTMLAnchorElement;
+      const propertyLink = (target && typeof target.closest === 'function') 
+        ? target.closest('a[href*="/properties/"]') as HTMLAnchorElement
+        : null;
       
       if (propertyLink) {
         // Delay prefetching to avoid unnecessary requests
