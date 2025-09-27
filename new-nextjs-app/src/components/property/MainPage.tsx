@@ -1,5 +1,5 @@
 // MainPage.jsx (updated)
-import { React, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PropertyCard } from '@/components/ui';
 import './MainPage.css';
 
@@ -41,8 +41,8 @@ const MainPagePropertyCard = ({ property }) => {
       city: 'Nashik',
       state: 'Maharashtra'
     },
-    type: 'apartment',
-    status: 'For Sale'
+    type: 'apartment' as const,
+    status: 'For Sale' as const
   };
 
   return (

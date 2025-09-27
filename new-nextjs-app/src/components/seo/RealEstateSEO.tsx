@@ -193,7 +193,7 @@ export default function RealEstateSEO({ children }: RealEstateSEOProps) {
       
       new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (!entry.hadRecentInput) {
+          if (!(entry as any).hadRecentInput) {
             cumulativeLayoutShiftScore += (entry as any).value;
           }
         }
@@ -243,8 +243,8 @@ export default function RealEstateSEO({ children }: RealEstateSEOProps) {
       
       setTimeout(() => {
         deferredScripts.forEach(script => {
-          if (script.dataset.src) {
-            (script as HTMLScriptElement).src = script.dataset.src;
+          if ((script as HTMLScriptElement).dataset.src) {
+            (script as HTMLScriptElement).src = (script as HTMLScriptElement).dataset.src;
           }
         });
       }, 2000);

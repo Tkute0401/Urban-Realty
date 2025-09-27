@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './More.css';
 
-const More = ({ onApply, currentFilters = {}, amenityOptions = [] }) => {
+const More = ({ onApply, currentFilters = {} as any, amenityOptions = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('amenities');
   const [selectedFilters, setSelectedFilters] = useState({

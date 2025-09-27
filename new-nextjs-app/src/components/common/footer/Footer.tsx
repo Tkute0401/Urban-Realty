@@ -63,10 +63,10 @@ const Footer = () => {
                       fontSize: '0.875rem'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.color = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
                     }}
                   >
                     {city} Real Estate
@@ -91,10 +91,10 @@ const Footer = () => {
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.color = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
                     }}
                   >
                     {typeof item === 'string' ? item : item.name}
@@ -119,10 +119,10 @@ const Footer = () => {
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.color = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
                     }}
                   >
                     {typeof item === 'string' ? item : item.name}
@@ -147,10 +147,10 @@ const Footer = () => {
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.color = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
                     }}
                   >
                     {typeof item === 'string' ? item : item.name}
@@ -178,10 +178,10 @@ const Footer = () => {
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.color = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
                     }}
                   >
                     {item.name}
@@ -205,12 +205,12 @@ const Footer = () => {
                  opacity: '0.1' 
                }}
                onMouseEnter={(e) => {
-                 e.target.style.backgroundColor = 'var(--color-primary)';
-                 e.target.style.opacity = '0.2';
+                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                 (e.target as HTMLElement).style.opacity = '0.2';
                }}
                onMouseLeave={(e) => {
-                 e.target.style.backgroundColor = 'var(--color-primary)';
-                 e.target.style.opacity = '0.1';
+                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                 (e.target as HTMLElement).style.opacity = '0.1';
                }}
             >
               <FacebookIcon className="w-6 h-6" style={{ color: 'var(--color-text)' }} />
@@ -222,12 +222,12 @@ const Footer = () => {
                  opacity: '0.1' 
                }}
                onMouseEnter={(e) => {
-                 e.target.style.backgroundColor = 'var(--color-primary)';
-                 e.target.style.opacity = '0.2';
+                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                 (e.target as HTMLElement).style.opacity = '0.2';
                }}
                onMouseLeave={(e) => {
-                 e.target.style.backgroundColor = 'var(--color-primary)';
-                 e.target.style.opacity = '0.1';
+                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                 (e.target as HTMLElement).style.opacity = '0.1';
                }}
             >
               <InstagramIcon className="w-6 h-6" style={{ color: 'var(--color-text)' }} />
@@ -239,12 +239,12 @@ const Footer = () => {
                  opacity: '0.1' 
                }}
                onMouseEnter={(e) => {
-                 e.target.style.backgroundColor = 'var(--color-primary)';
-                 e.target.style.opacity = '0.2';
+                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                 (e.target as HTMLElement).style.opacity = '0.2';
                }}
                onMouseLeave={(e) => {
-                 e.target.style.backgroundColor = 'var(--color-primary)';
-                 e.target.style.opacity = '0.1';
+                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                 (e.target as HTMLElement).style.opacity = '0.1';
                }}
             >
               <LinkedInIcon className="w-6 h-6" style={{ color: 'var(--color-text)' }} />

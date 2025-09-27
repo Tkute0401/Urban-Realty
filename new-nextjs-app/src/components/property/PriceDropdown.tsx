@@ -136,14 +136,14 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
     const value = Number(e.target.value);
     
     setTempValues(prev => {
-      const newValues = { ...prev, [type]: value };
+      const newValues = { ...prev, [type]: value.toString() };
       
       // Ensure min doesn't exceed max and vice versa
       if (type === 'min' && newValues.max && value > Number(newValues.max)) {
-        newValues.max = value;
+        newValues.max = value.toString();
       }
       if (type === 'max' && newValues.min && value < Number(newValues.min)) {
-        newValues.min = value;
+        newValues.min = value.toString();
       }
       
       return newValues;
@@ -279,25 +279,25 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
                 <>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 0, max: 5000000 })}
+                    onClick={() => setTempValues({ min: '0', max: '5000000' })}
                   >
                     Under ₹50L
                   </button>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 5000000, max: 10000000 })}
+                    onClick={() => setTempValues({ min: '5000000', max: '10000000' })}
                   >
                     ₹50L - ₹1Cr
                   </button>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 10000000, max: 25000000 })}
+                    onClick={() => setTempValues({ min: '10000000', max: '25000000' })}
                   >
                     ₹1Cr - ₹2.5Cr
                   </button>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 25000000, max: '' })}
+                    onClick={() => setTempValues({ min: '25000000', max: '' })}
                   >
                     Above ₹2.5Cr
                   </button>
@@ -306,25 +306,25 @@ const PriceDropdown = ({ activeBtn = 'BUY', onApply, currentMin = '', currentMax
                 <>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 0, max: 25000 })}
+                    onClick={() => setTempValues({ min: '0', max: '25000' })}
                   >
                     Under ₹25K
                   </button>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 25000, max: 50000 })}
+                    onClick={() => setTempValues({ min: '25000', max: '50000' })}
                   >
                     ₹25K - ₹50K
                   </button>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 50000, max: 100000 })}
+                    onClick={() => setTempValues({ min: '50000', max: '100000' })}
                   >
                     ₹50K - ₹1L
                   </button>
                   <button 
                     className="preset-btn"
-                    onClick={() => setTempValues({ min: 100000, max: '' })}
+                    onClick={() => setTempValues({ min: '100000', max: '' })}
                   >
                     Above ₹1L
                   </button>

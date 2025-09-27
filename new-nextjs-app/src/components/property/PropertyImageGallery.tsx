@@ -82,8 +82,8 @@ const PropertyImageGallery = ({ images }) => {
             src={validImages[0]}
             alt="Property cover"
             onError={(e) => { 
-              e.target.src = '/default-property.jpg';
-              e.target.style.objectFit = 'contain';
+              (e.target as HTMLImageElement).src = '/default-property.jpg';
+              (e.target as HTMLImageElement).style.objectFit = 'contain';
             }}
             onClick={() => handleOpen(0)}
             sx={{
@@ -117,8 +117,8 @@ const PropertyImageGallery = ({ images }) => {
                 src={img}
                 alt={`Property ${index + 2}`}
                 onError={(e) => { 
-                  e.target.src = '/default-property.jpg';
-                  e.target.style.objectFit = 'contain';
+                  (e.target as HTMLImageElement).src = '/default-property.jpg';
+                  (e.target as HTMLImageElement).style.objectFit = 'contain';
                 }}
                 onClick={() => handleOpen(index + 1)}
                 sx={{
@@ -184,8 +184,8 @@ const PropertyImageGallery = ({ images }) => {
                 src={validImages[currentIndex]}
                 alt={`Property view ${currentIndex + 1}`}
                 onError={(e) => { 
-                  e.target.src = '/default-property.jpg';
-                  e.target.style.objectFit = 'contain';
+                  (e.target as HTMLImageElement).src = '/default-property.jpg';
+                  (e.target as HTMLImageElement).style.objectFit = 'contain';
                 }}
                 sx={{ 
                   width: '100%', 
@@ -284,8 +284,8 @@ const PropertyImageGallery = ({ images }) => {
             src={validImages[0]}
             alt="Property main view"
             onError={(e) => { 
-              e.target.src = '/default-property.jpg';
-              e.target.style.objectFit = 'contain';
+              (e.target as HTMLImageElement).src = '/default-property.jpg';
+              (e.target as HTMLImageElement).style.objectFit = 'contain';
             }}
             onClick={() => handleOpen(0)}
             sx={{
@@ -330,8 +330,8 @@ const PropertyImageGallery = ({ images }) => {
               src={validImages[1]}
               alt="Property view 2"
               onError={(e) => { 
-                e.target.src = '/default-property.jpg';
-                e.target.style.objectFit = 'contain';
+                (e.target as HTMLImageElement).src = '/default-property.jpg';
+                (e.target as HTMLImageElement).style.objectFit = 'contain';
               }}
               onClick={() => handleOpen(1)}
               sx={{
@@ -357,8 +357,8 @@ const PropertyImageGallery = ({ images }) => {
                 src={validImages[2]}
                 alt="Property view 3"
                 onError={(e) => { 
-                  e.target.src = '/default-property.jpg';
-                  e.target.style.objectFit = 'contain';
+                  (e.target as HTMLImageElement).src = '/default-property.jpg';
+                  (e.target as HTMLImageElement).style.objectFit = 'contain';
                 }}
                 onClick={() => handleOpen(2)}
                 sx={{
@@ -453,8 +453,8 @@ const PropertyImageGallery = ({ images }) => {
               src={validImages[currentIndex]}
               alt={`Property view ${currentIndex + 1}`}
               onError={(e) => { 
-                e.target.src = '/default-property.jpg';
-                e.target.style.objectFit = 'contain';
+                (e.target as HTMLImageElement).src = '/default-property.jpg';
+                (e.target as HTMLImageElement).style.objectFit = 'contain';
               }}
               sx={{ 
                 width: '100%', 

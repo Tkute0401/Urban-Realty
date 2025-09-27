@@ -73,29 +73,29 @@ class PerformanceMonitor {
 
   private async initializeWebVitals() {
     try {
-      const { getCLS, getFID, getFCP, getLCP, getTTFB } = await import('web-vitals');
+      const { onCLS, onINP, onFCP, onLCP, onTTFB } = await import('web-vitals');
       
-      getCLS((metric) => {
+      onCLS((metric) => {
         this.metrics.cumulativeLayoutShift = metric.value;
         this.reportMetric('CLS', metric.value);
       });
       
-      getFID((metric) => {
+      onINP((metric) => {
         this.metrics.firstInputDelay = metric.value;
-        this.reportMetric('FID', metric.value);
+        this.reportMetric('INP', metric.value);
       });
       
-      getFCP((metric) => {
+      onFCP((metric) => {
         this.metrics.firstContentfulPaint = metric.value;
         this.reportMetric('FCP', metric.value);
       });
       
-      getLCP((metric) => {
+      onLCP((metric) => {
         this.metrics.largestContentfulPaint = metric.value;
         this.reportMetric('LCP', metric.value);
       });
       
-      getTTFB((metric) => {
+      onTTFB((metric) => {
         this.reportMetric('TTFB', metric.value);
       });
     } catch (error) {
