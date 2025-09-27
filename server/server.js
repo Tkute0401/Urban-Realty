@@ -39,7 +39,32 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-const clientDistDir = path.join(__dirname, '..', 'new-nextjs-app', 'public');
+// Ensure clientDistDir is properly defined with fallback
+let clientDistDir;
+try {
+  clientDistDir = path.join(__dirname, '..', 'new-nextjs-app', 'public');
+  // Validate the path exists or use a fallback
+  if (!fs.existsSync(clientDistDir)) {
+    console.log(`Warning: Default clientDistDir not found: ${clientDistDir}`);
+    // Try alternative paths for Docker environment
+    const alternativePaths = [
+      path.join(__dirname, '..', 'new-nextjs-app', 'public'),
+      path.join(process.cwd(), 'new-nextjs-app', 'public'),
+      path.join('/', 'app', 'new-nextjs-app', 'public')
+    ];
+    
+    for (const altPath of alternativePaths) {
+      if (fs.existsSync(altPath)) {
+        clientDistDir = altPath;
+        console.log(`Using alternative clientDistDir: ${clientDistDir}`);
+        break;
+      }
+    }
+  }
+} catch (error) {
+  console.error('Error setting up clientDistDir:', error);
+  clientDistDir = path.join(__dirname, '..', 'new-nextjs-app', 'public');
+}
 // Next.js server configuration
 const NEXTJS_PORT = process.env.NEXTJS_PORT || 3001;
 const NEXTJS_URL = `http://localhost:${NEXTJS_PORT}`;
