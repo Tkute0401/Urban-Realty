@@ -46,6 +46,7 @@ COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
 COPY server ./server
 COPY shared ./shared
 COPY uploads ./uploads
+COPY ecosystem.config.js ./
 
 # Build the Next.js application
 WORKDIR /app/new-nextjs-app
