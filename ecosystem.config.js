@@ -31,18 +31,22 @@ module.exports = {
       merge_logs: true,
       
       // Railway-optimized restart configuration
-      max_restarts: 5,
-      min_uptime: '30s',
-      restart_delay: 2000,
+      max_restarts: 3,
+      min_uptime: '60s',
+      restart_delay: 5000,
       
       // Memory management
       max_memory_restart: '1G',
       
       // Railway-optimized process management
       watch: false,
-      kill_timeout: 5000,
+      kill_timeout: 10000,
       wait_ready: true,
-      listen_timeout: 15000,
+      listen_timeout: 20000,
+      
+      // Improved process termination
+      force_kill: true,
+      kill_retry_time: 1000,
       
       // Error handling
       autorestart: true,

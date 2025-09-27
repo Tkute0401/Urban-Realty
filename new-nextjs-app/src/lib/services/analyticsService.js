@@ -215,8 +215,12 @@ class AnalyticsService {
 
     // Track clicks on external links
     document.addEventListener('click', (event) => {
-      if (event.target && typeof event.target.closest === 'function') {
-        const link = event.target.closest('a');
+      if (event.target) {
+        // Use the closest method (now polyfilled) with fallback
+        const link = event.target.closest ? 
+          event.target.closest('a') : 
+          this.findClosestElement(event.target, 'A');
+        
         if (link && link.hostname !== window.location.hostname) {
           this.trackEvent('external_link_click', {
             url: link.href,
@@ -230,9 +234,12 @@ class AnalyticsService {
     // Track form field interactions
     document.addEventListener('focus', (event) => {
       if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-        const formName = (event.target && typeof event.target.closest === 'function') 
-          ? event.target.closest('form')?.name || 'unknown'
-          : 'unknown';
+        // Use the closest method (now polyfilled) with fallback
+        const form = event.target.closest ? 
+          event.target.closest('form') : 
+          this.findClosestElement(event.target, 'FORM');
+        const formName = form ? (form.name || 'unknown') : 'unknown';
+        
         this.trackEvent('form_field_focus', {
           fieldName: event.target.name || event.target.id,
           formName: formName,
@@ -282,6 +289,18 @@ class AnalyticsService {
   // Helper methods
   generateSessionId() {
     return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Fallback method for finding closest element
+  findClosestElement(element, tagName) {
+    let current = element;
+    while (current && current !== document) {
+      if (current.tagName === tagName) {
+        return current;
+      }
+      current = current.parentElement;
+    }
+    return null;
   }
 
   generateId() {
