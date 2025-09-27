@@ -39,10 +39,9 @@ setTimeout(async () => {
 
 // Configure paths
 const uploadsDir = path.join(__dirname, 'uploads');
-// Prefer env override; fall back to repo-relative client dist. Avoid absolute container path.
-const clientDistDir = process.env.CLIENT_DIST_DIR
-  ? process.env.CLIENT_DIST_DIR
-  : path.join(__dirname, '..', 'client', 'dist');
+// Next.js server configuration
+const NEXTJS_PORT = process.env.NEXTJS_PORT || 3001;
+const NEXTJS_URL = `http://localhost:${NEXTJS_PORT}`;
 
 // Ensure uploads directory exists (do not attempt to create client dist)
 try {
@@ -73,11 +72,6 @@ app.use(trackPerformance);
 
 // Static files
 app.use('/uploads', express.static(uploadsDir));
-if (fs.existsSync(clientDistDir)) {
-  app.use(express.static(clientDistDir)); // Serve React build
-} else {
-  console.warn(`Client dist directory not found, skipping static serve: ${clientDistDir}`);
-}
 
 // API Routes
 app.use('/api/v1/auth', require('./src/api/routes/authRoutes'));
@@ -89,6 +83,27 @@ app.use('/api/v1/analytics', require('./src/api/routes/analyticsRoutes'));
 app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'))
+
+// Proxy non-API routes to Next.js server
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+// Proxy all non-API routes to Next.js server
+app.use('*', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) {
+    return next();
+  }
+  
+  // Proxy to Next.js server
+  const proxy = createProxyMiddleware({
+    target: NEXTJS_URL,
+    changeOrigin: true,
+    ws: true,
+    logLevel: 'debug'
+  });
+  
+  proxy(req, res, next);
+});
 
 // Health endpoints
 app.get('/api/v1/health', (req, res) => {
