@@ -11,8 +11,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd new-nextjs-app && npm install",
     "test": "cd new-nextjs-app && npm run test",
-    "heroku-postbuild": "cd new-nextjs-app && npm install && npm run build",
-    "prepare": "husky"
+    "heroku-postbuild": "cd new-nextjs-app && npm install && npm run build"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
