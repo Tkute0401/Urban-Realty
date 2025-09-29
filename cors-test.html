@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - Squarefooot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #b6d4ea;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CORS Test for Squarefooot API</h1>
+    <p>This page tests the CORS configuration for the Urban Realty backend API.</p>
+    
+    <div class="info test-result">
+        <strong>API Endpoints to Test:</strong>
+        <ul>
+            <li>Health Check: /api/v1/health</li>
+            <li>Properties: /api/v1/properties/featured</li>
+            <li>Test Endpoint: /api/v1/test</li>
+        </ul>
+    </div>
+
+    <div>
+        <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
+        <button onclick="testPropertiesEndpoint()">Test Properties Endpoint</button>
+        <button onclick="testApiEndpoint()">Test API Endpoint</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        const PRODUCTION_API = 'https://urban-realty-production.up.railway.app';
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function makeRequest(url, description) {
+            try {
+                addResult(`Testing ${description}: ${url}`, 'info');
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ SUCCESS: ${description} - Status: ${response.status}`, 'success');
+                    addResult(`Response: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    addResult(`❌ HTTP ERROR: ${description} - Status: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('CORS')) {
+                    addResult(`❌ CORS ERROR: ${description} - ${error.message}`, 'error');
+                } else {
+                    addResult(`❌ NETWORK ERROR: ${description} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testHealthEndpoint() {
+            await makeRequest(`${API_BASE}/api/v1/health`, 'Health Check (Local)');
+            await makeRequest(`${PRODUCTION_API}/api/v1/health`, 'Health Check (Production)');
+        }
+
+        async function testPropertiesEndpoint() {
+            await makeRequest(`${API_BASE}/api/v1/properties/featured`, 'Featured Properties (Local)');
+            await makeRequest(`${PRODUCTION_API}/api/v1/properties/featured`, 'Featured Properties (Production)');
+        }
+
+        async function testApiEndpoint() {
+            await makeRequest(`${API_BASE}/api/v1/test`, 'Test Endpoint (Local)');
+            await makeRequest(`${PRODUCTION_API}/api/v1/test`, 'Test Endpoint (Production)');
+        }
+
+        // Test current origin
+        addResult(`Current Origin: ${window.location.origin}`, 'info');
+        addResult(`User Agent: ${navigator.userAgent}`, 'info');
+        
+        // Auto-run basic test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addResult('Running automatic health check...', 'info');
+                testHealthEndpoint();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

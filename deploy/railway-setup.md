@@ -52,8 +52,8 @@ RAZORPAY_KEY_SECRET=your-razorpay-key-secret
 # Frontend
 FRONTEND_URL=https://your-app.up.railway.app
 
-# CORS
-CORS_ORIGIN=https://your-app.up.railway.app
+# CORS - Add your domain and any development URLs
+CORS_ORIGIN=https://your-app.up.railway.app,https://www.squarefooot.com,http://localhost:3000,http://localhost:5000
 
 # Security
 SESSION_SECRET=your-session-secret-key-minimum-32-characters
@@ -175,7 +175,10 @@ Set up alerts for:
    - Ensure database exists
 
 4. **CORS Issues**
-   - Update CORS_ORIGIN environment variable
+   - Update CORS_ORIGIN environment variable in Railway dashboard
+   - Add all domains that need to access the API (separated by commas)
+   - For www.squarefooot.com: CORS_ORIGIN=https://your-app.up.railway.app,https://www.squarefooot.com
+   - Restart the service after updating environment variables
    - Check frontend URL configuration
 
 ### Debug Commands
