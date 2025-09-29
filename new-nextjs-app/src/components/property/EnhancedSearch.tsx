@@ -104,9 +104,9 @@ const EnhancedSearch = ({
         // Add icons to suggestions
         const suggestionsWithIcons = suggestions.map(suggestion => ({
           ...suggestion,
-          icon: suggestion.type === 'city' || suggestion.type === 'state' 
+          icon: suggestion.type === 'city' 
             ? <LocationIcon color="primary" />
-            : suggestion.type === 'property' || suggestion.type === 'propertyType'
+            : suggestion.type === 'property'
             ? <HomeIcon color="primary" />
             : <StarIcon color="primary" />
         }));

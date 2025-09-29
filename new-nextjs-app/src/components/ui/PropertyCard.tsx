@@ -33,6 +33,7 @@ interface PropertyAddress {
   state?: string;
   country?: string;
   zipCode?: string;
+  locality?: string;
 }
 
 interface PropertyLocation {

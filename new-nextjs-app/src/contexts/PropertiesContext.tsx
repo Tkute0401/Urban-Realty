@@ -1,41 +1,7 @@
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
 import http from '@/lib/services/http';
+import type { Property } from '@/components/ui';
 
-// Types
-interface Property {
-  _id: string;
-  title?: string;
-  buildingName?: string;
-  description?: string;
-  images?: Array<{ url: string; alt?: string }>;
-  price?: number;
-  area?: number;
-  sqft?: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  type?: 'apartment' | 'villa' | 'land' | 'commercial' | 'house';
-  propertyType?: string;
-  listingType?: 'sale' | 'rent';
-  status?: 'For Sale' | 'For Rent' | 'Sold' | 'Rented';
-  address?: {
-    street?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    locality?: string;
-  };
-  location?: {
-    coordinates?: [number, number];
-  };
-  developer?: {
-    _id: string;
-    name: string;
-  };
-  amenities?: string[];
-  features?: string[];
-  rating?: number;
-  reviews?: number;
-}
 
 interface Developer {
   _id: string;

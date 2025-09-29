@@ -98,12 +98,14 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(property => {
         const address = property.address || {};
-        const location = property.location || '';
+        const locationAddress = property.location?.address || {};
         return (
           address.city?.toLowerCase().includes(searchLower) ||
           address.state?.toLowerCase().includes(searchLower) ||
           address.street?.toLowerCase().includes(searchLower) ||
-          (typeof location === 'string' && location.toLowerCase().includes(searchLower)) ||
+          locationAddress.city?.toLowerCase().includes(searchLower) ||
+          locationAddress.state?.toLowerCase().includes(searchLower) ||
+          locationAddress.street?.toLowerCase().includes(searchLower) ||
           property.title?.toLowerCase().includes(searchLower)
         );
       });
@@ -177,8 +179,9 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
       const cityFilter = filters.city.toLowerCase();
       filtered = filtered.filter(property => {
         const address = property.address || {};
+        const locationAddress = property.location?.address || {};
         return address.city?.toLowerCase().includes(cityFilter) || 
-               (typeof property.location === 'string' && property.location.toLowerCase().includes(cityFilter));
+               locationAddress.city?.toLowerCase().includes(cityFilter);
       });
     }
 
@@ -193,7 +196,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     // Apply area filters
     if (filters.minArea || filters.maxArea) {
       filtered = filtered.filter(property => {
-        const area = property.area || property.sqft || 0;
+        const area = property.area || 0;
         const minArea = filters.minArea ? Number(filters.minArea) : 0;
         const maxArea = filters.maxArea ? Number(filters.maxArea) : Infinity;
         return area >= minArea && area <= maxArea;
