@@ -69,7 +69,7 @@
     "@playwright/test": "^1.55.0",
     "@vitest/coverage-v8": "latest",
     "concurrently": "^8.2.2",
-    "_disabled_husky": "^9.1.7",
+    "husky": "^9.1.7",
     "nodemon": "^3.0.2"
   },
   "engines": {
