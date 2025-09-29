@@ -1,77 +1,56 @@
 #!/bin/bash
-# Railway deployment optimization script
 
-set -e
+# Railway Deployment Script for Urban Realty
+# This script helps prepare and deploy the application to Railway
 
-echo "=== Railway Deployment Optimization ==="
+echo "🚀 Starting Railway deployment process..."
 
-# Ensure we're using the correct Node.js version
-echo "Checking Node.js version..."
-node --version
+# Check if we're in the right directory
+if [ ! -f "package.json" ]; then
+    echo "❌ Error: package.json not found. Please run this script from the project root."
+    exit 1
+fi
 
-# Clean npm cache to avoid version conflicts
-echo "Cleaning npm cache..."
-npm cache clean --force
+# Install dependencies
+echo "📦 Installing dependencies..."
+npm install
 
-# Remove node_modules to ensure clean install
-echo "Removing existing node_modules..."
-rm -rf node_modules
-rm -rf new-nextjs-app/node_modules
-rm -rf server/node_modules
-
-# Install with exact versions and production optimizations
-echo "Installing root dependencies..."
-npm ci --only=production --no-audit --no-fund --silent
-
-# Install Next.js dependencies
-echo "Installing Next.js dependencies..."
+# Build the Next.js application
+echo "🏗️  Building Next.js application..."
 cd new-nextjs-app
-npm ci --only=production --no-audit --no-fund --silent
-npm ci --no-audit --no-fund --silent
+npm install
+npm run build
 cd ..
 
-# Install server dependencies
-echo "Installing server dependencies..."
-cd server
-npm ci --only=production --no-audit --no-fund --silent
-cd ..
+# Check if build was successful
+if [ $? -eq 0 ]; then
+    echo "✅ Build completed successfully!"
+else
+    echo "❌ Build failed. Please check the errors above."
+    exit 1
+fi
 
-# Build Next.js with optimizations
-echo "Building Next.js application..."
-cd new-nextjs-app
-NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production npm run build
-cd ..
-
-# Install PM2 globally
-echo "Installing PM2..."
-npm install pm2@latest -g --no-audit --no-fund --silent
-
-# Create necessary directories
-echo "Creating application directories..."
-mkdir -p uploads logs
+# Create uploads directory if it doesn't exist
+echo "📁 Creating uploads directory..."
+mkdir -p uploads
 
 # Set proper permissions
-echo "Setting permissions..."
-chmod -R 755 uploads logs
+chmod 755 uploads
 
-echo "=== Deployment preparation complete ==="
-echo "Node.js version: $(node --version)"
-echo "NPM version: $(npm --version)"
-echo "PM2 version: $(pm2 --version)"
-
-# Validate the build
-if [ -d "new-nextjs-app/.next" ]; then
-    echo "✅ Next.js build successful"
-else
-    echo "❌ Next.js build failed"
-    exit 1
-fi
-
-if [ -f "ecosystem.config.js" ]; then
-    echo "✅ PM2 ecosystem config found"
-else
-    echo "❌ PM2 ecosystem config missing"
-    exit 1
-fi
-
-echo "=== Ready for deployment ==="
+echo "✅ Railway deployment preparation complete!"
+echo ""
+echo "📝 Next steps:"
+echo "1. Make sure all environment variables are set in Railway dashboard"
+echo "2. Deploy to Railway using: railway up"
+echo "3. Check the logs for any issues: railway logs"
+echo ""
+echo "🔧 Required environment variables:"
+echo "   - MONGODB_URI"
+echo "   - JWT_SECRET"
+echo "   - NODE_ENV=production"
+echo ""
+echo "💡 Optional environment variables:"
+echo "   - FRONTEND_URL"
+echo "   - CORS_ORIGIN"
+echo "   - CLOUDINARY_* (for image uploads)"
+echo "   - RAZORPAY_* (for payments)"

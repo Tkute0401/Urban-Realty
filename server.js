@@ -9,6 +9,7 @@ require('dotenv').config();
 const express = require('express');
 const next = require('next');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
 const mongoose = require('mongoose');
@@ -26,8 +27,23 @@ if (missingEnvVars.length > 0) {
   console.error('   - MONGODB_URI: Your MongoDB connection string');
   console.error('   - JWT_SECRET: A secure secret key (minimum 32 characters)');
   console.error('\n💡 You can set them in Railway dashboard under Variables tab');
-  process.exit(1);
+  
+  // In production, exit with error
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  } else {
+    console.warn('⚠️  Running in development mode with missing environment variables');
+  }
 }
+
+// Log environment configuration (without sensitive data)
+console.log('🔧 Environment Configuration:');
+console.log(`   - NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+console.log(`   - PORT: ${process.env.PORT || 3000}`);
+console.log(`   - MONGODB_URI: ${process.env.MONGODB_URI ? '✅ Set' : '❌ Missing'}`);
+console.log(`   - JWT_SECRET: ${process.env.JWT_SECRET ? '✅ Set' : '❌ Missing'}`);
+console.log(`   - CORS_ORIGIN: ${process.env.CORS_ORIGIN || 'Not set (using defaults)'}`);
+console.log(`   - FRONTEND_URL: ${process.env.FRONTEND_URL || 'Not set'}`);
 
 const connectDB = require('./server/src/config/db');
 const errorHandler = require('./server/src/api/middleware/errorHandler');
@@ -90,9 +106,34 @@ try {
 
 // Middleware
 app.use(cors({
-  origin: config.cors.origin,
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    // In production, allow Railway domain and any configured origins
+    const allowedOrigins = [
+      'https://urban-realty-production.up.railway.app',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // For development, allow all origins
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+app.use(cookieParser());
 app.use(express.json({ limit: config.upload.maxFileSize }));
 app.use(express.urlencoded({ extended: true, limit: config.upload.maxFileSize }));
 

@@ -130,15 +130,22 @@ exports.getAgentProperties = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/properties/:id
 // @access  Public
 exports.getProperty = asyncHandler(async (req, res, next) => {
-  // Find property and populate agent details
-  const property = await Property.findById(req.params.id)
-    .populate('agent', 'name email phone mobile');
-  
-  if (!property) {
-    return next(
-      new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
-    );
-  }
+  try {
+    // Validate property ID format
+    if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return next(new ErrorResponse('Invalid property ID format', 400));
+    }
+
+    // Find property and populate agent details
+    const property = await Property.findById(req.params.id)
+      .populate('agent', 'name email phone mobile')
+      .populate('developer', 'name logo');
+    
+    if (!property) {
+      return next(
+        new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
+      );
+    }
 
   // Find similar properties within 20km radius
   let similarProperties = [];
@@ -222,13 +229,17 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
     // Don't fail the request if view count fails
   }
 
-  res.status(200).json({ 
-    success: true, 
-    data: {
-      ...property.toObject(),
-      similarProperties
-    }
-  });
+    res.status(200).json({ 
+      success: true, 
+      data: {
+        ...property.toObject(),
+        similarProperties
+      }
+    });
+  } catch (error) {
+    console.error('Error in getProperty:', error);
+    return next(new ErrorResponse('Error fetching property details', 500));
+  }
 });
 
 // Helper function to calculate distance between two coordinates in km
