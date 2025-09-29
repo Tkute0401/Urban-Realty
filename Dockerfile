@@ -48,9 +48,11 @@ COPY shared ./shared
 COPY uploads ./uploads
 COPY ecosystem.config.js ./
 COPY server.js ./
+COPY start-server.js ./
 
 # Build the Next.js application
 WORKDIR /app/new-nextjs-app
+ENV SKIP_BUILD_STATIC_GENERATION=true
 RUN npm run build
 
 # Production image, copy all the files and run next
@@ -77,6 +79,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json* ./
 COPY --from=builder /app/ecosystem.config.js ./
 COPY --from=builder /app/server.js ./
+COPY --from=builder /app/start-server.js ./
 
 # Copy root node_modules for backend dependencies
 COPY --from=builder /app/node_modules ./node_modules
@@ -90,6 +93,7 @@ RUN mkdir -p /app/logs
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
 RUN chmod +x /app/server.js
+RUN chmod +x /app/start-server.js
 USER nextjs
 
 EXPOSE 3000
@@ -97,5 +101,5 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# Start the application with PM2
-CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production", "--no-daemon"]
+# Start the application with start-server.js
+CMD ["node", "start-server.js"]

@@ -53,4 +53,4 @@ if (isProduction) {
 
 // Start the Express server
 console.log('🚀 Starting Express server...');
-require('./server/server.js');
+require('./server.js');
