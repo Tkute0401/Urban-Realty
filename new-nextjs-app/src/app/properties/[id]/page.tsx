@@ -14,7 +14,11 @@ async function getProperty(id: string) {
   try {
     // For server-side rendering, we need the full URL
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-    const response = await fetch(`${baseUrl}/api/v1/properties/${id}`, {
+    const url = `${baseUrl}/api/v1/properties/${id}`;
+    
+    console.log('🔍 Server-side getProperty - Fetching property:', { id, url, baseUrl });
+    
+    const response = await fetch(url, {
       next: { 
         revalidate: 3600 // Revalidate every hour for ISR
       },
@@ -27,17 +31,47 @@ async function getProperty(id: string) {
       signal: AbortSignal.timeout(10000),
     });
     
+    console.log('🔍 Server-side getProperty - Response status:', response.status);
+    
     if (!response.ok) {
       if (response.status === 404) {
+        console.log('🔍 Server-side getProperty - Property not found (404)');
+        // Try to get a fallback property for testing
+        console.log('🔍 Server-side getProperty - Attempting to get fallback property...');
+        try {
+          const fallbackResponse = await fetch(`${baseUrl}/api/v1/properties/featured`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          });
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json();
+            const fallbackProperties = fallbackData?.data || [];
+            if (fallbackProperties.length > 0) {
+              console.log('🔍 Server-side getProperty - Using fallback property:', fallbackProperties[0]._id);
+              return fallbackProperties[0];
+            }
+          }
+        } catch (fallbackError) {
+          console.error('🔍 Server-side getProperty - Fallback failed:', fallbackError);
+        }
         return null; // Property not found
       }
+      console.error('🔍 Server-side getProperty - Error response:', response.status, response.statusText);
       throw new Error(`Failed to fetch property: ${response.status} ${response.statusText}`);
     }
     
     const data = await response.json();
+    console.log('🔍 Server-side getProperty - Response data:', { 
+      hasData: !!data, 
+      dataKeys: data ? Object.keys(data) : 'no data',
+      propertyId: data?.data?.data?._id || data?.data?._id || data?._id
+    });
+    
     return data?.data?.data || data?.data || data;
   } catch (error) {
-    console.error('Error fetching property:', error);
+    console.error('🔍 Server-side getProperty - Error fetching property:', error);
     return null;
   }
 }
@@ -221,9 +255,18 @@ export async function generateStaticParams() {
 
 // Main page component - Server Component
 export default async function PropertyDetailsPage({ params }: { params: { id: string } }) {
+  console.log('🔍 PropertyDetailsPage - Rendering for property ID:', params.id);
+  
   const property = await getProperty(params.id);
   
+  console.log('🔍 PropertyDetailsPage - Property data:', { 
+    hasProperty: !!property, 
+    propertyId: property?._id,
+    propertyTitle: property?.title 
+  });
+  
   if (!property) {
+    console.log('🔍 PropertyDetailsPage - Property not found, calling notFound()');
     notFound();
   }
 
