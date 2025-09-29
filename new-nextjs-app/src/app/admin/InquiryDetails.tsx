@@ -1,6 +1,7 @@
 // src/pages/admin/InquiryDetails.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { api } from '@/lib/services/api';
 import { 
   Box, Typography, Paper, Button, Avatar, 
   Divider, Chip, CircularProgress, Alert,
@@ -26,7 +27,7 @@ const InquiryDetails = () => {
       setLoading(true);
       setError(null);
       
-      const response = await http.get(`/admin/inquiries/${id}`);
+      const response = await api.admin.getInquiry(id);
       setInquiry(response.data);
       setStatus(response.data.status);
     } catch (err) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Box,
   Typography,
@@ -103,7 +104,7 @@ const AdminAnalytics = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await http.get('/api/v1/admin/analytics');
+      const response = await api.admin.analytics();
       if (response.success) {
         setAnalytics(response.data);
       } else {

@@ -81,6 +81,7 @@ export const api = {
                 users: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/users", { params })),
                 properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/properties", { params })),
                 contacts: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/contacts", { params })),
+                getInquiry: (id: string) => unwrap<any>(http.get(`/api/v1/admin/inquiries/${id}`)),
                 updateUser: (userId: string, payload: any) => unwrap<any>(http.put(`/api/v1/admin/users/${userId}`, payload)),
                 deleteUser: (userId: string) => unwrap<any>(http.delete(`/api/v1/admin/users/${userId}`)),
                 deleteProperty: (propertyId: string) => unwrap<any>(http.delete(`/api/v1/admin/properties/${propertyId}`)),
