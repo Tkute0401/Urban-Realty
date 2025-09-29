@@ -40,10 +40,14 @@ const MoonIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
 );
 
 const HeroSection = () => {
-  console.log('🔧 HeroSection rendering...');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔧 HeroSection rendering...');
+  }
   
   React.useEffect(() => {
-    console.log('🔧 HeroSection mounted on client side!');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 HeroSection mounted on client side!');
+    }
   }, []);
   const [searchText, setSearchText] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,7 +71,7 @@ const HeroSection = () => {
 
   useEffect(() => {
     getProperties();
-  }, []);
+  }, [getProperties]);
 
   const getAvailableCities = () => {
     if (!properties || !Array.isArray(properties) || properties.length === 0) return [];
@@ -116,7 +120,9 @@ const HeroSection = () => {
         setSelectedTab(params.propertyType === 'BUY' ? 'BUY' : params.propertyType === 'RENT' ? 'RENT' : 'ALL');
       }
     }
+  }, [searchParams, availableCities]);
 
+  useEffect(() => {
     const updateVisibleCount = () => {
       if (typeof window !== 'undefined') {
         if (window.innerWidth < 640) {
@@ -136,7 +142,7 @@ const HeroSection = () => {
       window.addEventListener('resize', updateVisibleCount);
       return () => window.removeEventListener('resize', updateVisibleCount);
     }
-  }, [searchParams, availableCities]);
+  }, []);
 
   useEffect(() => {
     if (!selectedCity && Array.isArray(availableCities) && availableCities.length > 0) {

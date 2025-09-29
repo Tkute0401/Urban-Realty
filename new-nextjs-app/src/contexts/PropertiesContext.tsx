@@ -96,7 +96,9 @@ interface PropertiesProviderProps {
 }
 
 export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children }) => {
-  console.log('🔧 PropertiesProvider rendering...');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔧 PropertiesProvider rendering...');
+  }
   
   const [properties, setProperties] = useState([]);
   const [featuredProperties, setFeaturedProperties] = useState([]);
@@ -110,9 +112,13 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
   
   // Add useEffect for debugging
   useEffect(() => {
-    console.log('🔧 PropertiesProvider mounted on client side!');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 PropertiesProvider mounted on client side!');
+    }
     return () => {
-      console.log('🔧 PropertiesProvider unmounted');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 PropertiesProvider unmounted');
+      }
     };
   }, []);
 
@@ -202,7 +208,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     } finally {
       setLoading(false);
     }
-  }, [cache]);
+  }, []); // Remove cache dependency to prevent infinite loops
 
   const getFeaturedProperties = useCallback(async () => {
     console.log('🔧 PropertiesContext - getFeaturedProperties called');
@@ -266,7 +272,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     } finally {
       setLoading(false);
     }
-  }, [cache]);
+  }, []); // Remove cache dependency to prevent infinite loops
 
   const createProperty = useCallback(async (formData, config = {}) => {
     try {
