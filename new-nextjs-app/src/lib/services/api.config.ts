@@ -16,7 +16,15 @@ export const isProductionBuild = () => {
 
 // Get API base URL with Railway optimization
 export const getApiBaseUrl = (): string => {
-  // Always use relative paths for unified server setup
+  // Check if we're in unified mode (no separate backend URL)
+  const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
+  
+  if (!explicitApiUrl) {
+    // Unified mode - Express server handles all routes directly
+    return '';
+  }
+  
+  // Separate backend mode - use /api/v1 prefix
   return '/api/v1';
 };
 

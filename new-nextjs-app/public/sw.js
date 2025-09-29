@@ -397,9 +397,9 @@ async function savePropertyForLater(propertyId) {
   try {
     const cache = await caches.open(DYNAMIC_CACHE);
     // Store property for offline access
-    const propertyResponse = await fetch(`/api/properties/${propertyId}`);
+    const propertyResponse = await fetch(`/api/v1/properties/${propertyId}`);
     if (propertyResponse.ok) {
-      await cache.put(`/api/properties/${propertyId}`, propertyResponse);
+      await cache.put(`/api/v1/properties/${propertyId}`, propertyResponse);
     }
   } catch (error) {
     console.error('Failed to save property:', error);
