@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const geocoder = require('../utils/geocoder');
 
+console.log('🔧 Property model loaded');
+console.log('🔧 Mongoose connection state:', mongoose.connection.readyState);
+console.log('🔧 Mongoose version:', mongoose.version);
+
 const PropertySchema = new mongoose.Schema({
   // Basic Information
   title: {

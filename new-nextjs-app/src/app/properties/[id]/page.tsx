@@ -11,7 +11,7 @@ import PropertyInteractiveWrapper from './PropertyInteractiveWrapper';
 async function getProperty(id: string) {
   try {
     const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}/properties/${id}`, {
+    const response = await fetch(`${baseUrl}/api/v1/properties/${id}`, {
       next: { 
         revalidate: 3600 // Revalidate every hour for ISR
       },
@@ -187,7 +187,7 @@ export async function generateStaticParams() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     
-    const response = await fetch(`${baseUrl}/properties/featured`, {
+    const response = await fetch(`${baseUrl}/api/v1/properties/featured`, {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
