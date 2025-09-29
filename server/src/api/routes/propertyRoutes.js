@@ -6,6 +6,19 @@ const contactController = require('../../../controllers/contactController');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/multer');
 
+console.log('🔧 Property routes loaded');
+console.log('🔧 Property controller functions:', {
+  getProperties: typeof propertyController.getProperties,
+  getProperty: typeof propertyController.getProperty,
+  createProperty: typeof propertyController.createProperty,
+  updateProperty: typeof propertyController.updateProperty,
+  deleteProperty: typeof propertyController.deleteProperty,
+  getPropertiesInRadius: typeof propertyController.getPropertiesInRadius,
+  propertyPhotoUpload: typeof propertyController.propertyPhotoUpload,
+  propertyPhotoDelete: typeof propertyController.propertyPhotoDelete
+});
+console.log('🔧 Property controller object keys:', Object.keys(propertyController));
+
 // @desc    Get all properties
 // @route   GET /api/v1/properties
 // @access  Public
@@ -113,7 +126,18 @@ router.put(
 // @desc    Get single property
 // @route   GET /api/v1/properties/:id
 // @access  Public
-router.get('/:id', propertyController.getProperty);
+router.get('/:id', (req, res, next) => {
+  console.log('🏠 Property route hit:', req.params.id);
+  console.log('🔧 Request details:', {
+    method: req.method,
+    url: req.url,
+    params: req.params,
+    query: req.query,
+    headers: req.headers
+  });
+  console.log('🔧 Route handler called');
+  propertyController.getProperty(req, res, next);
+});
 
 
 module.exports = router;

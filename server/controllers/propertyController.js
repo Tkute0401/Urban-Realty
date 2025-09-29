@@ -8,6 +8,18 @@ const geocoder = require('../utils/geocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
+// Debug model imports
+console.log('🔧 Property Controller - Model imports:', {
+  Property: Property ? 'Loaded' : 'Failed',
+  User: User ? 'Loaded' : 'Failed',
+  Developer: Developer ? 'Loaded' : 'Failed'
+});
+console.log('🔧 Property model details:', {
+  modelName: Property ? Property.modelName : 'N/A',
+  schema: Property ? 'Schema loaded' : 'No schema',
+  collection: Property ? Property.collection.name : 'N/A'
+});
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -131,17 +143,60 @@ exports.getAgentProperties = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getProperty = asyncHandler(async (req, res, next) => {
   try {
+    console.log('🏠 Getting property with ID:', req.params.id);
+    console.log('🔧 Database state:', require('mongoose').connection.readyState);
+    console.log('🔧 Request details:', {
+      method: req.method,
+      url: req.url,
+      params: req.params,
+      query: req.query,
+      headers: req.headers
+    });
+    
     // Validate property ID format
     if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      console.log('❌ Invalid property ID format:', req.params.id);
       return next(new ErrorResponse('Invalid property ID format', 400));
     }
-
+    
     // Find property and populate agent details
-    const property = await Property.findById(req.params.id)
-      .populate('agent', 'name email phone mobile')
-      .populate('developer', 'name logo');
+    console.log('🔍 Searching for property in database...');
+    let property;
+    try {
+      console.log('🔧 Executing Property.findById with ID:', req.params.id);
+      console.log('🔧 Property model available:', Property ? 'Yes' : 'No');
+      console.log('🔧 Property model name:', Property ? Property.modelName : 'N/A');
+      property = await Property.findById(req.params.id)
+        .populate('agent', 'name email phone mobile')
+        .populate('developer', 'name logo');
+      console.log('🔧 Query executed successfully');
+    } catch (dbError) {
+      console.error('❌ Database error:', dbError);
+      console.error('❌ Database error details:', {
+        message: dbError.message,
+        name: dbError.name,
+        code: dbError.code,
+        stack: dbError.stack
+      });
+      return next(new ErrorResponse('Database error occurred', 500));
+    }
+    
+    console.log('✅ Property found:', property ? 'Yes' : 'No');
+    if (property) {
+      console.log('🔧 Property details:', {
+        id: property._id,
+        title: property.title,
+        agent: property.agent ? 'Populated' : 'Not populated',
+        developer: property.developer ? 'Populated' : 'Not populated',
+        type: property.type,
+        status: property.status,
+        price: property.price
+      });
+    }
     
     if (!property) {
+      console.log('❌ Property not found with ID:', req.params.id);
+      console.log('🔧 Database state when property not found:', require('mongoose').connection.readyState);
       return next(
         new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
       );
@@ -150,25 +205,32 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
   // Find similar properties within 20km radius
   let similarProperties = [];
   if (property.location?.coordinates && property.location.coordinates.length === 2) {
+    console.log('🔍 Finding similar properties...');
     const radius = 80 / 6378.1; // Convert km to radians
     
-    similarProperties = await Property.find({
-      _id: { $ne: property._id }, // Exclude current property
-      location: {
-        $geoWithin: { 
-          $centerSphere: [
-            property.location.coordinates, 
-            radius
-          ] 
-        }
-      },
-      // type: property.type, // Same property type
-      // bedrooms: property.bedrooms, // Same number of bedrooms
-      // status: property.status // Same status (For Sale/For Rent)
-    })
-    .limit(3) // Limit to 3 similar properties
-    .select('title price bedrooms bathrooms area type images address status')
-    .lean(); // Convert to plain JS object
+    try {
+      similarProperties = await Property.find({
+        _id: { $ne: property._id }, // Exclude current property
+        location: {
+          $geoWithin: { 
+            $centerSphere: [
+              property.location.coordinates, 
+              radius
+            ] 
+          }
+        },
+        // type: property.type, // Same property type
+        // bedrooms: property.bedrooms, // Same number of bedrooms
+        // status: property.status // Same status (For Sale/For Rent)
+      })
+      .limit(3) // Limit to 3 similar properties
+      .select('title price bedrooms bathrooms area type images address status')
+      .lean(); // Convert to plain JS object
+      console.log('✅ Similar properties found:', similarProperties.length);
+    } catch (similarError) {
+      console.error('❌ Error finding similar properties:', similarError);
+      similarProperties = [];
+    }
     
     // Calculate distance for each similar property
     similarProperties = similarProperties.map(similarProp => {
@@ -187,6 +249,7 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
 
   // If user is authenticated, track this view in their recently viewed
   if (req.user) {
+    console.log('🔍 Tracking recently viewed property for user:', req.user.id);
     try {
       const user = await User.findById(req.user.id);
       
@@ -199,6 +262,7 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
         if (existingIndex !== -1) {
           // Update viewedAt if already exists
           user.recentlyViewed[existingIndex].viewedAt = Date.now();
+          console.log('✅ Updated recently viewed property');
         } else {
           // Add new entry
           user.recentlyViewed.push({
@@ -210,12 +274,14 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
           if (user.recentlyViewed.length > 10) {
             user.recentlyViewed.shift(); // Remove the oldest item
           }
+          console.log('✅ Added new recently viewed property');
         }
         
         await user.save();
+        console.log('✅ User recently viewed updated');
       }
     } catch (err) {
-      console.error('Error tracking recently viewed property:', err);
+      console.error('❌ Error tracking recently viewed property:', err);
       // Don't fail the request if tracking fails
     }
   }
@@ -224,20 +290,40 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
   try {
     property.views = (property.views || 0) + 1;
     await property.save();
+    console.log('✅ View count incremented');
   } catch (err) {
-    console.error('Error incrementing property views:', err);
+    console.error('❌ Error incrementing property views:', err);
     // Don't fail the request if view count fails
   }
 
-    res.status(200).json({ 
+    console.log('📤 Sending response...');
+    const responseData = { 
       success: true, 
-      data: {
-        ...property.toObject(),
-        similarProperties
-      }
-    });
+      data: { 
+        ...property.toObject(), 
+        similarProperties 
+      } 
+    };
+    console.log('🔧 Response data size:', JSON.stringify(responseData).length, 'bytes');
+    console.log('🔧 Response data keys:', Object.keys(responseData.data));
+    console.log('🔧 Property data keys:', Object.keys(property.toObject()));
+    res.status(200).json(responseData);
   } catch (error) {
-    console.error('Error in getProperty:', error);
+    console.error('❌ Error in getProperty:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
+    console.error('❌ Request details:', {
+      id: req.params.id,
+      method: req.method,
+      url: req.url,
+      headers: req.headers
+    });
+    console.error('❌ Database state:', require('mongoose').connection.readyState);
+    console.error('❌ Property model available:', Property ? 'Yes' : 'No');
     return next(new ErrorResponse('Error fetching property details', 500));
   }
 });

@@ -5,7 +5,17 @@ const errorHandler = (err, req, res, next) => {
   error.message = err.message;
 
   // Log to console for dev
-  console.error(err.stack);
+  console.error('❌ Error Handler:', {
+    message: err.message,
+    stack: err.stack,
+    name: err.name,
+    statusCode: err.statusCode,
+    path: req.path,
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body
+  });
 
   if (err.name === 'CastError') {
     const message = `Resource not found with id of ${err.value}`;

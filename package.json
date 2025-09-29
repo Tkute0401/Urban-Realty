@@ -7,7 +7,7 @@
     "run": "cd new-nextjs-app && npm start",
     "server": "nodemon server/server.js",
     "client": "cd new-nextjs-app && npm run dev",
-    "build": "cd new-nextjs-app && npm install && npm run build",
+    "build": "npm install && cd new-nextjs-app && npm install && npm run build",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd new-nextjs-app && npm install",
     "test": "cd new-nextjs-app && npm run test",

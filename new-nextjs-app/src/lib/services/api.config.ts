@@ -16,22 +16,15 @@ export const isProductionBuild = () => {
 
 // Get API base URL with Railway optimization
 export const getApiBaseUrl = (): string => {
-        return 'https://urban-realty-production.up.railway.app/api/v1';
-//   // During Railway build, skip API calls
-//   if (isRailwayBuild() && isProductionBuild() && typeof window === 'undefined') {
-//     console.log('Railway build detected - using fallback API URL');
-//     return process.env.NEXT_PUBLIC_API_URL || 'https://urban-realty-production.up.railway.app/api/v1';
-//   }
+  // Client-side runtime - use relative paths
+  if (typeof window !== 'undefined') {
+    return '/api/v1';
+  }
 
-//   // Client-side runtime
-//   if (typeof window !== 'undefined') {
-//     return process.env.NEXT_PUBLIC_API_URL || '/api/v1';
-//   }
-
-//   // Server-side runtime
-//   return process.env.NEXT_PUBLIC_API_URL || 
-//          process.env.API_URL || 
-//          'https://urban-realty-production.up.railway.app/api/v1';
+  // Server-side runtime - use full URL for SSR
+  return process.env.NEXT_PUBLIC_API_URL || 
+         process.env.API_URL || 
+         'https://urban-realty-production.up.railway.app/api/v1';
 };
 
 // Enhanced fetch configuration for Railway

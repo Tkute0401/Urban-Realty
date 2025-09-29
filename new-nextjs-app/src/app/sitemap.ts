@@ -9,7 +9,7 @@ async function fetchDynamicUrls() {
     const apiUrl = getApiBaseUrl()
     
     // Fetch latest properties for sitemap
-    const propertiesResponse = await fetch(`${apiUrl}/properties?limit=100&sort=-createdAt`, {
+    const propertiesResponse = await fetch(`${apiUrl}/api/v1/properties?limit=100&sort=-createdAt`, {
       next: { revalidate: 86400 }, // Revalidate every 24 hours
     })
     const propertiesData = await propertiesResponse.json()
