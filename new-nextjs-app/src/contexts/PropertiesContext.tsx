@@ -10,6 +10,7 @@ interface Property {
   images?: Array<{ url: string; alt?: string }>;
   price?: number;
   area?: number;
+  sqft?: number;
   bedrooms?: number;
   bathrooms?: number;
   type?: 'apartment' | 'villa' | 'land' | 'commercial' | 'house';
@@ -30,6 +31,10 @@ interface Property {
     _id: string;
     name: string;
   };
+  amenities?: string[];
+  features?: string[];
+  rating?: number;
+  reviews?: number;
 }
 
 interface Developer {
