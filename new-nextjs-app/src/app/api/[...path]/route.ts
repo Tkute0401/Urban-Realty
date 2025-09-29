@@ -3,13 +3,23 @@ import { NextRequest, NextResponse } from 'next/server';
 // Build a safe backend base URL that never re-enters this Next.js catch-all route
 // Priority:
 // 1) NEXT_PUBLIC_API_URL or BACKEND_URL (should point directly to Express API service)
-// 2) Development fallback to localhost:5000 (Express default)
+// 2) Railway production URL
+// 3) Development fallback to localhost:5000 (Express default)
 function getBackendBaseUrl(): string {
   const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
-
+  
+  // Railway production URL as fallback
+  const railwayUrl = 'https://urban-realty-production.up.railway.app';
   const fallbackDev = 'http://localhost:5000';
 
-  const base = explicitApiUrl || (process.env.NODE_ENV === 'production' ? explicitApiUrl : fallbackDev);
+  let base;
+  if (explicitApiUrl) {
+    base = explicitApiUrl;
+  } else if (process.env.NODE_ENV === 'production') {
+    base = railwayUrl;
+  } else {
+    base = fallbackDev;
+  }
 
   // Normalize and ensure we do NOT accidentally target this Next.js route again
   // Strip any trailing slashes

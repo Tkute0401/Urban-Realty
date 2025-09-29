@@ -50,16 +50,16 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
   }
 
-  const title = `${property.title || `${property.bedrooms || 'N/A'} BR ${property.propertyType || 'Property'}`} in ${property.address?.city || 'Prime Location'} | Squarefooot`;
-  const description = `${property.description || `Discover this ${property.bedrooms || 'N/A'} bedroom ${property.propertyType || 'property'} in ${property.address?.city || 'prime location'}. Price: $${property.price?.toLocaleString() || 'Contact for pricing'}. ${property.area || property.sqft ? `Size: ${property.area || property.sqft} sqft.` : ''} ${property.amenities?.length ? `Features: ${property.amenities.slice(0, 3).join(', ')}.` : ''}`}`.slice(0, 160);
+  const title = `${property.title || `${property.bedrooms || 'N/A'} BR ${property.type || property.propertyType || 'Property'}`} in ${property.address?.city || 'Prime Location'} | Squarefooot`;
+  const description = `${property.description || `Discover this ${property.bedrooms || 'N/A'} bedroom ${property.type || property.propertyType || 'property'} in ${property.address?.city || 'prime location'}. Price: ₹${property.price?.toLocaleString() || 'Contact for pricing'}. ${property.area || property.sqft ? `Size: ${property.area || property.sqft} sqft.` : ''} ${property.amenities?.length ? `Features: ${property.amenities.slice(0, 3).join(', ')}.` : ''}`}`.slice(0, 160);
   
   const propertyImage = property.images?.[0];
   const optimizedImage = propertyImage ? getOptimizedImageUrl(propertyImage, 1200, 630) : undefined;
   
   // Get optimized social media assets
   const socialAssets = getPropertySocialAssets(
-    property.title || `${property.bedrooms} BR ${property.propertyType}`,
-    property.price ? `$${property.price.toLocaleString()}` : 'Contact for pricing',
+    property.title || `${property.bedrooms} BR ${property.type || property.propertyType}`,
+    property.price ? `₹${property.price.toLocaleString()}` : 'Contact for pricing',
     property.address?.city || 'Prime Location',
     optimizedImage
   );
@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     title,
     description,
     keywords: [
-      property.propertyType,
+      property.type || property.propertyType,
       `${property.bedrooms} bedroom`,
       property.address?.city,
       property.address?.state,
@@ -112,8 +112,8 @@ function generatePropertyStructuredData(property: any) {
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
-    "name": property.title || `${property.bedrooms} BR ${property.propertyType} in ${property.address?.city}`,
-    "description": property.description || `Beautiful ${property.bedrooms} bedroom ${property.propertyType} in ${property.address?.city}`,
+    "name": property.title || `${property.bedrooms} BR ${property.type || property.propertyType} in ${property.address?.city}`,
+    "description": property.description || `Beautiful ${property.bedrooms} bedroom ${property.type || property.propertyType} in ${property.address?.city}`,
     "url": `${baseUrl}/properties/${property._id}`,
     "image": property.images?.[0] || `${baseUrl}/default-property-image.jpg`,
     "datePosted": property.createdAt || new Date().toISOString(),
@@ -121,7 +121,7 @@ function generatePropertyStructuredData(property: any) {
     "priceSpecification": {
       "@type": "PriceSpecification",
       "price": property.price || 0,
-      "priceCurrency": "USD"
+      "priceCurrency": "INR"
     },
     "availabilityStarts": property.availableFrom || new Date().toISOString(),
     "address": {
@@ -130,7 +130,7 @@ function generatePropertyStructuredData(property: any) {
       "addressLocality": property.address?.city || "",
       "addressRegion": property.address?.state || "",
       "postalCode": property.address?.zipCode || "",
-      "addressCountry": "US"
+      "addressCountry": "IN"
     },
     "geo": property.location?.coordinates ? {
       "@type": "GeoCoordinates",
@@ -148,11 +148,11 @@ function generatePropertyStructuredData(property: any) {
       "@type": "LocationFeatureSpecification",
       "name": amenity
     })),
-    "category": property.propertyType || "Residential",
+    "category": property.type || property.propertyType || "Residential",
     "yearBuilt": property.yearBuilt,
     "occupancy": {
       "@type": "Occupancy",
-      "occupancyType": property.listingType === 'rent' ? 'rental' : 'owner'
+      "occupancyType": (property.status === 'For Rent' || property.listingType === 'rent') ? 'rental' : 'owner'
     }
   };
 }

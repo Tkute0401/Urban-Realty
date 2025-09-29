@@ -77,12 +77,14 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     // Filter by property type (buy/rent)
     if (activeBtn === 'BUY') {
       filtered = filtered.filter(property => 
+        property.status?.toLowerCase() === 'for sale' || 
         property.listingType?.toLowerCase() === 'sale' || 
         property.type?.toLowerCase() === 'sale' ||
-        !property.listingType // Default to sale if no type specified
+        !property.status // Default to sale if no type specified
       );
     } else {
       filtered = filtered.filter(property => 
+        property.status?.toLowerCase() === 'for rent' || 
         property.listingType?.toLowerCase() === 'rent' || 
         property.type?.toLowerCase() === 'rent'
       );
@@ -134,7 +136,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     // Apply home type filter
     if (filters.propertyTypes && filters.propertyTypes.length > 0) {
       filtered = filtered.filter(property => {
-        const propertyType = property.propertyType || property.type || '';
+        const propertyType = property.type || property.propertyType || '';
         return filters.propertyTypes.some((filterType: string) => {
           // Map common property types to filter labels
           const typeMapping: Record<string, string[]> = {

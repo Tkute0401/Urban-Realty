@@ -48,10 +48,12 @@ export interface Property {
   images?: PropertyImage[];
   price?: number;
   area?: number;
+  sqft?: number; // Alternative field name
   bedrooms?: number;
   bathrooms?: number;
-  type?: 'apartment' | 'villa' | 'land' | 'commercial' | 'house';
+  type?: 'apartment' | 'villa' | 'land' | 'commercial' | 'house' | 'Apartment' | 'Villa' | 'Land' | 'Commercial' | 'House';
   status?: 'For Sale' | 'For Rent' | 'Sold' | 'Rented';
+  listingType?: 'sale' | 'rent'; // Alternative field name
   address?: PropertyAddress;
   location?: PropertyLocation;
   rating?: number;
@@ -62,6 +64,7 @@ export interface Property {
   };
   amenities?: string[];
   features?: string[];
+  highlights?: string[];
 }
 
 interface PropertyCardProps {
@@ -185,7 +188,8 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
   };
 
   const getPropertyTypeIcon = () => {
-    switch (property.type?.toLowerCase()) {
+    const propertyType = property.type?.toLowerCase();
+    switch (propertyType) {
       case 'apartment':
         return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'villa':
@@ -193,6 +197,8 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
       case 'land':
         return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       case 'commercial':
+        return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
+      case 'house':
         return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
       default:
         return <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />;
@@ -236,11 +242,11 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
       whileHover={animate ? { y: -5 } : undefined}
     >
       {/* Status Badge */}
-      {showStatus && property.status && (
+      {showStatus && (property.status || property.listingType) && (
         <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-md text-xs font-bold ${
-          property.status === 'For Sale' ? 'bg-[var(--color-primary)] text-[var(--color-primary-contrast)]' : 'bg-[var(--color-danger)] text-white'
+          (property.status === 'For Sale' || property.listingType === 'sale') ? 'bg-[var(--color-primary)] text-[var(--color-primary-contrast)]' : 'bg-[var(--color-danger)] text-white'
         }`}>
-          {property.status}
+          {property.status || (property.listingType === 'sale' ? 'For Sale' : 'For Rent')}
         </div>
       )}
 
@@ -333,7 +339,7 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
             <div className="flex items-center gap-1 sm:gap-2">
               <HomeOutlinedIcon className="text-[var(--color-primary)] icon-sm" />
               <span className="text-[var(--color-text-muted)] text-xs sm:text-sm">
-                {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
+                {(property.area || property.sqft) ? `${(property.area || property.sqft).toLocaleString()} sqft` : 'N/A'}
               </span>
             </div>
           </Tooltip>
@@ -362,7 +368,7 @@ const PropertyCardContent: React.FC<Omit<PropertyCardProps, 'lazy'>> = ({
           <div className="flex justify-between items-center mb-2 sm:mb-3">
             <p className="text-xl sm:text-2xl font-bold text-[var(--color-text)]">
               {formatPrice(property.price)}
-              {property.status === 'For Rent' && <span className="text-sm text-[var(--color-text-muted)]">/mo</span>}
+              {(property.status === 'For Rent' || property.listingType === 'rent') && <span className="text-sm text-[var(--color-text-muted)]">/mo</span>}
             </p>
             {(property as any).projectDetails?.launchDate && (
               <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">

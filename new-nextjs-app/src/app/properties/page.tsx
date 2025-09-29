@@ -105,19 +105,19 @@ function generatePropertiesListingStructuredData(properties: any[]) {
       "position": index + 1,
       "item": {
         "@type": "RealEstateListing",
-        "name": property.title || `${property.bedrooms} BR ${property.propertyType} in ${property.address?.city}`,
+        "name": property.title || `${property.bedrooms} BR ${property.type || property.propertyType} in ${property.address?.city}`,
         "url": `${baseUrl}/properties/${property._id}`,
         "image": property.images?.[0] || `${baseUrl}/default-property-image.jpg`,
         "priceSpecification": {
           "@type": "PriceSpecification",
           "price": property.price || 0,
-          "priceCurrency": "USD"
+          "priceCurrency": "INR"
         },
         "address": {
           "@type": "PostalAddress",
           "addressLocality": property.address?.city || "",
           "addressRegion": property.address?.state || "",
-          "addressCountry": "US"
+          "addressCountry": "IN"
         },
         "floorSize": {
           "@type": "QuantitativeValue",
