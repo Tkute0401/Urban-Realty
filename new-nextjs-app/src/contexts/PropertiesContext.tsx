@@ -13,6 +13,8 @@ interface Property {
   bedrooms?: number;
   bathrooms?: number;
   type?: 'apartment' | 'villa' | 'land' | 'commercial' | 'house';
+  propertyType?: string;
+  listingType?: 'sale' | 'rent';
   status?: 'For Sale' | 'For Rent' | 'Sold' | 'Rented';
   address?: {
     street?: string;
