@@ -8,6 +8,8 @@ import { getApiBaseUrl } from '@/lib/services/api.config';
 import PropertyInteractiveWrapper from './PropertyInteractiveWrapper';
 
 // Server-side data fetching function - Railway optimized
+// This function is kept for server-side rendering and SEO purposes
+// The actual data fetching will be handled by the PropertiesContext on the client side
 async function getProperty(id: string) {
   try {
     const baseUrl = getApiBaseUrl();

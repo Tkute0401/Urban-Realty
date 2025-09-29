@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { debounce } from 'lodash';
 import searchAnalytics from './SearchAnalytics';
+import { searchSuggestionsService, SearchSuggestion } from '@/lib/services/searchSuggestions';
 
 const EnhancedSearch = ({ 
   value, 
@@ -98,57 +99,24 @@ const EnhancedSearch = ({
 
       setLoading(true);
       try {
-        const response = await fetch(`/api/v1/properties/search-suggestions?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
+        const suggestions = await searchSuggestionsService.getSuggestions(query);
         
-        if (data.success) {
-          const allSuggestions = [];
-          
-          // Add cities with location icon
-          data.data.cities.forEach(city => {
-            allSuggestions.push({
-              text: city,
-              type: 'city',
-              icon: <LocationIcon color="primary" />,
-              category: 'Cities'
-            });
-          });
-          
-          // Add states with location icon
-          data.data.states.forEach(state => {
-            allSuggestions.push({
-              text: state,
-              type: 'state',
-              icon: <LocationIcon color="primary" />,
-              category: 'States'
-            });
-          });
-          
-          // Add property types with home icon
-          data.data.propertyTypes.forEach(type => {
-            allSuggestions.push({
-              text: type,
-              type: 'propertyType',
-              icon: <HomeIcon color="primary" />,
-              category: 'Property Types'
-            });
-          });
-          
-          // Add amenities with star icon
-          data.data.amenities.forEach(amenity => {
-            allSuggestions.push({
-              text: amenity,
-              type: 'amenity',
-              icon: <StarIcon color="primary" />,
-              category: 'Amenities'
-            });
-          });
-          
-          setSuggestions(allSuggestions);
-          setShowDropdown(true);
-        }
+        // Add icons to suggestions
+        const suggestionsWithIcons = suggestions.map(suggestion => ({
+          ...suggestion,
+          icon: suggestion.type === 'city' || suggestion.type === 'state' 
+            ? <LocationIcon color="primary" />
+            : suggestion.type === 'property' || suggestion.type === 'propertyType'
+            ? <HomeIcon color="primary" />
+            : <StarIcon color="primary" />
+        }));
+        
+        setSuggestions(suggestionsWithIcons);
+        setShowDropdown(true);
       } catch (error) {
         console.error('Error fetching suggestions:', error);
+        setSuggestions([]);
+        setShowDropdown(false);
       } finally {
         setLoading(false);
       }

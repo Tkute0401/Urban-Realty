@@ -6,6 +6,7 @@ import {
   Search as SearchIcon,
   FilterAlt as FilterIcon
 } from '@mui/icons-material';
+import { useProperties } from '@/contexts/PropertiesContext';
 import styles from './Properties.module.css';
 
 // Import the components
@@ -41,13 +42,12 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
   initialSearchParams 
 }) => {
   const router = useRouter();
+  const { properties, loading, getProperties, setProperties } = useProperties();
   const [searchTerm, setSearchTerm] = useState((initialSearchParams.location as string) || '');
   const [activeBtn, setActiveBtn] = useState((initialSearchParams.type as string)?.toUpperCase() || 'BUY');
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [isLoaded, setIsLoaded] = useState(false);
-  const [properties, setProperties] = useState<any[]>(initialProperties);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>(initialProperties as Property[]);
-  const [loading, setLoading] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
@@ -61,6 +61,11 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     window.scrollTo(0, 0);
     setIsLoaded(true);
     
+    // Initialize properties from context or use initial properties
+    if (properties.length === 0 && initialProperties.length > 0) {
+      setProperties(initialProperties);
+    }
+    
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -68,7 +73,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [properties.length, initialProperties, setProperties]);
 
   // Filter properties whenever filters, search term, or activeBtn change
   useEffect(() => {
