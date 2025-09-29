@@ -1,1 +1,0 @@
-npm run -s test --prefix client || echo 'Tests skipped (no tests configured)'

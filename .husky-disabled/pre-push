@@ -1,0 +1,3 @@
+# Precommit tests disabled
+# npm run -s test --prefix client || echo 'Tests skipped (no tests configured)'
+echo "Pre-push tests disabled - skipping all tests"

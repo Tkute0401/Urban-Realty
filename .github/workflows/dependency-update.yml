@@ -48,10 +48,13 @@ jobs:
           cd client && npm audit --audit-level=moderate
           cd ../server && npm audit --audit-level=moderate
 
-      - name: Run tests
-        run: |
-          cd client && npm test -- --watchAll=false
-          cd ../server && npm test || echo "No server tests"
+      # Tests disabled per user request
+      # - name: Run tests
+      #   run: |
+      #     cd client && npm test -- --watchAll=false
+      #     cd ../server && npm test || echo "No server tests"
+      - name: Skip tests (disabled)
+        run: echo "Tests disabled - skipping test execution"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
@@ -95,15 +98,18 @@ jobs:
           cd mobile
           flutter pub upgrade
 
-      - name: Run Flutter tests
-        run: |
-          cd mobile
-          flutter test
+      # Flutter tests disabled per user request
+      # - name: Run Flutter tests
+      #   run: |
+      #     cd mobile
+      #     flutter test
 
-      - name: Run Flutter analyze
-        run: |
-          cd mobile
-          flutter analyze
+      # - name: Run Flutter analyze
+      #   run: |
+      #     cd mobile
+      #     flutter analyze
+      - name: Skip Flutter tests (disabled)
+        run: echo "Flutter tests disabled - skipping test execution"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
