@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Box,
   Typography,
@@ -133,9 +134,9 @@ const AdminReports = () => {
         ...(dateRange === 'custom' && { startDate, endDate })
       };
 
-      const response = await http.get('/admin/reports', { params });
-      if (response.data.success) {
-        setReportData(response.data.data);
+      const response = await api.admin.reports(params);
+      if (response.success) {
+        setReportData(response.data);
       } else {
         setError('Failed to generate report');
       }
@@ -159,10 +160,7 @@ const AdminReports = () => {
         ...(dateRange === 'custom' && { startDate, endDate })
       };
 
-      const response = await http.get('/admin/reports/export', { 
-        params,
-        responseType: 'blob'
-      });
+      const response = await api.admin.exportReport(params);
 
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));

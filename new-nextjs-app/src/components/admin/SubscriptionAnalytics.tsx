@@ -1,4 +1,5 @@
 import React from 'react';
+import { api } from '@/lib/services/api';
 import {
   Card,
   CardContent,
@@ -43,16 +44,16 @@ const SubscriptionAnalytics = () => {
     queryKey: ['subscriptionAnalytics'],
     queryFn: async () => {
       try {
-        const response = await http.get('/admin/subscription-analytics');
+        const response = await api.admin.analytics();
         
-        if (response.data.success) {
-          return response.data.data;
+        if (response.success) {
+          return response.data;
         } else {
-          throw new Error(response.data.message || 'Failed to fetch subscription analytics');
+          throw new Error(response.message || 'Failed to fetch subscription analytics');
         }
       } catch (error) {
         console.error('Error fetching subscription analytics:', error);
-        throw new Error(error.response?.data?.message || 'Failed to load subscription analytics');
+        throw new Error(error.message || 'Failed to load subscription analytics');
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Table,
   TableBody,
@@ -55,7 +56,7 @@ const UsersTable = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await http.get('/admin/users');
+      const response = await api.admin.users();
       console.log('🔧 UsersTable - Response:', response.data);
       
       // Handle different response structures

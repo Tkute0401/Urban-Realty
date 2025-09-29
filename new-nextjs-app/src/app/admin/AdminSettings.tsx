@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Box,
   Typography,
@@ -142,9 +143,9 @@ const AdminSettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await http.get('/admin/settings');
-      if (response.data.success) {
-        setSettings(response.data.data);
+      const response = await api.admin.settings();
+      if (response.success) {
+        setSettings(response.data);
       } else {
         setError('Failed to fetch settings');
       }

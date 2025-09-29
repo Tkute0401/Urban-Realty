@@ -85,6 +85,12 @@ export const api = {
                 deleteUser: (userId: string) => unwrap<any>(http.delete(`/api/v1/admin/users/${userId}`)),
                 deleteProperty: (propertyId: string) => unwrap<any>(http.delete(`/api/v1/admin/properties/${propertyId}`)),
                 verifyAgent: (agentId: string) => unwrap<any>(http.put(`/api/v1/admin/agents/${agentId}/verify`, {})),
+                settings: () => unwrap<any>(http.get("/api/v1/admin/settings")),
+                updateSettings: (payload: any) => unwrap<any>(http.put("/api/v1/admin/settings", payload)),
+                reports: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/admin/reports", { params })),
+                exportReport: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/admin/reports/export", { params })),
+                agents: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/agents", { params })),
+                media: (params?: Record<string, any>) => unwrap<any[]>(http.get("/api/v1/admin/media", { params })),
         },
         agent: {
                 // Agent self-access endpoints (logged-in agent accessing their own data)

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import http from '@/lib/services/http';
+import { api } from '@/lib/services/api';
 
 // Types
 interface Agent {
@@ -37,7 +37,7 @@ export const AgentsProvider: React.FC<AgentsProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/admin/agents');
+      const response = await api.admin.agents();
       if (response.data.success) {
         setAgents(response.data.data || []);
       }

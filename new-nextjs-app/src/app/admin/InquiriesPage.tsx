@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Button, Container, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Chip } from '@mui/material';
 import { Mail, Phone, Check, Close } from '@mui/icons-material';
-import http from '@/lib/services/http';
+import { api } from '@/lib/services/api';
 import { formatDate } from '@/lib/utils/format';
 
 const InquiriesPage = () => {
@@ -14,7 +14,7 @@ const InquiriesPage = () => {
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
-        const response = await http.get('/admin/inquiries');
+        const response = await api.admin.contacts();
         setInquiries(response.data.data);
       } catch (err) {
         console.error('Error fetching inquiries:', err);

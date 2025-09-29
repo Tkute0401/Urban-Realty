@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Box,
   Typography,
@@ -54,9 +55,9 @@ const AdminProperties = () => {
   const fetchPropertyStats = async () => {
     setLoading(true);
     try {
-      const response = await http.get('/admin/properties/stats');
-      if (response.data.success) {
-        setStats(response.data.data);
+      const response = await api.admin.stats();
+      if (response.success) {
+        setStats(response.data);
       }
     } catch (err) {
       console.error('Error fetching property stats:', err);

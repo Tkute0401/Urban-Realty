@@ -1083,3 +1083,25 @@ exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
     next(new ErrorResponse('Failed to fetch subscription analytics', 500));
   }
 });
+
+// @desc    Get all media
+// @route   GET /api/v1/admin/media
+// @access  Private/Admin
+exports.getMedia = asyncHandler(async (req, res, next) => {
+  try {
+    const Media = require('../models/Media');
+    const media = await Media.find()
+      .populate('entity', 'title')
+      .populate('uploadedBy', 'name email')
+      .sort('-createdAt');
+
+    res.status(200).json({
+      success: true,
+      count: media.length,
+      data: media
+    });
+  } catch (err) {
+    console.error('Error fetching media:', err);
+    next(new ErrorResponse('Failed to fetch media', 500));
+  }
+});

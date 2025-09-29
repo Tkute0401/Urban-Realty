@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Table,
   TableBody,
@@ -46,7 +47,7 @@ const ContactsTable: React.FC<ContactsTableProps> = ({ filters }) => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await http.get('/admin/contacts');
+        const response = await api.admin.contacts();
         setContacts(response.data.data);
       } catch (err) {
         console.error('Error fetching contacts:', err);

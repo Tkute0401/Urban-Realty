@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Box,
   Typography,
@@ -93,9 +94,9 @@ const AdminMedia = () => {
 
   const fetchMedia = async () => {
     try {
-      const response = await http.get('/admin/media');
-      if (response.data.success) {
-        setMedia(response.data.data || []);
+      const response = await api.admin.media();
+      if (response.success) {
+        setMedia(response.data || []);
       } else {
         setError('Failed to fetch media');
       }

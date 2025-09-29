@@ -1,5 +1,6 @@
 // src/pages/admin/AgentsPage.jsx
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import { 
   Box, Typography, Paper, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Button, 
@@ -11,7 +12,6 @@ import {
   Edit, Delete, Search, Refresh, 
   Person, CheckCircle, Cancel, Email, Phone
 } from '@mui/icons-material';
-import http from '@/lib/services/http';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
 
@@ -29,7 +29,7 @@ const AgentsPage = () => {
       setLoading(true);
       setError(null);
       
-      const response = await http.get('/admin/users?role=agent');
+      const response = await api.admin.users({ role: 'agent' });
       setAgents(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load agents');
