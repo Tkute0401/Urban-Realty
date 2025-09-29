@@ -14,7 +14,7 @@ async function fetchDynamicUrls() {
     )
     
     // Fetch latest properties for sitemap with timeout
-    const propertiesPromise = fetch(`${apiUrl}/api/v1/properties?limit=50&sort=-createdAt`, {
+    const propertiesPromise = fetch(`${apiUrl}/properties?limit=50&sort=-createdAt`, {
       next: { revalidate: 86400 }, // Revalidate every 24 hours
     }).then(res => res.json())
     
