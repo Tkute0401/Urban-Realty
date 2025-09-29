@@ -6,7 +6,8 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-produc
 // Helper function to fetch dynamic URLs with timeout and fallback
 async function fetchDynamicUrls() {
   try {
-    const apiUrl = getApiBaseUrl()
+    // For server-side rendering, we need the full URL
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000'
     
     // Create a timeout promise
     const timeoutPromise = new Promise((_, reject) => 
@@ -14,12 +15,12 @@ async function fetchDynamicUrls() {
     )
     
     // Fetch latest properties for sitemap with timeout
-    const propertiesPromise = fetch(`${apiUrl}/properties?limit=50&sort=-createdAt`, {
+    const propertiesPromise = fetch(`${apiUrl}/api/v1/properties?limit=50&sort=-createdAt`, {
       next: { revalidate: 86400 }, // Revalidate every 24 hours
     }).then(res => res.json())
     
     // Fetch developers for sitemap with timeout
-    const developersPromise = fetch(`${apiUrl}/developers?limit=25&sort=-createdAt`, {
+    const developersPromise = fetch(`${apiUrl}/api/v1/developers?limit=25&sort=-createdAt`, {
       next: { revalidate: 86400 }, // Revalidate every 24 hours
     }).then(res => res.json())
     

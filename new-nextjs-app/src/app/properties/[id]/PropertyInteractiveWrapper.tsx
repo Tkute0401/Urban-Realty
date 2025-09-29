@@ -173,112 +173,56 @@ const PropertyInteractiveWrapper: React.FC<PropertyInteractiveWrapperProps> = ({
     setActiveSection(section);
   };
 
-  // Don't render interactive components until client-side
-  if (!isClient) {
-    return (
-      <Box sx={{ bgcolor: 'var(--color-bg)', color: 'var(--color-text)', minHeight: '100vh' }}>
-        {/* Property Images Gallery - Static, safe to render */}
-        <Box sx={{ mb: 2 }}>
-          <PropertyImageGallery images={Array.isArray(currentProperty.images) ? currentProperty.images : []} />
-        </Box>
-
-        <Container maxWidth="lg" sx={{ py: 2 }}>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={8}>
-              {/* Static components only during SSR */}
-              <PropertyOverview property={currentProperty} sectionRef={overviewRef} />
-              <PropertyHighlights property={currentProperty} sectionRef={highlightsRef} />
-              <PropertyNearby property={currentProperty} sectionRef={nearbyRef} />
-              <PropertyMoreInfo property={currentProperty} sectionRef={moreRef} />
-              <PropertyAmenities property={currentProperty} sectionRef={amenitiesRef} />
-              <PropertyDeveloper property={currentProperty} sectionRef={developerRef} />
-              
-              {/* Map - Static, safe to render */}
-              <Box sx={{ mb: 4 }}>
-                <Box 
-                  sx={{ 
-                    p: 3, 
-                    bgcolor: 'var(--color-surface)', 
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 2
-                  }}
-                >
-                  <PropertyMap location={currentProperty.location} address={currentProperty.address} />
-                </Box>
-              </Box>
-            </Grid>
-            
-            <Grid item xs={12} md={4}>
-              {/* Placeholder for sidebar during SSR */}
-              <Box 
-                sx={{ 
-                  height: 600, 
-                  bgcolor: 'var(--color-surface)',
-                  borderRadius: 2,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-    );
-  }
-
-  // Show loading state if context is loading
-  if (contextLoading) {
-    return (
-      <Box sx={{ bgcolor: 'var(--color-bg)', color: 'var(--color-text)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  // Client-side rendering with all interactive components
+  // Always render the same structure to prevent hydration mismatches
   return (
     <Box sx={{ bgcolor: 'var(--color-bg)', color: 'var(--color-text)', minHeight: '100vh' }}>
-      {/* Property Images Gallery */}
+      {/* Property Images Gallery - Static, safe to render */}
       <Box sx={{ mb: 2 }}>
         <PropertyImageGallery images={Array.isArray(currentProperty.images) ? currentProperty.images : []} />
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 2 }}>
-        {/* Property Header - Interactive */}
-        <Box sx={{ mb: 4 }}>
-          <PropertyHeader 
-            property={currentProperty}
-            isFavorite={isFavorite}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
-        </Box>
+        {/* Property Header - Only render on client side */}
+        {isClient && (
+          <Box sx={{ mb: 4 }}>
+            <PropertyHeader 
+              property={currentProperty}
+              isFavorite={isFavorite}
+              onFavoriteToggle={handleFavoriteToggle}
+            />
+          </Box>
+        )}
 
-        {/* Navigation - Interactive */}
-        <PropertyNavigation 
-          activeSection={activeSection}
-          onSectionChange={handleSectionChange}
-          sections={sections}
-          isSticky={!isMobile}
-        />
+        {/* Navigation - Only render on client side */}
+        {isClient && (
+          <PropertyNavigation 
+            activeSection={activeSection}
+            onSectionChange={handleSectionChange}
+            sections={sections}
+            isSticky={!isMobile}
+          />
+        )}
 
         <Grid container spacing={4}>
-          {/* Main Content */}
           <Grid item xs={12} md={8}>
-            {/* Static components */}
+            {/* Static components - safe to render on both server and client */}
             <PropertyOverview property={currentProperty} sectionRef={overviewRef} />
             <PropertyHighlights property={currentProperty} sectionRef={highlightsRef} />
             <PropertyNearby property={currentProperty} sectionRef={nearbyRef} />
             <PropertyMoreInfo property={currentProperty} sectionRef={moreRef} />
             
-            {/* Interactive components */}
-            <PropertyFloorPlan property={currentProperty} sectionRef={floorplanRef} />
+            {/* Floor Plans - Only render on client side */}
+            {isClient && (
+              <PropertyFloorPlan 
+                property={currentProperty} 
+                sectionRef={floorplanRef}
+              />
+            )}
+            
             <PropertyAmenities property={currentProperty} sectionRef={amenitiesRef} />
             <PropertyDeveloper property={currentProperty} sectionRef={developerRef} />
-
-            {/* Map */}
+            
+            {/* Map - Static, safe to render */}
             <Box sx={{ mb: 4 }}>
               <Box 
                 sx={{ 
@@ -292,13 +236,24 @@ const PropertyInteractiveWrapper: React.FC<PropertyInteractiveWrapperProps> = ({
               </Box>
             </Box>
 
-            {/* Similar Properties - Interactive */}
-            <PropertySimilar property={currentProperty} sectionRef={similarRef} />
+            {/* Similar Properties - Only render on client side */}
+            {isClient && (
+              <PropertySimilar 
+                property={currentProperty} 
+                sectionRef={similarRef}
+              />
+            )}
           </Grid>
-
-          {/* Sidebar - Interactive */}
+          
           <Grid item xs={12} md={4}>
-            <PropertySidebar property={currentProperty} />
+            {/* Sidebar - Only render on client side */}
+            {isClient ? (
+              <PropertySidebar property={currentProperty} />
+            ) : (
+              <Box sx={{ height: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CircularProgress />
+              </Box>
+            )}
           </Grid>
         </Grid>
       </Container>

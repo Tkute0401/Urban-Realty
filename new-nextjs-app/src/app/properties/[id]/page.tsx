@@ -12,8 +12,9 @@ import PropertyInteractiveWrapper from './PropertyInteractiveWrapper';
 // The actual data fetching will be handled by the PropertiesContext on the client side
 async function getProperty(id: string) {
   try {
-    const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}/properties/${id}`, {
+    // For server-side rendering, we need the full URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
+    const response = await fetch(`${baseUrl}/api/v1/properties/${id}`, {
       next: { 
         revalidate: 3600 // Revalidate every hour for ISR
       },
@@ -185,11 +186,12 @@ export async function generateStaticParams() {
 
   // Development or non-Railway production builds
   try {
-    const baseUrl = getApiBaseUrl();
+    // For server-side rendering, we need the full URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     
-    const response = await fetch(`${baseUrl}/properties/featured`, {
+    const response = await fetch(`${baseUrl}/api/v1/properties/featured`, {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
