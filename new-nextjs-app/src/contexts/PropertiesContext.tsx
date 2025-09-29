@@ -228,7 +228,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         return cache[id];
       }
   
-      const response = await http.get(`/api/v1/properties/${id}`);
+      const response = await http.get(`/properties/${id}`);
       const propertyData = response.data?.data ?? response.data;
       
       if (!propertyData) {
