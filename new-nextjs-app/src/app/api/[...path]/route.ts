@@ -1,8 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NODE_ENV === 'production' 
-  ? `${process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com'}/api/v1`
-  : 'http://localhost:3001/api/v1';
+// Build a safe backend base URL that never re-enters this Next.js catch-all route
+// Priority:
+// 1) NEXT_PUBLIC_API_URL or BACKEND_URL (should point directly to Express API service)
+// 2) Development fallback to localhost:5000 (Express default)
+function getBackendBaseUrl(): string {
+  const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
+
+  const fallbackDev = 'http://localhost:5000';
+
+  const base = explicitApiUrl || (process.env.NODE_ENV === 'production' ? explicitApiUrl : fallbackDev);
+
+  // Normalize and ensure we do NOT accidentally target this Next.js route again
+  // Strip any trailing slashes
+  const normalized = (base || '').replace(/\/$/, '');
+
+  // If someone mistakenly points to the same public origin (e.g. NEXT_PUBLIC_BASE_URL),
+  // do NOT append /api here, because that would recurse back into this handler.
+  return normalized;
+}
+
+// Ensure exactly one /api/v1 prefix is present when forwarding
+function joinApiV1(base: string, subpath: string): string {
+  const cleanedBase = base.replace(/\/$/, '');
+  let apiBase = cleanedBase;
+
+  // If the base already ends with /api or /api/v1, don't add another /api/v1
+  if (/\/api(\/v1)?$/i.test(cleanedBase)) {
+    apiBase = cleanedBase;
+  } else {
+    apiBase = `${cleanedBase}/api/v1`;
+  }
+
+  const cleanedSub = subpath.replace(/^\//, '');
+  return `${apiBase}/${cleanedSub}`;
+}
+
+const BACKEND_BASE = getBackendBaseUrl();
 
 // Mock data for fallback when backend is unavailable
 const mockData = {
@@ -233,7 +267,7 @@ function getMockUser(email?: string) {
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
   const searchParams = request.nextUrl.searchParams.toString();
-  const url = `${BACKEND_URL}/${path}${searchParams ? `?${searchParams}` : ''}`;
+  const url = `${joinApiV1(BACKEND_BASE, path)}${searchParams ? `?${searchParams}` : ''}`;
   
   try {
     const response = await fetch(url, {
@@ -306,7 +340,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
 export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
   const body = await request.json();
-  const url = `${BACKEND_URL}/${path}`;
+  const url = joinApiV1(BACKEND_BASE, path);
   
   try {
     const response = await fetch(url, {
@@ -368,7 +402,7 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
 export async function PUT(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
   const body = await request.json();
-  const url = `${BACKEND_URL}/${path}`;
+  const url = joinApiV1(BACKEND_BASE, path);
   
   try {
     const response = await fetch(url, {
@@ -390,7 +424,7 @@ export async function PUT(request: NextRequest, { params }: { params: { path: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
-  const url = `${BACKEND_URL}/${path}`;
+  const url = joinApiV1(BACKEND_BASE, path);
   
   try {
     const response = await fetch(url, {
