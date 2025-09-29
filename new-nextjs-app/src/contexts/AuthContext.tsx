@@ -64,10 +64,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const loadUser = useCallback(() => {
+  // Handle profile data loading without circular dependencies
+  useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 AuthContext - loadUser called');
+      console.log('🔧 AuthContext - loadUser effect triggered');
     }
+    
     const token = sessionManager.getToken();
     if (!token) {
       if (process.env.NODE_ENV === 'development') {
@@ -80,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (process.env.NODE_ENV === 'development') {
       console.log('🔧 AuthContext - Token found, checking profile data');
     }
+    
     if (profileQuery.data) {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔧 AuthContext - Profile data loaded successfully');
@@ -171,10 +174,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [profileQuery.data, profileQuery.isError, profileQuery.error]);
-
-  useEffect(() => {
-    loadUser();
-  }, [loadUser]);
 
   const login = useCallback(async (credentials: { email: string; password: string }) => {
     if (process.env.NODE_ENV === 'development') {

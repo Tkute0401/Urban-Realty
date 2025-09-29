@@ -25,6 +25,8 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
       queries: {
         retry: 1,
         refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,
       },
@@ -76,7 +78,9 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
 }
 
 export default function Providers({ children }: ProvidersProps) {
-  console.log('🔧 Providers component rendering...');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔧 Providers component rendering...');
+  }
   
   return (
     <ThemeProvider>
