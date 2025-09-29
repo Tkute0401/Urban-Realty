@@ -38,8 +38,8 @@ export const AgentsProvider: React.FC<AgentsProviderProps> = ({ children }) => {
       setLoading(true);
       setError(null);
       const response = await api.admin.agents();
-      if (response.data.success) {
-        setAgents(response.data.data || []);
+      if (response.success) {
+        setAgents(response.data || []);
       }
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Failed to load agents');

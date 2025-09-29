@@ -27,8 +27,8 @@ const InquiryDetails = () => {
       setError(null);
       
       const response = await http.get(`/admin/inquiries/${id}`);
-      setInquiry(response.data.data);
-      setStatus(response.data.data.status);
+      setInquiry(response.data);
+      setStatus(response.data.status);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load inquiry');
     } finally {

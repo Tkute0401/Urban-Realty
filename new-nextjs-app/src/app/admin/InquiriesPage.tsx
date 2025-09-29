@@ -15,7 +15,7 @@ const InquiriesPage = () => {
     const fetchInquiries = async () => {
       try {
         const response = await api.admin.contacts();
-        setInquiries(response.data.data);
+        setInquiries(response.data);
       } catch (err) {
         console.error('Error fetching inquiries:', err);
       } finally {

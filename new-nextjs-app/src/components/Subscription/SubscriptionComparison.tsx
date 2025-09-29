@@ -50,8 +50,8 @@ const SubscriptionComparison = () => {
       const response = await http.get('/api/v1/subscriptions');
       
       // Handle different response structures
-      if (response.data && response.data.success) {
-        const plansData = response.data.data || [];
+      if (response.success) {
+        const plansData = response.data || [];
         setPlans(plansData);
         
         // Log source of data for debugging

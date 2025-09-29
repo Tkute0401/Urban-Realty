@@ -198,7 +198,7 @@ const AdminReports = () => {
         ...params
       });
 
-      if (response.data.success) {
+      if (response.success) {
         setSuccess('Report sent successfully!');
         setEmailDialog(false);
         setEmailForm({ email: '', subject: '', message: '' });

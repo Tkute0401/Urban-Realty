@@ -62,8 +62,8 @@ const PropertiesTable = ({ filters }: PropertiesTableProps) => {
       try {
         const endpoint = user?.role === 'admin' ? '/admin/properties' : '/properties';
         const response = await http.get(endpoint);
-        if (response.data.success) {
-          setProperties(response.data.data || []);
+        if (response.success) {
+          setProperties(response.data || []);
         } else {
           setError('Failed to fetch properties');
         }

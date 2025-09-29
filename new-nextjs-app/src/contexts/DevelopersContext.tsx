@@ -87,7 +87,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
       setError(null);
       const response = await http.get('/api/v1/developers');
       console.log(response);
-      setDevelopers(response.data.data || response.data);
+      setDevelopers(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Failed to fetch developers');
       setDevelopers([]);
@@ -102,7 +102,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
       setError(null);
       const response = await http.get(`/developers/${id}`);
       console.log(response);
-      return response.data.data || response.data;
+      return response.data;
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Failed to fetch developer');
       throw err;

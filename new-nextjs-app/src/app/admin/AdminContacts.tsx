@@ -56,8 +56,8 @@ const AdminContacts = () => {
     setLoading(true);
     try {
       const response = await axios.get('/admin/contacts/stats');
-      if (response.data.success) {
-        setStats(response.data.data);
+      if (response.success) {
+        setStats(response.data);
       }
     } catch (err) {
       console.error('Error fetching contact stats:', err);

@@ -37,7 +37,7 @@ const AdminInquiries = () => {
       }
       
       const response = await http.get(url, { params });
-      setInquiries(response.data.data || response.data);
+      setInquiries(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load inquiries');
     } finally {

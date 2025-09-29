@@ -60,8 +60,8 @@ const UsersTable = () => {
       console.log('🔧 UsersTable - Response:', response.data);
       
       // Handle different response structures
-      if (response.data && response.data.success !== false) {
-        const userData = response.data.data || response.data || [];
+      if (response.success) {
+        const userData = response.data || [];
         setUsers(Array.isArray(userData) ? userData : []);
       } else {
         setError(response.data?.message || 'Failed to fetch users');
@@ -125,13 +125,13 @@ const UsersTable = () => {
         editFormData
       );
       
-      if (response.data.success) {
+      if (response.success) {
         setUsers(users.map(user => 
-          user._id === selectedUser._id ? response.data.data : user
+          user._id === selectedUser._id ? response.data : user
         ));
         setEditDialogOpen(false);
       } else {
-        setError(response.data.message || 'Failed to update user');
+        setError(response.message || 'Failed to update user');
       }
     } catch (err) {
       console.error('Error updating user:', err);
@@ -159,7 +159,7 @@ const UsersTable = () => {
     try {
       const response = await http.put(`/admin/agents/${selectedUser._id}/verify`);
       setUsers(users.map(user => 
-        user._id === selectedUser._id ? response.data.data : user
+        user._id === selectedUser._id ? response.data : user
       ));
     } catch (err) {
       console.error('Error verifying agent:', err);

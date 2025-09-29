@@ -104,8 +104,8 @@ const AdminAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       const response = await http.get('/api/v1/admin/analytics');
-      if (response.data.success) {
-        setAnalytics(response.data.data);
+      if (response.success) {
+        setAnalytics(response.data);
       } else {
         setError('Failed to fetch analytics data');
       }

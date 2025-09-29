@@ -146,7 +146,7 @@ const AdminMedia = () => {
         }
       });
 
-      if (response.data.success) {
+      if (response.success) {
         setSuccess('File uploaded successfully!');
         setUploadDialog(false);
         setSelectedFile(null);
@@ -182,7 +182,7 @@ const AdminMedia = () => {
         altText: editingMedia.altText
       });
 
-      if (response.data.success) {
+      if (response.success) {
         setSuccess('Media updated successfully!');
         setEditDialog(false);
         setEditingMedia(null);

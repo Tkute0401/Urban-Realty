@@ -73,7 +73,7 @@ const UserProfile = () => {
   const fetchSubscription = async () => {
     try {
       const response = await http.get('/api/v1/subscriptions/my-subscription');
-      setSubscription(response.data.data);
+      setSubscription(response.data);
     } catch (err) {
       if (err.response?.status !== 404) {
         setError('Failed to load subscription information');
