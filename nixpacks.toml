@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['nodejs-22.13.0', 'nodePackages.npm', 'nodePackages.pm2']
+nixPkgs = ['nodejs-22.13.0', 'nodePackages.npm']
 
 [phases.install]
 cmds = ['npm install', 'cd new-nextjs-app && npm install']
@@ -8,4 +8,4 @@ cmds = ['npm install', 'cd new-nextjs-app && npm install']
 cmds = ['cd new-nextjs-app && npm run build']
 
 [start]
-cmd = 'pm2-runtime start ecosystem.config.js --env production'
+cmd = 'node server.js'
