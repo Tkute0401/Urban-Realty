@@ -22,7 +22,7 @@ const MapTest = () => {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await http.get('/properties', { params: { limit: 1 } });
+        const res = await http.get('/api/v1/properties', { params: { limit: 1 } });
         const list = res?.data?.data || res?.data?.properties || res?.data || [];
         setTestProperty(list[0] || null);
       } catch (e) {

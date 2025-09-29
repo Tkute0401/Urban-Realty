@@ -47,7 +47,7 @@ const SubscriptionComparison = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/subscriptions');
+      const response = await http.get('/api/v1/subscriptions');
       
       // Handle different response structures
       if (response.data && response.data.success) {

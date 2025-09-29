@@ -141,7 +141,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
       console.log("Backend Params:=",backendParams);
-      const response = await http.get('/properties', { params: backendParams });
+      const response = await http.get('/api/v1/properties', { params: backendParams });
       console.log('🔧 PropertiesContext - Properties response:', response.data);
       
       // Handle different response structures
@@ -189,7 +189,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
       console.log('🔧 PropertiesContext - Fetching featured properties');
-      const response = await http.get('/properties/featured');
+      const response = await http.get('/api/v1/properties/featured');
       const data = response.data?.data ?? response.data;
       
       console.log('🔧 PropertiesContext - Featured properties response:', { 
@@ -286,7 +286,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
 
-      const response = await http.post('/properties', formDataToSend, finalConfig);
+      const response = await http.post('/api/v1/properties', formDataToSend, finalConfig);
       
       const newProperty = response.data?.data ?? response.data;
       setProperties(prev => [...prev, newProperty]);
@@ -347,7 +347,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       if (extras.brochure) formDataToSend.append('brochure', extras.brochure);
       if (extras.virtualTour) formDataToSend.append('virtualTour', extras.virtualTour);
 
-      const response = await http.post('/properties', formDataToSend, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const response = await http.post('/api/v1/properties', formDataToSend, { headers: { 'Content-Type': 'multipart/form-data' } });
       const newProperty = response.data?.data ?? response.data;
       setProperties(prev => [...prev, newProperty]);
       setCache({});
@@ -465,7 +465,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/developers');
+      const response = await http.get('/api/v1/developers');
       const data = response.data?.data ?? response.data;
       
       if (!Array.isArray(data)) {

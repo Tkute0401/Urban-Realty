@@ -30,7 +30,7 @@ export const searchSuggestionsService = {
     }
 
     try {
-      const response = await http.get('/properties/search-suggestions', {
+      const response = await http.get('/api/v1/properties/search-suggestions', {
         params: { query }
       });
       

@@ -50,9 +50,9 @@ const BillingDashboard = () => {
     try {
       setLoading(true);
       const [billingHistory, upcomingBilling, subscription] = await Promise.all([
-        http.get('/subscriptions/billing-history'),
-        http.get('/subscriptions/upcoming-billing'),
-        http.get('/subscriptions/my-subscription')
+        http.get('/api/v1/subscriptions/billing-history'),
+        http.get('/api/v1/subscriptions/upcoming-billing'),
+        http.get('/api/v1/subscriptions/my-subscription')
       ]);
       
       setBillingData({

@@ -85,7 +85,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/developers');
+      const response = await http.get('/api/v1/developers');
       console.log(response);
       setDevelopers(response.data.data || response.data);
     } catch (err: any) {

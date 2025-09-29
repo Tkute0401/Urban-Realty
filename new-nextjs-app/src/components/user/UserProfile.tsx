@@ -72,7 +72,7 @@ const UserProfile = () => {
 
   const fetchSubscription = async () => {
     try {
-      const response = await http.get('/subscriptions/my-subscription');
+      const response = await http.get('/api/v1/subscriptions/my-subscription');
       setSubscription(response.data.data);
     } catch (err) {
       if (err.response?.status !== 404) {
@@ -113,7 +113,7 @@ const UserProfile = () => {
   const handleCancelSubscription = async () => {
     if (window.confirm('Are you sure you want to cancel your subscription?')) {
       try {
-        await http.put('/subscriptions/cancel');
+        await http.put('/api/v1/subscriptions/cancel');
         fetchSubscription();
         // Refresh user data
         window.location.reload();
