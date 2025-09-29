@@ -165,7 +165,10 @@ app.get('/api/v1/health', (req, res) => {
     status: 'healthy',
     environment: config.env,
     uploadsPath: uploadsDir,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    nodeVersion: process.version,
+    memory: process.memoryUsage()
   });
 });
 
@@ -173,7 +176,29 @@ app.get('/api/v1/test', (req, res) => {
   res.status(HTTP_STATUS.OK).json({ 
     status: 'success',
     message: 'API is working',
-    environment: config.env
+    environment: config.env,
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
+// Debug endpoint to check environment variables
+app.get('/api/v1/debug', (req, res) => {
+  res.status(200).json({
+    status: 'debug',
+    environment: config.env,
+    database: {
+      connected: mongoose.connection.readyState === 1,
+      state: mongoose.connection.readyState,
+      name: mongoose.connection.name
+    },
+    envVars: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      MONGODB_URI: process.env.MONGODB_URI ? 'Set' : 'Not set',
+      JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set',
+      RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT || 'Not set'
+    },
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -188,8 +213,16 @@ async function startServer() {
     await nextApp.prepare();
     console.log('✅ Next.js app prepared');
 
-    // Handle all other routes with Next.js
-    app.get('*', (req, res) => {
+    // Handle all other routes with Next.js (but not API routes)
+    app.all('*', (req, res) => {
+      // Skip API routes - they should be handled by Express
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'API endpoint not found',
+          path: req.path 
+        });
+      }
       return nextHandler(req, res);
     });
 

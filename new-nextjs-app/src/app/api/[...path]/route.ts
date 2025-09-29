@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Build a safe backend base URL that never re-enters this Next.js catch-all route
-// Priority:
-// 1) NEXT_PUBLIC_API_URL or BACKEND_URL (should point directly to Express API service)
-// 2) Development fallback to localhost:5000 (Express default)
+// For unified server setup, we don't need to proxy to external backend
+// The Express server handles all API routes directly
 function getBackendBaseUrl(): string {
+  // In unified server setup, we should not proxy to external backend
+  // This proxy should only be used for development or if backend is separate
   const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
+  
+  // If no explicit API URL is set, we're in unified mode - return empty to indicate no proxy needed
+  if (!explicitApiUrl) {
+    return '';
+  }
 
   const fallbackDev = 'http://localhost:5000';
-
   const base = explicitApiUrl || (process.env.NODE_ENV === 'production' ? explicitApiUrl : fallbackDev);
-
-  // Normalize and ensure we do NOT accidentally target this Next.js route again
-  // Strip any trailing slashes
   const normalized = (base || '').replace(/\/$/, '');
-
-  // If someone mistakenly points to the same public origin (e.g. NEXT_PUBLIC_BASE_URL),
-  // do NOT append /api here, because that would recurse back into this handler.
+  
   return normalized;
 }
 
@@ -266,6 +265,18 @@ function getMockUser(email?: string) {
 
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
+  
+  // If no backend URL is configured, we're in unified mode
+  // The Express server should handle all API routes directly
+  if (!BACKEND_BASE) {
+    console.log('Unified server mode - API routes handled by Express server');
+    return NextResponse.json({ 
+      success: false,
+      error: 'API route not found',
+      message: 'This should be handled by the Express server in unified mode' 
+    }, { status: 404 });
+  }
+  
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${joinApiV1(BACKEND_BASE, path)}${searchParams ? `?${searchParams}` : ''}`;
   
@@ -339,6 +350,17 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
 
 export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
+  
+  // If no backend URL is configured, we're in unified mode
+  if (!BACKEND_BASE) {
+    console.log('Unified server mode - API routes handled by Express server');
+    return NextResponse.json({ 
+      success: false,
+      error: 'API route not found',
+      message: 'This should be handled by the Express server in unified mode' 
+    }, { status: 404 });
+  }
+  
   const body = await request.json();
   const url = joinApiV1(BACKEND_BASE, path);
   
@@ -401,6 +423,17 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
 
 export async function PUT(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
+  
+  // If no backend URL is configured, we're in unified mode
+  if (!BACKEND_BASE) {
+    console.log('Unified server mode - API routes handled by Express server');
+    return NextResponse.json({ 
+      success: false,
+      error: 'API route not found',
+      message: 'This should be handled by the Express server in unified mode' 
+    }, { status: 404 });
+  }
+  
   const body = await request.json();
   const url = joinApiV1(BACKEND_BASE, path);
   
@@ -424,6 +457,17 @@ export async function PUT(request: NextRequest, { params }: { params: { path: st
 
 export async function DELETE(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
+  
+  // If no backend URL is configured, we're in unified mode
+  if (!BACKEND_BASE) {
+    console.log('Unified server mode - API routes handled by Express server');
+    return NextResponse.json({ 
+      success: false,
+      error: 'API route not found',
+      message: 'This should be handled by the Express server in unified mode' 
+    }, { status: 404 });
+  }
+  
   const url = joinApiV1(BACKEND_BASE, path);
   
   try {

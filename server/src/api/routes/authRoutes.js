@@ -23,7 +23,30 @@ router.post(
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Password is required').exists()
   ],
-  authController.login
+  (req, res, next) => {
+    try {
+      console.log('🔐 Login route hit');
+      console.log('🔧 Request body:', { email: req.body.email, hasPassword: !!req.body.password });
+      
+      // Check if authController.login exists
+      if (typeof authController.login !== 'function') {
+        console.error('❌ authController.login is not a function');
+        return res.status(500).json({
+          success: false,
+          error: 'Auth controller method not available'
+        });
+      }
+      
+      authController.login(req, res, next);
+    } catch (error) {
+      console.error('❌ Error in login route handler:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error in login route',
+        message: error.message
+      });
+    }
+  }
 );
 
 router.get('/me', protect, authController.getMe);

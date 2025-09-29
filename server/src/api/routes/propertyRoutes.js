@@ -127,16 +127,35 @@ router.put(
 // @route   GET /api/v1/properties/:id
 // @access  Public
 router.get('/:id', (req, res, next) => {
-  console.log('🏠 Property route hit:', req.params.id);
-  console.log('🔧 Request details:', {
-    method: req.method,
-    url: req.url,
-    params: req.params,
-    query: req.query,
-    headers: req.headers
-  });
-  console.log('🔧 Route handler called');
-  propertyController.getProperty(req, res, next);
+  try {
+    console.log('🏠 Property route hit:', req.params.id);
+    console.log('🔧 Request details:', {
+      method: req.method,
+      url: req.url,
+      params: req.params,
+      query: req.query,
+      headers: req.headers
+    });
+    console.log('🔧 Route handler called');
+    
+    // Check if propertyController.getProperty exists
+    if (typeof propertyController.getProperty !== 'function') {
+      console.error('❌ propertyController.getProperty is not a function');
+      return res.status(500).json({
+        success: false,
+        error: 'Property controller method not available'
+      });
+    }
+    
+    propertyController.getProperty(req, res, next);
+  } catch (error) {
+    console.error('❌ Error in property route handler:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error in property route',
+      message: error.message
+    });
+  }
 });
 
 

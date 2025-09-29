@@ -16,15 +16,8 @@ export const isProductionBuild = () => {
 
 // Get API base URL with Railway optimization
 export const getApiBaseUrl = (): string => {
-  // Client-side runtime - use relative paths
-  if (typeof window !== 'undefined') {
-    return '/api/v1';
-  }
-
-  // Server-side runtime - use full URL for SSR
-  return process.env.NEXT_PUBLIC_API_URL || 
-         process.env.API_URL || 
-         'https://urban-realty-production.up.railway.app/api/v1';
+  // Always use relative paths for unified server setup
+  return '/api/v1';
 };
 
 // Enhanced fetch configuration for Railway
