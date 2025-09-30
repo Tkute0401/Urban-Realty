@@ -1,11 +1,15 @@
 import { motion } from "framer-motion";
 import { PhoneIcon, EnvelopeIcon, MapPinIcon, ClockIcon } from "@heroicons/react/24/outline";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ThemeContext } from '@/contexts/ThemeProvider';
+import { createThemeColors } from '@/lib/theme/colors';
 
 const ContactUs = () => {
+  const { theme } = useContext(ThemeContext);
+  const colors = createThemeColors(theme as 'light' | 'dark');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -36,7 +40,13 @@ const ContactUs = () => {
   };
 
   return (
-    <section className="bg-[color:var(--color-surface)] min-h-screen text-white">
+    <section 
+      className="min-h-screen"
+      style={{ 
+        backgroundColor: colors.bg.primary, 
+        color: colors.text.primary 
+      }}
+    >
       {/* Header Section */}
       <div className="relative h-96 overflow-hidden">
         <div className="absolute inset-0 bg-black/40 z-10 flex items-center justify-center">
@@ -47,9 +57,12 @@ const ContactUs = () => {
             className="text-center px-4"
           >
             <h1 className="font-poppins text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
-              Get In <span className="text-[var(--color-primary)]">Touch</span>
+              Get In <span style={{ color: colors.primary.main }}>Touch</span>
             </h1>
-            <p className="text-gray-300 max-w-2xl mx-auto text-lg">
+            <p 
+              className="max-w-2xl mx-auto text-lg"
+              style={{ color: colors.text.secondary }}
+            >
               We&apos;re here to help you with all your real estate needs. Reach out to our team for personalized assistance.
             </p>
           </motion.div>
@@ -65,48 +78,69 @@ const ContactUs = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         <motion.div
           whileHover={{ y: -10 }}
-          className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
+          className="p-8 rounded-xl border transition-all hover:border-opacity-50"
+          style={{ 
+            backgroundColor: colors.bg.secondary,
+            borderColor: `${colors.primary.main}33`
+          }}
         >
-          <div className="bg-[color:var(--color-primary)] w-14 h-14 rounded-full flex items-center justify-center mb-6">
-            <PhoneIcon className="w-6 h-6 text-[var(--color-bg-dark)]" />
+          <div 
+            className="w-14 h-14 rounded-full flex items-center justify-center mb-6"
+            style={{ backgroundColor: colors.primary.main }}
+          >
+            <PhoneIcon className="w-6 h-6" style={{ color: colors.primary.contrast }} />
           </div>
-          <h3 className="font-poppins text-xl font-bold mb-3">Phone</h3>
-          <p className="text-gray-400 mb-2">Main Office</p>
-          <p className="text-lg">+91 9689772874</p>
-          <p className="text-gray-400 mt-4 mb-2">Sales Department</p>
-          <p className="text-lg">+91 9689772863</p>
+          <h3 className="font-poppins text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Phone</h3>
+          <p className="mb-2" style={{ color: colors.text.muted }}>Main Office</p>
+          <p className="text-lg" style={{ color: colors.text.primary }}>+91 9689772874</p>
+          <p className="mt-4 mb-2" style={{ color: colors.text.muted }}>Sales Department</p>
+          <p className="text-lg" style={{ color: colors.text.primary }}>+91 9689772863</p>
         </motion.div>
 
         <motion.div
           whileHover={{ y: -10 }}
-          className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
+          className="p-8 rounded-xl border transition-all hover:border-opacity-50"
+          style={{ 
+            backgroundColor: colors.bg.secondary,
+            borderColor: `${colors.primary.main}33`
+          }}
         >
-          <div className="bg-[color:var(--color-primary)] w-14 h-14 rounded-full flex items-center justify-center mb-6">
-            <EnvelopeIcon className="w-6 h-6 text-[var(--color-bg-dark)]" />
+          <div 
+            className="w-14 h-14 rounded-full flex items-center justify-center mb-6"
+            style={{ backgroundColor: colors.primary.main }}
+          >
+            <EnvelopeIcon className="w-6 h-6" style={{ color: colors.primary.contrast }} />
           </div>
-          <h3 className="font-poppins text-xl font-bold mb-3">Email</h3>
-          <p className="text-gray-400 mb-2">General Inquiries</p>
-          <p className="text-lg">info@urbanrealty360.com</p>
-          <p className="text-gray-400 mt-4 mb-2">Support</p>
-          <p className="text-lg">support@urbanrealty360.com</p>
+          <h3 className="font-poppins text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Email</h3>
+          <p className="mb-2" style={{ color: colors.text.muted }}>General Inquiries</p>
+          <p className="text-lg" style={{ color: colors.text.primary }}>info@urbanrealty360.com</p>
+          <p className="mt-4 mb-2" style={{ color: colors.text.muted }}>Support</p>
+          <p className="text-lg" style={{ color: colors.text.primary }}>support@urbanrealty360.com</p>
         </motion.div>
 
         <motion.div
           whileHover={{ y: -10 }}
-          className="bg-[color:var(--color-surface-elevated)] p-8 rounded-xl border border-[color:var(--color-primary)]/20 hover:border-[color:var(--color-primary)]/50 transition-all"
+          className="p-8 rounded-xl border transition-all hover:border-opacity-50"
+          style={{ 
+            backgroundColor: colors.bg.secondary,
+            borderColor: `${colors.primary.main}33`
+          }}
         >
-          <div className="bg-[color:var(--color-primary)] w-14 h-14 rounded-full flex items-center justify-center mb-6">
-            <MapPinIcon className="w-6 h-6 text-[var(--color-bg-dark)]" />
+          <div 
+            className="w-14 h-14 rounded-full flex items-center justify-center mb-6"
+            style={{ backgroundColor: colors.primary.main }}
+          >
+            <MapPinIcon className="w-6 h-6" style={{ color: colors.primary.contrast }} />
           </div>
-          <h3 className="font-poppins text-xl font-bold mb-3">Office</h3>
-          <p className="text-lg mb-6">Anupama Apt., Pandit Colony, <br/>
+          <h3 className="font-poppins text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Office</h3>
+          <p className="text-lg mb-6" style={{ color: colors.text.primary }}>Anupama Apt., Pandit Colony, <br/>
           Gangapur Road,<br/>
           Nashik, Maharashtra 422002, IN</p>
-          <h3 className="font-poppins text-xl font-bold mb-3 flex items-center gap-2">
+          <h3 className="font-poppins text-xl font-bold mb-3 flex items-center gap-2" style={{ color: colors.text.primary }}>
             <ClockIcon className="w-5 h-5" /> Hours
           </h3>
-          <p className="text-gray-400">Monday - Friday: 9am - 6pm</p>
-          <p className="text-gray-400">Saturday: 10am - 4pm</p>
+          <p style={{ color: colors.text.muted }}>Monday - Friday: 9am - 6pm</p>
+          <p style={{ color: colors.text.muted }}>Saturday: 10am - 4pm</p>
         </motion.div>
       </div>
 
@@ -116,38 +150,76 @@ const ContactUs = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="bg-[color:var(--color-surface-elevated)] p-8 sm:p-12 rounded-xl border border-[color:var(--color-primary)]/20"
+          className="p-8 sm:p-12 rounded-xl border"
+          style={{ 
+            backgroundColor: colors.bg.secondary,
+            borderColor: `${colors.primary.main}33`
+          }}
         >
-          <h2 className="font-poppins text-3xl font-bold mb-2">Send Us a Message</h2>
-          <p className="text-gray-400 mb-8">We typically respond within 24 hours</p>
+          <h2 className="font-poppins text-3xl font-bold mb-2" style={{ color: colors.text.primary }}>Send Us a Message</h2>
+          <p className="mb-8" style={{ color: colors.text.muted }}>We typically respond within 24 hours</p>
           
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+              <label 
+                htmlFor="name" 
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.secondary }}
+              >
+                Full Name
+              </label>
               <input
                 type="text"
                 id="name"
                 {...register("name")}
-                className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
+                className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all"
+                style={{ 
+                  backgroundColor: colors.bg.primary,
+                  borderColor: `${colors.primary.main}50`,
+                  color: colors.text.primary
+                }}
                 placeholder="Your name"
                 aria-invalid={!!errors.name}
               />
               {errors.name && (
-                <p className="text-red-400 text-sm mt-2" role="alert">{errors.name.message}</p>
+                <p 
+                  className="text-sm mt-2" 
+                  role="alert"
+                  style={{ color: colors.semantic.error }}
+                >
+                  {errors.name.message}
+                </p>
               )}
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+              <label 
+                htmlFor="email" 
+                className="block text-sm font-medium mb-2"
+                style={{ color: colors.text.secondary }}
+              >
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
                 {...register("email")}
-                className="w-full bg-[color:var(--color-surface)] border border-[color:var(--color-primary)]/30 rounded-lg px-4 py-3 focus:border-[color:var(--color-primary)] focus:ring-1 focus:ring-[color:var(--color-primary)] outline-none transition-all"
+                className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all"
+                style={{ 
+                  backgroundColor: colors.bg.primary,
+                  borderColor: `${colors.primary.main}50`,
+                  color: colors.text.primary
+                }}
                 placeholder="your.email@example.com"
                 aria-invalid={!!errors.email}
               />
               {errors.email && (
-                <p className="text-red-400 text-sm mt-2" role="alert">{errors.email.message}</p>
+                <p 
+                  className="text-sm mt-2" 
+                  role="alert"
+                  style={{ color: colors.semantic.error }}
+                >
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div className="md:col-span-2">
@@ -182,7 +254,11 @@ const ContactUs = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:opacity-60 disabled:cursor-not-allowed text-[var(--color-bg-dark)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+                className="font-bold py-3 px-8 rounded-lg transition-colors shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ 
+                  backgroundColor: colors.primary.main,
+                  color: colors.primary.contrast
+                }}
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
               </button>
@@ -193,10 +269,24 @@ const ContactUs = () => {
 
       {/* Map */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
-        <h2 className="font-poppins text-3xl font-bold mb-12 text-center">Our Location</h2>
-        <div className="h-96 w-full bg-[#0c2327] rounded-xl overflow-hidden border border-[#78cadc]/20">
+        <h2 
+          className="font-poppins text-3xl font-bold mb-12 text-center"
+          style={{ color: colors.text.primary }}
+        >
+          Our Location
+        </h2>
+        <div 
+          className="h-96 w-full rounded-xl overflow-hidden border"
+          style={{ 
+            backgroundColor: colors.bg.secondary,
+            borderColor: `${colors.primary.main}33`
+          }}
+        >
           {/* Replace with your actual map component or iframe */}
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div 
+            className="w-full h-full flex items-center justify-center"
+            style={{ color: colors.text.muted }}
+          >
             <p>Map integration would go here</p>
           </div>
         </div>

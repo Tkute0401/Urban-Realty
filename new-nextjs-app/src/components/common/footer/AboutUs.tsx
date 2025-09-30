@@ -1,9 +1,14 @@
 import { motion } from "framer-motion";
 import Link from 'next/link';
 import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon } from "@heroicons/react/24/outline";
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
+import { createThemeColors } from '@/lib/theme/colors';
 
 const AboutUs = () => {
+  const { theme } = useContext(ThemeContext);
+  const colors = createThemeColors(theme as 'light' | 'dark');
+  
   console.log('🔧 AboutUs component rendering...');
   
   useEffect(() => {
@@ -30,7 +35,12 @@ const AboutUs = () => {
   ];
 
   return (
-    <div className="bg-[#08171A] text-white">
+    <div 
+      style={{ 
+        backgroundColor: colors.bg.primary, 
+        color: colors.text.primary 
+      }}
+    >
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-black/50 z-10" />
@@ -42,9 +52,12 @@ const AboutUs = () => {
           className="relative z-20 text-center px-4"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-poppins">
-            Redefining <span className="text-[var(--color-primary)]">Real Estate</span>
+            Redefining <span style={{ color: colors.primary.main }}>Real Estate</span>
           </h1>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
+          <p 
+            className="text-lg sm:text-xl max-w-2xl mx-auto"
+            style={{ color: colors.text.secondary }}
+          >
             SQUAREFOOT combines cutting-edge technology with unparalleled market expertise to transform your property journey.
           </p>
         </motion.div>
@@ -61,12 +74,18 @@ const AboutUs = () => {
             className="lg:w-1/2"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-              Our <span className="text-[var(--color-primary)]">Story</span>
+              Our <span style={{ color: colors.primary.main }}>Story</span>
             </h2>
-            <p className="text-gray-300 mb-4">
+            <p 
+              className="mb-4"
+              style={{ color: colors.text.secondary }}
+            >
               Founded in 2015, SQUAREFOOT began as a boutique real estate firm with a vision to revolutionize property transactions through transparency and innovation.
             </p>
-            <p className="text-gray-300 mb-6">
+            <p 
+              className="mb-6"
+              style={{ color: colors.text.secondary }}
+            >
               Today, we&apos;re a market leader with a national presence, recognized for our client-first approach and data-driven solutions that simplify buying, selling, and renting properties.
             </p>
             <div className="relative">
@@ -84,10 +103,17 @@ const AboutUs = () => {
             className="lg:w-1/2 grid grid-cols-2 gap-6"
           >
             {stats.map((stat, index) => (
-              <div key={index} className="bg-[#0c2327] p-6 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all">
-                <div className="text-[var(--color-primary)] mb-3">{stat.icon}</div>
-                <h3 className="text-2xl font-bold mb-1">{stat.value}</h3>
-                <p className="text-gray-400 text-sm">{stat.label}</p>
+              <div 
+                key={index} 
+                className="p-6 rounded-xl border transition-all hover:border-opacity-50"
+                style={{ 
+                  backgroundColor: colors.bg.secondary,
+                  borderColor: `${colors.primary.main}33`
+                }}
+              >
+                <div className="mb-3" style={{ color: colors.primary.main }}>{stat.icon}</div>
+                <h3 className="text-2xl font-bold mb-1" style={{ color: colors.text.primary }}>{stat.value}</h3>
+                <p className="text-sm" style={{ color: colors.text.muted }}>{stat.label}</p>
               </div>
             ))}
           </motion.div>
@@ -95,7 +121,10 @@ const AboutUs = () => {
       </section>
 
       {/* Our Team */}
-      <section className="py-16 sm:py-24 bg-[#0c2327] px-4 sm:px-8">
+      <section 
+        className="py-16 sm:py-24 px-4 sm:px-8"
+        style={{ backgroundColor: colors.bg.secondary }}
+      >
         <div className="max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0 }}
@@ -105,9 +134,12 @@ const AboutUs = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-poppins">
-              Meet Our <span className="text-[var(--color-primary)]">Leadership</span>
+              Meet Our <span style={{ color: colors.primary.main }}>Leadership</span>
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p 
+              className="max-w-2xl mx-auto"
+              style={{ color: colors.text.muted }}
+            >
               The brilliant minds behind SQUAREFOOT&apos;s success, combining decades of experience with fresh perspectives.
             </p>
           </motion.div>
@@ -152,9 +184,12 @@ const AboutUs = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-poppins">
-            Our Core <span className="text-[var(--color-primary)]">Values</span>
+            Our Core <span style={{ color: colors.primary.main }}>Values</span>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p 
+            className="max-w-2xl mx-auto"
+            style={{ color: colors.text.muted }}
+          >
             The principles that guide every decision we make and every interaction we have.
           </p>
         </motion.div>
@@ -165,11 +200,15 @@ const AboutUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+            className="p-8 rounded-xl border transition-all hover:border-opacity-50"
+            style={{ 
+              backgroundColor: colors.bg.secondary,
+              borderColor: `${colors.primary.main}33`
+            }}
           >
-            <div className="text-[var(--color-primary)] text-4xl mb-4">01</div>
-            <h3 className="text-xl font-bold mb-3">Client-Centric Approach</h3>
-            <p className="text-gray-400">
+            <div className="text-4xl mb-4" style={{ color: colors.primary.main }}>01</div>
+            <h3 className="text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Client-Centric Approach</h3>
+            <p style={{ color: colors.text.muted }}>
               We prioritize your needs above all else, offering personalized solutions tailored to your unique property goals.
             </p>
           </motion.div>
@@ -179,11 +218,15 @@ const AboutUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+            className="p-8 rounded-xl border transition-all hover:border-opacity-50"
+            style={{ 
+              backgroundColor: colors.bg.secondary,
+              borderColor: `${colors.primary.main}33`
+            }}
           >
-            <div className="text-[var(--color-primary)] text-4xl mb-4">02</div>
-            <h3 className="text-xl font-bold mb-3">Market Intelligence</h3>
-            <p className="text-gray-400">
+            <div className="text-4xl mb-4" style={{ color: colors.primary.main }}>02</div>
+            <h3 className="text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Market Intelligence</h3>
+            <p style={{ color: colors.text.muted }}>
               Our proprietary analytics provide insights that give you a competitive edge in today&apos;s dynamic real estate market.
             </p>
           </motion.div>
@@ -193,11 +236,15 @@ const AboutUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             viewport={{ once: true }}
-            className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+            className="p-8 rounded-xl border transition-all hover:border-opacity-50"
+            style={{ 
+              backgroundColor: colors.bg.secondary,
+              borderColor: `${colors.primary.main}33`
+            }}
           >
-            <div className="text-[var(--color-primary)] text-4xl mb-4">03</div>
-            <h3 className="text-xl font-bold mb-3">Ethical Practices</h3>
-            <p className="text-gray-400">
+            <div className="text-4xl mb-4" style={{ color: colors.primary.main }}>03</div>
+            <h3 className="text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Ethical Practices</h3>
+            <p style={{ color: colors.text.muted }}>
               Transparency and integrity form the foundation of every transaction, ensuring trust at every step of your journey.
             </p>
           </motion.div>

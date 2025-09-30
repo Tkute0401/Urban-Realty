@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { TruckIcon, CubeIcon, ShieldCheckIcon, HomeIcon, ClockIcon } from '@heroicons/react/24/outline';
 import ComingSoonPopup from './ComingSoonPopup';
+import { ThemeContext } from '@/contexts/ThemeProvider';
+import { createThemeColors } from '@/lib/theme/colors';
 
 const PackersMovers = () => {
+  const { theme } = useContext(ThemeContext);
+  const colors = createThemeColors(theme as 'light' | 'dark');
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -13,22 +18,22 @@ const PackersMovers = () => {
   const [showPopup, setShowPopup] = useState(true);
   const services = [
     {
-      icon: <CubeIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <CubeIcon className="w-8 h-8" style={{ color: colors.primary.main }} />,
       title: "Professional Packing",
       description: "Expert packing using high-quality materials to ensure complete protection of your belongings"
     },
     {
-      icon: <TruckIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <TruckIcon className="w-8 h-8" style={{ color: colors.primary.main }} />,
       title: "Safe Transportation",
       description: "GPS-enabled vehicles with trained personnel for secure relocation"
     },
     {
-      icon: <HomeIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <HomeIcon className="w-8 h-8" style={{ color: colors.primary.main }} />,
       title: "Unpacking & Setup",
       description: "We unpack and arrange your items at your new location as per your preference"
     },
     {
-      icon: <ShieldCheckIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <ShieldCheckIcon className="w-8 h-8" style={{ color: colors.primary.main }} />,
       title: "Insurance Coverage",
       description: "All shipments come with basic insurance coverage (optional upgrades available)"
     }
@@ -74,7 +79,13 @@ const PackersMovers = () => {
   ];
 
   return (
-    <div className="bg-[#08171A] text-white min-h-screen">
+    <div 
+      className="min-h-screen"
+      style={{ 
+        backgroundColor: colors.bg.primary, 
+        color: colors.text.primary 
+      }}
+    >
       {/* Coming soon popup */}
       <ComingSoonPopup isOpen={showPopup} onClose={() => setShowPopup(false)} />
         
@@ -93,12 +104,15 @@ const PackersMovers = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex items-center justify-center mb-4">
-            <TruckIcon className="w-10 h-10 text-[#78cadc] mr-3" />
+            <TruckIcon className="w-10 h-10 mr-3" style={{ color: colors.primary.main }} />
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
-              Packers & <span className="text-[#78cadc]">Movers</span>
+              Packers & <span style={{ color: colors.primary.main }}>Movers</span>
             </h1>
           </div>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
+          <p 
+            className="text-lg sm:text-xl max-w-2xl mx-auto"
+            style={{ color: colors.text.secondary }}
+          >
             Stress-free relocation services with complete packing, moving, and unpacking solutions
           </p>
         </motion.div>
@@ -113,9 +127,12 @@ const PackersMovers = () => {
           className="mb-16 text-center"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-            Our Relocation <span className="text-[#78cadc]">Services</span>
+            Our Relocation <span style={{ color: colors.primary.main }}>Services</span>
           </h2>
-          <p className="text-gray-400 max-w-3xl mx-auto text-lg">
+          <p 
+            className="max-w-3xl mx-auto text-lg"
+            style={{ color: colors.text.muted }}
+          >
             Comprehensive moving solutions tailored to your specific needs
           </p>
         </motion.div>
@@ -128,11 +145,15 @@ const PackersMovers = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all h-full"
+              className="p-8 rounded-xl border transition-all h-full hover:border-opacity-50"
+              style={{ 
+                backgroundColor: colors.bg.secondary,
+                borderColor: `${colors.primary.main}33`
+              }}
             >
               <div className="mb-4">{service.icon}</div>
-              <h3 className="text-xl font-bold mb-3">{service.title}</h3>
-              <p className="text-gray-400">{service.description}</p>
+              <h3 className="text-xl font-bold mb-3" style={{ color: colors.text.primary }}>{service.title}</h3>
+              <p style={{ color: colors.text.muted }}>{service.description}</p>
             </motion.div>
           ))}
         </div>
@@ -140,7 +161,7 @@ const PackersMovers = () => {
         {/* How It Works */}
         <div className="mb-20">
           <h3 className="text-2xl font-bold mb-12 text-center font-poppins">
-            How It <span className="text-[#78cadc]">Works</span>
+            How It <span style={{ color: colors.primary.main }}>Works</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div
@@ -148,13 +169,20 @@ const PackersMovers = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 text-center"
+              className="p-8 rounded-xl border text-center"
+              style={{ 
+                backgroundColor: colors.bg.secondary,
+                borderColor: `${colors.primary.main}33`
+              }}
             >
-              <div className="bg-[#78cadc] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ClockIcon className="w-6 h-6 text-[#08171A]" />
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: colors.primary.main }}
+              >
+                <ClockIcon className="w-6 h-6" style={{ color: colors.primary.contrast }} />
               </div>
-              <h4 className="text-lg font-bold mb-2">Schedule Your Move</h4>
-              <p className="text-gray-400">
+              <h4 className="text-lg font-bold mb-2" style={{ color: colors.text.primary }}>Schedule Your Move</h4>
+              <p style={{ color: colors.text.muted }}>
                 Book online or call us to schedule your moving date
               </p>
             </motion.div>
@@ -163,13 +191,20 @@ const PackersMovers = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 text-center"
+              className="p-8 rounded-xl border text-center"
+              style={{ 
+                backgroundColor: colors.bg.secondary,
+                borderColor: `${colors.primary.main}33`
+              }}
             >
-              <div className="bg-[#78cadc] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CubeIcon className="w-6 h-6 text-[#08171A]" />
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: colors.primary.main }}
+              >
+                <CubeIcon className="w-6 h-6" style={{ color: colors.primary.contrast }} />
               </div>
-              <h4 className="text-lg font-bold mb-2">We Pack & Load</h4>
-              <p className="text-gray-400">
+              <h4 className="text-lg font-bold mb-2" style={{ color: colors.text.primary }}>We Pack & Load</h4>
+              <p style={{ color: colors.text.muted }}>
                 Our team carefully packs and loads your belongings
               </p>
             </motion.div>
@@ -178,13 +213,20 @@ const PackersMovers = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 text-center"
+              className="p-8 rounded-xl border text-center"
+              style={{ 
+                backgroundColor: colors.bg.secondary,
+                borderColor: `${colors.primary.main}33`
+              }}
             >
-              <div className="bg-[#78cadc] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-                <HomeIcon className="w-6 h-6 text-[#08171A]" />
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: colors.primary.main }}
+              >
+                <HomeIcon className="w-6 h-6" style={{ color: colors.primary.contrast }} />
               </div>
-              <h4 className="text-lg font-bold mb-2">Deliver & Unpack</h4>
-              <p className="text-gray-400">
+              <h4 className="text-lg font-bold mb-2" style={{ color: colors.text.primary }}>Deliver & Unpack</h4>
+              <p style={{ color: colors.text.muted }}>
                 We transport and unpack at your new location
               </p>
             </motion.div>
@@ -194,7 +236,7 @@ const PackersMovers = () => {
         {/* Pricing Plans */}
         <div className="mb-20">
           <h3 className="text-2xl font-bold mb-12 text-center font-poppins">
-            Pricing <span className="text-[#78cadc]">Plans</span>
+            Pricing <span style={{ color: colors.primary.main }}>Plans</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pricingPlans.map((plan, index) => (
@@ -204,25 +246,48 @@ const PackersMovers = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className={`bg-[#0c2327] rounded-xl overflow-hidden border ${plan.bestValue ? 'border-[#78cadc]' : 'border-[#78cadc]/20'}`}
+                className="rounded-xl overflow-hidden border"
+                style={{ 
+                  backgroundColor: colors.bg.secondary,
+                  borderColor: plan.bestValue ? colors.primary.main : `${colors.primary.main}33`
+                }}
               >
                 {plan.bestValue && (
-                  <div className="bg-[#78cadc] text-[#08171A] text-center py-2 font-bold">
+                  <div 
+                    className="text-center py-2 font-bold"
+                    style={{ 
+                      backgroundColor: colors.primary.main,
+                      color: colors.primary.contrast
+                    }}
+                  >
                     BEST VALUE
                   </div>
                 )}
                 <div className="p-8">
-                  <h4 className="text-xl font-bold mb-2 text-center">{plan.name}</h4>
-                  <p className="text-3xl font-bold text-[#78cadc] mb-6 text-center">{plan.price}</p>
+                  <h4 className="text-xl font-bold mb-2 text-center" style={{ color: colors.text.primary }}>{plan.name}</h4>
+                  <p className="text-3xl font-bold mb-6 text-center" style={{ color: colors.primary.main }}>{plan.price}</p>
                   <ul className="space-y-3">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start">
-                        <div className="w-1.5 h-1.5 mt-2 mr-2 bg-[#78cadc] rounded-full flex-shrink-0"></div>
-                        <span className="text-gray-300">{feature}</span>
+                        <div 
+                          className="w-1.5 h-1.5 mt-2 mr-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: colors.primary.main }}
+                        ></div>
+                        <span style={{ color: colors.text.secondary }}>{feature}</span>
                       </li>
                     ))}
                   </ul>
-                  <button className={`mt-6 w-full py-3 rounded-lg font-bold transition-colors ${plan.bestValue ? 'bg-[#78cadc] text-[#08171A] hover:bg-[#8DD9E5]' : 'bg-transparent border border-[#78cadc] text-[#78cadc] hover:bg-[#78cadc]/10'}`}>
+                  <button 
+                    className="mt-6 w-full py-3 rounded-lg font-bold transition-colors"
+                    style={plan.bestValue ? {
+                      backgroundColor: colors.primary.main,
+                      color: colors.primary.contrast
+                    } : {
+                      backgroundColor: 'transparent',
+                      border: `1px solid ${colors.primary.main}`,
+                      color: colors.primary.main
+                    }}
+                  >
                     Book Now
                   </button>
                 </div>
@@ -232,14 +297,26 @@ const PackersMovers = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-[#0c2327] p-8 sm:p-12 rounded-xl border border-[#78cadc]/20 text-center">
-          <h3 className="text-2xl sm:text-3xl font-bold mb-6">
+        <div 
+          className="p-8 sm:p-12 rounded-xl border text-center"
+          style={{ 
+            backgroundColor: colors.bg.secondary,
+            borderColor: `${colors.primary.main}33`
+          }}
+        >
+          <h3 className="text-2xl sm:text-3xl font-bold mb-6" style={{ color: colors.text.primary }}>
             Ready to Move?
           </h3>
-          <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: colors.text.muted }}>
             Get a free quote and let us handle your relocation with care
           </p>
-          <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+          <button 
+            className="font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+            style={{ 
+              backgroundColor: colors.primary.main,
+              color: colors.primary.contrast
+            }}
+          >
             Get Free Quote
           </button>
         </div>

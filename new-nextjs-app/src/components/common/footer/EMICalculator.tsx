@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useEffect } from "react";
 import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { ThemeContext } from '@/contexts/ThemeProvider';
+import { createThemeColors } from '@/lib/theme/colors';
 
 const EMICalculator = () => {
+  const { theme } = useContext(ThemeContext);
+  const colors = createThemeColors(theme as 'light' | 'dark');
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
@@ -484,41 +489,83 @@ const unitData = {
   const shouldBlurResults = !user && hasCalculatedWithChanges;
 
   return (
-    <div className="min-h-screen bg-[#08171A] p-4">
+    <div 
+      className="min-h-screen p-4"
+      style={{ backgroundColor: colors.bg.primary }}
+    >
       <div className="max-w-6xl mx-auto">
         {/* Login Prompt Modal */}
         {showLoginPrompt && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#0c2227] border border-[color:var(--color-primary)] rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold text-[var(--color-primary)] mb-4">Login Required</h3>
-              <p className="text-gray-300 mb-6">
+            <div 
+              className="border rounded-lg p-6 max-w-md w-full"
+              style={{ 
+                backgroundColor: colors.bg.secondary,
+                borderColor: colors.primary.main
+              }}
+            >
+              <h3 
+                className="text-xl font-bold mb-4"
+                style={{ color: colors.primary.main }}
+              >
+                Login Required
+              </h3>
+              <p 
+                className="mb-6"
+                style={{ color: colors.text.secondary }}
+              >
                 Please login to calculate EMI with your custom values and view detailed charts.
               </p>      
               
               <form onSubmit={handleLogin}>
                 <div className="mb-4">
-                  <label className="block text-gray-300 text-sm mb-2">Email</label>
+                  <label 
+                    className="block text-sm mb-2"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Email
+                  </label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 bg-[#08171A] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
+                    className="w-full p-3 rounded-md focus:outline-none"
+                    style={{ 
+                      backgroundColor: colors.bg.primary,
+                      borderColor: `${colors.primary.main}50`,
+                      color: colors.text.primary
+                    }}
                     required
                   />
                 </div>
                 <div className="mb-6">
-                  <label className="block text-gray-300 text-sm mb-2">Password</label>
+                  <label 
+                    className="block text-sm mb-2"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Password
+                  </label>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 bg-[#08171A] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
+                    className="w-full p-3 rounded-md focus:outline-none"
+                    style={{ 
+                      backgroundColor: colors.bg.primary,
+                      borderColor: `${colors.primary.main}50`,
+                      color: colors.text.primary
+                    }}
                     required
                   />
                 </div>
                 
                 {loginError && (
-                  <div className="text-red-400 text-sm mb-4">{loginError}</div>
+                  <div 
+                    className="text-sm mb-4"
+                    style={{ color: colors.semantic.error }}
+                  >
+                    {loginError}
+                  </div>
                 )}
 
                 <div className="flex justify-end space-x-3">
@@ -528,13 +575,22 @@ const unitData = {
                       setShowLoginPrompt(false);
                       setLoginError('');
                     }}
-                    className="px-4 py-2 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary)]/10"
+                    className="px-4 py-2 border rounded-lg"
+                    style={{ 
+                      borderColor: colors.primary.main,
+                      color: colors.primary.main,
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[color:var(--color-primary)] text-[#08171A] font-semibold rounded-lg hover:bg-[color:var(--color-primary)]/90"
+                    className="px-4 py-2 font-semibold rounded-lg"
+                    style={{ 
+                      backgroundColor: colors.primary.main,
+                      color: colors.primary.contrast
+                    }}
                   >
                     Login
                   </button>
@@ -542,11 +598,15 @@ const unitData = {
               </form>
 
               <div className="mt-4 text-center">
-                <p className="text-gray-400 text-sm">
+                <p 
+                  className="text-sm"
+                  style={{ color: colors.text.muted }}
+                >
                   Don&apos;t have an account?{' '}
                   <button 
                     onClick={() => router.push('/register')}
-                    className="text-[color:var(--color-primary)] hover:underline"
+                    className="hover:underline"
+                    style={{ color: colors.primary.main }}
                   >
                     Register
                   </button>
@@ -558,22 +618,46 @@ const unitData = {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Panel - Calculator (always visible) */}
-          <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
+          <div 
+            className="border rounded-lg p-6"
+            style={{ 
+              backgroundColor: colors.bg.secondary,
+              borderColor: colors.primary.main
+            }}
+          >
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-2">EMI Calculator</h2>
+              <h2 
+                className="text-2xl font-bold mb-2"
+                style={{ color: colors.primary.main }}
+              >
+                EMI Calculator
+              </h2>
             </div>
 
             {/* Loan Amount */}
             <div className="mb-6">
-              <label className="block text-gray-300 text-sm mb-2">Loan Amount</label>
+              <label 
+                className="block text-sm mb-2"
+                style={{ color: colors.text.secondary }}
+              >
+                Loan Amount
+              </label>
               <input
                 type="number"
                 value={loanAmount}
                 onChange={(e) => setLoanAmount(parseInt(e.target.value) || 0)}
-                className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
+                className="w-full p-3 rounded-md focus:outline-none"
+                style={{ 
+                  backgroundColor: colors.bg.primary,
+                  borderColor: `${colors.primary.main}50`,
+                  color: colors.text.primary
+                }}
                 placeholder="Enter loan amount"
               />
-              <div className="text-xs text-gray-400 mt-1 italic">
+              <div 
+                className="text-xs mt-1 italic"
+                style={{ color: colors.text.muted }}
+              >
                 {numberToWords(loanAmount)}
               </div>
             </div>
@@ -624,7 +708,11 @@ const unitData = {
             {/* Calculate Button */}
             <button 
               onClick={handleCalculate}
-              className="w-full bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/90 text-[#08171A] font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="w-full font-semibold py-3 px-6 rounded-lg transition-colors"
+              style={{ 
+                backgroundColor: colors.primary.main,
+                color: colors.primary.contrast
+              }}
             >
               Calculate EMI
             </button>

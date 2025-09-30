@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
 import { LightBulbIcon, SparklesIcon, UserGroupIcon, ChartBarIcon, ArrowPathIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
+import { ThemeContext } from '@/contexts/ThemeProvider';
+import { createThemeColors } from '@/lib/theme/colors';
 
 const HowWeWork = () => {
+  const { theme } = useContext(ThemeContext);
+  const colors = createThemeColors(theme as 'light' | 'dark');
 
   useEffect(() => {
       window.scrollTo(0, 0);
@@ -12,7 +16,7 @@ const HowWeWork = () => {
     {
       step: "01",
       title: "Discovery",
-      icon: <LightBulbIcon className="w-8 h-8 text-[var(--color-primary)]" />,
+      icon: <LightBulbIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       description: "We begin by deeply understanding your unique needs, preferences, and goals through comprehensive consultations and advanced matching algorithms.",
       features: [
         "Needs assessment questionnaire",
@@ -23,7 +27,7 @@ const HowWeWork = () => {
     {
       step: "02",
       title: "Curated Selection",
-      icon: <SparklesIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <SparklesIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       description: "Our proprietary technology filters thousands of listings to present only the most relevant options that match your criteria.",
       features: [
         "AI-powered property matching",
@@ -34,7 +38,7 @@ const HowWeWork = () => {
     {
       step: "03",
       title: "Expert Guidance",
-      icon: <UserGroupIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <UserGroupIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       description: "Your dedicated advisor provides insights, arranges viewings, and helps evaluate each property's potential.",
       features: [
         "Comparative market analysis",
@@ -45,7 +49,7 @@ const HowWeWork = () => {
     {
       step: "04",
       title: "Transaction Management",
-      icon: <ChartBarIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <ChartBarIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       description: "We handle all paperwork, coordinate with lenders and attorneys, and ensure compliance at every step.",
       features: [
         "Document management system",
@@ -56,7 +60,7 @@ const HowWeWork = () => {
     {
       step: "05",
       title: "Closing & Beyond",
-      icon: <ArrowPathIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <ArrowPathIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       description: "Our relationship continues after closing with move-in support, home services, and long-term investment monitoring.",
       features: [
         "Closing day coordination",
@@ -68,24 +72,30 @@ const HowWeWork = () => {
 
   const differentiators = [
     {
-      icon: <PuzzlePieceIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <PuzzlePieceIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       title: "Integrated Technology",
       description: "Our proprietary platform connects every stage of your real estate journey for seamless coordination"
     },
     {
-      icon: <UserGroupIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <UserGroupIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       title: "Dedicated Teams",
       description: "You get a cross-functional team including an agent, analyst, and transaction coordinator"
     },
     {
-      icon: <ChartBarIcon className="w-8 h-8 text-[#78cadc]" />,
+      icon: <ChartBarIcon className="w-8 h-8 style={{ color: colors.primary.main }}" />,
       title: "Data-Driven Insights",
       description: "We provide predictive analytics and market intelligence unavailable elsewhere"
     }
   ];
 
   return (
-    <div className="bg-[#08171A] text-white min-h-screen">
+    <div 
+      className="min-h-screen"
+      style={{ 
+        backgroundColor: colors.bg.primary, 
+        color: colors.text.primary 
+      }}
+    >
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/30 z-10" />
@@ -101,9 +111,12 @@ const HowWeWork = () => {
           className="relative z-20 text-center px-4"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-poppins">
-            How We <span className="text-[var(--color-primary)]">Work</span>
+            How We <span style={{ color: colors.primary.main }}>Work</span>
           </h1>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
+          <p 
+            className="text-lg sm:text-xl max-w-2xl mx-auto"
+            style={{ color: colors.text.secondary }}
+          >
             A transparent look at our client-focused process that delivers exceptional results
           </p>
         </motion.div>
@@ -118,7 +131,7 @@ const HowWeWork = () => {
           className="mb-16 text-center"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-            Our <span className="text-[var(--color-primary)]">Process</span>
+            Our <span className="style={{ color: colors.primary.main }}">Process</span>
           </h2>
           <p className="text-gray-400 max-w-4xl mx-auto text-lg">
             SQUAREFOOT has reimagined the real estate experience with a streamlined, technology-enhanced approach 
@@ -139,7 +152,7 @@ const HowWeWork = () => {
             >
               <div className="lg:w-1/4">
                 <div className="flex items-center">
-                  <span className="text-4xl font-bold text-[var(--color-primary)] mr-4">{step.step}</span>
+                  <span className="text-4xl font-bold style={{ color: colors.primary.main }} mr-4">{step.step}</span>
                   <div className="bg-[var(--color-primary)] p-3 rounded-lg">
                     {step.icon}
                   </div>
@@ -170,7 +183,7 @@ const HowWeWork = () => {
             className="mb-12 text-center"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-poppins">
-              What Makes Us <span className="text-[var(--color-primary)]">Different</span>
+              What Makes Us <span className="style={{ color: colors.primary.main }}">Different</span>
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -201,7 +214,7 @@ const HowWeWork = () => {
             <p className="mb-8 max-w-2xl mx-auto">
               Whether you&apos;re buying, selling, or investing, our proven process delivers better results with less stress.
             </p>
-            <button className="bg-[var(--color-bg-dark)] hover:bg-[#0c2327] text-[var(--color-primary)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+            <button className="bg-[var(--color-bg-dark)] hover:bg-[#0c2327] style={{ color: colors.primary.main }} font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
               Get Started Today
             </button>
           </div>
@@ -218,7 +231,7 @@ const HowWeWork = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-poppins">
-              Proven <span className="text-[#78cadc]">Results</span>
+              Proven <span className="style={{ color: colors.primary.main }}">Results</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Our approach consistently outperforms traditional methods
@@ -233,7 +246,7 @@ const HowWeWork = () => {
               viewport={{ once: true }}
               className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
             >
-              <div className="text-3xl font-bold text-[#78cadc] mb-2">32%</div>
+              <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">32%</div>
               <div className="text-gray-300">Faster Transactions</div>
             </motion.div>
             <motion.div
@@ -243,7 +256,7 @@ const HowWeWork = () => {
               viewport={{ once: true }}
               className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
             >
-              <div className="text-3xl font-bold text-[#78cadc] mb-2">98.7%</div>
+              <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">98.7%</div>
               <div className="text-gray-300">Client Satisfaction</div>
             </motion.div>
             <motion.div
@@ -253,7 +266,7 @@ const HowWeWork = () => {
               viewport={{ once: true }}
               className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
             >
-              <div className="text-3xl font-bold text-[#78cadc] mb-2">5.2%</div>
+              <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">5.2%</div>
               <div className="text-gray-300">Higher Sale Prices</div>
             </motion.div>
             <motion.div
@@ -263,7 +276,7 @@ const HowWeWork = () => {
               viewport={{ once: true }}
               className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
             >
-              <div className="text-3xl font-bold text-[#78cadc] mb-2">500+</div>
+              <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">500+</div>
               <div className="text-gray-300">Five-Star Reviews</div>
             </motion.div>
           </div>
