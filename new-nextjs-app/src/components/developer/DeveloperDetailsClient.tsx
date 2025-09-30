@@ -48,6 +48,20 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
   const router = useRouter();
   const { user } = useAuth();
   const { developers, getDevelopers } = useDevelopers();
+
+  // Fallback data if developer is null or undefined
+  const safeDeveloper = developer || {
+    name: 'Unknown Developer',
+    description: 'No description available',
+    completedProjects: 0,
+    ongoingProjects: 0,
+    upcomingProjects: 0,
+    headquarters: {
+      city: 'Unknown',
+      state: 'Unknown',
+      country: 'Unknown'
+    }
+  };
   
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -120,8 +134,8 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
   };
 
   const getHeadquarters = () => {
-    if (!developer || !developer.headquarters) return '';
-    const { city, state, country } = developer.headquarters;
+    if (!safeDeveloper || !safeDeveloper.headquarters) return '';
+    const { city, state, country } = safeDeveloper.headquarters;
     return [city, state, country].filter(Boolean).join(', ');
   };
 
@@ -146,10 +160,10 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
                 height: '100%',
                 border: '1px solid rgba(120, 202, 220, 0.3)'
               }}>
-                {developer.logo?.url ? (
+                {safeDeveloper.logo?.url ? (
                   <img 
-                    src={developer.logo.url} 
-                    alt={`${developer.name} logo`} 
+                    src={safeDeveloper.logo.url} 
+                    alt={`${safeDeveloper.name} logo`} 
                     className="w-100 h-auto"
                   />
                 ) : (
@@ -164,7 +178,7 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
                 mb: 2,
                 color: 'var(--color-primary)'
               }}>
-                {developer.name}
+                {safeDeveloper.name}
               </Typography>
               
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -174,20 +188,20 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
                 </Typography>
               </Box>
               
-              {developer.foundedYear && (
+              {safeDeveloper.foundedYear && (
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <CalendarToday sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
                   <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
-                    Established in {developer.foundedYear}
+                    Established in {safeDeveloper.foundedYear}
                   </Typography>
                 </Box>
               )}
               
-              {developer.website && (
+              {safeDeveloper.website && (
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Language sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
                   <Link 
-                    href={developer.website} 
+                    href={safeDeveloper.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     sx={{ color: 'var(--color-primary)' }}
@@ -200,9 +214,9 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Business sx={{ mr: 1, color: 'rgba(255, 255, 255, 0.7)' }} />
                 <Typography variant="body1" sx={{ color: 'var(--color-primary)' }}>
-                  {formatNumber(developer.completedProjects || 0)} Completed Projects •{' '}
-                  {formatNumber(developer.ongoingProjects || 0)} Ongoing •{' '}
-                  {formatNumber(developer.upcomingProjects || 0)} Upcoming
+                  {formatNumber(safeDeveloper.completedProjects || 0)} Completed Projects •{' '}
+                  {formatNumber(safeDeveloper.ongoingProjects || 0)} Ongoing •{' '}
+                  {formatNumber(safeDeveloper.upcomingProjects || 0)} Upcoming
                 </Typography>
               </Box>
               
@@ -292,16 +306,261 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
 
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ py: 6, pt: isSticky ? `${headerHeight + 100}px` : '40px' }}>
-        {/* Content sections would go here - rest of the original component content */}
-        <Typography variant="body1">Content sections to be added here</Typography>
+        {/* Overview Section */}
+        <Box ref={overviewRef} sx={{ mb: 6 }}>
+          <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
+            Overview
+          </Typography>
+          <Paper sx={{ p: 4, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(120, 202, 220, 0.3)' }}>
+            <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.8 }}>
+              {safeDeveloper.description || 'No description available for this developer.'}
+            </Typography>
+            
+            {safeDeveloper.flagshipProjects && safeDeveloper.flagshipProjects.length > 0 && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-primary)' }}>
+                  Flagship Projects
+                </Typography>
+                <Grid container spacing={2}>
+                  {safeDeveloper.flagshipProjects.map((project, index) => (
+                    <Grid item xs={12} md={6} key={index}>
+                      <Box sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 1 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                          {project.name}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          {project.description}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Projects Section */}
+        <Box ref={projectsRef} sx={{ mb: 6 }}>
+          <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
+            Projects
+          </Typography>
+          <Paper sx={{ p: 4, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(120, 202, 220, 0.3)' }}>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: 'center', p: 3 }}>
+                  <Typography variant="h3" sx={{ color: 'var(--color-primary)', fontWeight: 700 }}>
+                    {formatNumber(safeDeveloper.completedProjects || 0)}
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Completed Projects
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: 'center', p: 3 }}>
+                  <Typography variant="h3" sx={{ color: 'var(--color-primary)', fontWeight: 700 }}>
+                    {formatNumber(safeDeveloper.ongoingProjects || 0)}
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Ongoing Projects
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: 'center', p: 3 }}>
+                  <Typography variant="h3" sx={{ color: 'var(--color-primary)', fontWeight: 700 }}>
+                    {formatNumber(safeDeveloper.upcomingProjects || 0)}
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Upcoming Projects
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Box>
+
+        {/* Team Section */}
+        <Box ref={teamRef} sx={{ mb: 6 }}>
+          <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
+            Team
+          </Typography>
+          <Paper sx={{ p: 4, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(120, 202, 220, 0.3)' }}>
+            {safeDeveloper.team && safeDeveloper.team.length > 0 ? (
+              <Grid container spacing={3}>
+                {safeDeveloper.team.map((member, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Box sx={{ textAlign: 'center', p: 2 }}>
+                      <Avatar
+                        src={member.image?.url}
+                        sx={{ 
+                          width: 80, 
+                          height: 80, 
+                          mx: 'auto', 
+                          mb: 2,
+                          backgroundColor: 'var(--color-primary)'
+                        }}
+                      >
+                        <Groups />
+                      </Avatar>
+                      <Typography variant="h6" sx={{ mb: 1 }}>
+                        {member.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {member.designation}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center' }}>
+                No team information available.
+              </Typography>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Specializations Section */}
+        <Box ref={specializationsRef} sx={{ mb: 6 }}>
+          <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
+            Specializations
+          </Typography>
+          <Paper sx={{ p: 4, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(120, 202, 220, 0.3)' }}>
+            {safeDeveloper.specializations && safeDeveloper.specializations.length > 0 ? (
+              <Grid container spacing={2}>
+                {safeDeveloper.specializations.map((spec, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Box sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                        {spec.name}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {spec.description}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center' }}>
+                No specializations information available.
+              </Typography>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Contact Section */}
+        <Box ref={contactRef} sx={{ mb: 6 }}>
+          <Typography variant="h4" sx={{ mb: 3, color: 'var(--color-primary)' }}>
+            Contact Information
+          </Typography>
+          <Paper sx={{ p: 4, backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(120, 202, 220, 0.3)' }}>
+            <Grid container spacing={4}>
+              {safeDeveloper.contact?.email && (
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Email sx={{ mr: 2, color: 'var(--color-primary)' }} />
+                    <Typography variant="body1">
+                      {safeDeveloper.contact.email}
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
+              
+              {safeDeveloper.contact?.phone && (
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Phone sx={{ mr: 2, color: 'var(--color-primary)' }} />
+                    <Typography variant="body1">
+                      {safeDeveloper.contact.phone}
+                    </Typography>
+                  </Box>
+                </Grid>
+              )}
+              
+              {safeDeveloper.website && (
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Language sx={{ mr: 2, color: 'var(--color-primary)' }} />
+                    <Link 
+                      href={safeDeveloper.website} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      sx={{ color: 'var(--color-primary)' }}
+                    >
+                      Visit Website
+                    </Link>
+                  </Box>
+                </Grid>
+              )}
+            </Grid>
+
+            {/* Social Media Links */}
+            {safeDeveloper.socialMedia && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-primary)' }}>
+                  Follow Us
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {safeDeveloper.socialMedia.facebook && (
+                    <IconButton 
+                      component="a" 
+                      href={safeDeveloper.socialMedia.facebook} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      sx={{ color: 'var(--color-primary)' }}
+                    >
+                      <FacebookIcon />
+                    </IconButton>
+                  )}
+                  {safeDeveloper.socialMedia.twitter && (
+                    <IconButton 
+                      component="a" 
+                      href={safeDeveloper.socialMedia.twitter} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      sx={{ color: 'var(--color-primary)' }}
+                    >
+                      <XIcon />
+                    </IconButton>
+                  )}
+                  {safeDeveloper.socialMedia.linkedin && (
+                    <IconButton 
+                      component="a" 
+                      href={safeDeveloper.socialMedia.linkedin} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      sx={{ color: 'var(--color-primary)' }}
+                    >
+                      <LinkedInIcon />
+                    </IconButton>
+                  )}
+                  {safeDeveloper.socialMedia.instagram && (
+                    <IconButton 
+                      component="a" 
+                      href={safeDeveloper.socialMedia.instagram} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      sx={{ color: 'var(--color-primary)' }}
+                    >
+                      <InstagramIcon />
+                    </IconButton>
+                  )}
+                </Box>
+              </Box>
+            )}
+          </Paper>
+        </Box>
       </Container>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(true)}>
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete {developer.name}? This action cannot be undone.
+            Are you sure you want to delete {safeDeveloper.name}? This action cannot be undone.
           </Typography>
           {deleteError && (
             <Alert severity="error" sx={{ mt: 2 }}>
