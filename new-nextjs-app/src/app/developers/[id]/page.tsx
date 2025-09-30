@@ -8,7 +8,7 @@ import { getApiBaseUrl } from '@/lib/services/api.config';
 async function getDeveloper(id: string) {
   try {
     const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}/developers/${id}`, {
+    const response = await fetch(`${baseUrl}/api/v1/developers/${id}`, {
       next: { revalidate: 3600 }, // Revalidate every hour
       headers: {
         'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ export async function generateStaticParams() {
   // Development or non-Railway production builds
   try {
     const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}/developers`, {
+    const response = await fetch(`${baseUrl}/api/v1/developers`, {
       next: { revalidate: 3600 },
       headers: {
         'Content-Type': 'application/json',
