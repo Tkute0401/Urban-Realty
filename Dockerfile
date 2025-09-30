@@ -44,6 +44,12 @@ COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
 # Copy the app directory to the root for Next.js App Router
 COPY new-nextjs-app/src/app ./new-nextjs-app/app
 
+# Create symlinks for the contexts and components directories so imports work
+RUN cd /app/new-nextjs-app && \
+    ln -sf ../src/contexts ./contexts && \
+    ln -sf ../src/components ./components && \
+    ln -sf ../src/lib ./lib
+
 
 # Copy backend files
 COPY server ./server
