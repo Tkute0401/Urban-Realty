@@ -13,7 +13,9 @@ import PropertyInteractiveWrapper from './PropertyInteractiveWrapper';
 async function getProperty(id: string) {
   try {
     // For server-side rendering, we need the full URL
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
+    // In production, use the same domain since Express serves both API and frontend
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 
+                   (process.env.NODE_ENV === 'production' ? 'https://www.squarefooot.com' : 'http://localhost:5000');
     const url = `${baseUrl}/api/v1/properties/${id}`;
     
     console.log('🔍 Server-side getProperty - Fetching property:', { id, url, baseUrl });

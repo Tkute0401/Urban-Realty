@@ -113,6 +113,8 @@ app.use(cors({
     // In production, allow Railway domain and any configured origins
     const allowedOrigins = [
       'https://urban-realty-production.up.railway.app',
+      'https://www.squarefooot.com',
+      'https://squarefooot.com',
       'http://localhost:3000',
       'http://localhost:3001',
       process.env.FRONTEND_URL
@@ -210,8 +212,13 @@ app.use(errorHandler);
 async function startServer() {
   try {
     // Prepare Next.js
-    await nextApp.prepare();
-    console.log('✅ Next.js app prepared');
+    try {
+      await nextApp.prepare();
+      console.log('✅ Next.js app prepared');
+    } catch (nextError) {
+      console.error('❌ Failed to build Next.js:', nextError.message);
+      console.log('⚠️  Continuing with server startup (some features may not work)');
+    }
 
     // Handle all other routes with Next.js (but not API routes)
     app.all('*', (req, res) => {
@@ -223,6 +230,28 @@ async function startServer() {
           path: req.path 
         });
       }
+      
+      // If Next.js is not available, serve a basic response
+      if (!nextHandler) {
+        return res.status(200).send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Urban Realty</title>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body>
+              <h1>Urban Realty</h1>
+              <p>Server is running. Frontend is being prepared...</p>
+              <script>
+                setTimeout(() => location.reload(), 5000);
+              </script>
+            </body>
+          </html>
+        `);
+      }
+      
       return nextHandler(req, res);
     });
 
