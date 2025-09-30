@@ -41,15 +41,8 @@ COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
 COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
 COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
 
-# Copy the app directory to the root for Next.js App Router
-COPY new-nextjs-app/src/app ./new-nextjs-app/app
-
-# Copy the required directories that the app imports from
-COPY new-nextjs-app/src/contexts ./new-nextjs-app/contexts
-COPY new-nextjs-app/src/components ./new-nextjs-app/components
-COPY new-nextjs-app/src/lib ./new-nextjs-app/lib
-COPY new-nextjs-app/src/style-constants ./new-nextjs-app/style-constants
-COPY new-nextjs-app/src/hooks ./new-nextjs-app/hooks
+# Copy the entire src directory structure to maintain proper imports
+COPY new-nextjs-app/src ./new-nextjs-app/src
 
 
 # Copy backend files
