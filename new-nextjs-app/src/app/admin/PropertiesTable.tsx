@@ -65,7 +65,8 @@ const PropertiesTable = ({ filters }: PropertiesTableProps) => {
           ? await api.admin.properties() 
           : await api.properties.list();
         if (response.success) {
-          setProperties(response.data || []);
+          const propertiesData = response.data.items || response.data || [];
+          setProperties(Array.isArray(propertiesData) ? propertiesData : []);
         } else {
           setError('Failed to fetch properties');
         }
