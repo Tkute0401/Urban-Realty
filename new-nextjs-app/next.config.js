@@ -87,6 +87,8 @@ const nextConfig = {
     RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT,
     RAILWAY_PROJECT_ID: process.env.RAILWAY_PROJECT_ID,
     SKIP_BUILD_STATIC_GENERATION: process.env.SKIP_BUILD_STATIC_GENERATION || 'false',
+    // Google Maps API Key
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
 
   // Image optimization for Railway

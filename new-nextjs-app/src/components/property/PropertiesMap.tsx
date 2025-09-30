@@ -77,6 +77,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   return (
     <LoadScript 
       googleMapsApiKey={googleMapsApiKey}
+      loadingElement={<div>Loading Google Maps...</div>}
       onLoad={() => {
         setTimeout(() => setIsLoaded(true), 100);
       }}

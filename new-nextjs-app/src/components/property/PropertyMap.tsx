@@ -52,6 +52,7 @@ const PropertyMap = ({ location, address }) => {
   return (
     <LoadScript 
       googleMapsApiKey={googleMapsApiKey}
+      loadingElement={<div>Loading Google Maps...</div>}
       >
       <GoogleMap
         mapContainerClassName="map-container map-container--sm"
