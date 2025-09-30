@@ -81,6 +81,7 @@ export const api = {
                 users: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/users", { params })),
                 properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/properties", { params })),
                 contacts: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/contacts", { params })),
+                contactStats: () => unwrap<any>(http.get("/api/v1/admin/contacts/stats")),
                 getInquiry: (id: string) => unwrap<any>(http.get(`/api/v1/admin/inquiries/${id}`)),
                 updateUser: (userId: string, payload: any) => unwrap<any>(http.put(`/api/v1/admin/users/${userId}`, payload)),
                 deleteUser: (userId: string) => unwrap<any>(http.delete(`/api/v1/admin/users/${userId}`)),
@@ -88,17 +89,23 @@ export const api = {
                 verifyAgent: (agentId: string) => unwrap<any>(http.put(`/api/v1/admin/agents/${agentId}/verify`, {})),
                 settings: () => unwrap<any>(http.get("/api/v1/admin/settings")),
                 updateSettings: (payload: any) => unwrap<any>(http.put("/api/v1/admin/settings", payload)),
+                backup: () => unwrap<any>(http.post("/api/v1/admin/backup")),
+                restore: (backupId: string) => unwrap<any>(http.post(`/api/v1/admin/restore/${backupId}`)),
                 reports: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/admin/reports", { params })),
                 exportReport: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/admin/reports/export", { params })),
+                emailReport: (payload: any) => unwrap<any>(http.post("/api/v1/admin/reports/email", payload)),
                 agents: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/agents", { params })),
                 media: (params?: Record<string, any>) => unwrap<any[]>(http.get("/api/v1/admin/media", { params })),
+                uploadMedia: (formData: FormData, config?: any) => unwrap<any>(http.post("/api/v1/admin/media/upload", formData, config)),
+                updateMedia: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/admin/media/${id}`, payload)),
+                deleteMedia: (id: string) => unwrap<any>(http.delete(`/api/v1/admin/media/${id}`)),
         },
         agent: {
                 // Agent self-access endpoints (logged-in agent accessing their own data)
                 dashboard: (params?: Record<string, any>) => unwrap<any>(http.get(`/api/v1/agent/dashboard`, { params })),
                 analytics: (params?: Record<string, any>) => unwrap<any>(http.get(`/api/v1/agent/analytics`, { params })),
                 leads: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/agent/leads`, { params })),
-                properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/agent/properties`, { params })),
+                properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/properties/agent/${params?.agentId || ''}`, { params })),
                 updateLead: (leadId: string, payload: { status?: string }) => unwrap<any>(http.put(`/api/v1/contacts/${leadId}`, payload)),
                 
                 // Admin endpoints for accessing any agent's data (admin only)

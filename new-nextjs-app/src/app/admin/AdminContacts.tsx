@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Box,
   Typography,
@@ -55,7 +56,7 @@ const AdminContacts = () => {
   const fetchContactStats = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/admin/contacts/stats');
+      const response = await api.admin.contactStats();
       if (response.success) {
         setStats(response.data);
       }

@@ -30,6 +30,11 @@ router.get('/contacts/stats', protect, authorize('admin'), adminController.getCo
 router.get('/contacts/:id', protect, authorize('admin'), adminController.getContactRequest);
 router.delete('/contacts/:id', protect, authorize('admin'), adminController.deleteContactRequest);
 
+// Inquiry Management (alias for contacts)
+router.get('/inquiries', protect, authorize('admin'), adminController.getContactRequests);
+router.get('/inquiries/:id', protect, authorize('admin'), adminController.getContactRequest);
+router.patch('/inquiries/:id/status', protect, authorize('admin'), adminController.updateContactStatus);
+
 // Statistics
 router.get('/stats', protect, authorize('admin'), adminController.getStats);
 
@@ -65,8 +70,10 @@ router.post('/user-types', protect, authorize('admin'), userTypeController.creat
 router.put('/user-types/:id', protect, authorize('admin'), userTypeController.updateUserType);
 router.delete('/user-types/:id', protect, authorize('admin'), userTypeController.deleteUserType);
 
-// Media Management (Admin can view and delete any media)
+// Media Management (Admin can view, upload and delete any media)
 router.get('/media', protect, authorize('admin'), adminController.getMedia);
+router.post('/media/upload', protect, authorize('admin'), mediaController.uploadMedia);
+router.put('/media/:id', protect, authorize('admin'), mediaController.updateMedia);
 router.delete('/media/:id', protect, authorize('admin'), mediaController.deleteMedia);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
-import http from '@/lib/services/http';
+import { api } from '@/lib/services/api';
 import type { Property } from '@/components/ui';
 
 
@@ -141,7 +141,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
       console.log("Backend Params:=",backendParams);
-      const response = await http.get('/api/v1/properties', { params: backendParams });
+      const response = await api.properties.list(backendParams);
       console.log('🔧 PropertiesContext - Properties response:', response.data);
       
       // Handle different response structures
@@ -149,9 +149,17 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       let data = [];
       let paginationData = {};
       
-      if (responseData.data && Array.isArray(responseData.data)) {
+      if (responseData && 'items' in responseData && Array.isArray(responseData.items)) {
+        data = responseData.items;
+        paginationData = {
+          page: responseData.page,
+          limit: responseData.pageSize,
+          total: responseData.totalItems,
+          pages: responseData.totalPages
+        };
+      } else if (responseData && 'data' in responseData && Array.isArray(responseData.data)) {
         data = responseData.data;
-        paginationData = responseData.pagination || {};
+        paginationData = ('pagination' in responseData && responseData.pagination) || {};
       } else if (Array.isArray(responseData)) {
         data = responseData;
       } else {
@@ -189,8 +197,15 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
       console.log('🔧 PropertiesContext - Fetching featured properties');
-      const response = await http.get('/api/v1/properties/featured');
-      const data = response.data?.data ?? response.data;
+      const response = await api.properties.featured();
+      const responseData = response.data;
+      const data = (responseData && 'items' in responseData && Array.isArray(responseData.items)) 
+        ? responseData.items 
+        : (responseData && 'data' in responseData && Array.isArray(responseData.data))
+        ? responseData.data
+        : Array.isArray(responseData) 
+        ? responseData 
+        : [];
       
       console.log('🔧 PropertiesContext - Featured properties response:', { 
         dataType: typeof data,
@@ -228,7 +243,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         return cache[id];
       }
   
-      const response = await http.get(`/properties/${id}`);
+      const response = await api.properties.getById(id);
       const propertyData = response.data?.data ?? response.data;
       
       if (!propertyData) {
@@ -286,7 +301,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
 
-      const response = await http.post('/api/v1/properties', formDataToSend, finalConfig);
+      const response = await api.properties.create(formDataToSend);
       
       const newProperty = response.data?.data ?? response.data;
       setProperties(prev => [...prev, newProperty]);
@@ -347,7 +362,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       if (extras.brochure) formDataToSend.append('brochure', extras.brochure);
       if (extras.virtualTour) formDataToSend.append('virtualTour', extras.virtualTour);
 
-      const response = await http.post('/api/v1/properties', formDataToSend, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const response = await api.properties.create(formDataToSend);
       const newProperty = response.data?.data ?? response.data;
       setProperties(prev => [...prev, newProperty]);
       setCache({});
@@ -407,7 +422,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
 
-      const response = await http.put(`/properties/${id}`, formDataToSend, config);
+      const response = await api.properties.update(id, formDataToSend);
       const responseData = response.data?.data || response.data || response;
       
       if (!responseData) {
@@ -443,7 +458,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     try {
       setLoading(true);
       setError(null);
-      await http.delete(`/properties/${id}`);
+      await api.properties.delete(id);
       setProperties(prev => prev.filter(p => p._id !== id));
       setCache(prev => {
         const newCache = { ...prev };
@@ -465,8 +480,15 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/api/v1/developers');
-      const data = response.data?.data ?? response.data;
+      const response = await api.developers.list();
+      const responseData = response.data;
+      const data = (responseData && 'items' in responseData && Array.isArray(responseData.items)) 
+        ? responseData.items 
+        : (responseData && 'data' in responseData && Array.isArray(responseData.data))
+        ? responseData.data
+        : Array.isArray(responseData) 
+        ? responseData 
+        : [];
       
       if (!Array.isArray(data)) {
         throw new Error('Received invalid developers data format');
@@ -490,9 +512,16 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setError(null);
   
       // Use the correct endpoint based on backend routes
-      const response = await http.get(`/properties/agent/${user.id}`);
+      const response = await api.agent.properties({ agentId: user.id });
       console.log("Response in context:=",response);
-      const data = response.data?.data ?? response.data;
+      const responseData = response.data;
+      const data = (responseData && 'items' in responseData && Array.isArray(responseData.items)) 
+        ? responseData.items 
+        : (responseData && 'data' in responseData && Array.isArray(responseData.data))
+        ? responseData.data
+        : Array.isArray(responseData) 
+        ? responseData 
+        : [];
       
       if (!Array.isArray(data)) {
         throw new Error('Received invalid properties data format');

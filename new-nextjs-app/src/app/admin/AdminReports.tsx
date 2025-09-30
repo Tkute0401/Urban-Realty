@@ -193,7 +193,7 @@ const AdminReports = () => {
         ...(dateRange === 'custom' && { startDate, endDate })
       };
 
-      const response = await http.post('/admin/reports/email', {
+      const response = await api.admin.emailReport({
         ...emailForm,
         ...params
       });

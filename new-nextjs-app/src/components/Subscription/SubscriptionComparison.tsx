@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Container,
   Grid,
@@ -47,7 +48,7 @@ const SubscriptionComparison = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/api/v1/subscriptions');
+      const response = await api.subscriptions.plans();
       
       // Handle different response structures
       if (response.success) {

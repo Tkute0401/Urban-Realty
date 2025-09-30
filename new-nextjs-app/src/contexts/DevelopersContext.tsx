@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
-import http from '@/lib/services/http';
+import { api } from '@/lib/services/api';
 
 // Types
 interface Developer {
@@ -44,11 +44,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
   const createDeveloper = useCallback(async (formData: FormData, config?: any): Promise<any> => {
     try {
       setLoading(true);
-      const response = await http.post(
-        '/developers',
-        formData,
-        config
-      );
+      const response = await api.developers.create(formData);
       console.log(response);
       
       getDevelopers();
@@ -64,11 +60,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
   const updateDeveloper = useCallback(async (id: string, formData: FormData, config?: any): Promise<any> => {
     try {
       setLoading(true);
-      const response = await http.put(
-        `/developers/${id}`,
-        formData,
-        config
-      );
+      const response = await api.developers.update(id, formData);
       console.log(response);
       
       getDevelopers();
@@ -85,7 +77,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get('/api/v1/developers');
+      const response = await api.developers.list();
       console.log(response);
       setDevelopers(response.data);
     } catch (err: any) {
@@ -100,7 +92,7 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
     try {
       setLoading(true);
       setError(null);
-      const response = await http.get(`/developers/${id}`);
+      const response = await api.developers.getById(id);
       console.log(response);
       return response.data;
     } catch (err: any) {

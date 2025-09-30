@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Table,
   TableBody,
@@ -60,8 +61,9 @@ const PropertiesTable = ({ filters }: PropertiesTableProps) => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const endpoint = user?.role === 'admin' ? '/admin/properties' : '/properties';
-        const response = await http.get(endpoint);
+        const response = user?.role === 'admin' 
+          ? await api.admin.properties() 
+          : await api.properties.list();
         if (response.success) {
           setProperties(response.data || []);
         } else {

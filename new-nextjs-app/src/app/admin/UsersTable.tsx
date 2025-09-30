@@ -120,10 +120,7 @@ const UsersTable = () => {
     }
 
     try {
-      const response = await http.put(
-        `/admin/users/${selectedUser._id}`, 
-        editFormData
-      );
+      const response = await api.admin.updateUser(selectedUser._id, editFormData);
       
       if (response.success) {
         setUsers(users.map(user => 
@@ -143,7 +140,7 @@ const UsersTable = () => {
     if (!selectedUser) return;
 
     try {
-      await http.delete(`/admin/users/${selectedUser._id}`);
+      await api.admin.deleteUser(selectedUser._id);
       setUsers(users.filter(user => user._id !== selectedUser._id));
     } catch (err) {
       console.error('Error deleting user:', err);
@@ -157,7 +154,7 @@ const UsersTable = () => {
     if (!selectedUser || selectedUser.role !== 'agent') return;
 
     try {
-      const response = await http.put(`/admin/agents/${selectedUser._id}/verify`);
+      const response = await api.admin.verifyAgent(selectedUser._id);
       setUsers(users.map(user => 
         user._id === selectedUser._id ? response.data : user
       ));

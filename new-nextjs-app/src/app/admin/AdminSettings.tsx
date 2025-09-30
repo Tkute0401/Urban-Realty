@@ -173,7 +173,7 @@ const AdminSettings = () => {
     setSuccess(null);
 
     try {
-      const response = await http.put('/admin/settings', settings);
+      const response = await api.admin.updateSettings(settings);
       if (response.success) {
         setSuccess('Settings saved successfully!');
         setTimeout(() => setSuccess(null), 3000);
@@ -190,7 +190,7 @@ const AdminSettings = () => {
 
   const handleBackup = async () => {
     try {
-      const response = await http.post('/admin/backup');
+      const response = await api.admin.backup();
       if (response.success) {
         setSuccess('Backup created successfully!');
         setBackupDialog(false);
@@ -205,7 +205,7 @@ const AdminSettings = () => {
 
   const handleRestore = async (backupId) => {
     try {
-      const response = await http.post(`/admin/restore/${backupId}`);
+      const response = await api.admin.restore(backupId);
       if (response.success) {
         setSuccess('System restored successfully!');
         setRestoreDialog(false);

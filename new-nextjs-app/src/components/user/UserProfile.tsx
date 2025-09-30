@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { api } from '@/lib/services/api';
 import {
   Container,
   Grid,
@@ -72,7 +73,7 @@ const UserProfile = () => {
 
   const fetchSubscription = async () => {
     try {
-      const response = await http.get('/api/v1/subscriptions/my-subscription');
+      const response = await api.subscriptions.current(user?.id || '');
       setSubscription(response.data);
     } catch (err) {
       if (err.response?.status !== 404) {
@@ -91,7 +92,7 @@ const UserProfile = () => {
     try {
       setSaving(true);
       // Use normalized API path (baseURL already includes /api/v1)
-      await http.put('/auth/update', editData);
+      await api.auth.updateProfile(editData);
       
       // Update local user state
       updateUser({
@@ -113,7 +114,7 @@ const UserProfile = () => {
   const handleCancelSubscription = async () => {
     if (window.confirm('Are you sure you want to cancel your subscription?')) {
       try {
-        await http.put('/api/v1/subscriptions/cancel');
+        await api.subscriptions.cancel(user?.id || '');
         fetchSubscription();
         // Refresh user data
         window.location.reload();

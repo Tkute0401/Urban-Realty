@@ -136,7 +136,7 @@ const AdminMedia = () => {
     formData.append('altText', uploadForm.altText);
 
     try {
-      const response = await http.post('/admin/media/upload', formData, {
+      const response = await api.admin.uploadMedia(formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
@@ -174,7 +174,7 @@ const AdminMedia = () => {
     if (!editingMedia) return;
 
     try {
-      const response = await http.put(`/admin/media/${editingMedia._id}`, {
+      const response = await api.admin.updateMedia(editingMedia._id, {
         title: editingMedia.title,
         description: editingMedia.description,
         tags: editingMedia.tags,
@@ -201,7 +201,7 @@ const AdminMedia = () => {
 
     try {
       const deletePromises = selectedMedia.map(id => 
-        http.delete(`/admin/media/${id}`)
+        api.admin.deleteMedia(id)
       );
       
       await Promise.all(deletePromises);
