@@ -20,12 +20,12 @@ export const getApiBaseUrl = (): string => {
   const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
   
   if (!explicitApiUrl) {
-    // Unified mode - Express server handles all routes directly, no prefix needed
-    return '';
+    // Unified mode - Express server handles all routes directly, use /api/v1 prefix
+    return '/api/v1';
   }
   
-  // Separate backend mode - use /api/v1 prefix
-  return '/api/v1';
+  // Separate backend mode - use the explicit URL
+  return explicitApiUrl;
 };
 
 // Enhanced fetch configuration for Railway

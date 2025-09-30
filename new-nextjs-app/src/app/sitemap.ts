@@ -15,12 +15,13 @@ async function fetchDynamicUrls() {
     )
     
     // Fetch latest properties for sitemap with timeout
-    const propertiesPromise = fetch(`${apiUrl}/api/v1/properties?limit=50&sort=-createdAt`, {
+    const apiBaseUrl = getApiBaseUrl();
+    const propertiesPromise = fetch(`${apiUrl}${apiBaseUrl}/properties?limit=50&sort=-createdAt`, {
       next: { revalidate: 86400 }, // Revalidate every 24 hours
     }).then(res => res.json())
     
     // Fetch developers for sitemap with timeout
-    const developersPromise = fetch(`${apiUrl}/api/v1/developers?limit=25&sort=-createdAt`, {
+    const developersPromise = fetch(`${apiUrl}${apiBaseUrl}/developers?limit=25&sort=-createdAt`, {
       next: { revalidate: 86400 }, // Revalidate every 24 hours
     }).then(res => res.json())
     
