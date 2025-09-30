@@ -49,6 +49,7 @@ COPY new-nextjs-app/src/contexts ./new-nextjs-app/contexts
 COPY new-nextjs-app/src/components ./new-nextjs-app/components
 COPY new-nextjs-app/src/lib ./new-nextjs-app/lib
 COPY new-nextjs-app/src/style-constants ./new-nextjs-app/style-constants
+COPY new-nextjs-app/src/hooks ./new-nextjs-app/hooks
 
 
 # Copy backend files
