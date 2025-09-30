@@ -1,4 +1,4 @@
-const asyncHandler = require('../middleware/asyncHandler');
+const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
 // @desc    Get agent dashboard data
