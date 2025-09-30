@@ -11,8 +11,7 @@ import PropertiesLoading from './PropertiesLoading';
 async function getInitialProperties() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-    const apiBaseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}${apiBaseUrl}/api/v1/properties`, {
+    const response = await fetch(`${baseUrl}/api/v1/properties`, {
       next: { 
         revalidate: 300 // Revalidate every 5 minutes for fresh listings
       }

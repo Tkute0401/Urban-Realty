@@ -17,10 +17,8 @@ async function getProperty(id: string) {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 
                    (process.env.NODE_ENV === 'production' ? 'https://www.squarefooot.com' : 'http://localhost:5000');
     
-    // Use the API base URL from config to avoid duplication
-    const apiBaseUrl = getApiBaseUrl();
     // Ensure /api/v1 prefix is always included for property details
-    const url = `${baseUrl}${apiBaseUrl}/api/v1/properties/${id}`;
+    const url = `${baseUrl}/api/v1/properties/${id}`;
     
     console.log('🔍 Server-side getProperty - Fetching property:', { id, url, baseUrl });
     
@@ -45,7 +43,7 @@ async function getProperty(id: string) {
         // Try to get a fallback property for testing
         console.log('🔍 Server-side getProperty - Attempting to get fallback property...');
         try {
-          const fallbackResponse = await fetch(`${baseUrl}${apiBaseUrl}/api/v1/properties/featured`, {
+          const fallbackResponse = await fetch(`${baseUrl}/api/v1/properties/featured`, {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
@@ -232,7 +230,7 @@ export async function generateStaticParams() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     
-    const response = await fetch(`${baseUrl}${apiBaseUrl}/api/v1/properties/featured`, {
+    const response = await fetch(`${baseUrl}/api/v1/properties/featured`, {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',

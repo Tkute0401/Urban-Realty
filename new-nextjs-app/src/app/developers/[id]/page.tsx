@@ -7,7 +7,7 @@ import { getApiBaseUrl } from '@/lib/services/api.config';
 // Fetch developer data server-side with Railway-optimized configuration
 async function getDeveloper(id: string) {
   try {
-    const baseUrl = getApiBaseUrl();
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
     const response = await fetch(`${baseUrl}/api/v1/developers/${id}`, {
       next: { revalidate: 3600 }, // Revalidate every hour
       headers: {
@@ -212,7 +212,7 @@ export async function generateStaticParams() {
 
   // Development or non-Railway production builds
   try {
-    const baseUrl = getApiBaseUrl();
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
     const response = await fetch(`${baseUrl}/api/v1/developers`, {
       next: { revalidate: 3600 },
       headers: {
