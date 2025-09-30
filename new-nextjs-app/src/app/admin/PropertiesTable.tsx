@@ -93,7 +93,7 @@ const PropertiesTable = ({ filters }: PropertiesTableProps) => {
 
   const handleDelete = async () => {
     try {
-      await http.delete(`/admin/properties/${selectedProperty._id}`);
+      await api.admin.deleteProperty(selectedProperty._id);
       setProperties(properties.filter(property => property._id !== selectedProperty._id));
     } catch (err) {
       console.error('Error deleting property:', err);

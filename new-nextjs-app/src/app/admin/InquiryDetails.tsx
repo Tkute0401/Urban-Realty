@@ -27,7 +27,7 @@ const InquiryDetails = () => {
       setLoading(true);
       setError(null);
       
-      const response = await api.admin.getInquiry(id);
+      const response = await api.admin.getInquiry(Array.isArray(id) ? id[0] : id);
       setInquiry(response.data);
       setStatus(response.data.status);
     } catch (err) {
@@ -43,7 +43,7 @@ const InquiryDetails = () => {
 
   const updateStatus = async () => {
     try {
-      await http.patch(`/admin/inquiries/${id}/status`, { status });
+      await api.contacts.update(Array.isArray(id) ? id[0] : id, { status });
       fetchInquiry();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update status');

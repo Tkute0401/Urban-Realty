@@ -38,7 +38,7 @@ const InquiriesPage = () => {
 
   const handleStatusChange = async (inquiryId, newStatus) => {
     try {
-      await http.patch(`/admin/inquiries/${inquiryId}/status`, { status: newStatus });
+      await api.contacts.update(inquiryId, { status: newStatus });
       setInquiries(inquiries.map(inquiry => 
         inquiry._id === inquiryId ? { ...inquiry, status: newStatus } : inquiry
       ));

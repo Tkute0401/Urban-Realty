@@ -1,4 +1,4 @@
-import http from './http';
+import { api } from './api';
 
 export interface SearchSuggestion {
   text: string;
@@ -30,9 +30,7 @@ export const searchSuggestionsService = {
     }
 
     try {
-      const response = await http.get('/api/v1/properties/search-suggestions', {
-        params: { query }
-      });
+      const response = await api.properties.searchSuggestions(query);
       
       const data: SearchSuggestionsResponse = response.data;
       

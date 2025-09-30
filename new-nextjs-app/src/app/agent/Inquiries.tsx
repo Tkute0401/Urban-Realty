@@ -30,7 +30,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import http from '@/lib/services/http';
+import { api } from '@/lib/services/api';
 import { formatDate } from '@/lib/utils/format';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -45,14 +45,12 @@ const AgentInquiries = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['agentInquiries', page, rowsPerPage, searchTerm],
     queryFn: async () => {
-      const res = await http.get(`/contacts/agent`, {
-        params: {
-          page: page + 1,
-          limit: rowsPerPage,
-          search: searchTerm
-        }
+      const res = await api.agent.leads({
+        page: page + 1,
+        limit: rowsPerPage,
+        search: searchTerm
       });
-      return res.data;
+      return res.data.items || res.data || [];
     }
   });
 
@@ -105,7 +103,7 @@ const AgentInquiries = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data?.data?.map((inquiry) => (
+            {(Array.isArray(data) ? data : data?.items || [])?.map((inquiry) => (
               <TableRow 
                 key={inquiry._id} 
                 hover 
@@ -154,7 +152,7 @@ const AgentInquiries = () => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={data?.count || 0}
+        count={Array.isArray(data) ? data.length : (data?.totalItems || 0)}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

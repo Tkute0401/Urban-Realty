@@ -72,7 +72,7 @@ const ContactsTable: React.FC<ContactsTableProps> = ({ filters }) => {
 
   const handleDelete = async () => {
     try {
-      await http.delete(`/admin/contacts/${selectedContact._id}`);
+      await api.contacts.delete(selectedContact._id);
       setContacts(contacts.filter(contact => contact._id !== selectedContact._id));
     } catch (err) {
       console.error('Error deleting contact:', err);

@@ -17,6 +17,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDevelopers } from '../../contexts/DevelopersContext';
+import { api } from '../../lib/services/api';
 import { formatNumber } from '../../lib/utils/format';
 import http from '../../lib/services/http';
 import { styled, keyframes } from '@mui/material/styles';
@@ -105,7 +106,7 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
     try {
       setDeleting(true);
       setDeleteError(null);
-      await http.delete(`/developers/${id}`);
+      await api.developers.delete(Array.isArray(id) ? id[0] : id);
       toast.success('Developer deleted successfully');
       getDevelopers(); // Refresh developers list
       router.push('/developers');

@@ -73,6 +73,7 @@ export const api = {
                 update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/properties/${id}`, payload)),
                 delete: (id: string) => unwrap<any>(http.delete(`/api/v1/properties/${id}`)),
                 featured: () => unwrap<any[]>(http.get("/api/v1/properties/featured")),
+                searchSuggestions: (query: string) => unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { query } })),
         },
         admin: {
                 stats: () => unwrap<any>(http.get("/api/v1/admin/stats")),
@@ -118,6 +119,9 @@ export const api = {
         subscriptions: {
                 plans: () => unwrap<any[]>(http.get("/api/v1/subscriptions")),
                 current: (userId: string) => unwrap<any>(http.get(`/api/v1/subscriptions/my-subscription`)),
+                getMySubscription: () => unwrap<any>(http.get("/api/v1/subscriptions/my-subscription")),
+                getBillingHistory: () => unwrap<any>(http.get("/api/v1/subscriptions/billing-history")),
+                getUpcomingBilling: () => unwrap<any>(http.get("/api/v1/subscriptions/upcoming-billing")),
                 subscribe: (payload: { userId: string; planId: string; paymentMethod: string; billingCycle: string }) =>
                         unwrap<any>(http.post(`/api/v1/subscriptions/subscribe`, { subscriptionId: payload.planId, paymentMethod: payload.paymentMethod, billingCycle: payload.billingCycle })),
                 cancel: (userId: string) => unwrap<any>(http.put(`/api/v1/subscriptions/cancel`, {})),
@@ -136,6 +140,8 @@ export const api = {
                         unwrap<any>(http.post("/api/v1/subscriptions/razorpay/order", payload)),
                 verifyRazorpayPayment: (payload: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
                         unwrap<any>(http.post("/api/v1/subscriptions/razorpay/verify", payload)),
+                downloadInvoice: (subscriptionId: string) =>
+                        unwrap<any>(http.get(`/api/v1/subscriptions/invoice/${subscriptionId}/download`, { responseType: 'blob' })),
         },
         developers: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/developers", { params })),
@@ -143,6 +149,9 @@ export const api = {
                 create: (payload: any) => unwrap<any>(http.post("/api/v1/developers", payload)),
                 update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/developers/${id}`, payload)),
                 delete: (id: string) => unwrap<any>(http.delete(`/api/v1/developers/${id}`)),
+        },
+        search: {
+                suggestions: (query: string) => unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { query } })),
         },
         contacts: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/contacts", { params })),

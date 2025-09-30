@@ -79,7 +79,9 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
       setError(null);
       const response = await api.developers.list();
       console.log(response);
-      setDevelopers(response.data);
+      const data = response.data;
+      const items = Array.isArray(data) ? data : (data?.items || []);
+      setDevelopers(items);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Failed to fetch developers');
       setDevelopers([]);

@@ -64,7 +64,7 @@ const UsersTable = () => {
         const userData = response.data || [];
         setUsers(Array.isArray(userData) ? userData : []);
       } else {
-        setError(response.data?.message || 'Failed to fetch users');
+        setError(response.message || 'Failed to fetch users');
       }
     } catch (err: any) {
       console.error('🔧 UsersTable - Error fetching users:', err);

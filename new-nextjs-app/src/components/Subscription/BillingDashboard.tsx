@@ -22,6 +22,7 @@ import {
   Divider,
   LinearProgress
 } from '@mui/material';
+import { api } from '@/lib/services/api';
 import {
   Receipt as ReceiptIcon,
   Payment as PaymentIcon,
@@ -32,7 +33,6 @@ import {
   AccountBalance as AccountBalanceIcon,
   Warning as WarningIcon
 } from '@mui/icons-material';
-import http from '@/lib/services/http';
 import { useAuth } from '@/contexts/AuthContext';
 
 const BillingDashboard = () => {
@@ -50,9 +50,9 @@ const BillingDashboard = () => {
     try {
       setLoading(true);
       const [billingHistory, upcomingBilling, subscription] = await Promise.all([
-        http.get('/api/v1/subscriptions/billing-history'),
-        http.get('/api/v1/subscriptions/upcoming-billing'),
-        http.get('/api/v1/subscriptions/my-subscription')
+        api.subscriptions.getBillingHistory(),
+        api.subscriptions.getUpcomingBilling(),
+        api.subscriptions.getMySubscription()
       ]);
       
       setBillingData({
@@ -70,9 +70,7 @@ const BillingDashboard = () => {
 
   const handleDownloadInvoice = async (subscriptionId) => {
     try {
-      const response = await http.get(`/subscriptions/invoice/${subscriptionId}/download`, {
-        responseType: 'blob'
-      });
+      const response = await api.subscriptions.downloadInvoice(subscriptionId);
       
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');

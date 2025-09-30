@@ -55,10 +55,7 @@ const SubscriptionComparison = () => {
         const plansData = response.data || [];
         setPlans(plansData);
         
-        // Log source of data for debugging
-        if (response.data.source) {
-          console.log(`Plans loaded from ${response.data.source}`);
-        }
+        // Plans loaded successfully
         
         if (plansData.length === 0) {
           setError('No subscription plans available');

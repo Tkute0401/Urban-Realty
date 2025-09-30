@@ -11,7 +11,7 @@ import {
   Mail, Delete, Search, Refresh, 
   CheckCircle, Pending, Cancel
 } from '@mui/icons-material';
-import http from '@/lib/services/http';
+import { api } from '@/lib/services/api';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
 
@@ -36,8 +36,10 @@ const AdminInquiries = () => {
         params.status = statusFilter;
       }
       
-      const response = await http.get(url, { params });
-      setInquiries(response.data);
+      const response = await api.admin.contacts({ status: statusFilter !== 'all' ? statusFilter : undefined });
+      const data = response.data;
+      const items = Array.isArray(data) ? data : (data?.items || []);
+      setInquiries(items);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load inquiries');
     } finally {
@@ -51,7 +53,7 @@ const AdminInquiries = () => {
 
   const handleDeleteInquiry = async () => {
     try {
-      await http.delete(`/contacts/${(selectedInquiry as any)._id}`);
+      await api.contacts.delete((selectedInquiry as any)._id);
       setOpenDeleteDialog(false);
       fetchInquiries();
     } catch (err: any) {
@@ -61,7 +63,7 @@ const AdminInquiries = () => {
 
   const updateInquiryStatus = async (inquiryId: string, newStatus: string) => {
     try {
-      await http.put(`/contacts/${inquiryId}`, {
+      await api.contacts.update(inquiryId, {
         status: newStatus
       });
       fetchInquiries();
