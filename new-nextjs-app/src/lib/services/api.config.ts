@@ -20,8 +20,8 @@ export const getApiBaseUrl = (): string => {
   const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
   
   if (!explicitApiUrl) {
-    // Unified mode - Express server handles all routes directly, use /api/v1 prefix
-    return '/api/v1';
+    // Unified mode - Express server handles all routes directly, use empty string since API calls already include /api/v1
+    return '';
   }
   
   // Separate backend mode - use the explicit URL
@@ -58,7 +58,8 @@ export const railwaySafeApiCall = async <T>(
 ): Promise<T | null> => {
   try {
     const baseUrl = getApiBaseUrl();
-    const response = await fetch(`${baseUrl}${url}`, getFetchConfig(options));
+    const fullUrl = baseUrl ? `${baseUrl}${url}` : url;
+    const response = await fetch(fullUrl, getFetchConfig(options));
     
     if (!response.ok) {
       console.warn(`API call failed: ${response.status} ${response.statusText}`);
