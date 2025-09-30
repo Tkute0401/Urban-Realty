@@ -19,7 +19,8 @@ async function getProperty(id: string) {
     
     // Use the API base URL from config to avoid duplication
     const apiBaseUrl = getApiBaseUrl();
-    const url = `${baseUrl}${apiBaseUrl}/properties/${id}`;
+    // Ensure /api/v1 prefix is always included for property details
+    const url = `${baseUrl}${apiBaseUrl}/api/v1/properties/${id}`;
     
     console.log('🔍 Server-side getProperty - Fetching property:', { id, url, baseUrl });
     
@@ -44,7 +45,7 @@ async function getProperty(id: string) {
         // Try to get a fallback property for testing
         console.log('🔍 Server-side getProperty - Attempting to get fallback property...');
         try {
-          const fallbackResponse = await fetch(`${baseUrl}${apiBaseUrl}/properties/featured`, {
+          const fallbackResponse = await fetch(`${baseUrl}${apiBaseUrl}/api/v1/properties/featured`, {
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
@@ -231,7 +232,7 @@ export async function generateStaticParams() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     
-    const response = await fetch(`${baseUrl}${apiBaseUrl}/properties/featured`, {
+    const response = await fetch(`${baseUrl}${apiBaseUrl}/api/v1/properties/featured`, {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
