@@ -48,7 +48,8 @@ const ContactsTable: React.FC<ContactsTableProps> = ({ filters }) => {
     const fetchContacts = async () => {
       try {
         const response = await api.admin.contacts();
-        setContacts(response.data.items || response.data);
+        const contactsData = response.data.items || response.data || [];
+        setContacts(Array.isArray(contactsData) ? contactsData : []);
       } catch (err) {
         console.error('Error fetching contacts:', err);
       } finally {

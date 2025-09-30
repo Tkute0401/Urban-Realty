@@ -30,7 +30,8 @@ const AgentsPage = () => {
       setError(null);
       
       const response = await api.admin.users({ role: 'agent' });
-      setAgents(response.data.items || response.data);
+      const agentsData = response.data.items || response.data || [];
+      setAgents(Array.isArray(agentsData) ? agentsData : []);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load agents');
     } finally {

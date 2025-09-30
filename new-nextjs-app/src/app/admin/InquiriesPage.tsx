@@ -15,7 +15,8 @@ const InquiriesPage = () => {
     const fetchInquiries = async () => {
       try {
         const response = await api.admin.contacts();
-        setInquiries(response.data.items || response.data);
+        const inquiriesData = response.data.items || response.data || [];
+        setInquiries(Array.isArray(inquiriesData) ? inquiriesData : []);
       } catch (err) {
         console.error('Error fetching inquiries:', err);
       } finally {
