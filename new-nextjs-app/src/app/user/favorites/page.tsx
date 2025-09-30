@@ -3,6 +3,7 @@
 import { Box, Typography } from '@mui/material';
 import FavoritesGrid from '../../../components/user/FavoritesGrid';
 import { useAuth } from '../../../contexts/AuthContext';
+import { unstable_noStore as noStore } from 'next/cache';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,9 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/services/api';
 
 const Favorites = () => {
+  // Force dynamic rendering
+  noStore();
+  
   console.log('🔧 User Favorites Page rendering...');
   
   const { user } = useAuth();

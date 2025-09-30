@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../contexts/AuthContext';
+import { unstable_noStore as noStore } from 'next/cache';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -51,6 +52,9 @@ const ProfileButton = styled(Button)(({ theme }) => ({
 }));
 
 const EditProfile = () => {
+  // Force dynamic rendering
+  noStore();
+  
   const { user, updateUser } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);

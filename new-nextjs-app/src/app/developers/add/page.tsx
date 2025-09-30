@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDevelopers } from '../../../contexts/DevelopersContext';
 import { useAuth } from '../../../contexts/AuthContext';
+import { unstable_noStore as noStore } from 'next/cache';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -84,6 +85,9 @@ const SectionHeader = styled(Typography)(({ theme }) => ({
 }));
 
 const AddDeveloperPage = () => {
+  // Force dynamic rendering
+  noStore();
+  
   const { createDeveloper, loading, error, clearErrors } = useDevelopers();
   const { user } = useAuth();
   const router = useRouter();

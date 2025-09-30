@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDevelopers } from '../../contexts/DevelopersContext';
+import { unstable_noStore as noStore } from 'next/cache';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,9 @@ import {
 import './DeveloperList.css';
 
 const DeveloperList = () => {
+  // Force dynamic rendering
+  noStore();
+  
   console.log('🔧 Developers Page rendering...');
 
   useEffect(() => {
