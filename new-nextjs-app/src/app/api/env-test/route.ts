@@ -9,9 +9,19 @@ export async function GET() {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   };
 
+  // Additional debugging info
+  const debugInfo = {
+    apiKeyExists: !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    apiKeyLength: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.length || 0,
+    apiKeyPreview: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? 
+      `${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.substring(0, 10)}...` : 'N/A',
+    allEnvKeys: Object.keys(process.env).filter(key => key.includes('GOOGLE') || key.includes('MAPS')),
+  };
+
   return NextResponse.json({
     success: true,
     environment: envVars,
+    debug: debugInfo,
     timestamp: new Date().toISOString()
   });
 }

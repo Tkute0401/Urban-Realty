@@ -19,6 +19,16 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   
   // Use environment variable from Next.js
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
+  // Debug logging
+  console.log('🔧 PropertiesMap Debug Info:', {
+    apiKey: googleMapsApiKey ? 'Found' : 'Missing',
+    apiKeyLength: googleMapsApiKey?.length || 0,
+    apiKeyPreview: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'N/A',
+    nodeEnv: process.env.NODE_ENV,
+    isClient: typeof window !== 'undefined',
+    propertiesCount: properties?.length || 0
+  });
 
   useEffect(() => {
     if (isLoaded && properties?.length > 0 && mapRef.current) {

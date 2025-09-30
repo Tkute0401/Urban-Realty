@@ -16,6 +16,16 @@ const PropertyMap = ({ location, address }) => {
 
   // Use environment variable from Next.js
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
+  // Debug logging
+  console.log('🔧 PropertyMap Debug Info:', {
+    apiKey: googleMapsApiKey ? 'Found' : 'Missing',
+    apiKeyLength: googleMapsApiKey?.length || 0,
+    apiKeyPreview: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'N/A',
+    nodeEnv: process.env.NODE_ENV,
+    isClient: typeof window !== 'undefined',
+    location: location
+  });
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (
