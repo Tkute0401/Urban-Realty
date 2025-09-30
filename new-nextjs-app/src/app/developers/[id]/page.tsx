@@ -14,11 +14,12 @@ export default function DeveloperPage() {
 
   useEffect(() => {
     const fetchDeveloper = async () => {
+      const id = params.id as string;
+      
       try {
         setLoading(true);
         setError(null);
         
-        const id = params.id as string;
         console.log('🔍 Client-side fetchDeveloper - Fetching developer:', id);
         
         // Use the API client which already has the correct /api/v1 prefix
