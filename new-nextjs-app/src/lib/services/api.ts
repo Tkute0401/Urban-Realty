@@ -84,6 +84,7 @@ export const api = {
                 contactStats: () => unwrap<any>(http.get("/api/v1/admin/contacts/stats")),
                 getInquiry: (id: string) => unwrap<any>(http.get(`/api/v1/admin/inquiries/${id}`)),
                 updateUser: (userId: string, payload: any) => unwrap<any>(http.put(`/api/v1/admin/users/${userId}`, payload)),
+                updateUserStatus: (userId: string, payload: any) => unwrap<any>(http.patch(`/api/v1/admin/users/${userId}/status`, payload)),
                 deleteUser: (userId: string) => unwrap<any>(http.delete(`/api/v1/admin/users/${userId}`)),
                 deleteProperty: (propertyId: string) => unwrap<any>(http.delete(`/api/v1/admin/properties/${propertyId}`)),
                 verifyAgent: (agentId: string) => unwrap<any>(http.put(`/api/v1/admin/agents/${agentId}/verify`, {})),

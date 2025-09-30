@@ -45,7 +45,7 @@ const AgentsPage = () => {
 
   const handleDeleteAgent = async () => {
     try {
-      await http.delete(`/admin/users/${selectedAgent._id}`);
+      await api.admin.deleteUser(selectedAgent._id);
       setOpenDeleteDialog(false);
       fetchAgents();
     } catch (err) {
@@ -55,7 +55,7 @@ const AgentsPage = () => {
 
   const toggleAgentStatus = async (agentId, isActive) => {
     try {
-      await http.patch(`/admin/users/${agentId}/status`, {
+      await api.admin.updateUserStatus(agentId, {
         active: !isActive
       });
       fetchAgents();
