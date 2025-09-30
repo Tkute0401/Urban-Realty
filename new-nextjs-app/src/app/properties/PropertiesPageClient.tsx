@@ -65,6 +65,10 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     // Initialize properties from context or use initial properties
     if (properties.length === 0 && initialProperties.length > 0) {
       setProperties(initialProperties);
+      setFilteredProperties(initialProperties as Property[]);
+    } else if (properties.length > 0) {
+      // Use properties from context if available
+      setFilteredProperties(properties as Property[]);
     }
     
     const handleResize = () => {
@@ -75,6 +79,13 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [properties.length, initialProperties, setProperties]);
+
+  // Update filtered properties when properties change
+  useEffect(() => {
+    if (properties.length > 0) {
+      setFilteredProperties(properties as Property[]);
+    }
+  }, [properties]);
 
   // Filter properties whenever filters, search term, or activeBtn change
   useEffect(() => {

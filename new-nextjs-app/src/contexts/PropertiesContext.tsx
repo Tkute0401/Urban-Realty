@@ -33,6 +33,7 @@ interface PropertiesContextType {
   setFeaturedProperties: (properties: Property[]) => void;
   setProperty: (property: Property | null) => void;
   clearError: () => void;
+  clearCache: () => void;
   // New alias with richer signature matching client app usage
   addProperty?: (
     data: Record<string, any>, 
@@ -60,6 +61,7 @@ const defaultContextValue: PropertiesContextType = {
   setFeaturedProperties: () => {},
   setProperty: () => {},
   clearError: () => {},
+  clearCache: () => {},
 };
 
 const PropertiesContext = createContext<PropertiesContextType>(defaultContextValue);
@@ -73,14 +75,39 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     console.log('🔧 PropertiesProvider rendering...');
   }
   
-  const [properties, setProperties] = useState([]);
-  const [featuredProperties, setFeaturedProperties] = useState([]);
+  // Initialize state with localStorage persistence
+  const [properties, setProperties] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('urban-realty-properties');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  const [featuredProperties, setFeaturedProperties] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('urban-realty-featured-properties');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [cache, setCache] = useState({});
+  const [cache, setCache] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('urban-realty-cache');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
   const [developers, setDevelopers] = useState([]);
-  const [pagination, setPagination] = useState({});
+  const [pagination, setPagination] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('urban-realty-pagination');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
   const [agentProperties, setAgentProperties] = useState([]);
   
   // Add useEffect for debugging
@@ -94,6 +121,88 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       }
     };
   }, []);
+
+  // Persist properties to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && properties.length > 0) {
+      localStorage.setItem('urban-realty-properties', JSON.stringify(properties));
+    }
+  }, [properties]);
+
+  // Persist featured properties to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && featuredProperties.length > 0) {
+      localStorage.setItem('urban-realty-featured-properties', JSON.stringify(featuredProperties));
+    }
+  }, [featuredProperties]);
+
+  // Persist cache to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Object.keys(cache).length > 0) {
+      localStorage.setItem('urban-realty-cache', JSON.stringify(cache));
+    }
+  }, [cache]);
+
+  // Persist pagination to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Object.keys(pagination).length > 0) {
+      localStorage.setItem('urban-realty-pagination', JSON.stringify(pagination));
+    }
+  }, [pagination]);
+
+  // Initialize properties from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedProperties = localStorage.getItem('urban-realty-properties');
+      const savedFeatured = localStorage.getItem('urban-realty-featured-properties');
+      const savedCache = localStorage.getItem('urban-realty-cache');
+      const savedPagination = localStorage.getItem('urban-realty-pagination');
+      
+      if (savedProperties && properties.length === 0) {
+        try {
+          const parsed = JSON.parse(savedProperties);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProperties(parsed);
+          }
+        } catch (e) {
+          console.warn('Failed to parse saved properties:', e);
+        }
+      }
+      
+      if (savedFeatured && featuredProperties.length === 0) {
+        try {
+          const parsed = JSON.parse(savedFeatured);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setFeaturedProperties(parsed);
+          }
+        } catch (e) {
+          console.warn('Failed to parse saved featured properties:', e);
+        }
+      }
+      
+      if (savedCache && Object.keys(cache).length === 0) {
+        try {
+          const parsed = JSON.parse(savedCache);
+          if (typeof parsed === 'object' && parsed !== null) {
+            setCache(parsed);
+          }
+        } catch (e) {
+          console.warn('Failed to parse saved cache:', e);
+        }
+      }
+      
+      if (savedPagination && Object.keys(pagination).length === 0) {
+        try {
+          const parsed = JSON.parse(savedPagination);
+          if (typeof parsed === 'object' && parsed !== null) {
+            setPagination(parsed);
+          }
+        } catch (e) {
+          console.warn('Failed to parse saved pagination:', e);
+        }
+      }
+    }
+  }, []); // Only run on mount
 
   const getProperties = useCallback(async (params: Record<string, any> = {}) => {
     const cacheKey = JSON.stringify(params);
@@ -540,6 +649,19 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
 
   const clearProperty = useCallback(() => setProperty(null), []);
   const clearErrors = useCallback(() => setError(null), []);
+  
+  const clearCache = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('urban-realty-properties');
+      localStorage.removeItem('urban-realty-featured-properties');
+      localStorage.removeItem('urban-realty-cache');
+      localStorage.removeItem('urban-realty-pagination');
+    }
+    setProperties([]);
+    setFeaturedProperties([]);
+    setCache({});
+    setPagination({});
+  }, []);
 
   const contextValue = useMemo(() => ({
     properties,
@@ -564,7 +686,8 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     setProperty: (prop: Property | null) => setProperty(prop),
     clearProperty,
     clearError: () => setError(null),
-    clearErrors
+    clearErrors,
+    clearCache
   }), [
     properties,
     featuredProperties,
@@ -583,7 +706,8 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     deleteProperty,
     getDevelopers,
     clearProperty,
-    clearErrors
+    clearErrors,
+    clearCache
   ]);
 
   return (

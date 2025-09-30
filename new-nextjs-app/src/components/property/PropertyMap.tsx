@@ -13,6 +13,7 @@ const PropertyMap = ({ location, address }) => {
   }, []);
   const mapRef = useRef(null);
   const [activeMarker, setActiveMarker] = useState(null);
+  const [error, setError] = useState(null);
 
   // Use environment variable from Next.js
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -59,10 +60,22 @@ const PropertyMap = ({ location, address }) => {
     );
   }
 
+  if (error) {
+    return (
+      <Typography variant="body2" color="error">
+        Map unavailable. {error}
+      </Typography>
+    );
+  }
+
   return (
     <LoadScript 
       googleMapsApiKey={googleMapsApiKey}
       loadingElement={<div>Loading Google Maps...</div>}
+      onError={(error) => {
+        console.error('🔧 Google Maps script failed to load:', error);
+        setError('Failed to load Google Maps');
+      }}
       >
       <GoogleMap
         mapContainerClassName="map-container map-container--sm"
