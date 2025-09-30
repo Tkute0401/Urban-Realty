@@ -2,6 +2,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useDevelopers } from '../../contexts/DevelopersContext';
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Box, Grid, Typography, CircularProgress, Button, 

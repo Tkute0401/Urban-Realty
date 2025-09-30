@@ -3,6 +3,9 @@
 import { Box, Typography } from '@mui/material';
 import FavoritesGrid from '../../../components/user/FavoritesGrid';
 import { useAuth } from '../../../contexts/AuthContext';
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/services/api';

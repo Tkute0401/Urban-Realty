@@ -3,6 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDevelopers } from '../../../contexts/DevelopersContext';
 import { useAuth } from '../../../contexts/AuthContext';
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
 import { useRouter } from 'next/navigation';
 import { 
   Box, TextField, Button, Grid, MenuItem, Chip, Typography, Paper,

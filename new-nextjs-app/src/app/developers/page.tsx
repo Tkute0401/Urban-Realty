@@ -2,6 +2,9 @@ import React from 'react';
 import type { Metadata } from 'next';
 import DevelopersPageWrapper from './DevelopersPageWrapper';
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Real Estate Developers | Squarefooot',
   description: 'Browse our network of trusted real estate developers. Find developers for your next property investment or development project.',
