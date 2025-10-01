@@ -1,31 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
-import MapTilesContainer from './MapTilesContainer';
 
 // Mappls types are now defined in src/types/mappls.d.ts
 
 const PropertyMapNew = ({ location, address }) => {
-  console.log('🔧 PropertyMapNew rendering...', { location, address });
-  
+  const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
   const [error, setError] = useState(null);
 
   // Use environment variable from Next.js
   const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
-  
-  // Debug logging
-  console.log('🔧 PropertyMapNew Debug Info:', {
-    apiKey: mapplsApiKey ? 'Found' : 'Missing',
-    apiKeyLength: mapplsApiKey?.length || 0,
-    apiKeyPreview: mapplsApiKey ? `${mapplsApiKey.substring(0, 10)}...` : 'N/A',
-    nodeEnv: process.env.NODE_ENV,
-    isClient: typeof window !== 'undefined',
-    location: location,
-    address: address
-  });
 
   // Load Mappls script
   useEffect(() => {
@@ -62,56 +49,89 @@ const PropertyMapNew = ({ location, address }) => {
     }
   }, [mapplsApiKey]);
 
-  // Add marker when map is ready
-  const handleMapReady = (mapInstance) => {
-    console.log('🔧 PropertyMap is ready, adding marker...');
-    setMap(mapInstance);
-    
+  // Initialize map when script is loaded
+  useEffect(() => {
+    if (!mapplsLoaded || !window.mappls || !mapRef.current || map) return;
+
     if (!location || !location.coordinates || location.coordinates.length !== 2) {
-      console.log('🔧 No valid location to display');
+      setError('Invalid location data');
       return;
     }
 
-    const center = {
-      lat: location.coordinates[1],
-      lng: location.coordinates[0]
+    const initializeMap = () => {
+      try {
+        const center = {
+          lat: location.coordinates[1],
+          lng: location.coordinates[0]
+        };
+
+        const mapInstance = new window.mappls.Map(mapRef.current, {
+          center: center,
+          zoom: 15,
+          mapTypeId: 'mappls.vector',
+          gestureHandling: 'greedy',
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: true,
+          scaleControl: true,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: true
+        });
+
+        mapInstance.addListener('error', (e) => {
+          console.error('🔧 Map error:', e);
+          setError('Map failed to load properly');
+        });
+
+        mapInstance.addListener('idle', () => {
+          console.log('🔧 Map is idle and ready');
+        });
+
+        // Add marker
+        const marker = new window.mappls.Marker({
+          map: mapInstance,
+          position: center,
+          icon: {
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+              <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="8" fill="#FF4081" stroke="#0B1011" stroke-width="2"/>
+              </svg>
+            `)}`,
+            scaledSize: { width: 20, height: 20 }
+          }
+        });
+
+        // Add info window
+        const infoWindow = new window.mappls.InfoWindow({
+          map: mapInstance,
+          position: center,
+          content: `<div style="padding: 5px; font-size: 12px;">${address || 'Property Location'}</div>`
+        });
+
+        setMap(mapInstance);
+        console.log('🔧 PropertyMap initialized successfully');
+      } catch (err) {
+        console.error('🔧 Error initializing map:', err);
+        setError('Failed to initialize map: ' + err.message);
+      }
     };
 
-    console.log('🔧 Adding marker at:', center);
+    // Wait for container to be ready
+    const checkContainer = () => {
+      if (mapRef.current && mapRef.current.offsetParent) {
+        initializeMap();
+      } else {
+        setTimeout(checkContainer, 100);
+      }
+    };
 
-    // Add marker
-    const marker = new window.mappls.Marker({
-      map: mapInstance,
-      position: center,
-      title: address || 'Property Location'
-    });
-
-    // Add info window
-    const infoWindow = new window.mappls.InfoWindow({
-      map: mapInstance,
-      position: center,
-      content: `
-        <div style="padding: 10px; max-width: 200px;">
-          <h4 style="margin: 0 0 5px 0; font-size: 14px;">Property Location</h4>
-          <p style="margin: 0; font-size: 12px; color: #666;">${address || 'Location not specified'}</p>
-        </div>
-      `
-    });
-
-    // Open info window by default
-    infoWindow.open(mapInstance);
-
-    console.log('✅ PropertyMap marker and info window created successfully');
-  };
-
-  const handleMapError = (errorMessage) => {
-    console.error('🔧 PropertyMap error:', errorMessage);
-    setError(errorMessage);
-  };
+    checkContainer();
+  }, [mapplsLoaded, location, address, map]);
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (
-      <Box className="map-empty">
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
         <Typography variant="body2" color="text.secondary">
           No location data available for this property
         </Typography>
@@ -119,13 +139,26 @@ const PropertyMapNew = ({ location, address }) => {
     );
   }
 
+  if (error) {
+    return (
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box className="map-container-wrapper">
-      <MapTilesContainer
-        className="map-container--sm"
-        onMapReady={handleMapReady}
-        onMapError={handleMapError}
-        style={{ height: '300px' }}
+    <Box sx={{ width: '100%', height: '400px', position: 'relative' }}>
+      <div
+        ref={mapRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '4px',
+          overflow: 'hidden'
+        }}
       />
     </Box>
   );

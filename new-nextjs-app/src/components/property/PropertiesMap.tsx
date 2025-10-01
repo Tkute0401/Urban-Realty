@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import './PropertiesMap.css';
-import MapTilesContainer from './MapTilesContainer';
+// Removed MapTilesContainer import - using direct implementation
 
 // Mappls types are now defined in src/types/mappls.d.ts
 

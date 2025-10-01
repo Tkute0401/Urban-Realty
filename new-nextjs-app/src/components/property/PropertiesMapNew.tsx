@@ -1,15 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
-import MapTilesDebug from './MapTilesDebug';
-import MapTilesContainer from './MapTilesContainer';
 
 // Mappls types are now defined in src/types/mappls.d.ts
 
 const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
-  console.log('🔧 PropertiesMapNew rendering...', { propertiesCount: properties?.length, selectedProperty });
-  
+  const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
@@ -17,18 +14,6 @@ const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
 
   // Use environment variable from Next.js
   const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
-  
-  // Debug logging
-  console.log('🔧 PropertiesMapNew Debug Info:', {
-    apiKey: mapplsApiKey ? 'Found' : 'Missing',
-    apiKeyLength: mapplsApiKey?.length || 0,
-    apiKeyPreview: mapplsApiKey ? `${mapplsApiKey.substring(0, 10)}...` : 'N/A',
-    nodeEnv: process.env.NODE_ENV,
-    isClient: typeof window !== 'undefined',
-    propertiesCount: properties?.length || 0,
-    allEnvVars: Object.keys(process.env).filter(key => key.includes('MAPPLS')),
-    rawApiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY
-  });
 
   // Load Mappls script
   useEffect(() => {
@@ -65,15 +50,60 @@ const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
     }
   }, [mapplsApiKey]);
 
-  // Add markers when map is ready
-  const handleMapReady = (mapInstance) => {
-    console.log('🔧 Map is ready, adding markers...');
-    setMap(mapInstance);
-    
-    if (!properties || properties.length === 0) {
-      console.log('🔧 No properties to display');
-      return;
-    }
+  // Initialize map when script is loaded
+  useEffect(() => {
+    if (!mapplsLoaded || !window.mappls || !mapRef.current || map) return;
+
+    const initializeMap = () => {
+      try {
+        const mapInstance = new window.mappls.Map(mapRef.current, {
+          center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
+          zoom: 10,
+          mapTypeId: 'mappls.vector',
+          gestureHandling: 'greedy',
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: true,
+          scaleControl: true,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: true
+        });
+
+        mapInstance.addListener('error', (e) => {
+          console.error('🔧 Map error:', e);
+          setError('Map failed to load properly');
+        });
+
+        mapInstance.addListener('idle', () => {
+          console.log('🔧 Map is idle and ready');
+        });
+
+        setMap(mapInstance);
+        console.log('🔧 Map initialized successfully');
+      } catch (err) {
+        console.error('🔧 Error initializing map:', err);
+        setError('Failed to initialize map: ' + err.message);
+      }
+    };
+
+    // Wait for container to be ready
+    const checkContainer = () => {
+      if (mapRef.current && mapRef.current.offsetParent) {
+        initializeMap();
+      } else {
+        setTimeout(checkContainer, 100);
+      }
+    };
+
+    checkContainer();
+  }, [mapplsLoaded, map]);
+
+  // Add markers when map and properties are ready
+  useEffect(() => {
+    if (!map || !properties || properties.length === 0) return;
+
+    console.log('🔧 Adding markers to map...');
 
     // Clear existing markers
     markers.forEach(marker => {
@@ -88,12 +118,10 @@ const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
       if (property.location && property.location.coordinates && property.location.coordinates.length === 2) {
         const [lng, lat] = property.location.coordinates;
         
-        console.log(`🔧 Adding marker for property ${index}:`, { lat, lng, property: property.title });
-        
         const isSelected = selectedProperty?._id === property._id;
 
         const marker = new window.mappls.Marker({
-          map: mapInstance,
+          map: map,
           position: { lat, lng },
           icon: {
             url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
@@ -107,15 +135,12 @@ const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
 
         // Add click listener
         marker.addListener('click', () => {
-          console.log('🔧 Marker clicked:', property.title);
           if (onMarkerClick) {
             onMarkerClick(property);
           }
         });
 
         newMarkers.push(marker);
-      } else {
-        console.warn(`🔧 Property ${index} has invalid coordinates:`, property.location);
       }
     });
 
@@ -128,19 +153,13 @@ const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
       newMarkers.forEach(marker => {
         bounds.extend(marker.getPosition());
       });
-      mapInstance.fitBounds(bounds);
-      console.log('🔧 Map bounds fitted to markers');
+      map.fitBounds(bounds);
     }
-  };
-
-  const handleMapError = (errorMessage) => {
-    console.error('🔧 Map error:', errorMessage);
-    setError(errorMessage);
-  };
+  }, [map, properties, selectedProperty, onMarkerClick]);
 
   if (!properties || properties.length === 0) {
     return (
-      <Box className="map-empty">
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
         <Typography variant="body2" color="text.secondary">
           No properties to display on map
         </Typography>
@@ -148,22 +167,26 @@ const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
     );
   }
 
+  if (error) {
+    return (
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box className="map-container-wrapper">
-      <MapTilesDebug 
-        apiKey={mapplsApiKey}
-        isLoaded={mapplsLoaded}
-        error={error}
-        propertiesCount={properties?.length || 0}
-        allEnvVars={Object.keys(process.env).filter(key => key.includes('MAPPLS'))}
-        rawApiKey={process.env.NEXT_PUBLIC_MAPPLS_API_KEY}
-      />
-      
-      <MapTilesContainer
-        className="map-container--lg"
-        onMapReady={handleMapReady}
-        onMapError={handleMapError}
-        style={{ height: '500px' }}
+    <Box sx={{ width: '100%', height: '400px', position: 'relative' }}>
+      <div
+        ref={mapRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '4px',
+          overflow: 'hidden'
+        }}
       />
     </Box>
   );
