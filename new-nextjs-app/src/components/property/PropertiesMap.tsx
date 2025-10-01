@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import './PropertiesMap.css';
+import MapTilesContainer from './MapTilesContainer';
 
 // Declare Mappls types
 declare global {

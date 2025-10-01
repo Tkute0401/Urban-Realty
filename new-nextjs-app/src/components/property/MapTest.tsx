@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import PropertyMap from './PropertyMap';
 import PropertiesMap from './PropertiesMap';
+import PropertyMapNew from './PropertyMapNew';
+import PropertiesMapNew from './PropertiesMapNew';
 import LocationSearch from './LocationSearch';
 import NearbyAmenities from './NearbyAmenities';
 import MapTilesDebug from './MapTilesDebug';
@@ -101,6 +103,42 @@ const MapTest = () => {
           <MapErrorBoundary>
             <MapTilesDirectTest />
           </MapErrorBoundary>
+        </Grid>
+
+        {/* New Map Components Test */}
+        <Grid item xs={12}>
+          <Card sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                New Map Components Test
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Properties Map (New)
+                  </Typography>
+                  <MapErrorBoundary>
+                    <PropertiesMapNew 
+                      properties={testProperties} 
+                      selectedProperty={testProperty}
+                      onMarkerClick={setTestProperty}
+                    />
+                  </MapErrorBoundary>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Property Map (New)
+                  </Typography>
+                  <MapErrorBoundary>
+                    <PropertyMapNew 
+                      location={testProperty?.location} 
+                      address={testProperty?.address}
+                    />
+                  </MapErrorBoundary>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Grid>
 
         {/* Location Search Test */}
