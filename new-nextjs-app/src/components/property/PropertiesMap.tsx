@@ -26,7 +26,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
   
   // Use environment variable from Next.js
-  const mapplsApiKey ='82f5c384638d8cfc7d13e310780bae89';
+  const mapplsApiKey =  '82f5c384638d8cfc7d13e310780bae89';
   
   // Debug logging
   console.log('🔧 PropertiesMap Debug Info:', {
@@ -74,19 +74,15 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     }
   }, [mapplsApiKey, mapplsLoaded]);
 
-  useEffect(() => {
-    if (!mapplsLoaded || !mapRef.current || !properties) {
+  // Initialize map function
+  const initializeMap = () => {
+    if (!mapRef.current || !window.mappls) {
+      console.log('🔧 Map initialization failed: missing container or mappls');
       return;
     }
 
     try {
-      // Cleanup existing markers before re-rendering
-      markers.forEach(marker => {
-        if (marker && marker.setMap) {
-          marker.setMap(null);
-        }
-      });
-
+      console.log('🔧 Initializing MapTiles map...');
       // Create map
       const map = new window.mappls.Map(mapRef.current, {
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
@@ -153,6 +149,35 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       console.error('Error creating Mappls map:', err);
       setError('Failed to load map');
     }
+  };
+
+  useEffect(() => {
+    if (!mapplsLoaded || !mapRef.current || !properties) {
+      console.log('🔧 Map initialization skipped:', { mapplsLoaded, mapRef: !!mapRef.current, properties: !!properties });
+      return;
+    }
+
+    // Cleanup existing markers before re-rendering
+    markers.forEach(marker => {
+      if (marker && marker.setMap) {
+        marker.setMap(null);
+      }
+    });
+
+    // Ensure the map container is ready
+    if (!mapRef.current || !mapRef.current.offsetParent) {
+      console.log('🔧 Map container not ready, retrying...');
+      setTimeout(() => {
+        if (mapRef.current && mapRef.current.offsetParent) {
+          console.log('🔧 Map container ready, initializing map...');
+          initializeMap();
+        }
+      }, 100);
+      return;
+    }
+
+    // Initialize map immediately if container is ready
+    initializeMap();
   }, [mapplsLoaded, properties, selectedProperty, onMarkerClick]);
 
   if (!properties || properties.length === 0) {

@@ -24,7 +24,7 @@ const PropertyMap = ({ location, address }) => {
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
 
       // Use environment variable from Next.js
-      const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
+      const mapplsApiKey =  '82f5c384638d8cfc7d13e310780bae89';
   
   // Debug logging
   console.log('🔧 PropertyMap Debug Info:', {
@@ -75,6 +75,29 @@ const PropertyMap = ({ location, address }) => {
   // Initialize map when Mappls is loaded
   useEffect(() => {
     if (!mapplsLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2) {
+      console.log('🔧 PropertyMap initialization skipped:', { mapplsLoaded, mapRef: !!mapRef.current, location });
+      return;
+    }
+
+    // Ensure the map container is ready
+    if (!mapRef.current || !mapRef.current.offsetParent) {
+      console.log('🔧 PropertyMap container not ready, retrying...');
+      setTimeout(() => {
+        if (mapRef.current && mapRef.current.offsetParent) {
+          console.log('🔧 PropertyMap container ready, initializing map...');
+          initializePropertyMap();
+        }
+      }, 100);
+      return;
+    }
+
+    // Initialize map immediately if container is ready
+    initializePropertyMap();
+  }, [mapplsLoaded, location, address]);
+
+  const initializePropertyMap = () => {
+    if (!mapRef.current || !window.mappls) {
+      console.log('🔧 PropertyMap initialization failed: missing container or mappls');
       return;
     }
 
@@ -84,6 +107,7 @@ const PropertyMap = ({ location, address }) => {
         lng: location.coordinates[0]
       };
 
+      console.log('🔧 Initializing PropertyMap...');
       // Create map using Mappls API
       const map = new window.mappls.Map(mapRef.current, {
         center: center,
@@ -119,7 +143,7 @@ const PropertyMap = ({ location, address }) => {
       console.error('Error creating Mappls map:', err);
       setError('Failed to load map');
     }
-  }, [mapplsLoaded, location, address]);
+  };
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (

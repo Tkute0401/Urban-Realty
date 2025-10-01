@@ -13,6 +13,7 @@ import PropertiesMap from './PropertiesMap';
 import LocationSearch from './LocationSearch';
 import NearbyAmenities from './NearbyAmenities';
 import MapTilesDebug from './MapTilesDebug';
+import MapTilesTest from './MapTilesTest';
 import { api } from '@/lib/services/api';
 
 // Test component for Phase 4 Maps & Location Services
@@ -47,6 +48,11 @@ const MapTest = () => {
         {/* Debug Information */}
         <Grid item xs={12}>
           <MapTilesDebug />
+        </Grid>
+
+        {/* MapTiles Test Component */}
+        <Grid item xs={12}>
+          <MapTilesTest />
         </Grid>
 
         {/* Location Search Test */}

@@ -34,9 +34,13 @@ const MapTilesDebug = () => {
     setDebugInfo(prev => ({ ...prev, loading: true }));
     try {
       const response = await fetch('/api/test-mappls');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
       setDebugInfo(prev => ({ ...prev, apiTestResult: data, loading: false }));
     } catch (error) {
+      console.error('MapTiles API test error:', error);
       setDebugInfo(prev => ({ 
         ...prev, 
         apiTestResult: { success: false, error: error.message },
@@ -105,6 +109,18 @@ const MapTilesDebug = () => {
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" component="div">
             <strong>Environment:</strong> {process.env.NODE_ENV}
+          </Typography>
+        </Box>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" component="div">
+            <strong>Script Status:</strong> {debugInfo.windowMappls ? '✅ Loaded' : '❌ Not Loaded'}
+          </Typography>
+        </Box>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" component="div">
+            <strong>API Key Length:</strong> {debugInfo.apiKey.length} characters
           </Typography>
         </Box>
 
