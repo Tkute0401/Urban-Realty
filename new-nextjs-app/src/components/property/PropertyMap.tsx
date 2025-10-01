@@ -70,7 +70,7 @@ const PropertyMap = ({ location, address }) => {
     if (mapplsApiKey) {
       loadMapplsScript().catch(console.error);
     }
-  }, [mapplsApiKey, mapplsLoaded]);
+  }, [mapplsApiKey]);
 
   // Initialize map when Mappls is loaded
   useEffect(() => {
@@ -79,20 +79,23 @@ const PropertyMap = ({ location, address }) => {
       return;
     }
 
-    // Ensure the map container is ready
-    if (!mapRef.current || !mapRef.current.offsetParent) {
-      console.log('🔧 PropertyMap container not ready, retrying...');
-      setTimeout(() => {
-        if (mapRef.current && mapRef.current.offsetParent) {
-          console.log('🔧 PropertyMap container ready, initializing map...');
-          initializePropertyMap();
-        }
-      }, 100);
-      return;
-    }
+    // Use a timeout to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      if (mapRef.current && mapRef.current.offsetParent) {
+        console.log('🔧 PropertyMap container ready, initializing map...');
+        initializePropertyMap();
+      } else {
+        console.log('🔧 PropertyMap container not ready, retrying...');
+        // Retry after a longer delay
+        setTimeout(() => {
+          if (mapRef.current && mapRef.current.offsetParent) {
+            initializePropertyMap();
+          }
+        }, 500);
+      }
+    }, 100);
 
-    // Initialize map immediately if container is ready
-    initializePropertyMap();
+    return () => clearTimeout(timeoutId);
   }, [mapplsLoaded, location, address]);
 
   const initializePropertyMap = () => {
@@ -136,10 +139,35 @@ const PropertyMap = ({ location, address }) => {
         center: center
       });
       
-      // Create map using Mappls API
+      // Clear any existing map content
+      if (mapRef.current) {
+        mapRef.current.innerHTML = '';
+      }
+
+      // Create map using Mappls API with proper configuration
       const map = new window.mappls.Map(mapRef.current, {
         center: center,
-        zoom: 15
+        zoom: 15,
+        mapTypeId: 'mappls.vector', // Use vector map type
+        gestureHandling: 'greedy',
+        disableDefaultUI: false,
+        zoomControl: true,
+        mapTypeControl: true,
+        scaleControl: true,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: true
+      });
+
+      // Add error listener
+      map.addListener('error', (error) => {
+        console.error('🔧 PropertyMap error:', error);
+        setError('Map failed to load properly');
+      });
+
+      // Wait for map to be ready
+      map.addListener('idle', () => {
+        console.log('🔧 PropertyMap is idle and ready');
       });
 
       // Add marker

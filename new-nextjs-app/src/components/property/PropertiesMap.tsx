@@ -48,6 +48,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       return new Promise((resolve, reject) => {
         // Check if script already exists
         if (window.mappls) {
+          setMapplsLoaded(true);
           resolve(undefined);
           return;
         }
@@ -72,7 +73,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     if (mapplsApiKey) {
       loadMapplsScript().catch(console.error);
     }
-  }, [mapplsApiKey, mapplsLoaded]);
+  }, [mapplsApiKey]);
 
   // Initialize map function
   const initializeMap = () => {
@@ -112,13 +113,38 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
         mappls: !!window.mappls
       });
       
-      // Create map
+      // Clear any existing map content
+      if (mapRef.current) {
+        mapRef.current.innerHTML = '';
+      }
+
+      // Create map with proper configuration
       const map = new window.mappls.Map(mapRef.current, {
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
-        zoom: 10
+        zoom: 10,
+        mapTypeId: 'mappls.vector', // Use vector map type
+        gestureHandling: 'greedy',
+        disableDefaultUI: false,
+        zoomControl: true,
+        mapTypeControl: true,
+        scaleControl: true,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: true
       });
 
       setMapInstance(map);
+
+      // Add error listener
+      map.addListener('error', (error) => {
+        console.error('🔧 Map error:', error);
+        setError('Map failed to load properly');
+      });
+
+      // Wait for map to be ready
+      map.addListener('idle', () => {
+        console.log('🔧 Map is idle and ready');
+      });
 
       // Calculate bounds
       const validProperties = properties.filter(property => 
@@ -193,20 +219,23 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       }
     });
 
-    // Ensure the map container is ready
-    if (!mapRef.current || !mapRef.current.offsetParent) {
-      console.log('🔧 Map container not ready, retrying...');
-      setTimeout(() => {
-        if (mapRef.current && mapRef.current.offsetParent) {
-          console.log('🔧 Map container ready, initializing map...');
-          initializeMap();
-        }
-      }, 100);
-      return;
-    }
+    // Use a timeout to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      if (mapRef.current && mapRef.current.offsetParent) {
+        console.log('🔧 Map container ready, initializing map...');
+        initializeMap();
+      } else {
+        console.log('🔧 Map container not ready, retrying...');
+        // Retry after a longer delay
+        setTimeout(() => {
+          if (mapRef.current && mapRef.current.offsetParent) {
+            initializeMap();
+          }
+        }, 500);
+      }
+    }, 100);
 
-    // Initialize map immediately if container is ready
-    initializeMap();
+    return () => clearTimeout(timeoutId);
   }, [mapplsLoaded, properties, selectedProperty, onMarkerClick]);
 
   if (!properties || properties.length === 0) {

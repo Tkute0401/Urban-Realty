@@ -16,6 +16,8 @@ import MapTilesDebug from './MapTilesDebug';
 import MapTilesTest from './MapTilesTest';
 import MapTilesSimpleTest from './MapTilesSimpleTest';
 import MapTilesMinimalTest from './MapTilesMinimalTest';
+import MapTilesApiTest from './MapTilesApiTest';
+import MapTilesDirectTest from './MapTilesDirectTest';
 import MapErrorBoundary from './MapErrorBoundary';
 import { api } from '@/lib/services/api';
 
@@ -69,6 +71,20 @@ const MapTest = () => {
         <Grid item xs={12}>
           <MapErrorBoundary>
             <MapTilesMinimalTest />
+          </MapErrorBoundary>
+        </Grid>
+
+        {/* MapTiles API Test Component */}
+        <Grid item xs={12}>
+          <MapErrorBoundary>
+            <MapTilesApiTest />
+          </MapErrorBoundary>
+        </Grid>
+
+        {/* MapTiles Direct Test Component */}
+        <Grid item xs={12}>
+          <MapErrorBoundary>
+            <MapTilesDirectTest />
           </MapErrorBoundary>
         </Grid>
 
