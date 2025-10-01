@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import MapplsMap from './MapplsMap';
+import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { getMapStyles } from '../../lib/map-styles';
 import './PropertiesMap.css';
 
 // Styles moved to CSS to avoid inline-style usage
@@ -11,15 +12,161 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   React.useEffect(() => {
     console.log('🔧 PropertiesMap mounted on client side!', { propertiesCount: properties?.length });
   }, []);
+  const mapRef = useRef(null);
+  const [activeMarker, setActiveMarker] = useState(null);
+  const [bounds, setBounds] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Use environment variable from Next.js
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
+  // Debug logging
+  console.log('🔧 PropertiesMap Debug Info:', {
+    apiKey: googleMapsApiKey ? 'Found' : 'Missing',
+    apiKeyLength: googleMapsApiKey?.length || 0,
+    apiKeyPreview: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'N/A',
+    nodeEnv: process.env.NODE_ENV,
+    isClient: typeof window !== 'undefined',
+    propertiesCount: properties?.length || 0
+  });
+
+  useEffect(() => {
+    if (isLoaded && properties?.length > 0 && mapRef.current) {
+      // Calculate bounds to fit all markers
+      const newBounds = new window.google.maps.LatLngBounds();
+      properties.forEach(property => {
+        if (property.location?.coordinates?.length === 2) {
+          newBounds.extend({
+            lat: property.location.coordinates[1],
+            lng: property.location.coordinates[0]
+          });
+        }
+      });
+      setBounds(newBounds);
+      mapRef.current.fitBounds(newBounds);
+    }
+  }, [properties, isLoaded]);
+
+  if (!properties || properties.length === 0) {
+    return (
+      <Box className="map-empty">
+        <Typography variant="body2" color="text.secondary">
+          No properties to display on map.
+        </Typography>
+      </Box>
+    );
+  }
+
+  const handleActiveMarker = (marker) => {
+    if (marker === activeMarker) {
+      return;
+    }
+    setActiveMarker(marker);
+  };
+
+  const onLoad = (map) => {
+    mapRef.current = map;
+    setIsLoaded(true);
+  };
+
+  const onUnmount = () => {
+    mapRef.current = null;
+    setIsLoaded(false);
+  };
+
+  if (!googleMapsApiKey) {
+    return (
+      <Box className="map-empty">
+        <Typography variant="body2" color="text.secondary">
+          Map unavailable. Missing Google Maps API key.
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box className="map-empty">
+        <Typography variant="body2" color="error">
+          Map unavailable. {error}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <MapplsMap
-      properties={properties}
-      selectedProperty={selectedProperty}
-      onMarkerClick={onMarkerClick}
-      className="map-container map-container--lg"
-      height="500px"
-    />
+    <LoadScript 
+      googleMapsApiKey={googleMapsApiKey}
+      loadingElement={<div>Loading Google Maps...</div>}
+      onLoad={() => {
+        console.log('🔧 Google Maps script loaded successfully');
+        setTimeout(() => setIsLoaded(true), 100);
+      }}
+      onError={(error) => {
+        console.error('🔧 Google Maps script failed to load:', error);
+        setError('Failed to load Google Maps');
+      }}
+    >
+      <GoogleMap
+        mapContainerClassName="map-container map-container--lg"
+        zoom={10}
+        onLoad={onLoad}
+        onUnmount={onUnmount}
+        options={{
+          styles: getMapStyles()
+        }}
+      >
+        {isLoaded && properties.map((property, index) => {
+          if (!property.location?.coordinates || property.location.coordinates.length !== 2) {
+            return null;
+          }
+          
+          const position = {
+            lat: property.location.coordinates[1],
+            lng: property.location.coordinates[0]
+          };
+          
+          const isSelected = selectedProperty?._id === property._id;
+          const markerColor = isSelected ? 'var(--color-primary-orange)' : 'var(--color-primary-blue)';
+          
+          return (
+            <Marker
+              key={property._id}
+              position={position}
+              onClick={() => {
+                handleActiveMarker(index);
+                if (onMarkerClick) {
+                  onMarkerClick(property);
+                }
+              }}
+              icon={{
+                path: window.google.maps.SymbolPath.CIRCLE,
+                fillColor: markerColor,
+                fillOpacity: 1,
+                strokeColor: 'var(--color-bg-dark)',
+                strokeWeight: 1,
+                scale: isSelected ? 10 : 8
+              }}
+            >
+              {activeMarker === index && (
+                <InfoWindow onCloseClick={() => setActiveMarker(null)}>
+                  <div className="text-dark maxw-200">
+                    <h3 className="my-1 fs-16">{property.title}</h3>
+                    <p className="my-1 fs-14">
+                      {property.address?.street}, {property.address?.city}
+                    </p>
+                    <p className="my-1 fs-14 fw-700">
+                      {property.price ? `$${property.price.toLocaleString()}` : 'Price not available'}
+                    </p>
+                  </div>
+                </InfoWindow>
+              )}
+            </Marker>
+          );
+        })}
+      </GoogleMap>
+    </LoadScript>
   );
 };
 

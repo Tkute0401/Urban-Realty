@@ -12,6 +12,7 @@ import PropertyMap from './PropertyMap';
 import PropertiesMap from './PropertiesMap';
 import LocationSearch from './LocationSearch';
 import NearbyAmenities from './NearbyAmenities';
+import GoogleMapsDebug from './GoogleMapsDebug';
 import { api } from '@/lib/services/api';
 
 // Test component for Phase 4 Maps & Location Services
@@ -45,6 +46,7 @@ const MapTest = () => {
       <Grid container spacing={3}>
         {/* Debug Information */}
         <Grid item xs={12}>
+          <GoogleMapsDebug />
         </Grid>
 
         {/* Location Search Test */}
