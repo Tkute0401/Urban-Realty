@@ -33,6 +33,7 @@
     "framer-motion": "^12.23.12",
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
+    "mappls-web-maps": "^3.8.0",
     "next": "14.2.14",
     "node-geocoder": "^4.4.1",
     "postcss": "8.4.31",

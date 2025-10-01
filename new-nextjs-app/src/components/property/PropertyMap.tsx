@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import MapplsMap from './MapplsMap';
 import './PropertyMap.css';
 
 // Styles moved to CSS to avoid inline-style usage
@@ -11,22 +11,6 @@ const PropertyMap = ({ location, address }) => {
   React.useEffect(() => {
     console.log('🔧 PropertyMap mounted on client side!');
   }, []);
-  const mapRef = useRef(null);
-  const [activeMarker, setActiveMarker] = useState(null);
-  const [error, setError] = useState(null);
-
-  // Use environment variable from Next.js
-  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  
-  // Debug logging
-  console.log('🔧 PropertyMap Debug Info:', {
-    apiKey: googleMapsApiKey ? 'Found' : 'Missing',
-    apiKeyLength: googleMapsApiKey?.length || 0,
-    apiKeyPreview: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'N/A',
-    nodeEnv: process.env.NODE_ENV,
-    isClient: typeof window !== 'undefined',
-    location: location
-  });
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (
@@ -36,70 +20,27 @@ const PropertyMap = ({ location, address }) => {
     );
   }
 
-  const onLoad = (map) => {
-    mapRef.current = map;
-  };
-
   const center = {
     lat: location.coordinates[1],
     lng: location.coordinates[0]
   };
 
-  const handleActiveMarker = (marker) => {
-    if (marker === activeMarker) {
-      return;
-    }
-    setActiveMarker(marker);
+  // Create a single property object for the map
+  const property = {
+    _id: 'single-property',
+    title: address?.street || 'Property Location',
+    address: address,
+    location: location
   };
 
-  if (!googleMapsApiKey) {
-    return (
-      <Typography variant="body2" color="text.secondary">
-        Map unavailable. Missing Google Maps API key.
-      </Typography>
-    );
-  }
-
-  if (error) {
-    return (
-      <Typography variant="body2" color="error">
-        Map unavailable. {error}
-      </Typography>
-    );
-  }
-
   return (
-    <LoadScript 
-      googleMapsApiKey={googleMapsApiKey}
-      loadingElement={<div>Loading Google Maps...</div>}
-      onError={(error) => {
-        console.error('🔧 Google Maps script failed to load:', error);
-        setError('Failed to load Google Maps');
-      }}
-      >
-      <GoogleMap
-        mapContainerClassName="map-container map-container--sm"
-        center={center}
-        zoom={15}
-        onLoad={onLoad}
-      >
-        <Marker
-          position={center}
-          onClick={() => handleActiveMarker(1)}
-        >
-          {activeMarker === 1 && (
-            <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-              <div>
-                <Typography variant="subtitle2">{address.street}</Typography>
-                <Typography variant="body2">
-                  {address.city}, {address.state} {address.zipCode}
-                </Typography>
-              </div>
-            </InfoWindow>
-          )}
-        </Marker>
-      </GoogleMap>
-    </LoadScript>
+    <MapplsMap
+      properties={[property]}
+      center={center}
+      zoom={15}
+      className="map-container map-container--sm"
+      height="300px"
+    />
   );
 };
 
