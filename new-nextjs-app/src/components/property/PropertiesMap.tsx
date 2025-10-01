@@ -89,12 +89,29 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
           console.log('🔧 Map container ready, initializing map...');
           initializeMap();
         }
-      }, 100);
+      }, 200);
+      return;
+    }
+
+    // Additional check to ensure container has dimensions
+    const rect = mapRef.current.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.log('🔧 Map container has no dimensions, retrying...');
+      setTimeout(() => {
+        if (mapRef.current) {
+          initializeMap();
+        }
+      }, 200);
       return;
     }
 
     try {
-      console.log('🔧 Initializing MapTiles map...');
+      console.log('🔧 Initializing MapTiles map...', {
+        container: mapRef.current,
+        dimensions: { width: rect.width, height: rect.height },
+        mappls: !!window.mappls
+      });
+      
       // Create map
       const map = new window.mappls.Map(mapRef.current, {
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi

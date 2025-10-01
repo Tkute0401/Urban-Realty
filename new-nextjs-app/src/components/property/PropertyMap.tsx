@@ -101,13 +101,41 @@ const PropertyMap = ({ location, address }) => {
       return;
     }
 
+    // Ensure the map container is ready and visible
+    if (!mapRef.current.offsetParent) {
+      console.log('🔧 PropertyMap container not ready, retrying...');
+      setTimeout(() => {
+        if (mapRef.current && mapRef.current.offsetParent) {
+          initializePropertyMap();
+        }
+      }, 200);
+      return;
+    }
+
+    // Additional check to ensure container has dimensions
+    const rect = mapRef.current.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.log('🔧 PropertyMap container has no dimensions, retrying...');
+      setTimeout(() => {
+        if (mapRef.current) {
+          initializePropertyMap();
+        }
+      }, 200);
+      return;
+    }
+
     try {
       const center = {
         lat: location.coordinates[1],
         lng: location.coordinates[0]
       };
 
-      console.log('🔧 Initializing PropertyMap...');
+      console.log('🔧 Initializing PropertyMap...', {
+        container: mapRef.current,
+        dimensions: { width: rect.width, height: rect.height },
+        center: center
+      });
+      
       // Create map using Mappls API
       const map = new window.mappls.Map(mapRef.current, {
         center: center,

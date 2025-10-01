@@ -15,6 +15,7 @@ import NearbyAmenities from './NearbyAmenities';
 import MapTilesDebug from './MapTilesDebug';
 import MapTilesTest from './MapTilesTest';
 import MapTilesSimpleTest from './MapTilesSimpleTest';
+import MapTilesMinimalTest from './MapTilesMinimalTest';
 import MapErrorBoundary from './MapErrorBoundary';
 import { api } from '@/lib/services/api';
 
@@ -61,6 +62,13 @@ const MapTest = () => {
         <Grid item xs={12}>
           <MapErrorBoundary>
             <MapTilesSimpleTest />
+          </MapErrorBoundary>
+        </Grid>
+
+        {/* MapTiles Minimal Test Component */}
+        <Grid item xs={12}>
+          <MapErrorBoundary>
+            <MapTilesMinimalTest />
           </MapErrorBoundary>
         </Grid>
 
