@@ -10,7 +10,7 @@ const MapTilesDirectTest = () => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
 
-  const mapplsApiKey = '82f5c384638d8cfc7d13e310780bae89';
+  const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
 
   useEffect(() => {
     const loadMapTiles = async () => {
