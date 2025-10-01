@@ -22,7 +22,9 @@ const PropertyMap = ({ location, address }) => {
     apiKeyPreview: mapplsApiKey ? `${mapplsApiKey.substring(0, 10)}...` : 'N/A',
     nodeEnv: process.env.NODE_ENV,
     isClient: typeof window !== 'undefined',
-    location: location
+    location: location,
+    allEnvVars: Object.keys(process.env).filter(key => key.includes('MAPPLS')),
+    rawApiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY
   });
 
   useEffect(() => {
