@@ -2,32 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import './PropertyMap.css';
 
-// Mappls types are now defined in src/types/mappls.d.ts
-
-// Styles moved to CSS to avoid inline-style usage
-
 const PropertyMap = ({ location, address }) => {
-  console.log('🔧 PropertyMap rendering...', { location, address });
-  
   const mapRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [mapInstance, setMapInstance] = useState(null);
   const [error, setError] = useState(null);
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
 
-      // Use environment variable from Next.js
-      const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
-  
-  // Debug logging
-  console.log('🔧 PropertyMap Debug Info:', {
-    apiKey: mapplsApiKey ? 'Found' : 'Missing',
-    apiKeyLength: mapplsApiKey?.length || 0,
-    apiKeyPreview: mapplsApiKey ? `${mapplsApiKey.substring(0, 10)}...` : 'N/A',
-    nodeEnv: process.env.NODE_ENV,
-    isClient: typeof window !== 'undefined',
-    location: location,
-    allEnvVars: Object.keys(process.env).filter(key => key.includes('MAPPLS')),
-    rawApiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY
-  });
+  const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
 
   // Load Mappls script
   useEffect(() => {
@@ -35,8 +16,8 @@ const PropertyMap = ({ location, address }) => {
 
     const loadMapplsScript = () => {
       return new Promise((resolve, reject) => {
-        // Check if script already exists
         if (window.mappls) {
+          setMapplsLoaded(true);
           resolve(undefined);
           return;
         }
@@ -51,8 +32,8 @@ const PropertyMap = ({ location, address }) => {
         };
         script.onerror = () => {
           console.error('🔧 Failed to load Mappls script');
-          setError('Failed to load map library');
-          reject(new Error('Failed to load Mappls script'));
+          setError('Failed to load map script');
+          reject(new Error('Script load failed'));
         };
         document.head.appendChild(script);
       });
@@ -63,49 +44,19 @@ const PropertyMap = ({ location, address }) => {
     }
   }, [mapplsApiKey]);
 
-  // Initialize map when Mappls is loaded
-  useEffect(() => {
-    if (!mapplsLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2) {
-      console.log('🔧 PropertyMap initialization skipped:', { mapplsLoaded, mapRef: !!mapRef.current, location });
-      return;
-    }
-
-    // Use a longer timeout to ensure DOM is fully ready
-    const timeoutId = setTimeout(() => {
-      console.log('🔧 PropertyMap attempting initialization...');
-      initializePropertyMap();
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [mapplsLoaded, location, address]);
-
+  // Initialize map
   const initializePropertyMap = () => {
     if (!mapRef.current || !window.mappls) {
       console.log('🔧 PropertyMap initialization failed: missing container or mappls');
       return;
     }
 
-    // More robust container readiness check
     const container = mapRef.current;
     const rect = container.getBoundingClientRect();
     
-    // Check if container is attached to DOM and visible
+    // Check if container is ready
     if (!container.offsetParent || rect.width === 0 || rect.height === 0) {
-      console.log('🔧 PropertyMap container not ready, retrying...', {
-        offsetParent: !!container.offsetParent,
-        dimensions: { width: rect.width, height: rect.height }
-      });
-      setTimeout(() => {
-        if (mapRef.current) {
-          initializePropertyMap();
-        }
-      }, 300);
-      return;
-    }
-
-    // Additional check to ensure container is fully rendered
-    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-      console.log('🔧 PropertyMap container has no offset dimensions, retrying...');
+      console.log('🔧 PropertyMap container not ready, retrying...');
       setTimeout(() => {
         if (mapRef.current) {
           initializePropertyMap();
@@ -120,21 +71,16 @@ const PropertyMap = ({ location, address }) => {
         lng: location.coordinates[0]
       };
 
-      console.log('🔧 Initializing PropertyMap...', {
-        container: container,
-        dimensions: { width: rect.width, height: rect.height },
-        offsetDimensions: { width: container.offsetWidth, height: container.offsetHeight },
-        center: center
-      });
+      console.log('🔧 Initializing PropertyMap...', { center });
       
       // Clear any existing map content
       container.innerHTML = '';
 
-      // Create map using Mappls API with proper configuration
+      // Create map
       const map = new window.mappls.Map(container, {
         center: center,
         zoom: 15,
-        mapTypeId: 'mappls.vector', // Use vector map type
+        mapTypeId: 'mappls.vector',
         gestureHandling: 'greedy',
         disableDefaultUI: false,
         zoomControl: true,
@@ -146,80 +92,100 @@ const PropertyMap = ({ location, address }) => {
       });
 
       // Add error listener
-      map.addListener('error', (error) => {
-        console.error('🔧 PropertyMap error:', error);
+      map.addListener('error', (e) => {
+        console.error('🔧 Map error:', e);
         setError('Map failed to load properly');
       });
 
-      // Wait for map to be ready
+      // Add idle listener
       map.addListener('idle', () => {
         console.log('🔧 PropertyMap is idle and ready');
       });
 
       // Add marker
       const marker = new window.mappls.Marker({
+        position: center,
         map: map,
-        position: center
+        title: address || 'Property Location'
       });
 
       // Add info window
       const infoWindow = new window.mappls.InfoWindow({
-        map: map,
-        position: center,
         content: `
-          <div style="padding: 10px;">
-            <h4>${address?.street || 'Address'}</h4>
-            <p>${address?.city || ''}, ${address?.state || ''} ${address?.zipCode || ''}</p>
+          <div style="padding: 10px; max-width: 200px;">
+            <h4 style="margin: 0 0 5px 0; font-size: 14px;">Property Location</h4>
+            <p style="margin: 0; font-size: 12px; color: #666;">${address || 'Property Location'}</p>
           </div>
         `
       });
 
-      // Show info window on marker click
-      marker.addListener('click', () => {
-        infoWindow.open(map, marker);
-      });
+      // Open info window
+      infoWindow.open(map, marker);
 
-      setIsLoaded(true);
-
+      setMapInstance(map);
+      console.log('🔧 PropertyMap initialized successfully');
     } catch (err) {
-      console.error('Error creating Mappls map:', err);
-      setError('Failed to load map');
+      console.error('Error creating Mappls map in PropertyMap:', err);
+      setError('Failed to load map: ' + err.message);
     }
   };
 
+  // Initialize map when ready
+  useEffect(() => {
+    if (!mapplsLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2) {
+      return;
+    }
+
+    // Use timeout to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      initializePropertyMap();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [mapplsLoaded, location, address]);
+
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (
-      <Typography variant="body2" color="text.secondary">
-        Location information is not available.
-      </Typography>
-    );
-  }
-
-  if (!mapplsApiKey) {
-    return (
-      <Typography variant="body2" color="text.secondary">
-        Map unavailable. Missing Mappls API key.
-      </Typography>
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
+        <Typography variant="body2" color="text.secondary">
+          No location data available for this property
+        </Typography>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Typography variant="body2" color="error">
-        Map unavailable. {error}
-      </Typography>
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (!mapplsLoaded) {
+    return (
+      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
+        <Typography variant="body2" color="text.secondary">
+          Loading map...
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div 
-      ref={mapRef}
-      className="map-container map-container--sm"
-      style={{
-        height: '300px',
-        width: '100%'
-      }}
-    />
+    <Box sx={{ width: '100%', height: '400px', position: 'relative' }}>
+      <div
+        ref={mapRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '4px',
+          overflow: 'hidden'
+        }}
+      />
+    </Box>
   );
 };
 
