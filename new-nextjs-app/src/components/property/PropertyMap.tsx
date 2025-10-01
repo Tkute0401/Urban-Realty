@@ -6,9 +6,9 @@ import './PropertyMap.css';
 declare global {
   interface Window {
     mappls: {
-      Map: (options: any) => any;
-      Marker: (options: any) => any;
-      InfoWindow: (options: any) => any;
+      Map: new (element: HTMLElement, options: any) => any;
+      Marker: new (options: any) => any;
+      InfoWindow: new (options: any) => any;
     };
   }
 }
@@ -51,7 +51,7 @@ const PropertyMap = ({ location, address }) => {
         }
 
         const script = document.createElement('script');
-        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/js/map_v1.4.2.js`;
+        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/map_sdk?v=3.0&layer=vector`;
         script.async = true;
         script.onload = () => {
           console.log('🔧 Mappls script loaded');
@@ -85,20 +85,19 @@ const PropertyMap = ({ location, address }) => {
       };
 
       // Create map using Mappls API
-      const map = window.mappls.Map({
-        id: mapRef.current,
+      const map = new window.mappls.Map(mapRef.current, {
         center: center,
         zoom: 15
       });
 
       // Add marker
-      const marker = window.mappls.Marker({
+      const marker = new window.mappls.Marker({
         map: map,
         position: center
       });
 
       // Add info window
-      const infoWindow = window.mappls.InfoWindow({
+      const infoWindow = new window.mappls.InfoWindow({
         map: map,
         position: center,
         content: `

@@ -6,9 +6,9 @@ import './PropertiesMap.css';
 declare global {
   interface Window {
     mappls: {
-      Map: (options: any) => any;
-      Marker: (options: any) => any;
-      InfoWindow: (options: any) => any;
+      Map: new (element: HTMLElement, options: any) => any;
+      Marker: new (options: any) => any;
+      InfoWindow: new (options: any) => any;
     };
   }
 }
@@ -53,7 +53,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
         }
 
         const script = document.createElement('script');
-        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/js/map_v1.4.2.js`;
+        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/map_sdk?v=3.0&layer=vector`;
         script.async = true;
         script.onload = () => {
           console.log('🔧 Mappls script loaded');
@@ -88,8 +88,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       });
 
       // Create map
-      const map = window.mappls.Map({
-        id: mapRef.current,
+      const map = new window.mappls.Map(mapRef.current, {
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
         zoom: 10
       });
@@ -124,7 +123,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
 
         const isSelected = selectedProperty?._id === property._id;
 
-        const marker = window.mappls.Marker({
+        const marker = new window.mappls.Marker({
           map: map,
           position: position,
           icon: {

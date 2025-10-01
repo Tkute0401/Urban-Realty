@@ -37,22 +37,22 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       return new Promise((resolve, reject) => {
         // Check if script already exists
         if (window.mappls) {
-          resolve();
+          resolve(undefined);
           return;
         }
 
         const script = document.createElement('script');
-        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/js/map_v1.4.2.js`;
+        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/map_sdk?v=3.0&layer=vector`;
         script.async = true;
         script.onload = () => {
           console.log('🔧 Mappls script loaded');
           setMapplsLoaded(true);
-          resolve();
+          resolve(undefined);
         };
         script.onerror = () => {
           console.error('🔧 Failed to load Mappls script');
           setError('Failed to load map library');
-          reject();
+          reject(new Error('Failed to load Mappls script'));
         };
         document.head.appendChild(script);
       });
@@ -77,8 +77,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       });
 
       // Create map
-      const map = new window.mappls.Map({
-        id: mapRef.current,
+      const map = new window.mappls.Map(mapRef.current, {
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
         zoom: 10
       });
