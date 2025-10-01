@@ -1,35 +1,128 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { mappls } from 'mappls-web-maps';
 import './PropertiesMap.css';
 
 // Styles moved to CSS to avoid inline-style usage
 
 const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const mapRef = useRef(null);
-  const [activeMarker, setActiveMarker] = useState(null);
-  const [bounds, setBounds] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState(null);
+  const [mapInstance, setMapInstance] = useState(null);
+  const [markers, setMarkers] = useState([]);
   
   // Use environment variable from Vite
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const mapplsApiKey = import.meta.env.VITE_MAPPLS_API_KEY;
 
   useEffect(() => {
-    if (isLoaded && properties?.length > 0 && mapRef.current) {
-      // Calculate bounds to fit all markers
-      const newBounds = new window.google.maps.LatLngBounds();
-      properties.forEach(property => {
-        if (property.location?.coordinates?.length === 2) {
-          newBounds.extend({
-            lat: property.location.coordinates[1],
-            lng: property.location.coordinates[0]
-          });
+    if (!mapplsApiKey) {
+      return;
+    }
+
+    // Initialize Mappls
+    const mapplsInstance = new mappls();
+    mapplsInstance.initialize(mapplsApiKey, {
+      mapSdkLibraries: ['marker', 'infoWindow']
+    }, () => {
+      console.log('🔧 Mappls initialized successfully');
+      setIsLoaded(true);
+    });
+
+    return () => {
+      // Cleanup markers
+      markers.forEach(marker => {
+        if (marker && marker.setMap) {
+          marker.setMap(null);
         }
       });
-      setBounds(newBounds);
-      mapRef.current.fitBounds(newBounds);
+    };
+  }, [mapplsApiKey]);
+
+  useEffect(() => {
+    if (!isLoaded || !mapRef.current || !properties || properties.length === 0) {
+      return;
     }
-  }, [properties, isLoaded]);
+
+    try {
+      // Clear existing markers
+      markers.forEach(marker => {
+        if (marker && marker.setMap) {
+          marker.setMap(null);
+        }
+      });
+
+      // Create map
+      const mapplsInstance = new mappls();
+      const map = mapplsInstance.Map({
+        id: mapRef.current,
+        center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
+        zoom: 10
+      });
+
+      setMapInstance(map);
+
+      // Calculate bounds
+      const validProperties = properties.filter(property => 
+        property.location?.coordinates?.length === 2
+      );
+
+      if (validProperties.length > 0) {
+        const coordinates = validProperties.map(property => ({
+          lat: property.location.coordinates[1],
+          lng: property.location.coordinates[0]
+        }));
+
+        // Fit bounds to show all properties
+        if (coordinates.length > 1) {
+          mapplsInstance.fitBounds({
+            map: map,
+            bounds: coordinates
+          });
+        } else if (coordinates.length === 1) {
+          map.setCenter(coordinates[0]);
+        }
+      }
+
+      // Add markers for each property
+      const newMarkers = validProperties.map((property, index) => {
+        const position = {
+          lat: property.location.coordinates[1],
+          lng: property.location.coordinates[0]
+        };
+
+        const isSelected = selectedProperty?._id === property._id;
+
+        const marker = mapplsInstance.Marker({
+          map: map,
+          position: position,
+          icon: {
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+              <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
+              </svg>
+            `)}`,
+            scaledSize: { width: 20, height: 20 }
+          }
+        });
+
+        // Add click listener
+        marker.addListener('click', () => {
+          if (onMarkerClick) {
+            onMarkerClick(property);
+          }
+        });
+
+        return marker;
+      });
+
+      setMarkers(newMarkers);
+
+    } catch (err) {
+      console.error('Error creating Mappls map:', err);
+      setError('Failed to load map');
+    }
+  }, [isLoaded, properties, selectedProperty, onMarkerClick]);
 
   if (!properties || properties.length === 0) {
     return (
@@ -41,321 +134,35 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     );
   }
 
-  const handleActiveMarker = (marker) => {
-    if (marker === activeMarker) {
-      return;
-    }
-    setActiveMarker(marker);
-  };
+  if (!mapplsApiKey) {
+    return (
+      <Box className="map-empty">
+        <Typography variant="body2" color="text.secondary">
+          Map unavailable. Missing Mappls API key.
+        </Typography>
+      </Box>
+    );
+  }
 
-  const onLoad = (map) => {
-    mapRef.current = map;
-    setIsLoaded(true);
-  };
-
-  const onUnmount = () => {
-    mapRef.current = null;
-    setIsLoaded(false);
-  };
+  if (error) {
+    return (
+      <Box className="map-empty">
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <LoadScript 
-      googleMapsApiKey={googleMapsApiKey}
-      onLoad={() => {
-        setTimeout(() => setIsLoaded(true), 100);
+    <div 
+      ref={mapRef}
+      className="map-container map-container--lg"
+      style={{
+        height: '500px',
+        width: '100%'
       }}
-    >
-      <GoogleMap
-        mapContainerClassName="map-container map-container--lg"
-        zoom={10}
-        onLoad={onLoad}
-        onUnmount={onUnmount}
-        options={{
-          styles: [
-            {
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#1d2c2e"
-                }
-              ]
-            },
-            {
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#8ec3b9"
-                }
-              ]
-            },
-            {
-              "elementType": "labels.text.stroke",
-              "stylers": [
-                {
-                  "color": "#1a3646"
-                }
-              ]
-            },
-            {
-              "featureType": "administrative.country",
-              "elementType": "geometry.stroke",
-              "stylers": [
-                {
-                  "color": "#4b6878"
-                }
-              ]
-            },
-            {
-              "featureType": "administrative.land_parcel",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#64779e"
-                }
-              ]
-            },
-            {
-              "featureType": "administrative.province",
-              "elementType": "geometry.stroke",
-              "stylers": [
-                {
-                  "color": "#4b6878"
-                }
-              ]
-            },
-            {
-              "featureType": "landscape.man_made",
-              "elementType": "geometry.stroke",
-              "stylers": [
-                {
-                  "color": "#334e87"
-                }
-              ]
-            },
-            {
-              "featureType": "landscape.natural",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#023e58"
-                }
-              ]
-            },
-            {
-              "featureType": "poi",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#283d6a"
-                }
-              ]
-            },
-            {
-              "featureType": "poi",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#6f9ba5"
-                }
-              ]
-            },
-            {
-              "featureType": "poi",
-              "elementType": "labels.text.stroke",
-              "stylers": [
-                {
-                  "color": "#1d2c4d"
-                }
-              ]
-            },
-            {
-              "featureType": "poi.park",
-              "elementType": "geometry.fill",
-              "stylers": [
-                {
-                  "color": "#023e58"
-                }
-              ]
-            },
-            {
-              "featureType": "poi.park",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#3C7680"
-                }
-              ]
-            },
-            {
-              "featureType": "road",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#304a7d"
-                }
-              ]
-            },
-            {
-              "featureType": "road",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#98a5be"
-                }
-              ]
-            },
-            {
-              "featureType": "road",
-              "elementType": "labels.text.stroke",
-              "stylers": [
-                {
-                  "color": "#1d2c4d"
-                }
-              ]
-            },
-            {
-              "featureType": "road.highway",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#2c6675"
-                }
-              ]
-            },
-            {
-              "featureType": "road.highway",
-              "elementType": "geometry.stroke",
-              "stylers": [
-                {
-                  "color": "#255763"
-                }
-              ]
-            },
-            {
-              "featureType": "road.highway",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#b0d5ce"
-                }
-              ]
-            },
-            {
-              "featureType": "road.highway",
-              "elementType": "labels.text.stroke",
-              "stylers": [
-                {
-                  "color": "#023e58"
-                }
-              ]
-            },
-            {
-              "featureType": "transit",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#98a5be"
-                }
-              ]
-            },
-            {
-              "featureType": "transit",
-              "elementType": "labels.text.stroke",
-              "stylers": [
-                {
-                  "color": "#1d2c4d"
-                }
-              ]
-            },
-            {
-              "featureType": "transit.line",
-              "elementType": "geometry.fill",
-              "stylers": [
-                {
-                  "color": "#283d6a"
-                }
-              ]
-            },
-            {
-              "featureType": "transit.station",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#3a4762"
-                }
-              ]
-            },
-            {
-              "featureType": "water",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#0e1626"
-                }
-              ]
-            },
-            {
-              "featureType": "water",
-              "elementType": "labels.text.fill",
-              "stylers": [
-                {
-                  "color": "#4e6d70"
-                }
-              ]
-            }
-          ]
-        }}
-      >
-        {isLoaded && properties.map((property, index) => {
-          if (!property.location?.coordinates || property.location.coordinates.length !== 2) {
-            return null;
-          }
-          
-          const position = {
-            lat: property.location.coordinates[1],
-            lng: property.location.coordinates[0]
-          };
-          
-          const isSelected = selectedProperty?._id === property._id;
-          const markerColor = isSelected ? '#FF4081' : '#78CADC';
-          
-          return (
-            <Marker
-              key={property._id}
-              position={position}
-              onClick={() => {
-                handleActiveMarker(index);
-                if (onMarkerClick) {
-                  onMarkerClick(property);
-                }
-              }}
-              icon={{
-                path: window.google.maps.SymbolPath.CIRCLE,
-                fillColor: markerColor,
-                fillOpacity: 1,
-                strokeColor: '#0B1011',
-                strokeWeight: 1,
-                scale: isSelected ? 10 : 8
-              }}
-            >
-              {activeMarker === index && (
-                <InfoWindow onCloseClick={() => setActiveMarker(null)}>
-                  <div className="text-dark maxw-200">
-                    <h3 className="my-1 fs-16">{property.title}</h3>
-                    <p className="my-1 fs-14">
-                      {property.address?.street}, {property.address?.city}
-                    </p>
-                    <p className="my-1 fs-14 fw-700">
-                      {property.price ? `$${property.price.toLocaleString()}` : 'Price not available'}
-                    </p>
-                  </div>
-                </InfoWindow>
-              )}
-            </Marker>
-          );
-        })}
-      </GoogleMap>
-    </LoadScript>
+    />
   );
 };
 
