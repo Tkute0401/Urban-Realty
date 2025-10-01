@@ -1,51 +1,75 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { mappls } from 'mappls-web-maps';
 import './PropertiesMap.css';
 
 // Styles moved to CSS to avoid inline-style usage
 
 const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
+  console.log('🔧 PropertiesMap rendering...', { propertiesCount: properties?.length, selectedProperty });
+  
   const mapRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [markers, setMarkers] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState(null);
+  const [mapplsLoaded, setMapplsLoaded] = useState(false);
   
   // Use environment variable from Vite
   const mapplsApiKey = import.meta.env.VITE_MAPPLS_API_KEY;
+  
+  // Debug logging
+  console.log('🔧 PropertiesMap Debug Info:', {
+    apiKey: mapplsApiKey ? 'Found' : 'Missing',
+    apiKeyLength: mapplsApiKey?.length || 0,
+    apiKeyPreview: mapplsApiKey ? `${mapplsApiKey.substring(0, 10)}...` : 'N/A',
+    nodeEnv: import.meta.env.MODE,
+    isClient: typeof window !== 'undefined',
+    propertiesCount: properties?.length || 0,
+    allEnvVars: Object.keys(import.meta.env).filter(key => key.includes('MAPPLS')),
+    rawApiKey: import.meta.env.VITE_MAPPLS_API_KEY
+  });
 
+  // Load Mappls script
   useEffect(() => {
-    if (!mapplsApiKey) {
-      return;
-    }
+    if (typeof window === 'undefined' || mapplsLoaded) return;
 
-    // Initialize Mappls
-    const mapplsInstance = new mappls();
-    mapplsInstance.initialize(mapplsApiKey, {
-      mapSdkLibraries: ['marker', 'infoWindow']
-    }, () => {
-      console.log('🔧 Mappls initialized successfully');
-      setIsLoaded(true);
-    });
-
-    return () => {
-      // Cleanup markers
-      markers.forEach(marker => {
-        if (marker && marker.setMap) {
-          marker.setMap(null);
+    const loadMapplsScript = () => {
+      return new Promise((resolve, reject) => {
+        // Check if script already exists
+        if (window.mappls) {
+          resolve();
+          return;
         }
+
+        const script = document.createElement('script');
+        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/js/map_v1.4.2.js`;
+        script.async = true;
+        script.onload = () => {
+          console.log('🔧 Mappls script loaded');
+          setMapplsLoaded(true);
+          resolve();
+        };
+        script.onerror = () => {
+          console.error('🔧 Failed to load Mappls script');
+          setError('Failed to load map library');
+          reject();
+        };
+        document.head.appendChild(script);
       });
     };
-  }, [mapplsApiKey]);
+
+    if (mapplsApiKey) {
+      loadMapplsScript().catch(console.error);
+    }
+  }, [mapplsApiKey, mapplsLoaded]);
 
   useEffect(() => {
-    if (!isLoaded || !mapRef.current || !properties || properties.length === 0) {
+    if (!mapplsLoaded || !mapRef.current || !properties) {
       return;
     }
 
     try {
-      // Clear existing markers
+      // Cleanup existing markers before re-rendering
       markers.forEach(marker => {
         if (marker && marker.setMap) {
           marker.setMap(null);
@@ -53,8 +77,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       });
 
       // Create map
-      const mapplsInstance = new mappls();
-      const map = mapplsInstance.Map({
+      const map = new window.mappls.Map({
         id: mapRef.current,
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
         zoom: 10
@@ -75,10 +98,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
 
         // Fit bounds to show all properties
         if (coordinates.length > 1) {
-          mapplsInstance.fitBounds({
-            map: map,
-            bounds: coordinates
-          });
+          map.fitBounds(coordinates);
         } else if (coordinates.length === 1) {
           map.setCenter(coordinates[0]);
         }
@@ -93,7 +113,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
 
         const isSelected = selectedProperty?._id === property._id;
 
-        const marker = mapplsInstance.Marker({
+        const marker = new window.mappls.Marker({
           map: map,
           position: position,
           icon: {
@@ -117,12 +137,13 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       });
 
       setMarkers(newMarkers);
+      setIsLoaded(true);
 
     } catch (err) {
       console.error('Error creating Mappls map:', err);
       setError('Failed to load map');
     }
-  }, [isLoaded, properties, selectedProperty, onMarkerClick]);
+  }, [mapplsLoaded, properties, selectedProperty, onMarkerClick]);
 
   if (!properties || properties.length === 0) {
     return (
@@ -148,7 +169,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     return (
       <Box className="map-empty">
         <Typography variant="body2" color="error">
-          {error}
+          Map unavailable. {error}
         </Typography>
       </Box>
     );

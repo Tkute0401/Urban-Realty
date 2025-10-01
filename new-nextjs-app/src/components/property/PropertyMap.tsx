@@ -1,7 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { mappls } from 'mappls-web-maps';
 import './PropertyMap.css';
+
+// Declare Mappls types
+declare global {
+  interface Window {
+    mappls: {
+      Map: (options: any) => any;
+      Marker: (options: any) => any;
+      InfoWindow: (options: any) => any;
+    };
+  }
+}
 
 // Styles moved to CSS to avoid inline-style usage
 
@@ -11,6 +21,7 @@ const PropertyMap = ({ location, address }) => {
   const mapRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const [mapplsLoaded, setMapplsLoaded] = useState(false);
 
   // Use environment variable from Next.js
   const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY;
@@ -27,27 +38,43 @@ const PropertyMap = ({ location, address }) => {
     rawApiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY
   });
 
+  // Load Mappls script
   useEffect(() => {
-    if (!mapplsApiKey || !location || !location.coordinates || location.coordinates.length !== 2) {
-      return;
-    }
+    if (typeof window === 'undefined' || mapplsLoaded) return;
 
-    // Initialize Mappls
-    const mapplsInstance = new mappls();
-    mapplsInstance.initialize(mapplsApiKey, {
-      mapSdkLibraries: ['marker', 'infoWindow']
-    }, () => {
-      console.log('🔧 Mappls initialized successfully');
-      setIsLoaded(true);
-    });
+    const loadMapplsScript = () => {
+      return new Promise((resolve, reject) => {
+        // Check if script already exists
+        if (window.mappls) {
+          resolve(undefined);
+          return;
+        }
 
-    return () => {
-      // Cleanup if needed
+        const script = document.createElement('script');
+        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/js/map_v1.4.2.js`;
+        script.async = true;
+        script.onload = () => {
+          console.log('🔧 Mappls script loaded');
+          setMapplsLoaded(true);
+          resolve(undefined);
+        };
+        script.onerror = () => {
+          console.error('🔧 Failed to load Mappls script');
+          setError('Failed to load map library');
+          reject(new Error('Failed to load Mappls script'));
+        };
+        document.head.appendChild(script);
+      });
     };
-  }, [mapplsApiKey, location]);
 
+    if (mapplsApiKey) {
+      loadMapplsScript().catch(console.error);
+    }
+  }, [mapplsApiKey, mapplsLoaded]);
+
+  // Initialize map when Mappls is loaded
   useEffect(() => {
-    if (!isLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2) {
+    if (!mapplsLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2) {
       return;
     }
 
@@ -57,22 +84,21 @@ const PropertyMap = ({ location, address }) => {
         lng: location.coordinates[0]
       };
 
-      // Create map
-      const mapplsInstance = new mappls();
-      const map = mapplsInstance.Map({
+      // Create map using Mappls API
+      const map = window.mappls.Map({
         id: mapRef.current,
         center: center,
         zoom: 15
       });
 
       // Add marker
-      const marker = mapplsInstance.Marker({
+      const marker = window.mappls.Marker({
         map: map,
         position: center
       });
 
       // Add info window
-      const infoWindow = mapplsInstance.InfoWindow({
+      const infoWindow = window.mappls.InfoWindow({
         map: map,
         position: center,
         content: `
@@ -88,11 +114,13 @@ const PropertyMap = ({ location, address }) => {
         infoWindow.open(map, marker);
       });
 
+      setIsLoaded(true);
+
     } catch (err) {
       console.error('Error creating Mappls map:', err);
       setError('Failed to load map');
     }
-  }, [isLoaded, location, address]);
+  }, [mapplsLoaded, location, address]);
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {
     return (
