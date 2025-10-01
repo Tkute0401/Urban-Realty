@@ -38,7 +38,8 @@ const MapTest = () => {
     (async () => {
       try {
         const res = await api.properties.list({ limit: 5 });
-        const list = res?.data?.items || res?.data || [];
+        const list = Array.isArray(res?.data?.items) ? res.data.items : 
+                   Array.isArray(res?.data) ? res.data : [];
         setTestProperties(list);
         setTestProperty(list[0] || null);
       } catch (e) {
