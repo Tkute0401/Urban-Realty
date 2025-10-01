@@ -15,7 +15,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const [markers, setMarkers] = useState([]);
   
   // Use environment variable from Next.js
-  const mapplsApiKey = 'jlkkhjduceawzjoehvxouwjnhaysrirbdahc' || process.env.NEXT_PUBLIC_MAPPLS_API_KEY;
+  const mapplsApiKey = 'jlkkhjduceawzjoehvxouwjnhaysrirbdahc';
   
   // Debug logging
   console.log('🔧 PropertiesMap Debug Info:', {
