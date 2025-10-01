@@ -2,16 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import './PropertyMap.css';
 
-// Declare Mappls types
-declare global {
-  interface Window {
-    mappls: {
-      Map: new (element: HTMLElement, options: any) => any;
-      Marker: new (options: any) => any;
-      InfoWindow: new (options: any) => any;
-    };
-  }
-}
+// Mappls types are now defined in src/types/mappls.d.ts
 
 // Styles moved to CSS to avoid inline-style usage
 

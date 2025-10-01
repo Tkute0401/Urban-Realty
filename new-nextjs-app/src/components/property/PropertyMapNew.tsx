@@ -4,16 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import MapTilesContainer from './MapTilesContainer';
 
-// Declare Mappls types
-declare global {
-  interface Window {
-    mappls: {
-      Map: new (element: HTMLElement, options: any) => any;
-      Marker: new (options: any) => any;
-      InfoWindow: new (options: any) => any;
-    };
-  }
-}
+// Mappls types are now defined in src/types/mappls.d.ts
 
 const PropertyMapNew = ({ location, address }) => {
   console.log('🔧 PropertyMapNew rendering...', { location, address });

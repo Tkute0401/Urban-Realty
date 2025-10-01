@@ -5,17 +5,7 @@ import { Box, Typography } from '@mui/material';
 import MapTilesDebug from './MapTilesDebug';
 import MapTilesContainer from './MapTilesContainer';
 
-// Declare Mappls types
-declare global {
-  interface Window {
-    mappls: {
-      Map: new (element: HTMLElement, options: any) => any;
-      Marker: new (options: any) => any;
-      InfoWindow: new (options: any) => any;
-      LatLngBounds: new () => any;
-    };
-  }
-}
+// Mappls types are now defined in src/types/mappls.d.ts
 
 const PropertiesMapNew = ({ properties, selectedProperty, onMarkerClick }) => {
   console.log('🔧 PropertiesMapNew rendering...', { propertiesCount: properties?.length, selectedProperty });
