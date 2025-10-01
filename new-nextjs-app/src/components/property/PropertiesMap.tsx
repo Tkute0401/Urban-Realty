@@ -81,6 +81,18 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       return;
     }
 
+    // Ensure the map container is ready and visible
+    if (!mapRef.current.offsetParent) {
+      console.log('🔧 Map container not ready, retrying...');
+      setTimeout(() => {
+        if (mapRef.current && mapRef.current.offsetParent) {
+          console.log('🔧 Map container ready, initializing map...');
+          initializeMap();
+        }
+      }, 100);
+      return;
+    }
+
     try {
       console.log('🔧 Initializing MapTiles map...');
       // Create map

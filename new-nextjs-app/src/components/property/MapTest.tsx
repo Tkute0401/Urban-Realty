@@ -14,6 +14,8 @@ import LocationSearch from './LocationSearch';
 import NearbyAmenities from './NearbyAmenities';
 import MapTilesDebug from './MapTilesDebug';
 import MapTilesTest from './MapTilesTest';
+import MapTilesSimpleTest from './MapTilesSimpleTest';
+import MapErrorBoundary from './MapErrorBoundary';
 import { api } from '@/lib/services/api';
 
 // Test component for Phase 4 Maps & Location Services
@@ -55,6 +57,13 @@ const MapTest = () => {
           <MapTilesTest />
         </Grid>
 
+        {/* MapTiles Simple Test Component */}
+        <Grid item xs={12}>
+          <MapErrorBoundary>
+            <MapTilesSimpleTest />
+          </MapErrorBoundary>
+        </Grid>
+
         {/* Location Search Test */}
         <Grid item xs={12} md={6}>
           <Card sx={{ mb: 2 }}>
@@ -83,10 +92,12 @@ const MapTest = () => {
                 Single Property Map
               </Typography>
               {testProperty?.location?.coordinates ? (
-                <PropertyMap 
-                  location={{ coordinates: [testProperty.location.coordinates.lng, testProperty.location.coordinates.lat] }}
-                  address={testProperty.location}
-                />
+                <MapErrorBoundary>
+                  <PropertyMap 
+                    location={{ coordinates: [testProperty.location.coordinates.lng, testProperty.location.coordinates.lat] }}
+                    address={testProperty.location}
+                  />
+                </MapErrorBoundary>
               ) : (
                 <Alert severity="warning">
                   No coordinates available for test property
@@ -103,11 +114,13 @@ const MapTest = () => {
               <Typography variant="h6" gutterBottom>
                 Multiple Properties Map
               </Typography>
-              <PropertiesMap 
-                properties={testProperty ? [testProperty] : []}
-                selectedProperty={testProperty}
-                onMarkerClick={(property) => console.log('Marker clicked:', property.title)}
-              />
+              <MapErrorBoundary>
+                <PropertiesMap 
+                  properties={testProperty ? [testProperty] : []}
+                  selectedProperty={testProperty}
+                  onMarkerClick={(property) => console.log('Marker clicked:', property.title)}
+                />
+              </MapErrorBoundary>
             </CardContent>
           </Card>
         </Grid>
