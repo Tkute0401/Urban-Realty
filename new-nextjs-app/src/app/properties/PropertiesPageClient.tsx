@@ -15,7 +15,7 @@ import BedBath from '@/components/property/filters/BedBath';
 import HomeType from '@/components/property/filters/HomeType';
 import More from '@/components/property/filters/More';
 import PropertiesMap from '@/components/property/PropertiesMap';
-import MapTilesDebug from '@/components/property/MapTilesDebug';
+// MapTilesDebug component removed - using direct map implementation
 import { PropertyCard as UnifiedPropertyCard } from '@/components/ui';
 import type { Property } from '@/components/ui';
 
@@ -443,7 +443,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
           <div className={`${styles.mapContainer} ${styles.slideInRight}`}>
             {/* Debug Information - Remove this after fixing */}
             <div style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-              <MapTilesDebug />
+              {/* MapTilesDebug component removed - maps now work directly */}
             </div>
             <PropertiesMap
               properties={filteredProperties}

@@ -1,38 +1,20 @@
 'use client'
 
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
-
-// Dynamically import MapTest to ensure it only runs on client-side
-const MapTest = dynamic(() => import('@/components/property/MapTest'), {
-  ssr: false,
-  loading: () => (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      height: '100vh',
-      fontSize: '18px'
-    }}>
-      Loading Map Test...
-    </div>
-  )
-});
+import React from 'react';
+import { Box, Typography } from '@mui/material';
 
 export default function MapTestPage() {
   return (
-    <Suspense fallback={
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '18px'
-      }}>
-        Loading Map Test...
-      </div>
-    }>
-      <MapTest />
-    </Suspense>
+    <Box sx={{ p: 3, textAlign: 'center' }}>
+      <Typography variant="h4" gutterBottom>
+        Map Test Page
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
+        Map test components have been removed. Maps are now integrated directly into the main application.
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 2 }}>
+        Visit the Properties page to see the working maps.
+      </Typography>
+    </Box>
   );
 }
