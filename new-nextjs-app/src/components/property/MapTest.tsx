@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -25,6 +25,11 @@ import { api } from '@/lib/services/api';
 const MapTest = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [testProperty, setTestProperty] = useState(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   React.useEffect(() => {
     (async () => {
@@ -42,6 +47,16 @@ const MapTest = () => {
     setSelectedLocation(location);
     console.log('Selected location:', location);
   };
+
+  if (!isClient) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="h6">
+          Loading Map Test Components...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3, bgcolor: 'var(--color-bg-primary)', minHeight: '100vh' }}>
