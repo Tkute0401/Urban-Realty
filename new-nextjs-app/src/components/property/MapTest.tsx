@@ -27,6 +27,7 @@ import { api } from '@/lib/services/api';
 const MapTest = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [testProperty, setTestProperty] = useState(null);
+  const [testProperties, setTestProperties] = useState([]);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -36,10 +37,12 @@ const MapTest = () => {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await api.properties.list({ limit: 1 });
+        const res = await api.properties.list({ limit: 5 });
         const list = res?.data?.items || res?.data || [];
+        setTestProperties(list);
         setTestProperty(list[0] || null);
       } catch (e) {
+        setTestProperties([]);
         setTestProperty(null);
       }
     })();
