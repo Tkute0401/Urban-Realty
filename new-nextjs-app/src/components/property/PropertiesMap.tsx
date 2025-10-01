@@ -67,51 +67,55 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     }
   }, [mapplsApiKey]);
 
-  // Initialize map function
+  // Initialize map function with better container checks
   const initializeMap = () => {
     if (!mapRef.current || !window.mappls) {
       console.log('🔧 Map initialization failed: missing container or mappls');
       return;
     }
 
-    // Ensure the map container is ready and visible
-    if (!mapRef.current.offsetParent) {
-      console.log('🔧 Map container not ready, retrying...');
-      setTimeout(() => {
-        if (mapRef.current && mapRef.current.offsetParent) {
-          console.log('🔧 Map container ready, initializing map...');
-          initializeMap();
-        }
-      }, 200);
-      return;
-    }
-
-    // Additional check to ensure container has dimensions
-    const rect = mapRef.current.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) {
-      console.log('🔧 Map container has no dimensions, retrying...');
+    // More robust container readiness check
+    const container = mapRef.current;
+    const rect = container.getBoundingClientRect();
+    
+    // Check if container is attached to DOM and visible
+    if (!container.offsetParent || rect.width === 0 || rect.height === 0) {
+      console.log('🔧 Map container not ready, retrying...', {
+        offsetParent: !!container.offsetParent,
+        dimensions: { width: rect.width, height: rect.height }
+      });
       setTimeout(() => {
         if (mapRef.current) {
           initializeMap();
         }
-      }, 200);
+      }, 300);
+      return;
+    }
+
+    // Additional check to ensure container is fully rendered
+    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+      console.log('🔧 Map container has no offset dimensions, retrying...');
+      setTimeout(() => {
+        if (mapRef.current) {
+          initializeMap();
+        }
+      }, 300);
       return;
     }
 
     try {
       console.log('🔧 Initializing MapTiles map...', {
-        container: mapRef.current,
+        container: container,
         dimensions: { width: rect.width, height: rect.height },
+        offsetDimensions: { width: container.offsetWidth, height: container.offsetHeight },
         mappls: !!window.mappls
       });
       
       // Clear any existing map content
-      if (mapRef.current) {
-        mapRef.current.innerHTML = '';
-      }
+      container.innerHTML = '';
 
       // Create map with proper configuration
-      const map = new window.mappls.Map(mapRef.current, {
+      const map = new window.mappls.Map(container, {
         center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
         zoom: 10,
         mapTypeId: 'mappls.vector', // Use vector map type
@@ -211,21 +215,11 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       }
     });
 
-    // Use a timeout to ensure DOM is ready
+    // Use a longer timeout to ensure DOM is fully ready
     const timeoutId = setTimeout(() => {
-      if (mapRef.current && mapRef.current.offsetParent) {
-        console.log('🔧 Map container ready, initializing map...');
-        initializeMap();
-      } else {
-        console.log('🔧 Map container not ready, retrying...');
-        // Retry after a longer delay
-        setTimeout(() => {
-          if (mapRef.current && mapRef.current.offsetParent) {
-            initializeMap();
-          }
-        }, 500);
-      }
-    }, 100);
+      console.log('🔧 PropertiesMap attempting initialization...');
+      initializeMap();
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [mapplsLoaded, properties, selectedProperty, onMarkerClick]);

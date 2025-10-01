@@ -70,21 +70,11 @@ const PropertyMap = ({ location, address }) => {
       return;
     }
 
-    // Use a timeout to ensure DOM is ready
+    // Use a longer timeout to ensure DOM is fully ready
     const timeoutId = setTimeout(() => {
-      if (mapRef.current && mapRef.current.offsetParent) {
-        console.log('🔧 PropertyMap container ready, initializing map...');
-        initializePropertyMap();
-      } else {
-        console.log('🔧 PropertyMap container not ready, retrying...');
-        // Retry after a longer delay
-        setTimeout(() => {
-          if (mapRef.current && mapRef.current.offsetParent) {
-            initializePropertyMap();
-          }
-        }, 500);
-      }
-    }, 100);
+      console.log('🔧 PropertyMap attempting initialization...');
+      initializePropertyMap();
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [mapplsLoaded, location, address]);
@@ -95,26 +85,32 @@ const PropertyMap = ({ location, address }) => {
       return;
     }
 
-    // Ensure the map container is ready and visible
-    if (!mapRef.current.offsetParent) {
-      console.log('🔧 PropertyMap container not ready, retrying...');
-      setTimeout(() => {
-        if (mapRef.current && mapRef.current.offsetParent) {
-          initializePropertyMap();
-        }
-      }, 200);
-      return;
-    }
-
-    // Additional check to ensure container has dimensions
-    const rect = mapRef.current.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) {
-      console.log('🔧 PropertyMap container has no dimensions, retrying...');
+    // More robust container readiness check
+    const container = mapRef.current;
+    const rect = container.getBoundingClientRect();
+    
+    // Check if container is attached to DOM and visible
+    if (!container.offsetParent || rect.width === 0 || rect.height === 0) {
+      console.log('🔧 PropertyMap container not ready, retrying...', {
+        offsetParent: !!container.offsetParent,
+        dimensions: { width: rect.width, height: rect.height }
+      });
       setTimeout(() => {
         if (mapRef.current) {
           initializePropertyMap();
         }
-      }, 200);
+      }, 300);
+      return;
+    }
+
+    // Additional check to ensure container is fully rendered
+    if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+      console.log('🔧 PropertyMap container has no offset dimensions, retrying...');
+      setTimeout(() => {
+        if (mapRef.current) {
+          initializePropertyMap();
+        }
+      }, 300);
       return;
     }
 
@@ -125,18 +121,17 @@ const PropertyMap = ({ location, address }) => {
       };
 
       console.log('🔧 Initializing PropertyMap...', {
-        container: mapRef.current,
+        container: container,
         dimensions: { width: rect.width, height: rect.height },
+        offsetDimensions: { width: container.offsetWidth, height: container.offsetHeight },
         center: center
       });
       
       // Clear any existing map content
-      if (mapRef.current) {
-        mapRef.current.innerHTML = '';
-      }
+      container.innerHTML = '';
 
       // Create map using Mappls API with proper configuration
-      const map = new window.mappls.Map(mapRef.current, {
+      const map = new window.mappls.Map(container, {
         center: center,
         zoom: 15,
         mapTypeId: 'mappls.vector', // Use vector map type
