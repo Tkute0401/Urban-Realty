@@ -58,14 +58,30 @@ const MapplsMap: React.FC<MapplsMapProps> = ({
           return;
         }
 
+        // Load the main Mappls script
         const script = document.createElement('script');
-        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/map_sdk?layer=vector&v=3.0&callback=initMap`;
+        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/map_sdk?layer=vector&v=3.0`;
         script.async = true;
         script.defer = true;
 
-        // Define the callback function
-        window.initMap = () => {
-          resolve(window.Mappls);
+        // Load the CSS
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://apis.mappls.com/vector_map/assets/v3.5/mappls-glob.css';
+        document.head.appendChild(link);
+
+        script.onload = () => {
+          // Wait a bit for the script to initialize
+          setTimeout(() => {
+            console.log('🔧 Mappls script loaded, checking for window.Mappls...', !!window.Mappls);
+            if (window.Mappls) {
+              console.log('🔧 Mappls object found:', window.Mappls);
+              resolve(window.Mappls);
+            } else {
+              console.error('🔧 Mappls not available after script load');
+              reject(new Error('Mappls not available after script load'));
+            }
+          }, 500);
         };
 
         script.onerror = () => {
@@ -78,19 +94,29 @@ const MapplsMap: React.FC<MapplsMapProps> = ({
 
     const initializeMap = async () => {
       try {
+        console.log('🔧 Starting Mappls initialization...');
         const Mappls = await loadMapplsScript();
+        console.log('🔧 Mappls script loaded successfully');
         
-        if (!mapRef.current) return;
+        if (!mapRef.current) {
+          console.error('🔧 Map container not available');
+          return;
+        }
 
-        // Initialize the map
+        // Initialize the map with correct options
         const mapOptions = {
-          ...getMapplsMapOptions(),
           container: mapRef.current,
+          style: 'mappls://styles/streets',
           center: center ? [center.lng, center.lat] : DEFAULT_MAP_CONFIG.center,
-          zoom: zoom || DEFAULT_MAP_CONFIG.zoom
+          zoom: zoom || DEFAULT_MAP_CONFIG.zoom,
+          interactive: true,
+          bearing: 0,
+          pitch: 0
         };
 
+        console.log('🔧 Creating Mappls map with options:', mapOptions);
         const map = new (Mappls as any).Map(mapOptions);
+        console.log('🔧 Mappls map created successfully');
 
         mapInstanceRef.current = map;
 
@@ -106,7 +132,7 @@ const MapplsMap: React.FC<MapplsMapProps> = ({
 
       } catch (err) {
         console.error('🔧 Error loading Mappls:', err);
-        setError('Failed to load Mappls');
+        setError(`Failed to load Mappls: ${err.message}`);
       }
     };
 
