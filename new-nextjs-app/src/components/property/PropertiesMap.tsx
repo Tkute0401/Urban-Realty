@@ -8,6 +8,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const [markers, setMarkers] = useState([]);
   const [error, setError] = useState(null);
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
+  const retryCountRef = useRef(0);
   
   const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
 
@@ -55,14 +56,33 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
     const container = mapRef.current;
     const rect = container.getBoundingClientRect();
     
+    // More comprehensive container readiness check
+    const isVisible = container.offsetParent !== null;
+    const hasDimensions = rect.width > 0 && rect.height > 0 && container.offsetWidth > 0 && container.offsetHeight > 0;
+    const isInDOM = document.contains(container);
+    
+    console.log('🔧 Container check:', {
+      isVisible,
+      hasDimensions,
+      isInDOM,
+      rect: { width: rect.width, height: rect.height },
+      offset: { width: container.offsetWidth, height: container.offsetHeight }
+    });
+    
     // Check if container is ready
-    if (!container.offsetParent || rect.width === 0 || rect.height === 0) {
-      console.log('🔧 Map container not ready, retrying...');
+    if (!isVisible || !hasDimensions || !isInDOM) {
+      retryCountRef.current += 1;
+      if (retryCountRef.current > 10) {
+        console.error('🔧 Map container failed to initialize after 10 retries');
+        setError('Map container failed to initialize');
+        return;
+      }
+      console.log(`🔧 Map container not ready, retrying in 500ms... (attempt ${retryCountRef.current})`);
       setTimeout(() => {
         if (mapRef.current) {
           initializeMap();
         }
-      }, 300);
+      }, 500);
       return;
     }
 
@@ -99,6 +119,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       });
 
       setMapInstance(map);
+      retryCountRef.current = 0; // Reset retry counter on success
       console.log('🔧 Map initialized successfully');
     } catch (err) {
       console.error('Error creating Mappls map:', err);
