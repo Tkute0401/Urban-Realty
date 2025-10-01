@@ -833,7 +833,7 @@ exports.getSettings = asyncHandler(async (req, res, next) => {
       integrations: {
         googleAnalytics: process.env.GOOGLE_ANALYTICS_ID || '',
         facebookPixel: process.env.FACEBOOK_PIXEL_ID || '',
-        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+        mapplsApiKey: process.env.MAPPLS_API_KEY || '',
         recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY || '',
         recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY || '',
         enableRecaptcha: !!process.env.RECAPTCHA_SECRET_KEY

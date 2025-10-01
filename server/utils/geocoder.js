@@ -1,10 +1,9 @@
 // utils/geocoder.js
 const NodeGeocoder = require('node-geocoder');
 
-// Google Maps configuration
+// MapTiles configuration
 const options = {
-  provider: 'google',
-  apiKey: process.env.GOOGLE_MAPS_API_KEY, // Make sure to add this to your .env
+  provider: 'openstreetmap', // Using OpenStreetMap as MapTiles alternative
   httpAdapter: 'https',
   formatter: null, // 'gpx', 'string', ...
   timeout: 30000,

@@ -1,13 +1,33 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY;
   
-  return NextResponse.json({
-    mapplsApiKey: mapplsApiKey ? 'Found' : 'Missing',
-    apiKeyLength: mapplsApiKey?.length || 0,
-    apiKeyPreview: mapplsApiKey ? `${mapplsApiKey.substring(0, 10)}...` : 'N/A',
-    nodeEnv: process.env.NODE_ENV,
-    allEnvVars: Object.keys(process.env).filter(key => key.includes('MAPPLS')),
-  });
+  if (!apiKey) {
+    return NextResponse.json({
+      success: false,
+      error: 'No MapTiles API key found'
+    });
+  }
+
+  try {
+    // Test the API key by making a request to MapTiles API
+    const testUrl = `https://apis.mappls.com/advancedmaps/api/${apiKey}/map_sdk?v=3.0&layer=vector`;
+    
+    const response = await fetch(testUrl);
+    
+    return NextResponse.json({
+      success: true,
+      apiKey: `${apiKey.substring(0, 10)}...`,
+      status: response.status,
+      statusText: response.statusText,
+      testUrl: testUrl
+    });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      error: error.message,
+      apiKey: `${apiKey.substring(0, 10)}...`
+    });
+  }
 }

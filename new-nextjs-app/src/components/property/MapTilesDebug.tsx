@@ -3,26 +3,26 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Alert, Card, CardContent } from '@mui/material';
 
-const GoogleMapsDebug = () => {
+const MapTilesDebug = () => {
   const [debugInfo, setDebugInfo] = useState({
     apiKey: '',
     isLoaded: false,
     error: null,
-    windowGoogle: false,
+    windowMappls: false,
     apiTestResult: null,
     loading: false
   });
 
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY;
     setDebugInfo(prev => ({
       ...prev,
       apiKey: apiKey || 'NOT_FOUND',
-      windowGoogle: typeof window !== 'undefined' && !!window.google
+      windowMappls: typeof window !== 'undefined' && !!window.mappls
     }));
 
-    // Check if Google Maps is loaded
-    if (typeof window !== 'undefined' && window.google) {
+    // Check if MapTiles is loaded
+    if (typeof window !== 'undefined' && window.mappls) {
       setDebugInfo(prev => ({ ...prev, isLoaded: true }));
     }
 
@@ -33,7 +33,7 @@ const GoogleMapsDebug = () => {
   const testApiKey = async () => {
     setDebugInfo(prev => ({ ...prev, loading: true }));
     try {
-      const response = await fetch('/api/test-google-maps');
+      const response = await fetch('/api/test-mappls');
       const data = await response.json();
       setDebugInfo(prev => ({ ...prev, apiTestResult: data, loading: false }));
     } catch (error) {
@@ -49,7 +49,7 @@ const GoogleMapsDebug = () => {
     <Card sx={{ mb: 2 }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Google Maps Debug Information
+          MapTiles Debug Information
         </Typography>
         
         <Box sx={{ mb: 2 }}>
@@ -92,13 +92,13 @@ const GoogleMapsDebug = () => {
 
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" component="div">
-            <strong>Google Maps Loaded:</strong> {debugInfo.isLoaded ? '✅ Yes' : '❌ No'}
+            <strong>MapTiles Loaded:</strong> {debugInfo.isLoaded ? '✅ Yes' : '❌ No'}
           </Typography>
         </Box>
 
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" component="div">
-            <strong>Window Google Object:</strong> {debugInfo.windowGoogle ? '✅ Available' : '❌ Not Available'}
+            <strong>Window MapTiles Object:</strong> {debugInfo.windowMappls ? '✅ Available' : '❌ Not Available'}
           </Typography>
         </Box>
 
@@ -110,19 +110,19 @@ const GoogleMapsDebug = () => {
 
         {!debugInfo.apiKey && (
           <Alert severity="error" sx={{ mt: 2 }}>
-            Google Maps API key is not available. Please check your environment variables.
+            MapTiles API key is not available. Please check your environment variables.
           </Alert>
         )}
 
         {debugInfo.apiKey && !debugInfo.isLoaded && (
           <Alert severity="warning" sx={{ mt: 2 }}>
-            API key is available but Google Maps is not loaded yet. This is normal during initial load.
+            API key is available but MapTiles is not loaded yet. This is normal during initial load.
           </Alert>
         )}
 
         {debugInfo.apiKey && debugInfo.isLoaded && (
           <Alert severity="success" sx={{ mt: 2 }}>
-            Google Maps is properly configured and loaded!
+            MapTiles is properly configured and loaded!
           </Alert>
         )}
       </CardContent>
@@ -130,4 +130,4 @@ const GoogleMapsDebug = () => {
   );
 };
 
-export default GoogleMapsDebug;
+export default MapTilesDebug;

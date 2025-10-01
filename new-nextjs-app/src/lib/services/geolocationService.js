@@ -171,7 +171,7 @@ class GeolocationService {
 
   // Get address from coordinates (reverse geocoding)
   async reverseGeocode(latitude, longitude) {
-    // This would typically use a geocoding service like Google Maps Geocoding API
+    // This would typically use a geocoding service like MapTiles Geocoding API
     // For now, return mock data
     return {
       address: 'Mock Address',
@@ -184,7 +184,7 @@ class GeolocationService {
 
   // Get coordinates from address (geocoding)
   async geocode(address) {
-    // This would typically use a geocoding service like Google Maps Geocoding API
+    // This would typically use a geocoding service like MapTiles Geocoding API
     // For now, return mock data
     return {
       latitude: 40.7128,

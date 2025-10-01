@@ -15,7 +15,7 @@ import BedBath from '@/components/property/filters/BedBath';
 import HomeType from '@/components/property/filters/HomeType';
 import More from '@/components/property/filters/More';
 import PropertiesMap from '@/components/property/PropertiesMap';
-import GoogleMapsDebug from '@/components/property/GoogleMapsDebug';
+import MapTilesDebug from '@/components/property/MapTilesDebug';
 import { PropertyCard as UnifiedPropertyCard } from '@/components/ui';
 import type { Property } from '@/components/ui';
 
@@ -443,7 +443,7 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
           <div className={`${styles.mapContainer} ${styles.slideInRight}`}>
             {/* Debug Information - Remove this after fixing */}
             <div style={{ marginBottom: '10px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-              <GoogleMapsDebug />
+              <MapTilesDebug />
             </div>
             <PropertiesMap
               properties={filteredProperties}

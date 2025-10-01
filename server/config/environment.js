@@ -123,9 +123,9 @@ const envSchema = Joi.object({
     .description('Session secret for secure sessions'),
   
   // API Keys
-  GOOGLE_MAPS_API_KEY: Joi.string()
+  MAPPLS_API_KEY: Joi.string()
     .optional()
-    .description('Google Maps API key for location services'),
+    .description('MapTiles API key for location services'),
   
   // Monitoring
   SENTRY_DSN: Joi.string()
@@ -219,7 +219,7 @@ module.exports = {
   
   // API Keys
   apiKeys: {
-    googleMaps: envVars.GOOGLE_MAPS_API_KEY
+    mappls: envVars.MAPPLS_API_KEY
   },
   
   // Monitoring

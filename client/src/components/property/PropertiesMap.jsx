@@ -15,7 +15,7 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   const [mapplsLoaded, setMapplsLoaded] = useState(false);
   
   // Use environment variable from Vite
-  const mapplsApiKey = import.meta.env.VITE_MAPPLS_API_KEY;
+  const mapplsApiKey = import.meta.env.VITE_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
   
   // Debug logging
   console.log('🔧 PropertiesMap Debug Info:', {
