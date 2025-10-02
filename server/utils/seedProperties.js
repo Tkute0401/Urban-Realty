@@ -119,6 +119,72 @@ const seedProperties = async () => {
         agent: defaultAgent ? defaultAgent._id : new mongoose.Types.ObjectId(),
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        _id: new mongoose.Types.ObjectId('68114ff6743775803753ded3'),
+        title: "Premium Apartment in Delhi",
+        description: "A premium 3BHK apartment in the heart of Delhi with modern amenities and excellent connectivity. Perfect for families looking for luxury living.",
+        type: "Apartment",
+        status: "For Sale",
+        price: 8000000,
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 1400,
+        address: {
+          street: "321 Connaught Place",
+          city: "Delhi",
+          state: "Delhi",
+          zipCode: "110001",
+          locality: "Connaught Place",
+          country: "India"
+        },
+        location: {
+          type: "Point",
+          coordinates: [77.2090, 28.6139] // [lng, lat] for Connaught Place, Delhi
+        },
+        images: [{
+          url: "/placeholder-property.jpg",
+          publicId: "placeholder-property-4"
+        }],
+        amenities: ["Swimming Pool", "Gym", "Parking", "Security", "Elevator", "Conference Room"],
+        highlights: ["Prime Location", "Metro Connectivity", "Shopping Centers Nearby"],
+        developer: developers.length > 1 ? developers[1]._id : null,
+        agent: defaultAgent ? defaultAgent._id : new mongoose.Types.ObjectId(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        _id: new mongoose.Types.ObjectId('68115205743775803753e21f'),
+        title: "Luxury Penthouse in Mumbai",
+        description: "An exclusive penthouse with panoramic city views in Mumbai. This 4BHK penthouse offers the ultimate in luxury living with premium finishes and world-class amenities.",
+        type: "Apartment",
+        status: "For Sale",
+        price: 25000000,
+        bedrooms: 4,
+        bathrooms: 3,
+        area: 3000,
+        address: {
+          street: "555 Marine Drive",
+          city: "Mumbai",
+          state: "Maharashtra",
+          zipCode: "400020",
+          locality: "Marine Drive",
+          country: "India"
+        },
+        location: {
+          type: "Point",
+          coordinates: [72.8261, 18.9400] // [lng, lat] for Marine Drive, Mumbai
+        },
+        images: [{
+          url: "/placeholder-property.jpg",
+          publicId: "placeholder-property-5"
+        }],
+        amenities: ["Swimming Pool", "Gym", "Parking", "Security", "Elevator", "Garden", "Balcony"],
+        highlights: ["Sea View", "Penthouse", "Luxury Living", "Prime Location"],
+        developer: developers.length > 0 ? developers[0]._id : null,
+        agent: defaultAgent ? defaultAgent._id : new mongoose.Types.ObjectId(),
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ];
 

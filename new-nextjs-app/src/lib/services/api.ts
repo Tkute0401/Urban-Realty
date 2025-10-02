@@ -33,7 +33,8 @@ export const api = {
 				favoritesList: () => unwrap<any[]>(http.get("/api/v1/auth/favorites")),
 				addFavorite: (propertyId: string) => unwrap<any>(http.put(`/api/v1/auth/favorites/${propertyId}`, {})),
 				removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/api/v1/auth/favorites/${propertyId}`)),
-				favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)), 
+				favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)),
+				getFavoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)), 
 				/**
 				 * Toggle favorite state safely. If desiredState is provided, it enforces that state.
 				 * If not provided, it tries PUT first and on 400 falls back to DELETE.
@@ -101,6 +102,14 @@ export const api = {
                 uploadMedia: (formData: FormData, config?: any) => unwrap<any>(http.post("/api/v1/admin/media/upload", formData, config)),
                 updateMedia: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/admin/media/${id}`, payload)),
                 deleteMedia: (id: string) => unwrap<any>(http.delete(`/api/v1/admin/media/${id}`)),
+        },
+        // Inquiries APIs
+        inquiries: {
+            create: (payload: any) => unwrap<any>(http.post("/api/v1/inquiries", payload)),
+            list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/inquiries", { params })),
+            getById: (id: string) => unwrap<any>(http.get(`/api/v1/inquiries/${id}`)),
+            update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/inquiries/${id}`, payload)),
+            delete: (id: string) => unwrap<any>(http.delete(`/api/v1/inquiries/${id}`)),
         },
         agent: {
                 // Agent self-access endpoints (logged-in agent accessing their own data)
