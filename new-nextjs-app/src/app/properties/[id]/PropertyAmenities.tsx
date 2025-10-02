@@ -16,7 +16,8 @@ import {
   LocalLaundryService, 
   Storage, 
   MeetingRoom, 
-  Kitchen 
+  Kitchen,
+  Check
 } from '@mui/icons-material';
 import SectionHeader from './SectionHeader';
 
