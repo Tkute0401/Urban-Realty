@@ -281,6 +281,8 @@ const PropertiesPageClient: React.FC<PropertiesPageClientProps> = ({
 
   const handleMarkerClick = (property: any) => {
     setSelectedProperty(property);
+    // Navigate to property details page when marker is clicked
+    router.push(`/properties/${property._id}`);
   };
 
   const handlePropertyClick = (property: Property) => {
