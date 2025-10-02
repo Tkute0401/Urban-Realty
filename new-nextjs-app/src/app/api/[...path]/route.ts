@@ -16,6 +16,9 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
         state: "Maharashtra",
         locality: "Bandra"
       },
+      location: {
+        coordinates: [72.8261, 19.0596] // [lng, lat] for Bandra, Mumbai
+      },
       price: 5000000,
       propertyType: "apartment",
       listingType: "sale",
@@ -43,6 +46,9 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
         city: "Delhi",
         state: "Haryana",
         locality: "Gurgaon"
+      },
+      location: {
+        coordinates: [77.1025, 28.4595] // [lng, lat] for Gurgaon
       },
       price: 15000000,
       propertyType: "villa",
