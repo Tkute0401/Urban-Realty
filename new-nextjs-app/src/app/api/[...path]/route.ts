@@ -8,7 +8,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
   // Mock properties data
   const mockProperties = [
     {
-      _id: "mock_prop_1",
+      _id: "68566b6b9b0fdb60e5cbcea4",
       title: "Modern Apartment in Bandra",
       address: {
         street: "123 Sea View Road",
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
       ]
     },
     {
-      _id: "mock_prop_2",
+      _id: "680cb6370b06b388af8e6ce4",
       title: "Luxury Villa in Gurgaon",
       address: {
         street: "456 Golf Course Road",
@@ -68,6 +68,37 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
         { name: "Metro Station", distance: "3 km", type: "transport" },
         { name: "Hospital", distance: "1 km", type: "healthcare" }
       ]
+    },
+    {
+      _id: "680ac17c3e3b9100aaa10559",
+      title: "Cozy Apartment in Bangalore",
+      address: {
+        street: "789 Tech Park Road",
+        city: "Bangalore",
+        state: "Karnataka",
+        locality: "Koramangala"
+      },
+      location: {
+        coordinates: [77.5946, 12.9352] // [lng, lat] for Bangalore
+      },
+      price: 35000,
+      propertyType: "apartment",
+      listingType: "rent",
+      bedrooms: 2,
+      bathrooms: 2,
+      area: 900,
+      sqft: 900,
+      images: ["/placeholder-property.jpg"],
+      amenities: ["Gym", "Parking", "Security", "Balcony"],
+      developer: {
+        name: "Sobha Limited",
+        contact: "contact@sobha.com"
+      },
+      highlights: ["Tech Hub Location", "Modern Design", "Great Connectivity"],
+      nearby: [
+        { name: "IT Park", distance: "1 km", type: "work" },
+        { name: "Metro Station", distance: "2 km", type: "transport" }
+      ]
     }
   ];
   
@@ -85,6 +116,30 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
         total: mockProperties.length
       }
     });
+  }
+  
+  // Handle individual property requests
+  if (path.startsWith('v1/properties/') && path !== 'v1/properties/featured') {
+    const propertyId = path.replace('v1/properties/', '');
+    console.log('🔍 API route - Looking for property ID:', propertyId);
+    
+    const property = mockProperties.find(p => p._id === propertyId);
+    
+    if (property) {
+      console.log('🔍 API route - Found property:', property.title);
+      return NextResponse.json({
+        success: true,
+        data: property
+      });
+    } else {
+      console.log('🔍 API route - Property not found for ID:', propertyId);
+      return NextResponse.json({
+        success: false,
+        error: 'Property not found',
+        message: 'The requested property could not be found',
+        data: null
+      }, { status: 404 });
+    }
   }
   
   return NextResponse.json({ 

@@ -234,10 +234,6 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
 
         // Add click listener for marker
         marker.addListener('click', () => {
-          console.log('🔧 Marker clicked for property:', property);
-          console.log('🔧 Property ID:', property._id);
-          console.log('🔧 Property title:', property.title);
-          
           // Close other info windows
           newMarkers.forEach(m => {
             if (m.infoWindow) {
@@ -250,7 +246,6 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
           
           // Call onMarkerClick if provided
           if (onMarkerClick) {
-            console.log('🔧 Calling onMarkerClick with property:', property);
             onMarkerClick(property);
           }
         });
