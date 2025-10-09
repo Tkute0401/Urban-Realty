@@ -1,534 +1,467 @@
-import { useState } from 'react';
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Box, Modal, IconButton, Typography, useMediaQuery, useTheme,
-  Stack, Button
-} from '@mui/material';
-import { Close, NavigateBefore, NavigateNext, Share, Bookmark } from '@mui/icons-material';
+  ChevronLeft, 
+  ChevronRight, 
+  Fullscreen, 
+  Close,
+  ZoomIn,
+  ZoomOut
+} from '@mui/icons-material';
+import { IconButton, Box, Typography, Chip } from '@mui/material';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
-const PropertyImageGallery = ({ images }) => {
+interface Image {
+  url: string;
+  alt?: string;
+  caption?: string;
+}
+
+interface PropertyImageGalleryProps {
+  images: Image[];
+  propertyTitle?: string;
+  showThumbnails?: boolean;
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
+}
+
+const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
+  images,
+  propertyTitle = 'Property',
+  showThumbnails = true,
+  autoPlay = false,
+  autoPlayInterval = 5000
+}) => {
+  const { theme } = useThemeContext();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [open, setOpen] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isDark = theme === 'dark';
 
-  // Process images array safely
-  const getValidImages = () => {
-    if (!images || !Array.isArray(images)) return [];
-    
-    return images
-      .map(img => {
-        if (!img) return null;
-        if (typeof img === 'string') return img;
-        if (typeof img === 'object' && img.url) return img.url;
-        return null;
-      })
-      .filter(img => img !== null);
+  // Auto-play functionality
+  useEffect(() => {
+    if (autoPlay && images.length > 1) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+      }, autoPlayInterval);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [autoPlay, autoPlayInterval, images.length]);
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  const validImages = getValidImages();
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
 
-  if (validImages.length === 0) {
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    setIsZoomed(false);
+  };
+
+  const toggleZoom = () => {
+    setIsZoomed(!isZoomed);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (isFullscreen) {
+      switch (e.key) {
+        case 'Escape':
+          setIsFullscreen(false);
+          setIsZoomed(false);
+          break;
+        case 'ArrowLeft':
+          goToPrevious();
+          break;
+        case 'ArrowRight':
+          goToNext();
+          break;
+        case ' ':
+          e.preventDefault();
+          toggleZoom();
+          break;
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isFullscreen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isFullscreen]);
+
+  if (!images || images.length === 0) {
     return (
-      <Box 
-        sx={{ 
-          height: 200, 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          bgcolor: '#f0f0f0',
-          borderRadius: 1,
-          border: '1px solid',
-          borderColor: 'divider'
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
+      <Box sx={{
+        height: '400px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        borderRadius: '12px',
+        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+      }}>
+        <Typography variant="h6" color="text.secondary">
           No images available
         </Typography>
       </Box>
     );
   }
 
-  const handleOpen = (index) => {
-    setCurrentIndex(index);
-    setOpen(true);
-  };
+  const currentImage = images[currentIndex];
 
-  const handleClose = () => setOpen(false);
-
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? validImages.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === validImages.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  // Show first 4 images in grid (main + 3 thumbnails)
-  const visibleImages = validImages.slice(0, 4);
-  const remainingCount = validImages.length - 4;
-
-  if (isMobile) {
-    // Mobile: Keep vertical layout
-    return (
-      <>
-        <Box sx={{ position: 'relative', mb: 2 }}>
-          {/* Main cover image */}
-          <Box
-            component="img"
-            src={validImages[0]}
-            alt="Property cover"
-            onError={(e) => { 
-              (e.target as HTMLImageElement).src = '/default-property.jpg';
-              (e.target as HTMLImageElement).style.objectFit = 'contain';
-            }}
-            onClick={() => handleOpen(0)}
-            sx={{
+  return (
+    <>
+      {/* Main Gallery */}
+      <Box sx={{
+        position: 'relative',
+        height: { xs: '300px', sm: '400px', md: '500px' },
+        borderRadius: '12px',
+        overflow: 'hidden',
+        background: isDark ? '#0B1011' : '#f8fafc',
+        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+      }}>
+        {/* Main Image */}
+        <Box sx={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {!imageLoaded && (
+            <Box sx={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+            }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                border: '2px solid transparent',
+                borderTop: '2px solid #78CADC',
+                borderLeft: '2px solid #78CADC',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }} />
+            </Box>
+          )}
+          
+          <motion.img
+            key={currentIndex}
+            src={currentImage.url}
+            alt={currentImage.alt || propertyTitle}
+            style={{
               width: '100%',
-              height: 300,
-              borderRadius: 2,
-              cursor: 'pointer',
+              height: '100%',
               objectFit: 'cover',
-              border: '1px solid',
-              borderColor: 'divider'
+              opacity: imageLoaded ? 1 : 0,
+              transform: isZoomed ? 'scale(1.5)' : 'scale(1)',
+              transition: 'transform 0.3s ease'
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: imageLoaded ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageLoaded(true)}
+          />
+
+          {/* Image Counter */}
+          <Chip
+            label={`${currentIndex + 1} / ${images.length}`}
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              background: 'rgba(0, 0, 0, 0.7)',
+              color: 'white',
+              backdropFilter: 'blur(10px)'
             }}
           />
+
+          {/* Navigation Arrows */}
+          {images.length > 1 && (
+            <>
+              <IconButton
+                onClick={goToPrevious}
+                sx={{
+                  position: 'absolute',
+                  left: 16,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'rgba(0, 0, 0, 0.7)'
+                  }
+                }}
+              >
+                <ChevronLeft />
+              </IconButton>
+              
+              <IconButton
+                onClick={goToNext}
+                sx={{
+                  position: 'absolute',
+                  right: 16,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'rgba(0, 0, 0, 0.7)'
+                  }
+                }}
+              >
+                <ChevronRight />
+              </IconButton>
+            </>
+          )}
+
+          {/* Action Buttons */}
+          <Box sx={{
+            position: 'absolute',
+            bottom: 16,
+            right: 16,
+            display: 'flex',
+            gap: 1
+          }}>
+            <IconButton
+              onClick={toggleZoom}
+              sx={{
+                background: 'rgba(0, 0, 0, 0.5)',
+                color: 'white',
+                '&:hover': {
+                  background: 'rgba(0, 0, 0, 0.7)'
+                }
+              }}
+            >
+              {isZoomed ? <ZoomOut /> : <ZoomIn />}
+            </IconButton>
+            
+            <IconButton
+              onClick={toggleFullscreen}
+              sx={{
+                background: 'rgba(0, 0, 0, 0.5)',
+                color: 'white',
+                '&:hover': {
+                  background: 'rgba(0, 0, 0, 0.7)'
+                }
+              }}
+            >
+              <Fullscreen />
+            </IconButton>
+          </Box>
         </Box>
 
-        {/* Thumbnail images row for mobile */}
-        {validImages.length > 1 && (
-          <Box sx={{ 
-            display: 'flex', 
-            gap: 1, 
-            overflowX: 'auto', 
-            py: 1,
-            scrollbarWidth: 'none',
+        {/* Thumbnails */}
+        {showThumbnails && images.length > 1 && (
+          <Box sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.8))',
+            p: 2,
+            display: 'flex',
+            gap: 1,
+            overflowX: 'auto',
             '&::-webkit-scrollbar': {
-              display: 'none'
+              height: 4
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(255, 255, 255, 0.1)'
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(255, 255, 255, 0.3)',
+              borderRadius: 2
             }
           }}>
-            {validImages.slice(1).map((img, index) => (
+            {images.map((image, index) => (
               <Box
-                key={index + 1}
-                component="img"
-                src={img}
-                alt={`Property ${index + 2}`}
-                onError={(e) => { 
-                  (e.target as HTMLImageElement).src = '/default-property.jpg';
-                  (e.target as HTMLImageElement).style.objectFit = 'contain';
-                }}
-                onClick={() => handleOpen(index + 1)}
+                key={index}
+                onClick={() => goToSlide(index)}
                 sx={{
-                  height: 80,
-                  width: 'auto',
-                  minWidth: 120,
-                  borderRadius: 1,
+                  minWidth: 60,
+                  height: 40,
+                  borderRadius: '4px',
+                  overflow: 'hidden',
                   cursor: 'pointer',
-                  objectFit: 'cover',
-                  border: '1px solid',
-                  borderColor: 'divider'
+                  border: currentIndex === index ? '2px solid #78CADC' : '2px solid transparent',
+                  opacity: currentIndex === index ? 1 : 0.7,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    opacity: 1
+                  }
                 }}
-              />
+              >
+                <img
+                  src={image.url}
+                  alt={image.alt || `${propertyTitle} ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              </Box>
             ))}
           </Box>
         )}
+      </Box>
 
-        {/* Modal remains the same */}
-        <Modal 
-          open={open} 
-          onClose={handleClose}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            p: 2
-          }}
-        >
-          <Box sx={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: '100%',
-            maxHeight: '90vh',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            outline: 'none',
-            borderRadius: 1,
-            overflow: 'hidden'
-          }}>
-            <IconButton 
-              onClick={handleClose}
-              sx={{ 
-                position: 'absolute', 
-                right: 8, 
-                top: 8, 
-                color: 'white', 
-                bgcolor: 'rgba(0,0,0,0.5)',
-                zIndex: 1
-              }}
-            >
-              <Close />
-            </IconButton>
-            
-            <Box sx={{ 
-              position: 'relative', 
-              height: '60vh',
+      {/* Fullscreen Modal */}
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.95)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px'
+            }}
+            onClick={() => setIsFullscreen(false)}
+          >
+            <Box sx={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Box 
-                component="img"
-                src={validImages[currentIndex]}
-                alt={`Property view ${currentIndex + 1}`}
-                onError={(e) => { 
-                  (e.target as HTMLImageElement).src = '/default-property.jpg';
-                  (e.target as HTMLImageElement).style.objectFit = 'contain';
-                }}
-                sx={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain',
-                  display: 'block'
-                }}
-              />
-              
+              {/* Close Button */}
               <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePrev();
-                }}
-                sx={{ 
-                  position: 'absolute', 
-                  left: 8, 
-                  top: '50%', 
-                  color: 'white', 
-                  bgcolor: 'rgba(0,0,0,0.5)',
-                  zIndex: 1,
-                  transform: 'translateY(-50%)'
-                }}
-              >
-                <NavigateBefore />
-              </IconButton>
-              
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNext();
-                }}
-                sx={{ 
-                  position: 'absolute', 
-                  right: 8, 
-                  top: '50%', 
-                  color: 'white', 
-                  bgcolor: 'rgba(0,0,0,0.5)',
-                  zIndex: 1,
-                  transform: 'translateY(-50%)'
-                }}
-              >
-                <NavigateNext />
-              </IconButton>
-            </Box>
-
-            {validImages.length > 1 && (
-              <Box sx={{
-                position: 'absolute',
-                bottom: 16,
-                left: 0,
-                right: 0,
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 1
-              }}>
-                {validImages.map((_, index) => (
-                  <Box
-                    key={index}
-                    onClick={() => setCurrentIndex(index)}
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: currentIndex === index ? 'primary.main' : 'rgba(255,255,255,0.5)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s'
-                    }}
-                  />
-                ))}
-              </Box>
-            )}
-          </Box>
-        </Modal>
-      </>
-    );
-  }
-
-  // Desktop: Horizontal layout like in screenshot
-  return (
-    <>
-      <Box sx={{ 
-        display: 'flex', 
-        gap: 1, 
-        height: 400,
-        mb: 2,
-        position: 'relative'
-      }}>
-        {/* Main image on the left */}
-        <Box sx={{ 
-          flex: '0 0 70%',
-          position: 'relative'
-        }}>
-          <Box
-            component="img"
-            src={validImages[0]}
-            alt="Property main view"
-            onError={(e) => { 
-              (e.target as HTMLImageElement).src = '/default-property.jpg';
-              (e.target as HTMLImageElement).style.objectFit = 'contain';
-            }}
-            onClick={() => handleOpen(0)}
-            sx={{
-              width: '100%',
-              height: '100%',
-              borderRadius: 2,
-              cursor: 'pointer',
-              objectFit: 'cover',
-              border: '1px solid',
-              borderColor: 'divider'
-            }}
-          />
-          
-          {/* "Cover Image" label */}
-          <Box sx={{
-            position: 'absolute',
-            top: 16,
-            left: 16,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            color: 'white',
-            px: 1.5,
-            py: 0.5,
-            borderRadius: 1,
-            fontSize: '0.75rem',
-            fontWeight: 'medium'
-          }}>
-            Cover Image
-          </Box>
-        </Box>
-
-        {/* Thumbnail grid on the right */}
-        <Box sx={{ 
-          flex: '0 0 30%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1
-        }}>
-          {/* Top thumbnail */}
-          {validImages[1] && (
-            <Box
-              component="img"
-              src={validImages[1]}
-              alt="Property view 2"
-              onError={(e) => { 
-                (e.target as HTMLImageElement).src = '/default-property.jpg';
-                (e.target as HTMLImageElement).style.objectFit = 'contain';
-              }}
-              onClick={() => handleOpen(1)}
-              sx={{
-                width: '100%',
-                height: '49%',
-                borderRadius: 1,
-                cursor: 'pointer',
-                objectFit: 'cover',
-                border: '1px solid',
-                borderColor: 'divider'
-              }}
-            />
-          )}
-
-          {/* Bottom thumbnail with overlay if more images exist */}
-          {validImages[2] && (
-            <Box sx={{ 
-              position: 'relative',
-              height: '49%'
-            }}>
-              <Box
-                component="img"
-                src={validImages[2]}
-                alt="Property view 3"
-                onError={(e) => { 
-                  (e.target as HTMLImageElement).src = '/default-property.jpg';
-                  (e.target as HTMLImageElement).style.objectFit = 'contain';
-                }}
-                onClick={() => handleOpen(2)}
+                onClick={() => setIsFullscreen(false)}
                 sx={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: 1,
-                  cursor: 'pointer',
-                  objectFit: 'cover',
-                  border: '1px solid',
-                  borderColor: 'divider'
+                  position: 'absolute',
+                  top: -50,
+                  right: 0,
+                  color: 'white',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  '&:hover': {
+                    background: 'rgba(0, 0, 0, 0.7)'
+                  }
                 }}
+              >
+                <Close />
+              </IconButton>
+
+              {/* Fullscreen Image */}
+              <motion.img
+                key={currentIndex}
+                src={currentImage.url}
+                alt={currentImage.alt || propertyTitle}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'contain',
+                  transform: isZoomed ? 'scale(1.5)' : 'scale(1)',
+                  transition: 'transform 0.3s ease'
+                }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+                onClick={(e) => e.stopPropagation()}
               />
-              
-              {/* "+X more" overlay */}
-              {remainingCount > 0 && (
-                <Box 
-                  onClick={() => handleOpen(2)}
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                    borderRadius: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'white'
-                  }}
-                >
-                  <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                    +
-                  </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                    {remainingCount + 1} more
-                  </Typography>
-                </Box>
+
+              {/* Fullscreen Navigation */}
+              {images.length > 1 && (
+                <>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToPrevious();
+                    }}
+                    sx={{
+                      position: 'absolute',
+                      left: -60,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'white',
+                      background: 'rgba(0, 0, 0, 0.5)',
+                      '&:hover': {
+                        background: 'rgba(0, 0, 0, 0.7)'
+                      }
+                    }}
+                  >
+                    <ChevronLeft />
+                  </IconButton>
+                  
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToNext();
+                    }}
+                    sx={{
+                      position: 'absolute',
+                      right: -60,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'white',
+                      background: 'rgba(0, 0, 0, 0.5)',
+                      '&:hover': {
+                        background: 'rgba(0, 0, 0, 0.7)'
+                      }
+                    }}
+                  >
+                    <ChevronRight />
+                  </IconButton>
+                </>
               )}
-            </Box>
-          )}
-        </Box>
-      </Box>
 
-      {/* Modal for full-screen viewing */}
-      <Modal 
-        open={open} 
-        onClose={handleClose}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2
-        }}
-      >
-        <Box sx={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 800,
-          maxHeight: '90vh',
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          outline: 'none',
-          borderRadius: 1,
-          overflow: 'hidden'
-        }}>
-          <IconButton 
-            onClick={handleClose}
-            sx={{ 
-              position: 'absolute', 
-              right: 8, 
-              top: 8, 
-              color: 'white', 
-              bgcolor: 'rgba(0,0,0,0.5)',
-              zIndex: 1
-            }}
-          >
-            <Close />
-          </IconButton>
-          
-          <Box sx={{ 
-            position: 'relative', 
-            height: '70vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Box 
-              component="img"
-              src={validImages[currentIndex]}
-              alt={`Property view ${currentIndex + 1}`}
-              onError={(e) => { 
-                (e.target as HTMLImageElement).src = '/default-property.jpg';
-                (e.target as HTMLImageElement).style.objectFit = 'contain';
-              }}
-              sx={{ 
-                width: '100%', 
-                height: '100%', 
-                objectFit: 'contain',
-                display: 'block'
-              }}
-            />
-            
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePrev();
-              }}
-              sx={{ 
-                position: 'absolute', 
-                left: 8, 
-                top: '50%', 
-                color: 'white', 
-                bgcolor: 'rgba(0,0,0,0.5)',
-                zIndex: 1,
-                transform: 'translateY(-50%)'
-              }}
-            >
-              <NavigateBefore />
-            </IconButton>
-            
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNext();
-              }}
-              sx={{ 
-                position: 'absolute', 
-                right: 8, 
-                top: '50%', 
-                color: 'white', 
-                bgcolor: 'rgba(0,0,0,0.5)',
-                zIndex: 1,
-                transform: 'translateY(-50%)'
-              }}
-            >
-              <NavigateNext />
-            </IconButton>
-          </Box>
-
-          {validImages.length > 1 && (
-            <Box sx={{
-              position: 'absolute',
-              bottom: 16,
-              left: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 1
-            }}>
-              {validImages.map((_, index) => (
-                <Box
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: currentIndex === index ? 'primary.main' : 'rgba(255,255,255,0.5)',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s'
-                  }}
-                />
-              ))}
+              {/* Fullscreen Image Counter */}
+              <Typography
+                variant="h6"
+                sx={{
+                  position: 'absolute',
+                  bottom: -50,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  color: 'white',
+                  background: 'rgba(0, 0, 0, 0.5)',
+                  px: 2,
+                  py: 1,
+                  borderRadius: '4px'
+                }}
+              >
+                {currentIndex + 1} / {images.length}
+              </Typography>
             </Box>
-          )}
-        </Box>
-      </Modal>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

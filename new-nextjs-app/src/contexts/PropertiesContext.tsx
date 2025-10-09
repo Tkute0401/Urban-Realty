@@ -1,7 +1,47 @@
-import { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
-import { api } from '@/lib/services/api';
-import type { Property } from '@/components/ui';
+'use client';
 
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
+
+interface Property {
+  _id: string;
+  title: string;
+  buildingName?: string;
+  price: number;
+  area: number;
+  bedrooms: number;
+  bathrooms: number;
+  type: string;
+  status: string;
+  description?: string;
+  address?: {
+    street?: string;
+    city: string;
+    state: string;
+    zipCode?: string;
+  };
+  images?: Array<{ url: string; alt?: string; caption?: string }>;
+  projectDetails?: {
+    launchDate?: string;
+    possessionDate?: string;
+    developer?: string;
+  };
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+  amenities?: string[];
+  highlights?: string[];
+  floorPlan?: {
+    image: string;
+    description: string;
+  };
+  nearbyPlaces?: Array<{
+    name: string;
+    type: string;
+    distance: string;
+  }>;
+  similarProperties?: Property[];
+}
 
 interface Developer {
   _id: string;
@@ -22,7 +62,12 @@ interface PropertiesContextType {
   error: string | null;
   cache: Record<string, any>;
   developers: Developer[];
-  pagination: Record<string, any>;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
   agentProperties: Property[];
   getProperties: (params?: Record<string, any>) => Promise<void>;
   getFeaturedProperties: () => Promise<Property[]>;
@@ -34,7 +79,6 @@ interface PropertiesContextType {
   setProperty: (property: Property | null) => void;
   clearError: () => void;
   clearCache: () => void;
-  // New alias with richer signature matching client app usage
   addProperty?: (
     data: Record<string, any>, 
     images?: File[], 
@@ -50,7 +94,12 @@ const defaultContextValue: PropertiesContextType = {
   error: null,
   cache: {},
   developers: [],
-  pagination: {},
+  pagination: {
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0
+  },
   agentProperties: [],
   getProperties: async () => {},
   getFeaturedProperties: async () => [],
@@ -71,138 +120,88 @@ interface PropertiesProviderProps {
 }
 
 export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children }) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔧 PropertiesProvider rendering...');
-  }
-  
-  // Initialize state with localStorage persistence
-  const [properties, setProperties] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('urban-realty-properties');
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-  const [featuredProperties, setFeaturedProperties] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('urban-realty-featured-properties');
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-  const [property, setProperty] = useState(null);
+  // Initialize state with proper SSR handling
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [cache, setCache] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('urban-realty-cache');
-      return saved ? JSON.parse(saved) : {};
-    }
-    return {};
+  const [error, setError] = useState<string | null>(null);
+  const [cache, setCache] = useState<Record<string, any>>({});
+  const [developers, setDevelopers] = useState<Developer[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0
   });
-  const [developers, setDevelopers] = useState([]);
-  const [pagination, setPagination] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('urban-realty-pagination');
-      return saved ? JSON.parse(saved) : {};
-    }
-    return {};
-  });
-  const [agentProperties, setAgentProperties] = useState([]);
-  
-  // Add useEffect for debugging
+  const [agentProperties, setAgentProperties] = useState<Property[]>([]);
+
+  // Load from localStorage on client side only
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 PropertiesProvider mounted on client side!');
-    }
-    return () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 PropertiesProvider unmounted');
+    if (typeof window !== 'undefined') {
+      try {
+        const savedProperties = localStorage.getItem('urban-realty-properties');
+        const savedFeatured = localStorage.getItem('urban-realty-featured-properties');
+        const savedCache = localStorage.getItem('urban-realty-cache');
+        const savedPagination = localStorage.getItem('urban-realty-pagination');
+        
+        if (savedProperties) {
+          const parsed = JSON.parse(savedProperties);
+          if (Array.isArray(parsed)) {
+            setProperties(parsed);
+          }
+        }
+        
+        if (savedFeatured) {
+          const parsed = JSON.parse(savedFeatured);
+          if (Array.isArray(parsed)) {
+            setFeaturedProperties(parsed);
+          }
+        }
+        
+        if (savedCache) {
+          const parsed = JSON.parse(savedCache);
+          if (typeof parsed === 'object' && parsed !== null) {
+            setCache(parsed);
+          }
+        }
+        
+        if (savedPagination) {
+          const parsed = JSON.parse(savedPagination);
+          if (typeof parsed === 'object' && parsed !== null) {
+            setPagination(parsed);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load data from localStorage:', err);
       }
-    };
+    }
   }, []);
 
-  // Persist properties to localStorage
+  // Persist to localStorage on client side only
   useEffect(() => {
     if (typeof window !== 'undefined' && properties.length > 0) {
       localStorage.setItem('urban-realty-properties', JSON.stringify(properties));
     }
   }, [properties]);
 
-  // Persist featured properties to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined' && featuredProperties.length > 0) {
       localStorage.setItem('urban-realty-featured-properties', JSON.stringify(featuredProperties));
     }
   }, [featuredProperties]);
 
-  // Persist cache to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined' && Object.keys(cache).length > 0) {
       localStorage.setItem('urban-realty-cache', JSON.stringify(cache));
     }
   }, [cache]);
 
-  // Persist pagination to localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined' && Object.keys(pagination).length > 0) {
+    if (typeof window !== 'undefined' && pagination.total > 0) {
       localStorage.setItem('urban-realty-pagination', JSON.stringify(pagination));
     }
   }, [pagination]);
-
-  // Initialize properties from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedProperties = localStorage.getItem('urban-realty-properties');
-      const savedFeatured = localStorage.getItem('urban-realty-featured-properties');
-      const savedCache = localStorage.getItem('urban-realty-cache');
-      const savedPagination = localStorage.getItem('urban-realty-pagination');
-      
-      if (savedProperties && properties.length === 0) {
-        try {
-          const parsed = JSON.parse(savedProperties);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setProperties(parsed);
-          }
-        } catch (e) {
-          console.warn('Failed to parse saved properties:', e);
-        }
-      }
-      
-      if (savedFeatured && featuredProperties.length === 0) {
-        try {
-          const parsed = JSON.parse(savedFeatured);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setFeaturedProperties(parsed);
-          }
-        } catch (e) {
-          console.warn('Failed to parse saved featured properties:', e);
-        }
-      }
-      
-      if (savedCache && Object.keys(cache).length === 0) {
-        try {
-          const parsed = JSON.parse(savedCache);
-          if (typeof parsed === 'object' && parsed !== null) {
-            setCache(parsed);
-          }
-        } catch (e) {
-          console.warn('Failed to parse saved cache:', e);
-        }
-      }
-      
-      if (savedPagination && Object.keys(pagination).length === 0) {
-        try {
-          const parsed = JSON.parse(savedPagination);
-          if (typeof parsed === 'object' && parsed !== null) {
-            setPagination(parsed);
-          }
-        } catch (e) {
-          console.warn('Failed to parse saved pagination:', e);
-        }
-      }
-    }
-  }, []); // Only run on mount
 
   const getProperties = useCallback(async (params: Record<string, any> = {}) => {
     const cacheKey = JSON.stringify(params);
@@ -212,127 +211,91 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setPagination(cache[cacheKey].pagination);
       return;
     }
-  
+
     try {
       setLoading(true);
       setError(null);
       
-      // Convert parameters to backend expected format
-      const backendParams: Record<string, any> = { 
-        ...params,
-        page: params.page || 1,
-        limit: params.limit || 12
-      };
-      
-      // Handle status filter
-      if (params.status) {
-        backendParams.status = params.status === 'BUY' ? 'For Sale' : 'For Rent';
-      } else {
-        delete backendParams.status;
-      }
-      
-      // Handle type filter
-      if (params.type) {
-        backendParams.propertyType = params.type;
-        delete backendParams.type;
-      }
-      
-      // Handle developer filter
-      if (params.developer) {
-        backendParams.developer = params.developer;
-      }
-      
-      // Remove empty filters
-      Object.keys(backendParams).forEach(key => {
-        if (backendParams[key] === '' || 
-            (Array.isArray(backendParams[key]) && backendParams[key].length === 0)) {
-          delete backendParams[key];
+      // Build query string
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              queryParams.append(key, value.join(','));
+            }
+          } else {
+            queryParams.append(key, value.toString());
+          }
         }
       });
-      console.log("Backend Params:=",backendParams);
-      const response = await api.properties.list(backendParams);
-      console.log('🔧 PropertiesContext - Properties response:', response.data);
+
+      const response = await fetch(`/api/properties?${queryParams.toString()}`);
       
-      // Handle different response structures
-      const responseData = response.data;
-      let data = [];
-      let paginationData = {};
-      
-      if (responseData && 'items' in responseData && Array.isArray(responseData.items)) {
-        data = responseData.items;
-        paginationData = {
-          page: responseData.page,
-          limit: responseData.pageSize,
-          total: responseData.totalItems,
-          pages: responseData.totalPages
-        };
-      } else if (responseData && 'data' in responseData && Array.isArray(responseData.data)) {
-        data = responseData.data;
-        paginationData = ('pagination' in responseData && responseData.pagination) || {};
-      } else if (Array.isArray(responseData)) {
-        data = responseData;
-      } else {
-        console.warn('🔧 PropertiesContext - Unexpected response format:', responseData);
-        data = [];
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data = await response.json();
       
-      setProperties(data);
-      setPagination(paginationData);
+      setProperties(data.properties || []);
+      setPagination({
+        page: data.page || 1,
+        limit: data.limit || 12,
+        total: data.total || 0,
+        totalPages: data.totalPages || 0
+      });
+      
       setCache(prev => ({ 
         ...prev, 
         [cacheKey]: {
-          properties: data,
-          pagination: paginationData
+          properties: data.properties || [],
+          pagination: {
+            page: data.page || 1,
+            limit: data.limit || 12,
+            total: data.total || 0,
+            totalPages: data.totalPages || 0
+          }
         } 
       }));
     } catch (err) {
-      console.error('API Error:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-        url: err.config?.url
-      });
-      setError(err.response?.data?.message || err.message || 'Failed to fetch properties');
+      console.error('Error fetching properties:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch properties');
       setProperties([]);
-      setPagination({});
+      setPagination({
+        page: 1,
+        limit: 12,
+        total: 0,
+        totalPages: 0
+      });
     } finally {
       setLoading(false);
     }
-  }, []); // Remove cache dependency to prevent infinite loops
+  }, [cache]);
 
   const getFeaturedProperties = useCallback(async () => {
-    console.log('🔧 PropertiesContext - getFeaturedProperties called');
     try {
       setLoading(true);
       setError(null);
-      console.log('🔧 PropertiesContext - Fetching featured properties');
-      const response = await api.properties.featured();
-      const responseData = response.data;
-      const data = (responseData && 'items' in responseData && Array.isArray(responseData.items)) 
-        ? responseData.items 
-        : (responseData && 'data' in responseData && Array.isArray(responseData.data))
-        ? responseData.data
-        : Array.isArray(responseData) 
-        ? responseData 
-        : [];
       
-      console.log('🔧 PropertiesContext - Featured properties response:', { 
-        dataType: typeof data,
-        isArray: Array.isArray(data),
-        count: Array.isArray(data) ? data.length : 'N/A'
-      });
+      const response = await fetch('/api/properties/featured');
       
-      if (!Array.isArray(data)) {
-        console.error('🔧 PropertiesContext - Invalid featured properties data format:', data);
-        throw new Error('Received invalid properties data format');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const properties = data.properties || data || [];
+      
+      if (!Array.isArray(properties)) {
+        throw new Error('Invalid properties data format');
       }
       
-      console.log('🔧 PropertiesContext - Setting featured properties, count:', data.length);
-      setFeaturedProperties(data);
-      return data;
+      setFeaturedProperties(properties);
+      return properties;
     } catch (err) {
-      console.error('🔧 PropertiesContext - Error fetching featured properties:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to fetch featured properties');
+      console.error('Error fetching featured properties:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch featured properties');
       setFeaturedProperties([]);
       throw err;
     } finally {
@@ -340,8 +303,8 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     }
   }, []);
 
-  const getProperty = useCallback(async (id) => {
-    if (!id) return;
+  const getProperty = useCallback(async (id: string) => {
+    if (!id) return null;
     
     try {
       setLoading(true);
@@ -351,93 +314,103 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         setProperty(cache[id]);
         return cache[id];
       }
-  
-      const response = await api.properties.getById(id);
-      const propertyData = response.data?.data ?? response.data;
+
+      const response = await fetch(`/api/properties/${id}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Property not found');
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const propertyData = data.property || data;
       
       if (!propertyData) {
-        throw new Error('Received empty property data');
+        throw new Error('Property data not found');
       }
       
       setProperty(propertyData);
       setCache(prev => ({ ...prev, [id]: propertyData }));
       return propertyData;
     } catch (err) {
-      setError(err.response?.data?.message || 'Property not found');
+      console.error('Error fetching property:', err);
+      setError(err instanceof Error ? err.message : 'Property not found');
       setProperty(null);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []); // Remove cache dependency to prevent infinite loops
+  }, [cache]);
 
-  const createProperty = useCallback(async (formData, config = {}) => {
+  const getDevelopers = useCallback(async (params: Record<string, any> = {}) => {
     try {
       setLoading(true);
       setError(null);
       
-      const finalConfig = {
-        ...config,
-        headers: {
-          ...((config as any).headers || {}),
-          'Content-Type': 'multipart/form-data'
-        }
-      };
-
-      // Convert nested objects to JSON strings for FormData
-      if (formData.address) {
-        formData.address = JSON.stringify(formData.address);
-      }
-      if (formData.nearbyLocalities) {
-        formData.nearbyLocalities = JSON.stringify(formData.nearbyLocalities);
-      }
-      if (formData.projectDetails) {
-        formData.projectDetails = JSON.stringify(formData.projectDetails);
-      }
-      if (formData.approvals) {
-        formData.approvals = JSON.stringify(formData.approvals);
-      }
-
-      // Create FormData and append all fields
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach(item => formDataToSend.append(`${key}[]`, item));
-        } else if (value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value));
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
         }
       });
 
-      const response = await api.properties.create(formDataToSend);
+      const response = await fetch(`/api/developers?${queryParams.toString()}`);
       
-      const newProperty = response.data?.data ?? response.data;
-      setProperties(prev => [...prev, newProperty]);
-      setCache({}); // Clear cache since we added a new property
-      return newProperty;
-    } catch (err) {
-      const errorData = err.response?.data;
-      let errorMsg = 'Failed to create property';
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const developers = data.developers || data || [];
       
-      if (errorData) {
-        if (errorData.error) {
-          errorMsg = errorData.error;
-        } else if (errorData.message) {
-          errorMsg = errorData.message;
-        } else if (errorData.errors) {
-          errorMsg = Object.values(errorData.errors).join(', ');
-        }
+      if (!Array.isArray(developers)) {
+        throw new Error('Invalid developers data format');
       }
       
-      setError(errorMsg);
-      throw new Error(errorMsg);
+      setDevelopers(developers);
+      return developers;
+    } catch (err) {
+      console.error('Error fetching developers:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch developers');
+      setDevelopers([]);
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Aliased helper to match client app API: addProperty(data, imageFiles, extras)
+  const getAgentProperties = useCallback(async (user: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/api/agent/properties?agentId=${user.id}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const properties = data.properties || data || [];
+      
+      if (!Array.isArray(properties)) {
+        throw new Error('Invalid properties data format');
+      }
+      
+      setAgentProperties(properties);
+      return properties;
+    } catch (err) {
+      console.error('Error fetching agent properties:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch properties');
+      setAgentProperties([]);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const addProperty = useCallback(async (
     data: Record<string, any>, 
     images: File[] = [], 
@@ -447,208 +420,59 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
 
-      // Normalize nested structures to strings where necessary (server expects FormData + JSON strings for objects)
-      const normalized: Record<string, any> = { ...data };
-      if (normalized.address && typeof normalized.address !== 'string') normalized.address = JSON.stringify(normalized.address);
-      if (normalized.nearbyLocalities && typeof normalized.nearbyLocalities !== 'string') normalized.nearbyLocalities = JSON.stringify(normalized.nearbyLocalities);
-      if (normalized.projectDetails && typeof normalized.projectDetails !== 'string') normalized.projectDetails = JSON.stringify(normalized.projectDetails);
-      if (normalized.approvals && typeof normalized.approvals !== 'string') normalized.approvals = JSON.stringify(normalized.approvals);
-
-      const formDataToSend = new FormData();
-      Object.entries(normalized).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach(item => formDataToSend.append(`${key}[]`, item as any));
-        } else if (value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value));
+      const formData = new FormData();
+      
+      // Add basic property data
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (typeof value === 'object' && !(value instanceof File)) {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value);
+          }
         }
       });
 
-      // Append images and optional assets using keys aligned with client app
-      images?.forEach(file => formDataToSend.append('images', file));
-      extras.floorPlans?.forEach(file => formDataToSend.append('floorPlans', file));
-      if (extras.brochure) formDataToSend.append('brochure', extras.brochure);
-      if (extras.virtualTour) formDataToSend.append('virtualTour', extras.virtualTour);
+      // Add images
+      images.forEach(file => formData.append('images', file));
+      
+      // Add extras
+      if (extras.floorPlans) {
+        extras.floorPlans.forEach(file => formData.append('floorPlans', file));
+      }
+      if (extras.brochure) {
+        formData.append('brochure', extras.brochure);
+      }
+      if (extras.virtualTour) {
+        formData.append('virtualTour', extras.virtualTour);
+      }
 
-      const response = await api.properties.create(formDataToSend);
-      const newProperty = response.data?.data ?? response.data;
+      const response = await fetch('/api/properties', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const newProperty = result.property || result;
+      
       setProperties(prev => [...prev, newProperty]);
-      setCache({});
+      setCache({}); // Clear cache since we added a new property
       return newProperty;
     } catch (err) {
-      const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to create property';
-      setError(errorMsg);
-      throw new Error(errorMsg);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateProperty = useCallback(async (id, formData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      };
-
-      // Convert nested objects to JSON strings for FormData
-      if (formData.address) {
-        formData.address = JSON.stringify(formData.address);
-      }
-      if (formData.nearbyLocalities) {
-        formData.nearbyLocalities = JSON.stringify(formData.nearbyLocalities);
-      }
-      if (formData.projectDetails) {
-        formData.projectDetails = JSON.stringify(formData.projectDetails);
-      }
-      if (formData.approvals) {
-        formData.approvals = JSON.stringify(formData.approvals);
-      }
-
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          // Special handling for existingImages parity with client app
-          if (key === 'existingImages') {
-            (value as any[]).forEach((item: any) => {
-              const payload = typeof item === 'string' ? item : JSON.stringify(item);
-              formDataToSend.append('existingImages', payload);
-            });
-          } else if (key === 'images' || key === 'floorPlans') {
-            (value as any[]).forEach((item: any) => formDataToSend.append(key, item));
-          } else {
-            (value as any[]).forEach((item: any) => formDataToSend.append(`${key}[]`, item));
-          }
-        } else if (value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value));
-        }
-      });
-
-      const response = await api.properties.update(id, formDataToSend);
-      const responseData = response.data?.data || response.data || response;
-      
-      if (!responseData) {
-        throw new Error('No response data received');
-      }
-
-      if (responseData.success !== undefined && !responseData.success) {
-        throw new Error(responseData.message || 'Update failed');
-      }
-
-      setProperty(responseData);
-      setProperties(prev => prev.map(p => p._id === id ? responseData : p));
-      setCache(prev => ({ ...prev, [id]: responseData }));
-      
-      return {
-        data: responseData,
-        status: response.status,
-        message: responseData.message || 'Property updated successfully'
-      };
-    } catch (err) {
-      const errorMsg = err.response?.data?.error || 
-                      err.response?.data?.message || 
-                      err.message || 
-                      'Failed to update property';
-      setError(errorMsg);
-      throw new Error(errorMsg);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const deleteProperty = useCallback(async (id) => {
-    try {
-      setLoading(true);
-      setError(null);
-      await api.properties.delete(id);
-      setProperties(prev => prev.filter(p => p._id !== id));
-      setCache(prev => {
-        const newCache = { ...prev };
-        delete newCache[id];
-        return newCache;
-      });
-      if (property?._id === id) {
-        setProperty(null);
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete property');
+      console.error('Error creating property:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create property');
       throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [property]);
-
-  const getDevelopers = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.developers.list();
-      const responseData = response.data;
-      const data = (responseData && 'items' in responseData && Array.isArray(responseData.items)) 
-        ? responseData.items 
-        : (responseData && 'data' in responseData && Array.isArray(responseData.data))
-        ? responseData.data
-        : Array.isArray(responseData) 
-        ? responseData 
-        : [];
-      
-      if (!Array.isArray(data)) {
-        throw new Error('Received invalid developers data format');
-      }
-      
-      setDevelopers(data);
-      return data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch developers');
-      setDevelopers([]);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const getAgentProperties = useCallback(async (user) => {
-    try {
-      console.log("User in context:=",user);
-      setLoading(true);
-      setError(null);
-  
-      // Use the correct endpoint based on backend routes
-      const response = await api.agent.properties({ agentId: user.id });
-      console.log("Response in context:=",response);
-      const responseData = response.data;
-      const data = (responseData && 'items' in responseData && Array.isArray(responseData.items)) 
-        ? responseData.items 
-        : (responseData && 'data' in responseData && Array.isArray(responseData.data))
-        ? responseData.data
-        : Array.isArray(responseData) 
-        ? responseData 
-        : [];
-      
-      if (!Array.isArray(data)) {
-        throw new Error('Received invalid properties data format');
-      }
-      
-      setAgentProperties(data);
-      return data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch properties');
-      setAgentProperties([]); // Fix: was setting wrong state
-      //throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
   const clearProperty = useCallback(() => setProperty(null), []);
-  const clearErrors = useCallback(() => setError(null), []);
+  const clearError = useCallback(() => setError(null), []);
   
   const clearCache = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -660,7 +484,12 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     setProperties([]);
     setFeaturedProperties([]);
     setCache({});
-    setPagination({});
+    setPagination({
+      page: 1,
+      limit: 12,
+      total: 0,
+      totalPages: 0
+    });
   }, []);
 
   const contextValue = useMemo(() => ({
@@ -670,23 +499,20 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     property,
     loading,
     error,
-    cache: {},
+    cache,
     pagination,
     developers,
     getProperties,
     getFeaturedProperties,
     getAgentProperties,
     getProperty,
-    createProperty,
-    updateProperty,
-    deleteProperty,
     getDevelopers,
-    setProperties: (props: Property[]) => setProperties(props),
-    setFeaturedProperties: (props: Property[]) => setFeaturedProperties(props),
-    setProperty: (prop: Property | null) => setProperty(prop),
+    addProperty,
+    setProperties,
+    setFeaturedProperties,
+    setProperty,
     clearProperty,
-    clearError: () => setError(null),
-    clearErrors,
+    clearError,
     clearCache
   }), [
     properties,
@@ -695,18 +521,17 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
     property,
     loading,
     error,
+    cache,
     pagination,
     developers,
     getProperties,
     getFeaturedProperties,
     getAgentProperties,
     getProperty,
-    createProperty,
-    updateProperty,
-    deleteProperty,
     getDevelopers,
+    addProperty,
     clearProperty,
-    clearErrors,
+    clearError,
     clearCache
   ]);
 

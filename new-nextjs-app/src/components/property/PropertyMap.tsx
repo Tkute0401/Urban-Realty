@@ -1,275 +1,170 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
-import './PropertyMap.css';
+'use client';
 
-const PropertyMap = ({ location, address }) => {
-  const mapRef = useRef(null);
-  const [mapInstance, setMapInstance] = useState(null);
-  const [error, setError] = useState(null);
-  const [mapplsLoaded, setMapplsLoaded] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(false);
-  const retryCountRef = useRef(0);
-  const initializationTimeoutRef = useRef(null);
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { useThemeContext } from '@/contexts/ThemeContext';
 
-  const mapplsApiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
+interface PropertyMapProps {
+  latitude: number;
+  longitude: number;
+  address?: string;
+  height?: string | number;
+  zoom?: number;
+  showMarker?: boolean;
+  className?: string;
+}
 
-  // Load Mappls script
+// Declare Mappls types
+declare global {
+  interface Window {
+    MapmyIndia: any;
+    L: any;
+  }
+}
+
+const PropertyMap: React.FC<PropertyMapProps> = ({
+  latitude,
+  longitude,
+  address,
+  height = '400px',
+  zoom = 15,
+  showMarker = true,
+  className = ''
+}) => {
+  const { theme } = useThemeContext();
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const isDark = theme === 'dark';
+
   useEffect(() => {
-    if (typeof window === 'undefined' || mapplsLoaded) return;
+    const loadMap = async () => {
+      if (!mapRef.current || !latitude || !longitude) return;
 
-    const loadMapplsScript = () => {
-      return new Promise((resolve, reject) => {
-        if (window.mappls) {
-          console.log('🔧 Mappls already loaded');
-          setMapplsLoaded(true);
-          resolve(undefined);
-          return;
+      try {
+        // Check if Mappls is already loaded
+        if (typeof window.MapmyIndia === 'undefined') {
+          // Load Mappls API if not already loaded
+          const script = document.createElement('script');
+          script.src = `https://apis.mapmyindia.com/advancedmaps/v1/${process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY}/map_load?v=1.3`;
+          script.async = true;
+          script.defer = true;
+          
+          script.onload = () => {
+            initializeMap();
+          };
+          
+          script.onerror = () => {
+            setMapError('Failed to load MapmyIndia Maps');
+          };
+          
+          document.head.appendChild(script);
+        } else {
+          initializeMap();
         }
-
-        // Check if script is already being loaded
-        const existingScript = document.querySelector('script[src*="mappls.com"]');
-        if (existingScript) {
-          existingScript.addEventListener('load', () => {
-            console.log('🔧 Mappls script loaded from existing');
-            setMapplsLoaded(true);
-            resolve(undefined);
-          });
-          existingScript.addEventListener('error', () => {
-            console.error('🔧 Failed to load existing Mappls script');
-            setError('Failed to load map script');
-            reject(new Error('Script load failed'));
-          });
-          return;
-        }
-
-        const script = document.createElement('script');
-        script.src = `https://apis.mappls.com/advancedmaps/api/${mapplsApiKey}/map_sdk?v=3.0&layer=vector`;
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-          console.log('🔧 Mappls script loaded successfully');
-          setMapplsLoaded(true);
-          resolve(undefined);
-        };
-        script.onerror = () => {
-          console.error('🔧 Failed to load Mappls script');
-          setError('Failed to load map script');
-          reject(new Error('Script load failed'));
-        };
-        document.head.appendChild(script);
-      });
-    };
-
-    if (mapplsApiKey) {
-      loadMapplsScript().catch(console.error);
-    }
-  }, [mapplsApiKey, mapplsLoaded]);
-
-  // Initialize map with better error handling
-  const initializePropertyMap = useCallback(() => {
-    if (!mapRef.current || !window.mappls || isInitializing) {
-      console.log('🔧 PropertyMap initialization skipped:', {
-        hasContainer: !!mapRef.current,
-        hasMappls: !!window.mappls,
-        isInitializing
-      });
-      return;
-    }
-
-    if (!location || !location.coordinates || location.coordinates.length !== 2) {
-      console.log('🔧 PropertyMap: Invalid location data');
-      setError('Invalid location data');
-      return;
-    }
-
-    setIsInitializing(true);
-    const container = mapRef.current;
-    
-    // Wait for container to be properly rendered
-    const checkContainer = () => {
-      const rect = container.getBoundingClientRect();
-      const isVisible = container.offsetParent !== null;
-      const hasDimensions = rect.width > 0 && rect.height > 0 && container.offsetWidth > 0 && container.offsetHeight > 0;
-      const isInDOM = document.contains(container);
-      
-      console.log('🔧 PropertyMap container readiness check:', {
-        isVisible,
-        hasDimensions,
-        isInDOM,
-        rect: { width: rect.width, height: rect.height },
-        offset: { width: container.offsetWidth, height: container.offsetHeight }
-      });
-      
-      return isVisible && hasDimensions && isInDOM;
-    };
-
-    if (!checkContainer()) {
-      retryCountRef.current += 1;
-      if (retryCountRef.current > 5) {
-        console.error('🔧 PropertyMap container failed to initialize after 5 retries');
-        setError('Map container failed to initialize');
-        setIsInitializing(false);
-        return;
+      } catch (error) {
+        console.error('Error loading map:', error);
+        setMapError('Failed to load map');
       }
-      console.log(`🔧 PropertyMap container not ready, retrying in 1000ms... (attempt ${retryCountRef.current})`);
-      initializationTimeoutRef.current = setTimeout(() => {
-        if (mapRef.current && !isInitializing) {
-          initializePropertyMap();
-        }
-      }, 1000);
-      return;
-    }
+    };
 
-    try {
-      const center = {
-        lat: location.coordinates[1],
-        lng: location.coordinates[0]
-      };
+    const initializeMap = () => {
+      if (!mapRef.current || !window.MapmyIndia) return;
 
-      console.log('🔧 Initializing PropertyMap...', { center });
-      
-      // Clear any existing map content
-      container.innerHTML = '';
+      try {
+        // Initialize Mappls map
+        const map = new window.MapmyIndia.Map(mapRef.current, {
+          center: [longitude, latitude], // Mappls uses [lng, lat] format
+          zoom: zoom,
+          mapType: isDark ? 'dark' : 'standard', // Use dark theme if available
+          mapTypeControl: true,
+          fullscreenControl: true,
+          zoomControl: true,
+          gestureHandling: 'greedy'
+        });
 
-      // Wait a bit more to ensure container is fully ready
-      setTimeout(() => {
-        try {
-          // Create map with proper error handling
-          const map = new window.mappls.Map(container, {
-            center: center,
-            zoom: 15,
-            mapTypeId: 'mappls.vector',
-            gestureHandling: 'greedy',
-            disableDefaultUI: false,
-            zoomControl: true,
-            mapTypeControl: true,
-            scaleControl: true,
-            streetViewControl: false,
-            rotateControl: false,
-            fullscreenControl: true
-          });
-
-          // Verify map object is valid
-          if (!map || typeof map.addListener !== 'function') {
-            throw new Error('Invalid map object created');
-          }
-
-          // Add error listener
-          map.addListener('error', (e) => {
-            console.error('🔧 PropertyMap error:', e);
-            setError('Map failed to load properly');
-          });
-
-          // Add idle listener
-          map.addListener('idle', () => {
-            console.log('🔧 PropertyMap is idle and ready');
-            setIsInitializing(false);
-          });
-
-          // Add marker
-          const marker = new window.mappls.Marker({
-            position: center,
+        if (showMarker) {
+          // Create marker
+          const marker = new window.MapmyIndia.Marker({
+            position: [longitude, latitude],
             map: map,
             title: address || 'Property Location'
           });
 
-          // Add info window
-          const infoWindow = new window.mappls.InfoWindow({
-            content: `
-              <div style="padding: 10px; max-width: 200px;">
-                <h4 style="margin: 0 0 5px 0; font-size: 14px;">Property Location</h4>
-                <p style="margin: 0; font-size: 12px; color: #666;">${address || 'Property Location'}</p>
-              </div>
-            `
-          });
+          // Add popup if address is provided
+          if (address) {
+            const popup = new window.MapmyIndia.Popup({
+              content: `
+                <div style="padding: 10px; max-width: 200px;">
+                  <h3 style="margin: 0 0 5px 0; color: #333; font-size: 14px;">Property Location</h3>
+                  <p style="margin: 0; color: #666; font-size: 12px;">${address}</p>
+                </div>
+              `,
+              closeButton: true,
+              closeOnClick: false
+            });
 
-          // Open info window
-          infoWindow.open(map, marker);
-
-          setMapInstance(map);
-          retryCountRef.current = 0; // Reset retry counter on success
-          console.log('🔧 PropertyMap initialized successfully');
-        } catch (mapErr) {
-          console.error('Error creating Mappls map in PropertyMap:', mapErr);
-          setError('Failed to load map: ' + mapErr.message);
-          setIsInitializing(false);
+            marker.bindPopup(popup);
+          }
         }
-      }, 100);
-    } catch (err) {
-      console.error('Error in PropertyMap initialization:', err);
-      setError('Failed to load map: ' + err.message);
-      setIsInitializing(false);
-    }
-  }, [location, address, isInitializing]);
 
-  // Initialize map when ready
-  useEffect(() => {
-    if (!mapplsLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2 || isInitializing) {
-      return;
-    }
-
-    // Use timeout to ensure DOM is ready
-    const timeoutId = setTimeout(() => {
-      initializePropertyMap();
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (initializationTimeoutRef.current) {
-        clearTimeout(initializationTimeoutRef.current);
+        setMapLoaded(true);
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        setMapError('Failed to initialize map');
       }
     };
-  }, [mapplsLoaded, location, address, initializePropertyMap, isInitializing]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      // Cleanup timeouts
-      if (initializationTimeoutRef.current) {
-        clearTimeout(initializationTimeoutRef.current);
-      }
-    };
-  }, []);
+    loadMap();
+  }, [latitude, longitude, address, zoom, isDark, showMarker]);
 
-  if (!location || !location.coordinates || location.coordinates.length !== 2) {
+  if (mapError) {
     return (
-      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
-        <Typography variant="body2" color="text.secondary">
-          No location data available for this property
-        </Typography>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
-        <Typography variant="body2" color="error">
-          {error}
-        </Typography>
-      </Box>
-    );
-  }
-
-  if (!mapplsLoaded) {
-    return (
-      <Box sx={{ width: '100%', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #ccc', borderRadius: 1 }}>
-        <Typography variant="body2" color="text.secondary">
-          Loading map...
-        </Typography>
+      <Box sx={{
+        height: height,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        borderRadius: '12px',
+        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+      }}>
+        <Alert severity="error" sx={{ maxWidth: 400 }}>
+          {mapError}
+        </Alert>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ width: '100%', height: '400px', position: 'relative' }}>
+    <Box sx={{ position: 'relative', height: height, borderRadius: '12px', overflow: 'hidden' }}>
+      {!mapLoaded && (
+        <Box sx={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          zIndex: 1
+        }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <CircularProgress size={40} sx={{ color: '#78CADC', mb: 2 }} />
+            <Typography variant="body2" color="text.secondary">
+              Loading map...
+            </Typography>
+          </Box>
+        </Box>
+      )}
+      
       <div
         ref={mapRef}
+        className={className}
         style={{
           width: '100%',
           height: '100%',
-          borderRadius: '4px',
-          overflow: 'hidden'
+          borderRadius: '12px',
+          border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
         }}
       />
     </Box>

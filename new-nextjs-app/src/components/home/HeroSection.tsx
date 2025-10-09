@@ -97,8 +97,8 @@ const HeroSection = () => {
     
     const localitiesSet = new Set();
     properties.forEach(property => {
-      if (property && property.address && property.address.city === selectedCity && property.address.locality) {
-        localitiesSet.add(property.address.locality);
+      if (property && property.address && property.address.city === selectedCity && property.address.street) {
+        localitiesSet.add(property.address.street);
       }
     });
     

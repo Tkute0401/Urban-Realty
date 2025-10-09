@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Box, Typography, Button, Grid } from '@mui/material';
-import PropertiesMap from '@/components/property/PropertiesMap';
 import PropertyMap from '@/components/property/PropertyMap';
 
 export default function MapTestPage() {
@@ -63,29 +62,20 @@ export default function MapTestPage() {
       </Typography>
       
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12}>
           <Typography variant="h6" gutterBottom>
-            Properties Map (Multiple Properties)
-          </Typography>
-          <PropertiesMap 
-            properties={mockProperties}
-            selectedProperty={selectedProperty}
-            onMarkerClick={handleMarkerClick}
-          />
-        </Grid>
-        
-        <Grid item xs={12} md={4}>
-          <Typography variant="h6" gutterBottom>
-            Single Property Map
+            Property Map Test
           </Typography>
           {selectedProperty ? (
             <PropertyMap 
-              location={selectedProperty.location}
-              address={selectedProperty.address?.locality}
+              latitude={selectedProperty.location.coordinates[1]}
+              longitude={selectedProperty.location.coordinates[0]}
+              address={`${selectedProperty.address?.street || ''} ${selectedProperty.address?.city || ''}`.trim()}
+              height="500px"
             />
           ) : (
             <Box sx={{ 
-              height: '400px', 
+              height: '500px', 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
@@ -93,7 +83,7 @@ export default function MapTestPage() {
               borderRadius: 1
             }}>
               <Typography variant="body2" color="text.secondary">
-                Click a property marker to see its map
+                Select a property to see its map
               </Typography>
             </Box>
           )}

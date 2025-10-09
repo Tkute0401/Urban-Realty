@@ -4,6 +4,7 @@ import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createUrbanRealtyTheme } from '../lib/theme/NewTheme';
 
 interface ThemeContextType {
+  theme: 'light' | 'dark';
   toggleColorMode: () => void;
 }
 
@@ -23,7 +24,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ toggleColorMode }}>
+    <ThemeContext.Provider value={{ theme: mode, toggleColorMode }}>
       <MuiThemeProvider theme={theme}>
         {children}
       </MuiThemeProvider>

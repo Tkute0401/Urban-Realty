@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings } from '@mui/icons-material';
 import { useProperties } from '../../../contexts/PropertiesContext';
 import { api } from '@/lib/services/api';
-import { PropertyCard } from '@/components/ui';
+import PropertyCard from '@/components/property/PropertyCard';
 import FavoritesGrid from '../../../components/user/FavoritesGrid';
 
 const ProfileCard = styled(Paper)(({ theme }) => ({
