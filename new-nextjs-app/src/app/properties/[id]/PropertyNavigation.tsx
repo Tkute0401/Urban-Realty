@@ -7,7 +7,9 @@ import {
   Home, 
   LocationOn, 
   MoreHoriz, 
-  Business
+  Business,
+  Architecture,
+  Compare
 } from '@mui/icons-material';
 
 interface PropertyNavigationProps {
@@ -43,9 +45,9 @@ const PropertyNavigation = ({
     { label: 'Amenities', icon: <Home />, ref: amenitiesRef },
     { label: 'Nearby', icon: <LocationOn />, ref: nearbyRef },
     { label: 'More Info', icon: <MoreHoriz />, ref: moreInfoRef },
-    { label: 'Floor Plan', icon: <Home />, ref: floorPlanRef },
+    { label: 'Floor Plan', icon: <Architecture />, ref: floorPlanRef },
     { label: 'Developer', icon: <Business />, ref: developerRef },
-    { label: 'Similar', icon: <Star />, ref: similarRef },
+    { label: 'Similar', icon: <Compare />, ref: similarRef },
   ];
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {

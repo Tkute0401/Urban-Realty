@@ -51,7 +51,7 @@ const DeleteConfirmationDialog = ({
         </Typography>
         
         <Typography variant="h6" fontWeight="bold" color="primary.main" gutterBottom>
-          "{propertyTitle}"
+          &quot;{propertyTitle}&quot;
         </Typography>
         
         <Typography variant="body2" color="text.secondary">

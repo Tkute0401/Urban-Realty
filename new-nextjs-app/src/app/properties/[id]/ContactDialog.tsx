@@ -68,7 +68,7 @@ const ContactDialog = ({
           Contact Agent
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Send an inquiry about "{property.title}"
+          Send an inquiry about &quot;{property.title}&quot;
         </Typography>
       </DialogTitle>
       

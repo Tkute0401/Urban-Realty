@@ -17,7 +17,7 @@ import {
   Storage, 
   MeetingRoom, 
   Kitchen,
-  Check
+  CheckCircle
 } from '@mui/icons-material';
 import SectionHeader from './SectionHeader';
 
@@ -53,7 +53,7 @@ const PropertyAmenities = ({ property }: PropertyAmenitiesProps) => {
       'Kitchen': <Kitchen />
     };
     
-    return iconMap[amenity] || <Check />;
+    return iconMap[amenity] || <CheckCircle />;
   };
 
   return (

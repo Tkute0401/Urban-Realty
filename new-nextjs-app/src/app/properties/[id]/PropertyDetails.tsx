@@ -108,6 +108,10 @@ interface Property {
     url: string;
     publicId: string;
   }>;
+  floorPlanImages?: Array<{
+    url: string;
+    publicId: string;
+  }>;
   amenities: string[];
   highlights: string[];
   developer?: {
