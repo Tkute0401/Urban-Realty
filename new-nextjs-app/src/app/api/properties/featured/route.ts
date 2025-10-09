@@ -71,6 +71,7 @@ const featuredProperties = [
 ];
 
 export async function GET(request: NextRequest) {
+  console.log('🔧 API: /api/properties/featured GET request received');
   try {
     return NextResponse.json({
       properties: featuredProperties,

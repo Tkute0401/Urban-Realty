@@ -230,7 +230,12 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
 
-      const response = await fetch(`/api/properties?${queryParams.toString()}`);
+      const url = `/api/properties?${queryParams.toString()}`;
+      console.log('🔧 PropertiesContext: Making API request to:', url);
+      
+      const response = await fetch(url);
+      
+      console.log('🔧 PropertiesContext: API response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -278,7 +283,12 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
       
-      const response = await fetch('/api/properties/featured');
+      const url = '/api/properties/featured';
+      console.log('🔧 PropertiesContext: Making featured properties API request to:', url);
+      
+      const response = await fetch(url);
+      
+      console.log('🔧 PropertiesContext: Featured properties API response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -102,8 +102,10 @@ const mockProperties = [
 ];
 
 export async function GET(request: NextRequest) {
+  console.log('🔧 API: /api/properties GET request received');
   try {
     const { searchParams } = new URL(request.url);
+    console.log('🔧 API: Search params:', Object.fromEntries(searchParams.entries()));
     
     // Parse query parameters
     const page = parseInt(searchParams.get('page') || '1');
