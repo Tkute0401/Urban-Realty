@@ -1,10 +1,15 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-// Import the AddProperty component directly instead of using dynamic import to avoid build issues
-import AddProperty from "../properties/add/page";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AddPropertyShallow() {
-  return <AddProperty />;
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to the properties/add page
+    router.replace("/properties/add");
+  }, [router]);
+
+  return null;
 }

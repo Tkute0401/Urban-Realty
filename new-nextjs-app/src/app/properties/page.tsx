@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { 
   Box, 
@@ -79,7 +79,7 @@ interface Filters {
   amenities: string[];
 }
 
-const PropertiesPage: React.FC = () => {
+const PropertiesPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { theme } = useThemeContext();
@@ -535,6 +535,24 @@ const PropertiesPage: React.FC = () => {
         </Drawer>
       </Container>
     </Box>
+  );
+};
+
+const PropertiesPage: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    }>
+      <PropertiesPageContent />
+    </Suspense>
   );
 };
 

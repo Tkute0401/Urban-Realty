@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -13,13 +13,14 @@ import {
   InputLabel, 
   Select, 
   MenuItem,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { useThemeContext } from '@/contexts/ThemeContext';
 import { useProperties } from '@/contexts/PropertiesContext';
 import { useRouter } from 'next/navigation';
 
-const AddPropertyPage: React.FC = () => {
+const AddPropertyPageContent: React.FC = () => {
   const { theme } = useThemeContext();
   const { addProperty } = useProperties();
   const router = useRouter();
@@ -333,6 +334,30 @@ const AddPropertyPage: React.FC = () => {
       </Container>
     </Box>
   );
+};
+
+const AddPropertyPage: React.FC = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  return <AddPropertyPageContent />;
 };
 
 export default AddPropertyPage;

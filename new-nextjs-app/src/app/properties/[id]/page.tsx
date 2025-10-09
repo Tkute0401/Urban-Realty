@@ -103,7 +103,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const PropertyDetailsPage: React.FC = () => {
+const PropertyDetailsPageContent: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const { theme } = useThemeContext();
@@ -679,6 +679,30 @@ const PropertyDetailsPage: React.FC = () => {
       </Container>
     </Box>
   );
+};
+
+const PropertyDetailsPage: React.FC = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  return <PropertyDetailsPageContent />;
 };
 
 export default PropertyDetailsPage;
