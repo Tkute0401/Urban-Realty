@@ -11,7 +11,8 @@ import {
   ZoomOut
 } from '@mui/icons-material';
 import { IconButton, Box, Typography, Chip } from '@mui/material';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 
 interface Image {
   url: string;
@@ -34,7 +35,7 @@ const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
   autoPlay = false,
   autoPlayInterval = 5000
 }) => {
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);

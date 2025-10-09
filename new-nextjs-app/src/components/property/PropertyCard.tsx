@@ -7,7 +7,8 @@ import { HeartIcon as HeartFilled } from '@heroicons/react/24/solid';
 import { HomeOutlined, LocalHotelOutlined, BathtubOutlined } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 import { Tooltip } from '@mui/material';
 import { toast } from 'react-toastify';
 
@@ -50,7 +51,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const router = useRouter();
   const { user } = useAuth();
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);

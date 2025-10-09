@@ -35,7 +35,8 @@ import {
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartFilled } from '@heroicons/react/24/solid';
 import { motion } from 'framer-motion';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import { toast } from 'react-toastify';
@@ -106,7 +107,7 @@ function TabPanel(props: TabPanelProps) {
 const PropertyDetailsPageContent: React.FC = () => {
   const params = useParams();
   const router = useRouter();
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 

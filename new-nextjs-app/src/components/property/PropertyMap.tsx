@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 
 interface PropertyMapProps {
   latitude: number;
@@ -31,7 +32,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   showMarker = true,
   className = ''
 }) => {
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -46,7 +47,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         if (typeof window.MapmyIndia === 'undefined') {
           // Load Mappls API if not already loaded
           const script = document.createElement('script');
-          script.src = `https://apis.mapmyindia.com/advancedmaps/v1/${process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY}/map_load?v=1.3`;
+          script.src = `https://apis.mappls.com/advancedmaps/v1/${process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY}/map_load?v=1.3`;
           script.async = true;
           script.defer = true;
           

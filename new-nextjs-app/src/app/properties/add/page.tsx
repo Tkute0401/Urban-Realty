@@ -16,12 +16,13 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 import { useProperties } from '@/contexts/PropertiesContext';
 import { useRouter } from 'next/navigation';
 
 const AddPropertyPageContent: React.FC = () => {
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const { addProperty } = useProperties();
   const router = useRouter();
   const [loading, setLoading] = useState(false);

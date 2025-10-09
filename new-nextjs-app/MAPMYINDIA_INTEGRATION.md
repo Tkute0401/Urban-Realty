@@ -4,14 +4,14 @@ This project uses MapmyIndia (Mappls) for map functionality instead of Google Ma
 
 ## Setup
 
-1. **Get API Key**: Sign up at [MapmyIndia Developer Console](https://www.mapmyindia.com/api/) and get your API key.
+1. **Get API Key**: Sign up at [Mappls Console](https://apis.mappls.com/console/) and get your API key from your project.
 
 2. **Environment Variables**: Add your API key to your environment variables:
    ```bash
    NEXT_PUBLIC_MAPMYINDIA_API_KEY=your_mapmyindia_api_key_here
    ```
 
-3. **API Documentation**: Refer to [MapmyIndia Advanced Maps API](https://www.mapmyindia.com/api/advanced-maps/doc) for detailed documentation.
+3. **API Documentation**: Refer to [Mappls Advanced Maps API](https://apis.mappls.com/console/#/documentation) for detailed documentation.
 
 ## Features
 

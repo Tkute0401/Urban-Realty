@@ -1,34 +1,36 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
-  const apiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY || '82f5c384638d8cfc7d13e310780bae89';
-
-  // Basic validation without external API call
-  if (!apiKey || apiKey.length < 10) {
-    return NextResponse.json({
-      success: false,
-      error: 'Invalid MapTiles API key',
-      apiKey: apiKey ? `${apiKey.substring(0, 5)}...` : 'Not found',
-      environment: process.env.NODE_ENV || 'unknown'
-    });
-  }
-
+export async function GET(request: NextRequest) {
   try {
-    // Return basic validation without external API call
+    const apiKey = process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY;
+    
+    if (!apiKey) {
+      return NextResponse.json({
+        success: false,
+        error: 'Mappls API key not configured',
+        message: 'Please set NEXT_PUBLIC_MAPMYINDIA_API_KEY in your environment variables'
+      }, { status: 400 });
+    }
+
+    // Test API key by making a simple request to Mappls
+    const testUrl = `https://apis.mappls.com/advancedmaps/v1/${apiKey}/map_load?v=1.3`;
+    
     return NextResponse.json({
       success: true,
-      apiKey: `${apiKey.substring(0, 10)}...`,
-      apiKeyLength: apiKey.length,
-      message: 'MapTiles API key validation passed',
-      environment: process.env.NODE_ENV || 'unknown',
-      timestamp: new Date().toISOString()
+      message: 'Mappls API key is configured',
+      apiKey: apiKey.substring(0, 8) + '...', // Show only first 8 characters for security
+      testUrl: testUrl,
+      instructions: [
+        '1. Add your API key to .env.local file',
+        '2. Restart your development server',
+        '3. Visit /map-test to see the map in action'
+      ]
     });
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: error.message,
-      apiKey: `${apiKey.substring(0, 10)}...`,
-      environment: process.env.NODE_ENV || 'unknown'
-    });
+      error: 'Failed to test Mappls configuration',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }

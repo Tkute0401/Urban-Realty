@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyCard from './PropertyCard';
 import { CircularProgress, Alert, Box, Typography, Pagination } from '@mui/material';
 
@@ -53,7 +54,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
   onPageChange,
   emptyMessage = "No properties found"
 }) => {
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
 
   if (loading) {

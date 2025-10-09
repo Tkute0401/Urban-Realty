@@ -35,7 +35,8 @@ import {
   SquareFoot
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { useThemeContext } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyList from '@/components/property/PropertyList';
 import PropertyMap from '@/components/property/PropertyMap';
 
@@ -82,7 +83,7 @@ interface Filters {
 const PropertiesPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { theme } = useThemeContext();
+  const { theme } = useContext(ThemeContext);
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
