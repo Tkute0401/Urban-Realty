@@ -63,19 +63,19 @@ const structuredData = {
   "@type": "WebPage",
   "name": "Trust & Safety - Squarefooot",
   "description": "Comprehensive trust and safety measures for secure real estate transactions",
-  "url": "https://squarefooot.com/trust",
+  "url": "http://localhost:3000/trust",
   "isPartOf": {
     "@type": "WebSite",
     "name": "Squarefooot",
-    "url": "https://squarefooot.com"
+    "url": "http://localhost:3000"
   },
   "publisher": {
     "@type": "RealEstateAgent",
     "name": "Squarefooot",
-    "url": "https://squarefooot.com",
+    "url": "http://localhost:3000",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://squarefooot.com/images/logo.png"
+      "url": "http://localhost:3000/images/logo.png"
     },
     "address": {
       "@type": "PostalAddress",

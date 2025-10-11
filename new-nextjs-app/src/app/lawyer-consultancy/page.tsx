@@ -68,10 +68,10 @@ const structuredData = {
   "provider": {
     "@type": "RealEstateAgent",
     "name": "Squarefooot",
-    "url": "https://squarefooot.com",
+    "url": "http://localhost:3000",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://squarefooot.com/images/logo.png"
+      "url": "http://localhost:3000/images/logo.png"
     },
     "address": {
       "@type": "PostalAddress",

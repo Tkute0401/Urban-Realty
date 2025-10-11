@@ -65,19 +65,19 @@ const structuredData = {
   "@type": "WebPage",
   "name": "Help Center - Squarefooot",
   "description": "Comprehensive help center with support articles, FAQs, and customer assistance for real estate transactions",
-  "url": "https://squarefooot.com/help",
+  "url": "http://localhost:3000/help",
   "isPartOf": {
     "@type": "WebSite",
     "name": "Squarefooot",
-    "url": "https://squarefooot.com"
+    "url": "http://localhost:3000"
   },
   "publisher": {
     "@type": "RealEstateAgent",
     "name": "Squarefooot",
-    "url": "https://squarefooot.com",
+    "url": "http://localhost:3000",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://squarefooot.com/images/logo.png"
+      "url": "http://localhost:3000/images/logo.png"
     },
     "contactPoint": {
       "@type": "ContactPoint",

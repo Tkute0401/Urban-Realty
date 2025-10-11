@@ -63,7 +63,7 @@ function generateHomePageStructuredData() {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": `${process.env.NEXT_PUBLIC_BASE_URL || "https://urbanrealty.com"}/properties?search={search_term_string}`
+        "urlTemplate": `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/properties?search={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     },

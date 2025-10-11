@@ -116,7 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "addressCountry": "US"
               },
               "telephone": "+1-XXX-XXX-XXXX",
-              "email": "contact@squarefooot.com",
+              "email": "contact@urbanrealty.com",
               "sameAs": [
                 "https://facebook.com/squarefooot",
                 "https://twitter.com/squarefooot",
