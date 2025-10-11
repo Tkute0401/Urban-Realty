@@ -240,25 +240,24 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       console.log('🔧 PropertiesContext: API response data:', response.data);
       
       const data = response.data;
-      const propertiesData = data.data || data;
       
-      setProperties(propertiesData.properties || []);
+      setProperties(data.properties || []);
       setPagination({
-        page: propertiesData.page || 1,
-        limit: propertiesData.limit || 12,
-        total: propertiesData.total || 0,
-        totalPages: propertiesData.totalPages || 0
+        page: data.page || 1,
+        limit: data.limit || 12,
+        total: data.total || 0,
+        totalPages: data.totalPages || 0
       });
       
       setCache(prev => ({ 
         ...prev, 
         [cacheKey]: {
-          properties: propertiesData.properties || [],
+          properties: data.properties || [],
           pagination: {
-            page: propertiesData.page || 1,
-            limit: propertiesData.limit || 12,
-            total: propertiesData.total || 0,
-            totalPages: propertiesData.totalPages || 0
+            page: data.page || 1,
+            limit: data.limit || 12,
+            total: data.total || 0,
+            totalPages: data.totalPages || 0
           }
         } 
       }));
@@ -291,7 +290,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       console.log('🔧 PropertiesContext: Featured properties API response data:', response.data);
       
       const data = response.data;
-      const properties = data.data || data.properties || data || [];
+      const properties = data.properties || data.data || data || [];
       
       if (!Array.isArray(properties)) {
         throw new Error('Invalid properties data format');
@@ -326,7 +325,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       console.log('🔧 PropertiesContext: Property API response data:', response.data);
       
       const data = response.data;
-      const propertyData = data.data || data.property || data;
+      const propertyData = data.property || data.data || data;
       
       if (!propertyData) {
         throw new Error('Property data not found');
