@@ -11,6 +11,7 @@ import { useContext } from 'react';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import { Tooltip } from '@mui/material';
 import { toast } from 'react-toastify';
+import http from '@/lib/services/http';
 
 interface Property {
   _id: string;
@@ -61,8 +62,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     const checkFavoriteStatus = async () => {
       if (user && property?._id) {
         try {
-          const response = await fetch(`/api/v1/auth/favorites/${property._id}/status`);
-          const data = await response.json();
+          const response = await http.get(`/api/v1/auth/favorites/${property._id}/status`);
+          const data = response.data;
           setIsFavorite(data.isFavorite);
         } catch (err) {
           console.error('Error checking favorite status:', err);
@@ -94,10 +95,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     setLoadingFavorite(true);
     try {
       if (isFavorite) {
-        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'DELETE' });
+        await http.delete(`/api/v1/auth/favorites/${property._id}`);
         toast.success('Removed from favorites');
       } else {
-        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'PUT' });
+        await http.put(`/api/v1/auth/favorites/${property._id}`, {});
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);

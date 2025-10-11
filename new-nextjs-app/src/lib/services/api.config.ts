@@ -20,6 +20,10 @@ export const getApiBaseUrl = (): string => {
   const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
   
   if (!explicitApiUrl) {
+    // Development mode - use local backend server
+    if (process.env.NODE_ENV === 'development') {
+      return 'http://localhost:3001';
+    }
     // Unified mode - Express server handles all routes directly, use empty string since API calls already include /api/v1
     return '';
   }

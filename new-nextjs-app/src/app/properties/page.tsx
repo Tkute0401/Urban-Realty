@@ -38,6 +38,7 @@ import { motion } from 'framer-motion';
 import { useContext } from 'react';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyList from '@/components/property/PropertyList';
+import http from '@/lib/services/http';
 import PropertyMap from '@/components/property/PropertyMap';
 
 interface Property {
@@ -135,13 +136,8 @@ const PropertiesPageContent: React.FC = () => {
       queryParams.append('page', currentPage.toString());
       queryParams.append('limit', '12');
 
-      const response = await fetch(`/api/v1/properties?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch properties');
-      }
-
-      const data = await response.json();
+      const response = await http.get(`/api/v1/properties?${queryParams.toString()}`);
+      const data = response.data;
       setProperties(data.properties || []);
       setTotalPages(data.totalPages || 1);
       setTotalProperties(data.total || 0);

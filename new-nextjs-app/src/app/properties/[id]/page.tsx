@@ -40,6 +40,7 @@ import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import { toast } from 'react-toastify';
+import http from '@/lib/services/http';
 
 interface Property {
   _id: string;
@@ -128,23 +129,17 @@ const PropertyDetailsPageContent: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/v1/properties/${params.id}`);
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Property not found');
-          }
-          throw new Error('Failed to fetch property');
-        }
-
-        const data = await response.json();
+        const response = await http.get(`/api/v1/properties/${params.id}`);
+        const data = response.data;
         setProperty(data);
 
         // Check favorite status
-        const favoriteResponse = await fetch(`/api/v1/auth/favorites/${params.id}/status`);
-        if (favoriteResponse.ok) {
-          const favoriteData = await favoriteResponse.json();
+        try {
+          const favoriteResponse = await http.get(`/api/v1/auth/favorites/${params.id}/status`);
+          const favoriteData = favoriteResponse.data;
           setIsFavorite(favoriteData.isFavorite);
+        } catch (err) {
+          console.log('Could not check favorite status:', err);
         }
       } catch (err) {
         console.error('Error loading property:', err);
@@ -175,10 +170,10 @@ const PropertyDetailsPageContent: React.FC = () => {
     setLoadingFavorite(true);
     try {
       if (isFavorite) {
-        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'DELETE' });
+        await http.delete(`/api/v1/auth/favorites/${property._id}`);
         toast.success('Removed from favorites');
       } else {
-        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'PUT' });
+        await http.put(`/api/v1/auth/favorites/${property._id}`, {});
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);

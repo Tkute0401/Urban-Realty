@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, ReactNode } from 'react';
+import http from '@/lib/services/http';
 
 interface Property {
   _id: string;
@@ -233,15 +234,11 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const url = `/api/v1/properties?${queryParams.toString()}`;
       console.log('🔧 PropertiesContext: Making API request to:', url);
       
-      const response = await fetch(url);
+      const response = await http.get(url);
       
       console.log('🔧 PropertiesContext: API response status:', response.status);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       
       setProperties(data.properties || []);
       setPagination({
@@ -286,15 +283,11 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const url = '/api/v1/properties/featured';
       console.log('🔧 PropertiesContext: Making featured properties API request to:', url);
       
-      const response = await fetch(url);
+      const response = await http.get(url);
       
       console.log('🔧 PropertiesContext: Featured properties API response status:', response.status);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       const properties = data.properties || data || [];
       
       if (!Array.isArray(properties)) {
@@ -325,16 +318,9 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         return cache[id];
       }
   
-      const response = await fetch(`/api/v1/properties/${id}`);
+      const response = await http.get(`/api/v1/properties/${id}`);
       
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Property not found');
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       const propertyData = data.property || data;
       
       if (!propertyData) {
@@ -366,13 +352,9 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
 
-      const response = await fetch(`/api/v1/developers?${queryParams.toString()}`);
+      const response = await http.get(`/api/v1/developers?${queryParams.toString()}`);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       const developers = data.developers || data || [];
       
       if (!Array.isArray(developers)) {
@@ -396,13 +378,9 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/v1/agent/properties?agentId=${user.id}`);
+      const response = await http.get(`/api/v1/agent/properties?agentId=${user.id}`);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = response.data;
       const properties = data.properties || data || [];
       
       if (!Array.isArray(properties)) {
@@ -457,16 +435,13 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         formData.append('virtualTour', extras.virtualTour);
       }
 
-      const response = await fetch('/api/v1/properties', {
-        method: 'POST',
-        body: formData
+      const response = await http.post('/api/v1/properties', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
       const newProperty = result.property || result;
       
       setProperties(prev => [...prev, newProperty]);
