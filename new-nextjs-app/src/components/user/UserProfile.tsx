@@ -279,7 +279,7 @@ const UserProfile = () => {
                       <Button
                         variant="outlined"
                         size="small"
-                        href="/properties/add"
+                        href="/projects"
                         sx={{ 
                           borderColor: 'var(--color-primary)', 
                           color: 'var(--color-primary)',
@@ -290,7 +290,23 @@ const UserProfile = () => {
                           }
                         }}
                       >
-                        Add Property
+                        My Projects
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        href="/projects/add"
+                        sx={{ 
+                          borderColor: 'var(--color-primary)', 
+                          color: 'var(--color-primary)',
+                          '&:hover': { 
+                            borderColor: 'var(--color-primary)', 
+                            bgcolor: 'var(--color-primary)', 
+                            color: 'var(--color-primary-contrast)'
+                          }
+                        }}
+                      >
+                        Add Project
                       </Button>
                     </>
                   )}

@@ -10,6 +10,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { PropertiesProvider } from '@/contexts/PropertiesContext'
 import { AgentsProvider } from '@/contexts/AgentsContext'
 import { DevelopersProvider } from '@/contexts/DevelopersContext'
+import { ProjectsProvider } from '@/contexts/ProjectsContext'
 import ErrorBoundary from '@/components/common/ErrorBoundary'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
 import { reportWebVitals, setupPerformanceObserver } from '@/lib/performance/webVitals'
@@ -52,20 +53,22 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
             <PropertiesProvider>
               <AgentsProvider>
                 <DevelopersProvider>
-                  {children}
-                  
-                  {/* Performance monitoring - only in production */}
-                  {process.env.NODE_ENV === 'production' && (
-                    <PerformanceMonitor enableReporting={true} />
-                  )}
-                  
-                  {/* Development performance monitoring with console logging */}
-                  {process.env.NODE_ENV === 'development' && (
-                    <PerformanceMonitor 
-                      enableReporting={false} 
-                      enableConsoleLogging={true} 
-                    />
-                  )}
+                  <ProjectsProvider>
+                    {children}
+                    
+                    {/* Performance monitoring - only in production */}
+                    {process.env.NODE_ENV === 'production' && (
+                      <PerformanceMonitor enableReporting={true} />
+                    )}
+                    
+                    {/* Development performance monitoring with console logging */}
+                    {process.env.NODE_ENV === 'development' && (
+                      <PerformanceMonitor 
+                        enableReporting={false} 
+                        enableConsoleLogging={true} 
+                      />
+                    )}
+                  </ProjectsProvider>
                 </DevelopersProvider>
               </AgentsProvider>
             </PropertiesProvider>

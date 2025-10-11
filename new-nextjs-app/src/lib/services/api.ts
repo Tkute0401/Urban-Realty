@@ -152,6 +152,15 @@ export const api = {
                 downloadInvoice: (subscriptionId: string) =>
                         unwrap<any>(http.get(`/api/v1/subscriptions/invoice/${subscriptionId}/download`, { responseType: 'blob' })),
         },
+        projects: {
+                list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/projects", { params })),
+                getById: (id: string) => unwrap<any>(http.get(`/api/v1/projects/${id}`)),
+                getMyProjects: () => unwrap<any>(http.get("/api/v1/projects/my-projects")),
+                getByDeveloper: (developerId: string) => unwrap<any>(http.get(`/api/v1/projects/developer/${developerId}`)),
+                create: (payload: any) => unwrap<any>(http.post("/api/v1/projects", payload)),
+                update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/projects/${id}`, payload)),
+                delete: (id: string) => unwrap<any>(http.delete(`/api/v1/projects/${id}`)),
+        },
         developers: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/developers", { params })),
                 getById: (id: string) => unwrap<any>(http.get(`/api/v1/developers/${id}`)),
