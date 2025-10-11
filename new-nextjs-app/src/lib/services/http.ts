@@ -2,11 +2,13 @@ import axios, { AxiosInstance } from "axios";
 import { getApiBaseUrl, getBrowserAccessToken } from "./api.config";
 
 const http: AxiosInstance = axios.create({
-        baseURL: getApiBaseUrl(),
         withCredentials: true,
 });
 
 http.interceptors.request.use((config) => {
+        // Dynamically set the base URL on each request
+        config.baseURL = getApiBaseUrl();
+        
         const token = getBrowserAccessToken();
         if (token) {
                 config.headers = { 
