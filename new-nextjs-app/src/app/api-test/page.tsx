@@ -3,8 +3,15 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
 
+interface TestResult {
+  status: number | string;
+  success: boolean;
+  data: any;
+  error: string | null;
+}
+
 export default function ApiTestPage() {
-  const [testResults, setTestResults] = useState<any>({});
+  const [testResults, setTestResults] = useState<Record<string, TestResult>>({});
   const [loading, setLoading] = useState(false);
 
   const testApiEndpoint = async (endpoint: string, name: string) => {
