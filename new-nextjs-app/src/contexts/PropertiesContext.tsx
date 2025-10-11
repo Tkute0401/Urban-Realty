@@ -237,26 +237,28 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const response = await http.get(url);
       
       console.log('🔧 PropertiesContext: API response status:', response.status);
+      console.log('🔧 PropertiesContext: API response data:', response.data);
       
       const data = response.data;
+      const propertiesData = data.data || data;
       
-      setProperties(data.properties || []);
+      setProperties(propertiesData.properties || []);
       setPagination({
-        page: data.page || 1,
-        limit: data.limit || 12,
-        total: data.total || 0,
-        totalPages: data.totalPages || 0
+        page: propertiesData.page || 1,
+        limit: propertiesData.limit || 12,
+        total: propertiesData.total || 0,
+        totalPages: propertiesData.totalPages || 0
       });
       
       setCache(prev => ({ 
         ...prev, 
         [cacheKey]: {
-          properties: data.properties || [],
+          properties: propertiesData.properties || [],
           pagination: {
-            page: data.page || 1,
-            limit: data.limit || 12,
-            total: data.total || 0,
-            totalPages: data.totalPages || 0
+            page: propertiesData.page || 1,
+            limit: propertiesData.limit || 12,
+            total: propertiesData.total || 0,
+            totalPages: propertiesData.totalPages || 0
           }
         } 
       }));
@@ -286,9 +288,10 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       const response = await http.get(url);
       
       console.log('🔧 PropertiesContext: Featured properties API response status:', response.status);
+      console.log('🔧 PropertiesContext: Featured properties API response data:', response.data);
       
       const data = response.data;
-      const properties = data.properties || data || [];
+      const properties = data.data || data.properties || data || [];
       
       if (!Array.isArray(properties)) {
         throw new Error('Invalid properties data format');
@@ -320,8 +323,10 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
   
       const response = await http.get(`/api/v1/properties/${id}`);
       
+      console.log('🔧 PropertiesContext: Property API response data:', response.data);
+      
       const data = response.data;
-      const propertyData = data.property || data;
+      const propertyData = data.data || data.property || data;
       
       if (!propertyData) {
         throw new Error('Property data not found');
