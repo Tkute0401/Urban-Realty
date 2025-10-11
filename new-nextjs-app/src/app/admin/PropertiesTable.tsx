@@ -33,10 +33,12 @@ import {
 import { Visibility, Edit, Delete, Search } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useProperties } from '@/contexts/PropertiesContext';
+import { useAuth } from '@/contexts/AuthContext';
 import http from '@/lib/services/http';
 
 const PropertiesTable = () => {
   const router = useRouter();
+  const { user } = useAuth();
   const { properties, loading, getProperties, pagination } = useProperties();
   const [filters, setFilters] = useState({
     status: '',
@@ -81,7 +83,7 @@ const PropertiesTable = () => {
 
     setDeleteLoading(true);
     try {
-      await http.delete(`/api/v1/properties/${deleteDialog.property._id}`);
+      const response = await http.delete(`/api/v1/properties/${deleteDialog.property._id}`);
       
       setSnackbar({
         open: true,
@@ -95,9 +97,17 @@ const PropertiesTable = () => {
       setDeleteDialog({ open: false, property: null });
     } catch (error: any) {
       console.error('Error deleting property:', error);
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          'Failed to delete property';
+      
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || 'Failed to delete property',
+        message: `Error: ${errorMessage}`,
         severity: 'error'
       });
     } finally {
@@ -352,6 +362,16 @@ const PropertiesTable = () => {
           )}
           <Alert severity="warning" sx={{ mt: 2 }}>
             This action cannot be undone. All property data, images, and related information will be permanently deleted.
+            {deleteDialog.property?.agent && user?.role !== 'admin' && (
+              <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                Note: Only the property agent or admin can delete this property.
+              </Typography>
+            )}
+            {user?.role === 'admin' && (
+              <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'var(--color-success)' }}>
+                ✓ You have admin privileges to delete this property.
+              </Typography>
+            )}
           </Alert>
         </DialogContent>
         <DialogActions>
