@@ -123,15 +123,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const getPropertyTypeIcon = () => {
     switch (property.type?.toLowerCase()) {
       case 'apartment':
-        return <Home sx={{ color: '#78CADC', fontSize: 16 }} />;
+        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
       case 'villa':
-        return <Home sx={{ color: '#78CADC', fontSize: 16 }} />;
+        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
       case 'land':
-        return <Home sx={{ color: '#78CADC', fontSize: 16 }} />;
+        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
       case 'commercial':
-        return <Home sx={{ color: '#78CADC', fontSize: 16 }} />;
+        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
       default:
-        return <Home sx={{ color: '#78CADC', fontSize: 16 }} />;
+        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
     }
   };
 
@@ -142,14 +142,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         cursor: 'pointer',
         borderRadius: { xs: '12px', sm: '24px' },
         overflow: 'hidden',
-        backgroundColor: '#08171A',
-        border: isSelected ? '2px solid #78CADC' : 'border-[#78CADC]/50',
-        boxShadow: isSelected ? '0 8px 25px rgba(120, 202, 220, 0.3)' : 'none',
+        backgroundColor: 'var(--color-surface)',
+        border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+        boxShadow: isSelected ? '0 8px 25px rgba(247, 107, 28, 0.3)' : 'none',
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'translateY(-5px)',
-          boxShadow: '0 8px 25px rgba(120, 202, 220, 0.2)',
-          border: '1px solid #78CADC'
+          boxShadow: '0 8px 25px rgba(247, 107, 28, 0.2)',
+          border: '1px solid var(--color-primary)'
         }
       }}
       onClick={handleClick}
@@ -164,8 +164,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             top: 12,
             left: 12,
             zIndex: 1,
-            backgroundColor: property.status === 'For Sale' ? '#78CADC' : '#e74c3c',
-            color: property.status === 'For Sale' ? '#0B1011' : 'white',
+            backgroundColor: property.status === 'For Sale' ? 'var(--color-primary)' : 'var(--color-error)',
+            color: property.status === 'For Sale' ? 'var(--color-primary-contrast)' : 'var(--color-white)',
             fontSize: '12px',
             fontWeight: 'bold'
           }}
@@ -180,12 +180,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Box sx={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+                background: 'var(--color-bg)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <CircularProgress size={32} sx={{ color: '#78CADC' }} />
+                <CircularProgress size={32} sx={{ color: 'var(--color-primary)' }} />
               </Box>
             )}
             <CardMedia
@@ -204,12 +204,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <Box sx={{
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+            background: 'var(--color-bg)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <Home sx={{ color: 'rgba(120, 202, 220, 0.5)', fontSize: 48 }} />
+            <Home sx={{ color: 'var(--color-primary)', opacity: 0.5, fontSize: 48 }} />
           </Box>
         )}
         
@@ -220,22 +220,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               position: 'absolute',
               top: { xs: 8, sm: 16 },
               right: { xs: 8, sm: 16 },
-              backgroundColor: 'rgba(12, 13, 14, 0.9)',
+              backgroundColor: 'var(--color-surface)',
               backdropFilter: 'blur(4px)',
               padding: { xs: 1, sm: 1.5 },
               '&:hover': {
-                backgroundColor: 'rgba(12, 13, 14, 1)'
+                backgroundColor: 'var(--color-surface-elevated)'
               }
             }}
             onClick={handleFavoriteClick}
             disabled={loadingFavorite}
           >
             {loadingFavorite ? (
-              <CircularProgress size={20} sx={{ color: 'white' }} />
+              <CircularProgress size={20} sx={{ color: 'var(--color-text-primary)' }} />
             ) : isFavorite ? (
-              <Favorite sx={{ color: '#e74c3c', fontSize: { xs: 16, sm: 20 } }} />
+              <Favorite sx={{ color: 'var(--color-error)', fontSize: { xs: 16, sm: 20 } }} />
             ) : (
-              <FavoriteBorder sx={{ color: 'white', fontSize: { xs: 16, sm: 20 } }} />
+              <FavoriteBorder sx={{ color: 'var(--color-text-primary)', fontSize: { xs: 16, sm: 20 } }} />
             )}
           </IconButton>
         </Tooltip>
@@ -247,15 +247,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {[...Array(5)].map((_, i) => (
-              <Star key={i} sx={{ color: '#fbbf24', fontSize: { xs: 12, sm: 16 } }} />
+              <Star key={i} sx={{ color: 'var(--color-warning)', fontSize: { xs: 12, sm: 16 } }} />
             ))}
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)', ml: 1 }}>
+            <Typography variant="caption" sx={{ color: 'var(--color-text-muted)', ml: 1 }}>
               5.0 (??)
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {getPropertyTypeIcon()}
-            <Typography variant="caption" sx={{ color: '#78CADC', textTransform: 'capitalize' }}>
+            <Typography variant="caption" sx={{ color: 'var(--color-primary)', textTransform: 'capitalize' }}>
               {property.type || 'Property'}
             </Typography>
           </Box>
@@ -266,7 +266,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           variant="h6" 
           sx={{ 
             fontWeight: 'bold', 
-            color: 'white', 
+            color: 'var(--color-text-primary)', 
             mb: { xs: 1, sm: 2 },
             fontSize: { xs: '18px', sm: '20px' },
             overflow: 'hidden',
@@ -279,11 +279,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         
         {/* Location */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, mb: { xs: 2, sm: 3 } }}>
-          <LocationOn sx={{ color: '#78CADC', fontSize: { xs: 12, sm: 16 } }} />
+          <LocationOn sx={{ color: 'var(--color-primary)', fontSize: { xs: 12, sm: 16 } }} />
           <Typography 
             variant="body2" 
             sx={{ 
-              color: '#78CADC',
+              color: 'var(--color-primary)',
               fontSize: { xs: '12px', sm: '14px' },
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <Typography 
           variant="body2" 
           sx={{ 
-            color: 'rgba(255, 255, 255, 0.6)', 
+            color: 'var(--color-text-muted)', 
             mb: { xs: 3, sm: 4 },
             fontSize: { xs: '12px', sm: '14px' },
             overflow: 'hidden',
@@ -316,8 +316,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <Box sx={{ display: 'flex', gap: { xs: 3, sm: 6 }, mb: { xs: 3, sm: 4 } }}>
           <Tooltip title="Area" arrow>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Home sx={{ color: '#78CADC', fontSize: { xs: 14, sm: 16 } }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: { xs: '12px', sm: '14px' } }}>
+              <Home sx={{ color: 'var(--color-primary)', fontSize: { xs: 14, sm: 16 } }} />
+              <Typography variant="caption" sx={{ color: 'var(--color-text-primary)', fontSize: { xs: '12px', sm: '14px' } }}>
                 {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
               </Typography>
             </Box>
@@ -325,8 +325,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           
           <Tooltip title="Bedrooms" arrow>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Bed sx={{ color: '#78CADC', fontSize: { xs: 14, sm: 16 } }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: { xs: '12px', sm: '14px' } }}>
+              <Bed sx={{ color: 'var(--color-primary)', fontSize: { xs: 14, sm: 16 } }} />
+              <Typography variant="caption" sx={{ color: 'var(--color-text-primary)', fontSize: { xs: '12px', sm: '14px' } }}>
                 {property.bedrooms || '0'} Bed
               </Typography>
             </Box>
@@ -334,8 +334,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           
           <Tooltip title="Bathrooms" arrow>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Bathtub sx={{ color: '#78CADC', fontSize: { xs: 14, sm: 16 } }} />
-              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: { xs: '12px', sm: '14px' } }}>
+              <Bathtub sx={{ color: 'var(--color-primary)', fontSize: { xs: 14, sm: 16 } }} />
+              <Typography variant="caption" sx={{ color: 'var(--color-text-primary)', fontSize: { xs: '12px', sm: '14px' } }}>
                 {property.bathrooms || '0'} Bath
               </Typography>
             </Box>
@@ -343,12 +343,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </Box>
         
         {/* Price and CTA */}
-        <Box sx={{ pt: 3, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <Box sx={{ pt: 3, borderTop: '1px solid var(--color-border)' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white', fontSize: { xs: '20px', sm: '24px' } }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)', fontSize: { xs: '20px', sm: '24px' } }}>
               {formatPrice(property.price)}
               {property.status === 'For Rent' && (
-                <Typography component="span" variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                <Typography component="span" variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
                   /mo
                 </Typography>
               )}
@@ -362,8 +362,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 }
                 size="small"
                 sx={{
-                  backgroundColor: 'rgba(120, 202, 220, 0.1)',
-                  color: '#78CADC',
+                  backgroundColor: 'var(--color-primary-light)',
+                  color: 'var(--color-primary)',
                   fontSize: '12px'
                 }}
               />
@@ -375,16 +375,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             fullWidth
             sx={{
               backgroundColor: 'transparent',
-              border: '1px solid #78CADC',
-              color: 'white',
+              border: '1px solid var(--color-primary)',
+              color: 'var(--color-text-primary)',
               padding: { xs: '6px 12px', sm: '8px 16px' },
               borderRadius: '8px',
               fontSize: { xs: '12px', sm: '14px' },
               fontWeight: 500,
               textTransform: 'none',
               '&:hover': {
-                backgroundColor: 'rgba(120, 202, 220, 0.2)',
-                border: '1px solid #78CADC'
+                backgroundColor: 'var(--color-primary-light)',
+                border: '1px solid var(--color-primary)'
               }
             }}
             onClick={(e) => {
@@ -407,7 +407,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             content: '""',
             position: 'absolute',
             inset: 0,
-            border: '2px solid #78CADC',
+            border: '2px solid var(--color-primary)',
             borderRadius: { xs: '12px', sm: '24px' },
             opacity: 0,
             animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite'

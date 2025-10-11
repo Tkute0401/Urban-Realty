@@ -152,12 +152,6 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* Admin Link */}
-        {user?.role === 'admin' && (
-          <Link href="/admin" className="nav-item nav-item-outlined">
-            ADMIN
-          </Link>
-        )}
 
         {/* Mobile Menu Button */}
         {isMobile ? (
