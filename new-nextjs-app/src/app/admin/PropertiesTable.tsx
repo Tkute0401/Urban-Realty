@@ -21,11 +21,19 @@ import {
   MenuItem,
   Grid,
   CircularProgress,
-  Typography
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import { Visibility, Edit, Delete, Search } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useProperties } from '@/contexts/PropertiesContext';
+import http from '@/lib/services/http';
 
 const PropertiesTable = () => {
   const router = useRouter();
@@ -35,6 +43,16 @@ const PropertiesTable = () => {
     type: '',
     search: ''
   });
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    property: any | null;
+  }>({ open: false, property: null });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     getProperties({ page: 1, limit: 10 });
@@ -52,6 +70,47 @@ const PropertiesTable = () => {
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const limit = parseInt(event.target.value, 10);
     getProperties({ ...filters, page: 1, limit });
+  };
+
+  const handleDeleteClick = (property: any) => {
+    setDeleteDialog({ open: true, property });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteDialog.property) return;
+
+    setDeleteLoading(true);
+    try {
+      await http.delete(`/api/v1/properties/${deleteDialog.property._id}`);
+      
+      setSnackbar({
+        open: true,
+        message: 'Property deleted successfully',
+        severity: 'success'
+      });
+      
+      // Refresh the properties list
+      getProperties({ ...filters, page: pagination.page, limit: pagination.limit });
+      
+      setDeleteDialog({ open: false, property: null });
+    } catch (error: any) {
+      console.error('Error deleting property:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Failed to delete property',
+        severity: 'error'
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialog({ open: false, property: null });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ open: false, message: '', severity: 'success' });
   };
 
   const formatPrice = (price: number) => {
@@ -78,180 +137,275 @@ const PropertiesTable = () => {
   };
 
   return (
-    <Card sx={{ 
-      background: 'var(--color-surface)', 
-      border: '1px solid var(--color-border)',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-    }}>
-      <CardContent>
-        {/* Filters */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              placeholder="Search properties..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: 'var(--color-text-muted)' }} />
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  background: 'var(--color-bg)',
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text-primary)'
-                }
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Status</InputLabel>
-              <Select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
+    <>
+      <Card sx={{ 
+        background: 'var(--color-surface)', 
+        border: '1px solid var(--color-border)',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }}>
+        <CardContent>
+          {/* Filters */}
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                placeholder="Search properties..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                InputProps={{
+                  startAdornment: <Search sx={{ mr: 1, color: 'var(--color-text-muted)' }} />
+                }}
                 sx={{
-                  background: 'var(--color-bg)',
-                  color: 'var(--color-text-primary)',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--color-border)'
+                  '& .MuiOutlinedInput-root': {
+                    background: 'var(--color-bg)',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text-primary)'
                   }
                 }}
-              >
-                <MenuItem value="">All Status</MenuItem>
-                <MenuItem value="For Sale">For Sale</MenuItem>
-                <MenuItem value="For Rent">For Rent</MenuItem>
-                <MenuItem value="Sold">Sold</MenuItem>
-                <MenuItem value="Rented">Rented</MenuItem>
-              </Select>
-            </FormControl>
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Status</InputLabel>
+                <Select
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  sx={{
+                    background: 'var(--color-bg)',
+                    color: 'var(--color-text-primary)',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'var(--color-border)'
+                    }
+                  }}
+                >
+                  <MenuItem value="">All Status</MenuItem>
+                  <MenuItem value="For Sale">For Sale</MenuItem>
+                  <MenuItem value="For Rent">For Rent</MenuItem>
+                  <MenuItem value="Sold">Sold</MenuItem>
+                  <MenuItem value="Rented">Rented</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Type</InputLabel>
+                <Select
+                  value={filters.type}
+                  onChange={(e) => handleFilterChange('type', e.target.value)}
+                  sx={{
+                    background: 'var(--color-bg)',
+                    color: 'var(--color-text-primary)',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'var(--color-border)'
+                    }
+                  }}
+                >
+                  <MenuItem value="">All Types</MenuItem>
+                  <MenuItem value="House">House</MenuItem>
+                  <MenuItem value="Apartment">Apartment</MenuItem>
+                  <MenuItem value="Villa">Villa</MenuItem>
+                  <MenuItem value="Condo">Condo</MenuItem>
+                  <MenuItem value="Land">Land</MenuItem>
+                  <MenuItem value="Commercial">Commercial</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Type</InputLabel>
-              <Select
-                value={filters.type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                sx={{
-                  background: 'var(--color-bg)',
-                  color: 'var(--color-text-primary)',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'var(--color-border)'
-                  }
-                }}
-              >
-                <MenuItem value="">All Types</MenuItem>
-                <MenuItem value="House">House</MenuItem>
-                <MenuItem value="Apartment">Apartment</MenuItem>
-                <MenuItem value="Villa">Villa</MenuItem>
-                <MenuItem value="Condo">Condo</MenuItem>
-                <MenuItem value="Land">Land</MenuItem>
-                <MenuItem value="Commercial">Commercial</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
 
-        {/* Table */}
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-          </Box>
-        ) : properties.length === 0 ? (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography sx={{ color: 'var(--color-text-muted)' }}>
-              No properties found
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ background: 'var(--color-accent)' }}>
-                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Title</TableCell>
-                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Type</TableCell>
-                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Status</TableCell>
-                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Price</TableCell>
-                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Location</TableCell>
-                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {properties.map((property) => (
-                    <TableRow 
-                      key={property._id}
-                      sx={{ 
-                        '&:hover': { 
-                          background: 'var(--color-accent)' 
-                        }
-                      }}
-                    >
-                      <TableCell sx={{ color: 'var(--color-text-primary)' }}>
-                        {property.title}
-                      </TableCell>
-                      <TableCell sx={{ color: 'var(--color-text-primary)' }}>
-                        {property.type}
-                      </TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={property.status} 
-                          color={getStatusColor(property.status) as any}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell sx={{ color: 'var(--color-text-primary)' }}>
-                        {formatPrice(property.price)}
-                      </TableCell>
-                      <TableCell sx={{ color: 'var(--color-text-muted)' }}>
-                        {property.address?.city}, {property.address?.state}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          size="small"
-                          onClick={() => router.push(`/properties/${property._id}`)}
-                          sx={{ color: 'var(--color-secondary)' }}
-                        >
-                          <Visibility />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => router.push(`/properties/edit/${property._id}`)}
-                          sx={{ color: 'var(--color-warning)' }}
-                        >
-                          <Edit />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          sx={{ color: 'var(--color-danger)' }}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </TableCell>
+          {/* Table */}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress sx={{ color: 'var(--color-primary)' }} />
+            </Box>
+          ) : properties.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography sx={{ color: 'var(--color-text-muted)' }}>
+                No properties found
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow sx={{ background: 'var(--color-accent)' }}>
+                      <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Title</TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Type</TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Status</TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Price</TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Location</TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Actions</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            
-            <TablePagination
-              component="div"
-              count={pagination.total}
-              page={pagination.page - 1}
-              onPageChange={handlePageChange}
-              rowsPerPage={pagination.limit}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              sx={{ 
-                color: 'var(--color-text-primary)',
-                borderTop: '1px solid var(--color-border)'
-              }}
-            />
-          </>
-        )}
-      </CardContent>
-    </Card>
+                  </TableHead>
+                  <TableBody>
+                    {properties.map((property) => (
+                      <TableRow 
+                        key={property._id}
+                        sx={{ 
+                          '&:hover': { 
+                            background: 'var(--color-accent)' 
+                          }
+                        }}
+                      >
+                        <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                          {property.title}
+                        </TableCell>
+                        <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                          {property.type}
+                        </TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={property.status} 
+                            color={getStatusColor(property.status) as any}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                          {formatPrice(property.price)}
+                        </TableCell>
+                        <TableCell sx={{ color: 'var(--color-text-muted)' }}>
+                          {property.address?.city}, {property.address?.state}
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            size="small"
+                            onClick={() => router.push(`/properties/${property._id}`)}
+                            sx={{ color: 'var(--color-secondary)' }}
+                            title="View Property"
+                          >
+                            <Visibility />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => router.push(`/properties/edit/${property._id}`)}
+                            sx={{ color: 'var(--color-warning)' }}
+                            title="Edit Property"
+                          >
+                            <Edit />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteClick(property)}
+                            sx={{ color: 'var(--color-danger)' }}
+                            title="Delete Property"
+                          >
+                            <Delete />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              
+              <TablePagination
+                component="div"
+                count={pagination.total}
+                page={pagination.page - 1}
+                onPageChange={handlePageChange}
+                rowsPerPage={pagination.limit}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                sx={{ 
+                  color: 'var(--color-text-primary)',
+                  borderTop: '1px solid var(--color-border)'
+                }}
+              />
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialog.open}
+        onClose={handleDeleteCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: 'var(--color-text-primary)' }}>
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
+            Are you sure you want to delete this property?
+          </Typography>
+          {deleteDialog.property && (
+            <Box sx={{ 
+              background: 'var(--color-accent)', 
+              p: 2, 
+              borderRadius: 1,
+              border: '1px solid var(--color-border)'
+            }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 1 }}>
+                {deleteDialog.property.title}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                Type: {deleteDialog.property.type} | Status: {deleteDialog.property.status}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                Price: {formatPrice(deleteDialog.property.price)}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                Location: {deleteDialog.property.address?.city}, {deleteDialog.property.address?.state}
+              </Typography>
+            </Box>
+          )}
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            This action cannot be undone. All property data, images, and related information will be permanently deleted.
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleDeleteCancel}
+            sx={{ color: 'var(--color-text-muted)' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            disabled={deleteLoading}
+            sx={{
+              backgroundColor: 'var(--color-danger)',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'var(--color-danger)',
+                opacity: 0.8
+              },
+              '&:disabled': {
+                backgroundColor: 'var(--color-danger)',
+                opacity: 0.5
+              }
+            }}
+          >
+            {deleteLoading ? (
+              <>
+                <CircularProgress size={16} sx={{ mr: 1, color: 'white' }} />
+                Deleting...
+              </>
+            ) : (
+              'Delete Property'
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Success/Error Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
 export default PropertiesTable;
-
