@@ -196,9 +196,9 @@ const PropertiesPageContent: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: '#08171A'
+        background: 'var(--color-bg)'
       }}>
-        <CircularProgress sx={{ color: '#78CADC' }} />
+        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
       </Box>
     );
   }
@@ -206,8 +206,8 @@ const PropertiesPageContent: React.FC = () => {
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: '#08171A',
-      fontFamily: '"Poppins", sans-serif'
+      background: 'var(--color-bg)',
+      fontFamily: 'var(--font-family-sans, "Poppins", sans-serif)'
     }}>
       {/* Mobile Search and Filter Bar */}
       {isMobile && (
@@ -215,8 +215,8 @@ const PropertiesPageContent: React.FC = () => {
           position: 'sticky',
           top: 0,
           zIndex: 1000,
-          background: '#08171A',
-          borderBottom: '1px solid rgba(120, 202, 220, 0.2)',
+          background: 'var(--color-bg)',
+          borderBottom: '1px solid var(--color-border)',
           p: 2
         }}>
           {/* Enhanced Mobile Search */}
@@ -230,22 +230,22 @@ const PropertiesPageContent: React.FC = () => {
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  color: 'white',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)',
                   borderRadius: '12px',
                   '& fieldset': {
-                    borderColor: 'rgba(120, 202, 220, 0.3)'
+                    borderColor: 'var(--color-border)'
                   },
                   '&:hover fieldset': {
-                    borderColor: '#78CADC'
+                    borderColor: 'var(--color-primary)'
                   }
                 },
                 '& .MuiInputLabel-root': {
-                  color: 'rgba(255, 255, 255, 0.7)'
+                  color: 'var(--color-text-muted)'
                 }
               }}
               InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: '#78CADC' }} />
+                startAdornment: <Search sx={{ mr: 1, color: 'var(--color-primary)' }} />
               }}
             />
           </Box>
@@ -257,14 +257,14 @@ const PropertiesPageContent: React.FC = () => {
               onClick={() => setShowFiltersDrawer(true)}
               startIcon={<FilterList />}
               sx={{
-                borderColor: '#78CADC',
-                color: '#78CADC',
+                borderColor: 'var(--color-primary)',
+                color: 'var(--color-primary)',
                 borderRadius: '8px',
                 textTransform: 'none',
                 fontWeight: 600,
                 '&:hover': {
-                  borderColor: '#5fb4c9',
-                  backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                  borderColor: 'var(--color-primary-hover)',
+                  backgroundColor: 'var(--color-primary-light)'
                 }
               }}
             >
@@ -275,8 +275,8 @@ const PropertiesPageContent: React.FC = () => {
                   size="small"
                   sx={{
                     ml: 1,
-                    backgroundColor: '#78CADC',
-                    color: '#0B1011',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-primary-contrast)',
                     fontSize: '12px',
                     height: '20px'
                   }}
@@ -289,9 +289,9 @@ const PropertiesPageContent: React.FC = () => {
                 variant={filters.propertyType === 'ALL' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('ALL')}
                 sx={{
-                  backgroundColor: filters.propertyType === 'ALL' ? '#78CADC' : 'transparent',
-                  color: filters.propertyType === 'ALL' ? '#0B1011' : '#78CADC',
-                  borderColor: '#78CADC',
+                  backgroundColor: filters.propertyType === 'ALL' ? 'var(--color-primary)' : 'transparent',
+                  color: filters.propertyType === 'ALL' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
@@ -304,9 +304,9 @@ const PropertiesPageContent: React.FC = () => {
                 variant={filters.propertyType === 'BUY' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('BUY')}
                 sx={{
-                  backgroundColor: filters.propertyType === 'BUY' ? '#78CADC' : 'transparent',
-                  color: filters.propertyType === 'BUY' ? '#0B1011' : '#78CADC',
-                  borderColor: '#78CADC',
+                  backgroundColor: filters.propertyType === 'BUY' ? 'var(--color-primary)' : 'transparent',
+                  color: filters.propertyType === 'BUY' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
@@ -319,9 +319,9 @@ const PropertiesPageContent: React.FC = () => {
                 variant={filters.propertyType === 'RENT' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('RENT')}
                 sx={{
-                  backgroundColor: filters.propertyType === 'RENT' ? '#78CADC' : 'transparent',
-                  color: filters.propertyType === 'RENT' ? '#0B1011' : '#78CADC',
-                  borderColor: '#78CADC',
+                  backgroundColor: filters.propertyType === 'RENT' ? 'var(--color-primary)' : 'transparent',
+                  color: filters.propertyType === 'RENT' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
@@ -338,8 +338,8 @@ const PropertiesPageContent: React.FC = () => {
       {/* Desktop Navbar with search */}
       {!isMobile && (
         <Box sx={{
-          background: '#08171A',
-          borderBottom: '1px solid rgba(120, 202, 220, 0.2)',
+          background: 'var(--color-bg)',
+          borderBottom: '1px solid var(--color-border)',
           py: 3
         }}>
           <Box sx={{ maxWidth: '1400px', mx: 'auto', px: 4 }}>
@@ -354,22 +354,22 @@ const PropertiesPageContent: React.FC = () => {
                 sx={{
                   flex: 1,
                   '& .MuiOutlinedInput-root': {
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: 'white',
+                    background: 'var(--color-surface)',
+                    color: 'var(--color-text-primary)',
                     borderRadius: '12px',
                     '& fieldset': {
-                      borderColor: 'rgba(120, 202, 220, 0.3)'
+                      borderColor: 'var(--color-border)'
                     },
                     '&:hover fieldset': {
-                      borderColor: '#78CADC'
+                      borderColor: 'var(--color-primary)'
                     }
                   },
                   '& .MuiInputLabel-root': {
-                    color: 'rgba(255, 255, 255, 0.7)'
+                    color: 'var(--color-text-muted)'
                   }
                 }}
                 InputProps={{
-                  startAdornment: <Search sx={{ mr: 1, color: '#78CADC' }} />
+                  startAdornment: <Search sx={{ mr: 1, color: 'var(--color-primary)' }} />
                 }}
               />
               
@@ -377,15 +377,15 @@ const PropertiesPageContent: React.FC = () => {
                 variant="contained"
                 onClick={handleSearch}
                 sx={{
-                  backgroundColor: '#78CADC',
-                  color: '#0B1011',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)',
                   borderRadius: '12px',
                   px: 4,
                   py: 1.5,
                   textTransform: 'none',
                   fontWeight: 600,
                   '&:hover': {
-                    backgroundColor: '#5fb4c9'
+                    backgroundColor: 'var(--color-primary-hover)'
                   }
                 }}
               >
@@ -397,16 +397,16 @@ const PropertiesPageContent: React.FC = () => {
                 onClick={() => setShowFiltersDrawer(true)}
                 startIcon={<FilterList />}
                 sx={{
-                  borderColor: '#78CADC',
-                  color: '#78CADC',
+                  borderColor: 'var(--color-primary)',
+                  color: 'var(--color-primary)',
                   borderRadius: '12px',
                   px: 3,
                   py: 1.5,
                   textTransform: 'none',
                   fontWeight: 600,
                   '&:hover': {
-                    borderColor: '#5fb4c9',
-                    backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                    borderColor: 'var(--color-primary-hover)',
+                    backgroundColor: 'var(--color-primary-light)'
                   }
                 }}
               >
@@ -420,9 +420,9 @@ const PropertiesPageContent: React.FC = () => {
                 variant={filters.propertyType === 'ALL' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('ALL')}
                 sx={{
-                  backgroundColor: filters.propertyType === 'ALL' ? '#78CADC' : 'transparent',
-                  color: filters.propertyType === 'ALL' ? '#0B1011' : '#78CADC',
-                  borderColor: '#78CADC',
+                  backgroundColor: filters.propertyType === 'ALL' ? 'var(--color-primary)' : 'transparent',
+                  color: filters.propertyType === 'ALL' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
@@ -436,9 +436,9 @@ const PropertiesPageContent: React.FC = () => {
                 variant={filters.propertyType === 'BUY' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('BUY')}
                 sx={{
-                  backgroundColor: filters.propertyType === 'BUY' ? '#78CADC' : 'transparent',
-                  color: filters.propertyType === 'BUY' ? '#0B1011' : '#78CADC',
-                  borderColor: '#78CADC',
+                  backgroundColor: filters.propertyType === 'BUY' ? 'var(--color-primary)' : 'transparent',
+                  color: filters.propertyType === 'BUY' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
@@ -452,9 +452,9 @@ const PropertiesPageContent: React.FC = () => {
                 variant={filters.propertyType === 'RENT' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('RENT')}
                 sx={{
-                  backgroundColor: filters.propertyType === 'RENT' ? '#78CADC' : 'transparent',
-                  color: filters.propertyType === 'RENT' ? '#0B1011' : '#78CADC',
-                  borderColor: '#78CADC',
+                  backgroundColor: filters.propertyType === 'RENT' ? 'var(--color-primary)' : 'transparent',
+                  color: filters.propertyType === 'RENT' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
@@ -480,18 +480,18 @@ const PropertiesPageContent: React.FC = () => {
               maxHeight: '90vh',
               borderTopLeftRadius: '16px',
               borderTopRightRadius: '16px',
-              backgroundColor: '#0B1011',
-              color: 'white',
+              backgroundColor: 'var(--color-surface)',
+              color: 'var(--color-text-primary)',
             }
           }}
         >
           {/* Header */}
-          <Box sx={{ p: 2, borderBottom: '1px solid rgba(120, 202, 220, 0.2)' }}>
+          <Box sx={{ p: 2, borderBottom: '1px solid var(--color-border)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                 Filters
               </Typography>
-              <IconButton onClick={() => setShowFiltersDrawer(false)} sx={{ color: '#78CADC' }}>
+              <IconButton onClick={() => setShowFiltersDrawer(false)} sx={{ color: 'var(--color-primary)' }}>
                 <Close />
               </IconButton>
             </Box>
@@ -501,7 +501,7 @@ const PropertiesPageContent: React.FC = () => {
           <Box sx={{ p: 2, maxHeight: '70vh', overflowY: 'auto' }}>
             {/* Property Type */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                 Property Type
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -515,11 +515,11 @@ const PropertiesPageContent: React.FC = () => {
                       variant={isActive ? 'filled' : 'outlined'}
                       onClick={() => handleFilterChange('type', isActive ? '' : type)}
                       sx={{
-                        backgroundColor: isActive ? '#78CADC' : 'transparent',
-                        color: isActive ? '#0B1011' : '#78CADC',
-                        borderColor: '#78CADC',
+                        backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                        color: isActive ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                        borderColor: 'var(--color-primary)',
                         '&:hover': {
-                          backgroundColor: isActive ? '#5fb4c9' : 'rgba(120, 202, 220, 0.1)'
+                          backgroundColor: isActive ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
                         }
                       }}
                     />
@@ -530,7 +530,7 @@ const PropertiesPageContent: React.FC = () => {
 
             {/* Price Range */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                 Price Range
               </Typography>
               <Grid container spacing={2}>
@@ -543,14 +543,14 @@ const PropertiesPageContent: React.FC = () => {
                     onChange={(e) => handleFilterChange('priceMin', e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'white',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
                         '& fieldset': {
-                          borderColor: 'rgba(120, 202, 220, 0.3)'
+                          borderColor: 'var(--color-border)'
                         }
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'rgba(255, 255, 255, 0.7)'
+                        color: 'var(--color-text-muted)'
                       }
                     }}
                   />
@@ -564,14 +564,14 @@ const PropertiesPageContent: React.FC = () => {
                     onChange={(e) => handleFilterChange('priceMax', e.target.value)}
                     sx={{
                       '& .MuiOutlinedInput-root': {
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'white',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
                         '& fieldset': {
-                          borderColor: 'rgba(120, 202, 220, 0.3)'
+                          borderColor: 'var(--color-border)'
                         }
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'rgba(255, 255, 255, 0.7)'
+                        color: 'var(--color-text-muted)'
                       }
                     }}
                   />
@@ -581,21 +581,21 @@ const PropertiesPageContent: React.FC = () => {
 
             {/* Beds & Baths */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                 Beds & Baths
               </Typography>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <FormControl fullWidth>
-                    <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Bedrooms</InputLabel>
+                    <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Bedrooms</InputLabel>
                     <Select
                       value={filters.bedrooms}
                       onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
                       sx={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'white',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
                         '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(120, 202, 220, 0.3)'
+                          borderColor: 'var(--color-border)'
                         }
                       }}
                     >
@@ -610,15 +610,15 @@ const PropertiesPageContent: React.FC = () => {
                 </Grid>
                 <Grid item xs={6}>
                   <FormControl fullWidth>
-                    <InputLabel sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>Bathrooms</InputLabel>
+                    <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Bathrooms</InputLabel>
                     <Select
                       value={filters.bathrooms}
                       onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
                       sx={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'white',
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)',
                         '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(120, 202, 220, 0.3)'
+                          borderColor: 'var(--color-border)'
                         }
                       }}
                     >
@@ -636,7 +636,7 @@ const PropertiesPageContent: React.FC = () => {
 
             {/* Amenities */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                 Amenities
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -655,11 +655,11 @@ const PropertiesPageContent: React.FC = () => {
                         handleFilterChange('amenities', newAmenities);
                       }}
                       sx={{
-                        backgroundColor: isActive ? '#78CADC' : 'transparent',
-                        color: isActive ? '#0B1011' : '#78CADC',
-                        borderColor: '#78CADC',
+                        backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                        color: isActive ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                        borderColor: 'var(--color-primary)',
                         '&:hover': {
-                          backgroundColor: isActive ? '#5fb4c9' : 'rgba(120, 202, 220, 0.1)'
+                          backgroundColor: isActive ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
                         }
                       }}
                     />
@@ -670,15 +670,15 @@ const PropertiesPageContent: React.FC = () => {
           </Box>
 
           {/* Footer */}
-          <Box sx={{ p: 2, borderTop: '1px solid rgba(120, 202, 220, 0.2)' }}>
+          <Box sx={{ p: 2, borderTop: '1px solid var(--color-border)' }}>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button
                 variant="outlined"
                 onClick={clearAllFilters}
                 sx={{
                   flex: 1,
-                  borderColor: '#78CADC',
-                  color: '#78CADC',
+                  borderColor: 'var(--color-primary)',
+                  color: 'var(--color-primary)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600
@@ -694,13 +694,13 @@ const PropertiesPageContent: React.FC = () => {
                 }}
                 sx={{
                   flex: 2,
-                  backgroundColor: '#78CADC',
-                  color: '#0B1011',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)',
                   borderRadius: '8px',
                   textTransform: 'none',
                   fontWeight: 600,
                   '&:hover': {
-                    backgroundColor: '#5fb4c9'
+                    backgroundColor: 'var(--color-primary-hover)'
                   }
                 }}
               >
@@ -722,21 +722,21 @@ const PropertiesPageContent: React.FC = () => {
         <Typography 
           variant="h3" 
           sx={{ 
-            color: 'white', 
+            color: 'var(--color-text-primary)', 
             fontWeight: 'bold',
             mb: 2,
             fontSize: { xs: '28px', sm: '36px', md: '48px' }
           }}
         >
           {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All '}
-          <span style={{ color: '#78CADC' }}>
+          <span style={{ color: 'var(--color-primary)' }}>
             {filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : 'Properties'}
           </span>
         </Typography>
         <Typography 
           variant="h6" 
           sx={{ 
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'var(--color-text-muted)',
             fontSize: { xs: '16px', sm: '18px', md: '20px' }
           }}
         >
@@ -766,11 +766,11 @@ const PropertiesPageContent: React.FC = () => {
                       handleFilterChange('amenities', newAmenities);
                     }}
                     sx={{
-                      backgroundColor: 'rgba(120, 202, 220, 0.2)',
-                      color: '#78CADC',
-                      border: '1px solid #78CADC',
+                      backgroundColor: 'var(--color-primary-light)',
+                      color: 'var(--color-primary)',
+                      border: '1px solid var(--color-primary)',
                       '& .MuiChip-deleteIcon': {
-                        color: '#78CADC'
+                        color: 'var(--color-primary)'
                       }
                     }}
                   />
@@ -783,11 +783,11 @@ const PropertiesPageContent: React.FC = () => {
                   label={`${key}: ${value}`}
                   onDelete={() => handleFilterChange(key, '')}
                   sx={{
-                    backgroundColor: 'rgba(120, 202, 220, 0.2)',
-                    color: '#78CADC',
-                    border: '1px solid #78CADC',
+                    backgroundColor: 'var(--color-primary-light)',
+                    color: 'var(--color-primary)',
+                    border: '1px solid var(--color-primary)',
                     '& .MuiChip-deleteIcon': {
-                      color: '#78CADC'
+                      color: 'var(--color-primary)'
                     }
                   }}
                 />
@@ -799,7 +799,7 @@ const PropertiesPageContent: React.FC = () => {
                 variant="text"
                 onClick={clearAllFilters}
                 sx={{
-                  color: '#78CADC',
+                  color: 'var(--color-primary)',
                   textTransform: 'none',
                   fontWeight: 600
                 }}
@@ -814,7 +814,7 @@ const PropertiesPageContent: React.FC = () => {
       {/* Error Message */}
       {error && (
         <Box sx={{ maxWidth: '1400px', mx: 'auto', px: { xs: 2, md: 4 }, mb: 3 }}>
-          <Alert severity="error" sx={{ backgroundColor: 'rgba(211, 47, 47, 0.1)', color: 'white' }}>
+          <Alert severity="error" sx={{ backgroundColor: 'var(--color-error-light)', color: 'var(--color-error)' }}>
             {error}
           </Alert>
         </Box>
@@ -845,18 +845,18 @@ const PropertiesPageContent: React.FC = () => {
             color="primary"
             sx={{
               '& .MuiPaginationItem-root': {
-                color: 'white',
+                color: 'var(--color-text-primary)',
                 fontSize: { xs: '14px', sm: '16px' }
               },
               '& .MuiPaginationItem-root.Mui-selected': {
-                backgroundColor: '#78CADC',
-                color: '#0B1011',
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-primary-contrast)',
                 '&:hover': {
-                  backgroundColor: '#5fb4c9'
+                  backgroundColor: 'var(--color-primary-hover)'
                 }
               },
               '& .MuiPaginationItem-root:hover': {
-                backgroundColor: 'rgba(120, 202, 220, 0.2)'
+                backgroundColor: 'var(--color-primary-light)'
               }
             }}
           />
@@ -874,9 +874,9 @@ const PropertiesPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: '#08171A'
+        background: 'var(--color-bg)'
       }}>
-        <CircularProgress sx={{ color: '#78CADC' }} />
+        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
       </Box>
     }>
       <PropertiesPageContent />

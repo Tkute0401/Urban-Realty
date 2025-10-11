@@ -35,9 +35,9 @@ const PropertyList: React.FC<PropertyListProps> = ({
         justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '50vh',
-        background: '#08171A'
+        background: 'var(--color-bg)'
       }}>
-        <CircularProgress size={60} sx={{ color: '#78CADC' }} />
+        <CircularProgress size={60} sx={{ color: 'var(--color-primary)' }} />
       </Box>
     );
   }
@@ -49,7 +49,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
         justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '50vh',
-        background: '#08171A',
+        background: 'var(--color-bg)',
         p: 4
       }}>
         <Alert severity="error" sx={{ maxWidth: 400 }}>
@@ -67,14 +67,14 @@ const PropertyList: React.FC<PropertyListProps> = ({
         justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '50vh',
-        background: '#08171A',
+        background: 'var(--color-bg)',
         p: 4,
         textAlign: 'center'
       }}>
-        <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+        <Typography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
           {emptyMessage}
         </Typography>
-        <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+        <Typography variant="body1" sx={{ color: 'var(--color-text-muted)', mb: 3 }}>
           Try adjusting your search criteria or check back later for new listings.
         </Typography>
       </Box>
