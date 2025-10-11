@@ -4,6 +4,32 @@ const Developer = require('../models/Developer');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
+// @desc    Get developer profile for current user
+// @route   GET /api/v1/developers/profile/me
+// @access  Private (Developer)
+exports.getMyDeveloperProfile = asyncHandler(async (req, res, next) => {
+  if (req.user.role !== 'developer') {
+    return next(
+      new ErrorResponse('Access denied. This endpoint is only for developer users.', 403)
+    );
+  }
+
+  const developer = await Developer.findOne({ userId: req.user.id });
+
+  if (!developer) {
+    return res.status(200).json({
+      success: true,
+      data: null,
+      message: 'No developer profile found. Create one to get started.'
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: developer
+  });
+});
+
 // @desc    Get all developers
 // @route   GET /api/v1/developers
 // @access  Public
@@ -34,9 +60,20 @@ exports.getDeveloper = asyncHandler(async (req, res, next) => {
 
 // @desc    Create developer
 // @route   POST /api/v1/developers
-// @access  Private (Admin/Agent)
+// @access  Private (Admin/Agent/Developer)
 exports.createDeveloper = asyncHandler(async (req, res, next) => {
+  // If user is a developer, connect them to the developer entity
+  if (req.user.role === 'developer') {
+    req.body.userId = req.user.id;
+  }
+
   const developer = await Developer.create(req.body);
+
+  // If user is a developer, update their developerId
+  if (req.user.role === 'developer') {
+    const User = require('../models/User');
+    await User.findByIdAndUpdate(req.user.id, { developerId: developer._id });
+  }
 
   res.status(201).json({
     success: true,

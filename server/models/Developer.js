@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const DeveloperSchema = new mongoose.Schema({
+  // User connection
+  userId: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    default: null
+  },
   name: {
     type: String,
     required: [true, 'Please add a developer name'],

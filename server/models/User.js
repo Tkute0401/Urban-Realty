@@ -94,6 +94,12 @@ const UserSchema = new mongoose.Schema({
   subscriptionExpiry: {
     type: Date
   },
+  // Developer entity connection
+  developerId: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Developer',
+    default: null
+  },
   // Professional fields for professional roles
   professionalInfo: {
     licenseNumber: {

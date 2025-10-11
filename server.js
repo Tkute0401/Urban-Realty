@@ -159,6 +159,7 @@ app.use('/api/v1/subscriptions', require('./server/src/api/routes/subscriptionRo
 app.use('/api/v1/analytics', require('./server/src/api/routes/analyticsRoutes'));
 app.use('/api/v1/agent', require('./server/routes/agentRoutes'));
 app.use('/media', require('./server/src/api/routes/mediaRoutes'));
+app.use('/api/v1/projects', require('./server/routes/projectRoutes'));
 app.use('/api/v1/developers', require('./server/src/api/routes/developerRoutes'));
 
 // Health endpoints
