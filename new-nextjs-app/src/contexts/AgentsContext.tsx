@@ -3,7 +3,8 @@ import { api } from '@/lib/services/api';
 
 // Types
 interface Agent {
-  id: string;
+  _id: string;
+  id?: string; // Keep for backward compatibility
   name: string;
   email: string;
   phone?: string;
