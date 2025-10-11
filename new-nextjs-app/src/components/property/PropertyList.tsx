@@ -33,16 +33,11 @@ const PropertyList: React.FC<PropertyListProps> = ({
       <Box sx={{ 
         display: 'flex', 
         justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        width: '100%'
+        alignItems: 'center',
+        minHeight: '50vh',
+        background: '#08171A'
       }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <CircularProgress size={60} sx={{ color: 'var(--color-primary)', mb: 2 }} />
-          <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
-            Loading properties...
-          </Typography>
-        </Box>
+        <CircularProgress size={60} sx={{ color: '#78CADC' }} />
       </Box>
     );
   }
@@ -52,11 +47,12 @@ const PropertyList: React.FC<PropertyListProps> = ({
       <Box sx={{ 
         display: 'flex', 
         justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        width: '100%'
+        alignItems: 'center',
+        minHeight: '50vh',
+        background: '#08171A',
+        p: 4
       }}>
-        <Alert severity="error" sx={{ maxWidth: 600 }}>
+        <Alert severity="error" sx={{ maxWidth: 400 }}>
           {error}
         </Alert>
       </Box>
@@ -67,43 +63,69 @@ const PropertyList: React.FC<PropertyListProps> = ({
     return (
       <Box sx={{ 
         display: 'flex', 
+        flexDirection: 'column',
         justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '400px',
-        width: '100%'
+        alignItems: 'center',
+        minHeight: '50vh',
+        background: '#08171A',
+        p: 4,
+        textAlign: 'center'
       }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              color: 'var(--color-text-muted)',
-              mb: 1
-            }}
-          >
-            {emptyMessage}
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ color: 'var(--color-text-muted)' }}
-          >
-            Try adjusting your search filters
-          </Typography>
-        </Box>
+        <Typography variant="h6" sx={{ color: 'white', mb: 2 }}>
+          {emptyMessage}
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+          Try adjusting your search criteria or check back later for new listings.
+        </Typography>
       </Box>
     );
   }
 
   return (
-    <Grid container spacing={3}>
-      {properties.map((property) => (
-        <Grid item {...columns} key={property._id}>
-          <PropertyCard 
-            property={property} 
-            onClick={onPropertyClick}
-          />
+    <Box sx={{ 
+      background: '#08171A',
+      minHeight: '100vh',
+      py: 4
+    }}>
+      <Box sx={{ maxWidth: '1200px', mx: 'auto', px: { xs: 2, sm: 3 } }}>
+        {/* Results Header */}
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              color: 'white', 
+              fontWeight: 'bold',
+              mb: 1,
+              fontSize: { xs: '24px', sm: '32px' }
+            }}
+          >
+            Properties Found
+          </Typography>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontSize: { xs: '14px', sm: '16px' }
+            }}
+          >
+            {properties.length} {properties.length === 1 ? 'property' : 'properties'} available
+          </Typography>
+        </Box>
+
+        {/* Properties Grid */}
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+          {properties.map((property, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={property._id}>
+              <PropertyCard 
+                property={property}
+                index={index}
+                onClick={onPropertyClick}
+              />
+            </Grid>
+          ))}
         </Grid>
-      ))}
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
