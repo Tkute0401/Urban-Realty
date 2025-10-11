@@ -8,6 +8,7 @@ interface Developer {
   email?: string;
   phone?: string;
   profilePhoto?: string;
+  logo?: string; // Add logo property
   description?: string;
   establishedYear?: number;
   website?: string;
