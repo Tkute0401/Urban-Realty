@@ -68,9 +68,9 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.search) params.search = filters.search;
     if (filters.type) params.type = filters.type;
     if (filters.status) params.status = filters.status;
-    if (filters.minPrice) params.minPrice = filters.minPrice;
-    if (filters.maxPrice) params.maxPrice = filters.maxPrice;
-    if (filters.bedrooms) params.bedrooms = filters.bedrooms;
+    if (filters.minPrice) params.minPrice = Number(filters.minPrice);
+    if (filters.maxPrice) params.maxPrice = Number(filters.maxPrice);
+    if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
     if (filters.city) params.city = filters.city;
 
     getProperties(params);
@@ -85,7 +85,15 @@ const PropertiesPageContent: React.FC = () => {
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
-    getProperties({ ...filters, page, limit: 12 });
+    const params: any = { page, limit: 12 };
+    if (filters.search) params.search = filters.search;
+    if (filters.type) params.type = filters.type;
+    if (filters.status) params.status = filters.status;
+    if (filters.minPrice) params.minPrice = Number(filters.minPrice);
+    if (filters.maxPrice) params.maxPrice = Number(filters.maxPrice);
+    if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
+    if (filters.city) params.city = filters.city;
+    getProperties(params);
   };
 
   if (!mounted) {
