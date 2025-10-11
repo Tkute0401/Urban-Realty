@@ -112,6 +112,7 @@ const PropertyDetailsPageContent: React.FC = () => {
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
+  const [mounted, setMounted] = useState(false);
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +122,11 @@ const PropertyDetailsPageContent: React.FC = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const isDark = theme === 'dark';
+
+  // Client-side mounting check
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load property details
   useEffect(() => {
@@ -149,10 +155,10 @@ const PropertyDetailsPageContent: React.FC = () => {
       }
     };
 
-    if (params.id) {
+    if (mounted && params.id) {
       loadProperty();
     }
-  }, [params.id]);
+  }, [mounted, params.id]);
 
   // Handle scroll to show back to top button
   useEffect(() => {
@@ -228,6 +234,21 @@ const PropertyDetailsPageContent: React.FC = () => {
         break;
     }
   };
+
+  // Show loading state until mounted
+  if (!mounted) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
 
   if (loading) {
     return (
