@@ -594,14 +594,14 @@ const PropertyDetailsPageContent: React.FC = () => {
                   </Typography>
                 )}
 
-                {property.nearbyPlaces && property.nearbyPlaces.length > 0 && (
+                {property.nearbyLocalities && (
                   <Box sx={{ mt: 3 }}>
                     <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
                       Nearby Places
                     </Typography>
                     <Grid container spacing={2}>
-                      {property.nearbyPlaces.map((place, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
+                      {property.nearbyLocalities.hasSchool && property.nearbyLocalities.school && (
+                        <Grid item xs={12} sm={6}>
                           <Box sx={{
                             p: 2,
                             background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
@@ -609,14 +609,65 @@ const PropertyDetailsPageContent: React.FC = () => {
                             border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
                           }}>
                             <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
-                              {place.name}
+                              {property.nearbyLocalities.school}
                             </Typography>
                             <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
-                              {place.type} • {place.distance}
+                              School
                             </Typography>
                           </Box>
                         </Grid>
-                      ))}
+                      )}
+                      {property.nearbyLocalities.hasHospital && property.nearbyLocalities.hospital && (
+                        <Grid item xs={12} sm={6}>
+                          <Box sx={{
+                            p: 2,
+                            background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
+                            borderRadius: '8px',
+                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                          }}>
+                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                              {property.nearbyLocalities.hospital}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                              Hospital
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      )}
+                      {property.nearbyLocalities.hasMall && property.nearbyLocalities.mall && (
+                        <Grid item xs={12} sm={6}>
+                          <Box sx={{
+                            p: 2,
+                            background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
+                            borderRadius: '8px',
+                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                          }}>
+                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                              {property.nearbyLocalities.mall}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                              Shopping Mall
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      )}
+                      {property.nearbyLocalities.hasPark && property.nearbyLocalities.park && (
+                        <Grid item xs={12} sm={6}>
+                          <Box sx={{
+                            p: 2,
+                            background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
+                            borderRadius: '8px',
+                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                          }}>
+                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                              {property.nearbyLocalities.park}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                              Park
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      )}
                     </Grid>
                   </Box>
                 )}
