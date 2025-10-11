@@ -71,7 +71,7 @@ const AddProjectClient = () => {
   const router = useRouter();
   
   const [saving, setSaving] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   
   const [formData, setFormData] = useState({
     name: '',
