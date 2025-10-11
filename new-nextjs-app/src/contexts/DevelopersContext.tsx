@@ -11,9 +11,48 @@ interface Developer {
   profilePhoto?: string;
   logo?: string; // Add logo property
   description?: string;
-  establishedYear?: number;
+  foundedYear?: number;
   website?: string;
   location?: string;
+  headquarters?: {
+    city?: string;
+    state?: string;
+    country?: string;
+  };
+  contact?: {
+    email?: string;
+    phone?: string;
+  };
+  socialMedia?: {
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+  };
+  completedProjects?: number;
+  ongoingProjects?: number;
+  upcomingProjects?: number;
+  flagshipProjects?: Array<{
+    name?: string;
+    description?: string;
+  }>;
+  team?: Array<{
+    name?: string;
+    designation?: string;
+    image?: {
+      url?: string;
+      publicId?: string;
+    };
+  }>;
+  specializations?: Array<{
+    name?: string;
+    description?: string;
+  }>;
+  awards?: Array<{
+    name?: string;
+    year?: number;
+    category?: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
