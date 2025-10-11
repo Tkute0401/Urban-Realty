@@ -218,7 +218,7 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
   const createProject = useCallback(async (formData: FormData, config?: any): Promise<any> => {
     try {
       setLoading(true);
-      const response = await api.projects.create(formData, config);
+      const response = await api.projects.create(formData);
       console.log(response);
       
       getMyProjects(); // Refresh my projects list
