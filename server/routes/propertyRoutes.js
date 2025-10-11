@@ -5,6 +5,7 @@ const propertyController = require('../controllers/propertyController');
 const contactController = require('../controllers/contactController');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/multer');
+const parseFormData = require('../middleware/parseFormData');
 
 // @desc    Get all properties
 // @route   GET /api/v1/properties
@@ -52,12 +53,18 @@ router.post(
   [
     protect,
     authorize('agent', 'admin', 'individual_seller', 'developer'),
-    upload.array('images', 10),
+    upload.fields([
+      { name: 'images', maxCount: 10 },
+      { name: 'floorPlans', maxCount: 5 },
+      { name: 'brochure', maxCount: 1 },
+      { name: 'virtualTour', maxCount: 1 }
+    ]),
+    parseFormData,
     [
       check('title', 'Title is required').not().isEmpty(),
       check('description', 'Description is required').not().isEmpty(),
-      check('type', 'Type is required').isIn(['House', 'Apartment', 'Villa', 'Condo', 'Land', 'Commercial', 'PG']),
-      check('status', 'Status is required').isIn(['For Sale', 'For Rent', 'Sold']),
+      check('type', 'Type is required').isIn(['House', 'Apartment', 'Villa', 'Condo', 'Townhouse', 'Land', 'Commercial', 'PG']),
+      check('status', 'Status is required').isIn(['For Sale', 'For Rent', 'Sold', 'Rented']),
       check('price', 'Price must be a number').isNumeric(),
       check('bedrooms', 'Bedrooms must be a number').isNumeric(),
       check('bathrooms', 'Bathrooms must be a number').isNumeric(),

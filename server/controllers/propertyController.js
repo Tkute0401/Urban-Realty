@@ -355,6 +355,57 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
     // Add user to req.body as the agent
     req.body.agent = req.user.id;
 
+    // Parse FormData fields that come as arrays/objects
+    // Handle amenities array
+    if (req.body.amenities) {
+      if (typeof req.body.amenities === 'string') {
+        req.body.amenities = req.body.amenities.split(',').map(a => a.trim()).filter(a => a);
+      }
+    } else {
+      req.body.amenities = [];
+    }
+
+    // Handle highlights array
+    if (req.body.highlights) {
+      if (typeof req.body.highlights === 'string') {
+        req.body.highlights = req.body.highlights.split(',').map(h => h.trim()).filter(h => h);
+      }
+    } else {
+      req.body.highlights = [];
+    }
+
+    // Handle nearbyLocalities object
+    if (!req.body.nearbyLocalities) {
+      req.body.nearbyLocalities = {
+        hasSchool: false,
+        school: '',
+        hasHospital: false,
+        hospital: '',
+        hasMall: false,
+        mall: '',
+        hasPark: false,
+        park: '',
+        hasTransport: false,
+        transport: ''
+      };
+    }
+
+    // Handle projectDetails object
+    if (!req.body.projectDetails) {
+      req.body.projectDetails = {
+        projectArea: '',
+        totalUnits: '',
+        launchDate: null,
+        reraId: '',
+        configurations: ''
+      };
+    }
+
+    // Handle approvals array
+    if (!req.body.approvals) {
+      req.body.approvals = [];
+    }
+
     // Check if developer exists if provided
     if (req.body.developer) {
       const developer = await Developer.findById(req.body.developer);
@@ -385,42 +436,6 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       virtualTour = await uploadVideoToCloudinary(req.files.virtualTour[0], 'properties/virtual-tours');
     }
 
-    // Parse amenities if sent as string
-    if (req.body.amenities && typeof req.body.amenities === 'string') {
-      req.body.amenities = req.body.amenities.split(',');
-    }
-
-    // Parse highlights if sent as string
-    if (req.body.highlights && typeof req.body.highlights === 'string') {
-      req.body.highlights = req.body.highlights.split(',');
-    }
-
-    // Parse nearbyLocalities if sent as string
-    if (req.body.nearbyLocalities && typeof req.body.nearbyLocalities === 'string') {
-      try {
-        req.body.nearbyLocalities = JSON.parse(req.body.nearbyLocalities);
-      } catch (err) {
-        return next(new ErrorResponse('Invalid nearby localities format', 400));
-      }
-    }
-
-    // Parse projectDetails if sent as string
-    if (req.body.projectDetails && typeof req.body.projectDetails === 'string') {
-      try {
-        req.body.projectDetails = JSON.parse(req.body.projectDetails);
-      } catch (err) {
-        return next(new ErrorResponse('Invalid project details format', 400));
-      }
-    }
-
-    // Parse approvals if sent as string
-    if (req.body.approvals && typeof req.body.approvals === 'string') {
-      try {
-        req.body.approvals = JSON.parse(req.body.approvals);
-      } catch (err) {
-        return next(new ErrorResponse('Invalid approvals format', 400));
-      }
-    }
 
     // Convert possession date to Date object if provided
     if (req.body.possessionDate) {
@@ -597,7 +612,7 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
     }
   }
 
-  await property.remove();
+  await Property.findByIdAndDelete(req.params.id);
 
   res.status(200).json({ 
     success: true, 
