@@ -20,7 +20,17 @@ export const getApiBaseUrl = (): string => {
   const explicitApiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || process.env.API_URL;
   
   if (!explicitApiUrl) {
-    // Development mode - use local backend server
+    // Check if we're in the browser (client-side)
+    if (typeof window !== 'undefined') {
+      // Client-side: check if we're on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:3001';
+      }
+      // Production client-side: use empty string (same domain)
+      return '';
+    }
+    
+    // Server-side: check NODE_ENV
     if (process.env.NODE_ENV === 'development') {
       return 'http://localhost:3001';
     }
