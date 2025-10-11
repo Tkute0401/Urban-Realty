@@ -134,6 +134,15 @@ const nextConfig = {
         ],
       },
       {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
         source: '/api/(.*)',
         headers: [
           {
@@ -142,12 +151,30 @@ const nextConfig = {
           },
         ],
       },
+      // Force no-cache for development
+      ...(process.env.NODE_ENV === 'development' ? [{
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
+        ],
+      }] : []),
     ];
   },
 
   // Generate static params optimization
   generateBuildId: async () => {
-    return process.env.RAILWAY_ENVIRONMENT || process.env.VERCEL_GIT_COMMIT_SHA || 'build-' + Date.now();
+    return process.env.RAILWAY_ENVIRONMENT || process.env.VERCEL_GIT_COMMIT_SHA || 'build-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
   }
 };
 

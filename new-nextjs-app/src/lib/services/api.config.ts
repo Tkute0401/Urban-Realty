@@ -42,6 +42,15 @@ export const getApiBaseUrl = (): string => {
   return explicitApiUrl;
 };
 
+// Add cache-busting parameter for development
+export const addCacheBuster = (url: string): string => {
+  if (process.env.NODE_ENV === 'development') {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}v=${Date.now()}`;
+  }
+  return url;
+};
+
 // Enhanced fetch configuration for Railway
 export const getFetchConfig = (options: RequestInit = {}): RequestInit => {
   const isRailway = isRailwayBuild();

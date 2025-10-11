@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { getApiBaseUrl, getBrowserAccessToken } from "./api.config";
+import { getApiBaseUrl, getBrowserAccessToken, addCacheBuster } from "./api.config";
 
 const http: AxiosInstance = axios.create({
         withCredentials: true,
@@ -8,6 +8,11 @@ const http: AxiosInstance = axios.create({
 http.interceptors.request.use((config) => {
         // Dynamically set the base URL on each request
         config.baseURL = getApiBaseUrl();
+        
+        // Add cache buster for development
+        if (config.url) {
+                config.url = addCacheBuster(config.url);
+        }
         
         const token = getBrowserAccessToken();
         if (token) {
