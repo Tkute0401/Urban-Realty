@@ -81,7 +81,7 @@ const DeveloperProfileClient = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   
   // Find developer profile for current user
-  const developerProfile = developers.find(dev => dev.userId === user?._id);
+  const developerProfile = developers.find(dev => dev.userId === user?.id);
   
   const [formData, setFormData] = useState({
     name: '',
