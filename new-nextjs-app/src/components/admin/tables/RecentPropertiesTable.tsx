@@ -1,85 +1,130 @@
-"use client";
-import React from 'react';
-import { Avatar, Box, Button, Chip, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+'use client';
+
+import { useEffect, useState } from 'react';
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  IconButton,
+  CircularProgress,
+  Typography
+} from '@mui/material';
+import { Visibility } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import IconButton from '@mui/material/IconButton';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import HomeIcon from '@mui/icons-material/Home';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { useProperties } from '@/contexts/PropertiesContext';
+import { Property } from '@/types/property';
 
-export type RecentProperty = {
-  _id: string;
-  title: string;
-  images?: string[];
-  location?: string;
-  agent?: { name?: string };
-  price?: number;
-  status?: string;
-  views?: number;
-};
-
-type RecentPropertiesTableProps = {
-  properties: RecentProperty[];
-};
-
-const RecentPropertiesTable: React.FC<RecentPropertiesTableProps> = ({ properties }) => {
+const RecentPropertiesTable = () => {
   const router = useRouter();
-  return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h6" fontWeight="bold">Recent Properties</Typography>
-        <Button variant="outlined" size="small" onClick={() => router.push('/admin/properties')}>View All</Button>
+  const { properties, loading, getProperties } = useProperties();
+  const [recentProperties, setRecentProperties] = useState<Property[]>([]);
+
+  useEffect(() => {
+    getProperties({ sort: '-createdAt', limit: 5 });
+  }, []);
+
+  useEffect(() => {
+    setRecentProperties(properties.slice(0, 5));
+  }, [properties]);
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'For Sale':
+        return 'success';
+      case 'For Rent':
+        return 'info';
+      case 'Sold':
+        return 'default';
+      case 'Rented':
+        return 'warning';
+      default:
+        return 'default';
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
       </Box>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Property</TableCell>
-              <TableCell>Agent</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Views</TableCell>
-              <TableCell>Actions</TableCell>
+    );
+  }
+
+  if (recentProperties.length === 0) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Typography sx={{ color: 'var(--color-text-muted)' }}>
+          No recent properties
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow sx={{ background: 'var(--color-accent)' }}>
+            <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Title</TableCell>
+            <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Type</TableCell>
+            <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Status</TableCell>
+            <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Price</TableCell>
+            <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {recentProperties.map((property) => (
+            <TableRow 
+              key={property._id}
+              sx={{ 
+                '&:hover': { 
+                  background: 'var(--color-accent)' 
+                }
+              }}
+            >
+              <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                {property.title}
+              </TableCell>
+              <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                {property.type}
+              </TableCell>
+              <TableCell>
+                <Chip 
+                  label={property.status} 
+                  color={getStatusColor(property.status) as any}
+                  size="small"
+                />
+              </TableCell>
+              <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                {formatPrice(property.price)}
+              </TableCell>
+              <TableCell>
+                <IconButton
+                  size="small"
+                  onClick={() => router.push(`/properties/${property._id}`)}
+                  sx={{ color: 'var(--color-secondary)' }}
+                >
+                  <Visibility />
+                </IconButton>
+              </TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {properties.slice(0, 5).map((property) => (
-              <TableRow key={property._id} hover>
-                <TableCell>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Avatar src={property.images?.[0]} variant="rounded" sx={{ width: 50, height: 50 }}>
-                      <HomeIcon />
-                    </Avatar>
-                    <Box>
-                      <Typography fontWeight="500">{property.title}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        <LocationOnIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                        {property.location}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">{property.agent?.name}</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography fontWeight="500">₹{property.price?.toLocaleString()}</Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip label={property.status || 'active'} color={property.status === 'active' ? 'success' : 'warning'} size="small" />
-                </TableCell>
-                <TableCell>
-                  <Typography>{property.views || 0}</Typography>
-                </TableCell>
-                <TableCell>
-                  <IconButton size="small"><MoreVertIcon /></IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

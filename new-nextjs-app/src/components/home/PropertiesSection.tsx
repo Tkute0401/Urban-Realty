@@ -1,96 +1,89 @@
-'use client'
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useProperties } from "@/contexts/PropertiesContext";
-import PropertyCard from "@/components/property/PropertyCard";
-import { useEffect, useState } from "react";
+import React, { useEffect } from 'react';
+import { Box, Container, Typography, Button } from '@mui/material';
+import { ArrowForward } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
+import { useProperties } from '@/contexts/PropertiesContext';
+import PropertyList from '../property/PropertyList';
 
-const PropertiesSection = () => {
-  console.log('🔧 PropertiesSection rendering...');
-  
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-    console.log('🔧 PropertiesSection mounted on client side!');
-  }, []);
-  
-  const { featuredProperties, getFeaturedProperties } = useProperties();
+const PropertiesSection: React.FC = () => {
   const router = useRouter();
+  const { featuredProperties, loading, error, getFeaturedProperties } = useProperties();
 
   useEffect(() => {
-    const fetchFeaturedProperties = async () => {
-      try {
-        await getFeaturedProperties();
-      } catch (error) {
-        console.error("Error fetching featured properties:", error);
-      }
-    };
-    
-    // Only fetch if we don't have featured properties yet and component is mounted
-    if (mounted && featuredProperties.length === 0) {
-      fetchFeaturedProperties();
-    }
-  }, [mounted]); // Remove getFeaturedProperties from dependency array
-
-  const handleViewAll = () => {
-    router.push('/properties');
-  };
-
-  // Show loading state until mounted
-  if (!mounted) {
-    return (
-      <section className="py-12 sm:py-20 bg-[var(--color-surface)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="text-center">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded mb-8"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+    getFeaturedProperties();
+  }, [getFeaturedProperties]);
 
   return (
-    <section className="py-12 sm:py-20 bg-[var(--color-surface)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-4">
-          <h2 className="font-poppins text-2xl sm:text-3xl md:text-4xl font-bold text-[var(--color-text)] mb-4 sm:mb-0">
-            Properties based on <span className="text-[var(--color-primary)]">Your Location</span>
-          </h2>
-          <button 
-            onClick={handleViewAll}
-            className="group relative inline-flex items-center px-6 py-3 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] text-white font-medium text-sm sm:text-base rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out overflow-hidden"
+    <Box
+      component="section"
+      sx={{
+        py: 8,
+        background: 'var(--color-bg)',
+        borderTop: '1px solid var(--color-border)'
+      }}
+    >
+      <Container maxWidth="xl">
+        <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 'bold',
+                color: 'var(--color-text-primary)',
+                mb: 1,
+                fontSize: { xs: '2rem', md: '2.5rem' }
+              }}
+            >
+              Featured Properties
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'var(--color-text-muted)',
+                maxWidth: 600
+              }}
+            >
+              Explore our handpicked selection of premium properties
+            </Typography>
+          </Box>
+          
+          <Button
+            variant="contained"
+            endIcon={<ArrowForward />}
+            onClick={() => router.push('/properties')}
+            sx={{
+              background: 'var(--color-primary)',
+              color: 'var(--color-primary-contrast)',
+              px: 4,
+              py: 1.5,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              '&:hover': {
+                background: 'var(--color-primary-hover)',
+              }
+            }}
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary-hover)] to-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            <span className="relative flex items-center gap-2 text-[var(--color-bg-dark)]">
-              View All
-              <svg 
-                className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M13 7l5 5m0 0l-5 5m5-5H6" 
-                />
-              </svg>
-            </span>
-          </button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6 sm:mt-10">
-          {featuredProperties.slice(0, 4).map((property, index) => (
-            <PropertyCard key={property._id} index={index} property={property} />
-          ))}
-        </div>
-      </div>
-    </section>
+            View All Properties
+          </Button>
+        </Box>
+
+        <PropertyList
+          properties={featuredProperties}
+          loading={loading}
+          error={error}
+          emptyMessage="No featured properties available at the moment"
+          columns={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+          onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+        />
+      </Container>
+    </Box>
   );
 };
 
 export default PropertiesSection;
+

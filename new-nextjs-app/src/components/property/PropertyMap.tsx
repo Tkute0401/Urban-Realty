@@ -2,8 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
-import { useContext } from 'react';
-import { ThemeContext } from '@/contexts/ThemeProvider';
 
 interface PropertyMapProps {
   latitude: number;
@@ -15,14 +13,6 @@ interface PropertyMapProps {
   className?: string;
 }
 
-// Declare Mappls types
-declare global {
-  interface Window {
-    MapmyIndia: any;
-    L: any;
-  }
-}
-
 const PropertyMap: React.FC<PropertyMapProps> = ({
   latitude,
   longitude,
@@ -32,92 +22,135 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   showMarker = true,
   className = ''
 }) => {
-  const { theme } = useContext(ThemeContext);
   const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
-  const isDark = theme === 'dark';
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {
-    const loadMap = async () => {
-      if (!mapRef.current || !latitude || !longitude) return;
-
-      try {
-        // Check if Mappls is already loaded
-        if (typeof window.MapmyIndia === 'undefined') {
-          // Load Mappls API if not already loaded
-          const script = document.createElement('script');
-          script.src = `https://apis.mappls.com/advancedmaps/v1/${process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY}/map_load?v=1.3`;
-          script.async = true;
-          script.defer = true;
-          
-          script.onload = () => {
-            initializeMap();
-          };
-          
-          script.onerror = () => {
-            setMapError('Failed to load MapmyIndia Maps');
-          };
-          
-          document.head.appendChild(script);
-        } else {
-          initializeMap();
-        }
-      } catch (error) {
-        console.error('Error loading map:', error);
-        setMapError('Failed to load map');
+    const loadMapScript = () => {
+      // Check if already loaded
+      if (window.mappls) {
+        setScriptLoaded(true);
+        return;
       }
+
+      // Check if script already exists
+      const existingScript = document.querySelector('script[src*="mappls"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => setScriptLoaded(true));
+        return;
+      }
+
+      // Load Mappls script
+      const script = document.createElement('script');
+      script.src = `https://apis.mappls.com/advancedmaps/api/${process.env.NEXT_PUBLIC_MAPPLS_API_KEY}/map_sdk?layer=vector&v=3.0&callback=initMapplsMap`;
+      script.async = true;
+      script.defer = true;
+      
+      // Create global callback
+      (window as any).initMapplsMap = () => {
+        console.log('Mappls SDK loaded successfully');
+        setScriptLoaded(true);
+      };
+      
+      script.onerror = () => {
+        console.error('Failed to load Mappls Maps');
+        setMapError('Failed to load Mappls Maps. Please check your API key.');
+      };
+      
+      document.head.appendChild(script);
     };
 
-    const initializeMap = () => {
-      if (!mapRef.current || !window.MapmyIndia) return;
+    loadMapScript();
+  }, []);
 
+  useEffect(() => {
+    if (!scriptLoaded || !mapRef.current || !latitude || !longitude) return;
+    
+    // Clean up existing map
+    if (mapInstanceRef.current) {
       try {
-        // Initialize Mappls map
-        const map = new window.MapmyIndia.Map(mapRef.current, {
-          center: [longitude, latitude], // Mappls uses [lng, lat] format
-          zoom: zoom,
-          mapType: isDark ? 'dark' : 'standard', // Use dark theme if available
-          mapTypeControl: true,
-          fullscreenControl: true,
-          zoomControl: true,
-          gestureHandling: 'greedy'
-        });
+        mapInstanceRef.current.remove();
+      } catch (e) {
+        console.warn('Error removing map:', e);
+      }
+    }
 
+    const initializeMap = () => {
+      try {
+        if (!window.mappls) {
+          setMapError('Mappls SDK not loaded');
+          return;
+        }
+
+        // Initialize map
+        const mapOptions = {
+          center: [latitude, longitude],
+          zoom: zoom,
+          zoomControl: true,
+          fullscreenControl: true,
+          scrollWheel: true,
+          hybridMap: false,
+          clickableIcons: true,
+        };
+
+        mapInstanceRef.current = new window.mappls.Map(mapRef.current, mapOptions);
+
+        // Add marker if enabled
         if (showMarker) {
-          // Create marker
-          const marker = new window.MapmyIndia.Marker({
-            position: [longitude, latitude],
-            map: map,
-            title: address || 'Property Location'
+          const marker = new window.mappls.Marker({
+            map: mapInstanceRef.current,
+            position: { lat: latitude, lng: longitude },
+            fitbounds: false,
+            icon: {
+              url: 'https://apis.mapmyindia.com/map_v3/1.png',
+              width: 35,
+              height: 50
+            }
           });
 
-          // Add popup if address is provided
+          // Add popup with address if provided
           if (address) {
-            const popup = new window.MapmyIndia.Popup({
+            const infoWindow = new window.mappls.InfoWindow({
               content: `
                 <div style="padding: 10px; max-width: 200px;">
-                  <h3 style="margin: 0 0 5px 0; color: #333; font-size: 14px;">Property Location</h3>
-                  <p style="margin: 0; color: #666; font-size: 12px;">${address}</p>
+                  <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">Property Location</h3>
+                  <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">${address}</p>
                 </div>
               `,
-              closeButton: true,
-              closeOnClick: false
+              position: { lat: latitude, lng: longitude }
             });
 
-            marker.bindPopup(popup);
+            marker.addListener('click', () => {
+              infoWindow.open(mapInstanceRef.current);
+            });
           }
         }
 
         setMapLoaded(true);
+        setMapError(null);
       } catch (error) {
         console.error('Error initializing map:', error);
         setMapError('Failed to initialize map');
       }
     };
 
-    loadMap();
-  }, [latitude, longitude, address, zoom, isDark, showMarker]);
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(initializeMap, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      if (mapInstanceRef.current) {
+        try {
+          mapInstanceRef.current.remove();
+        } catch (e) {
+          console.warn('Error cleaning up map:', e);
+        }
+      }
+    };
+  }, [scriptLoaded, latitude, longitude, address, zoom, showMarker]);
 
   if (mapError) {
     return (
@@ -126,9 +159,9 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: 'var(--color-surface)',
         borderRadius: '12px',
-        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+        border: '1px solid var(--color-border)'
       }}>
         <Alert severity="error" sx={{ maxWidth: 400 }}>
           {mapError}
@@ -146,12 +179,12 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          background: 'var(--color-surface)',
           zIndex: 1
         }}>
           <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress size={40} sx={{ color: '#78CADC', mb: 2 }} />
-            <Typography variant="body2" color="text.secondary">
+            <CircularProgress size={40} sx={{ color: 'var(--color-primary)', mb: 2 }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
               Loading map...
             </Typography>
           </Box>
@@ -165,7 +198,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           width: '100%',
           height: '100%',
           borderRadius: '12px',
-          border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+          border: '1px solid var(--color-border)'
         }}
       />
     </Box>
@@ -173,3 +206,4 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 };
 
 export default PropertyMap;
+

@@ -1,12 +1,13 @@
-// Global type definitions for MapTiles SDK
+// Global type definitions for Mappls SDK
 declare global {
   interface Window {
-    mappls: {
+    mappls?: {
       Map: new (element: HTMLElement, options: any) => any;
       Marker: new (options: any) => any;
       InfoWindow: new (options: any) => any;
-      LatLngBounds: new () => any;
+      LatLngBounds?: new () => any;
     };
+    mappls_plugin?: any;
   }
 }
 

@@ -1,287 +1,257 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/services/api';
 import {
+  Box,
+  Card,
+  CardContent,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-  Chip,
-  Box,
-  CircularProgress,
   TablePagination,
+  IconButton,
+  Chip,
   TextField,
-  InputAdornment,
-  Avatar,
-  Tooltip,
-  Button
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  CircularProgress,
+  Typography
 } from '@mui/material';
-import { MoreVert, Delete, Visibility, Edit, Search, Add } from '@mui/icons-material';
-import http from '@/lib/services/http';
+import { Visibility, Edit, Delete, Search } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useProperties } from '@/contexts/PropertiesContext';
 
-const formatPrice = (price) => {
-  if (!price) return '$0';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(price);
-};
-
-interface PropertiesTableProps {
-  filters?: {
-    status: string;
-    type: string;
-    priceRange: string;
-    location: string;
-  };
-}
-
-const PropertiesTable = ({ filters }: PropertiesTableProps) => {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
+const PropertiesTable = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { properties, loading, getProperties, pagination } = useProperties();
+  const [filters, setFilters] = useState({
+    status: '',
+    type: '',
+    search: ''
+  });
 
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const response = user?.role === 'admin' 
-          ? await api.admin.properties() 
-          : await api.properties.list();
-        if (response.success) {
-          const propertiesData = response.data.items || response.data || [];
-          setProperties(Array.isArray(propertiesData) ? propertiesData : []);
-        } else {
-          setError('Failed to fetch properties');
-        }
-      } catch (err) {
-        console.error('Error fetching properties:', err);
-        setError('Failed to load properties. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchProperties();
-  }, [user]);
+    getProperties({ page: 1, limit: 10 });
+  }, []);
 
-  const handleMenuOpen = (event, property) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedProperty(property);
+  const handleFilterChange = (field: string, value: string) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+    getProperties({ ...filters, [field]: value, page: 1 });
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedProperty(null);
+  const handlePageChange = (event: unknown, newPage: number) => {
+    getProperties({ ...filters, page: newPage + 1, limit: pagination.limit });
   };
 
-  const handleDelete = async () => {
-    try {
-      await api.admin.deleteProperty(selectedProperty._id);
-      setProperties(properties.filter(property => property._id !== selectedProperty._id));
-    } catch (err) {
-      console.error('Error deleting property:', err);
-      setError('Failed to delete property');
-    } finally {
-      handleMenuClose();
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const limit = parseInt(event.target.value, 10);
+    getProperties({ ...filters, page: 1, limit });
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'For Sale':
+        return 'success';
+      case 'For Rent':
+        return 'info';
+      case 'Sold':
+        return 'default';
+      case 'Rented':
+        return 'warning';
+      default:
+        return 'default';
     }
   };
 
-  const handleView = () => {
-    router.push(`/properties/${selectedProperty._id}`);
-    handleMenuClose();
-  };
-
-  const handleEdit = () => {
-    router.push(`/properties/${selectedProperty._id}/edit`);
-    handleMenuClose();
-  };
-
-  const handleAddProperty = () => {
-    router.push('/add-property');
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const filteredProperties = properties.filter(property => {
-    if (!property) return false;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      (property.title?.toLowerCase() || '').includes(searchLower) ||
-      (property.agent?.name?.toLowerCase() || '').includes(searchLower) ||
-      (property.address?.city?.toLowerCase() || '').includes(searchLower) ||
-      (property.type?.toLowerCase() || '').includes(searchLower)
-    );
-  });
-
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
-    <Paper>
-      <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <TextField
-          variant="outlined"
-          placeholder="Search properties..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ width: '50%' }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<Add />}
-          onClick={handleAddProperty}
-        >
-          Add Property
-        </Button>
-      </Box>
+    <Card sx={{ 
+      background: 'var(--color-surface)', 
+      border: '1px solid var(--color-border)',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+    }}>
+      <CardContent>
+        {/* Filters */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              placeholder="Search properties..."
+              value={filters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              InputProps={{
+                startAdornment: <Search sx={{ mr: 1, color: 'var(--color-text-muted)' }} />
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  background: 'var(--color-bg)',
+                  borderColor: 'var(--color-border)',
+                  color: 'var(--color-text-primary)'
+                }
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Status</InputLabel>
+              <Select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                sx={{
+                  background: 'var(--color-bg)',
+                  color: 'var(--color-text-primary)',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'var(--color-border)'
+                  }
+                }}
+              >
+                <MenuItem value="">All Status</MenuItem>
+                <MenuItem value="For Sale">For Sale</MenuItem>
+                <MenuItem value="For Rent">For Rent</MenuItem>
+                <MenuItem value="Sold">Sold</MenuItem>
+                <MenuItem value="Rented">Rented</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth>
+              <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Type</InputLabel>
+              <Select
+                value={filters.type}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
+                sx={{
+                  background: 'var(--color-bg)',
+                  color: 'var(--color-text-primary)',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'var(--color-border)'
+                  }
+                }}
+              >
+                <MenuItem value="">All Types</MenuItem>
+                <MenuItem value="House">House</MenuItem>
+                <MenuItem value="Apartment">Apartment</MenuItem>
+                <MenuItem value="Villa">Villa</MenuItem>
+                <MenuItem value="Condo">Condo</MenuItem>
+                <MenuItem value="Land">Land</MenuItem>
+                <MenuItem value="Commercial">Commercial</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
 
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Title</TableCell>
-              {user?.role === 'admin' && <TableCell>Agent</TableCell>}
-              <TableCell>Type</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredProperties.length > 0 ? (
-              filteredProperties
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(property => (
-                  <TableRow key={property._id}>
-                    <TableCell>
-                      <Typography fontWeight="medium">{property.title}</Typography>
-                    </TableCell>
-                    {user?.role === 'admin' && (
-                      <TableCell>
-                        <Box display="flex" alignItems="center">
-                          <Avatar 
-                            src={property.agent?.photo} 
-                            sx={{ width: 24, height: 24, mr: 1 }}
-                          />
-                          <Typography variant="body2">
-                            {property.agent?.name}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <Chip label={property.type} color="primary" size="small" />
-                    </TableCell>
-                    <TableCell>
-                      {property.address?.city}, {property.address?.state}
-                    </TableCell>
-                    <TableCell>
-                      {formatPrice(property.price)}
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={property.status} 
-                        color={
-                          property.status === 'For Sale' ? 'primary' : 
-                          property.status === 'For Rent' ? 'secondary' : 'default'
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={(e) => handleMenuOpen(e, property)}>
-                        <MoreVert />
-                      </IconButton>
-                    </TableCell>
+        {/* Table */}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <CircularProgress sx={{ color: 'var(--color-primary)' }} />
+          </Box>
+        ) : properties.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography sx={{ color: 'var(--color-text-muted)' }}>
+              No properties found
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ background: 'var(--color-accent)' }}>
+                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Title</TableCell>
+                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Type</TableCell>
+                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Status</TableCell>
+                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Price</TableCell>
+                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Location</TableCell>
+                    <TableCell sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>Actions</TableCell>
                   </TableRow>
-                ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={user?.role === 'admin' ? 7 : 6} align="center">
-                  <Typography>No properties found</Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {filteredProperties.length > 0 && (
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredProperties.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      )}
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleView}>
-          <Visibility fontSize="small" sx={{ mr: 1 }} /> View
-        </MenuItem>
-        <MenuItem onClick={handleEdit}>
-          <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
-        </MenuItem>
-        {user?.role === 'admin' && (
-          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-            <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
-          </MenuItem>
+                </TableHead>
+                <TableBody>
+                  {properties.map((property) => (
+                    <TableRow 
+                      key={property._id}
+                      sx={{ 
+                        '&:hover': { 
+                          background: 'var(--color-accent)' 
+                        }
+                      }}
+                    >
+                      <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                        {property.title}
+                      </TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                        {property.type}
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={property.status} 
+                          color={getStatusColor(property.status) as any}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-primary)' }}>
+                        {formatPrice(property.price)}
+                      </TableCell>
+                      <TableCell sx={{ color: 'var(--color-text-muted)' }}>
+                        {property.address?.city}, {property.address?.state}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          size="small"
+                          onClick={() => router.push(`/properties/${property._id}`)}
+                          sx={{ color: 'var(--color-secondary)' }}
+                        >
+                          <Visibility />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => router.push(`/properties/edit/${property._id}`)}
+                          sx={{ color: 'var(--color-warning)' }}
+                        >
+                          <Edit />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          sx={{ color: 'var(--color-danger)' }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            <TablePagination
+              component="div"
+              count={pagination.total}
+              page={pagination.page - 1}
+              onPageChange={handlePageChange}
+              rowsPerPage={pagination.limit}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              sx={{ 
+                color: 'var(--color-text-primary)',
+                borderTop: '1px solid var(--color-border)'
+              }}
+            />
+          </>
         )}
-      </Menu>
-    </Paper>
+      </CardContent>
+    </Card>
   );
 };
 
 export default PropertiesTable;
+

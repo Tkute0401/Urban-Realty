@@ -54,33 +54,64 @@ interface Property {
   status: string;
   description?: string;
   address?: {
+    line1?: string;
     street?: string;
     city: string;
+    locality?: string;
     state: string;
     zipCode?: string;
+    country?: string;
   };
-  images?: Array<{ url: string; alt?: string; caption?: string }>;
+  images?: Array<{ 
+    url: string; 
+    publicId?: string;
+    width?: number;
+    height?: number;
+  }>;
   projectDetails?: {
+    projectArea?: string;
+    totalUnits?: string;
     launchDate?: string;
-    possessionDate?: string;
-    developer?: string;
+    reraId?: string;
+    configurations?: string;
   };
   location?: {
-    latitude: number;
-    longitude: number;
+    type: string;
+    coordinates: [number, number]; // [longitude, latitude]
+    formattedAddress?: string;
   };
   amenities?: string[];
   highlights?: string[];
-  floorPlan?: {
-    image: string;
-    description: string;
-  };
-  nearbyPlaces?: Array<{
-    name: string;
-    type: string;
-    distance: string;
+  floorPlanImages?: Array<{
+    url: string;
+    publicId?: string;
+    description?: string;
   }>;
+  nearbyLocalities?: {
+    hasSchool?: boolean;
+    school?: string;
+    hasHospital?: boolean;
+    hospital?: string;
+    hasMall?: boolean;
+    mall?: string;
+    hasPark?: boolean;
+    park?: string;
+    hasTransport?: boolean;
+    transport?: string;
+  };
   similarProperties?: Property[];
+  developer?: {
+    _id: string;
+    name: string;
+    logo?: { url: string };
+  };
+  agent?: {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    mobile?: string;
+  };
 }
 
 interface TabPanelProps {
@@ -137,7 +168,9 @@ const PropertyDetailsPageContent: React.FC = () => {
 
         const response = await http.get(`/api/v1/properties/${params.id}`);
         const data = response.data;
-        setProperty(data);
+        // Backend sends { success: true, data: propertyObject }
+        const propertyData = data.data || data;
+        setProperty(propertyData);
 
         // Check favorite status
         try {
@@ -378,9 +411,7 @@ const PropertyDetailsPageContent: React.FC = () => {
         <Box sx={{ mb: 4 }}>
           <PropertyImageGallery
             images={property.images || []}
-            propertyTitle={property.title}
-            showThumbnails={true}
-            autoPlay={false}
+            title={property.title}
           />
         </Box>
 
@@ -550,12 +581,12 @@ const PropertyDetailsPageContent: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
                   Location & Nearby Places
                 </Typography>
-                {property.location ? (
+                {property.location && property.location.coordinates && property.location.coordinates.length === 2 ? (
                   <PropertyMap
-                    latitude={property.location.latitude}
-                    longitude={property.location.longitude}
+                    latitude={property.location.coordinates[1]}
+                    longitude={property.location.coordinates[0]}
                     address={fullAddress}
-                    height="300px"
+                    height="400px"
                   />
                 ) : (
                   <Typography sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
@@ -595,22 +626,28 @@ const PropertyDetailsPageContent: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
                   Floor Plan
                 </Typography>
-                {property.floorPlan ? (
-                  <Box>
-                    <img
-                      src={property.floorPlan.image}
-                      alt="Floor Plan"
-                      style={{
-                        width: '100%',
-                        maxWidth: '600px',
-                        height: 'auto',
-                        borderRadius: '8px',
-                        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
-                      }}
-                    />
-                    <Typography sx={{ mt: 2, color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
-                      {property.floorPlan.description}
-                    </Typography>
+                {property.floorPlanImages && property.floorPlanImages.length > 0 ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    {property.floorPlanImages.map((floorPlan, index) => (
+                      <Box key={index}>
+                        <img
+                          src={floorPlan.url}
+                          alt={`Floor Plan ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            maxWidth: '800px',
+                            height: 'auto',
+                            borderRadius: '8px',
+                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                          }}
+                        />
+                        {floorPlan.description && (
+                          <Typography sx={{ mt: 2, color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                            {floorPlan.description}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
                   </Box>
                 ) : (
                   <Typography sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
