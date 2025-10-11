@@ -19,6 +19,7 @@ interface PropertiesContextType {
   getProperties: (filters?: PropertyFilters) => Promise<void>;
   getFeaturedProperties: () => Promise<Property[]>;
   getProperty: (id: string) => Promise<Property | null>;
+  addProperty: (propertyData: any) => Promise<Property>;
   setProperty: (property: Property | null) => void;
   clearError: () => void;
   refreshProperties: () => Promise<void>;
@@ -125,6 +126,28 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
     await getProperties(lastFilters);
   }, [lastFilters, getProperties]);
 
+  const addProperty = useCallback(async (propertyData: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await http.post('/api/v1/properties', propertyData);
+      const data = response.data;
+      const newProperty = data.data || data.property || data;
+      
+      // Add the new property to the current list
+      setProperties(prev => [newProperty, ...prev]);
+      
+      return newProperty;
+    } catch (err) {
+      console.error('Error creating property:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create property');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const clearError = useCallback(() => setError(null), []);
 
   const value = {
@@ -137,6 +160,7 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
     getProperties,
     getFeaturedProperties,
     getProperty,
+    addProperty,
     setProperty,
     clearError,
     refreshProperties
