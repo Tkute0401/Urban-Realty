@@ -75,7 +75,7 @@ const PropertiesPageContent: React.FC = () => {
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     const search = searchParams.get('search') || '';
     const type = searchParams.get('type') || '';
     const city = searchParams.get('city') || '';
@@ -303,7 +303,7 @@ const PropertiesPageContent: React.FC = () => {
               <Button
                 variant={filters.propertyType === 'BUY' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('BUY')}
-                sx={{
+            sx={{ 
                   backgroundColor: filters.propertyType === 'BUY' ? 'var(--color-primary)' : 'transparent',
                   color: filters.propertyType === 'BUY' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
                   borderColor: 'var(--color-primary)',
@@ -318,7 +318,7 @@ const PropertiesPageContent: React.FC = () => {
               <Button
                 variant={filters.propertyType === 'RENT' ? 'contained' : 'outlined'}
                 onClick={() => handlePropertyTypeChange('RENT')}
-                sx={{
+            sx={{ 
                   backgroundColor: filters.propertyType === 'RENT' ? 'var(--color-primary)' : 'transparent',
                   color: filters.propertyType === 'RENT' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
                   borderColor: 'var(--color-primary)',
@@ -413,7 +413,7 @@ const PropertiesPageContent: React.FC = () => {
                 Filters
               </Button>
             </Box>
-            
+
             {/* Buy/Rent Toggle */}
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
@@ -466,8 +466,8 @@ const PropertiesPageContent: React.FC = () => {
               </Button>
             </Box>
           </Box>
-        </Box>
-      )}
+              </Box>
+            )}
 
       {/* Mobile Filter Drawer */}
       {isMobile && (
@@ -514,11 +514,11 @@ const PropertiesPageContent: React.FC = () => {
                       clickable
                       variant={isActive ? 'filled' : 'outlined'}
                       onClick={() => handleFilterChange('type', isActive ? '' : type)}
-                      sx={{
+                    sx={{ 
                         backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
                         color: isActive ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
                         borderColor: 'var(--color-primary)',
-                        '&:hover': {
+                      '&:hover': {
                           backgroundColor: isActive ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
                         }
                       }}
@@ -675,7 +675,7 @@ const PropertiesPageContent: React.FC = () => {
               <Button
                 variant="outlined"
                 onClick={clearAllFilters}
-                sx={{
+                        sx={{ 
                   flex: 1,
                   borderColor: 'var(--color-primary)',
                   color: 'var(--color-primary)',
@@ -719,30 +719,30 @@ const PropertiesPageContent: React.FC = () => {
         py: 4,
         textAlign: 'center'
       }}>
-        <Typography 
+                      <Typography 
           variant="h3" 
-          sx={{ 
+                        sx={{ 
             color: 'var(--color-text-primary)', 
-            fontWeight: 'bold',
+                          fontWeight: 'bold', 
             mb: 2,
             fontSize: { xs: '28px', sm: '36px', md: '48px' }
-          }}
-        >
+                        }}
+                      >
           {filters.propertyType === 'RENT' ? 'Luxury Properties for ' : filters.propertyType === 'BUY' ? 'Luxury Properties for ' : 'All '}
           <span style={{ color: 'var(--color-primary)' }}>
             {filters.propertyType === 'RENT' ? 'Rent' : filters.propertyType === 'BUY' ? 'Sale' : 'Properties'}
           </span>
-        </Typography>
-        <Typography 
+                      </Typography>
+                        <Typography 
           variant="h6" 
-          sx={{ 
+                          sx={{ 
             color: 'var(--color-text-muted)',
             fontSize: { xs: '16px', sm: '18px', md: '20px' }
           }}
         >
           {properties.length} LISTING{properties.length !== 1 ? 'S' : ''}
-        </Typography>
-      </Box>
+                        </Typography>
+                      </Box>
 
       {/* Active Filter Tags */}
       {activeFilterCount > 0 && (
@@ -758,14 +758,14 @@ const PropertiesPageContent: React.FC = () => {
               
               if (Array.isArray(value)) {
                 return value.map(item => (
-                  <Chip
+                        <Chip 
                     key={`${key}-${item}`}
                     label={`${key}: ${item}`}
                     onDelete={() => {
                       const newAmenities = filters.amenities.filter(a => a !== item);
                       handleFilterChange('amenities', newAmenities);
                     }}
-                    sx={{
+                          sx={{ 
                       backgroundColor: 'var(--color-primary-light)',
                       color: 'var(--color-primary)',
                       border: '1px solid var(--color-primary)',
@@ -778,11 +778,11 @@ const PropertiesPageContent: React.FC = () => {
               }
               
               return (
-                <Chip
+                        <Chip 
                   key={key}
                   label={`${key}: ${value}`}
                   onDelete={() => handleFilterChange(key, '')}
-                  sx={{
+                          sx={{ 
                     backgroundColor: 'var(--color-primary-light)',
                     color: 'var(--color-primary)',
                     border: '1px solid var(--color-primary)',
@@ -817,7 +817,7 @@ const PropertiesPageContent: React.FC = () => {
           <Alert severity="error" sx={{ backgroundColor: 'var(--color-error-light)', color: 'var(--color-error)' }}>
             {error}
           </Alert>
-        </Box>
+                      </Box>
       )}
 
       {/* Properties List */}
@@ -830,7 +830,7 @@ const PropertiesPageContent: React.FC = () => {
         onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
       />
 
-      {/* Pagination */}
+            {/* Pagination */}
       {!loading && properties.length > 0 && pagination.totalPages > 1 && (
         <Box sx={{ 
           display: 'flex', 
@@ -838,17 +838,17 @@ const PropertiesPageContent: React.FC = () => {
           mt: 4,
           pb: 4
         }}>
-          <Pagination
+                <Pagination
             count={pagination.totalPages}
             page={pagination.page}
-            onChange={handlePageChange}
-            color="primary"
-            sx={{
-              '& .MuiPaginationItem-root': {
+                  onChange={handlePageChange}
+                  color="primary"
+                  sx={{
+                    '& .MuiPaginationItem-root': {
                 color: 'var(--color-text-primary)',
                 fontSize: { xs: '14px', sm: '16px' }
-              },
-              '& .MuiPaginationItem-root.Mui-selected': {
+                    },
+                    '& .MuiPaginationItem-root.Mui-selected': {
                 backgroundColor: 'var(--color-primary)',
                 color: 'var(--color-primary-contrast)',
                 '&:hover': {
@@ -857,11 +857,11 @@ const PropertiesPageContent: React.FC = () => {
               },
               '& .MuiPaginationItem-root:hover': {
                 backgroundColor: 'var(--color-primary-light)'
-              }
-            }}
-          />
-        </Box>
-      )}
+                    }
+                  }}
+                />
+              </Box>
+            )}
     </Box>
   );
 };

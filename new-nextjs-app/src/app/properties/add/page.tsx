@@ -40,6 +40,9 @@ import { styled } from '@mui/material/styles';
 import { useContext } from 'react';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import { useProperties } from '@/contexts/PropertiesContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAgents } from '@/contexts/AgentsContext';
+import { useDevelopers } from '@/contexts/DevelopersContext';
 import { useRouter } from 'next/navigation';
 
 // Styled components
@@ -143,6 +146,9 @@ const constructionStatuses = [
 const AddPropertyPageContent: React.FC = () => {
   const { theme } = useContext(ThemeContext);
   const { addProperty } = useProperties();
+  const { user } = useAuth();
+  const { agents, getAgents } = useAgents();
+  const { developers, getDevelopers } = useDevelopers();
   const router = useRouter();
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
@@ -166,6 +172,14 @@ const AddPropertyPageContent: React.FC = () => {
 
   const imagesInputRef = useRef<HTMLInputElement>(null);
 
+  // Load agents and developers data
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      getAgents();
+    }
+    getDevelopers();
+  }, [user?.role, getAgents, getDevelopers]);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -178,6 +192,7 @@ const AddPropertyPageContent: React.FC = () => {
     buildingName: '',
     floorNumber: '',
     featured: false,
+    agent: '', // Added for admin assignment
     developer: '',
     possessionDate: '',
     constructionStatus: 'Under Construction',
@@ -479,6 +494,147 @@ const AddPropertyPageContent: React.FC = () => {
           </Typography>
 
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
+          {/* Agent Selection Section (Admin Only) */}
+          {user?.role === 'admin' && (
+            <Grid item xs={12}>
+              <SectionHeader variant="h6">Assign to Agent</SectionHeader>
+              <PremiumPaper>
+                <Autocomplete
+                  options={agents}
+                  getOptionLabel={(option) => `${option.name} (${option.email})`}
+                  value={agents.find(agent => agent._id === formData.agent) || null}
+                  onChange={(_, newValue) => {
+                    handleInputChange('agent', newValue?._id || '');
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Agent"
+                      variant="outlined"
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Avatar sx={{ width: 32, height: 32, bgcolor: '#78CADC', color: '#0B1011' }}>
+                        {option.name.charAt(0)}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500 }}>
+                          {option.name}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                          {option.email}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+                />
+              </PremiumPaper>
+            </Grid>
+          )}
+
+          {/* Developer Information Section */}
+              <Grid item xs={12}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Developer Information</SectionHeader>
+              {user?.role === 'individual_seller' && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={sectionVisibility.developer}
+                      onChange={(e) => setSectionVisibility(prev => ({ ...prev, developer: e.target.checked }))}
+                      sx={{ color: '#78CADC' }}
+                    />
+                  }
+                  label="Show this section"
+                  sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                />
+              )}
+            </Box>
+            {sectionVisibility.developer && (
+              <PremiumPaper>
+                <Autocomplete
+                  options={developers}
+                  getOptionLabel={(option) => option.name}
+                  value={developers.find(dev => dev._id === formData.developer) || null}
+                  onChange={(_, newValue) => {
+                    handleInputChange('developer', newValue?._id || '');
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Developer"
+                      variant="outlined"
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {option.logo && (
+                        <Avatar 
+                          src={option.logo} 
+                          sx={{ width: 32, height: 32 }}
+                          alt={option.name}
+                        />
+                      )}
+                      <Box>
+                        <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500 }}>
+                          {option.name}
+                </Typography>
+                        {option.website && (
+                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                            {option.website}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  )}
+                />
+              </PremiumPaper>
+            )}
+              </Grid>
+
           {/* Basic Information Section */}
               <Grid item xs={12}>
             <SectionHeader variant="h6">Basic Information</SectionHeader>
@@ -1231,6 +1387,625 @@ const AddPropertyPageContent: React.FC = () => {
             </PremiumPaper>
           </Grid>
 
+          {/* Nearby Localities Section */}
+          <Grid item xs={12}>
+            <SectionHeader variant="h6">Nearby Localities</SectionHeader>
+            <PremiumPaper>
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+                Check the facilities that are nearby and provide their names
+              </Typography>
+              
+              <Grid container spacing={2}>
+                {/* School */}
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.nearbyLocalities.hasSchool}
+                        onChange={(e) => handleInputChange('nearbyLocalities', {
+                          ...formData.nearbyLocalities,
+                          hasSchool: e.target.checked
+                        })}
+                        sx={{ color: '#78CADC' }}
+                      />
+                    }
+                    label="School Nearby"
+                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                  />
+                  {formData.nearbyLocalities.hasSchool && (
+                    <TextField
+                      fullWidth
+                      label="School Name"
+                      value={formData.nearbyLocalities.school}
+                      onChange={(e) => handleInputChange('nearbyLocalities', {
+                        ...formData.nearbyLocalities,
+                        school: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        mt: 1,
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </Grid>
+
+                {/* Hospital */}
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.nearbyLocalities.hasHospital}
+                        onChange={(e) => handleInputChange('nearbyLocalities', {
+                          ...formData.nearbyLocalities,
+                          hasHospital: e.target.checked
+                        })}
+                        sx={{ color: '#78CADC' }}
+                      />
+                    }
+                    label="Hospital Nearby"
+                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                  />
+                  {formData.nearbyLocalities.hasHospital && (
+                    <TextField
+                      fullWidth
+                      label="Hospital Name"
+                      value={formData.nearbyLocalities.hospital}
+                      onChange={(e) => handleInputChange('nearbyLocalities', {
+                        ...formData.nearbyLocalities,
+                        hospital: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        mt: 1,
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </Grid>
+
+                {/* Mall */}
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.nearbyLocalities.hasMall}
+                        onChange={(e) => handleInputChange('nearbyLocalities', {
+                          ...formData.nearbyLocalities,
+                          hasMall: e.target.checked
+                        })}
+                        sx={{ color: '#78CADC' }}
+                      />
+                    }
+                    label="Mall Nearby"
+                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                  />
+                  {formData.nearbyLocalities.hasMall && (
+                    <TextField
+                      fullWidth
+                      label="Mall Name"
+                      value={formData.nearbyLocalities.mall}
+                      onChange={(e) => handleInputChange('nearbyLocalities', {
+                        ...formData.nearbyLocalities,
+                        mall: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        mt: 1,
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </Grid>
+
+                {/* Park */}
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.nearbyLocalities.hasPark}
+                        onChange={(e) => handleInputChange('nearbyLocalities', {
+                          ...formData.nearbyLocalities,
+                          hasPark: e.target.checked
+                        })}
+                        sx={{ color: '#78CADC' }}
+                      />
+                    }
+                    label="Park Nearby"
+                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                  />
+                  {formData.nearbyLocalities.hasPark && (
+                    <TextField
+                      fullWidth
+                      label="Park Name"
+                      value={formData.nearbyLocalities.park}
+                      onChange={(e) => handleInputChange('nearbyLocalities', {
+                        ...formData.nearbyLocalities,
+                        park: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        mt: 1,
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </Grid>
+
+                {/* Transport */}
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.nearbyLocalities.hasTransport}
+                        onChange={(e) => handleInputChange('nearbyLocalities', {
+                          ...formData.nearbyLocalities,
+                          hasTransport: e.target.checked
+                        })}
+                        sx={{ color: '#78CADC' }}
+                      />
+                    }
+                    label="Public Transport Nearby"
+                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                  />
+                  {formData.nearbyLocalities.hasTransport && (
+                    <TextField
+                      fullWidth
+                      label="Transport Details (Metro/Bus Station)"
+                      value={formData.nearbyLocalities.transport}
+                      onChange={(e) => handleInputChange('nearbyLocalities', {
+                        ...formData.nearbyLocalities,
+                        transport: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        mt: 1,
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </Grid>
+              </Grid>
+            </PremiumPaper>
+          </Grid>
+
+          {/* Project Details Section */}
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Project Details</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.projectDetails}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, projectDetails: e.target.checked }))}
+                    sx={{ color: '#78CADC' }}
+                  />
+                }
+                label="Show this section"
+                sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              />
+            </Box>
+            {sectionVisibility.projectDetails && (
+              <PremiumPaper>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Project Area (sq ft)"
+                      value={formData.projectDetails.projectArea}
+                      onChange={(e) => handleInputChange('projectDetails', {
+                        ...formData.projectDetails,
+                        projectArea: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Total Units"
+                      value={formData.projectDetails.totalUnits}
+                      onChange={(e) => handleInputChange('projectDetails', {
+                        ...formData.projectDetails,
+                        totalUnits: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Launch Date"
+                      type="date"
+                      value={formData.projectDetails.launchDate}
+                      onChange={(e) => handleInputChange('projectDetails', {
+                        ...formData.projectDetails,
+                        launchDate: e.target.value
+                      })}
+                      InputLabelProps={{ shrink: true }}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="RERA ID"
+                      value={formData.projectDetails.reraId}
+                      onChange={(e) => handleInputChange('projectDetails', {
+                        ...formData.projectDetails,
+                        reraId: e.target.value
+                      })}
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Available Configurations"
+                      value={formData.projectDetails.configurations}
+                      onChange={(e) => handleInputChange('projectDetails', {
+                        ...formData.projectDetails,
+                        configurations: e.target.value
+                      })}
+                      multiline
+                      rows={3}
+                      placeholder="e.g., 1BHK, 2BHK, 3BHK"
+                      size={isMobile ? 'small' : 'medium'}
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          color: '#fff',
+                          fontFamily: '"Poppins", sans-serif'
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: '#78CADC',
+                        },
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: '#5fb4c9',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#78CADC',
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </PremiumPaper>
+            )}
+          </Grid>
+
+          {/* Approvals & Certifications Section */}
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Approvals & Certifications</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.approvals}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, approvals: e.target.checked }))}
+                    sx={{ color: '#78CADC' }}
+                  />
+                }
+                label="Show this section"
+                sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              />
+            </Box>
+            {sectionVisibility.approvals && (
+              <PremiumPaper>
+                <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+                  Add property approvals and certifications
+                </Typography>
+                
+                {formData.approvals.map((approval, index) => (
+                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #78CADC', borderRadius: '8px' }}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          fullWidth
+                          label="Approval Name"
+                          value={approval.name}
+                          onChange={(e) => {
+                            const newApprovals = [...formData.approvals];
+                            newApprovals[index] = { ...approval, name: e.target.value };
+                            handleInputChange('approvals', newApprovals);
+                          }}
+                          size={isMobile ? 'small' : 'medium'}
+                          sx={{
+                            '& .MuiInputBase-root': {
+                              color: '#fff',
+                              fontFamily: '"Poppins", sans-serif'
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: '#78CADC',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                borderColor: '#78CADC',
+                              },
+                              '&:hover fieldset': {
+                                borderColor: '#5fb4c9',
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#78CADC',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          fullWidth
+                          label="Approval Number"
+                          value={approval.number}
+                          onChange={(e) => {
+                            const newApprovals = [...formData.approvals];
+                            newApprovals[index] = { ...approval, number: e.target.value };
+                            handleInputChange('approvals', newApprovals);
+                          }}
+                          size={isMobile ? 'small' : 'medium'}
+                          sx={{
+                            '& .MuiInputBase-root': {
+                              color: '#fff',
+                              fontFamily: '"Poppins", sans-serif'
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: '#78CADC',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                borderColor: '#78CADC',
+                              },
+                              '&:hover fieldset': {
+                                borderColor: '#5fb4c9',
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#78CADC',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={3}>
+                        <TextField
+                          fullWidth
+                          label="Date"
+                          type="date"
+                          value={approval.date}
+                          onChange={(e) => {
+                            const newApprovals = [...formData.approvals];
+                            newApprovals[index] = { ...approval, date: e.target.value };
+                            handleInputChange('approvals', newApprovals);
+                          }}
+                          InputLabelProps={{ shrink: true }}
+                          size={isMobile ? 'small' : 'medium'}
+                          sx={{
+                            '& .MuiInputBase-root': {
+                              color: '#fff',
+                              fontFamily: '"Poppins", sans-serif'
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: '#78CADC',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                borderColor: '#78CADC',
+                              },
+                              '&:hover fieldset': {
+                                borderColor: '#5fb4c9',
+                              },
+                              '&.Mui-focused fieldset': {
+                                borderColor: '#78CADC',
+                              },
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={1}>
+                        <IconButton
+                          onClick={() => {
+                            const newApprovals = formData.approvals.filter((_, i) => i !== index);
+                            handleInputChange('approvals', newApprovals);
+                          }}
+                          sx={{ color: '#ff6b6b' }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                ))}
+                
+                <Button
+                  onClick={() => {
+                    const newApprovals = [...formData.approvals, { name: '', number: '', date: '' }];
+                    handleInputChange('approvals', newApprovals);
+                  }}
+                  startIcon={<Add />}
+                  sx={{
+                    color: '#78CADC',
+                    borderColor: '#78CADC',
+                    '&:hover': {
+                      borderColor: '#5fb4c9',
+                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                    }
+                  }}
+                  variant="outlined"
+                >
+                  Add Approval
+                </Button>
+              </PremiumPaper>
+            )}
+          </Grid>
+
           {/* Images Section */}
           <Grid item xs={12}>
             <SectionHeader variant="h6">Property Images</SectionHeader>
@@ -1316,6 +2091,163 @@ const AddPropertyPageContent: React.FC = () => {
                   disabled={imagePreviews.length >= 10}
                 />
                   </Button>
+            </PremiumPaper>
+          </Grid>
+
+          {/* Floor Plans Section */}
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Floor Plans</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.floorPlans}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, floorPlans: e.target.checked }))}
+                    sx={{ color: '#78CADC' }}
+                  />
+                }
+                label="Show this section"
+                sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              />
+            </Box>
+            {sectionVisibility.floorPlans && (
+              <PremiumPaper>
+                <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+                  Upload floor plan images (optional)
+                </FormHelperText>
+                
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  id="floor-plans-input"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const files = Array.from(e.target.files);
+                      // Handle floor plan files here
+                      console.log('Floor plans uploaded:', files);
+                    }
+                  }}
+                />
+                
+                <label htmlFor="floor-plans-input">
+                  <Button
+                    component="span"
+                    startIcon={<CloudUpload />}
+                    sx={{
+                      color: '#78CADC',
+                      borderColor: '#78CADC',
+                      '&:hover': {
+                        borderColor: '#5fb4c9',
+                        backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                      }
+                    }}
+                    variant="outlined"
+                  >
+                    Upload Floor Plans
+                  </Button>
+                </label>
+              </PremiumPaper>
+            )}
+          </Grid>
+
+          {/* Brochure Section */}
+          <Grid item xs={12} sm={6}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+              <SectionHeader variant="h6">Property Brochure</SectionHeader>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionVisibility.brochure}
+                    onChange={(e) => setSectionVisibility(prev => ({ ...prev, brochure: e.target.checked }))}
+                    sx={{ color: '#78CADC' }}
+                  />
+                }
+                label="Show this section"
+                sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              />
+            </Box>
+            {sectionVisibility.brochure && (
+              <PremiumPaper>
+                <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+                  Upload property brochure (PDF)
+                </FormHelperText>
+                
+                <input
+                  type="file"
+                  accept=".pdf"
+                  style={{ display: 'none' }}
+                  id="brochure-input"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const file = e.target.files[0];
+                      // Handle brochure file here
+                      console.log('Brochure uploaded:', file);
+                    }
+                  }}
+                />
+                
+                <label htmlFor="brochure-input">
+                  <Button
+                    component="span"
+                    startIcon={<CloudUpload />}
+                    sx={{
+                      color: '#78CADC',
+                      borderColor: '#78CADC',
+                      '&:hover': {
+                        borderColor: '#5fb4c9',
+                        backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                      }
+                    }}
+                    variant="outlined"
+                  >
+                    Upload Brochure
+                  </Button>
+                </label>
+              </PremiumPaper>
+            )}
+          </Grid>
+
+          {/* Virtual Tour Section */}
+          <Grid item xs={12} sm={6}>
+            <SectionHeader variant="h6">Virtual Tour</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Upload a virtual tour video (optional)
+              </FormHelperText>
+              
+              <input
+                type="file"
+                accept="video/*"
+                style={{ display: 'none' }}
+                id="virtual-tour-input"
+                onChange={(e) => {
+                  if (e.target.files) {
+                    const file = e.target.files[0];
+                    // Handle virtual tour file here
+                    console.log('Virtual tour uploaded:', file);
+                  }
+                }}
+              />
+              
+              <label htmlFor="virtual-tour-input">
+                <Button
+                  component="span"
+                  startIcon={<CloudUpload />}
+                  sx={{
+                    color: '#78CADC',
+                    borderColor: '#78CADC',
+                    '&:hover': {
+                      borderColor: '#5fb4c9',
+                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                    }
+                  }}
+                  variant="outlined"
+                >
+                  Upload Virtual Tour
+                </Button>
+              </label>
             </PremiumPaper>
           </Grid>
 
