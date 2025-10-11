@@ -26,16 +26,16 @@ export const getApiBaseUrl = (): string => {
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return 'http://localhost:3001';
       }
-      // Production client-side: use empty string (same domain)
-      return '';
+      // Production client-side: use production backend
+      return 'https://www.squarefooot.com';
     }
     
     // Server-side: check NODE_ENV
     if (process.env.NODE_ENV === 'development') {
       return 'http://localhost:3001';
     }
-    // Unified mode - Express server handles all routes directly, use empty string since API calls already include /api/v1
-    return '';
+    // Production server-side: use production backend
+    return 'https://www.squarefooot.com';
   }
   
   // Separate backend mode - use the explicit URL

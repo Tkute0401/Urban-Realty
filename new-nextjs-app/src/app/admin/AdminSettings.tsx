@@ -73,7 +73,7 @@ const AdminSettings = () => {
       smtpPort: 587,
       smtpUser: '',
       smtpPassword: '',
-      fromEmail: 'noreply@urbanrealty.com',
+      fromEmail: 'noreply@squarefooot.com',
       fromName: 'Squarefooot',
       enableEmailNotifications: true
     },

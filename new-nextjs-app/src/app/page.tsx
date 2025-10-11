@@ -49,21 +49,21 @@ function generateHomePageStructuredData() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Squarefooot",
-    "url": process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+    "url": process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com",
     "description": "Premier real estate platform for buying, selling, and renting properties",
     "publisher": {
       "@type": "Organization",
       "name": "Squarefooot",
       "logo": {
         "@type": "ImageObject",
-        "url": `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/logo.png`
+        "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com"}/logo.png`
       }
     },
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/properties?search={search_term_string}`
+        "urlTemplate": `${process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com"}/properties?search={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     },

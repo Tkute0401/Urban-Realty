@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com'),
   alternates: {
     canonical: '/',
   },
@@ -116,7 +116,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "addressCountry": "US"
               },
               "telephone": "+1-XXX-XXX-XXXX",
-              "email": "contact@urbanrealty.com",
+              "email": "contact@squarefooot.com",
               "sameAs": [
                 "https://facebook.com/squarefooot",
                 "https://twitter.com/squarefooot",

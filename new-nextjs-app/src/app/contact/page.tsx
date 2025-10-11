@@ -57,7 +57,7 @@ function generateContactPageStructuredData() {
       "name": "Squarefooot",
       "url": baseUrl,
       "telephone": "+1-XXX-XXX-XXXX",
-      "email": "contact@urbanrealty.com",
+      "email": "contact@squarefooot.com",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Your City",
@@ -79,7 +79,7 @@ function generateContactPageStructuredData() {
         },
         {
           "@type": "ContactPoint",
-          "email": "contact@urbanrealty.com",
+          "email": "contact@squarefooot.com",
           "contactType": "customer service"
         },
         {
