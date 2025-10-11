@@ -47,11 +47,11 @@ import { useRouter } from 'next/navigation';
 
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#0B1011',
-  color: '#fff',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text-primary)',
   borderRadius: '16px',
   boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
-  border: `2px solid #78CADC`,
+  border: `2px solid var(--color-primary)`,
   padding: theme.spacing(3),
   fontFamily: '"Poppins", sans-serif',
   position: 'relative',
@@ -63,13 +63,13 @@ const PremiumPaper = styled(Paper)(({ theme }) => ({
     left: 0,
     right: 0,
     height: '4px',
-    background: 'linear-gradient(90deg, #78CADC 0%, #0B1011 100%)',
+    background: `linear-gradient(90deg, var(--color-primary) 0%, var(--color-surface) 100%)`,
   }
 }));
 
 const PremiumButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#78CADC',
-  color: '#0B1011',
+  backgroundColor: 'var(--color-primary)',
+  color: 'var(--color-primary-contrast)',
   fontWeight: 600,
   padding: theme.spacing(1.8, 4),
   borderRadius: '12px',
@@ -78,7 +78,7 @@ const PremiumButton = styled(Button)(({ theme }) => ({
   fontSize: '1rem',
   letterSpacing: '0.5px',
   '&:hover': {
-    backgroundColor: '#5fb4c9',
+    backgroundColor: 'var(--color-primary-hover)',
     transform: 'translateY(-3px)',
     boxShadow: '0 6px 12px rgba(120, 202, 220, 0.4)',
   },
@@ -88,7 +88,7 @@ const PremiumButton = styled(Button)(({ theme }) => ({
 
 const SectionHeader = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
-  color: '#78CADC',
+  color: 'var(--color-primary)',
   position: 'relative',
   paddingBottom: theme.spacing(1),
   marginBottom: theme.spacing(3),
@@ -100,7 +100,7 @@ const SectionHeader = styled(Typography)(({ theme }) => ({
     left: 0,
     width: '60px',
     height: '3px',
-    backgroundColor: '#78CADC',
+    backgroundColor: 'var(--color-primary)',
     borderRadius: '3px'
   }
 }));
@@ -446,13 +446,13 @@ const AddPropertyPageContent: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)'
+        background: 'linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)'
       }}>
         <PremiumPaper sx={{ p: 4, textAlign: 'center', maxWidth: 400 }}>
-          <Typography variant="h5" sx={{ color: '#78CADC', mb: 2 }}>
+          <Typography variant="h5" sx={{ color: 'var(--color-primary)', mb: 2 }}>
             Property Created Successfully!
           </Typography>
-          <Typography variant="body1" sx={{ color: '#fff' }}>
+          <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
             Redirecting to properties page...
           </Typography>
         </PremiumPaper>
@@ -463,7 +463,7 @@ const AddPropertyPageContent: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ 
       py: { xs: 2, md: 3 },
-      background: 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)',
+      background: 'linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)',
       minHeight: '100vh'
     }}>
       <Box 
@@ -473,9 +473,9 @@ const AddPropertyPageContent: React.FC = () => {
           maxWidth: 1200, 
           mx: 'auto',
           p: { xs: 1, sm: 2, md: 3 },
-          backgroundColor: '#0B1011',
+          backgroundColor: 'var(--color-surface)',
           borderRadius: '16px',
-          border: '2px solid #78CADC',
+          border: '2px solid var(--color-primary)',
           boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)'
         }}
       >
@@ -485,7 +485,7 @@ const AddPropertyPageContent: React.FC = () => {
           sx={{ 
             mb: { xs: 2, sm: 3 },
             fontSize: { xs: '1.5rem', sm: '2rem' },
-            color: '#78CADC',
+            color: 'var(--color-primary)',
             fontFamily: '"Poppins", sans-serif',
             fontWeight: 700
           }}
@@ -514,21 +514,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -536,11 +536,11 @@ const AddPropertyPageContent: React.FC = () => {
                   )}
                   renderOption={(props, option) => (
                     <Box component="li" {...props} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Avatar sx={{ width: 32, height: 32, bgcolor: '#78CADC', color: '#0B1011' }}>
+                      <Avatar sx={{ width: 32, height: 32, bgcolor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
                         {option.name.charAt(0)}
                       </Avatar>
                       <Box>
-                        <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500 }}>
+                        <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
                           {option.name}
                         </Typography>
                         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
@@ -564,7 +564,7 @@ const AddPropertyPageContent: React.FC = () => {
                     <Checkbox
                       checked={sectionVisibility.developer}
                       onChange={(e) => setSectionVisibility(prev => ({ ...prev, developer: e.target.checked }))}
-                      sx={{ color: '#78CADC' }}
+                      sx={{ color: 'var(--color-primary)' }}
                     />
                   }
                   label="Show this section"
@@ -589,21 +589,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -619,7 +619,7 @@ const AddPropertyPageContent: React.FC = () => {
                         />
                       )}
                       <Box>
-                        <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500 }}>
+                        <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
                           {option.name}
                 </Typography>
                         {option.website && (
@@ -652,18 +652,18 @@ const AddPropertyPageContent: React.FC = () => {
                 sx={{
                   mb: 2,
                   '& .MuiInputBase-root': {
-                    color: '#fff',
+                    color: 'var(--color-text-primary)',
                     fontFamily: '"Poppins", sans-serif'
                   },
                   '& .MuiInputLabel-root': {
-                    color: '#78CADC',
+                    color: 'var(--color-primary)',
                   },
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                      borderColor: '#78CADC',
+                      borderColor: 'var(--color-primary)',
                     },
                     '&:hover fieldset': {
-                      borderColor: '#78CADC',
+                      borderColor: 'var(--color-primary)',
                     },
                   }
                 }}
@@ -684,18 +684,18 @@ const AddPropertyPageContent: React.FC = () => {
                 sx={{
                   mb: 2,
                   '& .MuiInputBase-root': {
-                    color: '#fff',
+                    color: 'var(--color-text-primary)',
                     fontFamily: '"Poppins", sans-serif'
                   },
                   '& .MuiInputLabel-root': {
-                    color: '#78CADC',
+                    color: 'var(--color-primary)',
                   },
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
-                      borderColor: '#78CADC',
+                      borderColor: 'var(--color-primary)',
                     },
                     '&:hover fieldset': {
-                      borderColor: '#78CADC',
+                      borderColor: 'var(--color-primary)',
                     },
                   }
                 }}
@@ -715,22 +715,22 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       },
                       '& .MuiSelect-icon': {
-                        color: '#78CADC'
+                        color: 'var(--color-primary)'
                       }
                     }}
                   >
@@ -765,22 +765,22 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       },
                       '& .MuiSelect-icon': {
-                        color: '#78CADC'
+                        color: 'var(--color-primary)'
                       }
                     }}
                   >
@@ -808,22 +808,22 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       },
                       '& .MuiSelect-icon': {
-                        color: '#78CADC'
+                        color: 'var(--color-primary)'
                       }
                     }}
                   >
@@ -848,16 +848,16 @@ const AddPropertyPageContent: React.FC = () => {
                         onChange={(e) => setFormData({...formData, featured: e.target.checked})}
                         name="featured"
                         sx={{
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                           '&.Mui-checked': {
-                            color: '#78CADC',
+                            color: 'var(--color-primary)',
                           },
                         }}
                       />
                     }
                     label={
-                      <Box display="flex" alignItems="center" sx={{ color: '#fff' }}>
-                        <Star color={formData.featured ? "primary" : "inherit"} sx={{ mr: 1, color: formData.featured ? '#78CADC' : '#fff' }} />
+                      <Box display="flex" alignItems="center" sx={{ color: 'var(--color-text-primary)' }}>
+                        <Star color={formData.featured ? "primary" : "inherit"} sx={{ mr: 1, color: formData.featured ? 'var(--color-primary)' : 'var(--color-text-primary)' }} />
                         Featured Property
                       </Box>
                     }
@@ -887,24 +887,24 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.price}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>₹</InputAdornment>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>₹</InputAdornment>
                       ),
                       inputProps: { min: 0 }
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -926,7 +926,7 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.bedrooms}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <KingBed />
                         </InputAdornment>
                       ),
@@ -934,18 +934,18 @@ const AddPropertyPageContent: React.FC = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -967,7 +967,7 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.bathrooms}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <Bathtub />
                         </InputAdornment>
                       ),
@@ -975,18 +975,18 @@ const AddPropertyPageContent: React.FC = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1008,7 +1008,7 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.area}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <SquareFoot />
                         </InputAdornment>
                       ),
@@ -1016,18 +1016,18 @@ const AddPropertyPageContent: React.FC = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1045,18 +1045,18 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1074,18 +1074,18 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1110,18 +1110,18 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1140,18 +1140,18 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.street}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1170,18 +1170,18 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.city}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1200,18 +1200,18 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.locality}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1230,18 +1230,18 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.state}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1260,18 +1260,18 @@ const AddPropertyPageContent: React.FC = () => {
                     helperText={formErrors.zipCode}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1288,18 +1288,18 @@ const AddPropertyPageContent: React.FC = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-text-primary)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -1328,12 +1328,12 @@ const AddPropertyPageContent: React.FC = () => {
                       backgroundColor: formData.amenities.includes(amenity.name) 
                         ? 'rgba(120, 202, 220, 0.2)' 
                         : 'rgba(255, 255, 255, 0.1)',
-                      color: '#fff',
+                      color: 'var(--color-text-primary)',
                       border: formData.amenities.includes(amenity.name) 
-                        ? '1px solid #78CADC' 
+                        ? '1px solid var(--color-primary)' 
                         : '1px solid rgba(255, 255, 255, 0.2)',
                       '& .MuiChip-icon': {
-                        color: formData.amenities.includes(amenity.name) ? '#78CADC' : '#fff'
+                        color: formData.amenities.includes(amenity.name) ? 'var(--color-primary)' : 'var(--color-text-primary)'
                       },
                       '&:hover': {
                         backgroundColor: 'rgba(120, 202, 220, 0.3)'
@@ -1367,18 +1367,18 @@ const AddPropertyPageContent: React.FC = () => {
                   sx={{
                     mb: 2,
                     '& .MuiInputBase-root': {
-                      color: '#fff',
+                      color: 'var(--color-text-primary)',
                       fontFamily: '"Poppins", sans-serif'
                     },
                     '& .MuiInputLabel-root': {
-                      color: '#78CADC',
+                      color: 'var(--color-primary)',
                     },
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': {
-                        borderColor: '#78CADC',
+                        borderColor: 'var(--color-primary)',
                       },
                       '&:hover fieldset': {
-                        borderColor: '#78CADC',
+                        borderColor: 'var(--color-primary)',
                       },
                     }
                   }}
@@ -1406,7 +1406,7 @@ const AddPropertyPageContent: React.FC = () => {
                           ...formData.nearbyLocalities,
                           hasSchool: e.target.checked
                         })}
-                        sx={{ color: '#78CADC' }}
+                        sx={{ color: 'var(--color-primary)' }}
                       />
                     }
                     label="School Nearby"
@@ -1425,21 +1425,21 @@ const AddPropertyPageContent: React.FC = () => {
                       sx={{
                         mt: 1,
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1457,7 +1457,7 @@ const AddPropertyPageContent: React.FC = () => {
                           ...formData.nearbyLocalities,
                           hasHospital: e.target.checked
                         })}
-                        sx={{ color: '#78CADC' }}
+                        sx={{ color: 'var(--color-primary)' }}
                       />
                     }
                     label="Hospital Nearby"
@@ -1476,21 +1476,21 @@ const AddPropertyPageContent: React.FC = () => {
                       sx={{
                         mt: 1,
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1508,7 +1508,7 @@ const AddPropertyPageContent: React.FC = () => {
                           ...formData.nearbyLocalities,
                           hasMall: e.target.checked
                         })}
-                        sx={{ color: '#78CADC' }}
+                        sx={{ color: 'var(--color-primary)' }}
                       />
                     }
                     label="Mall Nearby"
@@ -1527,21 +1527,21 @@ const AddPropertyPageContent: React.FC = () => {
                       sx={{
                         mt: 1,
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1559,7 +1559,7 @@ const AddPropertyPageContent: React.FC = () => {
                           ...formData.nearbyLocalities,
                           hasPark: e.target.checked
                         })}
-                        sx={{ color: '#78CADC' }}
+                        sx={{ color: 'var(--color-primary)' }}
                       />
                     }
                     label="Park Nearby"
@@ -1578,21 +1578,21 @@ const AddPropertyPageContent: React.FC = () => {
                       sx={{
                         mt: 1,
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1610,7 +1610,7 @@ const AddPropertyPageContent: React.FC = () => {
                           ...formData.nearbyLocalities,
                           hasTransport: e.target.checked
                         })}
-                        sx={{ color: '#78CADC' }}
+                        sx={{ color: 'var(--color-primary)' }}
                       />
                     }
                     label="Public Transport Nearby"
@@ -1629,21 +1629,21 @@ const AddPropertyPageContent: React.FC = () => {
                       sx={{
                         mt: 1,
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1663,7 +1663,7 @@ const AddPropertyPageContent: React.FC = () => {
                   <Checkbox
                     checked={sectionVisibility.projectDetails}
                     onChange={(e) => setSectionVisibility(prev => ({ ...prev, projectDetails: e.target.checked }))}
-                    sx={{ color: '#78CADC' }}
+                    sx={{ color: 'var(--color-primary)' }}
                   />
                 }
                 label="Show this section"
@@ -1685,21 +1685,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1717,21 +1717,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1751,21 +1751,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1783,21 +1783,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1818,21 +1818,21 @@ const AddPropertyPageContent: React.FC = () => {
                       size={isMobile ? 'small' : 'medium'}
                       sx={{
                         '& .MuiInputBase-root': {
-                          color: '#fff',
+                          color: 'var(--color-text-primary)',
                           fontFamily: '"Poppins", sans-serif'
                         },
                         '& .MuiInputLabel-root': {
-                          color: '#78CADC',
+                          color: 'var(--color-primary)',
                         },
                         '& .MuiOutlinedInput-root': {
                           '& fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                           '&:hover fieldset': {
-                            borderColor: '#5fb4c9',
+                            borderColor: 'var(--color-primary-hover)',
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: '#78CADC',
+                            borderColor: 'var(--color-primary)',
                           },
                         },
                       }}
@@ -1852,7 +1852,7 @@ const AddPropertyPageContent: React.FC = () => {
                   <Checkbox
                     checked={sectionVisibility.approvals}
                     onChange={(e) => setSectionVisibility(prev => ({ ...prev, approvals: e.target.checked }))}
-                    sx={{ color: '#78CADC' }}
+                    sx={{ color: 'var(--color-primary)' }}
                   />
                 }
                 label="Show this section"
@@ -1866,7 +1866,7 @@ const AddPropertyPageContent: React.FC = () => {
                 </Typography>
                 
                 {formData.approvals.map((approval, index) => (
-                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #78CADC', borderRadius: '8px' }}>
+                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid var(--color-primary)', borderRadius: '8px' }}>
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs={12} sm={4}>
                         <TextField
@@ -1881,21 +1881,21 @@ const AddPropertyPageContent: React.FC = () => {
                           size={isMobile ? 'small' : 'medium'}
                           sx={{
                             '& .MuiInputBase-root': {
-                              color: '#fff',
+                              color: 'var(--color-text-primary)',
                               fontFamily: '"Poppins", sans-serif'
                             },
                             '& .MuiInputLabel-root': {
-                              color: '#78CADC',
+                              color: 'var(--color-primary)',
                             },
                             '& .MuiOutlinedInput-root': {
                               '& fieldset': {
-                                borderColor: '#78CADC',
+                                borderColor: 'var(--color-primary)',
                               },
                               '&:hover fieldset': {
-                                borderColor: '#5fb4c9',
+                                borderColor: 'var(--color-primary-hover)',
                               },
                               '&.Mui-focused fieldset': {
-                                borderColor: '#78CADC',
+                                borderColor: 'var(--color-primary)',
                               },
                             },
                           }}
@@ -1914,21 +1914,21 @@ const AddPropertyPageContent: React.FC = () => {
                           size={isMobile ? 'small' : 'medium'}
                           sx={{
                             '& .MuiInputBase-root': {
-                              color: '#fff',
+                              color: 'var(--color-text-primary)',
                               fontFamily: '"Poppins", sans-serif'
                             },
                             '& .MuiInputLabel-root': {
-                              color: '#78CADC',
+                              color: 'var(--color-primary)',
                             },
                             '& .MuiOutlinedInput-root': {
                               '& fieldset': {
-                                borderColor: '#78CADC',
+                                borderColor: 'var(--color-primary)',
                               },
                               '&:hover fieldset': {
-                                borderColor: '#5fb4c9',
+                                borderColor: 'var(--color-primary-hover)',
                               },
                               '&.Mui-focused fieldset': {
-                                borderColor: '#78CADC',
+                                borderColor: 'var(--color-primary)',
                               },
                             },
                           }}
@@ -1949,21 +1949,21 @@ const AddPropertyPageContent: React.FC = () => {
                           size={isMobile ? 'small' : 'medium'}
                           sx={{
                             '& .MuiInputBase-root': {
-                              color: '#fff',
+                              color: 'var(--color-text-primary)',
                               fontFamily: '"Poppins", sans-serif'
                             },
                             '& .MuiInputLabel-root': {
-                              color: '#78CADC',
+                              color: 'var(--color-primary)',
                             },
                             '& .MuiOutlinedInput-root': {
                               '& fieldset': {
-                                borderColor: '#78CADC',
+                                borderColor: 'var(--color-primary)',
                               },
                               '&:hover fieldset': {
-                                borderColor: '#5fb4c9',
+                                borderColor: 'var(--color-primary-hover)',
                               },
                               '&.Mui-focused fieldset': {
-                                borderColor: '#78CADC',
+                                borderColor: 'var(--color-primary)',
                               },
                             },
                           }}
@@ -1975,7 +1975,7 @@ const AddPropertyPageContent: React.FC = () => {
                             const newApprovals = formData.approvals.filter((_, i) => i !== index);
                             handleInputChange('approvals', newApprovals);
                           }}
-                          sx={{ color: '#ff6b6b' }}
+                          sx={{ color: 'var(--color-danger)' }}
                         >
                           <Delete />
                         </IconButton>
@@ -1991,10 +1991,10 @@ const AddPropertyPageContent: React.FC = () => {
                   }}
                   startIcon={<Add />}
                   sx={{
-                    color: '#78CADC',
-                    borderColor: '#78CADC',
+                    color: 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
                     '&:hover': {
-                      borderColor: '#5fb4c9',
+                      borderColor: 'var(--color-primary-hover)',
                       backgroundColor: 'rgba(120, 202, 220, 0.1)'
                     }
                   }}
@@ -2039,7 +2039,7 @@ const AddPropertyPageContent: React.FC = () => {
                         height: 120,
                         objectFit: 'cover',
                         borderRadius: '8px',
-                        border: '2px solid #78CADC'
+                        border: '2px solid var(--color-primary)'
                       }}
                     />
                     <IconButton
@@ -2069,11 +2069,11 @@ const AddPropertyPageContent: React.FC = () => {
                 size={isMobile ? 'small' : 'medium'}
                 disabled={imagePreviews.length >= 10}
                 sx={{
-                  backgroundColor: '#78CADC',
-                  color: '#0B1011',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-surface)',
                   fontWeight: 600,
                   '&:hover': {
-                    backgroundColor: '#5fb4c9'
+                    backgroundColor: 'var(--color-primary-hover)'
                   },
                   '&:disabled': {
                     backgroundColor: 'rgba(120, 202, 220, 0.5)'
@@ -2103,7 +2103,7 @@ const AddPropertyPageContent: React.FC = () => {
                   <Checkbox
                     checked={sectionVisibility.floorPlans}
                     onChange={(e) => setSectionVisibility(prev => ({ ...prev, floorPlans: e.target.checked }))}
-                    sx={{ color: '#78CADC' }}
+                    sx={{ color: 'var(--color-primary)' }}
                   />
                 }
                 label="Show this section"
@@ -2136,10 +2136,10 @@ const AddPropertyPageContent: React.FC = () => {
                     component="span"
                     startIcon={<CloudUpload />}
                     sx={{
-                      color: '#78CADC',
-                      borderColor: '#78CADC',
+                      color: 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)',
                       '&:hover': {
-                        borderColor: '#5fb4c9',
+                        borderColor: 'var(--color-primary-hover)',
                         backgroundColor: 'rgba(120, 202, 220, 0.1)'
                       }
                     }}
@@ -2161,7 +2161,7 @@ const AddPropertyPageContent: React.FC = () => {
                   <Checkbox
                     checked={sectionVisibility.brochure}
                     onChange={(e) => setSectionVisibility(prev => ({ ...prev, brochure: e.target.checked }))}
-                    sx={{ color: '#78CADC' }}
+                    sx={{ color: 'var(--color-primary)' }}
                   />
                 }
                 label="Show this section"
@@ -2193,10 +2193,10 @@ const AddPropertyPageContent: React.FC = () => {
                     component="span"
                     startIcon={<CloudUpload />}
                     sx={{
-                      color: '#78CADC',
-                      borderColor: '#78CADC',
+                      color: 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)',
                       '&:hover': {
-                        borderColor: '#5fb4c9',
+                        borderColor: 'var(--color-primary-hover)',
                         backgroundColor: 'rgba(120, 202, 220, 0.1)'
                       }
                     }}
@@ -2236,10 +2236,10 @@ const AddPropertyPageContent: React.FC = () => {
                   component="span"
                   startIcon={<CloudUpload />}
                   sx={{
-                    color: '#78CADC',
-                    borderColor: '#78CADC',
+                    color: 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
                     '&:hover': {
-                      borderColor: '#5fb4c9',
+                      borderColor: 'var(--color-primary-hover)',
                       backgroundColor: 'rgba(120, 202, 220, 0.1)'
                     }
                   }}
@@ -2262,7 +2262,7 @@ const AddPropertyPageContent: React.FC = () => {
                     type="submit"
                 size="large"
                 disabled={loading || isSubmitting}
-                startIcon={(loading || isSubmitting) ? <CircularProgress size={20} sx={{ color: '#0B1011' }} /> : null}
+                startIcon={(loading || isSubmitting) ? <CircularProgress size={20} sx={{ color: 'var(--color-surface)' }} /> : null}
                     sx={{
                   flex: 1,
                   py: 1.5,
@@ -2280,12 +2280,12 @@ const AddPropertyPageContent: React.FC = () => {
                 sx={{ 
                   flex: 1,
                   py: 1.5,
-                  color: '#78CADC',
-                  borderColor: '#78CADC',
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   fontWeight: 600,
                   '&:hover': {
                     backgroundColor: 'rgba(120, 202, 220, 0.1)',
-                    borderColor: '#78CADC'
+                    borderColor: 'var(--color-primary)'
                   }
                 }}
                 onClick={() => router.push('/properties')}
@@ -2314,9 +2314,9 @@ const AddPropertyPageContent: React.FC = () => {
         }
         sx={{
           '& .MuiSnackbarContent-root': {
-            backgroundColor: '#0B1011',
-            color: '#fff',
-            border: '2px solid #78CADC',
+            backgroundColor: 'var(--color-surface)',
+            color: 'var(--color-text-primary)',
+            border: '2px solid var(--color-primary)',
             fontFamily: '"Poppins", sans-serif'
           }
         }}
@@ -2339,7 +2339,7 @@ const AddPropertyPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+        background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-accent) 100%)'
       }}>
         <Typography>Loading...</Typography>
       </Box>
