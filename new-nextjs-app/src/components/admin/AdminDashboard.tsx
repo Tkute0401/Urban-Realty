@@ -642,7 +642,7 @@ const AdminDashboard: React.FC = () => {
           )}
 
           {selectedTab === 1 && (
-            <RecentPropertiesTable properties={stats.recent.properties as any} />
+            <RecentPropertiesTable />
           )}
 
           {selectedTab === 2 && (
