@@ -83,48 +83,23 @@ const PropertyList: React.FC<PropertyListProps> = ({
 
   return (
     <Box sx={{ 
-      background: '#08171A',
-      minHeight: '100vh',
+      maxWidth: '1400px', 
+      mx: 'auto', 
+      px: { xs: 2, md: 4 },
       py: 4
     }}>
-      <Box sx={{ maxWidth: '1200px', mx: 'auto', px: { xs: 2, sm: 3 } }}>
-        {/* Results Header */}
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              color: 'white', 
-              fontWeight: 'bold',
-              mb: 1,
-              fontSize: { xs: '24px', sm: '32px' }
-            }}
-          >
-            Properties Found
-          </Typography>
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontSize: { xs: '14px', sm: '16px' }
-            }}
-          >
-            {properties.length} {properties.length === 1 ? 'property' : 'properties'} available
-          </Typography>
-        </Box>
-
-        {/* Properties Grid */}
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-          {properties.map((property, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={property._id}>
-              <PropertyCard 
-                property={property}
-                index={index}
-                onClick={onPropertyClick}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
+      {/* Properties Grid */}
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        {properties.map((property, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={property._id}>
+            <PropertyCard 
+              property={property}
+              index={index}
+              onClick={onPropertyClick}
+            />
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 };
