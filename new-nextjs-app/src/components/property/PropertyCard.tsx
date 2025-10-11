@@ -1,16 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { HeartIcon as HeartOutline, MapPinIcon, StarIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartFilled } from '@heroicons/react/24/solid';
-import { HomeOutlined, LocalHotelOutlined, BathtubOutlined } from '@mui/icons-material';
+import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardMedia, Typography, Box, Chip, IconButton } from '@mui/material';
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartFilled } from '@heroicons/react/24/solid';
+import { LocationOn, Bed, Bathroom, SquareFoot } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
-import { useContext } from 'react';
 import { ThemeContext } from '@/contexts/ThemeProvider';
-import { Tooltip } from '@mui/material';
-import { toast } from 'react-toastify';
 import http from '@/lib/services/http';
 
 interface Property {
@@ -28,11 +25,32 @@ interface Property {
     street?: string;
     city: string;
     state: string;
+    zipCode?: string;
   };
-  images?: Array<{ url: string }>;
+  images?: Array<{ url: string; alt?: string; caption?: string }>;
   projectDetails?: {
     launchDate?: string;
+    possessionDate?: string;
+    developer?: string;
   };
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+  amenities?: string[];
+  highlights?: string[];
+  floorPlan?: {
+    image: string;
+    description: string;
+  };
+  nearbyPlaces?: Array<{
+    name: string;
+    type: string;
+    distance: string;
+  }>;
+  similarProperties?: Property[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface PropertyCardProps {
@@ -58,6 +76,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  const isDark = theme === 'dark';
+
   // Client-side mounting check
   useEffect(() => {
     setMounted(true);
@@ -82,267 +102,239 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     checkFavoriteStatus();
   }, [mounted, user, property?._id]);
 
-  const handleClick = () => {
-    router.push(`/properties/${property._id}`);
-    if (onClick) {
-      onClick(property);
-    }
-  };
-
-  const handleFavoriteClick = async (e: React.MouseEvent) => {
+  // Handle favorite toggle
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
     if (!user) {
       router.push('/login');
-      toast.info('Please login to save favorites');
       return;
     }
 
-    setLoadingFavorite(true);
+    if (!mounted) return;
+
     try {
+      setLoadingFavorite(true);
+      
       if (isFavorite) {
         await http.delete(`/api/v1/auth/favorites/${property._id}`);
-        toast.success('Removed from favorites');
+        setIsFavorite(false);
       } else {
-        await http.put(`/api/v1/auth/favorites/${property._id}`, {});
-        toast.success('Added to favorites');
+        await http.put(`/api/v1/auth/favorites/${property._id}`);
+        setIsFavorite(true);
       }
-      setIsFavorite(!isFavorite);
     } catch (err) {
-      console.error('Error updating favorite:', err);
-      toast.error('Failed to update favorites');
+      console.error('Error toggling favorite:', err);
     } finally {
       setLoadingFavorite(false);
     }
   };
 
+  // Handle card click
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(property);
+    } else {
+      router.push(`/properties/${property._id}`);
+    }
+  };
+
+  // Format price
   const formatPrice = (price: number) => {
-    if (!price) return 'Price not available';
-    if (price >= 10000000) {
-      return `₹ ${(price / 10000000).toFixed(2)} Cr`;
-    } else if (price >= 100000) {
-      return `₹ ${(price / 100000).toFixed(2)} Lac`;
-    }
-    return `₹ ${price.toLocaleString()}`;
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
   };
-
-  const getPropertyTypeIcon = () => {
-    switch (property.type?.toLowerCase()) {
-      case 'apartment':
-        return <HomeOutlined className="text-[#78CADC] text-sm" />;
-      case 'villa':
-        return <HomeOutlined className="text-[#78CADC] text-sm" />;
-      case 'land':
-        return <HomeOutlined className="text-[#78CADC] text-sm" />;
-      case 'commercial':
-        return <HomeOutlined className="text-[#78CADC] text-sm" />;
-      default:
-        return <HomeOutlined className="text-[#78CADC] text-sm" />;
-    }
-  };
-
-  const isDark = theme === 'dark';
 
   // Show loading state until mounted
   if (!mounted) {
     return (
-      <div className="relative rounded-xl sm:rounded-3xl overflow-hidden border border-[#78CADC]/50 bg-white animate-pulse">
-        <div className="aspect-video bg-gray-200" />
-        <div className="p-3 sm:p-5">
-          <div className="h-4 bg-gray-200 rounded mb-2" />
-          <div className="h-3 bg-gray-200 rounded mb-3" />
-          <div className="h-3 bg-gray-200 rounded" />
-        </div>
-      </div>
+      <Card sx={{ 
+        height: '100%',
+        background: isDark ? '#1a202c' : '#ffffff',
+        borderRadius: 3,
+        overflow: 'hidden',
+        border: `1px solid ${isDark ? '#2d3748' : '#e2e8f0'}`,
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }}>
+        <Box sx={{ aspectRatio: '16/10', background: '#f3f4f6' }} />
+        <CardContent sx={{ p: 3 }}>
+          <Box sx={{ height: 20, background: '#e5e7eb', borderRadius: 1, mb: 2 }} />
+          <Box sx={{ height: 16, background: '#e5e7eb', borderRadius: 1, mb: 2, width: '60%' }} />
+          <Box sx={{ height: 14, background: '#e5e7eb', borderRadius: 1, mb: 2 }} />
+          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            <Box sx={{ height: 24, background: '#e5e7eb', borderRadius: 1, width: 60 }} />
+            <Box sx={{ height: 24, background: '#e5e7eb', borderRadius: 1, width: 60 }} />
+          </Box>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <motion.div
-      id={id}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-[#78CADC]/20 group
-        ${isSelected ? 'border-2 border-[#78CADC] shadow-lg shadow-[#78CADC]/30' : 'border-[#78CADC]/50'}
-        ${isDark ? 'bg-[#0B1011]' : 'bg-white'}`}
-      onClick={handleClick}
-      whileHover={{ y: -5 }}
+    <Card 
+      sx={{ 
+        height: '100%',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        background: isDark ? '#1a202c' : '#ffffff',
+        borderRadius: 3,
+        overflow: 'hidden',
+        border: `1px solid ${isDark ? '#2d3748' : '#e2e8f0'}`,
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        '&:hover': {
+          transform: 'translateY(-8px)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          borderColor: '#78CADC'
+        }
+      }}
+      onClick={handleCardClick}
     >
-      {/* Status Badge */}
-      {property.status && (
-        <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-md text-xs font-bold ${
-          property.status === 'For Sale' ? 'bg-[#78CADC] text-[#0B1011]' : 'bg-[#e74c3c] text-white'
-        }`}>
-          {property.status}
-        </div>
-      )}
-
-      {/* Image Section */}
-      <div className="relative aspect-video">
-        {property.images?.length > 0 ? (
-          <>
-            {!imageLoaded && (
-              <div className={`absolute inset-0 flex items-center justify-center ${
-                isDark ? 'bg-gradient-to-br from-[#0B1011] to-[#1a2a32]' : 'bg-gradient-to-br from-gray-100 to-gray-200'
-              }`}>
-                <div className="w-8 h-8 border-2 border-transparent border-t-[#78CADC] border-l-[#78CADC] rounded-full animate-spin" />
-              </div>
-            )}
-            <img 
-              src={property.images[0].url} 
-              alt={property.title} 
-              className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-              loading="lazy"
-              onLoad={() => setImageLoaded(true)}
-            />
-          </>
-        ) : (
-          <div className={`w-full h-full flex items-center justify-center ${
-            isDark ? 'bg-gradient-to-br from-[#0B1011] to-[#1a2a32]' : 'bg-gradient-to-br from-gray-100 to-gray-200'
-          }`}>
-            <HomeOutlined className="text-[#78CADC]/50 text-2xl" />
-          </div>
-        )}
+      {/* Image */}
+      <Box sx={{ position: 'relative', aspectRatio: '16/10' }}>
+        <CardMedia
+          component="img"
+          image={property.images?.[0]?.url || '/placeholder-property.jpg'}
+          alt={property.title}
+          sx={{ 
+            height: '100%',
+            objectFit: 'cover',
+            transition: 'transform 0.3s ease',
+            '&:hover': {
+              transform: 'scale(1.05)'
+            }
+          }}
+          onLoad={() => setImageLoaded(true)}
+        />
         
         {/* Favorite Button */}
-        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
-          <button 
-            className="absolute top-2 sm:top-4 right-2 sm:right-4 p-1.5 sm:p-2 bg-black/90 rounded-full hover:bg-black transition-all
-                      backdrop-blur-sm shadow-md group-hover:opacity-100"
-            onClick={handleFavoriteClick}
-            disabled={loadingFavorite}
-          >
-            {loadingFavorite ? (
-              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-transparent border-t-white border-l-white rounded-full animate-spin" />
-            ) : isFavorite ? (
-              <HeartFilled className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 transition-all" />
-            ) : (
-              <HeartOutline className="w-4 h-4 sm:w-5 sm:h-5 text-white hover:text-red-500 transition-all" />
-            )}
-          </button>
-        </Tooltip>
-      </div>
+        <IconButton
+          onClick={handleFavoriteToggle}
+          disabled={loadingFavorite}
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(8px)',
+            '&:hover': {
+              background: 'rgba(255, 255, 255, 1)',
+            },
+            width: 40,
+            height: 40,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          {isFavorite ? (
+            <HeartFilled className="w-5 h-5 text-red-500" />
+          ) : (
+            <HeartOutline className="w-5 h-5 text-gray-600" />
+          )}
+        </IconButton>
 
-      {/* Content Section */}
-      <div className="p-3 sm:p-5">
-        {/* Rating and Type */}
-        <div className="flex justify-between items-center mb-2 sm:mb-3">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <StarIcon key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
-            ))}
-            <span className="text-xs sm:text-sm text-gray-400 ml-1">5.0 (??)</span>
-          </div>
-          <div className="flex items-center gap-1">
-            {getPropertyTypeIcon()}
-            <span className="text-xs sm:text-sm text-[#78CADC] capitalize">
-              {property.type || 'Property'}
-            </span>
-          </div>
-        </div>
-        
+        {/* Status Badge */}
+        <Chip
+          label={property.status}
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 12,
+            left: 12,
+            background: property.status === 'sale' ? '#10b981' : '#3b82f6',
+            color: 'white',
+            fontWeight: 'bold',
+            textTransform: 'capitalize',
+            fontSize: '0.75rem'
+          }}
+        />
+      </Box>
+
+      <CardContent sx={{ p: 3 }}>
         {/* Title */}
-        <h3 className={`font-poppins text-lg sm:text-xl font-bold mb-1 sm:mb-2 line-clamp-1 ${
-          isDark ? 'text-white' : 'text-gray-900'
-        }`}>
-          {property.buildingName || property.title}
-        </h3>
+        <Typography 
+          variant="h6" 
+          component="h3" 
+          sx={{ 
+            fontWeight: 'bold', 
+            mb: 1,
+            color: isDark ? '#ffffff' : '#1a202c',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontSize: '1.1rem'
+          }}
+        >
+          {property.title}
+        </Typography>
         
-        {/* Location */}
-        <div className="flex items-center gap-1 sm:gap-2 text-[#78CADC] mb-2 sm:mb-3">
-          <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span className="font-poppins text-xs sm:text-sm line-clamp-1">
-            {property.address?.street && `${property.address.street}, `}
-            {property.address?.city}, {property.address?.state}
-          </span>
-        </div>
-        
-        {/* Description */}
-        <p className={`text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 ${
-          isDark ? 'text-gray-400' : 'text-gray-600'
-        }`}>
-          {property.description || 'No description available'}
-        </p>
-        
-        {/* Features */}
-        <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
-          <Tooltip title="Area" arrow>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <HomeOutlined className="text-[#78CADC] text-sm" />
-              <span className={`text-xs sm:text-sm ${
-                isDark ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
-              </span>
-            </div>
-          </Tooltip>
-          
-          <Tooltip title="Bedrooms" arrow>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <LocalHotelOutlined className="text-[#78CADC] text-sm" />
-              <span className={`text-xs sm:text-sm ${
-                isDark ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                {property.bedrooms || '0'} Bed
-              </span>
-            </div>
-          </Tooltip>
-          
-          <Tooltip title="Bathrooms" arrow>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <BathtubOutlined className="text-[#78CADC] text-sm" />
-              <span className={`text-xs sm:text-sm ${
-                isDark ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                {property.bathrooms || '0'} Bath
-              </span>
-            </div>
-          </Tooltip>
-        </div>
-        
-        {/* Price and CTA */}
-        <div className={`pt-3 border-t ${
-          isDark ? 'border-gray-800' : 'border-gray-200'
-        }`}>
-          <div className="flex justify-between items-center mb-2 sm:mb-3">
-            <p className={`text-xl sm:text-2xl font-bold ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              {formatPrice(property.price)}
-              {property.status === 'For Rent' && <span className="text-sm text-gray-400">/mo</span>}
-            </p>
-            {property.projectDetails?.launchDate && (
-              <span className="text-xs bg-[#78CADC]/10 text-[#78CADC] px-2 py-1 rounded">
-                {new Date(property.projectDetails.launchDate) > new Date() ? 
-                  `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
-                  'Ready to Move'}
-              </span>
-            )}
-          </div>
-          
-          <motion.button 
-            className="w-full bg-transparent border border-[#78cadc] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[#78cadc]/20 transition-all text-xs sm:text-sm
-                      group-hover:bg-[#78cadc] group-hover:text-[#0B1011] group-hover:font-bold"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="font-poppins">View Details</span>
-          </motion.button>
-        </div>
-      </div>
+        {/* Price */}
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            color: '#78CADC', 
+            fontWeight: 'bold', 
+            mb: 2,
+            fontSize: '1.25rem'
+          }}
+        >
+          {formatPrice(property.price)}
+        </Typography>
 
-      {/* Highlight animation when selected */}
-      {isSelected && (
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 border-2 border-[#78CADC] rounded-xl sm:rounded-3xl opacity-0 animate-ping-slow" />
-        </div>
-      )}
-    </motion.div>
+        {/* Location */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <LocationOn sx={{ fontSize: 18, color: '#78CADC', mr: 1 }} />
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: isDark ? '#a0aec0' : '#4a5568',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              flex: 1
+            }}
+          >
+            {property.address?.street}, {property.address?.city}
+          </Typography>
+        </Box>
+
+        {/* Property Details */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Bed sx={{ fontSize: 16, color: '#78CADC' }} />
+            <Typography variant="body2" sx={{ color: isDark ? '#a0aec0' : '#4a5568' }}>
+              {property.bedrooms}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Bathroom sx={{ fontSize: 16, color: '#78CADC' }} />
+            <Typography variant="body2" sx={{ color: isDark ? '#a0aec0' : '#4a5568' }}>
+              {property.bathrooms}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <SquareFoot sx={{ fontSize: 16, color: '#78CADC' }} />
+            <Typography variant="body2" sx={{ color: isDark ? '#a0aec0' : '#4a5568' }}>
+              {property.area} sq ft
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Property Type */}
+        <Chip 
+          label={property.type} 
+          size="small" 
+          sx={{ 
+            background: '#78CADC', 
+            color: 'white',
+            textTransform: 'capitalize',
+            fontWeight: 'bold',
+            fontSize: '0.75rem'
+          }} 
+        />
+      </CardContent>
+    </Card>
   );
 };
 
