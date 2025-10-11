@@ -3,14 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useProperties } from "@/contexts/PropertiesContext";
 import PropertyCard from "@/components/property/PropertyCard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const PropertiesSection = () => {
   console.log('🔧 PropertiesSection rendering...');
   
+  const [mounted, setMounted] = useState(false);
+  
   useEffect(() => {
+    setMounted(true);
     console.log('🔧 PropertiesSection mounted on client side!');
   }, []);
+  
   const { featuredProperties, getFeaturedProperties } = useProperties();
   const router = useRouter();
 
@@ -23,15 +27,31 @@ const PropertiesSection = () => {
       }
     };
     
-    // Only fetch if we don't have featured properties yet
-    if (featuredProperties.length === 0) {
+    // Only fetch if we don't have featured properties yet and component is mounted
+    if (mounted && featuredProperties.length === 0) {
       fetchFeaturedProperties();
     }
-  }, []); // Remove getFeaturedProperties from dependency array
+  }, [mounted]); // Remove getFeaturedProperties from dependency array
 
   const handleViewAll = () => {
     router.push('/properties');
   };
+
+  // Show loading state until mounted
+  if (!mounted) {
+    return (
+      <section className="py-12 sm:py-20 bg-[var(--color-surface)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded mb-8"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 sm:py-20 bg-[var(--color-surface)]">

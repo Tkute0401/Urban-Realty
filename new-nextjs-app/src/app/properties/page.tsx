@@ -88,6 +88,7 @@ const PropertiesPageContent: React.FC = () => {
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
+  const [mounted, setMounted] = useState(false);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +112,11 @@ const PropertiesPageContent: React.FC = () => {
   const [totalProperties, setTotalProperties] = useState(0);
 
   const isDark = theme === 'dark';
+
+  // Client-side mounting check
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load properties from API
   const loadProperties = useCallback(async () => {
@@ -151,28 +157,32 @@ const PropertiesPageContent: React.FC = () => {
 
   // Load properties on mount and when filters change
   useEffect(() => {
-    loadProperties();
-  }, [loadProperties]);
+    if (mounted) {
+      loadProperties();
+    }
+  }, [loadProperties, mounted]);
 
   // Initialize filters from URL params
   useEffect(() => {
-    const search = searchParams.get('search') || '';
-    const type = searchParams.get('type') || '';
-    const status = searchParams.get('status') || '';
-    const city = searchParams.get('city') || '';
-    const minPrice = parseInt(searchParams.get('minPrice') || '0');
-    const maxPrice = parseInt(searchParams.get('maxPrice') || '100000000');
+    if (mounted) {
+      const search = searchParams.get('search') || '';
+      const type = searchParams.get('type') || '';
+      const status = searchParams.get('status') || '';
+      const city = searchParams.get('city') || '';
+      const minPrice = parseInt(searchParams.get('minPrice') || '0');
+      const maxPrice = parseInt(searchParams.get('maxPrice') || '100000000');
 
-    setFilters(prev => ({
-      ...prev,
-      search,
-      type,
-      status,
-      city,
-      minPrice,
-      maxPrice
-    }));
-  }, [searchParams]);
+      setFilters(prev => ({
+        ...prev,
+        search,
+        type,
+        status,
+        city,
+        minPrice,
+        maxPrice
+      }));
+    }
+  }, [searchParams, mounted]);
 
   const handleFilterChange = (key: keyof Filters, value: any) => {
     setFilters(prev => ({
@@ -418,6 +428,21 @@ const PropertiesPageContent: React.FC = () => {
       </Box>
     </Paper>
   );
+
+  // Show loading state until mounted
+  if (!mounted) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{

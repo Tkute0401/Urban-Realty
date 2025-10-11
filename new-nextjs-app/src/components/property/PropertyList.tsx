@@ -55,7 +55,28 @@ const PropertyList: React.FC<PropertyListProps> = ({
   emptyMessage = "No properties found"
 }) => {
   const { theme } = useContext(ThemeContext);
+  const [mounted, setMounted] = useState(false);
   const isDark = theme === 'dark';
+
+  // Client-side mounting check
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Show loading state until mounted
+  if (!mounted) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        minHeight: '400px',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+      }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
 
   if (loading) {
     return (

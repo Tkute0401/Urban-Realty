@@ -40,11 +40,14 @@ const MoonIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
 );
 
 const HeroSection = () => {
+  const [mounted, setMounted] = useState(false);
+  
   if (process.env.NODE_ENV === 'development') {
     console.log('🔧 HeroSection rendering...');
   }
   
   React.useEffect(() => {
+    setMounted(true);
     if (process.env.NODE_ENV === 'development') {
       console.log('🔧 HeroSection mounted on client side!');
     }
@@ -202,6 +205,19 @@ const HeroSection = () => {
   const visibleLocalities = Array.isArray(currentCityLocalities) 
     ? currentCityLocalities.slice(localityStartIndex, localityStartIndex + visibleLocalitiesCount)
     : [];
+
+  // Show loading state until mounted
+  if (!mounted) {
+    return (
+      <section className="relative h-[70vh] sm:h-screen flex items-center justify-center overflow-visible z-0">
+        <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+        <div className="relative z-10 text-center">
+          <div className="h-8 bg-gray-300 rounded mb-4 w-64 mx-auto"></div>
+          <div className="h-4 bg-gray-300 rounded w-48 mx-auto"></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative h-[70vh] sm:h-screen flex items-center justify-center overflow-visible z-0">

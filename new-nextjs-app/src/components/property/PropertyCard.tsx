@@ -53,14 +53,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const router = useRouter();
   const { user } = useAuth();
   const { theme } = useContext(ThemeContext);
+  const [mounted, setMounted] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // Client-side mounting check
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Check if property is in favorites when component mounts or user changes
   useEffect(() => {
     const checkFavoriteStatus = async () => {
-      if (user && property?._id) {
+      if (mounted && user && property?._id) {
         try {
           const response = await http.get(`/api/v1/auth/favorites/${property._id}/status`);
           const data = response.data;
@@ -74,7 +80,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     };
     
     checkFavoriteStatus();
-  }, [user, property?._id]);
+  }, [mounted, user, property?._id]);
 
   const handleClick = () => {
     router.push(`/properties/${property._id}`);
@@ -136,6 +142,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   const isDark = theme === 'dark';
+
+  // Show loading state until mounted
+  if (!mounted) {
+    return (
+      <div className="relative rounded-xl sm:rounded-3xl overflow-hidden border border-[#78CADC]/50 bg-white animate-pulse">
+        <div className="aspect-video bg-gray-200" />
+        <div className="p-3 sm:p-5">
+          <div className="h-4 bg-gray-200 rounded mb-2" />
+          <div className="h-3 bg-gray-200 rounded mb-3" />
+          <div className="h-3 bg-gray-200 rounded" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
