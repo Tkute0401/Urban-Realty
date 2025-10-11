@@ -231,7 +231,7 @@ const DeveloperProfileClient = () => {
         name: developerProfile.name || '',
         description: developerProfile.description || '',
         website: developerProfile.website || '',
-        foundedYear: developerProfile.foundedYear || '',
+        foundedYear: developerProfile.foundedYear ? developerProfile.foundedYear.toString() : '',
         headquarters: {
           city: developerProfile.headquarters?.city || '',
           state: developerProfile.headquarters?.state || '',
