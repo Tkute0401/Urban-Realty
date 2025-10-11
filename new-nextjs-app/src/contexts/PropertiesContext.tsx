@@ -211,7 +211,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setPagination(cache[cacheKey].pagination);
       return;
     }
-
+  
     try {
       setLoading(true);
       setError(null);
@@ -224,13 +224,13 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
             if (value.length > 0) {
               queryParams.append(key, value.join(','));
             }
-          } else {
+      } else {
             queryParams.append(key, value.toString());
           }
         }
       });
 
-      const url = `/api/properties?${queryParams.toString()}`;
+      const url = `/api/v1/properties?${queryParams.toString()}`;
       console.log('🔧 PropertiesContext: Making API request to:', url);
       
       const response = await fetch(url);
@@ -283,7 +283,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
       
-      const url = '/api/properties/featured';
+      const url = '/api/v1/properties/featured';
       console.log('🔧 PropertiesContext: Making featured properties API request to:', url);
       
       const response = await fetch(url);
@@ -324,8 +324,8 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         setProperty(cache[id]);
         return cache[id];
       }
-
-      const response = await fetch(`/api/properties/${id}`);
+  
+      const response = await fetch(`/api/v1/properties/${id}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -366,7 +366,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         }
       });
 
-      const response = await fetch(`/api/developers?${queryParams.toString()}`);
+      const response = await fetch(`/api/v1/developers?${queryParams.toString()}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -396,7 +396,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/agent/properties?agentId=${user.id}`);
+      const response = await fetch(`/api/v1/agent/properties?agentId=${user.id}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -457,7 +457,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
         formData.append('virtualTour', extras.virtualTour);
       }
 
-      const response = await fetch('/api/properties', {
+      const response = await fetch('/api/v1/properties', {
         method: 'POST',
         body: formData
       });

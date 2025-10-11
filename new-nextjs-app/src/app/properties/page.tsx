@@ -135,7 +135,7 @@ const PropertiesPageContent: React.FC = () => {
       queryParams.append('page', currentPage.toString());
       queryParams.append('limit', '12');
 
-      const response = await fetch(`/api/properties?${queryParams.toString()}`);
+      const response = await fetch(`/api/v1/properties?${queryParams.toString()}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch properties');

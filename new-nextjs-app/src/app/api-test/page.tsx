@@ -47,9 +47,9 @@ export default function ApiTestPage() {
     setLoading(true);
     setTestResults({});
     
-    await testApiEndpoint('/api/properties/featured', 'Featured Properties');
-    await testApiEndpoint('/api/properties?page=1&limit=5', 'Properties List');
-    await testApiEndpoint('/api/properties/1', 'Single Property');
+    await testApiEndpoint('/api/v1/properties/featured', 'Featured Properties');
+    await testApiEndpoint('/api/v1/properties?page=1&limit=5', 'Properties List');
+    await testApiEndpoint('/api/v1/properties/1', 'Single Property');
     
     setLoading(false);
   };

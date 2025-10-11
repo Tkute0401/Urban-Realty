@@ -128,7 +128,7 @@ const PropertyDetailsPageContent: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/properties/${params.id}`);
+        const response = await fetch(`/api/v1/properties/${params.id}`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -141,7 +141,7 @@ const PropertyDetailsPageContent: React.FC = () => {
         setProperty(data);
 
         // Check favorite status
-        const favoriteResponse = await fetch(`/api/auth/favorites/${params.id}/status`);
+        const favoriteResponse = await fetch(`/api/v1/auth/favorites/${params.id}/status`);
         if (favoriteResponse.ok) {
           const favoriteData = await favoriteResponse.json();
           setIsFavorite(favoriteData.isFavorite);
@@ -175,10 +175,10 @@ const PropertyDetailsPageContent: React.FC = () => {
     setLoadingFavorite(true);
     try {
       if (isFavorite) {
-        await fetch(`/api/auth/favorites/${property._id}`, { method: 'DELETE' });
+        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'DELETE' });
         toast.success('Removed from favorites');
       } else {
-        await fetch(`/api/auth/favorites/${property._id}`, { method: 'PUT' });
+        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'PUT' });
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);

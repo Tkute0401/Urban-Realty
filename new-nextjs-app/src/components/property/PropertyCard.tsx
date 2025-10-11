@@ -61,7 +61,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     const checkFavoriteStatus = async () => {
       if (user && property?._id) {
         try {
-          const response = await fetch(`/api/auth/favorites/${property._id}/status`);
+          const response = await fetch(`/api/v1/auth/favorites/${property._id}/status`);
           const data = await response.json();
           setIsFavorite(data.isFavorite);
         } catch (err) {
@@ -94,10 +94,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     setLoadingFavorite(true);
     try {
       if (isFavorite) {
-        await fetch(`/api/auth/favorites/${property._id}`, { method: 'DELETE' });
+        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'DELETE' });
         toast.success('Removed from favorites');
       } else {
-        await fetch(`/api/auth/favorites/${property._id}`, { method: 'PUT' });
+        await fetch(`/api/v1/auth/favorites/${property._id}`, { method: 'PUT' });
         toast.success('Added to favorites');
       }
       setIsFavorite(!isFavorite);
