@@ -4,6 +4,7 @@ import { api } from '@/lib/services/api';
 // Types
 interface Developer {
   _id: string;
+  userId?: string; // Added userId field for user connection
   name: string;
   email?: string;
   phone?: string;
