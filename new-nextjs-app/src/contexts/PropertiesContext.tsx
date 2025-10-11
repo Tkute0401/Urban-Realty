@@ -8,6 +8,7 @@ interface PropertiesContextType {
   properties: Property[];
   featuredProperties: Property[];
   property: Property | null;
+  agentProperties: Property[];
   loading: boolean;
   error: string | null;
   pagination: {
@@ -19,6 +20,7 @@ interface PropertiesContextType {
   getProperties: (filters?: PropertyFilters) => Promise<void>;
   getFeaturedProperties: () => Promise<Property[]>;
   getProperty: (id: string) => Promise<Property | null>;
+  getAgentProperties: (user: any) => Promise<void>;
   addProperty: (propertyData: any) => Promise<Property>;
   setProperty: (property: Property | null) => void;
   clearError: () => void;
@@ -31,6 +33,7 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
   const [properties, setProperties] = useState<Property[]>([]);
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [property, setProperty] = useState<Property | null>(null);
+  const [agentProperties, setAgentProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -148,18 +151,41 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   }, []);
 
+  const getAgentProperties = useCallback(async (user: any) => {
+    if (!user || !user._id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await http.get(`/api/v1/properties/agent/${user._id}`);
+      const data = response.data;
+      const properties = data.data || data.properties || [];
+      
+      setAgentProperties(properties);
+    } catch (err) {
+      console.error('Error fetching agent properties:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch agent properties');
+      setAgentProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const clearError = useCallback(() => setError(null), []);
 
   const value = {
     properties,
     featuredProperties,
     property,
+    agentProperties,
     loading,
     error,
     pagination,
     getProperties,
     getFeaturedProperties,
     getProperty,
+    getAgentProperties,
     addProperty,
     setProperty,
     clearError,
