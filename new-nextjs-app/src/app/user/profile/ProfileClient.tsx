@@ -258,9 +258,9 @@ const ProfileClient = () => {
             </Typography>
             
             <Grid container spacing={3}>
-              {agentProperties.map((property, index) => (
+              {agentProperties.map((property) => (
                 <Grid item xs={12} sm={6} key={property._id}>
-                  <PropertyCard property={property as any} index={index} />
+                  <PropertyCard property={property as any} />
                 </Grid>
               ))}
             </Grid>
