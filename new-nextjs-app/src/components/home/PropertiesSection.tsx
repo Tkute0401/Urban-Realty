@@ -23,8 +23,11 @@ const PropertiesSection = () => {
       }
     };
     
-    fetchFeaturedProperties();
-  }, [getFeaturedProperties]);
+    // Only fetch if we don't have featured properties yet
+    if (featuredProperties.length === 0) {
+      fetchFeaturedProperties();
+    }
+  }, []); // Remove getFeaturedProperties from dependency array
 
   const handleViewAll = () => {
     router.push('/properties');

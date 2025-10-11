@@ -70,8 +70,11 @@ const HeroSection = () => {
   const [visibleLocalitiesCount, setVisibleLocalitiesCount] = useState(5);
 
   useEffect(() => {
-    getProperties();
-  }, [getProperties]);
+    // Only fetch if we don't have properties yet
+    if (properties.length === 0) {
+      getProperties();
+    }
+  }, []); // Remove getProperties from dependency array
 
   const getAvailableCities = () => {
     if (!properties || !Array.isArray(properties) || properties.length === 0) return [];

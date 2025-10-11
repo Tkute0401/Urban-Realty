@@ -241,23 +241,23 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       
       const data = response.data;
       
-      setProperties(data.properties || []);
+      setProperties(data.data || []);
       setPagination({
-        page: data.page || 1,
-        limit: data.limit || 12,
+        page: data.pagination?.currentPage || 1,
+        limit: data.pagination?.limit || 12,
         total: data.total || 0,
-        totalPages: data.totalPages || 0
+        totalPages: data.pagination?.totalPages || 0
       });
       
       setCache(prev => ({ 
         ...prev, 
         [cacheKey]: {
-          properties: data.properties || [],
+          properties: data.data || [],
           pagination: {
-            page: data.page || 1,
-            limit: data.limit || 12,
+            page: data.pagination?.currentPage || 1,
+            limit: data.pagination?.limit || 12,
             total: data.total || 0,
-            totalPages: data.totalPages || 0
+            totalPages: data.pagination?.totalPages || 0
           }
         } 
       }));
@@ -290,7 +290,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       console.log('🔧 PropertiesContext: Featured properties API response data:', response.data);
       
       const data = response.data;
-      const properties = data.properties || data.data || data || [];
+      const properties = data.data || data.properties || data || [];
       
       if (!Array.isArray(properties)) {
         throw new Error('Invalid properties data format');
@@ -325,7 +325,7 @@ export const PropertiesProvider: React.FC<PropertiesProviderProps> = ({ children
       console.log('🔧 PropertiesContext: Property API response data:', response.data);
       
       const data = response.data;
-      const propertyData = data.property || data.data || data;
+      const propertyData = data.data || data.property || data;
       
       if (!propertyData) {
         throw new Error('Property data not found');

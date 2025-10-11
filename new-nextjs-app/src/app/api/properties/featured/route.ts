@@ -74,8 +74,10 @@ export async function GET(request: NextRequest) {
   console.log('🔧 API: /api/properties/featured GET request received');
   try {
     return NextResponse.json({
-      properties: featuredProperties,
-      success: true
+      data: featuredProperties,
+      success: true,
+      total: featuredProperties.length,
+      count: featuredProperties.length
     });
   } catch (error) {
     console.error('Error fetching featured properties:', error);
