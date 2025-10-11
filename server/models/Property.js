@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const geocoder = require('../utils/geocoder');
+const geocoder = require('../utils/hybridGeocoder');
 
 console.log('🔧 Property model loaded');
 console.log('🔧 Mongoose connection state:', mongoose.connection.readyState);
