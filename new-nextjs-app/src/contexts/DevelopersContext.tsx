@@ -19,12 +19,14 @@ interface Developer {
 
 interface DevelopersContextType {
   developers: Developer[];
+  myDeveloperProfile: Developer | null;
   loading: boolean;
   error: string | null;
   clearErrors: () => void;
   createDeveloper: (formData: FormData, config?: any) => Promise<any>;
   updateDeveloper: (id: string, formData: FormData, config?: any) => Promise<any>;
   getDevelopers: () => Promise<void>;
+  getMyDeveloperProfile: () => Promise<void>;
   getDeveloper: (id: string) => Promise<Developer>;
 }
 
@@ -37,6 +39,7 @@ const DevelopersContext = createContext<DevelopersContextType | undefined>(undef
 
 export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children }) => {
   const [developers, setDevelopers] = useState<Developer[]>([]);
+  const [myDeveloperProfile, setMyDeveloperProfile] = useState<Developer | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,6 +72,21 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Failed to update developer');
       throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getMyDeveloperProfile = useCallback(async (): Promise<void> => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.developers.getMyProfile();
+      console.log(response);
+      setMyDeveloperProfile(response.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || err.message || 'Failed to fetch developer profile');
+      setMyDeveloperProfile(null);
     } finally {
       setLoading(false);
     }
@@ -108,14 +126,16 @@ export const DevelopersProvider: React.FC<DevelopersProviderProps> = ({ children
 
   const value: DevelopersContextType = useMemo(() => ({
     developers,
+    myDeveloperProfile,
     loading,
     error,
     clearErrors,
     createDeveloper,
     updateDeveloper,
     getDevelopers,
+    getMyDeveloperProfile,
     getDeveloper
-  }), [developers, loading, error, createDeveloper, updateDeveloper, getDevelopers, getDeveloper]);
+  }), [developers, myDeveloperProfile, loading, error, createDeveloper, updateDeveloper, getDevelopers, getMyDeveloperProfile, getDeveloper]);
 
   return (
     <DevelopersContext.Provider value={value}>

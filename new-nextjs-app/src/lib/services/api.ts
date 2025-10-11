@@ -155,6 +155,7 @@ export const api = {
         developers: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/developers", { params })),
                 getById: (id: string) => unwrap<any>(http.get(`/api/v1/developers/${id}`)),
+                getMyProfile: () => unwrap<any>(http.get("/api/v1/developers/profile/me")),
                 create: (payload: any) => unwrap<any>(http.post("/api/v1/developers", payload)),
                 update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/developers/${id}`, payload)),
                 delete: (id: string) => unwrap<any>(http.delete(`/api/v1/developers/${id}`)),

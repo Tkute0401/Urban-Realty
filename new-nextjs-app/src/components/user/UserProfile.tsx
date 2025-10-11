@@ -251,9 +251,9 @@ const UserProfile = () => {
                         href="/developers"
                         sx={{ 
                           bgcolor: 'var(--color-primary)', 
-                          color: '#0B1011',
+                          color: 'var(--color-primary-contrast)',
                           '&:hover': { 
-                            bgcolor: 'var(--color-primary)', 
+                            bgcolor: 'var(--color-primary-hover)', 
                             opacity: 0.9 
                           }
                         }}
@@ -263,18 +263,34 @@ const UserProfile = () => {
                       <Button
                         variant="outlined"
                         size="small"
-                        href="/developers/add"
+                        href="/developer/profile"
                         sx={{ 
                           borderColor: 'var(--color-primary)', 
                           color: 'var(--color-primary)',
                           '&:hover': { 
-                            borderColor: 'var(--color-primary)',
-                            bgcolor: 'var(--color-primary)',
-                            color: '#0B1011'
+                            borderColor: 'var(--color-primary)', 
+                            bgcolor: 'var(--color-primary)', 
+                            color: 'var(--color-primary-contrast)'
                           }
                         }}
                       >
-                        Add Project
+                        My Developer Profile
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        href="/properties/add"
+                        sx={{ 
+                          borderColor: 'var(--color-primary)', 
+                          color: 'var(--color-primary)',
+                          '&:hover': { 
+                            borderColor: 'var(--color-primary)', 
+                            bgcolor: 'var(--color-primary)', 
+                            color: 'var(--color-primary-contrast)'
+                          }
+                        }}
+                      >
+                        Add Property
                       </Button>
                     </>
                   )}
