@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   alternates: {
     canonical: '/',
   },
@@ -101,10 +101,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "RealEstateAgent",
               "name": "Squarefooot",
-              "url": process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com",
+              "url": process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
               "logo": {
                 "@type": "ImageObject",
-                "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com"}/logo.png`,
+                "url": `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/logo.png`,
                 "width": 200,
                 "height": 60
               },

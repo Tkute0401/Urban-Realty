@@ -49,14 +49,14 @@ function generateHomePageStructuredData() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Squarefooot",
-    "url": process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com",
+    "url": process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
     "description": "Premier real estate platform for buying, selling, and renting properties",
     "publisher": {
       "@type": "Organization",
       "name": "Squarefooot",
       "logo": {
         "@type": "ImageObject",
-        "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://squarefooot.com"}/logo.png`
+        "url": `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/logo.png`
       }
     },
     "potentialAction": {
