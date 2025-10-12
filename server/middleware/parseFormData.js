@@ -80,6 +80,179 @@ const parseFormData = (req, res, next) => {
       }
     }
     
+    // Parse headquarters object (for developers)
+    if (parsed.headquarters) {
+      const headquarters = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('headquarters[') && key.endsWith(']')) {
+          const fieldName = key.slice(13, -1); // Remove 'headquarters[' and ']'
+          headquarters[fieldName] = parsed[key];
+          delete parsed[key];
+        }
+      });
+      if (Object.keys(headquarters).length > 0) {
+        parsed.headquarters = headquarters;
+      }
+    }
+    
+    // Parse contact object (for developers)
+    if (parsed.contact) {
+      const contact = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('contact[') && key.endsWith(']')) {
+          const fieldName = key.slice(8, -1); // Remove 'contact[' and ']'
+          contact[fieldName] = parsed[key];
+          delete parsed[key];
+        }
+      });
+      if (Object.keys(contact).length > 0) {
+        parsed.contact = contact;
+      }
+    }
+    
+    // Parse socialMedia object (for developers)
+    if (parsed.socialMedia) {
+      const socialMedia = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('socialMedia[') && key.endsWith(']')) {
+          const fieldName = key.slice(12, -1); // Remove 'socialMedia[' and ']'
+          socialMedia[fieldName] = parsed[key];
+          delete parsed[key];
+        }
+      });
+      if (Object.keys(socialMedia).length > 0) {
+        parsed.socialMedia = socialMedia;
+      }
+    }
+    
+    // Parse flagshipProjects array (for developers)
+    if (parsed.flagshipProjects) {
+      const flagshipProjects = [];
+      const projectMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('flagshipProjects[') && key.includes(']')) {
+          const match = key.match(/flagshipProjects\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!projectMap[index]) {
+              projectMap[index] = {};
+            }
+            projectMap[index][field] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(projectMap).forEach(index => {
+        const project = projectMap[index];
+        if (project.name || project.description) {
+          flagshipProjects.push(project);
+        }
+      });
+      
+      if (flagshipProjects.length > 0) {
+        parsed.flagshipProjects = flagshipProjects;
+      }
+    }
+    
+    // Parse team array (for developers)
+    if (parsed.team) {
+      const team = [];
+      const teamMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('team[') && key.includes(']')) {
+          const match = key.match(/team\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!teamMap[index]) {
+              teamMap[index] = {};
+            }
+            teamMap[index][field] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(teamMap).forEach(index => {
+        const member = teamMap[index];
+        if (member.name || member.designation) {
+          team.push(member);
+        }
+      });
+      
+      if (team.length > 0) {
+        parsed.team = team;
+      }
+    }
+    
+    // Parse specializations array (for developers)
+    if (parsed.specializations) {
+      const specializations = [];
+      const specMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('specializations[') && key.includes(']')) {
+          const match = key.match(/specializations\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!specMap[index]) {
+              specMap[index] = {};
+            }
+            specMap[index][field] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(specMap).forEach(index => {
+        const spec = specMap[index];
+        if (spec.name || spec.description) {
+          specializations.push(spec);
+        }
+      });
+      
+      if (specializations.length > 0) {
+        parsed.specializations = specializations;
+      }
+    }
+    
+    // Parse awards array (for developers)
+    if (parsed.awards) {
+      const awards = [];
+      const awardMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('awards[') && key.includes(']')) {
+          const match = key.match(/awards\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!awardMap[index]) {
+              awardMap[index] = {};
+            }
+            awardMap[index][field] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(awardMap).forEach(index => {
+        const award = awardMap[index];
+        if (award.name || award.category) {
+          awards.push(award);
+        }
+      });
+      
+      if (awards.length > 0) {
+        parsed.awards = awards;
+      }
+    }
+    
     return parsed;
   };
   
