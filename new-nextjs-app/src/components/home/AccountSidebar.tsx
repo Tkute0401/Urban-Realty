@@ -87,7 +87,9 @@ const AccountSidebar = ({ isOpen, onClose }) => {
           );
           // Filter out rejected promises and null values
           const validFavorites = favoritesData
-            .filter(result => result.status === 'fulfilled' && result.value)
+            .filter((result): result is PromiseFulfilledResult<any> => 
+              result.status === 'fulfilled' && result.value
+            )
             .map(result => result.value);
           setFavoriteProperties(validFavorites);
         } catch (error) {
