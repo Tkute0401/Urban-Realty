@@ -185,11 +185,24 @@ const DeveloperProfileClient = () => {
       
       // Append all form data
       Object.keys(formData).forEach(key => {
-        if (typeof formData[key] === 'object' && formData[key] !== null) {
+        if (Array.isArray(formData[key])) {
+          // Handle arrays
+          formData[key].forEach((item, index) => {
+            if (typeof item === 'object' && item !== null) {
+              Object.keys(item).forEach(subKey => {
+                formDataToSend.append(`${key}[${index}][${subKey}]`, item[subKey]);
+              });
+            } else {
+              formDataToSend.append(`${key}[${index}]`, item);
+            }
+          });
+        } else if (typeof formData[key] === 'object' && formData[key] !== null) {
+          // Handle objects
           Object.keys(formData[key]).forEach(subKey => {
             formDataToSend.append(`${key}[${subKey}]`, formData[key][subKey]);
           });
         } else {
+          // Handle primitive values
           formDataToSend.append(key, formData[key]);
         }
       });
