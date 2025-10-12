@@ -250,15 +250,7 @@ const AddDeveloperClient = () => {
         formDataToSend.append('teamPhotos', file);
       });
 
-      const token = sessionManager.getToken();
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      };
-
-      await createDeveloper(formDataToSend, config);
+      await createDeveloper(formDataToSend);
       setSnackbarMessage('Developer added successfully!');
       setSnackbarOpen(true);
       setTimeout(() => router.push('/developers'), 1500);
