@@ -34,8 +34,6 @@ exports.getMyDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/developers
 // @access  Public
 exports.getDevelopers = asyncHandler(async (req, res, next) => {
-  console.log('GET /api/v1/developers', res);  
-  console.log("chutiya madarchod",res.advancedResults)
   res.status(200).json(res.advancedResults);
 });
 
@@ -44,7 +42,6 @@ exports.getDevelopers = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getDeveloper = asyncHandler(async (req, res, next) => {
   const developer = await Developer.findById(req.params.id);
-  console.log('GET /api/v1/developers/:id', res);
 
   if (!developer) {
     return next(
@@ -82,7 +79,6 @@ exports.createDeveloper = asyncHandler(async (req, res, next) => {
 });
 
 exports.updateDeveloper = asyncHandler(async (req, res, next) => {
-  console.log("req.body", req.body);
   
   let developer = await Developer.findById(req.params.id);
 

@@ -13,6 +13,7 @@ import { DevelopersProvider } from '@/contexts/DevelopersContext'
 import { ProjectsProvider } from '@/contexts/ProjectsContext'
 import ErrorBoundary from '@/components/common/ErrorBoundary'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
+import HydrationWrapper from '@/components/common/HydrationWrapper'
 import { reportWebVitals, setupPerformanceObserver } from '@/lib/performance/webVitals'
 
 type ProvidersProps = { children: ReactNode }
@@ -54,7 +55,9 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
               <AgentsProvider>
                 <DevelopersProvider>
                   <ProjectsProvider>
-                    {children}
+                    <HydrationWrapper>
+                      {children}
+                    </HydrationWrapper>
                     
                     {/* Performance monitoring - only in production */}
                     {process.env.NODE_ENV === 'production' && (
