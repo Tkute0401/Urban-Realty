@@ -82,12 +82,17 @@ const AccountSidebar = ({ isOpen, onClose }) => {
       if (user?.favorites?.length > 0) {
         setLoadingFavorites(true);
         try {
-          const favoritesData = await Promise.all(
+          const favoritesData = await Promise.allSettled(
             user?.favorites.map(id => getProperty(id))
           );
-          setFavoriteProperties(favoritesData.filter(Boolean));
+          // Filter out rejected promises and null values
+          const validFavorites = favoritesData
+            .filter(result => result.status === 'fulfilled' && result.value)
+            .map(result => result.value);
+          setFavoriteProperties(validFavorites);
         } catch (error) {
           console.error("Error fetching favorites:", error);
+          setFavoriteProperties([]);
         } finally {
           setLoadingFavorites(false);
         }
@@ -108,8 +113,11 @@ const AccountSidebar = ({ isOpen, onClose }) => {
       if (!user) return setRecentlyViewed([]);
       try {
         const res = await api.auth.recentlyViewedList();
-        setRecentlyViewed(Array.isArray(res?.data) ? res.data : []);
+        const data = Array.isArray(res?.data) ? res.data : [];
+        // Filter out any invalid or null properties
+        setRecentlyViewed(data.filter(property => property && property._id));
       } catch (e) {
+        console.error("Error loading recently viewed:", e);
         setRecentlyViewed([]);
       }
     };
@@ -232,14 +240,16 @@ const AccountSidebar = ({ isOpen, onClose }) => {
                 {loadingFavorites && activeTab === 'favourites' ? (
                   <div className="text-white text-center py-4">Loading favorites...</div>
                 ) : (
-                  (activeTab === 'viewed' ? recentlyViewed : favoriteProperties).map((property) => (
+                  (activeTab === 'viewed' ? recentlyViewed : favoriteProperties)
+                    .filter(property => property && property._id)
+                    .map((property) => (
                     <div key={property._id || property.id} onClick={() => handlePropertyClick(property)} className="bg-[color:var(--color-surface)] border border-[color:var(--color-primary)] rounded-lg p-3 hover:bg-[color:var(--color-accent)] transition-colors overflow-hidden">
                       <div className="flex gap-3">
                         <div className="w-20 h-20 rounded-full border-2 border-[color:var(--color-primary)] overflow-hidden  mt-7">
-                          {property.images ? (
+                          {property?.images && property.images.length > 0 ? (
                             <img 
                               src={property.images[0]?.url || property.image || '/placeholder-property.jpg'} 
-                              //alt={property.title}
+                              alt={property.title || 'Property image'}
                               className="w-full h-full object-cover"
                             />
                           ) : (
