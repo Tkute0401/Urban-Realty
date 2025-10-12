@@ -7,20 +7,28 @@ const {
   createDeveloper,
   updateDeveloper,
   deleteDeveloper,
-  uploadDeveloperLogo
+  uploadDeveloperLogo,
+  getMyDeveloperProfile
 } = require('../../../controllers/developers');
 const upload = require('../middleware/multer');
 const advancedResults = require('../middleware/advancedResults');
+const parseFormData = require('../../../middleware/parseFormData');
 const Developer = require('../../../models/Developer');
 
 router
   .route('/')
   .get(advancedResults(Developer), getDevelopers)
-  .post(protect, authorize('admin', 'agent', 'developer'), createDeveloper);
+  .post(protect, authorize('admin', 'agent', 'developer'), parseFormData, createDeveloper);
+
+// Developer profile route for current user
+router
+  .route('/profile/me')
+  .get(protect, authorize('developer'), getMyDeveloperProfile);
+
 router
   .route('/:id')
   .get(getDeveloper)
-  .put(protect, authorize('admin', 'agent', 'developer'), updateDeveloper)
+  .put(protect, authorize('admin', 'agent', 'developer'), parseFormData, updateDeveloper)
   .delete(protect, authorize('admin'), deleteDeveloper);
 
 // Logo upload route
