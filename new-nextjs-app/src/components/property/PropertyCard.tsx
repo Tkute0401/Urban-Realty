@@ -50,7 +50,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   // Check if property is in favorites when component mounts or user changes
   useEffect(() => {
     const checkFavoriteStatus = async () => {
-      if (user && property?._id) {
+      if (user && property?._id && typeof window !== 'undefined') {
         try {
           const response = await fetch(`/api/v1/auth/favorites/${property._id}/status`, {
             headers: {
@@ -87,20 +87,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
     setLoadingFavorite(true);
     try {
-      if (isFavorite) {
-        await fetch(`/api/v1/auth/favorites/${property._id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-      } else {
-        await fetch(`/api/v1/auth/favorites/${property._id}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+      if (typeof window !== 'undefined') {
+        if (isFavorite) {
+          await fetch(`/api/v1/auth/favorites/${property._id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+        } else {
+          await fetch(`/api/v1/auth/favorites/${property._id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+        }
       }
       setIsFavorite(!isFavorite);
     } catch (err) {
@@ -356,7 +358,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             {property.projectDetails?.launchDate && (
               <Chip
                 label={
-                  new Date(property.projectDetails.launchDate) > new Date() ? 
+                  typeof window !== 'undefined' && new Date(property.projectDetails.launchDate) > new Date() ? 
                     `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
                     'Ready to Move'
                 }

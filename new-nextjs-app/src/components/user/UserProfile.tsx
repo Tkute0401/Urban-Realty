@@ -346,7 +346,7 @@ const UserProfile = () => {
                 <ListItem>
                   <ListItemText 
                     primary="Member Since"
-                    secondary={new Date(user?.createdAt || Date.now()).toLocaleDateString()}
+                    secondary={user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                   />
                 </ListItem>
               </List>

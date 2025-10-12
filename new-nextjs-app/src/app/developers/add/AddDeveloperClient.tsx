@@ -156,7 +156,7 @@ const AddDeveloperClient = () => {
     }
     
     // Year validation
-    if (formData.foundedYear && (parseInt(formData.foundedYear) < 1800 || parseInt(formData.foundedYear) > new Date().getFullYear())) {
+    if (formData.foundedYear && typeof window !== 'undefined' && (parseInt(formData.foundedYear) < 1800 || parseInt(formData.foundedYear) > new Date().getFullYear())) {
       errors.foundedYear = 'Please enter a valid year';
     }
     
@@ -586,7 +586,7 @@ const AddDeveloperClient = () => {
                     size={isMobile ? 'small' : 'medium'}
                     error={!!formErrors.foundedYear}
                     helperText={formErrors.foundedYear}
-                    inputProps={{ min: 1800, max: new Date().getFullYear() }}
+                    inputProps={{ min: 1800, max: typeof window !== 'undefined' ? new Date().getFullYear() : 2024 }}
                     sx={{
                       '& .MuiInputBase-root': {
                         color: '#fff',
