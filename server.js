@@ -147,8 +147,9 @@ app.use(trackSearch);
 app.use(trackAuthEvents);
 app.use(trackPerformance);
 
-// Static files
-app.use('/uploads', express.static(uploadsDir));
+// Static files - enhanced with proper headers
+const fileUploadService = require('./server/services/fileUploadService');
+fileUploadService.serveStaticFiles(app);
 
 // API Routes
 app.use('/api/v1/auth', require('./server/src/api/routes/authRoutes'));

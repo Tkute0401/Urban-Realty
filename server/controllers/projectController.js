@@ -2,8 +2,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Project = require('../models/Project');
 const Developer = require('../models/Developer');
-const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
+const { uploadImages, uploadVideos, uploadDocuments, deleteFiles } = require('../services/fileUploadService');
 
 // @desc    Get all projects
 // @route   GET /api/v1/projects
@@ -126,24 +125,24 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   });
   console.log('🔧 cleanReqBody after cleaning - brochures:', cleanReqBody.brochures);
 
-  // Process images if uploaded
+  // Process images if uploaded (to Cloudinary)
   const images = req.files?.images?.length > 0 
-    ? await uploadImagesToCloudinary(req.files.images, 'projects')
+    ? await uploadImages(req.files.images, 'projects')
     : [];
 
-  // Process floor plans if uploaded
+  // Process floor plans if uploaded (to Cloudinary)
   const floorPlans = req.files?.floorPlans?.length > 0
-    ? await uploadImagesToCloudinary(req.files.floorPlans, 'projects/floor-plans')
+    ? await uploadImages(req.files.floorPlans, 'projects/floor-plans')
     : [];
 
-  // Process brochures if uploaded
+  // Process brochures if uploaded (to Railway's local storage)
   console.log('🔧 req.files.brochures:', req.files?.brochures);
   console.log('🔧 req.body.brochures:', req.body.brochures);
   
   let brochures = [];
   if (req.files?.brochures?.length > 0) {
     try {
-      const uploadedBrochures = await uploadFileToCloudinary(req.files.brochures, 'projects/brochures');
+      const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
       console.log('🔧 Processed brochures:', uploadedBrochures);
       console.log('🔧 brochures type:', typeof uploadedBrochures);
       console.log('🔧 brochures is array:', Array.isArray(uploadedBrochures));
@@ -161,9 +160,9 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Process virtual tours if uploaded
+  // Process virtual tours if uploaded (to Cloudinary)
   const virtualTours = req.files?.virtualTours?.length > 0
-    ? await uploadVideoToCloudinary(req.files.virtualTours, 'projects/virtual-tours')
+    ? await uploadVideos(req.files.virtualTours, 'projects/virtual-tours')
     : [];
 
   // Set primary image if images exist
@@ -319,40 +318,16 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Delete images from Cloudinary
-  if (project.images?.length > 0) {
-    for (const image of project.images) {
-      if (image.publicId) {
-        await cloudinary.uploader.destroy(image.publicId);
-      }
-    }
-  }
+  // Delete all files using the file upload service
+  const allFiles = [
+    ...(project.images || []),
+    ...(project.floorPlans || []),
+    ...(project.brochures || []),
+    ...(project.virtualTours || [])
+  ];
 
-  // Delete floor plans from Cloudinary
-  if (project.floorPlans?.length > 0) {
-    for (const floorPlan of project.floorPlans) {
-      if (floorPlan.publicId) {
-        await cloudinary.uploader.destroy(floorPlan.publicId);
-      }
-    }
-  }
-
-  // Delete brochures from Cloudinary
-  if (project.brochures?.length > 0) {
-    for (const brochure of project.brochures) {
-      if (brochure.publicId) {
-        await cloudinary.uploader.destroy(brochure.publicId);
-      }
-    }
-  }
-
-  // Delete virtual tours from Cloudinary
-  if (project.virtualTours?.length > 0) {
-    for (const tour of project.virtualTours) {
-      if (tour.publicId) {
-        await cloudinary.uploader.destroy(tour.publicId);
-      }
-    }
+  if (allFiles.length > 0) {
+    await deleteFiles(allFiles);
   }
 
   await Project.findByIdAndDelete(req.params.id);
@@ -363,105 +338,3 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Helper function to upload images to Cloudinary
-const uploadImagesToCloudinary = async (files, folder) => {
-  const uploadedImages = [];
-  
-  for (const file of files) {
-    try {
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: folder,
-        access_mode: 'public', // Make images publicly accessible
-        transformation: [
-          { width: 1200, height: 800, crop: 'fill', quality: 'auto' },
-          { format: 'auto' }
-        ]
-      });
-      
-      uploadedImages.push({
-        url: result.secure_url,
-        publicId: result.public_id
-      });
-      
-      // Delete local file
-      fs.unlinkSync(file.path);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      // Delete local file even if upload failed
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
-    }
-  }
-  
-  return uploadedImages;
-};
-
-// Helper function to upload files to Cloudinary
-const uploadFileToCloudinary = async (files, folder) => {
-  const uploadedFiles = [];
-  
-  for (const file of files) {
-    try {
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: folder,
-        resource_type: 'raw',
-        access_mode: 'public' // Make files publicly accessible
-      });
-      
-      uploadedFiles.push({
-        url: result.secure_url,
-        publicId: result.public_id,
-        name: file.originalname,
-        type: file.mimetype
-      });
-      
-      // Delete local file
-      fs.unlinkSync(file.path);
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      // Delete local file even if upload failed
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
-    }
-  }
-  
-  return uploadedFiles;
-};
-
-// Helper function to upload videos to Cloudinary
-const uploadVideoToCloudinary = async (files, folder) => {
-  const uploadedVideos = [];
-  
-  for (const file of files) {
-    try {
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: folder,
-        resource_type: 'video',
-        access_mode: 'public', // Make videos publicly accessible
-        transformation: [
-          { width: 1280, height: 720, crop: 'fill', quality: 'auto' }
-        ]
-      });
-      
-      uploadedVideos.push({
-        url: result.secure_url,
-        publicId: result.public_id,
-        type: 'video',
-        thumbnail: result.secure_url.replace('.mp4', '.jpg')
-      });
-      
-      // Delete local file
-      fs.unlinkSync(file.path);
-    } catch (error) {
-      console.error('Error uploading video:', error);
-      // Delete local file even if upload failed
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
-    }
-  }
-  
-  return uploadedVideos;
-};

@@ -1,8 +1,7 @@
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const Developer = require('../models/Developer');
-const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
+const { uploadImages, uploadDocuments, deleteFiles } = require('../services/fileUploadService');
 
 // @desc    Get developer profile for current user
 // @route   GET /api/v1/developers/profile/me
@@ -157,19 +156,19 @@ exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'real-estate/developers',
-      width: 500,
-      height: 500,
-      crop: 'fill',
-      quality: 'auto:good'
-    });
+    // Upload to Cloudinary using the new service
+    const uploadedImages = await uploadImages([req.file], 'real-estate/developers');
+    
+    if (uploadedImages.length === 0) {
+      throw new Error('Failed to upload image');
+    }
+
+    const result = uploadedImages[0];
 
     // Delete old logo if exists
     if (developer.logo?.publicId) {
       try {
-        await cloudinary.uploader.destroy(developer.logo.publicId);
+        await deleteFiles([developer.logo]);
       } catch (err) {
         console.error('Error deleting old logo:', err);
       }
@@ -177,8 +176,8 @@ exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
 
     // Update developer
     developer.logo = {
-      url: result.secure_url,
-      publicId: result.public_id
+      url: result.url,
+      publicId: result.publicId
     };
     await developer.save();
 
