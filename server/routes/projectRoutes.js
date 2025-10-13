@@ -11,6 +11,7 @@ const {
   deleteProject
 } = require('../controllers/projectController');
 const upload = require('../middleware/multer');
+const parseFormData = require('../middleware/parseFormData');
 const advancedResults = require('../middleware/advancedResults');
 const Project = require('../models/Project');
 
@@ -26,6 +27,7 @@ router
       { name: 'brochures', maxCount: 3 },
       { name: 'virtualTours', maxCount: 2 }
     ]),
+    parseFormData,
     createProject
   );
 
@@ -51,6 +53,7 @@ router
       { name: 'brochures', maxCount: 3 },
       { name: 'virtualTours', maxCount: 2 }
     ]),
+    parseFormData,
     updateProject
   )
   .delete(protect, authorize('developer', 'admin'), deleteProject);

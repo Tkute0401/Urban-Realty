@@ -125,12 +125,28 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     images[0].isPrimary = true;
   }
 
+  // Geocode location if address is provided
+  let coordinates = null;
+  if (req.body.location?.address) {
+    try {
+      // For now, we'll set a default coordinate or you can integrate with a geocoding service
+      // You can replace this with actual geocoding API call
+      coordinates = {
+        type: 'Point',
+        coordinates: [77.2090, 28.6139] // Default to Delhi coordinates
+      };
+    } catch (error) {
+      console.error('Geocoding error:', error);
+    }
+  }
+
   const projectData = {
     ...req.body,
     images,
     floorPlans,
-    brochures: brochures ? [brochures] : [],
-    virtualTours: virtualTours ? [virtualTours] : []
+    brochures: brochures || [],
+    virtualTours: virtualTours || [],
+    ...(coordinates && { 'location.coordinates': coordinates })
   };
 
   const project = await Project.create(projectData);

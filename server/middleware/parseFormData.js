@@ -257,6 +257,151 @@ const parseFormData = (req, res, next) => {
       }
     }
     
+    // Parse location object (for projects)
+    if (parsed.location) {
+      const location = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('location[') && key.endsWith(']')) {
+          const fieldName = key.slice(9, -1); // Remove 'location[' and ']'
+          location[fieldName] = parsed[key];
+          delete parsed[key];
+        }
+      });
+      if (Object.keys(location).length > 0) {
+        parsed.location = location;
+      }
+    }
+    
+    // Parse amenities array (for projects)
+    if (parsed.amenities) {
+      const amenities = [];
+      const amenityMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('amenities[') && key.includes(']')) {
+          const match = key.match(/amenities\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!amenityMap[index]) {
+              amenityMap[index] = {};
+            }
+            amenityMap[index][field] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(amenityMap).forEach(index => {
+        const amenity = amenityMap[index];
+        if (amenity.name) {
+          amenities.push(amenity);
+        }
+      });
+      
+      if (amenities.length > 0) {
+        parsed.amenities = amenities;
+      }
+    }
+    
+    // Parse features array (for projects)
+    if (parsed.features) {
+      const features = [];
+      const featureMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('features[') && key.includes(']')) {
+          const match = key.match(/features\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!featureMap[index]) {
+              featureMap[index] = {};
+            }
+            featureMap[index][field] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(featureMap).forEach(index => {
+        const feature = featureMap[index];
+        if (feature.name) {
+          features.push(feature);
+        }
+      });
+      
+      if (features.length > 0) {
+        parsed.features = features;
+      }
+    }
+    
+    // Parse keywords array (for projects)
+    if (parsed.keywords) {
+      const keywords = [];
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('keywords[') && key.endsWith(']')) {
+          const match = key.match(/keywords\[(\d+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            keywords[index] = parsed[key];
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Filter out undefined values and add to parsed
+      const validKeywords = keywords.filter(keyword => keyword && keyword.trim());
+      if (validKeywords.length > 0) {
+        parsed.keywords = validKeywords;
+      }
+    }
+    
+    // Parse unitTypes array (for projects)
+    if (parsed.unitTypes) {
+      const unitTypes = [];
+      const unitTypeMap = {};
+      Object.keys(parsed).forEach(key => {
+        if (key.startsWith('unitTypes[') && key.includes(']')) {
+          const match = key.match(/unitTypes\[(\d+)\]\[(\w+)\]/);
+          if (match) {
+            const index = parseInt(match[1]);
+            const field = match[2];
+            if (!unitTypeMap[index]) {
+              unitTypeMap[index] = {};
+            }
+            // Handle nested priceRange object
+            if (field === 'priceRange' && parsed[key].includes('[')) {
+              const priceRangeMatch = key.match(/unitTypes\[(\d+)\]\[priceRange\]\[(\w+)\]/);
+              if (priceRangeMatch) {
+                const unitIndex = parseInt(priceRangeMatch[1]);
+                const priceField = priceRangeMatch[2];
+                if (!unitTypeMap[unitIndex].priceRange) {
+                  unitTypeMap[unitIndex].priceRange = {};
+                }
+                unitTypeMap[unitIndex].priceRange[priceField] = parsed[key];
+              }
+            } else {
+              unitTypeMap[index][field] = parsed[key];
+            }
+            delete parsed[key];
+          }
+        }
+      });
+      
+      // Convert map to array
+      Object.keys(unitTypeMap).forEach(index => {
+        const unitType = unitTypeMap[index];
+        if (unitType.type) {
+          unitTypes.push(unitType);
+        }
+      });
+      
+      if (unitTypes.length > 0) {
+        parsed.unitTypes = unitTypes;
+      }
+    }
+    
     return parsed;
   };
   
