@@ -99,16 +99,6 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     delete req.body.brochures;
   }
 
-  // Ensure req.body is clean and doesn't contain any file upload fields
-  const cleanReqBody = { ...req.body };
-  const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
-  fileUploadFields.forEach(field => {
-    if (cleanReqBody[field]) {
-      console.log(`🔧 Removing ${field} from cleanReqBody`);
-      delete cleanReqBody[field];
-    }
-  });
-  
   // Check if user is developer
   if (req.user.role === 'developer') {
     // Find developer profile for current user
@@ -121,7 +111,20 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
     
     req.body.developer = developer._id;
+    console.log('🔧 Set developer ID:', developer._id);
   }
+
+  // Ensure req.body is clean and doesn't contain any file upload fields
+  const cleanReqBody = { ...req.body };
+  console.log('🔧 cleanReqBody before cleaning:', JSON.stringify(cleanReqBody, null, 2));
+  const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
+  fileUploadFields.forEach(field => {
+    if (cleanReqBody[field]) {
+      console.log(`🔧 Removing ${field} from cleanReqBody`);
+      delete cleanReqBody[field];
+    }
+  });
+  console.log('🔧 cleanReqBody after cleaning:', JSON.stringify(cleanReqBody, null, 2));
 
   // Process images if uploaded
   const images = req.files?.images?.length > 0 
@@ -232,6 +235,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 Clean projectData brochures type:', typeof cleanProjectData.brochures);
   console.log('🔧 Clean projectData brochures is array:', Array.isArray(cleanProjectData.brochures));
   console.log('🔧 Clean projectData brochures value:', cleanProjectData.brochures);
+  console.log('🔧 Clean projectData developer:', cleanProjectData.developer);
+  console.log('🔧 Clean projectData full object:', JSON.stringify(cleanProjectData, null, 2));
 
   // Final safety check - ensure brochures is an array
   if (!Array.isArray(cleanProjectData.brochures)) {
