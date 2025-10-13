@@ -90,7 +90,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 req.body:', JSON.stringify(req.body, null, 2));
   console.log('🔧 req.files:', req.files);
   console.log('🔧 Content-Type:', req.headers['content-type']);
-  
+
   // Check if brochures is in req.body and remove it
   if (req.body.brochures) {
     console.log('🔧 WARNING: brochures found in req.body, removing it');
@@ -98,6 +98,16 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     console.log('🔧 req.body.brochures value:', req.body.brochures);
     delete req.body.brochures;
   }
+
+  // Ensure req.body is clean and doesn't contain any file upload fields
+  const cleanReqBody = { ...req.body };
+  const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
+  fileUploadFields.forEach(field => {
+    if (cleanReqBody[field]) {
+      console.log(`🔧 Removing ${field} from cleanReqBody`);
+      delete cleanReqBody[field];
+    }
+  });
   
   // Check if user is developer
   if (req.user.role === 'developer') {
@@ -167,7 +177,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 
   // Create projectData object, ensuring brochures is properly handled
   const projectData = {
-    ...req.body,
+    ...cleanReqBody,
     images,
     floorPlans,
     brochures: brochures || [],
@@ -184,7 +194,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
       projectData.brochures = [];
     }
   }
-  
+
   // Double-check that brochures is an array
   if (!Array.isArray(projectData.brochures)) {
     console.warn('🔧 brochures is not an array, converting to empty array');
@@ -197,7 +207,43 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 brochures is array:', Array.isArray(projectData.brochures));
   console.log('🔧 brochures length:', projectData.brochures?.length);
 
-  const project = await Project.create(projectData);
+  // Create a clean projectData object to avoid any string conversion issues
+  const cleanProjectData = {
+    name: projectData.name,
+    description: projectData.description,
+    shortDescription: projectData.shortDescription,
+    type: projectData.type,
+    status: projectData.status,
+    totalUnits: projectData.totalUnits,
+    totalArea: projectData.totalArea,
+    location: projectData.location,
+    launchDate: projectData.launchDate,
+    possessionDate: projectData.possessionDate,
+    pricePerSqFt: projectData.pricePerSqFt,
+    startingPrice: projectData.startingPrice,
+    developer: projectData.developer,
+    images: projectData.images,
+    floorPlans: projectData.floorPlans,
+    brochures: Array.isArray(projectData.brochures) ? projectData.brochures : [], // Force array
+    virtualTours: projectData.virtualTours,
+    'location.coordinates': projectData['location.coordinates']
+  };
+
+  console.log('🔧 Clean projectData brochures type:', typeof cleanProjectData.brochures);
+  console.log('🔧 Clean projectData brochures is array:', Array.isArray(cleanProjectData.brochures));
+  console.log('🔧 Clean projectData brochures value:', cleanProjectData.brochures);
+
+  // Final safety check - ensure brochures is an array
+  if (!Array.isArray(cleanProjectData.brochures)) {
+    console.warn('🔧 FINAL CHECK: brochures is not an array, setting to empty array');
+    cleanProjectData.brochures = [];
+  }
+
+  console.log('🔧 FINAL brochures check - type:', typeof cleanProjectData.brochures);
+  console.log('🔧 FINAL brochures check - is array:', Array.isArray(cleanProjectData.brochures));
+  console.log('🔧 FINAL brochures check - value:', cleanProjectData.brochures);
+
+  const project = await Project.create(cleanProjectData);
 
   // Populate developer information
   await project.populate('developer', 'name logo website');
