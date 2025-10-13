@@ -111,9 +111,12 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     : [];
 
   // Process brochures if uploaded
+  console.log('🔧 req.files.brochures:', req.files?.brochures);
+  console.log('🔧 req.body.brochures:', req.body.brochures);
   const brochures = req.files?.brochures?.length > 0
     ? await uploadFileToCloudinary(req.files.brochures, 'projects/brochures')
     : [];
+  console.log('🔧 Processed brochures:', brochures);
 
   // Process virtual tours if uploaded
   const virtualTours = req.files?.virtualTours?.length > 0
