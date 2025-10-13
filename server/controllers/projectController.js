@@ -125,6 +125,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     ? await uploadFileToCloudinary(req.files.brochures, 'projects/brochures')
     : [];
   console.log('🔧 Processed brochures:', brochures);
+  console.log('🔧 brochures type:', typeof brochures);
+  console.log('🔧 brochures is array:', Array.isArray(brochures));
 
   // Process virtual tours if uploaded
   const virtualTours = req.files?.virtualTours?.length > 0
@@ -151,8 +153,12 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Ensure brochures is not in req.body before creating projectData
+  const cleanReqBody = { ...req.body };
+  delete cleanReqBody.brochures;
+  
   const projectData = {
-    ...req.body,
+    ...cleanReqBody,
     images,
     floorPlans,
     brochures: brochures || [],
@@ -163,6 +169,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 Final projectData before create:', JSON.stringify(projectData, null, 2));
   console.log('🔧 brochures type:', typeof projectData.brochures);
   console.log('🔧 brochures value:', projectData.brochures);
+  console.log('🔧 brochures is array:', Array.isArray(projectData.brochures));
+  console.log('🔧 brochures length:', projectData.brochures?.length);
 
   const project = await Project.create(projectData);
 
