@@ -86,6 +86,19 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/projects
 // @access  Private (Developer/Admin)
 exports.createProject = asyncHandler(async (req, res, next) => {
+  console.log('🔧 createProject called');
+  console.log('🔧 req.body:', JSON.stringify(req.body, null, 2));
+  console.log('🔧 req.files:', req.files);
+  console.log('🔧 Content-Type:', req.headers['content-type']);
+  
+  // Check if brochures is in req.body and remove it
+  if (req.body.brochures) {
+    console.log('🔧 WARNING: brochures found in req.body, removing it');
+    console.log('🔧 req.body.brochures type:', typeof req.body.brochures);
+    console.log('🔧 req.body.brochures value:', req.body.brochures);
+    delete req.body.brochures;
+  }
+  
   // Check if user is developer
   if (req.user.role === 'developer') {
     // Find developer profile for current user
@@ -114,12 +127,18 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 req.files.brochures:', req.files?.brochures);
   console.log('🔧 req.body.brochures:', req.body.brochures);
   
-  const brochures = req.files?.brochures?.length > 0
+  let brochures = req.files?.brochures?.length > 0
     ? await uploadFileToCloudinary(req.files.brochures, 'projects/brochures')
     : [];
   console.log('🔧 Processed brochures:', brochures);
   console.log('🔧 brochures type:', typeof brochures);
   console.log('🔧 brochures is array:', Array.isArray(brochures));
+  
+  // Ensure brochures is always an array
+  if (!Array.isArray(brochures)) {
+    console.warn('🔧 brochures is not an array after processing, converting to empty array');
+    brochures = [];
+  }
 
   // Process virtual tours if uploaded
   const virtualTours = req.files?.virtualTours?.length > 0
@@ -146,6 +165,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Create projectData object, ensuring brochures is properly handled
   const projectData = {
     ...req.body,
     images,
@@ -154,6 +174,22 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     virtualTours: virtualTours || [],
     ...(coordinates && { 'location.coordinates': coordinates })
   };
+
+  // Ensure brochures is always an array and not a string
+  if (projectData.brochures && typeof projectData.brochures === 'string') {
+    try {
+      projectData.brochures = JSON.parse(projectData.brochures);
+    } catch (error) {
+      console.error('Error parsing brochures string:', error);
+      projectData.brochures = [];
+    }
+  }
+  
+  // Double-check that brochures is an array
+  if (!Array.isArray(projectData.brochures)) {
+    console.warn('🔧 brochures is not an array, converting to empty array');
+    projectData.brochures = [];
+  }
 
   console.log('🔧 Final projectData before create:', JSON.stringify(projectData, null, 2));
   console.log('🔧 brochures type:', typeof projectData.brochures);
