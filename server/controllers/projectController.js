@@ -143,13 +143,15 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   let brochures = [];
   if (req.files?.brochures?.length > 0) {
     try {
-      brochures = await uploadFileToCloudinary(req.files.brochures, 'projects/brochures');
-      console.log('🔧 Processed brochures:', brochures);
-      console.log('🔧 brochures type:', typeof brochures);
-      console.log('🔧 brochures is array:', Array.isArray(brochures));
+      const uploadedBrochures = await uploadFileToCloudinary(req.files.brochures, 'projects/brochures');
+      console.log('🔧 Processed brochures:', uploadedBrochures);
+      console.log('🔧 brochures type:', typeof uploadedBrochures);
+      console.log('🔧 brochures is array:', Array.isArray(uploadedBrochures));
       
       // Ensure brochures is always an array
-      if (!Array.isArray(brochures)) {
+      if (Array.isArray(uploadedBrochures)) {
+        brochures = uploadedBrochures;
+      } else {
         console.warn('🔧 brochures is not an array after processing, converting to empty array');
         brochures = [];
       }
@@ -189,30 +191,13 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     ...cleanReqBody,
     images,
     floorPlans,
-    brochures: Array.isArray(brochures) ? brochures : [], // Force array type
+    brochures: brochures, // Use the brochures array directly
     virtualTours: virtualTours || [],
     ...(coordinates && { 'location.coordinates': coordinates })
   };
 
-  // Ensure brochures is always an array and not a string
-  if (projectData.brochures && typeof projectData.brochures === 'string') {
-    try {
-      projectData.brochures = JSON.parse(projectData.brochures);
-    } catch (error) {
-      console.error('Error parsing brochures string:', error);
-      projectData.brochures = [];
-    }
-  }
-
-  // Double-check that brochures is an array
-  if (!Array.isArray(projectData.brochures)) {
-    console.warn('🔧 brochures is not an array, converting to empty array');
-    projectData.brochures = [];
-  }
-
   console.log('🔧 Final projectData before create - brochures only:', projectData.brochures);
   console.log('🔧 brochures type:', typeof projectData.brochures);
-  console.log('🔧 brochures value:', projectData.brochures);
   console.log('🔧 brochures is array:', Array.isArray(projectData.brochures));
   console.log('🔧 brochures length:', projectData.brochures?.length);
 
@@ -233,31 +218,21 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     developer: projectData.developer,
     images: projectData.images,
     floorPlans: projectData.floorPlans,
-    brochures: Array.isArray(projectData.brochures) ? projectData.brochures : [], // Force array
+    brochures: brochures, // Use the brochures array directly
     virtualTours: projectData.virtualTours,
     'location.coordinates': projectData['location.coordinates']
   };
 
-  // Final safety check - ensure brochures is an array
-  if (!Array.isArray(cleanProjectData.brochures)) {
-    console.warn('🔧 FINAL CHECK: brochures is not an array, setting to empty array');
-    cleanProjectData.brochures = [];
-  }
-
   console.log('🔧 Clean projectData brochures type:', typeof cleanProjectData.brochures);
   console.log('🔧 Clean projectData brochures is array:', Array.isArray(cleanProjectData.brochures));
-  console.log('🔧 Clean projectData brochures value:', cleanProjectData.brochures);
   console.log('🔧 Clean projectData developer:', cleanProjectData.developer);
-  console.log('🔧 Clean projectData brochures only:', cleanProjectData.brochures);
 
   console.log('🔧 FINAL brochures check - type:', typeof cleanProjectData.brochures);
   console.log('🔧 FINAL brochures check - is array:', Array.isArray(cleanProjectData.brochures));
-  console.log('🔧 FINAL brochures check - value:', cleanProjectData.brochures);
 
   // Additional debugging to see exactly what's being passed to Mongoose
-  console.log('🔧 About to call Project.create with brochures:', cleanProjectData.brochures);
+  console.log('🔧 About to call Project.create with brochures length:', cleanProjectData.brochures?.length);
   console.log('🔧 brochures constructor:', cleanProjectData.brochures?.constructor?.name);
-  console.log('🔧 brochures JSON stringify test:', JSON.stringify(cleanProjectData.brochures));
 
   const project = await Project.create(cleanProjectData);
 
