@@ -113,13 +113,6 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   // Process brochures if uploaded
   console.log('🔧 req.files.brochures:', req.files?.brochures);
   console.log('🔧 req.body.brochures:', req.body.brochures);
-  console.log('🔧 req.body keys:', Object.keys(req.body));
-  
-  // Check if brochures is being passed as a string in req.body
-  if (req.body.brochures && typeof req.body.brochures === 'string') {
-    console.log('🔧 brochures is a string, removing from req.body');
-    delete req.body.brochures;
-  }
   
   const brochures = req.files?.brochures?.length > 0
     ? await uploadFileToCloudinary(req.files.brochures, 'projects/brochures')
@@ -153,12 +146,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Ensure brochures is not in req.body before creating projectData
-  const cleanReqBody = { ...req.body };
-  delete cleanReqBody.brochures;
-  
   const projectData = {
-    ...cleanReqBody,
+    ...req.body,
     images,
     floorPlans,
     brochures: brochures || [],

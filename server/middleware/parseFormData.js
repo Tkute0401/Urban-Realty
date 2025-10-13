@@ -406,6 +406,16 @@ const parseFormData = (req, res, next) => {
   };
   
   const parsedBody = parseNestedFields(req.body);
+  
+  // Remove file upload fields from req.body since they should only be in req.files
+  const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
+  fileUploadFields.forEach(field => {
+    if (parsedBody[field]) {
+      console.log(`🔧 Removing ${field} from req.body (should be in req.files)`);
+      delete parsedBody[field];
+    }
+  });
+  
   console.log('🔧 Parsed req.body:', JSON.stringify(parsedBody, null, 2));
   
   req.body = parsedBody;
