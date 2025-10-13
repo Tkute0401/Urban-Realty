@@ -380,6 +380,7 @@ const uploadImagesToCloudinary = async (files, folder) => {
     try {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: folder,
+        access_mode: 'public', // Make images publicly accessible
         transformation: [
           { width: 1200, height: 800, crop: 'fill', quality: 'auto' },
           { format: 'auto' }
@@ -413,7 +414,8 @@ const uploadFileToCloudinary = async (files, folder) => {
     try {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: folder,
-        resource_type: 'raw'
+        resource_type: 'raw',
+        access_mode: 'public' // Make files publicly accessible
       });
       
       uploadedFiles.push({
@@ -446,6 +448,7 @@ const uploadVideoToCloudinary = async (files, folder) => {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: folder,
         resource_type: 'video',
+        access_mode: 'public', // Make videos publicly accessible
         transformation: [
           { width: 1280, height: 720, crop: 'fill', quality: 'auto' }
         ]
