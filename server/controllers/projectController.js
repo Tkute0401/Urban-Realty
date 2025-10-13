@@ -87,8 +87,8 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
 // @access  Private (Developer/Admin)
 exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 createProject called');
-  console.log('🔧 req.body:', JSON.stringify(req.body, null, 2));
-  console.log('🔧 req.files:', req.files);
+  console.log('🔧 req.body brochures:', req.body.brochures);
+  console.log('🔧 req.files brochures:', req.files?.brochures);
   console.log('🔧 Content-Type:', req.headers['content-type']);
 
   // Check if brochures is in req.body and remove it
@@ -116,7 +116,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 
   // Ensure req.body is clean and doesn't contain any file upload fields
   const cleanReqBody = { ...req.body };
-  console.log('🔧 cleanReqBody before cleaning:', JSON.stringify(cleanReqBody, null, 2));
+  console.log('🔧 cleanReqBody before cleaning - brochures:', cleanReqBody.brochures);
   const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
   fileUploadFields.forEach(field => {
     if (cleanReqBody[field]) {
@@ -124,7 +124,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
       delete cleanReqBody[field];
     }
   });
-  console.log('🔧 cleanReqBody after cleaning:', JSON.stringify(cleanReqBody, null, 2));
+  console.log('🔧 cleanReqBody after cleaning - brochures:', cleanReqBody.brochures);
 
   // Process images if uploaded
   const images = req.files?.images?.length > 0 
@@ -140,17 +140,23 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 req.files.brochures:', req.files?.brochures);
   console.log('🔧 req.body.brochures:', req.body.brochures);
   
-  let brochures = req.files?.brochures?.length > 0
-    ? await uploadFileToCloudinary(req.files.brochures, 'projects/brochures')
-    : [];
-  console.log('🔧 Processed brochures:', brochures);
-  console.log('🔧 brochures type:', typeof brochures);
-  console.log('🔧 brochures is array:', Array.isArray(brochures));
-  
-  // Ensure brochures is always an array
-  if (!Array.isArray(brochures)) {
-    console.warn('🔧 brochures is not an array after processing, converting to empty array');
-    brochures = [];
+  let brochures = [];
+  if (req.files?.brochures?.length > 0) {
+    try {
+      brochures = await uploadFileToCloudinary(req.files.brochures, 'projects/brochures');
+      console.log('🔧 Processed brochures:', brochures);
+      console.log('🔧 brochures type:', typeof brochures);
+      console.log('🔧 brochures is array:', Array.isArray(brochures));
+      
+      // Ensure brochures is always an array
+      if (!Array.isArray(brochures)) {
+        console.warn('🔧 brochures is not an array after processing, converting to empty array');
+        brochures = [];
+      }
+    } catch (error) {
+      console.error('🔧 Error processing brochures:', error);
+      brochures = [];
+    }
   }
 
   // Process virtual tours if uploaded
@@ -183,7 +189,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     ...cleanReqBody,
     images,
     floorPlans,
-    brochures: brochures || [],
+    brochures: Array.isArray(brochures) ? brochures : [], // Force array type
     virtualTours: virtualTours || [],
     ...(coordinates && { 'location.coordinates': coordinates })
   };
@@ -204,7 +210,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     projectData.brochures = [];
   }
 
-  console.log('🔧 Final projectData before create:', JSON.stringify(projectData, null, 2));
+  console.log('🔧 Final projectData before create - brochures only:', projectData.brochures);
   console.log('🔧 brochures type:', typeof projectData.brochures);
   console.log('🔧 brochures value:', projectData.brochures);
   console.log('🔧 brochures is array:', Array.isArray(projectData.brochures));
@@ -232,21 +238,26 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     'location.coordinates': projectData['location.coordinates']
   };
 
-  console.log('🔧 Clean projectData brochures type:', typeof cleanProjectData.brochures);
-  console.log('🔧 Clean projectData brochures is array:', Array.isArray(cleanProjectData.brochures));
-  console.log('🔧 Clean projectData brochures value:', cleanProjectData.brochures);
-  console.log('🔧 Clean projectData developer:', cleanProjectData.developer);
-  console.log('🔧 Clean projectData full object:', JSON.stringify(cleanProjectData, null, 2));
-
   // Final safety check - ensure brochures is an array
   if (!Array.isArray(cleanProjectData.brochures)) {
     console.warn('🔧 FINAL CHECK: brochures is not an array, setting to empty array');
     cleanProjectData.brochures = [];
   }
 
+  console.log('🔧 Clean projectData brochures type:', typeof cleanProjectData.brochures);
+  console.log('🔧 Clean projectData brochures is array:', Array.isArray(cleanProjectData.brochures));
+  console.log('🔧 Clean projectData brochures value:', cleanProjectData.brochures);
+  console.log('🔧 Clean projectData developer:', cleanProjectData.developer);
+  console.log('🔧 Clean projectData brochures only:', cleanProjectData.brochures);
+
   console.log('🔧 FINAL brochures check - type:', typeof cleanProjectData.brochures);
   console.log('🔧 FINAL brochures check - is array:', Array.isArray(cleanProjectData.brochures));
   console.log('🔧 FINAL brochures check - value:', cleanProjectData.brochures);
+
+  // Additional debugging to see exactly what's being passed to Mongoose
+  console.log('🔧 About to call Project.create with brochures:', cleanProjectData.brochures);
+  console.log('🔧 brochures constructor:', cleanProjectData.brochures?.constructor?.name);
+  console.log('🔧 brochures JSON stringify test:', JSON.stringify(cleanProjectData.brochures));
 
   const project = await Project.create(cleanProjectData);
 

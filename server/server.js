@@ -131,6 +131,7 @@ app.use('/api/v1/analytics', require('./src/api/routes/analyticsRoutes'));
 app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
+app.use('/api/v1/projects', require('./routes/projectRoutes'));
 console.log('✅ API routes registered');
 
 // Handle Next.js routes

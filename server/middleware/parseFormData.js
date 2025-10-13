@@ -1,6 +1,6 @@
 const parseFormData = (req, res, next) => {
   console.log('🔧 parseFormData middleware called');
-  console.log('🔧 Original req.body:', JSON.stringify(req.body, null, 2));
+  console.log('🔧 Original req.body brochures:', req.body.brochures);
   console.log('🔧 Content-Type:', req.headers['content-type']);
   
   // Parse nested object fields from FormData
@@ -416,7 +416,7 @@ const parseFormData = (req, res, next) => {
     }
   });
   
-  console.log('🔧 Parsed req.body:', JSON.stringify(parsedBody, null, 2));
+  console.log('🔧 Parsed req.body brochures:', parsedBody.brochures);
   
   req.body = parsedBody;
   next();
