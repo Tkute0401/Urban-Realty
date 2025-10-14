@@ -1,7 +1,4 @@
 const parseFormData = (req, res, next) => {
-  console.log('🔧 parseFormData middleware called');
-  console.log('🔧 Original req.body brochures:', req.body.brochures);
-  console.log('🔧 Content-Type:', req.headers['content-type']);
   
   // Parse nested object fields from FormData
   const parseNestedFields = (body) => {
@@ -411,12 +408,9 @@ const parseFormData = (req, res, next) => {
   const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
   fileUploadFields.forEach(field => {
     if (parsedBody[field]) {
-      console.log(`🔧 Removing ${field} from req.body (should be in req.files)`);
       delete parsedBody[field];
     }
   });
-  
-  console.log('🔧 Parsed req.body brochures:', parsedBody.brochures);
   
   req.body = parsedBody;
   next();

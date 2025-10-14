@@ -86,15 +86,10 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
 // @access  Private (Developer/Admin)
 exports.createProject = asyncHandler(async (req, res, next) => {
   console.log('🔧 createProject called');
-  console.log('🔧 req.body brochures:', req.body.brochures);
-  console.log('🔧 req.files brochures:', req.files?.brochures);
   console.log('🔧 Content-Type:', req.headers['content-type']);
 
   // Check if brochures is in req.body and remove it
   if (req.body.brochures) {
-    console.log('🔧 WARNING: brochures found in req.body, removing it');
-    console.log('🔧 req.body.brochures type:', typeof req.body.brochures);
-    console.log('🔧 req.body.brochures value:', req.body.brochures);
     delete req.body.brochures;
   }
 
@@ -110,20 +105,16 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
     
     req.body.developer = developer._id;
-    console.log('🔧 Set developer ID:', developer._id);
   }
 
   // Ensure req.body is clean and doesn't contain any file upload fields
   const cleanReqBody = { ...req.body };
-  console.log('🔧 cleanReqBody before cleaning - brochures:', cleanReqBody.brochures);
   const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
   fileUploadFields.forEach(field => {
     if (cleanReqBody[field]) {
-      console.log(`🔧 Removing ${field} from cleanReqBody`);
       delete cleanReqBody[field];
     }
   });
-  console.log('🔧 cleanReqBody after cleaning - brochures:', cleanReqBody.brochures);
 
   // Process images if uploaded (to Cloudinary)
   const images = req.files?.images?.length > 0 
@@ -136,24 +127,11 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     : [];
 
   // Process brochures if uploaded (to Railway's local storage)
-  console.log('🔧 req.files.brochures:', req.files?.brochures);
-  console.log('🔧 req.body.brochures:', req.body.brochures);
-  
   let brochures = [];
   if (req.files?.brochures?.length > 0) {
     try {
-      const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
-      console.log('🔧 Processed brochures:', uploadedBrochures);
-      console.log('🔧 brochures type:', typeof uploadedBrochures);
-      console.log('🔧 brochures is array:', Array.isArray(uploadedBrochures));
-      
-      // Ensure brochures is always an array
-      if (Array.isArray(uploadedBrochures)) {
-        brochures = uploadedBrochures;
-      } else {
-        console.warn('🔧 brochures is not an array after processing, converting to empty array');
-        brochures = [];
-      }
+      brochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
+      console.log('🔧 Processed brochures count:', brochures.length);
     } catch (error) {
       console.error('🔧 Error processing brochures:', error);
       brochures = [];
@@ -195,11 +173,6 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     ...(coordinates && { 'location.coordinates': coordinates })
   };
 
-  console.log('🔧 Final projectData before create - brochures only:', projectData.brochures);
-  console.log('🔧 brochures type:', typeof projectData.brochures);
-  console.log('🔧 brochures is array:', Array.isArray(projectData.brochures));
-  console.log('🔧 brochures length:', projectData.brochures?.length);
-
   // Create a clean projectData object to avoid any string conversion issues
   const cleanProjectData = {
     name: projectData.name,
@@ -222,16 +195,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     'location.coordinates': projectData['location.coordinates']
   };
 
-  console.log('🔧 Clean projectData brochures type:', typeof cleanProjectData.brochures);
-  console.log('🔧 Clean projectData brochures is array:', Array.isArray(cleanProjectData.brochures));
-  console.log('🔧 Clean projectData developer:', cleanProjectData.developer);
-
-  console.log('🔧 FINAL brochures check - type:', typeof cleanProjectData.brochures);
-  console.log('🔧 FINAL brochures check - is array:', Array.isArray(cleanProjectData.brochures));
-
-  // Additional debugging to see exactly what's being passed to Mongoose
-  console.log('🔧 About to call Project.create with brochures length:', cleanProjectData.brochures?.length);
-  console.log('🔧 brochures constructor:', cleanProjectData.brochures?.constructor?.name);
+  console.log('🔧 About to create project with brochures count:', cleanProjectData.brochures?.length);
 
   const project = await Project.create(cleanProjectData);
 
