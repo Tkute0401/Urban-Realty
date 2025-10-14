@@ -32,7 +32,13 @@ const generateUniqueFilename = (originalname) => {
 
 // Helper function to get file URL for Railway
 const getFileUrl = (filename, subfolder = '') => {
-  const baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.BASE_URL || 'http://localhost:5000';
+  let baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.BASE_URL || 'http://localhost:5000';
+  
+  // Ensure protocol is included
+  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+    baseUrl = `https://${baseUrl}`;
+  }
+  
   const folder = subfolder ? `/${subfolder}` : '';
   return `${baseUrl}/uploads${folder}/${filename}`;
 };
@@ -133,11 +139,9 @@ const uploadDocuments = async (files, subfolder = 'documents') => {
       
       uploadedDocuments.push({
         url: getFileUrl(filename, subfolder),
-        filename: filename,
+        publicId: filename, // Use filename as publicId for local storage
         name: file.originalname,
-        type: file.mimetype,
-        size: stats.size,
-        path: filepath
+        type: file.mimetype
       });
       
       // Delete original temp file
