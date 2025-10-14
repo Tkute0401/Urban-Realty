@@ -155,9 +155,10 @@ const ProjectSchema = new mongoose.Schema({
   
   // Media
   images: [{
-    url: String,
-    publicId: String,
-    caption: String,
+    _id: false,
+    url: { type: String },
+    publicId: { type: String },
+    caption: { type: String },
     isPrimary: {
       type: Boolean,
       default: false
@@ -165,27 +166,30 @@ const ProjectSchema = new mongoose.Schema({
   }],
   
   floorPlans: [{
-    url: String,
-    publicId: String,
-    unitType: String,
-    caption: String
+    _id: false,
+    url: { type: String },
+    publicId: { type: String },
+    unitType: { type: String },
+    caption: { type: String }
   }],
   
   brochures: [{
-    url: String,
-    publicId: String,
-    name: String,
-    type: String // PDF, DOC, etc.
+    _id: false,
+    url: { type: String },
+    publicId: { type: String },
+    name: { type: String },
+    type: { type: String } // PDF, DOC, etc.
   }],
   
   virtualTours: [{
-    url: String,
+    _id: false,
+    url: { type: String },
     type: {
       type: String,
       enum: ['video', '360', 'virtual_reality'],
       default: 'video'
     },
-    thumbnail: String
+    thumbnail: { type: String }
   }],
   
   // Legal and approvals
@@ -296,5 +300,10 @@ ProjectSchema.pre('deleteOne', { document: true, query: false }, async function(
   // Here you can add logic to delete related data like inquiries, etc.
   next();
 });
+
+// Delete existing model if it exists to prevent caching issues
+if (mongoose.models.Project) {
+  delete mongoose.models.Project;
+}
 
 module.exports = mongoose.model('Project', ProjectSchema);

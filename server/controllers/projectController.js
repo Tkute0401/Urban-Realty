@@ -147,13 +147,18 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   if (req.files?.brochures?.length > 0) {
     try {
       const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
-      // Create a completely clean array with no references
-      brochures = JSON.parse(JSON.stringify(uploadedBrochures.map(b => ({
-        url: b.url,
-        publicId: b.publicId,
-        name: b.name,
-        type: b.type
-      }))));
+      // Extract only the string values we need
+      brochures = uploadedBrochures.map(b => {
+        const clean = {
+          url: b.url ? String(b.url) : '',
+          publicId: b.publicId ? String(b.publicId) : '',
+          name: b.name ? String(b.name) : '',
+          type: b.type ? String(b.type) : ''
+        };
+        console.log('📄 Individual brochure object:', typeof clean, JSON.stringify(clean));
+        return clean;
+      });
+      console.log('📄 Final brochures array:', typeof brochures, Array.isArray(brochures), brochures.length);
     } catch (error) {
       console.error('Error processing brochures:', error);
       brochures = [];
@@ -186,8 +191,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Create project with processed data
-  const projectData = {
+  // Create new project instance
+  const project = new Project({
     name: cleanReqBody.name,
     description: cleanReqBody.description,
     shortDescription: cleanReqBody.shortDescription,
@@ -201,28 +206,37 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     pricePerSqFt: cleanReqBody.pricePerSqFt,
     startingPrice: cleanReqBody.startingPrice,
     developer: cleanReqBody.developer
-  };
+  });
 
-  // Only add arrays if they have data
+  // Assign arrays by pushing items individually
   if (images && images.length > 0) {
-    projectData.images = images;
+    images.forEach(img => project.images.push(img));
   }
   if (floorPlans && floorPlans.length > 0) {
-    projectData.floorPlans = floorPlans;
+    floorPlans.forEach(fp => project.floorPlans.push(fp));
   }
   if (brochures && brochures.length > 0) {
-    projectData.brochures = brochures;
+    console.log('📄 Before pushing to project.brochures, count:', brochures.length);
+    brochures.forEach((b, index) => {
+      console.log(`📄 Pushing brochure ${index}:`, typeof b, JSON.stringify(b));
+      project.brochures.push(b);
+      console.log(`📄 After push ${index}, project.brochures length:`, project.brochures.length);
+      console.log(`📄 Item in project.brochures[${index}]:`, typeof project.brochures[index], JSON.stringify(project.brochures[index]));
+    });
   }
   if (virtualTours && virtualTours.length > 0) {
-    projectData.virtualTours = virtualTours;
+    virtualTours.forEach(vt => project.virtualTours.push(vt));
   }
+  
+  console.log('📄 Right before save, project.brochures:', typeof project.brochures, Array.isArray(project.brochures), project.brochures?.length);
 
   // Add coordinates if they exist
   if (coordinates) {
-    projectData['location.coordinates'] = coordinates;
+    project.location.coordinates = coordinates;
   }
 
-  const project = await Project.create(projectData);
+  // Save the project
+  await project.save();
 
   // Populate developer information
   await project.populate('developer', 'name logo website');
