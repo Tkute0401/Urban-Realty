@@ -117,28 +117,29 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   let images = [];
   if (req.files?.images?.length > 0) {
     const uploadedImages = await uploadImages(req.files.images, 'projects');
-    images = uploadedImages.map(img => ({
+    const mappedImages = uploadedImages.map(img => ({
       url: img.url,
       publicId: img.publicId,
       caption: img.caption || '',
       isPrimary: false
     }));
     // Set first image as primary
-    if (images.length > 0) {
-      images[0].isPrimary = true;
+    if (mappedImages.length > 0) {
+      mappedImages[0].isPrimary = true;
     }
+    images = JSON.parse(JSON.stringify(mappedImages));
   }
 
   // Process floor plans if uploaded (to Cloudinary)
   let floorPlans = [];
   if (req.files?.floorPlans?.length > 0) {
     const uploadedFloorPlans = await uploadImages(req.files.floorPlans, 'projects/floor-plans');
-    floorPlans = uploadedFloorPlans.map(fp => ({
+    floorPlans = JSON.parse(JSON.stringify(uploadedFloorPlans.map(fp => ({
       url: fp.url,
       publicId: fp.publicId,
       unitType: fp.unitType || '',
       caption: fp.caption || ''
-    }));
+    }))));
   }
 
   // Process brochures if uploaded (to Railway's local storage)
@@ -146,12 +147,13 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   if (req.files?.brochures?.length > 0) {
     try {
       const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
-      brochures = uploadedBrochures.map(b => ({
+      // Create a completely clean array with no references
+      brochures = JSON.parse(JSON.stringify(uploadedBrochures.map(b => ({
         url: b.url,
         publicId: b.publicId,
         name: b.name,
         type: b.type
-      }));
+      }))));
     } catch (error) {
       console.error('Error processing brochures:', error);
       brochures = [];
@@ -162,11 +164,11 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   let virtualTours = [];
   if (req.files?.virtualTours?.length > 0) {
     const uploadedVirtualTours = await uploadVideos(req.files.virtualTours, 'projects/virtual-tours');
-    virtualTours = uploadedVirtualTours.map(vt => ({
+    virtualTours = JSON.parse(JSON.stringify(uploadedVirtualTours.map(vt => ({
       url: vt.url,
       type: 'video',
       thumbnail: vt.thumbnail || vt.url
-    }));
+    }))));
   }
 
   // Geocode location if address is provided
@@ -198,12 +200,22 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     possessionDate: cleanReqBody.possessionDate,
     pricePerSqFt: cleanReqBody.pricePerSqFt,
     startingPrice: cleanReqBody.startingPrice,
-    developer: cleanReqBody.developer,
-    images: images,
-    floorPlans: floorPlans,
-    brochures: brochures,
-    virtualTours: virtualTours
+    developer: cleanReqBody.developer
   };
+
+  // Only add arrays if they have data
+  if (images && images.length > 0) {
+    projectData.images = images;
+  }
+  if (floorPlans && floorPlans.length > 0) {
+    projectData.floorPlans = floorPlans;
+  }
+  if (brochures && brochures.length > 0) {
+    projectData.brochures = brochures;
+  }
+  if (virtualTours && virtualTours.length > 0) {
+    projectData.virtualTours = virtualTours;
+  }
 
   // Add coordinates if they exist
   if (coordinates) {
