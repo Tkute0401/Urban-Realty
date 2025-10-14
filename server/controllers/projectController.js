@@ -166,42 +166,45 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Create projectData object, ensuring brochures is properly handled
-  const projectData = {
-    ...cleanReqBody,
-    images,
-    floorPlans,
-    brochures: brochures, // Use the brochures array directly
-    virtualTours: virtualTours || [],
-    ...(coordinates && { 'location.coordinates': coordinates })
-  };
-
   // Create a clean projectData object to avoid any string conversion issues
   const cleanProjectData = {
-    name: projectData.name,
-    description: projectData.description,
-    shortDescription: projectData.shortDescription,
-    type: projectData.type,
-    status: projectData.status,
-    totalUnits: projectData.totalUnits,
-    totalArea: projectData.totalArea,
-    location: projectData.location,
-    launchDate: projectData.launchDate,
-    possessionDate: projectData.possessionDate,
-    pricePerSqFt: projectData.pricePerSqFt,
-    startingPrice: projectData.startingPrice,
-    developer: projectData.developer,
-    images: projectData.images,
-    floorPlans: projectData.floorPlans,
+    name: cleanReqBody.name,
+    description: cleanReqBody.description,
+    shortDescription: cleanReqBody.shortDescription,
+    type: cleanReqBody.type,
+    status: cleanReqBody.status,
+    totalUnits: cleanReqBody.totalUnits,
+    totalArea: cleanReqBody.totalArea,
+    location: cleanReqBody.location,
+    launchDate: cleanReqBody.launchDate,
+    possessionDate: cleanReqBody.possessionDate,
+    pricePerSqFt: cleanReqBody.pricePerSqFt,
+    startingPrice: cleanReqBody.startingPrice,
+    developer: cleanReqBody.developer,
+    images: images,
+    floorPlans: floorPlans,
     brochures: brochures, // Use the brochures array directly
-    virtualTours: projectData.virtualTours,
-    'location.coordinates': projectData['location.coordinates']
+    virtualTours: virtualTours
   };
+
+  // Add coordinates if they exist
+  if (coordinates) {
+    cleanProjectData['location.coordinates'] = coordinates;
+  }
 
   console.log('🔧 About to create project with brochures count:', cleanProjectData.brochures?.length);
   console.log('🔧 brochures type before create:', typeof cleanProjectData.brochures);
   console.log('🔧 brochures is array before create:', Array.isArray(cleanProjectData.brochures));
   console.log('🔧 brochures content before create:', cleanProjectData.brochures);
+
+  // Test: Try creating a minimal project with just brochures to isolate the issue
+  if (cleanProjectData.brochures && cleanProjectData.brochures.length > 0) {
+    console.log('🔧 Testing brochures array directly...');
+    const testBrochures = cleanProjectData.brochures;
+    console.log('🔧 Test brochures type:', typeof testBrochures);
+    console.log('🔧 Test brochures is array:', Array.isArray(testBrochures));
+    console.log('🔧 Test brochures constructor:', testBrochures.constructor?.name);
+  }
 
   const project = await Project.create(cleanProjectData);
 
