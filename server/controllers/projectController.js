@@ -85,10 +85,7 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/projects
 // @access  Private (Developer/Admin)
 exports.createProject = asyncHandler(async (req, res, next) => {
-  console.log('🔧 createProject called');
-  console.log('🔧 Content-Type:', req.headers['content-type']);
-
-  // Check if brochures is in req.body and remove it
+  // Check if brochures is in req.body and remove it (it should come from files)
   if (req.body.brochures) {
     delete req.body.brochures;
   }
@@ -117,38 +114,59 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   });
 
   // Process images if uploaded (to Cloudinary)
-  const images = req.files?.images?.length > 0 
-    ? await uploadImages(req.files.images, 'projects')
-    : [];
+  let images = [];
+  if (req.files?.images?.length > 0) {
+    const uploadedImages = await uploadImages(req.files.images, 'projects');
+    images = uploadedImages.map(img => ({
+      url: img.url,
+      publicId: img.publicId,
+      caption: img.caption || '',
+      isPrimary: false
+    }));
+    // Set first image as primary
+    if (images.length > 0) {
+      images[0].isPrimary = true;
+    }
+  }
 
   // Process floor plans if uploaded (to Cloudinary)
-  const floorPlans = req.files?.floorPlans?.length > 0
-    ? await uploadImages(req.files.floorPlans, 'projects/floor-plans')
-    : [];
+  let floorPlans = [];
+  if (req.files?.floorPlans?.length > 0) {
+    const uploadedFloorPlans = await uploadImages(req.files.floorPlans, 'projects/floor-plans');
+    floorPlans = uploadedFloorPlans.map(fp => ({
+      url: fp.url,
+      publicId: fp.publicId,
+      unitType: fp.unitType || '',
+      caption: fp.caption || ''
+    }));
+  }
 
   // Process brochures if uploaded (to Railway's local storage)
   let brochures = [];
   if (req.files?.brochures?.length > 0) {
     try {
-      brochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
-      console.log('🔧 Processed brochures count:', brochures.length);
-      console.log('🔧 brochures type after uploadDocuments:', typeof brochures);
-      console.log('🔧 brochures is array after uploadDocuments:', Array.isArray(brochures));
-      console.log('🔧 brochures content after uploadDocuments:', brochures);
+      const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
+      brochures = uploadedBrochures.map(b => ({
+        url: b.url,
+        publicId: b.publicId,
+        name: b.name,
+        type: b.type
+      }));
     } catch (error) {
-      console.error('🔧 Error processing brochures:', error);
+      console.error('Error processing brochures:', error);
       brochures = [];
     }
   }
 
   // Process virtual tours if uploaded (to Cloudinary)
-  const virtualTours = req.files?.virtualTours?.length > 0
-    ? await uploadVideos(req.files.virtualTours, 'projects/virtual-tours')
-    : [];
-
-  // Set primary image if images exist
-  if (images.length > 0) {
-    images[0].isPrimary = true;
+  let virtualTours = [];
+  if (req.files?.virtualTours?.length > 0) {
+    const uploadedVirtualTours = await uploadVideos(req.files.virtualTours, 'projects/virtual-tours');
+    virtualTours = uploadedVirtualTours.map(vt => ({
+      url: vt.url,
+      type: 'video',
+      thumbnail: vt.thumbnail || vt.url
+    }));
   }
 
   // Geocode location if address is provided
@@ -166,8 +184,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Create a clean projectData object to avoid any string conversion issues
-  const cleanProjectData = {
+  // Create project with processed data
+  const projectData = {
     name: cleanReqBody.name,
     description: cleanReqBody.description,
     shortDescription: cleanReqBody.shortDescription,
@@ -183,30 +201,16 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     developer: cleanReqBody.developer,
     images: images,
     floorPlans: floorPlans,
-    brochures: brochures, // Use the brochures array directly
+    brochures: brochures,
     virtualTours: virtualTours
   };
 
   // Add coordinates if they exist
   if (coordinates) {
-    cleanProjectData['location.coordinates'] = coordinates;
+    projectData['location.coordinates'] = coordinates;
   }
 
-  console.log('🔧 About to create project with brochures count:', cleanProjectData.brochures?.length);
-  console.log('🔧 brochures type before create:', typeof cleanProjectData.brochures);
-  console.log('🔧 brochures is array before create:', Array.isArray(cleanProjectData.brochures));
-  console.log('🔧 brochures content before create:', cleanProjectData.brochures);
-
-  // Test: Try creating a minimal project with just brochures to isolate the issue
-  if (cleanProjectData.brochures && cleanProjectData.brochures.length > 0) {
-    console.log('🔧 Testing brochures array directly...');
-    const testBrochures = cleanProjectData.brochures;
-    console.log('🔧 Test brochures type:', typeof testBrochures);
-    console.log('🔧 Test brochures is array:', Array.isArray(testBrochures));
-    console.log('🔧 Test brochures constructor:', testBrochures.constructor?.name);
-  }
-
-  const project = await Project.create(cleanProjectData);
+  const project = await Project.create(projectData);
 
   // Populate developer information
   await project.populate('developer', 'name logo website');
