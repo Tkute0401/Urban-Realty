@@ -132,6 +132,9 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     try {
       brochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
       console.log('🔧 Processed brochures count:', brochures.length);
+      console.log('🔧 brochures type after uploadDocuments:', typeof brochures);
+      console.log('🔧 brochures is array after uploadDocuments:', Array.isArray(brochures));
+      console.log('🔧 brochures content after uploadDocuments:', brochures);
     } catch (error) {
       console.error('🔧 Error processing brochures:', error);
       brochures = [];
@@ -196,6 +199,9 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   };
 
   console.log('🔧 About to create project with brochures count:', cleanProjectData.brochures?.length);
+  console.log('🔧 brochures type before create:', typeof cleanProjectData.brochures);
+  console.log('🔧 brochures is array before create:', Array.isArray(cleanProjectData.brochures));
+  console.log('🔧 brochures content before create:', cleanProjectData.brochures);
 
   const project = await Project.create(cleanProjectData);
 
