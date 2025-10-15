@@ -54,15 +54,16 @@ const ProjectSchema = new mongoose.Schema({
   },
   
   unitTypes: [{
+    _id: false,
     type: {
       type: String,
       enum: ['1BHK', '2BHK', '3BHK', '4BHK', '5BHK', 'Studio', 'Penthouse', 'Villa', 'Duplex', 'Other']
     },
-    count: Number,
-    area: Number,
+    count: { type: Number },
+    area: { type: Number },
     priceRange: {
-      min: Number,
-      max: Number
+      min: { type: Number },
+      max: { type: Number }
     }
   }],
   
@@ -99,7 +100,7 @@ const ProjectSchema = new mongoose.Schema({
         default: [0, 0]
       }
     },
-    landmarks: [String]
+    landmarks: [{ type: String }]
   },
   
   // Timeline
@@ -143,14 +144,16 @@ const ProjectSchema = new mongoose.Schema({
   
   // Amenities and features
   amenities: [{
-    name: String,
-    description: String,
-    icon: String
+    _id: false,
+    name: { type: String },
+    description: { type: String },
+    icon: { type: String }
   }],
   
   features: [{
-    name: String,
-    description: String
+    _id: false,
+    name: { type: String },
+    description: { type: String }
   }],
   
   // Media
@@ -194,10 +197,11 @@ const ProjectSchema = new mongoose.Schema({
   
   // Legal and approvals
   approvals: [{
-    name: String,
-    number: String,
-    issuingAuthority: String,
-    date: Date,
+    _id: false,
+    name: { type: String },
+    number: { type: String },
+    issuingAuthority: { type: String },
+    date: { type: Date },
     status: {
       type: String,
       enum: ['Approved', 'Pending', 'Rejected'],
@@ -212,10 +216,11 @@ const ProjectSchema = new mongoose.Schema({
   
   // Financial information
   paymentPlans: [{
-    name: String,
-    description: String,
-    percentage: Number,
-    timeline: String
+    _id: false,
+    name: { type: String },
+    description: { type: String },
+    percentage: { type: Number },
+    timeline: { type: String }
   }],
   
   // Contact information
@@ -232,7 +237,7 @@ const ProjectSchema = new mongoose.Schema({
   },
   
   // SEO and marketing
-  keywords: [String],
+  keywords: [{ type: String }],
   
   metaDescription: {
     type: String,

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import { useAuth } from '../../../contexts/AuthContext';
+import PropertyMap from '../../../components/property/PropertyMap';
 import {
   Box,
   Container,
@@ -668,6 +669,31 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                 </Stack>
               </CardContent>
             </Card>
+
+            {/* Location Map */}
+            {project.location?.coordinates && project.location.coordinates.coordinates?.length === 2 && (
+              <Card sx={{ mb: 3, backgroundColor: 'var(--color-surface)' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                    Project Location
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <PropertyMap
+                      latitude={project.location.coordinates.coordinates[1]}
+                      longitude={project.location.coordinates.coordinates[0]}
+                      address={`${project.location.address}, ${project.location.city}, ${project.location.state}`}
+                      height="300px"
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: 2 }}>
+                    <LocationOn sx={{ color: 'var(--color-primary)', mr: 1, mt: 0.5 }} />
+                    <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+                      {project.location.address}, {project.location.city}, {project.location.state} - {project.location.pincode}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Project Stats */}
             <Card sx={{ backgroundColor: 'var(--color-surface)' }}>

@@ -94,15 +94,16 @@ const PropertySchema = new mongoose.Schema({
     ],
     default: 'Under Construction'
   },
-  possessionDate: Date,
+  possessionDate: { type: Date },
   ageOfProperty: {
     type: Number,
     min: 0
   },
   approvals: [{
-    name: String,
-    number: String,
-    date: Date
+    _id: false,
+    name: { type: String },
+    number: { type: String },
+    date: { type: Date }
   }],
 
   // Location Information
@@ -229,6 +230,7 @@ const PropertySchema = new mongoose.Schema({
 
   // Media
   images: [{
+    _id: false,
     url: {
       type: String,
       required: true
@@ -237,24 +239,25 @@ const PropertySchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    width: Number,
-    height: Number,
+    width: { type: Number },
+    height: { type: Number },
     uploadedAt: {
       type: Date,
       default: Date.now
     }
   }],
   floorPlanImages: [{
-    url: String,
-    publicId: String,
-    description: String
+    _id: false,
+    url: { type: String },
+    publicId: { type: String },
+    description: { type: String }
   }],
   brochure: {
-    url: String,
-    publicId: String
+    url: { type: String },
+    publicId: { type: String }
   },
   virtualTour: {
-    url: String,
+    url: { type: String },
     type: {
       type: String,
       enum: ['video', '3d']
@@ -363,5 +366,10 @@ PropertySchema.index({
   'address.state': 'text',
   buildingName: 'text'
 });
+
+// Delete existing model if it exists to prevent caching issues
+if (mongoose.models.Property) {
+  delete mongoose.models.Property;
+}
 
 module.exports = mongoose.model('Property', PropertySchema);

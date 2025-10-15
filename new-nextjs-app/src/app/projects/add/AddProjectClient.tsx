@@ -230,17 +230,33 @@ const AddProjectClient = () => {
     }
   };
 
-  // Geocoding function
+  // Geocoding function using OpenStreetMap
   const geocodeAddress = async (address: string) => {
     if (!address.trim()) return null;
     
     setIsGeocoding(true);
     try {
-      // For now, we'll use a simple fallback approach
-      // In production, you should integrate with a proper geocoding service
-      // like Google Maps API, OpenCage, or Mapbox
+      // Use OpenStreetMap Nominatim for geocoding
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+        {
+          headers: {
+            'User-Agent': 'UrbanRealty/1.0'
+          }
+        }
+      );
       
-      // Simple fallback coordinates based on common Indian cities
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0) {
+          return {
+            type: 'Point',
+            coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)]
+          };
+        }
+      }
+      
+      // Fallback to city-based coordinates if API fails
       const cityCoordinates: { [key: string]: [number, number] } = {
         'delhi': [77.2090, 28.6139],
         'mumbai': [72.8777, 19.0760],
@@ -251,7 +267,8 @@ const AddProjectClient = () => {
         'pune': [73.8567, 18.5204],
         'ahmedabad': [72.5714, 23.0225],
         'jaipur': [75.7873, 26.9124],
-        'lucknow': [80.9462, 26.8467]
+        'lucknow': [80.9462, 26.8467],
+        'nashik': [73.7898, 19.9975]
       };
       
       const addressLower = address.toLowerCase();

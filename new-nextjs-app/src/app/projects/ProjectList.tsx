@@ -12,8 +12,9 @@ import {
 } from '@mui/material';
 import { 
   Add, Business, LocationOn, CalendarToday, 
-  AttachMoney, Visibility, Edit, Delete, MoreVert
+  AttachMoney, Visibility, Edit, Delete, MoreVert, Map as MapIcon
 } from '@mui/icons-material';
+import ProjectsMap from '../../components/projects/ProjectsMap';
 
 const ProjectList = () => {
   noStore();
@@ -23,8 +24,11 @@ const ProjectList = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   
   const [showMyProjects, setShowMyProjects] = useState(false);
+  const [showMap, setShowMap] = useState(!isTablet); // Hide map on mobile/tablet by default
+  const [selectedProject, setSelectedProject] = useState<any>(null);
 
   useEffect(() => {
     if (user?.role === 'developer') {
@@ -147,12 +151,32 @@ const ProjectList = () => {
           )}
         </Box>
         
-        <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
-          {showMyProjects 
-            ? `Your projects (${myProjects.length})` 
-            : `Browse all development projects (${projects.length})`
-          }
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
+            {showMyProjects 
+              ? `Your projects (${myProjects.length})` 
+              : `Browse all development projects (${projects.length})`
+            }
+          </Typography>
+          {!isTablet && displayProjects.length > 0 && (
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<MapIcon />}
+              onClick={() => setShowMap(!showMap)}
+              sx={{
+                borderColor: 'var(--color-primary)',
+                color: 'var(--color-primary)',
+                '&:hover': {
+                  borderColor: 'var(--color-primary)',
+                  bgcolor: 'rgba(120, 202, 220, 0.1)'
+                }
+              }}
+            >
+              {showMap ? 'Hide Map' : 'Show Map'}
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {error && (
@@ -191,16 +215,24 @@ const ProjectList = () => {
           )}
         </Box>
       ) : (
-        <Grid container spacing={3}>
-          {displayProjects.map((project) => (
-            <Grid item xs={12} sm={6} md={4} key={project._id}>
+        <Box sx={{ display: 'flex', gap: 3, height: showMap ? '600px' : 'auto' }}>
+          {/* Projects Grid */}
+          <Box sx={{ 
+            flex: showMap ? '0 0 50%' : '1', 
+            overflow: showMap ? 'auto' : 'visible',
+            pr: showMap ? 2 : 0
+          }}>
+            <Grid container spacing={3}>
+              {displayProjects.map((project) => (
+                <Grid item xs={12} sm={showMap ? 12 : 6} md={showMap ? 12 : 4} key={project._id}>
               <Card 
+                id={`project-${project._id}`}
                 sx={{ 
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   backgroundColor: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
+                  border: selectedProject?._id === project._id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
                   '&:hover': {
                     boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
                     transform: 'translateY(-2px)',
@@ -352,7 +384,28 @@ const ProjectList = () => {
               </Card>
             </Grid>
           ))}
-        </Grid>
+            </Grid>
+          </Box>
+
+          {/* Map View */}
+          {showMap && !isTablet && (
+            <Box sx={{ flex: '0 0 50%', position: 'sticky', top: 20, alignSelf: 'flex-start' }}>
+              <ProjectsMap
+                projects={displayProjects}
+                selectedProject={selectedProject}
+                onMarkerClick={(project) => {
+                  setSelectedProject(project);
+                  // Scroll to the project card
+                  const element = document.getElementById(`project-${project._id}`);
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }}
+                height="600px"
+              />
+            </Box>
+          )}
+        </Box>
       )}
     </Container>
   );

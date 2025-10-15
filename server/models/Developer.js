@@ -20,8 +20,8 @@ const DeveloperSchema = new mongoose.Schema({
     maxlength: [2000, 'Description cannot be more than 2000 characters']
   },
   logo: {
-    url: String,
-    publicId: String
+    url: { type: String },
+    publicId: { type: String }
   },
   website: {
     type: String,
@@ -55,23 +55,24 @@ const DeveloperSchema = new mongoose.Schema({
     default: 0
   },
   flagshipProjects: [{
-    name: String,
-    description: String
-  }]
-  ,
+    _id: false,
+    name: { type: String },
+    description: { type: String }
+  }],
   team: [{
-    name: String,
-    designation: String,
+    _id: false,
+    name: { type: String },
+    designation: { type: String },
     image: {
-      url: String,
-      publicId: String
+      url: { type: String },
+      publicId: { type: String }
     }
   }],
   specializations: [{
-    name: String,
-    description: String
-  }]
-  ,
+    _id: false,
+    name: { type: String },
+    description: { type: String }
+  }],
   contact: {
     email: {
       type: String,
@@ -89,14 +90,20 @@ const DeveloperSchema = new mongoose.Schema({
     instagram: String
   },
   awards: [{
-    name: String,
-    year: Number,
-    category: String
+    _id: false,
+    name: { type: String },
+    year: { type: Number },
+    category: { type: String }
   }],
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
+
+// Delete existing model if it exists to prevent caching issues
+if (mongoose.models.Developer) {
+  delete mongoose.models.Developer;
+}
 
 module.exports = mongoose.model('Developer', DeveloperSchema);
