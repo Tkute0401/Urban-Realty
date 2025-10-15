@@ -118,41 +118,54 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           clickableIcons: true,
         };
 
-        mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
+        console.log('PropertyMap initializing with options:', {
+          center: [longitude, latitude],
+          zoom,
+          address
+        });
 
-        // Add marker if enabled
-        if (showMarker) {
-          const marker = new window.mappls.Marker({
-            map: mapInstanceRef.current,
-            position: { lat: latitude, lng: longitude },
-            fitbounds: false,
-            icon: {
-              url: 'https://apis.mapmyindia.com/map_v3/1.png',
-              width: 35,
-              height: 50
+        // Add a small delay to ensure Mappls SDK is fully ready
+        setTimeout(() => {
+          mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
+          console.log('PropertyMap: Map created successfully');
+        }, 100);
+
+          // Add marker if enabled
+          if (showMarker) {
+            const marker = new window.mappls.Marker({
+              map: mapInstanceRef.current,
+              position: { lat: latitude, lng: longitude },
+              fitbounds: false,
+              icon: {
+                url: 'https://apis.mapmyindia.com/map_v3/1.png',
+                width: 35,
+                height: 50
+              }
+            });
+
+            // Add popup with address if provided
+            if (address) {
+              const infoWindow = new window.mappls.InfoWindow({
+                content: `
+                  <div style="padding: 10px; max-width: 200px;">
+                    <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">Property Location</h3>
+                    <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">${address}</p>
+                  </div>
+                `,
+                position: { lat: latitude, lng: longitude }
+              });
+
+              marker.addListener('click', () => {
+                infoWindow.open(mapInstanceRef.current);
+              });
             }
-          });
-
-          // Add popup with address if provided
-          if (address) {
-            const infoWindow = new window.mappls.InfoWindow({
-              content: `
-                <div style="padding: 10px; max-width: 200px;">
-                  <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">Property Location</h3>
-                  <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">${address}</p>
-                </div>
-              `,
-              position: { lat: latitude, lng: longitude }
-            });
-
-            marker.addListener('click', () => {
-              infoWindow.open(mapInstanceRef.current);
-            });
+            
+            console.log('PropertyMap: Marker created successfully');
           }
-        }
 
-        setMapLoaded(true);
-        setMapError(null);
+          setMapLoaded(true);
+          setMapError(null);
+        }, 100);
       } catch (error: any) {
         console.error('Error initializing map:', error);
         setMapError(`Failed to initialize map: ${error?.message || 'Unknown error'}`);
