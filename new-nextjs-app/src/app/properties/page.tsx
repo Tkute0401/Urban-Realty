@@ -30,18 +30,21 @@ import {
   ArrowBack,
   LocationOn,
   Add,
-  Refresh
+  Refresh,
+  MyLocation
 } from '@mui/icons-material';
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyList from '@/components/property/PropertyList';
 import PropertiesMap from '@/components/property/PropertiesMap';
 import MapTest from '@/components/property/MapTest';
+import { useLocation } from '@/hooks/useLocation';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 const PropertiesPageContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { properties, loading, error, pagination, getProperties } = useProperties();
+  const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
@@ -134,6 +137,12 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.maxArea) params.maxArea = Number(filters.maxArea);
     if (filters.propertyType !== 'ALL') {
       params.status = filters.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
+    }
+
+    // Add user location for distance-based sorting
+    if (userLocation) {
+      params.userLat = userLocation.latitude;
+      params.userLng = userLocation.longitude;
     }
 
     getProperties(params);
@@ -1222,19 +1231,53 @@ const PropertiesPageContent: React.FC = () => {
 
           {/* All Properties Heading */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography variant="h3" sx={{ 
-              color: 'var(--color-primary)', 
-              fontWeight: 700,
-              mb: 1
-            }}>
-              All Properties
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mb: 2 }}>
+              <Typography variant="h3" sx={{ 
+                color: 'var(--color-primary)', 
+                fontWeight: 700
+              }}>
+                All Properties
+              </Typography>
+              <IconButton
+                onClick={requestLocation}
+                disabled={locationLoading}
+                sx={{
+                  backgroundColor: userLocation ? 'var(--color-primary)' : 'var(--color-background-secondary)',
+                  color: userLocation ? 'white' : 'var(--color-text-muted)',
+                  '&:hover': {
+                    backgroundColor: userLocation ? 'var(--color-primary-dark)' : 'var(--color-primary)',
+                    color: 'white'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+                title={userLocation ? 'Location detected' : 'Detect my location'}
+              >
+                {locationLoading ? <CircularProgress size={20} /> : <MyLocation />}
+              </IconButton>
+            </Box>
             <Typography variant="h6" sx={{ 
               color: 'var(--color-text-muted)',
               fontWeight: 500
             }}>
               {properties.length} LISTINGS
+              {userLocation && (
+                <Chip 
+                  label="Sorted by distance" 
+                  size="small" 
+                  sx={{ 
+                    ml: 2, 
+                    backgroundColor: 'var(--color-primary-light)',
+                    color: 'var(--color-primary)',
+                    border: '1px solid var(--color-primary)'
+                  }} 
+                />
+              )}
             </Typography>
+            {locationError && (
+              <Alert severity="warning" sx={{ mt: 2, maxWidth: 400, mx: 'auto' }}>
+                {locationError}
+              </Alert>
+            )}
           </Box>
 
           {/* Properties List with Map */}
@@ -1258,7 +1301,17 @@ const PropertiesPageContent: React.FC = () => {
                 overflow: 'hidden',
                 border: '1px solid var(--color-border)'
               }}>
-                <MapTest />
+                <PropertiesMap 
+                  properties={properties}
+                  userLocation={userLocation}
+                  onMarkerClick={(property) => {
+                    // Scroll to property card
+                    const element = document.getElementById(`property-${property._id}`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }}
+                />
               </Box>
             </Grid>
           </Grid>

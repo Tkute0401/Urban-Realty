@@ -4,11 +4,84 @@ const Project = require('../models/Project');
 const Developer = require('../models/Developer');
 const { uploadImages, uploadVideos, uploadDocuments, deleteFiles } = require('../services/fileUploadService');
 
+// Helper function to calculate distance between two points using Haversine formula
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // Distance in kilometers
+  return distance;
+};
+
 // @desc    Get all projects
 // @route   GET /api/v1/projects
 // @access  Public
 exports.getProjects = asyncHandler(async (req, res, next) => {
-  res.status(200).json(res.advancedResults);
+  try {
+    // Get projects from advancedResults middleware
+    const projects = res.advancedResults.data;
+    const pagination = res.advancedResults.pagination;
+
+    // Handle location-based sorting
+    let userLocation = null;
+    if (req.query.userLat && req.query.userLng) {
+      userLocation = {
+        type: 'Point',
+        coordinates: [parseFloat(req.query.userLng), parseFloat(req.query.userLat)]
+      };
+    }
+
+    // Calculate distances if user location is provided
+    let projectsWithDistance = projects;
+    if (userLocation) {
+      projectsWithDistance = projects.map(project => {
+        if (project.location && project.location.coordinates) {
+          const distance = calculateDistance(
+            userLocation.coordinates[1], // user lat
+            userLocation.coordinates[0], // user lng
+            project.location.coordinates[1], // project lat
+            project.location.coordinates[0]  // project lng
+          );
+          return {
+            ...project.toObject(),
+            distance: Math.round(distance * 100) / 100 // Round to 2 decimal places
+          };
+        }
+        return {
+          ...project.toObject(),
+          distance: null
+        };
+      });
+
+      // Sort by distance if user location is provided and no explicit sort
+      if (!req.query.sort) {
+        projectsWithDistance.sort((a, b) => {
+          if (a.distance === null) return 1;
+          if (b.distance === null) return -1;
+          return a.distance - b.distance;
+        });
+      }
+    }
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      count: projectsWithDistance.length,
+      pagination,
+      userLocation: userLocation ? {
+        latitude: userLocation.coordinates[1],
+        longitude: userLocation.coordinates[0]
+      } : null,
+      data: projectsWithDistance
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // @desc    Get single project
@@ -174,14 +247,57 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   let coordinates = null;
   if (req.body.location?.address) {
     try {
-      // For now, we'll set a default coordinate or you can integrate with a geocoding service
-      // You can replace this with actual geocoding API call
+      const geocoder = require('../utils/hybridGeocoder');
+      
+      // First try with simplified address (city + state + country) for better success rate
+      let addressString = [
+        req.body.location.city,
+        req.body.location.state,
+        req.body.location.country || 'India'
+      ].filter(Boolean).join(', ');
+
+      console.log('🗺️ Project geocoding with simplified address:', addressString);
+      let loc = await geocoder.geocode(addressString);
+      
+      // If simplified address fails, try with more details
+      if (!loc || loc.length === 0) {
+        console.log('🗺️ Simplified project geocoding failed, trying with full address...');
+        addressString = [
+          req.body.location.address,
+          req.body.location.city,
+          req.body.location.state,
+          req.body.location.country || 'India'
+        ].filter(Boolean).join(', ');
+        
+        console.log('🗺️ Project geocoding with full address:', addressString);
+        loc = await geocoder.geocode(addressString);
+      }
+      
+      if (loc && loc.length > 0) {
+        console.log('✅ Project geocoding successful:', {
+          coordinates: [loc[0].longitude, loc[0].latitude],
+          formattedAddress: loc[0].formattedAddress
+        });
+        
+        coordinates = {
+          type: 'Point',
+          coordinates: [loc[0].longitude, loc[0].latitude]
+        };
+      } else {
+        console.warn('⚠️ Project geocoding failed - no results returned for address:', addressString);
+        // Fallback to Delhi coordinates if geocoding fails
+        coordinates = {
+          type: 'Point',
+          coordinates: [77.2090, 28.6139] // Default to Delhi coordinates
+        };
+      }
+    } catch (error) {
+      console.error('❌ Project geocoding error:', error.message);
+      // Fallback to Delhi coordinates if geocoding fails
       coordinates = {
         type: 'Point',
         coordinates: [77.2090, 28.6139] // Default to Delhi coordinates
       };
-    } catch (error) {
-      console.error('Geocoding error:', error);
     }
   }
 

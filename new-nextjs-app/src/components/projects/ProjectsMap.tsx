@@ -18,9 +18,16 @@ interface Project {
   };
 }
 
+interface UserLocation {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+}
+
 interface ProjectsMapProps {
   projects: Project[];
   selectedProject?: Project | null;
+  userLocation?: UserLocation | null;
   onMarkerClick?: (project: Project) => void;
   height?: string;
 }
@@ -28,6 +35,7 @@ interface ProjectsMapProps {
 const ProjectsMap: React.FC<ProjectsMapProps> = ({
   projects,
   selectedProject,
+  userLocation,
   onMarkerClick,
   height = '500px'
 }) => {
@@ -131,13 +139,31 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         }
 
         // Calculate center and zoom
-        const firstProject = validProjects[0];
-        const [lng, lat] = firstProject.location.coordinates.coordinates;
+        let mapCenter: [number, number];
+        let mapZoom: number;
+
+        if (userLocation) {
+          // Center on user location
+          mapCenter = [userLocation.longitude, userLocation.latitude];
+          mapZoom = 12;
+          console.log('Initializing map centered on user location:', mapCenter);
+        } else if (validProjects.length > 0) {
+          // Center on first project
+          const firstProject = validProjects[0];
+          mapCenter = firstProject.location.coordinates.coordinates;
+          mapZoom = validProjects.length > 1 ? 6 : 12;
+          console.log('Initializing map centered on first project:', mapCenter);
+        } else {
+          // Default to Delhi
+          mapCenter = [77.2090, 28.6139];
+          mapZoom = 10;
+          console.log('Initializing map with default center (Delhi):', mapCenter);
+        }
 
         // Initialize map
         mapInstanceRef.current = new window.mappls.Map(container, {
-          center: [lng, lat],
-          zoom: validProjects.length > 1 ? 6 : 12,
+          center: mapCenter,
+          zoom: mapZoom,
           zoomControl: true,
           fullscreenControl: true,
           scrollWheel: true,
@@ -197,10 +223,35 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           return marker;
         });
 
+        // Add user location marker if available
+        if (userLocation) {
+          try {
+            const userMarker = new window.mappls.Marker({
+              map: mapInstanceRef.current,
+              position: {
+                lat: userLocation.latitude,
+                lng: userLocation.longitude
+              },
+              icon: {
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                  </svg>
+                `)}`,
+                scaledSize: { width: 24, height: 24 }
+              }
+            });
+            console.log('User location marker created successfully');
+          } catch (error) {
+            console.warn('Failed to create user location marker:', error);
+          }
+        }
+
         markersRef.current = newMarkers;
 
-        // Fit bounds if multiple projects
-        if (validProjects.length > 1) {
+        // Fit bounds if multiple projects (only if no user location)
+        if (validProjects.length > 1 && !userLocation) {
           const bounds = validProjects.map(p => ({
             lat: p.location.coordinates.coordinates[1],
             lng: p.location.coordinates.coordinates[0]

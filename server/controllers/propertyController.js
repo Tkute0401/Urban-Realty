@@ -8,6 +8,20 @@ const geocoder = require('../utils/hybridGeocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
 
+// Helper function to calculate distance between two points using Haversine formula
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // Distance in kilometers
+  return distance;
+};
+
 // Debug model imports
 console.log('🔧 Property Controller - Model imports:', {
   Property: Property ? 'Loaded' : 'Failed',
@@ -75,10 +89,22 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     query = query.populate('agent', 'name email phone')
                 .populate('developer', 'name logo');
 
-    // 8. Sorting
+    // 8. Handle location-based sorting
+    let userLocation = null;
+    if (req.query.userLat && req.query.userLng) {
+      userLocation = {
+        type: 'Point',
+        coordinates: [parseFloat(req.query.userLng), parseFloat(req.query.userLat)]
+      };
+    }
+
+    // 9. Sorting
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
+    } else if (userLocation) {
+      // Sort by distance if user location is provided
+      query = query.sort({ 'location.coordinates': 1 });
     } else {
       query = query.sort('-createdAt');
     }
@@ -102,17 +128,53 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     // 11. Execute query
     const properties = await query;
 
-    // 12. Send response
+    // 12. Calculate distances if user location is provided
+    let propertiesWithDistance = properties;
+    if (userLocation) {
+      propertiesWithDistance = properties.map(property => {
+        if (property.location && property.location.coordinates) {
+          const distance = calculateDistance(
+            userLocation.coordinates[1], // user lat
+            userLocation.coordinates[0], // user lng
+            property.location.coordinates[1], // property lat
+            property.location.coordinates[0]  // property lng
+          );
+          return {
+            ...property.toObject(),
+            distance: Math.round(distance * 100) / 100 // Round to 2 decimal places
+          };
+        }
+        return {
+          ...property.toObject(),
+          distance: null
+        };
+      });
+
+      // Sort by distance if user location is provided and no explicit sort
+      if (!req.query.sort) {
+        propertiesWithDistance.sort((a, b) => {
+          if (a.distance === null) return 1;
+          if (b.distance === null) return -1;
+          return a.distance - b.distance;
+        });
+      }
+    }
+
+    // 13. Send response
     res.status(200).json({
       success: true,
-      count: properties.length,
+      count: propertiesWithDistance.length,
       pagination: {
         currentPage: page,
         limit,
         totalPages: Math.ceil(total / limit),
         totalResults: total
       },
-      data: properties
+      userLocation: userLocation ? {
+        latitude: userLocation.coordinates[1],
+        longitude: userLocation.coordinates[0]
+      } : null,
+      data: propertiesWithDistance
     });
 
   } catch (err) {
@@ -328,24 +390,6 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Helper function to calculate distance between two coordinates in km
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Radius of the earth in km
-  const dLat = deg2rad(lat2 - lat1);
-  const dLon = deg2rad(lon2 - lon1); 
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-    ; 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  const distance = R * c; // Distance in km
-  return distance;
-}
-
-function deg2rad(deg) {
-  return deg * (Math.PI/180);
-}
 
 // @desc    Create new property
 // @route   POST /api/v1/properties
@@ -486,18 +530,38 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
     // Try to geocode the address if provided
     if (req.body.address) {
       try {
-        const addressString = [
-          req.body.address.line1,
-          req.body.address.street,
+        // First try with simplified address (city + state + country) for better success rate
+        let addressString = [
           req.body.address.city,
           req.body.address.state,
-          req.body.address.zipCode,
-          req.body.address.country
+          req.body.address.country || 'India'
         ].filter(Boolean).join(', ');
 
-        const loc = await geocoder.geocode(addressString);
+        console.log('🗺️ Attempting geocoding with simplified address:', addressString);
+        let loc = await geocoder.geocode(addressString);
+        
+        // If simplified address fails, try with more details
+        if (!loc || loc.length === 0) {
+          console.log('🗺️ Simplified geocoding failed, trying with full address...');
+          addressString = [
+            req.body.address.line1,
+            req.body.address.street,
+            req.body.address.city,
+            req.body.address.state,
+            req.body.address.zipCode,
+            req.body.address.country || 'India'
+          ].filter(Boolean).join(', ');
+          
+          console.log('🗺️ Attempting geocoding with full address:', addressString);
+          loc = await geocoder.geocode(addressString);
+        }
         
         if (loc && loc.length > 0) {
+          console.log('✅ Geocoding successful:', {
+            coordinates: [loc[0].longitude, loc[0].latitude],
+            formattedAddress: loc[0].formattedAddress
+          });
+          
           property.location = {
             type: 'Point',
             coordinates: [loc[0].longitude, loc[0].latitude],
@@ -506,12 +570,14 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
             city: loc[0].city || req.body.address.city,
             state: loc[0].stateCode || req.body.address.state,
             zipCode: loc[0].zipcode || req.body.address.zipCode,
-            country: loc[0].countryCode || req.body.address.country
+            country: loc[0].countryCode || req.body.address.country || 'India'
           };
           await property.save();
+        } else {
+          console.warn('⚠️ Geocoding failed - no results returned for address:', addressString);
         }
       } catch (err) {
-        console.error('Geocoding failed:', err);
+        console.error('❌ Geocoding failed:', err.message);
         // Continue even if geocoding fails
       }
     }

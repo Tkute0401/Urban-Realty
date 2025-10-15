@@ -12,15 +12,17 @@ import {
 } from '@mui/material';
 import { 
   Add, Business, LocationOn, CalendarToday, 
-  AttachMoney, Visibility, Edit, Delete, MoreVert, Map as MapIcon
+  AttachMoney, Visibility, Edit, Delete, MoreVert, Map as MapIcon, MyLocation
 } from '@mui/icons-material';
 import ProjectsMap from '../../components/projects/ProjectsMap';
+import { useLocation } from '../../hooks/useLocation';
 
 const ProjectList = () => {
   noStore();
   
   const { projects, myProjects, loading, error, getProjects, getMyProjects, deleteProject } = useProjects();
   const { user } = useAuth();
+  const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -34,8 +36,15 @@ const ProjectList = () => {
     if (user?.role === 'developer') {
       getMyProjects();
     }
-    getProjects();
-  }, [user, getProjects, getMyProjects]);
+    
+    // Get projects with user location if available
+    const params: any = {};
+    if (userLocation) {
+      params.userLat = userLocation.latitude;
+      params.userLng = userLocation.longitude;
+    }
+    getProjects(params);
+  }, [user, getProjects, getMyProjects, userLocation]);
 
   const handleDeleteProject = async (projectId: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
@@ -95,9 +104,27 @@ const ProjectList = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h4" sx={{ color: 'var(--color-primary)' }}>
-            Developer Projects
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="h4" sx={{ color: 'var(--color-primary)' }}>
+              Developer Projects
+            </Typography>
+            <IconButton
+              onClick={requestLocation}
+              disabled={locationLoading}
+              sx={{
+                backgroundColor: userLocation ? 'var(--color-primary)' : 'var(--color-background-secondary)',
+                color: userLocation ? 'white' : 'var(--color-text-muted)',
+                '&:hover': {
+                  backgroundColor: userLocation ? 'var(--color-primary-dark)' : 'var(--color-primary)',
+                  color: 'white'
+                },
+                transition: 'all 0.3s ease'
+              }}
+              title={userLocation ? 'Location detected' : 'Detect my location'}
+            >
+              {locationLoading ? <CircularProgress size={20} /> : <MyLocation />}
+            </IconButton>
+          </Box>
           
           {user?.role === 'developer' && (
             <Box sx={{ display: 'flex', gap: 1 }}>
@@ -393,6 +420,7 @@ const ProjectList = () => {
               <ProjectsMap
                 projects={displayProjects}
                 selectedProject={selectedProject}
+                userLocation={userLocation}
                 onMarkerClick={(project) => {
                   setSelectedProject(project);
                   // Scroll to the project card
