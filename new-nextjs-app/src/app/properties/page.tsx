@@ -242,6 +242,13 @@ const PropertiesPageContent: React.FC = () => {
     );
   }
 
+  console.log('🔍 Properties page rendering:', {
+    isMobile,
+    propertiesCount: properties.length,
+    userLocation,
+    mounted
+  });
+
   return (
     <Box sx={{
       minHeight: '100vh',

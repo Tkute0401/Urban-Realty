@@ -40,6 +40,12 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   onMarkerClick,
   height = '500px'
 }) => {
+  console.log('🚀 PropertiesMap component rendering with:', {
+    propertiesCount: properties?.length,
+    userLocation,
+    selectedProperty: selectedProperty?._id
+  });
+
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -101,7 +107,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
   // Initialize map and markers
   useEffect(() => {
-    console.log('PropertiesMap useEffect triggered:', {
+    console.log('🔍 PropertiesMap useEffect triggered:', {
       scriptLoaded,
       propertiesLength: properties?.length,
       userLocation,
