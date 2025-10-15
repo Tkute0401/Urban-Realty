@@ -76,10 +76,23 @@ const MapTest: React.FC = () => {
           return;
         }
 
+        // Check if container is properly mounted and visible
+        const container = mapRef.current;
+        if (!container || !container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
+          console.warn('Map container not ready, retrying in 500ms...');
+          setTimeout(initializeMap, 500);
+          return;
+        }
+
         console.log('Initializing test map...');
+        console.log('Container dimensions:', {
+          width: container.offsetWidth,
+          height: container.offsetHeight,
+          visible: container.offsetParent !== null
+        });
         
         // Initialize map with Delhi coordinates
-        mapInstanceRef.current = new window.mappls.Map(mapRef.current, {
+        mapInstanceRef.current = new window.mappls.Map(container, {
           center: [77.2090, 28.6139], // Delhi coordinates
           zoom: 12,
           zoomControl: true,
@@ -131,8 +144,26 @@ const MapTest: React.FC = () => {
       }
     };
 
-    // Wait a bit for the container to be ready
-    setTimeout(initializeMap, 500);
+    // Wait for the container to be ready with retry mechanism
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    const tryInitialize = () => {
+      const container = mapRef.current;
+      if (!container || !container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Map container not ready, retry ${retryCount}/${maxRetries}...`);
+          setTimeout(tryInitialize, 200);
+        } else {
+          setMapError('Map container failed to initialize after multiple retries');
+        }
+        return;
+      }
+      initializeMap();
+    };
+    
+    setTimeout(tryInitialize, 1000);
   }, [scriptLoaded]);
 
   return (
@@ -160,6 +191,7 @@ const MapTest: React.FC = () => {
 
       <Box
         ref={mapRef}
+        id={`map-test-container-${Math.random().toString(36).substr(2, 9)}`}
         sx={{
           width: '100%',
           height: '400px',

@@ -133,11 +133,17 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
         // Verify the container element is valid and visible
         const container = mapRef.current;
-        if (!container || !container.offsetParent) {
+        if (!container || !container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
           console.warn('Map container not ready, retrying...');
-          setTimeout(initializeMap, 200);
+          setTimeout(initializeMap, 500);
           return;
         }
+
+        console.log('Container ready:', {
+          width: container.offsetWidth,
+          height: container.offsetHeight,
+          visible: container.offsetParent !== null
+        });
 
         // Filter properties with valid coordinates
         const validProperties = properties.filter(property => 
@@ -257,8 +263,26 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       }
     };
 
-    // Delay to ensure DOM is fully ready
-    const timer = setTimeout(initializeMap, 300);
+    // Wait for the container to be ready with retry mechanism
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    const tryInitialize = () => {
+      const container = mapRef.current;
+      if (!container || !container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Map container not ready, retry ${retryCount}/${maxRetries}...`);
+          setTimeout(tryInitialize, 200);
+        } else {
+          setMapError('Map container failed to initialize after multiple retries');
+        }
+        return;
+      }
+      initializeMap();
+    };
+    
+    const timer = setTimeout(tryInitialize, 1000);
     
     return () => {
       clearTimeout(timer);
