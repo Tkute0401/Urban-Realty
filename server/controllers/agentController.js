@@ -8,7 +8,7 @@ exports.getDashboard = asyncHandler(async (req, res, next) => {
   try {
     // Get agent's properties, leads, and analytics
     const Property = require('../models/Property');
-    const Contact = require('../models/Contact');
+    const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.user.id;
     
@@ -16,10 +16,10 @@ exports.getDashboard = asyncHandler(async (req, res, next) => {
     const propertiesCount = await Property.countDocuments({ agent: agentId });
     
     // Get agent's leads count
-    const leadsCount = await Contact.countDocuments({ agent: agentId });
+    const leadsCount = await ContactRequest.countDocuments({ agent: agentId });
     
     // Get recent leads
-    const recentLeads = await Contact.find({ agent: agentId })
+    const recentLeads = await ContactRequest.find({ agent: agentId })
       .sort('-createdAt')
       .limit(5)
       .populate('property', 'title location');
@@ -49,14 +49,14 @@ exports.getDashboard = asyncHandler(async (req, res, next) => {
 exports.getAnalytics = asyncHandler(async (req, res, next) => {
   try {
     const Property = require('../models/Property');
-    const Contact = require('../models/Contact');
+    const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.user.id;
     
     // Get analytics data
     const totalProperties = await Property.countDocuments({ agent: agentId });
-    const totalLeads = await Contact.countDocuments({ agent: agentId });
-    const monthlyLeads = await Contact.countDocuments({
+    const totalLeads = await ContactRequest.countDocuments({ agent: agentId });
+    const monthlyLeads = await ContactRequest.countDocuments({
       agent: agentId,
       createdAt: {
         $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -82,20 +82,20 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
 // @access  Private/Agent
 exports.getLeads = asyncHandler(async (req, res, next) => {
   try {
-    const Contact = require('../models/Contact');
+    const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.user.id;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const leads = await Contact.find({ agent: agentId })
+    const leads = await ContactRequest.find({ agent: agentId })
       .populate('property', 'title location price')
       .sort('-createdAt')
       .skip(skip)
       .limit(limit);
 
-    const total = await Contact.countDocuments({ agent: agentId });
+    const total = await ContactRequest.countDocuments({ agent: agentId });
 
     res.status(200).json({
       success: true,
@@ -154,7 +154,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
 exports.getAdminDashboard = asyncHandler(async (req, res, next) => {
   try {
     const Property = require('../models/Property');
-    const Contact = require('../models/Contact');
+    const ContactRequest = require('../models/ContactRequest');
     const User = require('../models/User');
     
     const agentId = req.params.agentId;
@@ -167,7 +167,7 @@ exports.getAdminDashboard = asyncHandler(async (req, res, next) => {
     
     // Get agent's data
     const propertiesCount = await Property.countDocuments({ agent: agentId });
-    const leadsCount = await Contact.countDocuments({ agent: agentId });
+    const leadsCount = await ContactRequest.countDocuments({ agent: agentId });
     
     res.status(200).json({
       success: true,
@@ -193,12 +193,12 @@ exports.getAdminDashboard = asyncHandler(async (req, res, next) => {
 exports.getAdminAnalytics = asyncHandler(async (req, res, next) => {
   try {
     const Property = require('../models/Property');
-    const Contact = require('../models/Contact');
+    const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.params.agentId;
     
     const totalProperties = await Property.countDocuments({ agent: agentId });
-    const totalLeads = await Contact.countDocuments({ agent: agentId });
+    const totalLeads = await ContactRequest.countDocuments({ agent: agentId });
 
     res.status(200).json({
       success: true,
@@ -218,20 +218,20 @@ exports.getAdminAnalytics = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getAdminLeads = asyncHandler(async (req, res, next) => {
   try {
-    const Contact = require('../models/Contact');
+    const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.params.agentId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const leads = await Contact.find({ agent: agentId })
+    const leads = await ContactRequest.find({ agent: agentId })
       .populate('property', 'title location price')
       .sort('-createdAt')
       .skip(skip)
       .limit(limit);
 
-    const total = await Contact.countDocuments({ agent: agentId });
+    const total = await ContactRequest.countDocuments({ agent: agentId });
 
     res.status(200).json({
       success: true,

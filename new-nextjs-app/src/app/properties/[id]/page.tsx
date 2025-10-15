@@ -39,6 +39,9 @@ import { useContext } from 'react';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
+import PropertySidebar from '@/components/property/PropertySidebar';
+import PropertyMoreInfo from '@/components/property/PropertyMoreInfo';
+import { formatPrice } from '@/lib/utils/format';
 import { toast } from 'react-toastify';
 import http from '@/lib/services/http';
 
@@ -111,6 +114,12 @@ interface Property {
     email: string;
     phone?: string;
     mobile?: string;
+    company?: string;
+    avatar?: string;
+  };
+  virtualTour?: {
+    url: string;
+    type?: string;
   };
 }
 
@@ -709,61 +718,22 @@ const PropertyDetailsPageContent: React.FC = () => {
             </Paper>
           </Grid>
 
-          {/* Contact Sidebar */}
+          {/* Property Sidebar */}
           <Grid item xs={12} lg={4}>
-            <Paper sx={{
-              p: 3,
-              position: 'sticky',
-              top: 100,
-              background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(10px)',
-              border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-              borderRadius: '12px'
-            }}>
-              <Typography variant="h6" sx={{ mb: 3, color: isDark ? 'white' : 'text.primary' }}>
-                Contact Agent
-              </Typography>
-
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  startIcon={<Phone />}
-                  onClick={() => handleContact('phone')}
-                  sx={{
-                    background: '#78CADC',
-                    '&:hover': { background: '#5fb4c9' }
-                  }}
-                >
-                  Call Now
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  startIcon={<Email />}
-                  onClick={() => handleContact('email')}
-                  sx={{ borderColor: '#78CADC', color: '#78CADC' }}
-                >
-                  Send Email
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  startIcon={<WhatsApp />}
-                  onClick={() => handleContact('whatsapp')}
-                  sx={{ borderColor: '#25D366', color: '#25D366' }}
-                >
-                  WhatsApp
-                </Button>
-              </Box>
-
-              <Divider sx={{ my: 3 }} />
-
-              <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
-                Interested in this property? Contact our agent for more information and to schedule a viewing.
-              </Typography>
-            </Paper>
+            <PropertySidebar
+              property={property}
+              fullAddress={fullAddress}
+              isSticky={true}
+              headerHeight={100}
+              handleContactOpen={() => handleContact('email')}
+            />
           </Grid>
         </Grid>
+
+        {/* More Information Section */}
+        <Box sx={{ mt: 4 }}>
+          <PropertyMoreInfo property={property} />
+        </Box>
 
         {/* Back to Top Button */}
         {showBackToTop && (

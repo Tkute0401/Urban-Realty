@@ -63,21 +63,41 @@ const PropertyMap = ({ location, address }) => {
 
   // Initialize map when Mappls is loaded
   useEffect(() => {
-    if (!mapplsLoaded || !mapRef.current || !location || !location.coordinates || location.coordinates.length !== 2) {
+    if (!mapplsLoaded || !location || !location.coordinates || location.coordinates.length !== 2) {
       return;
     }
 
-    try {
-      const center = {
-        lat: location.coordinates[1],
-        lng: location.coordinates[0]
-      };
+    // Ensure mapRef.current exists
+    if (!mapRef.current) {
+      console.warn('Map ref not available');
+      return;
+    }
 
-      // Create map using Mappls API
-      const map = new window.mappls.Map(mapRef.current, {
-        center: center,
-        zoom: 15
-      });
+    const initializeMap = () => {
+      try {
+        if (!window.mappls) {
+          setError('Mappls SDK not loaded');
+          return;
+        }
+
+        // Verify the container element is valid and visible
+        const container = mapRef.current;
+        if (!container || !container.offsetParent) {
+          console.warn('Map container not ready, retrying...');
+          setTimeout(initializeMap, 200);
+          return;
+        }
+
+        const center = {
+          lat: location.coordinates[1],
+          lng: location.coordinates[0]
+        };
+
+        // Create map using Mappls API
+        const map = new window.mappls.Map(container, {
+          center: center,
+          zoom: 15
+        });
 
       // Add marker
       const marker = new window.mappls.Marker({
@@ -104,10 +124,18 @@ const PropertyMap = ({ location, address }) => {
 
       setIsLoaded(true);
 
-    } catch (err) {
-      console.error('Error creating Mappls map:', err);
-      setError('Failed to load map');
-    }
+      } catch (err) {
+        console.error('Error creating Mappls map:', err);
+        setError('Failed to load map');
+      }
+    };
+
+    // Delay to ensure DOM is fully ready
+    const timer = setTimeout(initializeMap, 300);
+    
+    return () => {
+      clearTimeout(timer);
+    };
   }, [mapplsLoaded, location, address]);
 
   if (!location || !location.coordinates || location.coordinates.length !== 2) {

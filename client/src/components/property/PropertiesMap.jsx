@@ -64,23 +64,43 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
   }, [mapplsApiKey, mapplsLoaded]);
 
   useEffect(() => {
-    if (!mapplsLoaded || !mapRef.current || !properties) {
+    if (!mapplsLoaded || !properties) {
       return;
     }
 
-    try {
-      // Cleanup existing markers before re-rendering
-      markers.forEach(marker => {
-        if (marker && marker.setMap) {
-          marker.setMap(null);
-        }
-      });
+    // Ensure mapRef.current exists
+    if (!mapRef.current) {
+      console.warn('Map ref not available');
+      return;
+    }
 
-      // Create map
-      const map = new window.mappls.Map(mapRef.current, {
-        center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
-        zoom: 10
-      });
+    const initializeMap = () => {
+      try {
+        if (!window.mappls) {
+          setError('Mappls SDK not loaded');
+          return;
+        }
+
+        // Verify the container element is valid and visible
+        const container = mapRef.current;
+        if (!container || !container.offsetParent) {
+          console.warn('Properties map container not ready, retrying...');
+          setTimeout(initializeMap, 200);
+          return;
+        }
+
+        // Cleanup existing markers before re-rendering
+        markers.forEach(marker => {
+          if (marker && marker.setMap) {
+            marker.setMap(null);
+          }
+        });
+
+        // Create map
+        const map = new window.mappls.Map(container, {
+          center: { lat: 28.6139, lng: 77.2090 }, // Default to Delhi
+          zoom: 10
+        });
 
       setMapInstance(map);
 
@@ -138,10 +158,24 @@ const PropertiesMap = ({ properties, selectedProperty, onMarkerClick }) => {
       setMarkers(newMarkers);
       setIsLoaded(true);
 
-    } catch (err) {
-      console.error('Error creating Mappls map:', err);
-      setError('Failed to load map');
-    }
+      } catch (err) {
+        console.error('Error creating Mappls map:', err);
+        setError('Failed to load map');
+      }
+    };
+
+    // Delay to ensure DOM is fully ready
+    const timer = setTimeout(initializeMap, 300);
+    
+    return () => {
+      clearTimeout(timer);
+      // Cleanup markers
+      markers.forEach(marker => {
+        if (marker && marker.setMap) {
+          marker.setMap(null);
+        }
+      });
+    };
   }, [mapplsLoaded, properties, selectedProperty, onMarkerClick]);
 
   if (!properties || properties.length === 0) {

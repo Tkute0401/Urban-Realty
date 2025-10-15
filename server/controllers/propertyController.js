@@ -352,6 +352,14 @@ function deg2rad(deg) {
 // @access  Private (Agent/Admin)
 exports.createProperty = asyncHandler(async (req, res, next) => {
   try {
+    console.log('🏠 Creating property - received files:', {
+      images: req.files?.images?.length || 0,
+      floorPlans: req.files?.floorPlans?.length || 0,
+      brochure: req.files?.brochure?.length || 0,
+      virtualTour: req.files?.virtualTour?.length || 0,
+      allFileFields: Object.keys(req.files || {})
+    });
+
     // Add user to req.body as the agent
     req.body.agent = req.user.id;
 
@@ -418,23 +426,27 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
     const images = req.files?.images?.length > 0 
       ? await uploadImagesToCloudinary(req.files.images, 'properties')
       : [];
+    console.log('🏠 Processed images:', images.length);
 
     // Process floor plan images
     const floorPlanImages = req.files?.floorPlans?.length > 0
       ? await uploadImagesToCloudinary(req.files.floorPlans, 'properties/floor-plans')
       : [];
+    console.log('🏠 Processed floor plans:', floorPlanImages.length);
 
     // Process brochure if uploaded
     let brochure = null;
     if (req.files?.brochure?.length > 0) {
       brochure = await uploadFileToCloudinary(req.files.brochure[0], 'properties/brochures');
     }
+    console.log('🏠 Processed brochure:', brochure ? 'Yes' : 'No');
 
     // Process virtual tour if uploaded
     let virtualTour = null;
     if (req.files?.virtualTour?.length > 0) {
       virtualTour = await uploadVideoToCloudinary(req.files.virtualTour[0], 'properties/virtual-tours');
     }
+    console.log('🏠 Processed virtual tour:', virtualTour ? 'Yes' : 'No');
 
 
     // Convert possession date to Date object if provided
@@ -467,8 +479,9 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       }
     };
 
-    // Create property in database
-    const property = await Property.create(propertyData);
+    // Create property in database using safe pattern
+    const property = new Property(propertyData);
+    await property.save();
 
     // Try to geocode the address if provided
     if (req.body.address) {
@@ -884,6 +897,57 @@ const uploadVideosToCloudinary = async (files) => {
   }
   
   return videos;
+};
+
+// Helper function to upload single file to Cloudinary
+const uploadFileToCloudinary = async (file, folder = 'properties/documents') => {
+  try {
+    if (!fs.existsSync(file.path)) {
+      console.error('File does not exist:', file.path);
+      return null;
+    }
+
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'auto', // Auto-detect file type
+      folder: `real-estate/${folder}`,
+      quality: 'auto:good'
+    });
+    
+    // Delete local file
+    fs.unlinkSync(file.path);
+    
+    return result;
+  } catch (err) {
+    console.error('Error uploading file:', err);
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    throw err;
+  }
+};
+
+// Helper function to upload single video to Cloudinary
+const uploadVideoToCloudinary = async (file, folder = 'properties/videos') => {
+  try {
+    if (!fs.existsSync(file.path)) {
+      console.error('File does not exist:', file.path);
+      return null;
+    }
+
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: 'video',
+      folder: `real-estate/${folder}`,
+      quality: 'auto:good',
+      chunk_size: 6000000
+    });
+    
+    // Delete local file
+    fs.unlinkSync(file.path);
+    
+    return result;
+  } catch (err) {
+    console.error('Error uploading video:', err);
+    if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    throw err;
+  }
 };
 
 // @desc    Get search suggestions and autocomplete

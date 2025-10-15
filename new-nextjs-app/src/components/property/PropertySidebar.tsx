@@ -1,12 +1,55 @@
+'use client';
+
+import React, { useState } from 'react';
 import { Box, Typography, Button, Avatar, Divider } from '@mui/material';
 import { Phone, WhatsApp, Email, LocationOn } from '@mui/icons-material';
 import PremiumPaper from './PremiumPaper';
-import PropertyMap from '../../components/property/PropertyMap';
-import { formatPrice } from '../../utils/format';
+import PropertyMap from './PropertyMap';
 import PremiumButton from './PremiumButton';
-import { pulse } from './animations';
+import { formatPrice } from '@/lib/utils/format';
+import { pulse } from '@/lib/animations';
 
-const PropertySidebar = ({ property, fullAddress, isSticky, headerHeight, handleContactOpen }) => {
+interface Property {
+  _id: string;
+  price: number;
+  area: number;
+  projectDetails?: {
+    launchDate?: string;
+  };
+  location?: {
+    coordinates: [number, number];
+  };
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
+  agent?: {
+    _id: string;
+    name: string;
+    company?: string;
+    avatar?: string;
+  };
+}
+
+interface PropertySidebarProps {
+  property: Property;
+  fullAddress: string;
+  isSticky?: boolean;
+  headerHeight?: number;
+  handleContactOpen: () => void;
+}
+
+const PropertySidebar: React.FC<PropertySidebarProps> = ({ 
+  property, 
+  fullAddress, 
+  isSticky = false, 
+  headerHeight = 0, 
+  handleContactOpen 
+}) => {
+  const [contactMethod, setContactMethod] = useState<'phone' | 'whatsapp' | 'email'>('email');
+
   return (
     <Box sx={{ 
       position: 'sticky', 
@@ -159,9 +202,9 @@ const PropertySidebar = ({ property, fullAddress, isSticky, headerHeight, handle
         }}>
           {property.location && property.location.coordinates && property.location.coordinates.length === 2 ? (
             <PropertyMap 
-              location={property.location} 
-              address={property.address || {}} 
-              darkMode={true}
+              latitude={property.location.coordinates[1]}
+              longitude={property.location.coordinates[0]}
+              address={fullAddress}
             />
           ) : (
             <Box sx={{
