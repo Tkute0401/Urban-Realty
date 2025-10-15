@@ -53,6 +53,9 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
+  // Add a simple console log to verify the component is mounting
+  console.log('🔍 PropertiesMap component mounted, mapRef:', mapRef.current);
+
   // Load Mappls script
   useEffect(() => {
     if (typeof window === 'undefined' || scriptLoaded) return;
@@ -477,6 +480,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       </Box>
     );
   }
+
+  console.log('🔍 PropertiesMap render - mapLoaded:', mapLoaded, 'mapError:', mapError, 'scriptLoaded:', scriptLoaded);
 
   return (
     <Box sx={{ position: 'relative', height: height, borderRadius: '12px', overflow: 'hidden' }}>
