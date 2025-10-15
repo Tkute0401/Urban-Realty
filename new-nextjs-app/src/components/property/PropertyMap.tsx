@@ -128,7 +128,6 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         setTimeout(() => {
           mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
           console.log('PropertyMap: Map created successfully');
-        }, 100);
 
           // Add marker if enabled
           if (showMarker) {
