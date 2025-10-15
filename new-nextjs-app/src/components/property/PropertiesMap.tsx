@@ -53,8 +53,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  // Add a simple console log to verify the component is mounting
-  console.log('🔍 PropertiesMap component mounted, mapRef:', mapRef.current);
+  // Add useEffect to log when component mounts
+  useEffect(() => {
+    console.log('🔍 PropertiesMap component mounted, mapRef:', mapRef.current);
+  }, []);
 
   // Load Mappls script
   useEffect(() => {
