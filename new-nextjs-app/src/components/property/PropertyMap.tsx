@@ -73,7 +73,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!scriptLoaded || !mapRef.current || !latitude || !longitude) {
+    if (!scriptLoaded || !latitude || !longitude) {
+      return;
+    }
+    
+    // Ensure mapRef.current exists and has required properties
+    if (!mapRef.current) {
+      console.warn('Map ref not available');
       return;
     }
     
@@ -93,6 +99,14 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           return;
         }
 
+        // Verify the container element is valid
+        const container = mapRef.current;
+        if (!container || !container.offsetParent) {
+          console.warn('Map container not ready, retrying...');
+          setTimeout(initializeMap, 200);
+          return;
+        }
+
         // Initialize map
         const mapOptions = {
           center: [longitude, latitude], // Mappls uses [lng, lat] format
@@ -104,7 +118,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           clickableIcons: true,
         };
 
-        mapInstanceRef.current = new window.mappls.Map(mapRef.current, mapOptions);
+        mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
 
         // Add marker if enabled
         if (showMarker) {
@@ -139,14 +153,14 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
         setMapLoaded(true);
         setMapError(null);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error initializing map:', error);
-        setMapError(`Failed to initialize map: ${error.message}`);
+        setMapError(`Failed to initialize map: ${error?.message || 'Unknown error'}`);
       }
     };
 
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(initializeMap, 100);
+    // Delay to ensure DOM is fully ready
+    const timer = setTimeout(initializeMap, 300);
     
     return () => {
       clearTimeout(timer);
@@ -209,12 +223,15 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       
       <div
         ref={mapRef}
+        id={`map-container-${Math.random().toString(36).substr(2, 9)}`}
         className={className}
         style={{
           width: '100%',
           height: '100%',
           borderRadius: '12px',
-          border: '1px solid var(--color-border)'
+          border: '1px solid var(--color-border)',
+          minHeight: typeof height === 'string' ? height : `${height}px`,
+          position: 'relative'
         }}
       />
     </Box>

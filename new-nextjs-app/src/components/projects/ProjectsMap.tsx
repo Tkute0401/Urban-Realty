@@ -76,7 +76,13 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
   // Initialize map and markers
   useEffect(() => {
-    if (!scriptLoaded || !mapRef.current || !projects || projects.length === 0) {
+    if (!scriptLoaded || !projects || projects.length === 0) {
+      return;
+    }
+
+    // Ensure mapRef.current exists
+    if (!mapRef.current) {
+      console.warn('Map ref not available');
       return;
     }
 
@@ -106,6 +112,14 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           return;
         }
 
+        // Verify the container element is valid and visible
+        const container = mapRef.current;
+        if (!container || !container.offsetParent) {
+          console.warn('Map container not ready, retrying...');
+          setTimeout(initializeMap, 200);
+          return;
+        }
+
         // Filter projects with valid coordinates
         const validProjects = projects.filter(
           p => p.location?.coordinates?.coordinates?.length === 2
@@ -121,7 +135,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         const [lng, lat] = firstProject.location.coordinates.coordinates;
 
         // Initialize map
-        mapInstanceRef.current = new window.mappls.Map(mapRef.current, {
+        mapInstanceRef.current = new window.mappls.Map(container, {
           center: [lng, lat],
           zoom: validProjects.length > 1 ? 6 : 12,
           zoomControl: true,
@@ -196,13 +210,14 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
         setMapLoaded(true);
         setMapError(null);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error initializing map:', error);
-        setMapError('Failed to initialize map');
+        setMapError(`Failed to initialize map: ${error?.message || 'Unknown error'}`);
       }
     };
 
-    const timer = setTimeout(initializeMap, 100);
+    // Delay to ensure DOM is fully ready
+    const timer = setTimeout(initializeMap, 300);
     
     return () => {
       clearTimeout(timer);
@@ -284,11 +299,14 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
       
       <div
         ref={mapRef}
+        id={`projects-map-container-${Math.random().toString(36).substr(2, 9)}`}
         style={{
           width: '100%',
           height: '100%',
           borderRadius: '12px',
-          border: '1px solid var(--color-border)'
+          border: '1px solid var(--color-border)',
+          minHeight: typeof height === 'string' ? height : `${height}px`,
+          position: 'relative'
         }}
       />
     </Box>
