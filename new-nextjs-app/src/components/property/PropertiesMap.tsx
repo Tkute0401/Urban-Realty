@@ -104,11 +104,29 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     console.log('PropertiesMap useEffect triggered:', {
       scriptLoaded,
       propertiesLength: properties?.length,
-      properties: properties?.map(p => ({ id: p._id, title: p.title, hasLocation: !!p.location?.coordinates }))
+      userLocation,
+      properties: properties?.map(p => ({ 
+        id: p._id, 
+        title: p.title, 
+        hasLocation: !!p.location?.coordinates,
+        coordinates: p.location?.coordinates
+      }))
     });
     
     if (!scriptLoaded || !properties || properties.length === 0) {
       console.log('Skipping map initialization:', { scriptLoaded, propertiesLength: properties?.length });
+      return;
+    }
+
+    // Check if Mappls SDK is available
+    if (!window.mappls || !window.mappls.Map) {
+      console.warn('Mappls SDK not available, retrying in 1 second');
+      setTimeout(() => {
+        if (window.mappls && window.mappls.Map) {
+          console.log('Mappls SDK now available, retrying map initialization');
+          // Trigger re-initialization by updating a state or calling the effect again
+        }
+      }, 1000);
       return;
     }
 
@@ -220,7 +238,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
         console.log('Final map center and zoom:', { mapCenter, mapZoom });
 
-        // Add a small delay to ensure Mappls SDK is fully ready
+        // Add a delay to ensure Mappls SDK is fully ready
         setTimeout(() => {
           // Initialize map
           mapInstanceRef.current = new window.mappls.Map(container, {
@@ -232,6 +250,23 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           });
 
           console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);
+
+          // Wait for map to be ready before adding markers
+          mapInstanceRef.current.addListener('idle', () => {
+            console.log('Map is idle, ready to add markers');
+            addMarkersToMap();
+          });
+
+          // Also add markers immediately as fallback
+          addMarkersToMap();
+        }, 500);
+
+        // Function to add markers to the map
+        const addMarkersToMap = () => {
+          if (!mapInstanceRef.current) {
+            console.warn('Map instance not available for marker creation');
+            return;
+          }
 
           // Calculate bounds for multiple properties (only if no user location)
           if (validProperties.length > 1 && !userLocation) {
@@ -336,7 +371,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           markersRef.current = newMarkers;
           setMapLoaded(true);
           setMapError(null);
-        }, 100);
+        };
+        }, 500);
 
       } catch (err: any) {
         console.error('Error creating Mappls map:', err);

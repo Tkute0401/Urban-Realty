@@ -124,7 +124,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           address
         });
 
-        // Add a small delay to ensure Mappls SDK is fully ready
+        // Add a delay to ensure Mappls SDK is fully ready
         setTimeout(() => {
           mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
           console.log('PropertyMap: Map created successfully');
@@ -164,7 +164,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
           setMapLoaded(true);
           setMapError(null);
-        }, 100);
+        }, 500);
       } catch (error: any) {
         console.error('Error initializing map:', error);
         setMapError(`Failed to initialize map: ${error?.message || 'Unknown error'}`);
