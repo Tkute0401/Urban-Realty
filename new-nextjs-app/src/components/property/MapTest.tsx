@@ -129,9 +129,10 @@ const MapTest: React.FC = () => {
 
           // Try with different syntax
           console.log('Approach 2: Alternative syntax');
-          const testMarker2 = new window.mappls.Marker();
+          const testMarker2 = new window.mappls.Marker({
+            position: { lat: 28.6139, lng: 77.2090 }
+          });
           testMarker2.setMap(mapInstanceRef.current);
-          testMarker2.setPosition({ lat: 28.6139, lng: 77.2090 });
           console.log('Alternative marker created:', testMarker2);
 
           // Check if markers are visible
