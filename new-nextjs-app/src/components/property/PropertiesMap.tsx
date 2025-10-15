@@ -251,18 +251,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
           console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);
 
-          // Wait for map to be ready before adding markers
-          mapInstanceRef.current.addListener('idle', () => {
-            console.log('Map is idle, ready to add markers');
-            addMarkersToMap();
-          });
-
-          // Also add markers immediately as fallback
-          addMarkersToMap();
-        }, 500);
-
-        // Function to add markers to the map
-        const addMarkersToMap = () => {
+          // Function to add markers to the map
+          const addMarkersToMap = () => {
           if (!mapInstanceRef.current) {
             console.warn('Map instance not available for marker creation');
             return;
@@ -371,7 +361,16 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           markersRef.current = newMarkers;
           setMapLoaded(true);
           setMapError(null);
-        };
+          };
+
+          // Wait for map to be ready before adding markers
+          mapInstanceRef.current.addListener('idle', () => {
+            console.log('Map is idle, ready to add markers');
+            addMarkersToMap();
+          });
+
+          // Also add markers immediately as fallback
+          addMarkersToMap();
         }, 500);
 
       } catch (err: any) {
