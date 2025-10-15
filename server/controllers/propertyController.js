@@ -827,7 +827,7 @@ exports.createInquiry = asyncHandler(async (req, res, next) => {
 });
 
 // Helper function to upload images to Cloudinary
-const uploadImagesToCloudinary = async (files) => {
+const uploadImagesToCloudinary = async (files, folder = 'real-estate/properties') => {
   const images = [];
   
   for (const file of files) {
@@ -838,7 +838,7 @@ const uploadImagesToCloudinary = async (files) => {
       }
 
       const result = await cloudinary.uploader.upload(file.path, {
-        folder: 'real-estate/properties',
+        folder: folder,
         width: 1200,
         height: 800,
         crop: 'fill',

@@ -65,7 +65,12 @@ router.post(
   [
     protect,
     authorize('agent', 'admin', 'individual_seller', 'developer'),
-    upload.array('images', 10),
+    upload.fields([
+      { name: 'images', maxCount: 10 },
+      { name: 'floorPlans', maxCount: 5 },
+      { name: 'brochure', maxCount: 1 },
+      { name: 'virtualTour', maxCount: 1 }
+    ]),
     [
       check('title', 'Title is required').not().isEmpty(),
       check('description', 'Description is required').not().isEmpty(),

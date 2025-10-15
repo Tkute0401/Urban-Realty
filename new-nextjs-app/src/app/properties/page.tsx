@@ -20,7 +20,8 @@ import {
   Chip,
   IconButton,
   Drawer,
-  Stack
+  Stack,
+  Paper
 } from '@mui/material';
 import { 
   Search, 
@@ -711,6 +712,265 @@ const PropertiesPageContent: React.FC = () => {
         </Drawer>
       )}
 
+      {/* Desktop Filter Sidebar */}
+      {!isMobile && (
+        <Box sx={{
+          maxWidth: '1400px',
+          mx: 'auto',
+          px: 4,
+          py: 2
+        }}>
+          <Grid container spacing={3}>
+            {/* Filter Sidebar */}
+            <Grid item xs={12} md={3}>
+              <Paper sx={{
+                p: 3,
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '12px',
+                position: 'sticky',
+                top: 100
+              }}>
+                <Typography variant="h6" sx={{ mb: 3, color: 'var(--color-text-primary)', fontWeight: 600 }}>
+                  Filters
+                </Typography>
+
+                {/* Property Type */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
+                    Property Type
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {['Houses', 'Condos/Co-ops', 'Townhomes', 'Multi-family', 'Manufactured', 'Lots/Land', 'Apartments'].map(type => {
+                      const isActive = filters.type === type;
+                      return (
+                        <Chip
+                          key={type}
+                          label={type}
+                          clickable
+                          variant={isActive ? 'filled' : 'outlined'}
+                          onClick={() => handleFilterChange('type', isActive ? '' : type)}
+                          sx={{ 
+                            backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                            color: isActive ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                            borderColor: 'var(--color-primary)',
+                            '&:hover': {
+                              backgroundColor: isActive ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
+                            }
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
+                </Box>
+
+                {/* Price Range */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
+                    Price Range
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Min Price"
+                        type="number"
+                        value={filters.priceMin}
+                        onChange={(e) => handleFilterChange('priceMin', e.target.value)}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            background: 'var(--color-bg)',
+                            color: 'var(--color-text-primary)',
+                            '& fieldset': {
+                              borderColor: 'var(--color-border)'
+                            }
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'var(--color-text-muted)'
+                          }
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField
+                        fullWidth
+                        label="Max Price"
+                        type="number"
+                        value={filters.priceMax}
+                        onChange={(e) => handleFilterChange('priceMax', e.target.value)}
+                        size="small"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            background: 'var(--color-bg)',
+                            color: 'var(--color-text-primary)',
+                            '& fieldset': {
+                              borderColor: 'var(--color-border)'
+                            }
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'var(--color-text-muted)'
+                          }
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                {/* Beds & Baths */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
+                    Beds & Baths
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Bedrooms</InputLabel>
+                        <Select
+                          value={filters.bedrooms}
+                          onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                          sx={{
+                            background: 'var(--color-bg)',
+                            color: 'var(--color-text-primary)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'var(--color-border)'
+                            }
+                          }}
+                        >
+                          <MenuItem value="">Any</MenuItem>
+                          <MenuItem value="1">1+</MenuItem>
+                          <MenuItem value="2">2+</MenuItem>
+                          <MenuItem value="3">3+</MenuItem>
+                          <MenuItem value="4">4+</MenuItem>
+                          <MenuItem value="5">5+</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Bathrooms</InputLabel>
+                        <Select
+                          value={filters.bathrooms}
+                          onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                          sx={{
+                            background: 'var(--color-bg)',
+                            color: 'var(--color-text-primary)',
+                            '& .MuiOutlinedInput-notchedOutline': {
+                              borderColor: 'var(--color-border)'
+                            }
+                          }}
+                        >
+                          <MenuItem value="">Any</MenuItem>
+                          <MenuItem value="1">1+</MenuItem>
+                          <MenuItem value="1.5">1.5+</MenuItem>
+                          <MenuItem value="2">2+</MenuItem>
+                          <MenuItem value="3">3+</MenuItem>
+                          <MenuItem value="4">4+</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                {/* Amenities */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
+                    Amenities
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {amenityOptions.map(amenity => {
+                      const isActive = filters.amenities.includes(amenity);
+                      return (
+                        <Chip
+                          key={amenity}
+                          label={amenity}
+                          clickable
+                          variant={isActive ? 'filled' : 'outlined'}
+                          onClick={() => {
+                            const newAmenities = isActive
+                              ? filters.amenities.filter(a => a !== amenity)
+                              : [...filters.amenities, amenity];
+                            handleFilterChange('amenities', newAmenities);
+                          }}
+                          size="small"
+                          sx={{
+                            backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                            color: isActive ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                            borderColor: 'var(--color-primary)',
+                            '&:hover': {
+                              backgroundColor: isActive ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
+                            }
+                          }}
+                        />
+                      );
+                    })}
+                  </Box>
+                </Box>
+
+                {/* Filter Actions */}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={clearAllFilters}
+                    sx={{ 
+                      flex: 1,
+                      borderColor: 'var(--color-primary)',
+                      color: 'var(--color-primary)',
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    Clear All
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={handleSearch}
+                    sx={{
+                      flex: 1,
+                      backgroundColor: 'var(--color-primary)',
+                      color: 'var(--color-primary-contrast)',
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      '&:hover': {
+                        backgroundColor: 'var(--color-primary-hover)'
+                      }
+                    }}
+                  >
+                    Apply
+                  </Button>
+                </Box>
+              </Paper>
+            </Grid>
+
+            {/* Properties List */}
+            <Grid item xs={12} md={9}>
+              <PropertyList
+                properties={properties}
+                loading={loading}
+                error={error}
+                emptyMessage="No properties found matching your criteria"
+                columns={{ xs: 12, sm: 6, md: 4 }}
+                onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+      )}
+
+      {/* Mobile Properties List */}
+      {isMobile && (
+        <PropertyList
+          properties={properties}
+          loading={loading}
+          error={error}
+          emptyMessage="No properties found matching your criteria"
+          columns={{ xs: 12, sm: 6, md: 4 }}
+          onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+        />
+      )}
+
       {/* Page Title */}
       <Box sx={{ 
         maxWidth: '1400px', 
@@ -819,49 +1079,6 @@ const PropertiesPageContent: React.FC = () => {
           </Alert>
                       </Box>
       )}
-
-      {/* Properties List */}
-      <PropertyList
-        properties={properties}
-        loading={loading}
-        error={error}
-        emptyMessage="No properties found matching your criteria"
-        columns={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-        onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
-      />
-
-            {/* Pagination */}
-      {!loading && properties.length > 0 && pagination.totalPages > 1 && (
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          mt: 4,
-          pb: 4
-        }}>
-                <Pagination
-            count={pagination.totalPages}
-            page={pagination.page}
-                  onChange={handlePageChange}
-                  color="primary"
-                  sx={{
-                    '& .MuiPaginationItem-root': {
-                color: 'var(--color-text-primary)',
-                fontSize: { xs: '14px', sm: '16px' }
-                    },
-                    '& .MuiPaginationItem-root.Mui-selected': {
-                backgroundColor: 'var(--color-primary)',
-                color: 'var(--color-primary-contrast)',
-                '&:hover': {
-                  backgroundColor: 'var(--color-primary-hover)'
-                }
-              },
-              '& .MuiPaginationItem-root:hover': {
-                backgroundColor: 'var(--color-primary-light)'
-                    }
-                  }}
-                />
-              </Box>
-            )}
     </Box>
   );
 };

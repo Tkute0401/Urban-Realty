@@ -162,6 +162,12 @@ const AddPropertyPageContent: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [floorPlanPreviews, setFloorPlanPreviews] = useState<string[]>([]);
+  const [floorPlans, setFloorPlans] = useState<File[]>([]);
+  const [brochureFile, setBrochureFile] = useState<File | null>(null);
+  const [brochurePreview, setBrochurePreview] = useState<string | null>(null);
+  const [virtualTourFile, setVirtualTourFile] = useState<File | null>(null);
+  const [virtualTourPreview, setVirtualTourPreview] = useState<string | null>(null);
   const [sectionVisibility, setSectionVisibility] = useState({
     developer: true,
     projectDetails: true,
@@ -171,6 +177,9 @@ const AddPropertyPageContent: React.FC = () => {
   });
 
   const imagesInputRef = useRef<HTMLInputElement>(null);
+  const floorPlansInputRef = useRef<HTMLInputElement>(null);
+  const brochureInputRef = useRef<HTMLInputElement>(null);
+  const virtualTourInputRef = useRef<HTMLInputElement>(null);
 
   // Load agents and developers data
   useEffect(() => {
@@ -313,6 +322,54 @@ const AddPropertyPageContent: React.FC = () => {
     }
   };
 
+  // Floor Plans handlers
+  const handleFloorPlanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).slice(0, 5); // Limit to 5 files
+    const previews = files.map(file => URL.createObjectURL(file));
+    setFloorPlanPreviews([...floorPlanPreviews, ...previews]);
+    setFloorPlans([...floorPlans, ...files]);
+    if (floorPlansInputRef.current) floorPlansInputRef.current.value = '';
+  };
+
+  const handleRemoveFloorPlan = (index: number) => {
+    const newPreviews = [...floorPlanPreviews];
+    const newFiles = [...floorPlans];
+    newPreviews.splice(index, 1);
+    newFiles.splice(index, 1);
+    setFloorPlanPreviews(newPreviews);
+    setFloorPlans(newFiles);
+  };
+
+  // Brochure handlers
+  const handleBrochureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBrochureFile(file);
+      setBrochurePreview(URL.createObjectURL(file));
+      if (brochureInputRef.current) brochureInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveBrochure = () => {
+    setBrochureFile(null);
+    setBrochurePreview(null);
+  };
+
+  // Virtual Tour handlers
+  const handleVirtualTourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setVirtualTourFile(file);
+      setVirtualTourPreview(URL.createObjectURL(file));
+      if (virtualTourInputRef.current) virtualTourInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveVirtualTour = () => {
+    setVirtualTourFile(null);
+    setVirtualTourPreview(null);
+  };
+
   const handleAmenityToggle = (amenity: string) => {
     setFormData(prev => ({
       ...prev,
@@ -425,6 +482,21 @@ const AddPropertyPageContent: React.FC = () => {
       images.forEach(file => {
         formDataToSend.append('images', file);
       });
+
+      // Append floor plans
+      floorPlans.forEach(file => {
+        formDataToSend.append('floorPlans', file);
+      });
+
+      // Append brochure
+      if (brochureFile) {
+        formDataToSend.append('brochure', brochureFile);
+      }
+
+      // Append virtual tour
+      if (virtualTourFile) {
+        formDataToSend.append('virtualTour', virtualTourFile);
+      }
 
       await addProperty(formDataToSend);
       setSnackbarMessage('Property created successfully!');
@@ -2112,42 +2184,81 @@ const AddPropertyPageContent: React.FC = () => {
             </Box>
             {sectionVisibility.floorPlans && (
               <PremiumPaper>
-                <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
-                  Upload floor plan images (optional)
+                <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                  Upload floor plan images (optional, up to 5 files)
                 </FormHelperText>
                 
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  style={{ display: 'none' }}
-                  id="floor-plans-input"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      const files = Array.from(e.target.files);
-                      // Handle floor plan files here
-                      console.log('Floor plans uploaded:', files);
+                {/* Floor Plan Previews */}
+                {floorPlanPreviews.length > 0 && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                      Floor Plan Previews:
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      {floorPlanPreviews.map((preview, index) => (
+                        <Box key={index} sx={{ position: 'relative', width: 100, height: 100 }}>
+                          <img
+                            src={preview}
+                            alt={`Floor plan ${index + 1}`}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: '8px',
+                              border: '1px solid var(--color-border)'
+                            }}
+                          />
+                          <IconButton
+                            size="small"
+                            onClick={() => handleRemoveFloorPlan(index)}
+                            sx={{
+                              position: 'absolute',
+                              top: -8,
+                              right: -8,
+                              backgroundColor: 'var(--color-error)',
+                              color: 'white',
+                              '&:hover': {
+                                backgroundColor: 'var(--color-error-hover)'
+                              }
+                            }}
+                          >
+                            <Close fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+                
+                <Button
+                  component="label"
+                  startIcon={<CloudUpload />}
+                  disabled={floorPlanPreviews.length >= 5}
+                  sx={{
+                    color: 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
+                    '&:hover': {
+                      borderColor: 'var(--color-primary-hover)',
+                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                    },
+                    '&:disabled': {
+                      borderColor: 'rgba(120, 202, 220, 0.3)',
+                      color: 'rgba(120, 202, 220, 0.3)'
                     }
                   }}
-                />
-                
-                <label htmlFor="floor-plans-input">
-                  <Button
-                    component="span"
-                    startIcon={<CloudUpload />}
-                    sx={{
-                      color: 'var(--color-primary)',
-                      borderColor: 'var(--color-primary)',
-                      '&:hover': {
-                        borderColor: 'var(--color-primary-hover)',
-                        backgroundColor: 'rgba(120, 202, 220, 0.1)'
-                      }
-                    }}
-                    variant="outlined"
-                  >
-                    Upload Floor Plans
-                  </Button>
-                </label>
+                  variant="outlined"
+                >
+                  Upload Floor Plans
+                  <input
+                    type="file"
+                    hidden
+                    multiple
+                    accept="image/*"
+                    onChange={handleFloorPlanChange}
+                    ref={floorPlansInputRef}
+                    disabled={floorPlanPreviews.length >= 5}
+                  />
+                </Button>
               </PremiumPaper>
             )}
           </Grid>
@@ -2170,70 +2281,47 @@ const AddPropertyPageContent: React.FC = () => {
             </Box>
             {sectionVisibility.brochure && (
               <PremiumPaper>
-                <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+                <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
                   Upload property brochure (PDF)
                 </FormHelperText>
                 
-                <input
-                  type="file"
-                  accept=".pdf"
-                  style={{ display: 'none' }}
-                  id="brochure-input"
-                  onChange={(e) => {
-                    if (e.target.files) {
-                      const file = e.target.files[0];
-                      // Handle brochure file here
-                      console.log('Brochure uploaded:', file);
-                    }
-                  }}
-                />
+                {/* Brochure Preview */}
+                {brochurePreview && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                      Brochure Preview:
+                    </Typography>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 2,
+                      p: 2,
+                      backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--color-border)'
+                    }}>
+                      <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+                        📄 {brochureFile?.name}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={handleRemoveBrochure}
+                        sx={{
+                          backgroundColor: 'var(--color-error)',
+                          color: 'white',
+                          '&:hover': {
+                            backgroundColor: 'var(--color-error-hover)'
+                          }
+                        }}
+                      >
+                        <Close fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                )}
                 
-                <label htmlFor="brochure-input">
-                  <Button
-                    component="span"
-                    startIcon={<CloudUpload />}
-                    sx={{
-                      color: 'var(--color-primary)',
-                      borderColor: 'var(--color-primary)',
-                      '&:hover': {
-                        borderColor: 'var(--color-primary-hover)',
-                        backgroundColor: 'rgba(120, 202, 220, 0.1)'
-                      }
-                    }}
-                    variant="outlined"
-                  >
-                    Upload Brochure
-                  </Button>
-                </label>
-              </PremiumPaper>
-            )}
-          </Grid>
-
-          {/* Virtual Tour Section */}
-          <Grid item xs={12} sm={6}>
-            <SectionHeader variant="h6">Virtual Tour</SectionHeader>
-            <PremiumPaper>
-              <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
-                Upload a virtual tour video (optional)
-              </FormHelperText>
-              
-              <input
-                type="file"
-                accept="video/*"
-                style={{ display: 'none' }}
-                id="virtual-tour-input"
-                onChange={(e) => {
-                  if (e.target.files) {
-                    const file = e.target.files[0];
-                    // Handle virtual tour file here
-                    console.log('Virtual tour uploaded:', file);
-                  }
-                }}
-              />
-              
-              <label htmlFor="virtual-tour-input">
                 <Button
-                  component="span"
+                  component="label"
                   startIcon={<CloudUpload />}
                   sx={{
                     color: 'var(--color-primary)',
@@ -2245,9 +2333,99 @@ const AddPropertyPageContent: React.FC = () => {
                   }}
                   variant="outlined"
                 >
-                  Upload Virtual Tour
+                  Upload Brochure
+                  <input
+                    type="file"
+                    hidden
+                    accept=".pdf"
+                    onChange={handleBrochureChange}
+                    ref={brochureInputRef}
+                  />
                 </Button>
-              </label>
+              </PremiumPaper>
+            )}
+          </Grid>
+
+          {/* Virtual Tour Section */}
+          <Grid item xs={12} sm={6}>
+            <SectionHeader variant="h6">Virtual Tour</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Upload a virtual tour video (optional)
+              </FormHelperText>
+              
+              {/* Virtual Tour Preview */}
+              {virtualTourPreview && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    Virtual Tour Preview:
+                  </Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 2,
+                    p: 2,
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-border)'
+                  }}>
+                    <video
+                      src={virtualTourPreview}
+                      controls
+                      style={{
+                        width: '100px',
+                        height: '60px',
+                        borderRadius: '4px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+                        🎥 {virtualTourFile?.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {(virtualTourFile?.size && (virtualTourFile.size / 1024 / 1024).toFixed(1)) || '0'} MB
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={handleRemoveVirtualTour}
+                      sx={{
+                        backgroundColor: 'var(--color-error)',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'var(--color-error-hover)'
+                        }
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+              
+              <Button
+                component="label"
+                startIcon={<CloudUpload />}
+                sx={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                  '&:hover': {
+                    borderColor: 'var(--color-primary-hover)',
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                  }
+                }}
+                variant="outlined"
+              >
+                Upload Virtual Tour
+                <input
+                  type="file"
+                  hidden
+                  accept="video/*"
+                  onChange={handleVirtualTourChange}
+                  ref={virtualTourInputRef}
+                />
+              </Button>
             </PremiumPaper>
           </Grid>
 
