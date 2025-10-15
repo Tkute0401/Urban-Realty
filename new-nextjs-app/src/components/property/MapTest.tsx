@@ -10,6 +10,30 @@ const MapTest: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch properties from API
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        console.log('Fetching properties from API...');
+        const response = await fetch('/api/v1/properties?limit=50');
+        const data = await response.json();
+        
+        console.log('Properties fetched:', data);
+        console.log('Properties with location data:', data.data?.filter((p: any) => p.location?.coordinates?.length === 2));
+        
+        setProperties(data.data || []);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
 
   // Load Mappls script
   useEffect(() => {
@@ -65,9 +89,9 @@ const MapTest: React.FC = () => {
       });
   }, [scriptLoaded]);
 
-  // Initialize map when script is loaded
+  // Initialize map when script is loaded and properties are fetched
   useEffect(() => {
-    if (!scriptLoaded || !mapRef.current) return;
+    if (!scriptLoaded || !mapRef.current || loading) return;
 
     const initializeMap = () => {
       try {
@@ -90,11 +114,29 @@ const MapTest: React.FC = () => {
           height: container.offsetHeight,
           visible: container.offsetParent !== null
         });
+
+        // Filter properties with valid coordinates
+        const validProperties = properties.filter(p => p.location?.coordinates?.length === 2);
+        console.log('Valid properties for map:', validProperties);
+
+        // Set map center based on properties
+        let mapCenter = [77.2090, 28.6139]; // Default to Delhi
+        let mapZoom = 12;
+
+        if (validProperties.length > 0) {
+          // Use first property's coordinates as center
+          const firstProperty = validProperties[0];
+          mapCenter = [firstProperty.location.coordinates[0], firstProperty.location.coordinates[1]];
+          mapZoom = validProperties.length > 1 ? 10 : 12;
+          console.log('Map center set to property location:', mapCenter);
+        } else {
+          console.log('No valid properties found, using default Delhi coordinates');
+        }
         
-        // Initialize map with Delhi coordinates
+        // Initialize map with calculated coordinates
         mapInstanceRef.current = new window.mappls.Map(container, {
-          center: [77.2090, 28.6139], // Delhi coordinates
-          zoom: 12,
+          center: mapCenter,
+          zoom: mapZoom,
           zoomControl: true,
           fullscreenControl: true,
           scrollWheel: true,
@@ -146,23 +188,22 @@ const MapTest: React.FC = () => {
           console.error('Basic marker creation failed:', testError);
         }
 
-        // Add test markers
-        const testMarkers = [
-          { lat: 28.6139, lng: 77.2090, title: 'Delhi Center' },
-          { lat: 28.5355, lng: 77.3910, title: 'Gurgaon' },
-          { lat: 28.7041, lng: 77.1025, title: 'Noida' }
-        ];
+        // Create markers for real properties
+        console.log('Creating markers for properties...', validProperties);
 
-        console.log('Creating test markers...', testMarkers);
-
-        testMarkers.forEach((markerData, index) => {
+        validProperties.forEach((property, index) => {
           try {
-            console.log(`Creating marker ${index + 1}:`, markerData);
+            console.log(`Creating marker ${index + 1} for property:`, property.title);
+            
+            const position = {
+              lat: property.location.coordinates[1],
+              lng: property.location.coordinates[0]
+            };
             
             // Try with default marker first
             const marker = new window.mappls.Marker({
               map: mapInstanceRef.current,
-              position: { lat: markerData.lat, lng: markerData.lng }
+              position: position
             });
 
             console.log(`Default marker ${index + 1} created successfully`);
@@ -184,11 +225,11 @@ const MapTest: React.FC = () => {
             }
 
             marker.addListener('click', () => {
-              console.log(`Marker ${index + 1} clicked: ${markerData.title}`);
-              alert(`Clicked: ${markerData.title}`);
+              console.log(`Marker ${index + 1} clicked: ${property.title}`);
+              alert(`Clicked: ${property.title} - ${property.address?.city || 'Unknown City'}`);
             });
 
-            console.log(`Test marker ${index + 1} created and configured successfully`);
+            console.log(`Property marker ${index + 1} created and configured successfully`);
           } catch (error) {
             console.error(`Failed to create marker ${index + 1}:`, error);
           }
@@ -253,7 +294,7 @@ const MapTest: React.FC = () => {
     };
     
     setTimeout(tryInitialize, 1000);
-  }, [scriptLoaded]);
+  }, [scriptLoaded, properties, loading]);
 
   return (
     <Box sx={{ p: 2 }}>
@@ -270,6 +311,12 @@ const MapTest: React.FC = () => {
         </Typography>
         <Typography variant="body2" sx={{ mb: 1 }}>
           API Key: {MAPPLS_CONFIG.apiKey ? '✅ Found' : '❌ Missing'}
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Properties Loaded: {loading ? '⏳ Loading...' : `✅ ${properties.length} properties`}
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Properties with Coordinates: {properties.filter(p => p.location?.coordinates?.length === 2).length}
         </Typography>
         {mapError && (
           <Typography variant="body2" sx={{ color: 'error.main' }}>
@@ -291,7 +338,7 @@ const MapTest: React.FC = () => {
       />
       
       <Typography variant="body2" sx={{ mt: 1, color: 'var(--color-text-muted)' }}>
-        Click on the numbered markers to test functionality
+        Click on the property markers to see property details
       </Typography>
     </Box>
   );
