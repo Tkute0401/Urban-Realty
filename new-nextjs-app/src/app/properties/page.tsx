@@ -34,6 +34,7 @@ import {
 } from '@mui/icons-material';
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyList from '@/components/property/PropertyList';
+import PropertiesMap from '@/components/property/PropertiesMap';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 const PropertiesPageContent: React.FC = () => {
@@ -155,6 +156,11 @@ const PropertiesPageContent: React.FC = () => {
     if (isMobile && showFiltersDrawer) {
       setShowFiltersDrawer(false);
     }
+    
+    // Trigger search with new filter
+    setTimeout(() => {
+      loadProperties();
+    }, 100);
   };
 
   const clearAllFilters = () => {
@@ -1213,15 +1219,51 @@ const PropertiesPageContent: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Properties List */}
-          <PropertyList
-            properties={properties}
-            loading={loading}
-            error={error}
-            emptyMessage="No properties found matching your criteria"
-            columns={{ xs: 12, sm: 6, md: 4 }}
-            onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
-          />
+          {/* All Properties Heading */}
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography variant="h3" sx={{ 
+              color: 'var(--color-primary)', 
+              fontWeight: 700,
+              mb: 1
+            }}>
+              All Properties
+            </Typography>
+            <Typography variant="h6" sx={{ 
+              color: 'var(--color-text-muted)',
+              fontWeight: 500
+            }}>
+              {properties.length} LISTINGS
+            </Typography>
+          </Box>
+
+          {/* Properties List with Map */}
+          <Grid container spacing={4}>
+            <Grid item xs={12} lg={8}>
+              <PropertyList
+                properties={properties}
+                loading={loading}
+                error={error}
+                emptyMessage="No properties found matching your criteria"
+                columns={{ xs: 12, sm: 6, md: 4 }}
+                onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+              />
+            </Grid>
+            <Grid item xs={12} lg={4}>
+              <Box sx={{
+                position: 'sticky',
+                top: 100,
+                height: '600px',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                border: '1px solid var(--color-border)'
+              }}>
+                <PropertiesMap
+                  properties={properties}
+                  height="600px"
+                />
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
       )}
 
