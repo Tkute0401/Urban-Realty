@@ -35,6 +35,7 @@ import {
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyList from '@/components/property/PropertyList';
 import PropertiesMap from '@/components/property/PropertiesMap';
+import MapTest from '@/components/property/MapTest';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 const PropertiesPageContent: React.FC = () => {
@@ -1257,10 +1258,7 @@ const PropertiesPageContent: React.FC = () => {
                 overflow: 'hidden',
                 border: '1px solid var(--color-border)'
               }}>
-                <PropertiesMap
-                  properties={properties}
-                  height="600px"
-                />
+                <MapTest />
               </Box>
             </Grid>
           </Grid>

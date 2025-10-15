@@ -144,8 +144,27 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           property.location?.coordinates?.length === 2
         );
 
+        console.log('PropertiesMap Debug:', {
+          totalProperties: properties.length,
+          validProperties: validProperties.length,
+          properties: properties.map(p => ({
+            id: p._id,
+            title: p.title,
+            hasLocation: !!p.location,
+            coordinates: p.location?.coordinates
+          }))
+        });
+
         if (validProperties.length === 0) {
-          setMapError('No properties with valid coordinates');
+          console.log('No valid properties found, creating test marker');
+          // Create a test marker with default coordinates (Delhi)
+          const testMarker = new window.mappls.Marker({
+            map: mapInstanceRef.current,
+            position: { lat: 28.6139, lng: 77.2090 }
+          });
+          markersRef.current = [testMarker];
+          setMapLoaded(true);
+          setMapError(null);
           return;
         }
 
@@ -154,6 +173,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         const [lng, lat] = firstProperty.location!.coordinates;
 
         // Initialize map
+        console.log('Initializing map with center:', [lng, lat]);
         mapInstanceRef.current = new window.mappls.Map(container, {
           center: [lng, lat],
           zoom: validProperties.length > 1 ? 10 : 12,
@@ -161,6 +181,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           fullscreenControl: true,
           scrollWheel: true,
         });
+
+        console.log('Map initialized successfully');
 
         // Calculate bounds for multiple properties
         if (validProperties.length > 1) {
@@ -182,21 +204,41 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
           const isSelected = selectedProperty?._id === property._id;
 
-          const marker = new window.mappls.Marker({
-            map: mapInstanceRef.current,
-            position: position,
-            icon: {
-              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
-                </svg>
-              `)}`,
-              scaledSize: { width: 20, height: 20 }
-            }
+          console.log(`Creating marker for property ${property.title}:`, {
+            position,
+            isSelected,
+            propertyId: property._id
           });
+
+          // Try creating marker with custom icon first, fallback to default
+          let marker;
+          try {
+            marker = new window.mappls.Marker({
+              map: mapInstanceRef.current,
+              position: position,
+              icon: {
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
+                  </svg>
+                `)}`,
+                scaledSize: { width: 20, height: 20 }
+              }
+            });
+            console.log('Custom icon marker created successfully');
+          } catch (error) {
+            console.warn('Failed to create custom icon marker, using default:', error);
+            // Fallback to default marker
+            marker = new window.mappls.Marker({
+              map: mapInstanceRef.current,
+              position: position
+            });
+            console.log('Default marker created successfully');
+          }
 
           // Add click listener
           marker.addListener('click', () => {
+            console.log('Marker clicked:', property.title);
             if (onMarkerClick) {
               onMarkerClick(property);
             }
