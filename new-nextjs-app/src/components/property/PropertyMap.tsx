@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { MAPPLS_CONFIG } from '../../config/maps';
 
 interface PropertyMapProps {
   latitude: number;
@@ -45,15 +46,15 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         return;
       }
 
-      const apiKey = process.env.NEXT_PUBLIC_MAPPLS_API_KEY;
-      if (!apiKey) {
+      // Use centralized API key configuration
+      if (!MAPPLS_CONFIG.apiKey) {
         setMapError('Mappls API key not found. Please check your environment variables.');
         return;
       }
 
       // Load Mappls script
       const script = document.createElement('script');
-      script.src = `https://apis.mappls.com/advancedmaps/api/${apiKey}/map_sdk?layer=vector&v=3.0`;
+      script.src = MAPPLS_CONFIG.getScriptUrl();
       script.async = true;
       script.defer = true;
       
