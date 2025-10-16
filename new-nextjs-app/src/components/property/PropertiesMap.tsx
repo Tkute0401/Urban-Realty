@@ -189,7 +189,9 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       }));
 
       console.log('Fitting bounds to show all properties:', coordinates);
-      mapInstanceRef.current.fitBounds(coordinates);
+      // Mappls fitBounds expects an array of [lng, lat] coordinates
+      const mapplsCoordinates = coordinates.map(coord => [coord.lng, coord.lat]);
+      mapInstanceRef.current.fitBounds(mapplsCoordinates);
     } else if (validProperties.length === 1 && !userLocation) {
       // For single property, ensure it's visible
       const property = validProperties[0];
@@ -198,7 +200,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         lng: property.location!.coordinates[0]
       };
       console.log('Centering map on single property:', position);
-      mapInstanceRef.current.setCenter([position.lng, position.lat]);
+      mapInstanceRef.current.setCenter([position.lng, position.lat]); // Already in [lng, lat] format
       mapInstanceRef.current.setZoom(15);
     }
 
@@ -218,12 +220,13 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         propertyId: property._id
       });
 
-      // Try creating marker with custom icon first, fallback to default
+      // Create marker using proper Mappls SDK format
       let marker;
       try {
+        // Mappls markers use [lng, lat] format for position
         marker = new window.mappls.Marker({
           map: mapInstanceRef.current,
-          position: position,
+          position: [position.lng, position.lat], // Mappls expects [lng, lat]
           icon: {
             url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
               <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -239,7 +242,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         // Fallback to default marker
         marker = new window.mappls.Marker({
           map: mapInstanceRef.current,
-          position: position
+          position: [position.lng, position.lat] // Mappls expects [lng, lat]
         });
         console.log('Default marker created successfully for:', property.title);
       }
@@ -260,10 +263,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       try {
         const userMarker = new window.mappls.Marker({
           map: mapInstanceRef.current,
-          position: {
-            lat: userLocation.latitude,
-            lng: userLocation.longitude
-          },
+          position: [userLocation.longitude, userLocation.latitude], // Mappls expects [lng, lat]
           icon: {
             url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
               <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -416,13 +416,20 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           try {
             console.log('Creating Mappls map with:', { mapCenter, mapZoom, container });
             
-            // Initialize map
+            // Initialize Mappls with API key first
+            if (window.mappls.setAPIKey) {
+              window.mappls.setAPIKey(MAPPLS_CONFIG.apiKey);
+            }
+            
+            // Initialize map with proper Mappls SDK configuration
             mapInstanceRef.current = new window.mappls.Map(container, {
-              center: mapCenter,
+              center: [mapCenter.lng, mapCenter.lat], // Mappls expects [lng, lat] format
               zoom: mapZoom,
               zoomControl: true,
               fullscreenControl: true,
               scrollWheel: true,
+              mapType: 'mappls',
+              mapTypeId: 'mappls'
             });
 
             console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);

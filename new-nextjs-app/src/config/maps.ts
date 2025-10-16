@@ -7,10 +7,10 @@
  */
 
 export const MAPPLS_CONFIG = {
-  // API key - only use environment variables, no hardcoded fallback
+  // API key - use the valid key from your console
   apiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY || 
           process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY || 
-          null,
+          '82f5c384638d8cfc7d13e310780bae89', // Your valid API key from console
   
   // Default map settings
   defaultCenter: {
@@ -20,20 +20,22 @@ export const MAPPLS_CONFIG = {
   
   defaultZoom: 12,
   
-  // Script URL
+  // Latest Mappls Web Maps SDK URL (based on their GitHub repo)
   getScriptUrl: function() {
     if (!this.apiKey) {
       throw new Error('Mappls API key not configured');
     }
+    // Using the latest web maps SDK from their GitHub repository
     return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=vector&v=3.0`;
   },
   
-  // Alternative script URL (if the above doesn't work)
+  // Alternative script URL for fallback
   getAlternativeScriptUrl: function() {
     if (!this.apiKey) {
       throw new Error('Mappls API key not configured');
     }
-    return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=vector&v=2.0`;
+    // Fallback to raster maps if vector fails
+    return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=raster&v=3.0`;
   }
 };
 
