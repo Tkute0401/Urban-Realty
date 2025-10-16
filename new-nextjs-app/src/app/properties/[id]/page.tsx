@@ -17,7 +17,9 @@ import {
   Tabs,
   Tab,
   useMediaQuery,
-  useTheme as useMuiTheme
+  useTheme as useMuiTheme,
+  Card,
+  CardContent
 } from '@mui/material';
 import {
   Share,
@@ -44,6 +46,7 @@ import PropertyMoreInfo from '@/components/property/PropertyMoreInfo';
 import { formatPrice } from '@/lib/utils/format';
 import { toast } from 'react-toastify';
 import http from '@/lib/services/http';
+import { useProperties } from '@/contexts/PropertiesContext';
 
 interface Property {
   _id: string;
@@ -160,6 +163,11 @@ const PropertyDetailsPageContent: React.FC = () => {
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [similarPropertiesLoading, setSimilarPropertiesLoading] = useState(false);
+  const [featuredPropertiesLoading, setFeaturedPropertiesLoading] = useState(false);
+  const [similarPropertiesTab, setSimilarPropertiesTab] = useState(0);
 
   const isDark = theme === 'dark';
 
@@ -211,6 +219,14 @@ const PropertyDetailsPageContent: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Fetch similar and featured properties when property loads
+  useEffect(() => {
+    if (property) {
+      fetchSimilarProperties();
+      fetchFeaturedProperties();
+    }
+  }, [property]);
 
   const handleFavoriteClick = async () => {
     if (!property) return;
@@ -274,6 +290,52 @@ const PropertyDetailsPageContent: React.FC = () => {
       case 'whatsapp':
         window.open(`https://wa.me/1234567890?text=Hi, I'm interested in your property: ${property.title}`);
         break;
+    }
+  };
+
+  const fetchSimilarProperties = async () => {
+    if (!property) return;
+    
+    setSimilarPropertiesLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (property.address?.city) params.set('city', property.address.city);
+      if (property.type) params.set('type', property.type);
+      if (property.status) params.set('status', property.status);
+      params.set('limit', '6');
+      
+      // Add location-based filtering if property has coordinates
+      if (property.location?.coordinates) {
+        params.set('userLat', property.location.coordinates[1].toString());
+        params.set('userLng', property.location.coordinates[0].toString());
+        params.set('radius', '5000'); // 5km radius
+      }
+
+      const response = await http.get(`/api/v1/properties?${params.toString()}`);
+      const data = response.data;
+      const properties = data.data || data.properties || [];
+      
+      // Filter out the current property
+      const filteredProperties = properties.filter((p: Property) => p._id !== property._id);
+      setSimilarProperties(filteredProperties.slice(0, 6));
+    } catch (err) {
+      console.error('Error fetching similar properties:', err);
+    } finally {
+      setSimilarPropertiesLoading(false);
+    }
+  };
+
+  const fetchFeaturedProperties = async () => {
+    setFeaturedPropertiesLoading(true);
+    try {
+      const response = await http.get('/api/v1/properties/featured');
+      const data = response.data;
+      const properties = data.data || data.properties || [];
+      setFeaturedProperties(properties.slice(0, 6));
+    } catch (err) {
+      console.error('Error fetching featured properties:', err);
+    } finally {
+      setFeaturedPropertiesLoading(false);
     }
   };
 
@@ -414,7 +476,7 @@ const PropertyDetailsPageContent: React.FC = () => {
                   <IconButton
                     onClick={handleFavoriteClick}
                     disabled={loadingFavorite}
-                    sx={{ color: isFavorite ? '#e74c3c' : 'var(--color-text-primary)' }}
+                    sx={{ color: isFavorite ? 'var(--color-error)' : 'var(--color-text-primary)' }}
                   >
                     {loadingFavorite ? <CircularProgress size={20} /> : (isFavorite ? <HeartFilled /> : <HeartOutline />)}
                   </IconButton>
@@ -804,6 +866,301 @@ const PropertyDetailsPageContent: React.FC = () => {
         <Box sx={{ mt: 4 }}>
           <PropertyMoreInfo property={property} />
         </Box>
+
+        {/* Similar Properties Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <Box sx={{ mt: 6 }}>
+            <Paper sx={{
+              background: 'var(--color-surface)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid var(--color-border)',
+              borderRadius: { xs: '8px', sm: '12px' },
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              p: { xs: 2, sm: 3 }
+            }}>
+              <Typography variant="h4" sx={{ 
+                mb: 3, 
+                color: 'var(--color-text-primary)',
+                fontWeight: 'bold',
+                textAlign: 'center'
+              }}>
+                More Properties
+              </Typography>
+
+              <Tabs
+                value={similarPropertiesTab}
+                onChange={(_, newValue) => setSimilarPropertiesTab(newValue)}
+                variant={isMobile ? "scrollable" : "standard"}
+                scrollButtons="auto"
+                sx={{
+                  borderBottom: '1px solid var(--color-border)',
+                  mb: 3,
+                  '& .MuiTab-root': {
+                    color: 'var(--color-text-muted)',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    minHeight: { xs: 48, sm: 64 },
+                    '&.Mui-selected': {
+                      color: 'var(--color-primary)'
+                    }
+                  }
+                }}
+              >
+                <Tab label="Similar Properties" />
+                <Tab label="Featured Properties" />
+              </Tabs>
+
+              <TabPanel value={similarPropertiesTab} index={0}>
+                {similarPropertiesLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress size={40} sx={{ color: 'var(--color-primary)' }} />
+                  </Box>
+                ) : similarProperties.length > 0 ? (
+                  <Grid container spacing={3}>
+                    {similarProperties.map((prop) => (
+                      <Grid item xs={12} sm={6} md={4} key={prop._id}>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Card sx={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            background: 'var(--color-bg-secondary)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '12px',
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                              transform: 'translateY(-4px)'
+                            }
+                          }}
+                          onClick={() => router.push(`/properties/${prop._id}`)}
+                        >
+                          <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+                            <img
+                              src={prop.images?.[0]?.url || '/api/placeholder/400/300'}
+                              alt={prop.title}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                              }}
+                            />
+                            <Chip
+                              label={prop.status}
+                              color={prop.status === 'For Sale' ? 'success' : 'warning'}
+                              size="small"
+                              sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                fontWeight: 'bold'
+                              }}
+                            />
+                          </Box>
+                          
+                          <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                            <Typography variant="h6" sx={{ 
+                              fontWeight: 'bold', 
+                              color: 'var(--color-text-primary)',
+                              mb: 1,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {prop.buildingName || prop.title}
+                            </Typography>
+                            
+                            <Typography variant="body2" sx={{ 
+                              color: 'var(--color-text-muted)',
+                              mb: 2,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {prop.address?.city}, {prop.address?.state}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                              <Typography variant="h6" sx={{ 
+                                color: 'var(--color-primary)',
+                                fontWeight: 'bold'
+                              }}>
+                                {formatPrice(prop.price)}
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                {prop.area} sqft
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <LocalHotel sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  {prop.bedrooms}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Bathtub sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  {prop.bathrooms}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <SquareFoot sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  {prop.type}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </CardContent>
+                          </Card>
+                        </motion.div>
+                      </Grid>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
+                      No similar properties found.
+                    </Typography>
+                  </Box>
+                )}
+              </TabPanel>
+
+              <TabPanel value={similarPropertiesTab} index={1}>
+                {featuredPropertiesLoading ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress size={40} sx={{ color: 'var(--color-primary)' }} />
+                  </Box>
+                ) : featuredProperties.length > 0 ? (
+                  <Grid container spacing={3}>
+                    {featuredProperties.map((prop) => (
+                      <Grid item xs={12} sm={6} md={4} key={prop._id}>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Card sx={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            background: 'var(--color-bg-secondary)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '12px',
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                              transform: 'translateY(-4px)'
+                            }
+                          }}
+                          onClick={() => router.push(`/properties/${prop._id}`)}
+                        >
+                          <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+                            <img
+                              src={prop.images?.[0]?.url || '/api/placeholder/400/300'}
+                              alt={prop.title}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover'
+                              }}
+                            />
+                            <Chip
+                              label="Featured"
+                              color="primary"
+                              size="small"
+                              sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                fontWeight: 'bold',
+                                background: 'var(--color-primary)',
+                                color: 'var(--color-text-inverse)'
+                              }}
+                            />
+                          </Box>
+                          
+                          <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                            <Typography variant="h6" sx={{ 
+                              fontWeight: 'bold', 
+                              color: 'var(--color-text-primary)',
+                              mb: 1,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {prop.buildingName || prop.title}
+                            </Typography>
+                            
+                            <Typography variant="body2" sx={{ 
+                              color: 'var(--color-text-muted)',
+                              mb: 2,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {prop.address?.city}, {prop.address?.state}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                              <Typography variant="h6" sx={{ 
+                                color: 'var(--color-primary)',
+                                fontWeight: 'bold'
+                              }}>
+                                {formatPrice(prop.price)}
+                              </Typography>
+                              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                {prop.area} sqft
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <LocalHotel sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  {prop.bedrooms}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Bathtub sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  {prop.bathrooms}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <SquareFoot sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  {prop.type}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </CardContent>
+                          </Card>
+                        </motion.div>
+                      </Grid>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
+                      No featured properties available.
+                    </Typography>
+                  </Box>
+                )}
+              </TabPanel>
+            </Paper>
+          </Box>
+        </motion.div>
 
         {/* Back to Top Button */}
         {showBackToTop && (
