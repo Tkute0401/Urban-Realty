@@ -62,7 +62,7 @@ import {
   Refresh as RefreshIcon,
   Download as DownloadIcon,
   Settings as SettingsIcon,
-  Database as DatabaseIcon,
+  Storage as DatabaseIcon,
   Api as ApiIcon,
   Security as SecurityIcon,
   Assessment as AnalyticsIcon,
@@ -77,67 +77,7 @@ import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDate, formatBytes, formatDuration } from '@/lib/utils/format';
 
-// Mock data for demonstration - in production, this would come from real APIs
-
-const mockApiMetrics = {
-  totalRequests: 15420,
-  successRate: 98.5,
-  avgResponseTime: 245,
-  errorRate: 1.5,
-  endpoints: [
-    { name: '/api/v1/properties', requests: 5420, avgTime: 180, errors: 12 },
-    { name: '/api/v1/auth/login', requests: 3200, avgTime: 120, errors: 5 },
-    { name: '/api/v1/contacts', requests: 2800, avgTime: 200, errors: 8 },
-    { name: '/api/v1/agent/dashboard', requests: 1500, avgTime: 300, errors: 3 },
-    { name: '/api/v1/analytics', requests: 2500, avgTime: 450, errors: 15 }
-  ]
-};
-
-const mockDatabaseMetrics = {
-  connections: {
-    active: 12,
-    idle: 8,
-    total: 20,
-    max: 100
-  },
-  queries: {
-    total: 45620,
-    slow: 234,
-    avgTime: 45,
-    cacheHitRate: 87.5
-  },
-  collections: [
-    { name: 'properties', count: 15420, size: '2.3GB', indexes: 5 },
-    { name: 'users', count: 5420, size: '850MB', indexes: 3 },
-    { name: 'contacts', count: 12800, size: '1.2GB', indexes: 4 },
-    { name: 'sessions', count: 3200, size: '120MB', indexes: 2 }
-  ]
-};
-
-const mockDeploymentStatus = {
-  current: {
-    version: 'v2.1.4',
-    environment: 'production',
-    status: 'healthy',
-    uptime: '99.9%',
-    lastDeploy: '2024-01-15T10:30:00Z',
-    buildTime: '4m 32s'
-  },
-  recent: [
-    { version: 'v2.1.4', status: 'success', time: '2024-01-15T10:30:00Z', duration: '4m 32s' },
-    { version: 'v2.1.3', status: 'success', time: '2024-01-14T15:45:00Z', duration: '3m 45s' },
-    { version: 'v2.1.2', status: 'failed', time: '2024-01-13T09:20:00Z', duration: '2m 15s' },
-    { version: 'v2.1.1', status: 'success', time: '2024-01-12T14:10:00Z', duration: '5m 12s' }
-  ]
-};
-
-const mockErrorLogs = [
-  { id: 1, level: 'error', message: 'Database connection timeout', timestamp: '2024-01-15T10:25:30Z', service: 'database', count: 3 },
-  { id: 2, level: 'warning', message: 'High memory usage detected', timestamp: '2024-01-15T10:20:15Z', service: 'system', count: 1 },
-  { id: 3, level: 'error', message: 'API rate limit exceeded', timestamp: '2024-01-15T10:15:45Z', service: 'api', count: 12 },
-  { id: 4, level: 'info', message: 'Scheduled backup completed', timestamp: '2024-01-15T10:10:00Z', service: 'backup', count: 1 },
-  { id: 5, level: 'error', message: 'File upload failed', timestamp: '2024-01-15T10:05:20Z', service: 'storage', count: 5 }
-];
+// Real API endpoints for developer metrics
 
 export default function DeveloperDashboard() {
   const theme = useTheme();
@@ -148,13 +88,13 @@ export default function DeveloperDashboard() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [selectedTimeRange, setSelectedTimeRange] = useState('1h');
 
-  // Mock API calls - in production, these would be real API endpoints
-
+  // Real API calls for developer metrics
   const { data: apiMetrics, isLoading: apiLoading, refetch: refetchApi } = useQuery({
     queryKey: ['developerApiMetrics'],
     queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return mockApiMetrics;
+      const response = await fetch('/api/v1/developer/api-metrics');
+      if (!response.ok) throw new Error('Failed to fetch API metrics');
+      return response.json();
     },
     refetchInterval: autoRefresh ? 10000 : false, // Refresh every 10 seconds
     retry: (failureCount) => (failureCount < 3),
@@ -163,8 +103,9 @@ export default function DeveloperDashboard() {
   const { data: databaseMetrics, isLoading: dbLoading, refetch: refetchDb } = useQuery({
     queryKey: ['developerDatabaseMetrics'],
     queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      return mockDatabaseMetrics;
+      const response = await fetch('/api/v1/developer/database-metrics');
+      if (!response.ok) throw new Error('Failed to fetch database metrics');
+      return response.json();
     },
     refetchInterval: autoRefresh ? 15000 : false, // Refresh every 15 seconds
     retry: (failureCount) => (failureCount < 3),
@@ -173,8 +114,9 @@ export default function DeveloperDashboard() {
   const { data: deploymentStatus, isLoading: deployLoading, refetch: refetchDeploy } = useQuery({
     queryKey: ['developerDeploymentStatus'],
     queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return mockDeploymentStatus;
+      const response = await fetch('/api/v1/developer/deployment-status');
+      if (!response.ok) throw new Error('Failed to fetch deployment status');
+      return response.json();
     },
     refetchInterval: autoRefresh ? 30000 : false, // Refresh every 30 seconds
     retry: (failureCount) => (failureCount < 3),
@@ -183,8 +125,9 @@ export default function DeveloperDashboard() {
   const { data: errorLogs, isLoading: logsLoading, refetch: refetchLogs } = useQuery({
     queryKey: ['developerErrorLogs'],
     queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      return mockErrorLogs;
+      const response = await fetch('/api/v1/developer/error-logs');
+      if (!response.ok) throw new Error('Failed to fetch error logs');
+      return response.json();
     },
     refetchInterval: autoRefresh ? 2000 : false, // Refresh every 2 seconds
     retry: (failureCount) => (failureCount < 3),
@@ -279,8 +222,11 @@ export default function DeveloperDashboard() {
 
   if (apiLoading && dbLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2, color: 'text.secondary' }}>
+          Loading developer metrics...
+        </Typography>
       </Box>
     );
   }
@@ -364,7 +310,7 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Total Requests"
-                value={apiMetrics?.totalRequests?.toLocaleString()}
+                value={apiMetrics?.data?.totalRequests?.toLocaleString() || '0'}
                 subtitle="Last 24 hours"
                 icon={<ApiIcon />}
                 color="var(--color-primary)"
@@ -374,33 +320,33 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Success Rate"
-                value={`${apiMetrics?.successRate}%`}
+                value={`${apiMetrics?.data?.successRate || 0}%`}
                 subtitle="API reliability"
                 icon={<SuccessIcon />}
                 color="var(--color-success)"
-                trend="+2.1%"
+                trend={apiMetrics?.data?.trends?.successRate || ''}
                 loading={apiLoading}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Avg Response Time"
-                value={`${apiMetrics?.avgResponseTime}ms`}
+                value={`${apiMetrics?.data?.avgResponseTime || 0}ms`}
                 subtitle="Performance"
                 icon={<SpeedIcon />}
                 color="var(--color-warning)"
-                trend="-15ms"
+                trend={apiMetrics?.data?.trends?.responseTime || ''}
                 loading={apiLoading}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Error Rate"
-                value={`${apiMetrics?.errorRate}%`}
+                value={`${apiMetrics?.data?.errorRate || 0}%`}
                 subtitle="Issues detected"
                 icon={<ErrorIcon />}
                 color="var(--color-error)"
-                trend="-0.3%"
+                trend={apiMetrics?.data?.trends?.errorRate || ''}
                 loading={apiLoading}
               />
             </Grid>
@@ -425,18 +371,18 @@ export default function DeveloperDashboard() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {apiMetrics?.endpoints?.map((endpoint, index) => (
+                        {(apiMetrics?.data?.endpoints || []).map((endpoint, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Typography variant="body2" fontFamily="monospace">
                                 {endpoint.name}
                               </Typography>
                             </TableCell>
-                            <TableCell align="right">{endpoint.requests.toLocaleString()}</TableCell>
-                            <TableCell align="right">{endpoint.avgTime}</TableCell>
+                            <TableCell align="right">{endpoint.requests?.toLocaleString() || 0}</TableCell>
+                            <TableCell align="right">{endpoint.avgTime || 0}</TableCell>
                             <TableCell align="right">
                               <Chip
-                                label={endpoint.errors}
+                                label={endpoint.errors || 0}
                                 size="small"
                                 color={endpoint.errors > 10 ? 'error' : endpoint.errors > 5 ? 'warning' : 'success'}
                                 variant="outlined"
@@ -507,7 +453,7 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Active Connections"
-                value={`${databaseMetrics?.connections?.active}/${databaseMetrics?.connections?.max}`}
+                value={`${databaseMetrics?.data?.connections?.active || 0}/${databaseMetrics?.data?.connections?.max || 0}`}
                 subtitle="Database pool"
                 icon={<DatabaseIcon />}
                 color="var(--color-primary)"
@@ -517,7 +463,7 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Total Queries"
-                value={databaseMetrics?.queries?.total?.toLocaleString()}
+                value={databaseMetrics?.data?.queries?.total?.toLocaleString() || '0'}
                 subtitle="Last 24 hours"
                 icon={<TimelineIcon />}
                 color="var(--color-info)"
@@ -527,22 +473,22 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Cache Hit Rate"
-                value={`${databaseMetrics?.queries?.cacheHitRate}%`}
+                value={`${databaseMetrics?.data?.queries?.cacheHitRate || 0}%`}
                 subtitle="Performance"
                 icon={<SpeedIcon />}
                 color="var(--color-success)"
-                trend="+3.2%"
+                trend={databaseMetrics?.data?.trends?.cacheHitRate || ''}
                 loading={dbLoading}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Slow Queries"
-                value={databaseMetrics?.queries?.slow}
+                value={databaseMetrics?.data?.queries?.slow || 0}
                 subtitle="Need optimization"
                 icon={<WarningIcon />}
                 color="var(--color-warning)"
-                trend="-12"
+                trend={databaseMetrics?.data?.trends?.slowQueries || ''}
                 loading={dbLoading}
               />
             </Grid>
@@ -566,16 +512,16 @@ export default function DeveloperDashboard() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {databaseMetrics?.collections?.map((collection, index) => (
+                        {(databaseMetrics?.data?.collections || []).map((collection, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Typography variant="body2" fontFamily="monospace">
                                 {collection.name}
                               </Typography>
                             </TableCell>
-                            <TableCell align="right">{collection.count.toLocaleString()}</TableCell>
-                            <TableCell align="right">{collection.size}</TableCell>
-                            <TableCell align="right">{collection.indexes}</TableCell>
+                            <TableCell align="right">{collection.count?.toLocaleString() || 0}</TableCell>
+                            <TableCell align="right">{collection.size || '0MB'}</TableCell>
+                            <TableCell align="right">{collection.indexes || 0}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -622,8 +568,8 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Current Version"
-                value={deploymentStatus?.current?.version}
-                subtitle={deploymentStatus?.current?.environment}
+                value={deploymentStatus?.data?.current?.version || 'Unknown'}
+                subtitle={deploymentStatus?.data?.current?.environment || 'Unknown'}
                 icon={<DeployIcon />}
                 color="var(--color-primary)"
                 loading={deployLoading}
@@ -632,7 +578,7 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Uptime"
-                value={deploymentStatus?.current?.uptime}
+                value={deploymentStatus?.data?.current?.uptime || '0%'}
                 subtitle="System availability"
                 icon={<SuccessIcon />}
                 color="var(--color-success)"
@@ -642,7 +588,7 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Last Deploy"
-                value={deploymentStatus?.current?.buildTime}
+                value={deploymentStatus?.data?.current?.buildTime || 'Unknown'}
                 subtitle="Build duration"
                 icon={<BuildIcon />}
                 color="var(--color-info)"
@@ -652,10 +598,10 @@ export default function DeveloperDashboard() {
             <Grid item xs={12} sm={6} md={3}>
               <MetricCard
                 title="Status"
-                value={deploymentStatus?.current?.status}
+                value={deploymentStatus?.data?.current?.status || 'Unknown'}
                 subtitle="Health check"
-                icon={getStatusIcon(deploymentStatus?.current?.status)}
-                color={getStatusColor(deploymentStatus?.current?.status)}
+                icon={getStatusIcon(deploymentStatus?.data?.current?.status || 'unknown')}
+                color={getStatusColor(deploymentStatus?.data?.current?.status || 'unknown')}
                 loading={deployLoading}
               />
             </Grid>
@@ -680,7 +626,7 @@ export default function DeveloperDashboard() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {deploymentStatus?.recent?.map((deploy, index) => (
+                        {(deploymentStatus?.data?.recent || []).map((deploy, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <Typography variant="body2" fontFamily="monospace">
@@ -695,9 +641,9 @@ export default function DeveloperDashboard() {
                                 icon={getStatusIcon(deploy.status)}
                               />
                             </TableCell>
-                            <TableCell align="right">{deploy.duration}</TableCell>
+                            <TableCell align="right">{deploy.duration || 'Unknown'}</TableCell>
                             <TableCell align="right">
-                              {new Date(deploy.time).toLocaleString()}
+                              {deploy.time ? new Date(deploy.time).toLocaleString() : 'Unknown'}
                             </TableCell>
                             <TableCell align="center">
                               <IconButton size="small">
@@ -805,38 +751,38 @@ export default function DeveloperDashboard() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {errorLogs?.map((log) => (
-                      <TableRow key={log.id}>
+                    {(errorLogs?.data || []).map((log, index) => (
+                      <TableRow key={log.id || index}>
                         <TableCell>
                           <Chip
-                            label={log.level}
+                            label={log.level || 'unknown'}
                             size="small"
-                            color={getStatusColor(log.level)}
-                            icon={getStatusIcon(log.level)}
+                            color={getStatusColor(log.level || 'unknown')}
+                            icon={getStatusIcon(log.level || 'unknown')}
                           />
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {log.message}
+                            {log.message || 'No message'}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={log.service}
+                            label={log.service || 'unknown'}
                             size="small"
                             variant="outlined"
                           />
                         </TableCell>
                         <TableCell>
-                          <Badge badgeContent={log.count} color="error">
+                          <Badge badgeContent={log.count || 0} color="error">
                             <Typography variant="body2">
-                              {log.count}
+                              {log.count || 0}
                             </Typography>
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <Typography variant="caption">
-                            {new Date(log.timestamp).toLocaleString()}
+                            {log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Unknown'}
                           </Typography>
                         </TableCell>
                         <TableCell>
