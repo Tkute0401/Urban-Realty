@@ -331,6 +331,59 @@ const HeroSection = () => {
                   homes, apartments, and commercial spaces across the country.
                 </p>
               </div>
+              
+              {/* Popular localities section moved to center */}
+              {selectedCity && currentCityLocalities.length > 0 && (
+                <div className="w-full max-w-2xl mx-auto mt-4 sm:mt-6 md:mt-8">          
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 text-white/80 mb-1 sm:mb-2 md:mb-3 flex-wrap">
+                    <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
+                      Popular Localities in {selectedCity}:
+                    </span>
+                    <div className="flex items-center gap-1 sm:gap-1.5 overflow-hidden">
+                      <div 
+                        ref={localitiesContainerRef}
+                        className="flex gap-1 sm:gap-1.5 transition-transform duration-500 ease-in-out"
+                      >
+                        <AnimatePresence mode="wait">
+                          {visibleLocalities.map((locality, index) => (
+                            <motion.button
+                              key={`${selectedCity}-${locality}-${localityStartIndex + index}`}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -20 }}
+                              transition={{ 
+                                duration: 0.3, 
+                                delay: index * 0.05,
+                                ease: "easeOut"
+                              }}
+                              className="px-2 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
+                              onClick={() => {
+                                const newSearchParams = new URLSearchParams();
+                                newSearchParams.set('city', selectedCity);
+                                newSearchParams.set('search', String(locality));
+                                if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+                                router.push(`/properties?${newSearchParams.toString()}`);
+                              }}
+                            >
+                              {String(locality)}
+                            </motion.button>
+                          ))}
+                        </AnimatePresence>
+                      </div>
+                      {currentCityLocalities.length > visibleLocalitiesCount && (
+                        <motion.button
+                          onClick={handleNextLocalities}
+                          className="p-1 sm:p-1 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 flex-shrink-0"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <ChevronRightIcon className="w-3 h-3 sm:w-3 sm:h-3" />
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -442,61 +495,8 @@ const HeroSection = () => {
         )}
       </AnimatePresence>
       
-      {/* Search and filter bar - remains unchanged */}
+      {/* Search and filter bar */}
       <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center z-[100] px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2">
-        {/* Popular localities with scrolling */}
-        {selectedCity && currentCityLocalities.length > 0 && (
-          <div className="w-full max-w-2xl">          
-            <div className="flex items-center justify-center gap-1 sm:gap-1.5 text-white/80 mb-1 sm:mb-2 md:mb-3 flex-wrap">
-              <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
-                Popular Localities in {selectedCity}:
-              </span>
-              <div className="flex items-center gap-1 sm:gap-1.5 overflow-hidden">
-                <div 
-                  ref={localitiesContainerRef}
-                  className="flex gap-1 sm:gap-1.5 transition-transform duration-500 ease-in-out"
-                >
-                  <AnimatePresence mode="wait">
-                    {visibleLocalities.map((locality, index) => (
-                      <motion.button
-                        key={`${selectedCity}-${locality}-${localityStartIndex + index}`}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: index * 0.05,
-                          ease: "easeOut"
-                        }}
-                        className="px-2 py-1 text-xs sm:text-sm rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors whitespace-nowrap flex-shrink-0"
-                        onClick={() => {
-                          const newSearchParams = new URLSearchParams();
-                          newSearchParams.set('city', selectedCity);
-                          newSearchParams.set('search', String(locality));
-                          if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
-                          router.push(`/properties?${newSearchParams.toString()}`);
-                        }}
-                      >
-                        {String(locality)}
-                      </motion.button>
-                    ))}
-                  </AnimatePresence>
-                </div>
-                {currentCityLocalities.length > visibleLocalitiesCount && (
-                  <motion.button
-                    onClick={handleNextLocalities}
-                    className="p-1 sm:p-1 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 hover:scale-110 flex-shrink-0"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <ChevronRightIcon className="w-3 h-3 sm:w-3 sm:h-3" />
-                  </motion.button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Main search container */}
         <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative z-[200]">
           {/* Property type tabs */}
