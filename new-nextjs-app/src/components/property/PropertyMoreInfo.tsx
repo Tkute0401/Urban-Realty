@@ -30,15 +30,15 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
     <Box ref={ref} sx={{ mb: 6 }}>
       <SectionHeader variant="h4">More About Project</SectionHeader>
       <PremiumPaper>
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: 'var(--color-primary)' }}>
           Project Details
         </Typography>
         
         <Grid container spacing={3} sx={{ mb: 3 }}>
           {property.projectDetails?.projectArea && (
             <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Project Area</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>Project Area</Typography>
+              <Typography sx={{ color: 'var(--color-text-primary)' }}>
                 {property.projectDetails.projectArea} acres
               </Typography>
             </Grid>
@@ -46,8 +46,8 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
           
           {property.projectDetails?.totalUnits && (
             <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Total Units</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>Total Units</Typography>
+              <Typography sx={{ color: 'var(--color-text-primary)' }}>
                 {property.projectDetails.totalUnits}
               </Typography>
             </Grid>
@@ -55,8 +55,8 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
           
           {property.projectDetails?.launchDate && (
             <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Launch Date</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>Launch Date</Typography>
+              <Typography sx={{ color: 'var(--color-text-primary)' }}>
                 {new Date(property.projectDetails.launchDate).toLocaleDateString()}
               </Typography>
             </Grid>
@@ -64,8 +64,8 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
           
           {property.projectDetails?.reraId && (
             <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>RERA ID</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>RERA ID</Typography>
+              <Typography sx={{ color: 'var(--color-text-primary)' }}>
                 {property.projectDetails.reraId}
               </Typography>
             </Grid>
@@ -73,17 +73,17 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
           
           {property.projectDetails?.configurations && (
             <Grid item xs={12} sm={6} md={4}>
-              <Typography variant="h6" sx={{ color: '#78CADC' }}>Configurations</Typography>
-              <Typography sx={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+              <Typography variant="h6" sx={{ color: 'var(--color-primary)' }}>Configurations</Typography>
+              <Typography sx={{ color: 'var(--color-text-primary)' }}>
                 {property.projectDetails.configurations}
               </Typography>
             </Grid>
           )}
         </Grid>
         
-        <Divider sx={{ my: 3, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
+        <Divider sx={{ my: 3, borderColor: 'var(--color-border)' }} />
         
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: 'var(--color-primary)' }}>
           Property Description
         </Typography>
         <Typography 
@@ -92,7 +92,7 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
             whiteSpace: 'pre-line',
             fontSize: '1.1rem',
             lineHeight: 1.8,
-            color: 'rgba(255, 255, 255, 0.85)'
+            color: 'var(--color-text-primary)'
           }}
         >
           {property.description}
@@ -102,7 +102,7 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
       {/* Virtual Tour Section */}
       {property.virtualTour && property.virtualTour.url && (
         <PremiumPaper sx={{ mt: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: '#78CADC' }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: 'var(--color-primary)' }}>
             Virtual Tour
           </Typography>
           <Card 
@@ -111,25 +111,25 @@ const PropertyMoreInfo = forwardRef<HTMLDivElement, PropertyMoreInfoProps>(({ pr
               alignItems: 'center',
               p: 2,
               cursor: 'pointer',
-              backgroundColor: 'rgba(120, 202, 220, 0.1)',
-              border: '1px solid rgba(120, 202, 220, 0.3)',
+              backgroundColor: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-border)',
               '&:hover': {
-                backgroundColor: 'rgba(120, 202, 220, 0.2)',
+                backgroundColor: 'var(--color-primary-20)',
                 transition: 'background-color 0.3s ease'
               }
             }}
             onClick={() => window.open(property.virtualTour!.url, '_blank')}
           >
-            <VideoLibrary sx={{ color: '#78CADC', mr: 2, fontSize: 40 }} />
+            <VideoLibrary sx={{ color: 'var(--color-primary)', mr: 2, fontSize: 40 }} />
             <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 600, color: '#fff' }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
                 {property.virtualTour.type === '3d' ? '360° Virtual Tour' : 'Video Tour'}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                 Click to view in new window
               </Typography>
             </Box>
-            <IconButton sx={{ color: '#78CADC' }}>
+            <IconButton sx={{ color: 'var(--color-primary)' }}>
               <PlayArrow fontSize="large" />
             </IconButton>
           </Card>
