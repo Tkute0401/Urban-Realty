@@ -41,7 +41,7 @@ export interface Property {
   };
   virtualTour?: {
     url: string;
-    type: 'video' | '3d';
+    type: 'video' | '3d' | string;
   };
   projectDetails?: {
     projectArea?: string;

@@ -51,84 +51,8 @@ import { formatPrice } from '@/lib/utils/format';
 import { toast } from 'react-toastify';
 import http from '@/lib/services/http';
 import { useProperties } from '@/contexts/PropertiesContext';
-
-interface Property {
-  _id: string;
-  title: string;
-  buildingName?: string;
-  price: number;
-  area: number;
-  bedrooms: number;
-  bathrooms: number;
-  type: string;
-  status: string;
-  description?: string;
-  address?: {
-    line1?: string;
-    street?: string;
-    city: string;
-    locality?: string;
-    state: string;
-    zipCode?: string;
-    country?: string;
-  };
-  images?: Array<{ 
-    url: string; 
-    publicId?: string;
-    width?: number;
-    height?: number;
-  }>;
-  projectDetails?: {
-    projectArea?: string;
-    totalUnits?: string;
-    launchDate?: string;
-    reraId?: string;
-    configurations?: string;
-  };
-  location?: {
-    type: string;
-    coordinates: [number, number]; // [longitude, latitude]
-    formattedAddress?: string;
-  };
-  amenities?: string[];
-  highlights?: string[];
-  floorPlanImages?: Array<{
-    url: string;
-    publicId?: string;
-    description?: string;
-  }>;
-  nearbyLocalities?: {
-    hasSchool?: boolean;
-    school?: string;
-    hasHospital?: boolean;
-    hospital?: string;
-    hasMall?: boolean;
-    mall?: string;
-    hasPark?: boolean;
-    park?: string;
-    hasTransport?: boolean;
-    transport?: string;
-  };
-  similarProperties?: Property[];
-  developer?: {
-    _id: string;
-    name: string;
-    logo?: { url: string };
-  };
-  agent?: {
-    _id: string;
-    name: string;
-    email: string;
-    phone?: string;
-    mobile?: string;
-    company?: string;
-    avatar?: string;
-  };
-  virtualTour?: {
-    url: string;
-    type?: string;
-  };
-}
+import PropertyCard from '@/components/property/PropertyCard';
+import { Property } from '@/types/property';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -1048,109 +972,11 @@ const PropertyDetailsPageContent: React.FC = () => {
                   <Grid container spacing={3}>
                     {featuredProperties.map((prop) => (
                       <Grid item xs={12} sm={6} md={4} key={prop._id}>
-                        <motion.div
-                          whileHover={{ scale: 1.02 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Card sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            background: 'var(--color-bg-secondary)',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: '12px',
-                            overflow: 'hidden',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                              boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                              transform: 'translateY(-4px)'
-                            }
-                          }}
+                        <PropertyCard
+                          property={prop as Property}
+                          index={0}
                           onClick={() => router.push(`/properties/${prop._id}`)}
-                        >
-                          <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                            <img
-                              src={prop.images?.[0]?.url || '/api/placeholder/400/300'}
-                              alt={prop.title}
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                              }}
-                            />
-                            <Chip
-                              label="Featured"
-                              color="primary"
-                              size="small"
-                              sx={{
-                                position: 'absolute',
-                                top: 8,
-                                right: 8,
-                                fontWeight: 'bold',
-                                background: 'var(--color-primary)',
-                                color: 'var(--color-text-inverse)'
-                              }}
-                            />
-                          </Box>
-                          
-                          <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                            <Typography variant="h6" sx={{ 
-                              fontWeight: 'bold', 
-                              color: 'var(--color-text-primary)',
-                              mb: 1,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {prop.buildingName || prop.title}
-                            </Typography>
-                            
-                            <Typography variant="body2" sx={{ 
-                              color: 'var(--color-text-muted)',
-                              mb: 2,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {prop.address?.city}, {prop.address?.state}
-                            </Typography>
-
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                              <Typography variant="h6" sx={{ 
-                                color: 'var(--color-primary)',
-                                fontWeight: 'bold'
-                              }}>
-                                {formatPrice(prop.price)}
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                                {prop.area} sqft
-                              </Typography>
-                            </Box>
-
-                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <LocalHotel sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
-                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                                  {prop.bedrooms}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Bathtub sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
-                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                                  {prop.bathrooms}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <SquareFoot sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
-                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                                  {prop.type}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </CardContent>
-                          </Card>
-                        </motion.div>
+                        />
                       </Grid>
                     ))}
                   </Grid>

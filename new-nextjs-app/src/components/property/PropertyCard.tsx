@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Card, 
   CardContent, 
@@ -138,40 +139,48 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <Card 
+    <motion.div
       id={id}
-      sx={{ 
-        cursor: 'pointer',
-        borderRadius: { xs: '12px', sm: '24px' },
-        overflow: 'hidden',
-        backgroundColor: 'var(--color-surface)',
-        border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-        boxShadow: isSelected ? '0 8px 25px rgba(247, 107, 28, 0.3)' : 'none',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          transform: 'translateY(-5px)',
-          boxShadow: '0 8px 25px rgba(247, 107, 28, 0.2)',
-          border: '1px solid var(--color-primary)'
-        }
-      }}
-      onClick={handleClick}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
+      whileHover={{ y: -5 }}
     >
+      <Card 
+        sx={{ 
+          cursor: 'pointer',
+          borderRadius: { xs: '12px', sm: '24px' },
+          overflow: 'hidden',
+          backgroundColor: 'var(--color-surface)',
+          border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+          boxShadow: isSelected ? '0 8px 25px rgba(247, 107, 28, 0.3)' : 'none',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            boxShadow: '0 8px 25px rgba(247, 107, 28, 0.2)',
+            border: '1px solid var(--color-primary)'
+          }
+        }}
+        onClick={handleClick}
+      >
       {/* Status Badge */}
       {property.status && (
-        <Chip
-          label={property.status}
-          size="small"
+        <Box
           sx={{
             position: 'absolute',
             top: 12,
             left: 12,
             zIndex: 1,
-            backgroundColor: property.status === 'For Sale' ? 'var(--color-primary)' : 'var(--color-error)',
-            color: property.status === 'For Sale' ? 'var(--color-primary-contrast)' : 'var(--color-white)',
+            px: 2,
+            py: 1,
+            borderRadius: '6px',
             fontSize: '12px',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            backgroundColor: property.status === 'For Sale' ? 'var(--color-primary)' : 'var(--color-error)',
+            color: property.status === 'For Sale' ? 'var(--color-primary-contrast)' : 'var(--color-white)'
           }}
-        />
+        >
+          {property.status}
+        </Box>
       )}
 
       {/* Image Section */}
@@ -217,29 +226,37 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         
         {/* Favorite Button */}
         <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
-          <IconButton
+          <Box
+            component="button"
             sx={{
               position: 'absolute',
               top: { xs: 8, sm: 16 },
               right: { xs: 8, sm: 16 },
-              backgroundColor: 'var(--color-surface)',
+              p: { xs: 1.5, sm: 2 },
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
               backdropFilter: 'blur(4px)',
-              padding: { xs: 1, sm: 1.5 },
+              borderRadius: '50%',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.3s ease',
               '&:hover': {
-                backgroundColor: 'var(--color-surface-elevated)'
+                backgroundColor: 'rgba(0, 0, 0, 1)'
               }
             }}
             onClick={handleFavoriteClick}
             disabled={loadingFavorite}
           >
             {loadingFavorite ? (
-              <CircularProgress size={20} sx={{ color: 'var(--color-text-primary)' }} />
+              <CircularProgress size={20} sx={{ color: 'var(--color-white)' }} />
             ) : isFavorite ? (
               <Favorite sx={{ color: 'var(--color-error)', fontSize: { xs: 16, sm: 20 } }} />
             ) : (
-              <FavoriteBorder sx={{ color: 'var(--color-text-primary)', fontSize: { xs: 16, sm: 20 } }} />
+              <FavoriteBorder sx={{ color: 'var(--color-white)', fontSize: { xs: 16, sm: 20 } }} />
             )}
-          </IconButton>
+          </Box>
         </Tooltip>
       </Box>
 
@@ -251,13 +268,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             {[...Array(5)].map((_, i) => (
               <Star key={i} sx={{ color: 'var(--color-warning)', fontSize: { xs: 12, sm: 16 } }} />
             ))}
-            <Typography variant="caption" sx={{ color: 'var(--color-text-muted)', ml: 1 }}>
+            <Typography variant="caption" sx={{ color: 'var(--color-text-muted)', ml: 1, fontSize: { xs: '12px', sm: '14px' } }}>
               5.0 (??)
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {getPropertyTypeIcon()}
-            <Typography variant="caption" sx={{ color: 'var(--color-primary)', textTransform: 'capitalize' }}>
+            <Typography variant="caption" sx={{ color: 'var(--color-primary)', textTransform: 'capitalize', fontSize: { xs: '12px', sm: '14px' } }}>
               {property.type || 'Property'}
             </Typography>
           </Box>
@@ -350,52 +367,51 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)', fontSize: { xs: '20px', sm: '24px' } }}>
               {formatPrice(property.price)}
               {property.status === 'For Rent' && (
-                <Typography component="span" variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
+                <Typography component="span" variant="caption" sx={{ color: 'var(--color-text-muted)', fontSize: { xs: '12px', sm: '14px' } }}>
                   /mo
                 </Typography>
               )}
             </Typography>
             {property.projectDetails?.launchDate && (
-              <Chip
-                label={
-                  typeof window !== 'undefined' && new Date(property.projectDetails.launchDate) > new Date() ? 
-                    `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
-                    'Ready to Move'
-                }
-                size="small"
+              <Box
                 sx={{
                   backgroundColor: 'var(--color-primary-light)',
                   color: 'var(--color-primary)',
+                  px: 2,
+                  py: 1,
+                  borderRadius: '4px',
                   fontSize: '12px'
                 }}
-              />
+              >
+                {typeof window !== 'undefined' && new Date(property.projectDetails.launchDate) > new Date() ? 
+                  `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
+                  'Ready to Move'}
+              </Box>
             )}
           </Box>
           
-          <Button
-            variant="outlined"
-            fullWidth
-            sx={{
+          <motion.button
+            style={{
+              width: '100%',
               backgroundColor: 'transparent',
               border: '1px solid var(--color-primary)',
               color: 'var(--color-text-primary)',
-              padding: { xs: '6px 12px', sm: '8px 16px' },
+              padding: '8px 16px',
               borderRadius: '8px',
-              fontSize: { xs: '12px', sm: '14px' },
+              fontSize: '14px',
               fontWeight: 500,
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: 'var(--color-primary-light)',
-                border: '1px solid var(--color-primary)'
-              }
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
             }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={(e) => {
               e.stopPropagation();
               handleClick();
             }}
           >
             View Details
-          </Button>
+          </motion.button>
         </Box>
       </CardContent>
 
@@ -416,7 +432,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           }
         }} />
       )}
-    </Card>
+      </Card>
+    </motion.div>
   );
 };
 
