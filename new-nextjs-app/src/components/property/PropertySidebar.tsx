@@ -200,7 +200,16 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
           border: '1px solid var(--color-border)',
           mb: 2
         }}>
-          {property.location && property.location.coordinates && property.location.coordinates.length === 2 ? (
+          {(() => {
+            console.log('PropertySidebar - Property location data:', {
+              hasLocation: !!property.location,
+              hasCoordinates: !!(property.location && property.location.coordinates),
+              coordinatesLength: property.location?.coordinates?.length,
+              coordinates: property.location?.coordinates,
+              fullAddress
+            });
+            return property.location && property.location.coordinates && property.location.coordinates.length === 2;
+          })() ? (
             <PropertyMap 
               latitude={property.location.coordinates[1]}
               longitude={property.location.coordinates[0]}
