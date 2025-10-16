@@ -99,6 +99,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           return;
         }
 
+        // Validate coordinates
+        if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+          console.error('Invalid coordinates:', { latitude, longitude });
+          setMapError('Invalid coordinates provided');
+          return;
+        }
+
         // Verify the container element is valid
         const container = mapRef.current;
         if (!container || !container.offsetParent) {
@@ -121,7 +128,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         console.log('PropertyMap initializing with options:', {
           center: [longitude, latitude],
           zoom,
-          address
+          address,
+          latitude,
+          longitude,
+          markerPosition: [latitude, longitude]
         });
 
         // Add a delay to ensure Mappls SDK is fully ready
@@ -131,16 +141,18 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
           // Add marker if enabled
           if (showMarker) {
-        const marker = new window.mappls.Marker({
-          map: mapInstanceRef.current,
-          position: [latitude, longitude], // Mappls expects [lat, lng] format
-          fitbounds: false,
-          icon: {
-            url: 'https://apis.mapmyindia.com/map_v3/1.png',
-            width: 35,
-            height: 50
-          }
-        });
+            console.log('Creating marker with position:', [latitude, longitude]);
+            const marker = new window.mappls.Marker({
+              map: mapInstanceRef.current,
+              position: [latitude, longitude], // Mappls expects [lat, lng] format
+              fitbounds: false,
+              icon: {
+                url: 'https://apis.mapmyindia.com/map_v3/1.png',
+                width: 35,
+                height: 50
+              }
+            });
+            console.log('Marker created successfully:', marker);
 
             // Add popup with address if provided
             if (address) {
