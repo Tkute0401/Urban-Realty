@@ -75,6 +75,22 @@ const AgentAnalytics = () => {
     }
   };
 
+  // Ensure overview exists with defensive programming
+  const overview = analytics?.overview || {
+    totalProperties: 0,
+    activeProperties: 0,
+    totalLeads: 0,
+    conversionRate: 0,
+    avgResponseTime: 0
+  };
+
+  // Ensure performance exists with defensive programming
+  const performance = analytics?.performance || {
+    topPerformingProperties: [],
+    leadSources: {},
+    leadStatusBreakdown: {}
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'warning';
@@ -149,10 +165,10 @@ const AgentAnalytics = () => {
                     Total Properties
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.overview.totalProperties}
+                    {overview.totalProperties}
                   </Typography>
                   <Typography variant="body2" color="success.main">
-                    {analytics.overview.activeProperties} active
+                    {overview.activeProperties} active
                   </Typography>
                 </Box>
                 <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -172,7 +188,7 @@ const AgentAnalytics = () => {
                     Total Leads
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.overview.totalLeads}
+                    {overview.totalLeads}
                   </Typography>
                   <Typography variant="body2" color="primary.main">
                     {analytics?.trends?.views ? `${analytics.trends.views > 0 ? '+' : ''}${analytics.trends.views}% this month` : 'No trend data'}
@@ -195,7 +211,7 @@ const AgentAnalytics = () => {
                     Conversion Rate
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.overview.conversionRate.toFixed(1)}%
+                    {overview.conversionRate.toFixed(1)}%
                   </Typography>
                   <Typography variant="body2" color="success.main">
                     <TrendingUpIcon sx={{ fontSize: 14, mr: 0.5 }} />
@@ -219,7 +235,7 @@ const AgentAnalytics = () => {
                     Avg Response Time
                   </Typography>
                   <Typography variant="h4">
-                    {analytics.overview.avgResponseTime.toFixed(1)}h
+                    {overview.avgResponseTime.toFixed(1)}h
                   </Typography>
                   <Typography variant="body2" color="success.main">
                     <TrendingDownIcon sx={{ fontSize: 14, mr: 0.5 }} />
@@ -254,7 +270,7 @@ const AgentAnalytics = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {analytics.performance.topPerformingProperties.map((property) => (
+                    {performance.topPerformingProperties.map((property) => (
                       <TableRow key={property._id} hover>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={2}>
@@ -310,7 +326,7 @@ const AgentAnalytics = () => {
                 Lead Sources
               </Typography>
               <List>
-                {Object.entries(analytics.performance.leadSources).map(([method, count]) => (
+                {Object.entries(performance.leadSources).map(([method, count]) => (
                   <ListItem key={method}>
                     <ListItemAvatar>
                       <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -322,7 +338,7 @@ const AgentAnalytics = () => {
                       secondary={`${count} leads`}
                     />
                     <Typography variant="h6" color="primary">
-                      {analytics.overview.totalLeads > 0 ? ((Number(count) / Number(analytics.overview.totalLeads)) * 100).toFixed(1) : 0}%
+                      {overview.totalLeads > 0 ? ((Number(count) / Number(overview.totalLeads)) * 100).toFixed(1) : 0}%
                     </Typography>
                   </ListItem>
                 ))}
@@ -340,8 +356,8 @@ const AgentAnalytics = () => {
               </Typography>
               <List>
                 {['pending', 'contacted', 'followup', 'closed'].map((status) => {
-                  const count = analytics.performance.leadStatusBreakdown[status] || 0;
-                  const percentage = analytics.overview.totalLeads > 0 ? (count / analytics.overview.totalLeads) * 100 : 0;
+                  const count = performance.leadStatusBreakdown[status] || 0;
+                  const percentage = overview.totalLeads > 0 ? (count / overview.totalLeads) * 100 : 0;
                   
                   return (
                     <ListItem key={status}>
@@ -373,7 +389,7 @@ const AgentAnalytics = () => {
                 Recent Activity
               </Typography>
               <List>
-                {analytics.performance.recentActivity?.slice(0, 5).map((contact) => (
+                {performance.recentActivity?.slice(0, 5).map((contact) => (
                   <ListItem key={contact._id}>
                     <ListItemAvatar>
                       <Avatar>

@@ -58,6 +58,7 @@ const PropertiesPageContent: React.FC = () => {
     setSelectedProperty(property);
     router.push(`/properties/${property._id}`);
   };
+
   
   const [showHomeTypeFilter, setShowHomeTypeFilter] = useState(false);
   const [showPriceFilter, setShowPriceFilter] = useState(false);
@@ -1312,6 +1313,7 @@ const PropertiesPageContent: React.FC = () => {
                 userLocation={userLocation}
                 onMarkerClick={handlePropertyClick}
                 height="600px"
+                searchQuery={filters.search}
               />
             </Grid>
           </Grid>

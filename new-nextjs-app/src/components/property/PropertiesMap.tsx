@@ -31,6 +31,7 @@ interface PropertiesMapProps {
   userLocation?: UserLocation | null;
   onMarkerClick?: (property: Property) => void;
   height?: string | number;
+  searchQuery?: string;
 }
 
 const PropertiesMap: React.FC<PropertiesMapProps> = ({
@@ -38,7 +39,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   selectedProperty,
   userLocation,
   onMarkerClick,
-  height = '500px'
+  height = '500px',
+  searchQuery
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -223,9 +225,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     
     for (let i = 0; i < validProperties.length; i++) {
       const property = validProperties[i];
+      // Ensure coordinates are in correct order: [lng, lat]
       const position = {
-        lat: property.location!.coordinates[1],
-        lng: property.location!.coordinates[0]
+        lat: property.location!.coordinates[1], // latitude is second element
+        lng: property.location!.coordinates[0]  // longitude is first element
       };
 
       const isSelected = selectedProperty?._id === property._id;
@@ -233,7 +236,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       console.log(`Creating marker for property ${property.title}:`, {
         position,
         isSelected,
-        propertyId: property._id
+        propertyId: property._id,
+        rawCoordinates: property.location!.coordinates,
+        lng: position.lng,
+        lat: position.lat
       });
 
       // Create marker using proper Mappls SDK format
@@ -345,8 +351,14 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       return;
     }
 
-    // Clean up existing map
-    if (mapInstanceRef.current) {
+    // Don't clean up existing map if it's already initialized
+    if (mapInstanceRef.current && mapInitialized) {
+      console.log('Map already initialized, skipping cleanup');
+      return;
+    }
+
+    // Clean up existing map only if not initialized
+    if (mapInstanceRef.current && !mapInitialized) {
       try {
         mapInstanceRef.current.remove();
       } catch (e) {
@@ -415,7 +427,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         } else if (validProperties.length > 0) {
           // Center on first property
           const firstProperty = validProperties[0];
-          mapCenter = firstProperty.location!.coordinates;
+          mapCenter = firstProperty.location!.coordinates; // Already in [lng, lat] format
           mapZoom = validProperties.length > 1 ? 10 : 12;
           console.log('Initializing map centered on first property:', mapCenter, 'from property:', firstProperty.title);
           console.log('Property coordinates breakdown:', {
@@ -523,6 +535,33 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       addMarkersToMap();
     }
   }, [properties, selectedProperty, userLocation, addMarkersToMap, mapInitialized]);
+
+  // Center map on search results when search query changes
+  useEffect(() => {
+    if (mapInitialized && mapInstanceRef.current && searchQuery && properties && properties.length > 0) {
+      console.log('Centering map on search results for:', searchQuery);
+      const validProperties = properties.filter(property => 
+        property.location?.coordinates?.length === 2
+      );
+      
+      if (validProperties.length > 0) {
+        if (validProperties.length === 1) {
+          // Center on single result
+          const property = validProperties[0];
+          mapInstanceRef.current.setCenter(property.location!.coordinates);
+          mapInstanceRef.current.setZoom(15);
+        } else {
+          // Fit bounds for multiple results
+          const coordinates = validProperties.map(property => ({
+            lat: property.location!.coordinates[1],
+            lng: property.location!.coordinates[0]
+          }));
+          const mapplsCoordinates = coordinates.map(coord => [coord.lng, coord.lat]);
+          mapInstanceRef.current.fitBounds(mapplsCoordinates);
+        }
+      }
+    }
+  }, [searchQuery, properties, mapInitialized]);
 
   if (!properties || properties.length === 0) {
     return (
