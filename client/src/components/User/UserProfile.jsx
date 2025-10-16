@@ -297,7 +297,7 @@ const UserProfile = () => {
                           variant="outlined"
                           startIcon={<AddIcon />}
                           size="small"
-                          onClick={() => navigate('/developers/add')}
+                          onClick={() => navigate('/projects/add')}
                           sx={{ 
                             borderColor: '#78CADC', 
                             color: '#78CADC',

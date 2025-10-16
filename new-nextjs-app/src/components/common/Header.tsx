@@ -213,7 +213,7 @@ const Header: React.FC = () => {
                       <BuildingIcon className="menu-item-icon" />
                       <span>Developer Dashboard</span>
                     </Link>
-                    <Link href="/developers/add" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/projects/add" className="menu-item" onClick={handleMenuClose}>
                       <AddIcon className="menu-item-icon" />
                       <span>Add Project</span>
                     </Link>
@@ -301,7 +301,7 @@ const Header: React.FC = () => {
                   <BuildingIcon />
                   <span>Dashboard</span>
                 </Link>
-                <Link href="/developers/add" className="nav-item nav-item-outlined">
+                <Link href="/projects/add" className="nav-item nav-item-outlined">
                   <AddIcon />
                   <span>Add Project</span>
                 </Link>
