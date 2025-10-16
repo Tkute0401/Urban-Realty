@@ -65,10 +65,8 @@ export const useLocation = (): UseLocationReturn => {
     );
   };
 
-  useEffect(() => {
-    // Auto-request location on mount
-    requestLocation();
-  }, []);
+  // Removed automatic location request to prevent infinite re-renders
+  // Location will only be requested when user clicks the location button
 
   return {
     location,

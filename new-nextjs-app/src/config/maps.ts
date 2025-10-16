@@ -23,6 +23,11 @@ export const MAPPLS_CONFIG = {
   // Script URL
   getScriptUrl: function() {
     return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=vector&v=3.0`;
+  },
+  
+  // Alternative script URL (if the above doesn't work)
+  getAlternativeScriptUrl: function() {
+    return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=vector&v=2.0`;
   }
 };
 

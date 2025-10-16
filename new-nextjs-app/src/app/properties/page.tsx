@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Box, 
@@ -79,46 +79,7 @@ const PropertiesPageContent: React.FC = () => {
     'Laundry', 'Storage', 'Conference Room', 'Kitchen'
   ];
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    const search = searchParams.get('search') || '';
-    const type = searchParams.get('type') || '';
-    const city = searchParams.get('city') || '';
-    const propertyType = searchParams.get('propertyType') || 'ALL';
-
-    setFilters(prev => ({ ...prev, search, type, city, propertyType }));
-  }, [searchParams, mounted]);
-
-  useEffect(() => {
-    if (mounted) {
-      loadProperties();
-    }
-  }, [mounted]);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('[data-dropdown]')) {
-        setShowHomeTypeFilter(false);
-        setShowPriceFilter(false);
-        setShowBedBathFilter(false);
-        setShowMoreFilters(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const loadProperties = () => {
+  const loadProperties = useCallback(() => {
     const params: any = {
       page: pagination.page,
       limit: 12
@@ -146,7 +107,46 @@ const PropertiesPageContent: React.FC = () => {
     }
 
     getProperties(params);
-  };
+  }, [filters, pagination.page, userLocation, getProperties]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const search = searchParams.get('search') || '';
+    const type = searchParams.get('type') || '';
+    const city = searchParams.get('city') || '';
+    const propertyType = searchParams.get('propertyType') || 'ALL';
+
+    setFilters(prev => ({ ...prev, search, type, city, propertyType }));
+  }, [searchParams, mounted]);
+
+  useEffect(() => {
+    if (mounted && filters) {
+      loadProperties();
+    }
+  }, [mounted, loadProperties]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-dropdown]')) {
+        setShowHomeTypeFilter(false);
+        setShowPriceFilter(false);
+        setShowBedBathFilter(false);
+        setShowMoreFilters(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSearch = () => {
     loadProperties();
@@ -1308,17 +1308,7 @@ const PropertiesPageContent: React.FC = () => {
                 overflow: 'hidden',
                 border: '1px solid var(--color-border)'
               }}>
-                <PropertiesMap 
-                  properties={properties}
-                  userLocation={userLocation}
-                  onMarkerClick={(property) => {
-                    // Scroll to property card
-                    const element = document.getElementById(`property-${property._id}`);
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                  }}
-                />
+                <MapTest />
               </Box>
             </Grid>
           </Grid>

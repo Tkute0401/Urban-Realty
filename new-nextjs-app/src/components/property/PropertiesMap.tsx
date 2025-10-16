@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { MAPPLS_CONFIG } from '../../config/maps';
 
@@ -52,11 +52,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
-
-  // Add useEffect to log when component mounts
-  useEffect(() => {
-    console.log('🔍 PropertiesMap component mounted, mapRef:', mapRef.current);
-  }, []);
+  const [mapInitialized, setMapInitialized] = useState(false);
 
   // Load Mappls script
   useEffect(() => {
@@ -66,6 +62,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       return new Promise<void>((resolve, reject) => {
         // Check if script already exists
         if (window.mappls) {
+          console.log('Mappls SDK already loaded');
           setScriptLoaded(true);
           resolve();
           return;
@@ -74,6 +71,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         // Check if script already exists in DOM
         const existingScript = document.querySelector('script[src*="mappls"]');
         if (existingScript) {
+          console.log('Mappls script already in DOM, waiting for load');
           existingScript.addEventListener('load', () => {
             setScriptLoaded(true);
             resolve();
@@ -88,19 +86,43 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           return;
         }
 
+        console.log('Loading Mappls script with API key:', MAPPLS_CONFIG.apiKey);
+        console.log('Script URL:', MAPPLS_CONFIG.getScriptUrl());
+
         const script = document.createElement('script');
         script.src = MAPPLS_CONFIG.getScriptUrl();
         script.async = true;
         script.defer = true;
         
         script.onload = () => {
+          console.log('Mappls script loaded successfully');
           setScriptLoaded(true);
           resolve();
         };
         
-        script.onerror = () => {
-          setMapError('Failed to load Mappls Maps. Please check your API key.');
-          reject(new Error('Script load failed'));
+        script.onerror = (error) => {
+          console.error('Failed to load Mappls script with primary URL:', error);
+          console.log('Trying alternative script URL...');
+          
+          // Try alternative URL
+          const altScript = document.createElement('script');
+          altScript.src = MAPPLS_CONFIG.getAlternativeScriptUrl();
+          altScript.async = true;
+          altScript.defer = true;
+          
+          altScript.onload = () => {
+            console.log('Mappls script loaded successfully with alternative URL');
+            setScriptLoaded(true);
+            resolve();
+          };
+          
+          altScript.onerror = (altError) => {
+            console.error('Failed to load Mappls script with alternative URL:', altError);
+            setMapError('Failed to load Mappls Maps. Please check your API key.');
+            reject(new Error('Script load failed'));
+          };
+          
+          document.head.appendChild(altScript);
         };
         
         document.head.appendChild(script);
@@ -110,40 +132,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     loadMapplsScript().catch(console.error);
   }, [scriptLoaded]);
 
-  // Initialize map and markers
-  useEffect(() => {
-    console.log('🔍 PropertiesMap useEffect triggered:', {
-      scriptLoaded,
-      propertiesLength: properties?.length,
-      userLocation,
-      properties: properties?.map(p => ({ 
-        id: p._id, 
-        title: p.title, 
-        hasLocation: !!p.location?.coordinates,
-        coordinates: p.location?.coordinates
-      }))
-    });
-    
-    if (!scriptLoaded || !properties || properties.length === 0) {
-      console.log('Skipping map initialization:', { scriptLoaded, propertiesLength: properties?.length });
-      return;
-    }
-
-    // Check if Mappls SDK is available
-    if (!window.mappls || !window.mappls.Map) {
-      console.warn('Mappls SDK not available, retrying in 1 second');
-      setTimeout(() => {
-        if (window.mappls && window.mappls.Map) {
-          console.log('Mappls SDK now available, retrying map initialization');
-          // Trigger re-initialization by updating a state or calling the effect again
-        }
-      }, 1000);
-      return;
-    }
-
-    // Ensure mapRef.current exists
-    if (!mapRef.current) {
-      console.warn('Map ref not available');
+  // Function to add markers to the map
+  const addMarkersToMap = useCallback(() => {
+    if (!mapInstanceRef.current) {
+      console.warn('Map instance not available for marker creation');
       return;
     }
 
@@ -158,6 +150,177 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       }
     });
     markersRef.current = [];
+
+    // Filter properties with valid coordinates
+    const validProperties = properties.filter(property => 
+      property.location?.coordinates?.length === 2
+    );
+
+    console.log('PropertiesMap Debug:', {
+      totalProperties: properties.length,
+      validProperties: validProperties.length,
+      properties: properties.map(p => ({
+        id: p._id,
+        title: p.title,
+        hasLocation: !!p.location,
+        coordinates: p.location?.coordinates
+      }))
+    });
+
+    if (validProperties.length === 0) {
+      console.log('No valid properties found');
+      setMapLoaded(true);
+      setMapError(null);
+      return;
+    }
+
+    // Calculate bounds for multiple properties (only if no user location)
+    if (validProperties.length > 1 && !userLocation) {
+      const coordinates = validProperties.map(property => ({
+        lat: property.location!.coordinates[1],
+        lng: property.location!.coordinates[0]
+      }));
+
+      console.log('Fitting bounds to show all properties:', coordinates);
+      mapInstanceRef.current.fitBounds(coordinates);
+    } else if (validProperties.length === 1 && !userLocation) {
+      // For single property, ensure it's visible
+      const property = validProperties[0];
+      const position = {
+        lat: property.location!.coordinates[1],
+        lng: property.location!.coordinates[0]
+      };
+      console.log('Centering map on single property:', position);
+      mapInstanceRef.current.setCenter([position.lng, position.lat]);
+      mapInstanceRef.current.setZoom(15);
+    }
+
+    // Add markers for each property
+    console.log('Creating markers for', validProperties.length, 'properties');
+    const newMarkers = validProperties.map((property, index) => {
+      const position = {
+        lat: property.location!.coordinates[1],
+        lng: property.location!.coordinates[0]
+      };
+
+      const isSelected = selectedProperty?._id === property._id;
+
+      console.log(`Creating marker for property ${property.title}:`, {
+        position,
+        isSelected,
+        propertyId: property._id
+      });
+
+      // Try creating marker with custom icon first, fallback to default
+      let marker;
+      try {
+        marker = new window.mappls.Marker({
+          map: mapInstanceRef.current,
+          position: position,
+          icon: {
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+              <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
+              </svg>
+            `)}`,
+            scaledSize: { width: 20, height: 20 }
+          }
+        });
+        console.log('Custom icon marker created successfully for:', property.title);
+      } catch (error) {
+        console.warn('Failed to create custom icon marker, using default:', error);
+        // Fallback to default marker
+        marker = new window.mappls.Marker({
+          map: mapInstanceRef.current,
+          position: position
+        });
+        console.log('Default marker created successfully for:', property.title);
+      }
+
+      // Add click listener
+      marker.addListener('click', () => {
+        console.log('Marker clicked:', property.title);
+        if (onMarkerClick) {
+          onMarkerClick(property);
+        }
+      });
+
+      return marker;
+    });
+
+    // Add user location marker if available
+    if (userLocation) {
+      try {
+        const userMarker = new window.mappls.Marker({
+          map: mapInstanceRef.current,
+          position: {
+            lat: userLocation.latitude,
+            lng: userLocation.longitude
+          },
+          icon: {
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+              </svg>
+            `)}`,
+            scaledSize: { width: 24, height: 24 }
+          }
+        });
+        console.log('User location marker created successfully');
+      } catch (error) {
+        console.warn('Failed to create user location marker:', error);
+      }
+    }
+
+    markersRef.current = newMarkers;
+    setMapLoaded(true);
+    setMapError(null);
+  }, [properties, selectedProperty, userLocation, onMarkerClick]);
+
+  // Initialize map and markers
+  useEffect(() => {
+    console.log('🔍 PropertiesMap useEffect triggered:', {
+      scriptLoaded,
+      mapInitialized,
+      propertiesLength: properties?.length,
+      userLocation,
+      properties: properties?.map(p => ({ 
+        id: p._id, 
+        title: p.title, 
+        hasLocation: !!p.location?.coordinates,
+        coordinates: p.location?.coordinates
+      }))
+    });
+    
+    if (!scriptLoaded || !properties || properties.length === 0 || mapInitialized) {
+      console.log('Skipping map initialization:', { 
+        scriptLoaded, 
+        propertiesLength: properties?.length, 
+        mapInitialized 
+      });
+      return;
+    }
+
+    // Check if Mappls SDK is available
+    if (!window.mappls || !window.mappls.Map) {
+      console.warn('Mappls SDK not available, retrying in 1 second');
+      console.log('window.mappls:', window.mappls);
+      console.log('window.mappls.Map:', window.mappls?.Map);
+      setTimeout(() => {
+        if (window.mappls && window.mappls.Map) {
+          console.log('Mappls SDK now available, retrying map initialization');
+          // Trigger re-initialization by updating a state or calling the effect again
+        }
+      }, 1000);
+      return;
+    }
+
+    // Ensure mapRef.current exists
+    if (!mapRef.current) {
+      console.warn('Map ref not available');
+      return;
+    }
 
     // Clean up existing map
     if (mapInstanceRef.current) {
@@ -201,17 +364,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           property.location?.coordinates?.length === 2
         );
 
-        console.log('PropertiesMap Debug:', {
-          totalProperties: properties.length,
-          validProperties: validProperties.length,
-          properties: properties.map(p => ({
-            id: p._id,
-            title: p.title,
-            hasLocation: !!p.location,
-            coordinates: p.location?.coordinates
-          }))
-        });
-
         if (validProperties.length === 0) {
           console.log('No valid properties found, creating test marker');
           // Create a test marker with default coordinates (Delhi)
@@ -251,137 +403,33 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
         // Add a delay to ensure Mappls SDK is fully ready
         setTimeout(() => {
-          // Initialize map
-          mapInstanceRef.current = new window.mappls.Map(container, {
-            center: mapCenter,
-            zoom: mapZoom,
-            zoomControl: true,
-            fullscreenControl: true,
-            scrollWheel: true,
-          });
-
-          console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);
-
-          // Function to add markers to the map
-          const addMarkersToMap = () => {
-          if (!mapInstanceRef.current) {
-            console.warn('Map instance not available for marker creation');
-            return;
-          }
-
-          // Calculate bounds for multiple properties (only if no user location)
-          if (validProperties.length > 1 && !userLocation) {
-            const coordinates = validProperties.map(property => ({
-              lat: property.location!.coordinates[1],
-              lng: property.location!.coordinates[0]
-            }));
-
-            console.log('Fitting bounds to show all properties:', coordinates);
-            // Fit bounds to show all properties
-            mapInstanceRef.current.fitBounds(coordinates);
-          } else if (validProperties.length === 1 && !userLocation) {
-            // For single property, ensure it's visible
-            const property = validProperties[0];
-            const position = {
-              lat: property.location!.coordinates[1],
-              lng: property.location!.coordinates[0]
-            };
-            console.log('Centering map on single property:', position);
-            mapInstanceRef.current.setCenter([position.lng, position.lat]);
-            mapInstanceRef.current.setZoom(15);
-          }
-
-          // Add markers for each property
-          console.log('Creating markers for', validProperties.length, 'properties');
-          const newMarkers = validProperties.map((property, index) => {
-          const position = {
-            lat: property.location!.coordinates[1],
-            lng: property.location!.coordinates[0]
-          };
-
-          const isSelected = selectedProperty?._id === property._id;
-
-          console.log(`Creating marker for property ${property.title}:`, {
-            position,
-            isSelected,
-            propertyId: property._id
-          });
-
-          // Try creating marker with custom icon first, fallback to default
-          let marker;
           try {
-            marker = new window.mappls.Marker({
-              map: mapInstanceRef.current,
-              position: position,
-              icon: {
-                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                  <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
-                  </svg>
-                `)}`,
-                scaledSize: { width: 20, height: 20 }
-              }
+            console.log('Creating Mappls map with:', { mapCenter, mapZoom, container });
+            
+            // Initialize map
+            mapInstanceRef.current = new window.mappls.Map(container, {
+              center: mapCenter,
+              zoom: mapZoom,
+              zoomControl: true,
+              fullscreenControl: true,
+              scrollWheel: true,
             });
-            console.log('Custom icon marker created successfully for:', property.title);
-          } catch (error) {
-            console.warn('Failed to create custom icon marker, using default:', error);
-            // Fallback to default marker
-            marker = new window.mappls.Marker({
-              map: mapInstanceRef.current,
-              position: position
+
+            console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);
+            setMapInitialized(true);
+
+            // Wait for map to be ready before adding markers
+            mapInstanceRef.current.addListener('idle', () => {
+              console.log('Map is idle, ready to add markers');
+              addMarkersToMap();
             });
-            console.log('Default marker created successfully for:', property.title);
-          }
 
-          // Add click listener
-          marker.addListener('click', () => {
-            console.log('Marker clicked:', property.title);
-            if (onMarkerClick) {
-              onMarkerClick(property);
-            }
-          });
-
-          return marker;
-        });
-
-        // Add user location marker if available
-        if (userLocation) {
-          try {
-            const userMarker = new window.mappls.Marker({
-              map: mapInstanceRef.current,
-              position: {
-                lat: userLocation.latitude,
-                lng: userLocation.longitude
-              },
-              icon: {
-                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
-                    <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
-                  </svg>
-                `)}`,
-                scaledSize: { width: 24, height: 24 }
-              }
-            });
-            console.log('User location marker created successfully');
-          } catch (error) {
-            console.warn('Failed to create user location marker:', error);
-          }
-          }
-
-          markersRef.current = newMarkers;
-          setMapLoaded(true);
-          setMapError(null);
-          };
-
-          // Wait for map to be ready before adding markers
-          mapInstanceRef.current.addListener('idle', () => {
-            console.log('Map is idle, ready to add markers');
+            // Also add markers immediately as fallback
             addMarkersToMap();
-          });
-
-          // Also add markers immediately as fallback
-          addMarkersToMap();
+          } catch (mapError) {
+            console.error('Error creating Mappls map:', mapError);
+            setMapError('Failed to create map: ' + mapError.message);
+          }
         }, 500);
 
       } catch (err: any) {
@@ -424,7 +472,15 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         }
       });
     };
-  }, [scriptLoaded, properties.length, selectedProperty?._id, userLocation?.latitude, userLocation?.longitude]);
+  }, [scriptLoaded, properties, selectedProperty, userLocation, addMarkersToMap, mapInitialized]);
+
+  // Update markers when properties change (only if map is already initialized)
+  useEffect(() => {
+    if (mapInitialized && mapInstanceRef.current && properties && properties.length > 0) {
+      console.log('Updating markers for existing map');
+      addMarkersToMap();
+    }
+  }, [properties, selectedProperty, userLocation, addMarkersToMap, mapInitialized]);
 
   if (!properties || properties.length === 0) {
     return (
