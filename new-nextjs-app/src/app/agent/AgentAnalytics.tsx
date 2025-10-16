@@ -356,7 +356,7 @@ const AgentAnalytics = () => {
               </Typography>
               <List>
                 {['pending', 'contacted', 'followup', 'closed'].map((status) => {
-                  const count = performance.leadStatusBreakdown[status] || 0;
+                  const count = (performance.leadStatusBreakdown || {})[status] || 0;
                   const percentage = overview.totalLeads > 0 ? (count / overview.totalLeads) * 100 : 0;
                   
                   return (
