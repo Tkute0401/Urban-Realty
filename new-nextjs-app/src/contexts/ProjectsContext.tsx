@@ -153,7 +153,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
       setLoading(true);
       setError(null);
       const response = await api.projects.list(filters);
-      console.log(response);
       const data = response.data;
       const items = Array.isArray(data) ? data : (data?.items || []);
       setProjects(items);
@@ -170,7 +169,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
       setLoading(true);
       setError(null);
       const response = await api.projects.getMyProjects();
-      console.log(response);
       const data = response.data;
       setMyProjects(Array.isArray(data) ? data : []);
     } catch (err: any) {
@@ -186,7 +184,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
       setLoading(true);
       setError(null);
       const response = await api.projects.getById(id);
-      console.log(response);
       const projectData = response.data;
       setProject(projectData);
       return projectData;
@@ -204,7 +201,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
       setLoading(true);
       setError(null);
       const response = await api.projects.getByDeveloper(developerId);
-      console.log(response);
       const data = response.data;
       setProjects(Array.isArray(data) ? data : []);
     } catch (err: any) {
@@ -219,7 +215,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
     try {
       setLoading(true);
       const response = await api.projects.create(formData);
-      console.log(response);
       
       getMyProjects(); // Refresh my projects list
       return response.data;
@@ -235,7 +230,6 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
     try {
       setLoading(true);
       const response = await api.projects.update(id, formData);
-      console.log(response);
       
       getMyProjects(); // Refresh my projects list
       return response.data;
