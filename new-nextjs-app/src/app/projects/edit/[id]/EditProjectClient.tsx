@@ -331,14 +331,14 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
   };
 
   const addConfiguration = () => {
-    if (newConfiguration.name.trim()) {
+    if (newConfiguration.name.trim() && newConfiguration.area && newConfiguration.price) {
       const config = {
         name: newConfiguration.name.trim(),
         type: newConfiguration.type,
         bedrooms: newConfiguration.bedrooms || 0,
         bathrooms: newConfiguration.bathrooms || 0,
-        area: newConfiguration.area ? parseFloat(newConfiguration.area) : 0,
-        price: newConfiguration.price ? parseFloat(newConfiguration.price) : 0,
+        area: parseFloat(newConfiguration.area),
+        price: parseFloat(newConfiguration.price),
         pricePerSqFt: newConfiguration.pricePerSqFt ? parseFloat(newConfiguration.pricePerSqFt) : undefined,
         description: newConfiguration.description || undefined,
         isAvailable: newConfiguration.isAvailable,
@@ -394,6 +394,21 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       unitsAvailable: config.unitsAvailable?.toString() || ''
     });
     removeConfiguration(index);
+  };
+
+  const clearConfigurationForm = () => {
+    setNewConfiguration({
+      name: '',
+      type: '2BHK',
+      bedrooms: 2,
+      bathrooms: 2,
+      area: '',
+      price: '',
+      pricePerSqFt: '',
+      description: '',
+      isAvailable: true,
+      unitsAvailable: ''
+    });
   };
 
   // File upload handlers
@@ -482,6 +497,16 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       setSnackbar({
         open: true,
         message: 'Please fill in all required fields',
+        severity: 'error'
+      });
+      return;
+    }
+
+    // Check if there are any incomplete configurations in the form
+    if (newConfiguration.name.trim() || newConfiguration.area || newConfiguration.price) {
+      setSnackbar({
+        open: true,
+        message: 'Please complete or clear the configuration form before submitting',
         severity: 'error'
       });
       return;
@@ -1031,10 +1056,11 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Area (Sq Ft) - Optional"
+                  label="Area (Sq Ft)"
                   type="number"
                   value={newConfiguration.area}
                   onChange={(e) => updateConfiguration(0, 'area', e.target.value)}
+                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       color: 'var(--color-text-primary)',
@@ -1050,10 +1076,11 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Price (₹) - Optional"
+                  label="Price (₹)"
                   type="number"
                   value={newConfiguration.price}
                   onChange={(e) => updateConfiguration(0, 'price', e.target.value)}
+                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       color: 'var(--color-text-primary)',
@@ -1146,21 +1173,37 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
                 />
               </Grid>
               
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  onClick={addConfiguration}
-                  startIcon={<Add />}
-                  sx={{
-                    backgroundColor: 'var(--color-primary)',
-                    '&:hover': {
-                      backgroundColor: 'var(--color-primary-hover)',
-                    }
-                  }}
-                >
-                  Add Configuration
-                </Button>
-              </Grid>
+               <Grid item xs={12}>
+                 <Box sx={{ display: 'flex', gap: 2 }}>
+                   <Button
+                     variant="contained"
+                     onClick={addConfiguration}
+                     startIcon={<Add />}
+                     sx={{
+                       backgroundColor: 'var(--color-primary)',
+                       '&:hover': {
+                         backgroundColor: 'var(--color-primary-hover)',
+                       }
+                     }}
+                   >
+                     Add Configuration
+                   </Button>
+                   <Button
+                     variant="outlined"
+                     onClick={clearConfigurationForm}
+                     sx={{
+                       borderColor: 'var(--color-border)',
+                       color: 'var(--color-text-primary)',
+                       '&:hover': {
+                         borderColor: 'var(--color-text-muted)',
+                         backgroundColor: 'var(--color-surface)'
+                       }
+                     }}
+                   >
+                     Clear Form
+                   </Button>
+                 </Box>
+               </Grid>
             </Grid>
           </Box>
 
