@@ -256,7 +256,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
           <Box sx={{ position: 'relative', height: { xs: 300, md: 500 } }}>
             <CardMedia
               component="img"
-              image={images[currentImageIndex]?.url}
+              image={typeof images[currentImageIndex] === 'string' ? images[currentImageIndex] : images[currentImageIndex]?.url || ''}
               alt={project.name}
               sx={{
                 width: '100%',
@@ -434,7 +434,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                       <Grid item xs={6} sm={4} md={3} key={index}>
                         <CardMedia
                           component="img"
-                          image={image.url}
+                          image={typeof image === 'string' ? image : image?.url || ''}
                           alt={`${project.name} - Image ${index + 1}`}
                           sx={{
                             height: 120,
@@ -625,7 +625,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <Avatar
-                    src={project.developer?.logo?.url}
+                    src={typeof project.developer?.logo === 'string' ? project.developer.logo : project.developer?.logo?.url}
                     sx={{ width: 56, height: 56, mr: 2 }}
                   >
                     <Business />
@@ -749,7 +749,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
         <DialogContent>
           <CardMedia
             component="img"
-            image={images[currentImageIndex]?.url}
+            image={typeof images[currentImageIndex] === 'string' ? images[currentImageIndex] : images[currentImageIndex]?.url || ''}
             alt={project.name}
             sx={{ width: '100%', maxHeight: '70vh', objectFit: 'contain' }}
           />
