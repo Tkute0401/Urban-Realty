@@ -23,6 +23,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   showMarker = true,
   className = ''
 }) => {
+  console.log('PropertyMap component rendered with props:', { latitude, longitude, address, height, zoom, showMarker });
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -100,6 +101,12 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         }
 
         // Validate coordinates
+        console.log('PropertyMap - Received coordinates:', { 
+          latitude, 
+          longitude, 
+          latitudeType: typeof latitude, 
+          longitudeType: typeof longitude 
+        });
         if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
           console.error('Invalid coordinates:', { latitude, longitude });
           setMapError('Invalid coordinates provided');
