@@ -211,12 +211,17 @@ const AddProjectClient = () => {
   };
 
   const addConfiguration = () => {
-    if (newConfiguration.name.trim() && newConfiguration.area && newConfiguration.price) {
+    if (newConfiguration.name.trim()) {
       const config = {
-        ...newConfiguration,
-        area: parseFloat(newConfiguration.area),
-        price: parseFloat(newConfiguration.price),
+        name: newConfiguration.name.trim(),
+        type: newConfiguration.type,
+        bedrooms: newConfiguration.bedrooms || 0,
+        bathrooms: newConfiguration.bathrooms || 0,
+        area: newConfiguration.area ? parseFloat(newConfiguration.area) : 0,
+        price: newConfiguration.price ? parseFloat(newConfiguration.price) : 0,
         pricePerSqFt: newConfiguration.pricePerSqFt ? parseFloat(newConfiguration.pricePerSqFt) : undefined,
+        description: newConfiguration.description || undefined,
+        isAvailable: newConfiguration.isAvailable,
         unitsAvailable: newConfiguration.unitsAvailable ? parseInt(newConfiguration.unitsAvailable) : undefined
       };
       
@@ -861,11 +866,10 @@ const AddProjectClient = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Area (Sq Ft)"
+                  label="Area (Sq Ft) - Optional"
                   type="number"
                   value={newConfiguration.area}
                   onChange={(e) => updateConfiguration(0, 'area', e.target.value)}
-                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       color: 'var(--color-text-primary)',
@@ -881,11 +885,10 @@ const AddProjectClient = () => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Price (₹)"
+                  label="Price (₹) - Optional"
                   type="number"
                   value={newConfiguration.price}
                   onChange={(e) => updateConfiguration(0, 'price', e.target.value)}
-                  required
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       color: 'var(--color-text-primary)',
