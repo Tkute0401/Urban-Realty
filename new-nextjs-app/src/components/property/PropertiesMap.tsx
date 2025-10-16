@@ -40,13 +40,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   onMarkerClick,
   height = '500px'
 }) => {
-  console.log('🚀 PropertiesMap component rendering with:', {
-    propertiesCount: properties?.length,
-    userLocation,
-    selectedProperty: selectedProperty?._id,
-    containerId
-  });
-
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -55,6 +48,13 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
   const [containerId] = useState(() => `properties-map-container-${Math.random().toString(36).substr(2, 9)}`);
+
+  console.log('🚀 PropertiesMap component rendering with:', {
+    propertiesCount: properties?.length,
+    userLocation,
+    selectedProperty: selectedProperty?._id,
+    containerId
+  });
 
   // Debug: Log when component mounts
   useEffect(() => {
