@@ -88,16 +88,8 @@ const MapTest: React.FC = () => {
         // Add test marker
         const marker = new window.mappls.Marker({
           map: mapInstanceRef.current,
-          position: { lat: 28.6139, lng: 77.2090 },
-          icon: {
-            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-              <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="15" cy="15" r="12" fill="#FF4081" stroke="#0B1011" stroke-width="3"/>
-                <text x="15" y="20" text-anchor="middle" fill="white" font-size="12" font-weight="bold">TEST</text>
-              </svg>
-            `)}`,
-            scaledSize: { width: 30, height: 30 }
-          }
+          position: [77.2090, 28.6139], // Mappls expects [lng, lat] format
+          title: 'Test Marker'
         });
 
         setMapLoaded(true);

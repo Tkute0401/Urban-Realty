@@ -175,7 +175,19 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     });
 
     if (validProperties.length === 0) {
-      console.log('No valid properties found');
+      console.log('No valid properties found, creating test marker');
+      // Create a test marker to verify map is working
+      try {
+        const testMarker = new window.mappls.Marker({
+          map: mapInstanceRef.current,
+          position: [77.2090, 28.6139], // Delhi coordinates
+          title: 'Test Marker'
+        });
+        markersRef.current = [testMarker];
+        console.log('Test marker created successfully');
+      } catch (error) {
+        console.error('Failed to create test marker:', error);
+      }
       setMapLoaded(true);
       setMapError(null);
       return;
@@ -191,7 +203,15 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       console.log('Fitting bounds to show all properties:', coordinates);
       // Mappls fitBounds expects an array of [lng, lat] coordinates
       const mapplsCoordinates = coordinates.map(coord => [coord.lng, coord.lat]);
-      mapInstanceRef.current.fitBounds(mapplsCoordinates);
+      try {
+        mapInstanceRef.current.fitBounds(mapplsCoordinates);
+        console.log('Map bounds fitted successfully');
+      } catch (error) {
+        console.warn('Failed to fit bounds, centering on first property:', error);
+        const firstProperty = validProperties[0];
+        mapInstanceRef.current.setCenter([firstProperty.location!.coordinates[0], firstProperty.location!.coordinates[1]]);
+        mapInstanceRef.current.setZoom(12);
+      }
     } else if (validProperties.length === 1 && !userLocation) {
       // For single property, ensure it's visible
       const property = validProperties[0];
@@ -200,13 +220,21 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         lng: property.location!.coordinates[0]
       };
       console.log('Centering map on single property:', position);
-      mapInstanceRef.current.setCenter([position.lng, position.lat]); // Already in [lng, lat] format
-      mapInstanceRef.current.setZoom(15);
+      try {
+        mapInstanceRef.current.setCenter([position.lng, position.lat]); // Already in [lng, lat] format
+        mapInstanceRef.current.setZoom(15);
+        console.log('Map centered on single property successfully');
+      } catch (error) {
+        console.warn('Failed to center map on single property:', error);
+      }
     }
 
     // Add markers for each property
     console.log('Creating markers for', validProperties.length, 'properties');
-    const newMarkers = validProperties.map((property, index) => {
+    const newMarkers = [];
+    
+    for (let i = 0; i < validProperties.length; i++) {
+      const property = validProperties[i];
       const position = {
         lat: property.location!.coordinates[1],
         lng: property.location!.coordinates[0]
@@ -227,36 +255,42 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         marker = new window.mappls.Marker({
           map: mapInstanceRef.current,
           position: [position.lng, position.lat], // Mappls expects [lng, lat]
-          icon: {
+          title: property.title
+        });
+        
+        // Try to add custom icon after marker creation
+        try {
+          marker.setIcon({
             url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
               <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
               </svg>
             `)}`,
             scaledSize: { width: 20, height: 20 }
-          }
-        });
-        console.log('Custom icon marker created successfully for:', property.title);
+          });
+          console.log('Custom icon marker created successfully for:', property.title);
+        } catch (iconError) {
+          console.warn('Failed to set custom icon, using default marker:', iconError);
+        }
       } catch (error) {
-        console.warn('Failed to create custom icon marker, using default:', error);
-        // Fallback to default marker
-        marker = new window.mappls.Marker({
-          map: mapInstanceRef.current,
-          position: [position.lng, position.lat] // Mappls expects [lng, lat]
-        });
-        console.log('Default marker created successfully for:', property.title);
+        console.error('Failed to create marker for property:', property.title, error);
+        continue; // Skip this marker and continue with others
       }
 
       // Add click listener
-      marker.addListener('click', () => {
-        console.log('Marker clicked:', property.title);
-        if (onMarkerClick) {
-          onMarkerClick(property);
-        }
-      });
+      try {
+        marker.addListener('click', () => {
+          console.log('Marker clicked:', property.title);
+          if (onMarkerClick) {
+            onMarkerClick(property);
+          }
+        });
+      } catch (listenerError) {
+        console.warn('Failed to add click listener to marker:', listenerError);
+      }
 
-      return marker;
-    });
+      newMarkers.push(marker);
+    }
 
     // Add user location marker if available
     if (userLocation) {
@@ -417,15 +451,12 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
             console.log('Creating Mappls map with:', { mapCenter, mapZoom, container });
             
             // Initialize map with proper Mappls SDK configuration
-            // Note: API key is already included in the script URL, no need to set it separately
             mapInstanceRef.current = new window.mappls.Map(container, {
               center: mapCenter, // mapCenter is already in [lng, lat] format
               zoom: mapZoom,
               zoomControl: true,
               fullscreenControl: true,
-              scrollWheel: true,
-              mapType: 'mappls',
-              mapTypeId: 'mappls'
+              scrollWheel: true
             });
 
             console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);
@@ -437,13 +468,17 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
               addMarkersToMap();
             });
 
-            // Also add markers immediately as fallback
-            addMarkersToMap();
+            // Also add markers after a short delay as fallback
+            setTimeout(() => {
+              console.log('Adding markers as fallback');
+              addMarkersToMap();
+            }, 1000);
+
           } catch (mapError) {
             console.error('Error creating Mappls map:', mapError);
             setMapError('Failed to create map: ' + mapError.message);
           }
-        }, 500);
+        }, 1000);
 
       } catch (err: any) {
         console.error('Error creating Mappls map:', err);
