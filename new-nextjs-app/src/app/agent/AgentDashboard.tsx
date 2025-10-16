@@ -500,7 +500,9 @@ const AgentDashboard = () => {
               {stats.topPerformingProperty ? (
                 <Box display="flex" alignItems="center" gap={2}>
                   <Avatar
-                    src={stats.topPerformingProperty.images?.[0]}
+                    src={typeof stats.topPerformingProperty.images?.[0] === 'string' 
+                      ? stats.topPerformingProperty.images[0] 
+                      : stats.topPerformingProperty.images?.[0]?.url || ''}
                     variant="rounded"
                     sx={{ width: 60, height: 60 }}
                   >
@@ -511,7 +513,9 @@ const AgentDashboard = () => {
                       {stats.topPerformingProperty.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {stats.topPerformingProperty.location}
+                      {typeof stats.topPerformingProperty.location === 'string' 
+                        ? stats.topPerformingProperty.location 
+                        : `${stats.topPerformingProperty.location?.city || ''}, ${stats.topPerformingProperty.location?.state || ''}`.replace(/^,\s*|,\s*$/g, '')}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={1} mt={1}>
                       <VisibilityIcon sx={{ fontSize: 16, color: 'primary.main' }} />
@@ -633,7 +637,9 @@ const AgentDashboard = () => {
                           <TableCell>
                             <Box display="flex" alignItems="center" gap={2}>
                               <Avatar
-                                src={property.images?.[0]}
+                                src={typeof property.images?.[0] === 'string' 
+                                  ? property.images[0] 
+                                  : property.images?.[0]?.url || ''}
                                 variant="rounded"
                                 sx={{ width: 50, height: 50 }}
                               >
@@ -645,7 +651,9 @@ const AgentDashboard = () => {
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
                                   <LocationIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                  {property.location}
+                                  {typeof property.location === 'string' 
+                                    ? property.location 
+                                    : `${property.location?.city || ''}, ${property.location?.state || ''}`.replace(/^,\s*|,\s*$/g, '')}
                                 </Typography>
                               </Box>
                             </Box>
