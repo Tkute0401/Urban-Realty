@@ -285,7 +285,7 @@ const PropertyDetailsPageContent: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+        background: 'var(--color-bg)'
       }}>
         <Typography>Loading...</Typography>
       </Box>
@@ -296,12 +296,17 @@ const PropertyDetailsPageContent: React.FC = () => {
     return (
       <Box sx={{
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+        background: 'var(--color-bg)',
+        gap: 2
       }}>
-        <CircularProgress size={80} sx={{ color: '#78CADC' }} />
+        <CircularProgress size={80} sx={{ color: 'var(--color-primary)' }} />
+        <Typography variant="h6" sx={{ color: 'var(--color-text-muted)' }}>
+          Loading property details...
+        </Typography>
       </Box>
     );
   }
@@ -311,7 +316,7 @@ const PropertyDetailsPageContent: React.FC = () => {
       <Box sx={{
         p: 3,
         textAlign: 'center',
-        background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: 'var(--color-bg)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -341,32 +346,39 @@ const PropertyDetailsPageContent: React.FC = () => {
 
   return (
     <Box sx={{
-      background: isDark ? 'linear-gradient(135deg, #0B1011 0%, #1a2a32 100%)' : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      minHeight: '100vh'
+      background: 'var(--color-bg)',
+      minHeight: '100vh',
+      fontFamily: 'var(--font-family-sans, "Poppins", sans-serif)'
     }}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
         {/* Property Header */}
-        <Paper sx={{
-          p: 3,
-          mb: 4,
-          background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-          borderRadius: '12px'
-        }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Paper sx={{
+            p: { xs: 2, sm: 3 },
+            mb: { xs: 3, sm: 4 },
+            background: 'var(--color-surface)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid var(--color-border)',
+            borderRadius: { xs: '8px', sm: '12px' },
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          }}>
           <Grid container spacing={3} alignItems="center">
             <Grid item xs={12} md={8}>
               <Typography variant="h4" component="h1" sx={{
                 fontWeight: 'bold',
                 mb: 2,
-                color: isDark ? 'white' : 'text.primary'
+                color: 'var(--color-text-primary)'
               }}>
                 {property.buildingName || property.title}
               </Typography>
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                <LocationOn sx={{ color: '#78CADC' }} />
-                <Typography variant="body1" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                <LocationOn sx={{ color: 'var(--color-primary)' }} />
+                <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
                   {fullAddress}
                 </Typography>
               </Box>
@@ -391,7 +403,7 @@ const PropertyDetailsPageContent: React.FC = () => {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Typography variant="h3" sx={{
                   fontWeight: 'bold',
-                  color: '#78CADC',
+                  color: 'var(--color-primary)',
                   textAlign: { xs: 'left', md: 'right' }
                 }}>
                   {formatPrice(property.price)}
@@ -402,19 +414,20 @@ const PropertyDetailsPageContent: React.FC = () => {
                   <IconButton
                     onClick={handleFavoriteClick}
                     disabled={loadingFavorite}
-                    sx={{ color: isFavorite ? '#e74c3c' : isDark ? 'white' : 'text.primary' }}
+                    sx={{ color: isFavorite ? '#e74c3c' : 'var(--color-text-primary)' }}
                   >
                     {loadingFavorite ? <CircularProgress size={20} /> : (isFavorite ? <HeartFilled /> : <HeartOutline />)}
                   </IconButton>
                   
-                  <IconButton onClick={handleShare} sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                  <IconButton onClick={handleShare} sx={{ color: 'var(--color-text-primary)' }}>
                     <Share />
                   </IconButton>
                 </Box>
               </Box>
             </Grid>
           </Grid>
-        </Paper>
+          </Paper>
+        </motion.div>
 
         {/* Property Images */}
         <Box sx={{ mb: 4 }}>
@@ -428,100 +441,156 @@ const PropertyDetailsPageContent: React.FC = () => {
         <Grid container spacing={4}>
           <Grid item xs={12} lg={8}>
             {/* Property Info Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid item xs={6} sm={3}>
-                <Paper sx={{
-                  p: 2,
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 3, sm: 4 } }}>
+                <Grid item xs={6} sm={3}>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Paper sx={{
+                  p: { xs: 1.5, sm: 2 },
                   textAlign: 'center',
-                  background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                  background: 'var(--color-surface)',
                   backdropFilter: 'blur(10px)',
-                  border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-                  borderRadius: '12px'
+                  border: '1px solid var(--color-border)',
+                  borderRadius: { xs: '8px', sm: '12px' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                  }
                 }}>
-                  <SquareFoot sx={{ color: '#78CADC', mb: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: isDark ? 'white' : 'text.primary' }}>
+                  <SquareFoot sx={{ color: 'var(--color-primary)', mb: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
                     {property.area} sqft
                   </Typography>
-                  <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                     Area
                   </Typography>
-                </Paper>
-              </Grid>
+                    </Paper>
+                  </motion.div>
+                </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Paper sx={{
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Paper sx={{
                   p: 2,
                   textAlign: 'center',
-                  background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                  background: 'var(--color-surface)',
                   backdropFilter: 'blur(10px)',
-                  border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-                  borderRadius: '12px'
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '12px',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                  }
                 }}>
-                  <LocalHotel sx={{ color: '#78CADC', mb: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: isDark ? 'white' : 'text.primary' }}>
+                  <LocalHotel sx={{ color: 'var(--color-primary)', mb: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
                     {property.bedrooms}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                     Bedrooms
                   </Typography>
-                </Paper>
+                  </Paper>
+                </motion.div>
               </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Paper sx={{
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Paper sx={{
                   p: 2,
                   textAlign: 'center',
-                  background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                  background: 'var(--color-surface)',
                   backdropFilter: 'blur(10px)',
-                  border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-                  borderRadius: '12px'
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '12px',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                  }
                 }}>
-                  <Bathtub sx={{ color: '#78CADC', mb: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: isDark ? 'white' : 'text.primary' }}>
+                  <Bathtub sx={{ color: 'var(--color-primary)', mb: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
                     {property.bathrooms}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                     Bathrooms
                   </Typography>
-                </Paper>
+                  </Paper>
+                </motion.div>
               </Grid>
 
               <Grid item xs={6} sm={3}>
-                <Paper sx={{
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Paper sx={{
                   p: 2,
                   textAlign: 'center',
-                  background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                  background: 'var(--color-surface)',
                   backdropFilter: 'blur(10px)',
-                  border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-                  borderRadius: '12px'
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '12px',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                  }
                 }}>
-                  <Home sx={{ color: '#78CADC', mb: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: isDark ? 'white' : 'text.primary' }}>
+                  <Home sx={{ color: 'var(--color-primary)', mb: 1 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
                     {property.type}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                     Type
                   </Typography>
-                </Paper>
+                  </Paper>
+                </motion.div>
               </Grid>
-            </Grid>
+              </Grid>
+            </motion.div>
 
             {/* Tabs */}
-            <Paper sx={{
-              background: isDark ? 'rgba(11, 16, 17, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Paper sx={{
+              background: 'var(--color-surface)',
               backdropFilter: 'blur(10px)',
-              border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
-              borderRadius: '12px'
+              border: '1px solid var(--color-border)',
+              borderRadius: { xs: '8px', sm: '12px' },
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
             }}>
               <Tabs
                 value={activeTab}
                 onChange={(_, newValue) => setActiveTab(newValue)}
+                variant={isMobile ? "scrollable" : "standard"}
+                scrollButtons="auto"
                 sx={{
-                  borderBottom: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
+                  borderBottom: '1px solid var(--color-border)',
                   '& .MuiTab-root': {
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary',
+                    color: 'var(--color-text-muted)',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    minHeight: { xs: 48, sm: 64 },
                     '&.Mui-selected': {
-                      color: '#78CADC'
+                      color: 'var(--color-primary)'
                     }
                   }
                 }}
@@ -533,16 +602,16 @@ const PropertyDetailsPageContent: React.FC = () => {
               </Tabs>
 
               <TabPanel value={activeTab} index={0}>
-                <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                   Description
                 </Typography>
-                <Typography sx={{ mb: 3, color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                <Typography sx={{ mb: 3, color: 'var(--color-text-muted)' }}>
                   {property.description || 'No description available for this property.'}
                 </Typography>
 
                 {property.highlights && property.highlights.length > 0 && (
                   <>
-                    <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
+                    <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                       Key Highlights
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -561,7 +630,7 @@ const PropertyDetailsPageContent: React.FC = () => {
               </TabPanel>
 
               <TabPanel value={activeTab} index={1}>
-                <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                   Amenities
                 </Typography>
                 <Grid container spacing={2}>
@@ -572,12 +641,12 @@ const PropertyDetailsPageContent: React.FC = () => {
                         alignItems: 'center',
                         gap: 1,
                         p: 2,
-                        background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
+                        background: 'var(--color-bg-secondary)',
                         borderRadius: '8px',
-                        border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                        border: '1px solid var(--color-border)'
                       }}>
-                        <Star sx={{ color: '#78CADC', fontSize: 20 }} />
-                        <Typography variant="body2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                        <Star sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
+                        <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
                           {amenity}
                         </Typography>
                       </Box>
@@ -587,7 +656,7 @@ const PropertyDetailsPageContent: React.FC = () => {
               </TabPanel>
 
               <TabPanel value={activeTab} index={2}>
-                <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                   Location & Nearby Places
                 </Typography>
                 {property.location && property.location.coordinates && property.location.coordinates.length === 2 ? (
@@ -598,14 +667,14 @@ const PropertyDetailsPageContent: React.FC = () => {
                     height="400px"
                   />
                 ) : (
-                  <Typography sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                  <Typography sx={{ color: 'var(--color-text-muted)' }}>
                     Location information not available.
                   </Typography>
                 )}
 
                 {property.nearbyLocalities && (
                   <Box sx={{ mt: 3 }}>
-                    <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
+                    <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                       Nearby Places
                     </Typography>
                     <Grid container spacing={2}>
@@ -615,12 +684,12 @@ const PropertyDetailsPageContent: React.FC = () => {
                             p: 2,
                             background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
                             borderRadius: '8px',
-                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                            border: '1px solid var(--color-border)'
                           }}>
-                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                            <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)' }}>
                               {property.nearbyLocalities.school}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                               School
                             </Typography>
                           </Box>
@@ -632,12 +701,12 @@ const PropertyDetailsPageContent: React.FC = () => {
                             p: 2,
                             background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
                             borderRadius: '8px',
-                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                            border: '1px solid var(--color-border)'
                           }}>
-                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                            <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)' }}>
                               {property.nearbyLocalities.hospital}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                               Hospital
                             </Typography>
                           </Box>
@@ -649,12 +718,12 @@ const PropertyDetailsPageContent: React.FC = () => {
                             p: 2,
                             background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
                             borderRadius: '8px',
-                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                            border: '1px solid var(--color-border)'
                           }}>
-                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                            <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)' }}>
                               {property.nearbyLocalities.mall}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                               Shopping Mall
                             </Typography>
                           </Box>
@@ -666,12 +735,12 @@ const PropertyDetailsPageContent: React.FC = () => {
                             p: 2,
                             background: isDark ? 'rgba(11, 16, 17, 0.5)' : 'rgba(248, 250, 252, 0.5)',
                             borderRadius: '8px',
-                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                            border: '1px solid var(--color-border)'
                           }}>
-                            <Typography variant="subtitle2" sx={{ color: isDark ? 'white' : 'text.primary' }}>
+                            <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)' }}>
                               {property.nearbyLocalities.park}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                               Park
                             </Typography>
                           </Box>
@@ -683,7 +752,7 @@ const PropertyDetailsPageContent: React.FC = () => {
               </TabPanel>
 
               <TabPanel value={activeTab} index={3}>
-                <Typography variant="h6" sx={{ mb: 2, color: isDark ? 'white' : 'text.primary' }}>
+                <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                   Floor Plan
                 </Typography>
                 {property.floorPlanImages && property.floorPlanImages.length > 0 ? (
@@ -698,11 +767,11 @@ const PropertyDetailsPageContent: React.FC = () => {
                             maxWidth: '800px',
                             height: 'auto',
                             borderRadius: '8px',
-                            border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`
+                            border: '1px solid var(--color-border)'
                           }}
                         />
                         {floorPlan.description && (
-                          <Typography sx={{ mt: 2, color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                          <Typography sx={{ mt: 2, color: 'var(--color-text-muted)' }}>
                             {floorPlan.description}
                           </Typography>
                         )}
@@ -710,12 +779,13 @@ const PropertyDetailsPageContent: React.FC = () => {
                     ))}
                   </Box>
                 ) : (
-                  <Typography sx={{ color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary' }}>
+                  <Typography sx={{ color: 'var(--color-text-muted)' }}>
                     Floor plan not available for this property.
                   </Typography>
                 )}
               </TabPanel>
-            </Paper>
+              </Paper>
+            </motion.div>
           </Grid>
 
           {/* Property Sidebar */}
@@ -741,11 +811,19 @@ const PropertyDetailsPageContent: React.FC = () => {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             sx={{
               position: 'fixed',
-              bottom: 30,
-              right: 30,
-              backgroundColor: '#78CADC',
-              color: '#0B1011',
-              '&:hover': { backgroundColor: '#5fb4c9' }
+              bottom: { xs: 20, sm: 30 },
+              right: { xs: 20, sm: 30 },
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-text-inverse)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              width: { xs: 48, sm: 56 },
+              height: { xs: 48, sm: 56 },
+              '&:hover': { 
+                backgroundColor: 'var(--color-primary-hover)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)'
+              },
+              transition: 'all 0.3s ease'
             }}
           >
             <KeyboardArrowUp />
@@ -770,7 +848,7 @@ const PropertyDetailsPage: React.FC = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+        background: 'var(--color-bg)'
       }}>
         <Typography>Loading...</Typography>
       </Box>
