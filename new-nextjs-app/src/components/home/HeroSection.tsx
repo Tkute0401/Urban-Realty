@@ -305,7 +305,7 @@ const HeroSection = () => {
               </button>
 
               <button 
-                className="lg:hidden p-1 sm:p-1.5 text-[var(--color-text)] hover:bg-[var(--color-accent)] rounded-lg transition-colors duration-300"
+                className="lg:hidden p-1 sm:p-1.5 text-white hover:bg-white/20 rounded-lg transition-colors duration-300"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
@@ -321,12 +321,12 @@ const HeroSection = () => {
           <div className="flex-1 flex flex-col justify-center">
             <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
               <div className="text-center mb-2 sm:mb-3 md:mb-4 lg:mb-6">
-                <h1 className="font-poppins text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight font-bold mb-1 sm:mb-2 md:mb-4 lg:mb-6 text-[var(--color-text)]">
+                <h1 className="font-poppins text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight font-bold mb-1 sm:mb-2 md:mb-4 lg:mb-6 text-white">
                   Find Your <br />Perfect <span className="text-[var(--color-primary)]">Spot.</span>
                 </h1>
                 <br/>
                 
-                <p className="text-[var(--color-text)] mb-2 sm:mb-3 md:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-sm md:text-base">
+                <p className="text-white mb-2 sm:mb-3 md:mb-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto text-xs sm:text-sm md:text-base">
                   Discover your dream property from our extensive collection of 
                   homes, apartments, and commercial spaces across the country.
                 </p>
@@ -351,9 +351,9 @@ const HeroSection = () => {
               <div className="flex flex-col items-end">
                 <div className="flex gap-1 items-center">
                   <span className="text-yellow-400 text-base sm:text-lg md:text-xl lg:text-2xl">★</span>
-                  <span className="text-[var(--color-text)] text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
+                  <span className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">4.9</span>
                 </div>
-                <span className="text-[0.5rem] sm:text-xs font-poppins text-[var(--color-text-muted)] text-right mt-0.5">
+                <span className="text-[0.5rem] sm:text-xs font-poppins text-white/80 text-right mt-0.5">
                   FROM 6,900+ CUSTOMERS
                 </span>
               </div>
