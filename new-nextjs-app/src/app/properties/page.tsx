@@ -260,8 +260,14 @@ const PropertiesPageContent: React.FC = () => {
     <Box sx={{
       minHeight: '100vh',
       background: 'var(--color-bg)',
-      fontFamily: 'var(--font-family-sans, "Poppins", sans-serif)'
+      fontFamily: 'var(--font-family-sans, "Poppins", sans-serif)',
+      overflow: 'hidden'
     }}>
+      <Box sx={{
+        maxWidth: '100vw',
+        mx: 'auto',
+        overflow: 'hidden'
+      }}>
       {/* Mobile Search and Filter Bar */}
       {isMobile && (
         <Box sx={{
@@ -1295,8 +1301,18 @@ const PropertiesPageContent: React.FC = () => {
           </Box>
 
           {/* Properties List with Map */}
-          <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', lg: 'row' } }}>
-            <Box sx={{ flex: { xs: 1, lg: '0 0 66.666%' } }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: { xs: 2, md: 3 }, 
+            flexDirection: { xs: 'column', lg: 'row' },
+            maxWidth: '100%',
+            overflow: 'hidden'
+          }}>
+            <Box sx={{ 
+              flex: { xs: 1, lg: '0 0 60%' },
+              minWidth: 0,
+              overflow: 'hidden'
+            }}>
               <PropertyList
                 properties={properties}
                 loading={loading}
@@ -1306,7 +1322,14 @@ const PropertiesPageContent: React.FC = () => {
                 onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
               />
             </Box>
-            <Box sx={{ flex: { xs: 1, lg: '0 0 33.333%' }, position: { xs: 'static', lg: 'sticky' }, top: { lg: 20 }, height: { lg: 'fit-content' } }}>
+            <Box sx={{ 
+              flex: { xs: 1, lg: '0 0 40%' }, 
+              position: { xs: 'static', lg: 'sticky' }, 
+              top: { lg: 20 }, 
+              height: { lg: 'fit-content' },
+              minWidth: 0,
+              overflow: 'hidden'
+            }}>
               <PropertiesMap 
                 properties={properties}
                 selectedProperty={selectedProperty}
@@ -1438,8 +1461,9 @@ const PropertiesPageContent: React.FC = () => {
           <Alert severity="error" sx={{ backgroundColor: 'var(--color-error-light)', color: 'var(--color-error)' }}>
             {error}
           </Alert>
-                      </Box>
+        </Box>
       )}
+      </Box>
     </Box>
   );
 };

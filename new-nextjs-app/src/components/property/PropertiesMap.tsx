@@ -51,17 +51,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [mapInitialized, setMapInitialized] = useState(false);
   const [containerId] = useState(() => `properties-map-container-${Math.random().toString(36).substr(2, 9)}`);
 
-  console.log('🚀 PropertiesMap component rendering with:', {
-    propertiesCount: properties?.length,
-    userLocation,
-    selectedProperty: selectedProperty?._id,
-    containerId
-  });
 
-  // Debug: Log when component mounts
-  useEffect(() => {
-    console.log('🔍 PropertiesMap component mounted, containerId:', containerId);
-  }, [containerId]);
 
   // Load Mappls script
   useEffect(() => {
@@ -220,7 +210,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     }
 
     // Add markers for each property
-    console.log('Creating markers for', validProperties.length, 'properties');
     const newMarkers = [];
     
     for (let i = 0; i < validProperties.length; i++) {
@@ -234,14 +223,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
       const isSelected = selectedProperty?._id === property._id;
 
-      console.log(`Creating marker for property ${property.title}:`, {
-        position,
-        isSelected,
-        propertyId: property._id,
-        rawCoordinates: property.location!.coordinates,
-        lng: position.lng,
-        lat: position.lat
-      });
 
       // Create marker using proper Mappls SDK format
       let marker;
@@ -264,7 +245,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
             `)}`,
             scaledSize: { width: 20, height: 20 }
           });
-          console.log('Custom icon marker created successfully for:', property.title);
         } catch (iconError) {
           console.warn('Failed to set custom icon, using default marker:', iconError);
         }
@@ -317,25 +297,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
   // Initialize map and markers
   useEffect(() => {
-    console.log('🔍 PropertiesMap useEffect triggered:', {
-      scriptLoaded,
-      mapInitialized,
-      propertiesLength: properties?.length,
-      userLocation,
-      properties: properties?.map(p => ({ 
-        id: p._id, 
-        title: p.title, 
-        hasLocation: !!p.location?.coordinates,
-        coordinates: p.location?.coordinates
-      }))
-    });
     
     if (!scriptLoaded || !properties || properties.length === 0 || mapInitialized) {
-      console.log('Skipping map initialization:', { 
-        scriptLoaded, 
-        propertiesLength: properties?.length, 
-        mapInitialized 
-      });
       return;
     }
 
@@ -375,7 +338,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           return;
         }
 
-        console.log('Initializing map with properties:', properties.length);
 
         // Get the container element by ID instead of ref
         const container = document.getElementById(containerId) || mapRef.current;
@@ -465,7 +427,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
             setMapInitialized(true);
 
             // Add markers immediately after map creation
-            console.log('Adding markers immediately after map creation');
             addMarkersToMap();
 
           } catch (mapError) {

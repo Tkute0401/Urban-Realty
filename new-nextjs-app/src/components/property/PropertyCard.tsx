@@ -157,7 +157,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           transition: 'all 0.3s ease',
           width: '100%',
           maxWidth: '350px',
-          height: '500px',
+          height: '520px',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',

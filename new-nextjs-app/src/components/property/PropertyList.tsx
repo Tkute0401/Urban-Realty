@@ -83,11 +83,11 @@ const PropertyList: React.FC<PropertyListProps> = ({
 
   return (
     <Box sx={{ 
-      maxWidth: '1400px', 
-      mx: 'auto', 
-      px: { xs: 2, md: 4 },
+      width: '100%',
+      px: { xs: 1, md: 2 },
       py: 4,
-      minHeight: '400px'
+      minHeight: '400px',
+      overflow: 'hidden'
     }}>
       {/* Properties Grid */}
       <Box sx={{
@@ -95,13 +95,14 @@ const PropertyList: React.FC<PropertyListProps> = ({
         gridTemplateColumns: {
           xs: '1fr',
           sm: 'repeat(2, 1fr)',
-          md: 'repeat(3, 1fr)',
-          lg: 'repeat(3, 1fr)',
-          xl: 'repeat(4, 1fr)'
+          md: 'repeat(2, 1fr)',
+          lg: 'repeat(2, 1fr)',
+          xl: 'repeat(3, 1fr)'
         },
         gap: { xs: 2, sm: 3, md: 4 },
         justifyItems: 'center',
-        alignItems: 'start'
+        alignItems: 'start',
+        width: '100%'
       }}>
         {properties.map((property, index) => (
           <PropertyCard 
