@@ -246,11 +246,11 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       // Create marker using proper Mappls SDK format
       let marker;
       try {
-        // Mappls markers use [lng, lat] format for position
-        // Use coordinates directly from database without processing
+        // Mappls markers use [lat, lng] format for position
+        // Swap coordinates from database [lng, lat] to [lat, lng]
         marker = new window.mappls.Marker({
           map: mapInstanceRef.current,
-          position: property.location!.coordinates, // Use raw coordinates [lng, lat]
+          position: [property.location!.coordinates[1], property.location!.coordinates[0]], // [lat, lng]
           title: property.title
         });
         
@@ -429,7 +429,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         } else if (validProperties.length > 0) {
           // Center on first property with moderate zoom
           const firstProperty = validProperties[0];
-          mapCenter = firstProperty.location!.coordinates; // Already in [lng, lat] format
+          // Mappls expects [lng, lat] for map center
+          mapCenter = firstProperty.location!.coordinates; // Database is [lng, lat]
           mapZoom = 8; // Fixed moderate zoom level
           console.log('Initializing map centered on first property:', mapCenter, 'from property:', firstProperty.title);
           console.log('Property coordinates breakdown:', {
@@ -540,17 +541,13 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       
       if (validProperties.length > 0) {
         if (validProperties.length === 1) {
-          // Center on single result
+          // Center on single result - Mappls expects [lng, lat] for setCenter
           const property = validProperties[0];
           mapInstanceRef.current.setCenter(property.location!.coordinates);
           mapInstanceRef.current.setZoom(15);
         } else {
-          // Fit bounds for multiple results
-          const coordinates = validProperties.map(property => ({
-            lat: property.location!.coordinates[1],
-            lng: property.location!.coordinates[0]
-          }));
-          const mapplsCoordinates = coordinates.map(coord => [coord.lng, coord.lat]);
+          // Fit bounds for multiple results - Mappls expects [lng, lat] for fitBounds
+          const mapplsCoordinates = validProperties.map(property => property.location!.coordinates);
           mapInstanceRef.current.fitBounds(mapplsCoordinates);
         }
       }
