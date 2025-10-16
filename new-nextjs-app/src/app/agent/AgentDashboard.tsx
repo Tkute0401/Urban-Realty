@@ -118,8 +118,8 @@ const AgentDashboard = () => {
   });
 
   // Enhanced queries with TanStack Query v5 object syntax and better error handling
-  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useAgentDashboard(filters, {
-    refetchInterval: 5 * 60 * 1000,
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard, isFetching: dashboardFetching } = useAgentDashboard(filters, {
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds for real-time updates
     retry: (failureCount) => (failureCount < 3),
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -317,11 +317,21 @@ const AgentDashboard = () => {
       >
         <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} mb={4} gap={2}>
           <Box>
-            <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
-              color: 'var(--color-text-primary)'
-            }}>
-              Welcome back, {user?.name}! 👋
-            </Typography>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
+                color: 'var(--color-text-primary)'
+              }}>
+                Welcome back, {user?.name}! 👋
+              </Typography>
+              {dashboardFetching && (
+                <Box display="flex" alignItems="center" gap={1}>
+                  <CircularProgress size={16} />
+                  <Typography variant="caption" color="text.secondary">
+                    Updating...
+                  </Typography>
+                </Box>
+              )}
+            </Box>
             <Typography variant="h6" color="text.secondary">
               Here&apos;s your real estate performance overview
             </Typography>

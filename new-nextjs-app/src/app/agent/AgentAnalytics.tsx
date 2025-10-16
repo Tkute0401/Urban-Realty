@@ -56,11 +56,17 @@ const AgentAnalytics = () => {
   const [timeRange, setTimeRange] = useState('30');
   const [activeTab, setActiveTab] = useState(0);
 
-  // Fetch agent's analytics
-  const { data: analyticsData, isLoading: analyticsLoading } = useAgentAnalytics();
+  // Fetch agent's analytics with real-time data
+  const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError, isFetching } = useAgentAnalytics({
+    timeframe: timeRange + 'd'
+  }, {
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds for real-time updates
+    retry: (failureCount) => (failureCount < 3),
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
 
-  // Use analytics data from mock API
-  const analytics = analyticsData || {
+  // Use real analytics data from API
+  const analytics = analyticsData?.data || analyticsData || {
     overview: {
       totalProperties: 0,
       activeProperties: 0,
@@ -112,8 +118,36 @@ const AgentAnalytics = () => {
 
   if (analyticsLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2, color: 'text.secondary' }}>
+          Loading analytics data...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (analyticsError) {
+    return (
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
+        <Alert severity="error" sx={{ mb: 3, maxWidth: 500 }}>
+          <Typography variant="h6" gutterBottom>
+            Analytics Error
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {analyticsError?.message || 'Failed to load analytics data'}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Please check your internet connection and try again
+          </Typography>
+        </Alert>
+        <Button 
+          variant="contained" 
+          onClick={() => window.location.reload()}
+          startIcon={<RefreshIcon />}
+        >
+          Retry
+        </Button>
       </Box>
     );
   }
@@ -123,9 +157,19 @@ const AgentAnalytics = () => {
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
-          <Typography variant="h4" gutterBottom>
-            Analytics & Insights
-          </Typography>
+          <Box display="flex" alignItems="center" gap={2}>
+            <Typography variant="h4" gutterBottom>
+              Analytics & Insights
+            </Typography>
+            {isFetching && (
+              <Box display="flex" alignItems="center" gap={1}>
+                <CircularProgress size={16} />
+                <Typography variant="caption" color="text.secondary">
+                  Updating...
+                </Typography>
+              </Box>
+            )}
+          </Box>
           <Typography variant="body1" color="text.secondary">
             Track your performance and property insights
           </Typography>
