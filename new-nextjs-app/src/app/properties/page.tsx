@@ -36,7 +36,6 @@ import {
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyList from '@/components/property/PropertyList';
 import PropertiesMap from '@/components/property/PropertiesMap';
-import MapTest from '@/components/property/MapTest';
 import { useLocation } from '@/hooks/useLocation';
 import { useMediaQuery, useTheme } from '@mui/material';
 
@@ -53,6 +52,13 @@ const PropertiesPageContent: React.FC = () => {
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
   const [activeBtn, setActiveBtn] = useState('ALL');
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  
+  const handlePropertyClick = (property: any) => {
+    setSelectedProperty(property);
+    router.push(`/properties/${property._id}`);
+  };
+  
   const [showHomeTypeFilter, setShowHomeTypeFilter] = useState(false);
   const [showPriceFilter, setShowPriceFilter] = useState(false);
   const [showBedBathFilter, setShowBedBathFilter] = useState(false);
@@ -1300,16 +1306,13 @@ const PropertiesPageContent: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12} lg={4}>
-              <Box sx={{
-                position: 'sticky',
-                top: 100,
-                height: '600px',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                border: '1px solid var(--color-border)'
-              }}>
-                <MapTest />
-              </Box>
+              <PropertiesMap 
+                properties={properties}
+                selectedProperty={selectedProperty}
+                userLocation={userLocation}
+                onMarkerClick={handlePropertyClick}
+                height="600px"
+              />
             </Grid>
           </Grid>
         </Box>

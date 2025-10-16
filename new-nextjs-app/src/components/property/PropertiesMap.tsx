@@ -175,19 +175,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     });
 
     if (validProperties.length === 0) {
-      console.log('No valid properties found, creating test marker');
-      // Create a test marker to verify map is working
-      try {
-        const testMarker = new window.mappls.Marker({
-          map: mapInstanceRef.current,
-          position: [77.2090, 28.6139], // Delhi coordinates
-          title: 'Test Marker'
-        });
-        markersRef.current = [testMarker];
-        console.log('Test marker created successfully');
-      } catch (error) {
-        console.error('Failed to create test marker:', error);
-      }
+      console.log('No valid properties found with coordinates');
       setMapLoaded(true);
       setMapError(null);
       return;
@@ -409,13 +397,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         );
 
         if (validProperties.length === 0) {
-          console.log('No valid properties found, creating test marker');
-          // Create a test marker with default coordinates (Delhi)
-          const testMarker = new window.mappls.Marker({
-            map: mapInstanceRef.current,
-            position: [77.2090, 28.6139] // Mappls expects [lng, lat] format
-          });
-          markersRef.current = [testMarker];
+          console.log('No valid properties found with coordinates');
           setMapLoaded(true);
           setMapError(null);
           return;
@@ -442,10 +424,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
             lat: firstProperty.location!.coordinates[1]
           });
         } else {
-          // Default to Delhi
+          // Default to India center (Delhi)
           mapCenter = [77.2090, 28.6139];
-          mapZoom = 10;
-          console.log('Initializing map with default center (Delhi):', mapCenter);
+          mapZoom = 6; // Show more of India
+          console.log('Initializing map with default center (India):', mapCenter);
         }
 
         console.log('Final map center and zoom:', { mapCenter, mapZoom });
