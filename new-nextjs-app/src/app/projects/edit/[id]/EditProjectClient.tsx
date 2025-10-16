@@ -1060,7 +1060,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
                   type="number"
                   value={newConfiguration.area}
                   onChange={(e) => updateConfiguration(0, 'area', e.target.value)}
-                  required
+                  placeholder="Enter area in sq ft"
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       color: 'var(--color-text-primary)',
@@ -1080,7 +1080,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
                   type="number"
                   value={newConfiguration.price}
                   onChange={(e) => updateConfiguration(0, 'price', e.target.value)}
-                  required
+                  placeholder="Enter price in ₹"
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       color: 'var(--color-text-primary)',
