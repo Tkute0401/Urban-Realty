@@ -416,12 +416,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           try {
             console.log('Creating Mappls map with:', { mapCenter, mapZoom, container });
             
-            // Initialize Mappls with API key first
-            if (window.mappls.setAPIKey) {
-              window.mappls.setAPIKey(MAPPLS_CONFIG.apiKey);
-            }
-            
             // Initialize map with proper Mappls SDK configuration
+            // Note: API key is already included in the script URL, no need to set it separately
             mapInstanceRef.current = new window.mappls.Map(container, {
               center: [mapCenter.lng, mapCenter.lat], // Mappls expects [lng, lat] format
               zoom: mapZoom,
