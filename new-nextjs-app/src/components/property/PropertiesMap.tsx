@@ -225,10 +225,11 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     
     for (let i = 0; i < validProperties.length; i++) {
       const property = validProperties[i];
-      // Ensure coordinates are in correct order: [lng, lat]
+      // Coordinates are already in [lng, lat] format from database
+      // Don't swap them - use directly for marker position
       const position = {
-        lat: property.location!.coordinates[1], // latitude is second element
-        lng: property.location!.coordinates[0]  // longitude is first element
+        lng: property.location!.coordinates[0], // longitude is first element
+        lat: property.location!.coordinates[1]  // latitude is second element
       };
 
       const isSelected = selectedProperty?._id === property._id;
@@ -246,9 +247,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       let marker;
       try {
         // Mappls markers use [lng, lat] format for position
+        // Use coordinates directly from database without processing
         marker = new window.mappls.Marker({
           map: mapInstanceRef.current,
-          position: [position.lng, position.lat], // Mappls expects [lng, lat]
+          position: property.location!.coordinates, // Use raw coordinates [lng, lat]
           title: property.title
         });
         
@@ -425,10 +427,10 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           mapZoom = 12;
           console.log('Initializing map centered on user location:', mapCenter);
         } else if (validProperties.length > 0) {
-          // Center on first property
+          // Center on first property with moderate zoom
           const firstProperty = validProperties[0];
           mapCenter = firstProperty.location!.coordinates; // Already in [lng, lat] format
-          mapZoom = validProperties.length > 1 ? 10 : 12;
+          mapZoom = 8; // Fixed moderate zoom level
           console.log('Initializing map centered on first property:', mapCenter, 'from property:', firstProperty.title);
           console.log('Property coordinates breakdown:', {
             raw: firstProperty.location!.coordinates,
@@ -461,17 +463,9 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
             console.log('Map initialized successfully with center:', mapCenter, 'zoom:', mapZoom);
             setMapInitialized(true);
 
-            // Wait for map to be ready before adding markers
-            mapInstanceRef.current.addListener('idle', () => {
-              console.log('Map is idle, ready to add markers');
-              addMarkersToMap();
-            });
-
-            // Also add markers after a short delay as fallback
-            setTimeout(() => {
-              console.log('Adding markers as fallback');
-              addMarkersToMap();
-            }, 1000);
+            // Add markers immediately after map creation
+            console.log('Adding markers immediately after map creation');
+            addMarkersToMap();
 
           } catch (mapError) {
             console.error('Error creating Mappls map:', mapError);
