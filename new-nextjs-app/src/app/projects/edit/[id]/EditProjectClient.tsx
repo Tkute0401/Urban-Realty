@@ -221,8 +221,14 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
               min: projectData.priceRange?.min?.toString() || '',
               max: projectData.priceRange?.max?.toString() || ''
             },
-            amenities: projectData.amenities || [],
-            features: projectData.features || [],
+            amenities: (projectData.amenities || []).map((item: any) => ({
+              name: item.name || '',
+              description: item.description || ''
+            })),
+            features: (projectData.features || []).map((item: any) => ({
+              name: item.name || '',
+              description: item.description || ''
+            })),
             keywords: projectData.keywords || [],
             configurations: projectData.configurations || [],
             reraNumber: projectData.reraNumber || '',
