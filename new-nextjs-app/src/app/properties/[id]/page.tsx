@@ -1084,6 +1084,10 @@ const PropertyDetailsPageContent: React.FC = () => {
 
           {/* Property Sidebar */}
           <Grid item xs={12} lg={4}>
+            {(() => {
+              console.log('🔍 About to render PropertySidebar with property:', property?.title);
+              return null;
+            })()}
             <PropertySidebar
               property={property}
               fullAddress={fullAddress}
