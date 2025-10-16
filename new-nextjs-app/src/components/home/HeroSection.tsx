@@ -242,7 +242,7 @@ const HeroSection = () => {
               <img 
                 src="/vite.png" 
                 alt="Logo" 
-                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 hover:scale-105 transition-transform duration-300" 
+                className="h-12 w-auto sm:h-14 md:h-16 lg:h-18 xl:h-20 2xl:h-22 hover:scale-105 transition-transform duration-300 object-contain" 
               />
             </div>
 

@@ -258,7 +258,7 @@ const Footer = () => {
         {/* Bottom section with copyright and logo */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
-            <img src="/vite.png" alt="Logo" className="w-8 h-8" />
+            <img src="/vite.png" alt="Logo" className="h-8 w-auto object-contain" />
             <span className="font-poppins font-bold" style={{ color: 'var(--color-text)' }}>SQUAREFOOT</span>
           </div>
           

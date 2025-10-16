@@ -146,7 +146,7 @@ const Header: React.FC = () => {
             <img 
                 src="/vite.png" 
                 alt="Logo" 
-                className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 2xl:w-32 2xl:h-32 transition-all duration-300 hover:scale-105" 
+                className="h-10 w-auto sm:h-12 md:h-14 lg:h-16 xl:h-18 2xl:h-20 transition-all duration-300 hover:scale-105 object-contain" 
               />
             {/* <span className="logo-text">Urban Realty</span> */}
           </Link>
