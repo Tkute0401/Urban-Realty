@@ -364,7 +364,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                         </ListItemIcon>
                         <ListItemText
                           primary="Location"
-                          secondary={`${project.location?.address}, ${project.location?.city}, ${project.location?.state} ${project.location?.pincode}`}
+                          secondary={`${project.location?.address || ''}, ${project.location?.city || ''}, ${project.location?.state || ''} ${project.location?.pincode || ''}`.replace(/,\s*,/g, ',').replace(/^,\s*|,\s*$/g, '')}
                         />
                       </ListItem>
                       <ListItem>
@@ -688,7 +688,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: 2 }}>
                     <LocationOn sx={{ color: 'var(--color-primary)', mr: 1, mt: 0.5 }} />
                     <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
-                      {project.location.address}, {project.location.city}, {project.location.state} - {project.location.pincode}
+                      {`${project.location?.address || ''}, ${project.location?.city || ''}, ${project.location?.state || ''} - ${project.location?.pincode || ''}`.replace(/,\s*,/g, ',').replace(/^,\s*|,\s*$/g, '')}
                     </Typography>
                   </Box>
                 </CardContent>

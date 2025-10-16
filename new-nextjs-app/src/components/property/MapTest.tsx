@@ -22,6 +22,13 @@ const MapTest: React.FC = () => {
           return;
         }
 
+        // Check if API key is available
+        if (!MAPPLS_CONFIG.apiKey) {
+          setMapError('Mappls API key not configured');
+          reject(new Error('API key not found'));
+          return;
+        }
+
         const script = document.createElement('script');
         script.src = MAPPLS_CONFIG.getScriptUrl();
         script.async = true;

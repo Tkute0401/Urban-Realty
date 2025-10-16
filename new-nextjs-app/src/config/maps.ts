@@ -7,10 +7,10 @@
  */
 
 export const MAPPLS_CONFIG = {
-  // API key with fallback
+  // API key - only use environment variables, no hardcoded fallback
   apiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY || 
           process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY || 
-          '82f5c384638d8cfc7d13e310780bae89',
+          null,
   
   // Default map settings
   defaultCenter: {
@@ -22,11 +22,17 @@ export const MAPPLS_CONFIG = {
   
   // Script URL
   getScriptUrl: function() {
+    if (!this.apiKey) {
+      throw new Error('Mappls API key not configured');
+    }
     return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=vector&v=3.0`;
   },
   
   // Alternative script URL (if the above doesn't work)
   getAlternativeScriptUrl: function() {
+    if (!this.apiKey) {
+      throw new Error('Mappls API key not configured');
+    }
     return `https://apis.mappls.com/advancedmaps/api/${this.apiKey}/map_sdk?layer=vector&v=2.0`;
   }
 };
