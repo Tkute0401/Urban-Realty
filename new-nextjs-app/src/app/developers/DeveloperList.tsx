@@ -91,7 +91,7 @@ const DeveloperList = () => {
   }, [filters, getDevelopers, router]);
 
 
-  const paginatedDevelopers = (developers || []).slice(
+  const paginatedDevelopers = developers.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
@@ -152,13 +152,13 @@ const DeveloperList = () => {
           Top <span className='highlight-words'>Real Estate Developers</span> in India
         </h1>
         <div className="listings-count">
-          {(developers || []).length} DEVELOPER{(developers || []).length !== 1 ? 'S' : ''}
+          {developers.length} DEVELOPER{developers.length !== 1 ? 'S' : ''}
         </div>
       </div>
 
 
       {/* Empty state with responsive design */}
-      {!developers || (developers || []).length === 0 ? (
+      {!developers || developers.length === 0 ? (
         <Container maxWidth="md" className="empty-state fade-in-delay-4">
           <Typography variant="h6" gutterBottom>
             No developers found matching your criteria
@@ -200,10 +200,10 @@ const DeveloperList = () => {
           </div>
 
           {/* Pagination with responsive design */}
-          {(developers || []).length > itemsPerPage && (
+          {developers.length > itemsPerPage && (
             <Stack spacing={1} className="pagination-container fade-in-delay-4">
               <Pagination
-                count={Math.ceil((developers || []).length / itemsPerPage)}
+                count={Math.ceil(developers.length / itemsPerPage)}
                 page={page}
                 onChange={handlePageChange}
                 color="primary"
@@ -233,7 +233,7 @@ const DeveloperList = () => {
                 className="pagination-count"
                 sx={{ fontSize: isMobile ? '0.75rem' : '0.875rem' }}
               >
-                {paginatedDevelopers.length} of {(developers || []).length} developers
+                {paginatedDevelopers.length} of {developers.length} developers
               </Typography>
             </Stack>
           )}

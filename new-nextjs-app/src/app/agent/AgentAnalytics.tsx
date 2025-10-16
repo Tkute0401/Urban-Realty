@@ -270,7 +270,7 @@ const AgentAnalytics = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {performance.topPerformingProperties.map((property) => (
+                    {(performance.topPerformingProperties || []).map((property) => (
                       <TableRow key={property._id} hover>
                         <TableCell>
                           <Box display="flex" alignItems="center" gap={2}>
@@ -326,7 +326,7 @@ const AgentAnalytics = () => {
                 Lead Sources
               </Typography>
               <List>
-                {Object.entries(performance.leadSources).map(([method, count]) => (
+                {Object.entries(performance.leadSources || {}).map(([method, count]) => (
                   <ListItem key={method}>
                     <ListItemAvatar>
                       <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -389,7 +389,7 @@ const AgentAnalytics = () => {
                 Recent Activity
               </Typography>
               <List>
-                {performance.recentActivity?.slice(0, 5).map((contact) => (
+                {(performance.recentActivity || []).slice(0, 5).map((contact) => (
                   <ListItem key={contact._id}>
                     <ListItemAvatar>
                       <Avatar>
