@@ -267,7 +267,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof typeof prev] as any),
           [child]: value
         }
       }));
