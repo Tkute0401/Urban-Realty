@@ -388,27 +388,132 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Clean request body and remove file upload fields
+  const cleanReqBody = { ...req.body };
+  const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours'];
+  fileUploadFields.forEach(field => {
+    if (cleanReqBody[field]) {
+      delete cleanReqBody[field];
+    }
+  });
+
   // Process new images if uploaded
   if (req.files?.images?.length > 0) {
-    const newImages = await uploadImagesToCloudinary(req.files.images, 'projects');
-    project.images = [...project.images, ...newImages];
+    const uploadedImages = await uploadImages(req.files.images, 'projects');
+    const mappedImages = uploadedImages.map(img => ({
+      url: img.url,
+      publicId: img.publicId,
+      caption: img.caption || '',
+      isPrimary: false
+    }));
+    project.images = [...project.images, ...mappedImages];
   }
 
   // Process new floor plans if uploaded
   if (req.files?.floorPlans?.length > 0) {
-    const newFloorPlans = await uploadImagesToCloudinary(req.files.floorPlans, 'projects/floor-plans');
-    project.floorPlans = [...project.floorPlans, ...newFloorPlans];
+    const uploadedFloorPlans = await uploadImages(req.files.floorPlans, 'projects/floor-plans');
+    const mappedFloorPlans = uploadedFloorPlans.map(fp => ({
+      url: fp.url,
+      publicId: fp.publicId,
+      unitType: fp.unitType || '',
+      caption: fp.caption || ''
+    }));
+    project.floorPlans = [...project.floorPlans, ...mappedFloorPlans];
   }
 
-  // Update other fields
-  const fieldsToUpdate = { ...req.body };
-  delete fieldsToUpdate.images;
-  delete fieldsToUpdate.floorPlans;
+  // Process new brochures if uploaded
+  if (req.files?.brochures?.length > 0) {
+    try {
+      const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
+      const mappedBrochures = uploadedBrochures.map(b => ({
+        url: b.url ? String(b.url) : '',
+        publicId: b.publicId ? String(b.publicId) : '',
+        name: b.name ? String(b.name) : '',
+        type: b.type ? String(b.type) : ''
+      }));
+      project.brochures = [...project.brochures, ...mappedBrochures];
+    } catch (error) {
+      console.error('Error uploading brochures:', error);
+    }
+  }
 
-  project = await Project.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
-    new: true,
-    runValidators: true
-  }).populate('developer', 'name logo website');
+  // Process new virtual tours if uploaded
+  if (req.files?.virtualTours?.length > 0) {
+    try {
+      const uploadedVirtualTours = await uploadDocuments(req.files.virtualTours, 'projects/virtual-tours');
+      const mappedVirtualTours = uploadedVirtualTours.map(vt => ({
+        url: vt.url ? String(vt.url) : '',
+        type: vt.type ? String(vt.type) : 'video',
+        thumbnail: vt.thumbnail ? String(vt.thumbnail) : ''
+      }));
+      project.virtualTours = [...project.virtualTours, ...mappedVirtualTours];
+    } catch (error) {
+      console.error('Error uploading virtual tours:', error);
+    }
+  }
+
+  // Handle existing media preservation
+  if (req.body.existingImages) {
+    const existingImages = Array.isArray(req.body.existingImages) 
+      ? req.body.existingImages.map(img => JSON.parse(img))
+      : [JSON.parse(req.body.existingImages)];
+    project.images = existingImages;
+  }
+
+  if (req.body.existingFloorPlans) {
+    const existingFloorPlans = Array.isArray(req.body.existingFloorPlans) 
+      ? req.body.existingFloorPlans.map(fp => JSON.parse(fp))
+      : [JSON.parse(req.body.existingFloorPlans)];
+    project.floorPlans = existingFloorPlans;
+  }
+
+  if (req.body.existingBrochures) {
+    const existingBrochures = Array.isArray(req.body.existingBrochures) 
+      ? req.body.existingBrochures.map(b => JSON.parse(b))
+      : [JSON.parse(req.body.existingBrochures)];
+    project.brochures = existingBrochures;
+  }
+
+  if (req.body.existingVirtualTours) {
+    const existingVirtualTours = Array.isArray(req.body.existingVirtualTours) 
+      ? req.body.existingVirtualTours.map(vt => JSON.parse(vt))
+      : [JSON.parse(req.body.existingVirtualTours)];
+    project.virtualTours = existingVirtualTours;
+  }
+
+  // Geocoding for address if provided
+  if (cleanReqBody.location?.address) {
+    try {
+      const addressString = `${cleanReqBody.location.address}, ${cleanReqBody.location.city}, ${cleanReqBody.location.state} ${cleanReqBody.location.pincode}, India`;
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressString)}&limit=1&countrycodes=in`
+      );
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const loc = data[0];
+        cleanReqBody.location.coordinates = {
+          type: 'Point',
+          coordinates: [parseFloat(loc.lon), parseFloat(loc.lat)]
+        };
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+    }
+  }
+
+  // Update project fields
+  Object.keys(cleanReqBody).forEach(key => {
+    if (cleanReqBody[key] !== undefined) {
+      project[key] = cleanReqBody[key];
+    }
+  });
+
+  // Save the project
+  await project.save();
+
+  // Populate developer information
+  await project.populate('developer', 'name logo website');
 
   res.status(200).json({
     success: true,
