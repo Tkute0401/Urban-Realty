@@ -267,6 +267,7 @@ const PropertyDetailsPageContent: React.FC = () => {
 
   // Show loading state until mounted
   if (!mounted) {
+    console.log('🔍 PropertyDetailsPage: Not mounted yet, showing loading');
     return (
       <Box sx={{
         display: 'flex',
@@ -281,6 +282,7 @@ const PropertyDetailsPageContent: React.FC = () => {
   }
 
   if (loading) {
+    console.log('🔍 PropertyDetailsPage: Loading property data');
     return (
       <Box sx={{
         display: 'flex',
@@ -300,6 +302,7 @@ const PropertyDetailsPageContent: React.FC = () => {
   }
 
   if (error || !property) {
+    console.log('🔍 PropertyDetailsPage: Error or no property - error:', error, 'property:', !!property);
     return (
       <Box sx={{
         p: 3,
@@ -331,6 +334,8 @@ const PropertyDetailsPageContent: React.FC = () => {
     property.address?.state,
     property.address?.zipCode
   ].filter(Boolean).join(', ');
+
+  console.log('🔍 PropertyDetailsPage: About to render main content - property:', property?.title, 'mounted:', mounted, 'loading:', loading, 'error:', error);
 
   return (
     <Box sx={{
