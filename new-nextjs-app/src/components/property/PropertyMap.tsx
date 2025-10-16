@@ -109,7 +109,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
         // Initialize map
         const mapOptions = {
-          center: [longitude, latitude], // Mappls uses [lng, lat] format
+          center: [longitude, latitude], // Mappls uses [lng, lat] format for map center
           zoom: zoom,
           zoomControl: true,
           fullscreenControl: true,
@@ -131,16 +131,16 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
           // Add marker if enabled
           if (showMarker) {
-            const marker = new window.mappls.Marker({
-              map: mapInstanceRef.current,
-              position: [longitude, latitude], // Mappls expects [lng, lat] format
-              fitbounds: false,
-              icon: {
-                url: 'https://apis.mapmyindia.com/map_v3/1.png',
-                width: 35,
-                height: 50
-              }
-            });
+        const marker = new window.mappls.Marker({
+          map: mapInstanceRef.current,
+          position: [latitude, longitude], // Mappls expects [lat, lng] format
+          fitbounds: false,
+          icon: {
+            url: 'https://apis.mapmyindia.com/map_v3/1.png',
+            width: 35,
+            height: 50
+          }
+        });
 
             // Add popup with address if provided
             if (address) {

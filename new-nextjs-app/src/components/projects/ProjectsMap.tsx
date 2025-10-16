@@ -176,7 +176,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
           const marker = new window.mappls.Marker({
             map: mapInstanceRef.current,
-            position: [lng, lat], // Mappls expects [lng, lat] format
+            position: [lat, lng], // Mappls expects [lat, lng] format
             icon: {
               url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                 <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
@@ -228,10 +228,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           try {
             const userMarker = new window.mappls.Marker({
               map: mapInstanceRef.current,
-              position: {
-                lat: userLocation.latitude,
-                lng: userLocation.longitude
-              },
+              position: [userLocation.latitude, userLocation.longitude], // Mappls expects [lat, lng]
               icon: {
                 url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
