@@ -969,17 +969,25 @@ const PropertyDetailsPageContent: React.FC = () => {
                     <CircularProgress size={40} sx={{ color: 'var(--color-primary)' }} />
                   </Box>
                 ) : featuredProperties.length > 0 ? (
-                  <Grid container spacing={3}>
+                  <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: {
+                      xs: '1fr',
+                      sm: 'repeat(2, 1fr)',
+                      md: 'repeat(3, 1fr)'
+                    },
+                    gap: 3,
+                    justifyItems: 'center'
+                  }}>
                     {featuredProperties.map((prop) => (
-                      <Grid item xs={12} sm={6} md={4} key={prop._id}>
-                        <PropertyCard
-                          property={prop as Property}
-                          index={0}
-                          onClick={() => router.push(`/properties/${prop._id}`)}
-                        />
-                      </Grid>
+                      <PropertyCard
+                        key={prop._id}
+                        property={prop as Property}
+                        index={0}
+                        onClick={() => router.push(`/properties/${prop._id}`)}
+                      />
                     ))}
-                  </Grid>
+                  </Box>
                 ) : (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
                     <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>

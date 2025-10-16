@@ -149,12 +149,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <Card 
         sx={{ 
           cursor: 'pointer',
-          borderRadius: { xs: '12px', sm: '24px' },
+          borderRadius: '12px',
           overflow: 'hidden',
           backgroundColor: 'var(--color-surface)',
           border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
           boxShadow: isSelected ? '0 8px 25px rgba(247, 107, 28, 0.3)' : 'none',
           transition: 'all 0.3s ease',
+          width: '100%',
+          maxWidth: '350px',
+          height: '500px',
+          display: 'flex',
+          flexDirection: 'column',
           '&:hover': {
             boxShadow: '0 8px 25px rgba(247, 107, 28, 0.2)',
             border: '1px solid var(--color-primary)'
@@ -184,7 +189,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       )}
 
       {/* Image Section */}
-      <Box sx={{ position: 'relative', aspectRatio: '16/9' }}>
+      <Box sx={{ position: 'relative', height: '200px', flexShrink: 0 }}>
         {property.images?.length > 0 ? (
           <>
             {!imageLoaded && (
@@ -261,7 +266,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </Box>
 
       {/* Content Section */}
-      <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
+      <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Rating and Type */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -362,7 +367,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </Box>
         
         {/* Price and CTA */}
-        <Box sx={{ pt: 3, borderTop: '1px solid var(--color-border)' }}>
+        <Box sx={{ pt: 3, borderTop: '1px solid var(--color-border)', mt: 'auto' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)', fontSize: { xs: '20px', sm: '24px' } }}>
               {formatPrice(property.price)}

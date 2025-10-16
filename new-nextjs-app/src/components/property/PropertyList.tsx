@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Grid, Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import PropertyCard from './PropertyCard';
 import { Property } from '@/types/property';
 
@@ -89,17 +89,27 @@ const PropertyList: React.FC<PropertyListProps> = ({
       py: 4
     }}>
       {/* Properties Grid */}
-      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+      <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(3, 1fr)',
+          lg: 'repeat(4, 1fr)',
+          xl: 'repeat(5, 1fr)'
+        },
+        gap: { xs: 2, sm: 3, md: 4 },
+        justifyItems: 'center'
+      }}>
         {properties.map((property, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={property._id}>
-            <PropertyCard 
-              property={property}
-              index={index}
-              onClick={onPropertyClick}
-            />
-          </Grid>
+          <PropertyCard 
+            key={property._id}
+            property={property}
+            index={index}
+            onClick={onPropertyClick}
+          />
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 };
