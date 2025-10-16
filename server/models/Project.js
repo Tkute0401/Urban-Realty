@@ -66,6 +66,63 @@ const ProjectSchema = new mongoose.Schema({
       max: { type: Number }
     }
   }],
+
+  // Project configurations (e.g., 2BHK, 3BHK with different prices, areas, etc.)
+  configurations: [{
+    _id: false,
+    name: {
+      type: String,
+      required: [true, 'Configuration name is required'],
+      trim: true,
+      maxlength: [50, 'Configuration name cannot be more than 50 characters']
+    },
+    type: {
+      type: String,
+      required: [true, 'Configuration type is required'],
+      enum: ['1BHK', '2BHK', '3BHK', '4BHK', '5BHK', 'Studio', 'Penthouse', 'Villa', 'Duplex', 'Other']
+    },
+    bedrooms: {
+      type: Number,
+      required: [true, 'Number of bedrooms is required'],
+      min: [0, 'Bedrooms cannot be negative']
+    },
+    bathrooms: {
+      type: Number,
+      required: [true, 'Number of bathrooms is required'],
+      min: [0, 'Bathrooms cannot be negative']
+    },
+    area: {
+      type: Number,
+      required: [true, 'Area is required'],
+      min: [1, 'Area must be at least 1 sq ft']
+    },
+    price: {
+      type: Number,
+      required: [true, 'Price is required'],
+      min: [0, 'Price cannot be negative']
+    },
+    pricePerSqFt: {
+      type: Number,
+      min: [0, 'Price per sq ft cannot be negative']
+    },
+    floorPlan: {
+      url: { type: String },
+      publicId: { type: String },
+      caption: { type: String }
+    },
+    description: {
+      type: String,
+      maxlength: [500, 'Configuration description cannot be more than 500 characters']
+    },
+    isAvailable: {
+      type: Boolean,
+      default: true
+    },
+    unitsAvailable: {
+      type: Number,
+      min: [0, 'Units available cannot be negative']
+    }
+  }],
   
   // Location information
   location: {

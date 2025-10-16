@@ -26,6 +26,23 @@ interface Project {
       max: number;
     };
   }>;
+  configurations?: Array<{
+    name: string;
+    type: string;
+    bedrooms: number;
+    bathrooms: number;
+    area: number;
+    price: number;
+    pricePerSqFt?: number;
+    floorPlan?: {
+      url: string;
+      publicId: string;
+      caption?: string;
+    };
+    description?: string;
+    isAvailable: boolean;
+    unitsAvailable?: number;
+  }>;
   location: {
     address: string;
     city: string;

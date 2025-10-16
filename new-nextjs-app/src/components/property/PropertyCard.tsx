@@ -160,6 +160,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           height: '500px',
           display: 'flex',
           flexDirection: 'column',
+          position: 'relative',
           '&:hover': {
             boxShadow: '0 8px 25px rgba(247, 107, 28, 0.2)',
             border: '1px solid var(--color-primary)'

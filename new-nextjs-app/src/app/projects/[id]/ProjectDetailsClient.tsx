@@ -422,6 +422,125 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
               </CardContent>
             </Card>
 
+            {/* Project Configurations */}
+            {project.configurations && project.configurations.length > 0 && (
+              <Card sx={{ mb: 3, backgroundColor: 'var(--color-surface)' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-text-primary)' }}>
+                    Available Configurations
+                  </Typography>
+                  <Grid container spacing={3}>
+                    {project.configurations.map((config: any, index: number) => (
+                      <Grid item xs={12} md={6} key={index}>
+                        <Card sx={{ 
+                          border: '1px solid var(--color-border)', 
+                          '&:hover': { 
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                            transform: 'translateY(-2px)',
+                            transition: 'all 0.3s ease'
+                          }
+                        }}>
+                          <CardContent>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                              <Typography variant="h6" sx={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                                {config.name}
+                              </Typography>
+                              <Chip 
+                                label={config.isAvailable ? 'Available' : 'Sold Out'} 
+                                color={config.isAvailable ? 'success' : 'default'}
+                                size="small"
+                              />
+                            </Box>
+                            
+                            <Grid container spacing={2} sx={{ mb: 2 }}>
+                              <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                                  Unit Type
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
+                                  {config.type}
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                                  Area
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
+                                  {config.area} sq ft
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                                  Bedrooms
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
+                                  {config.bedrooms}
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                                  Bathrooms
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
+                                  {config.bathrooms}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+
+                            <Divider sx={{ my: 2 }} />
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                              <Typography variant="h6" sx={{ color: 'var(--color-primary)', fontWeight: 700 }}>
+                                ₹{config.price.toLocaleString()}
+                              </Typography>
+                              {config.pricePerSqFt && (
+                                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                                  ₹{config.pricePerSqFt}/sq ft
+                                </Typography>
+                              )}
+                            </Box>
+
+                            {config.unitsAvailable && (
+                              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mb: 1 }}>
+                                {config.unitsAvailable} units available
+                              </Typography>
+                            )}
+
+                            {config.description && (
+                              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mt: 1 }}>
+                                {config.description}
+                              </Typography>
+                            )}
+
+                            {config.floorPlan && config.floorPlan.url && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<PictureAsPdf />}
+                                sx={{ 
+                                  mt: 2,
+                                  borderColor: 'var(--color-primary)',
+                                  color: 'var(--color-primary)',
+                                  '&:hover': {
+                                    borderColor: 'var(--color-primary)',
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'white'
+                                  }
+                                }}
+                                onClick={() => window.open(config.floorPlan.url, '_blank')}
+                              >
+                                View Floor Plan
+                              </Button>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Gallery */}
             {images.length > 1 && (
               <Card sx={{ mb: 3, backgroundColor: 'var(--color-surface)' }}>

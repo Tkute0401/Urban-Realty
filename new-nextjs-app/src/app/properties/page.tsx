@@ -1295,8 +1295,8 @@ const PropertiesPageContent: React.FC = () => {
           </Box>
 
           {/* Properties List with Map */}
-          <Grid container spacing={4}>
-            <Grid item xs={12} lg={8}>
+          <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', lg: 'row' } }}>
+            <Box sx={{ flex: { xs: 1, lg: '0 0 66.666%' } }}>
               <PropertyList
                 properties={properties}
                 loading={loading}
@@ -1305,8 +1305,8 @@ const PropertiesPageContent: React.FC = () => {
                 columns={{ xs: 12, sm: 6, md: 4 }}
                 onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
               />
-            </Grid>
-            <Grid item xs={12} lg={4}>
+            </Box>
+            <Box sx={{ flex: { xs: 1, lg: '0 0 33.333%' }, position: { xs: 'static', lg: 'sticky' }, top: { lg: 20 }, height: { lg: 'fit-content' } }}>
               <PropertiesMap 
                 properties={properties}
                 selectedProperty={selectedProperty}
@@ -1315,8 +1315,8 @@ const PropertiesPageContent: React.FC = () => {
                 height="600px"
                 searchQuery={filters.search}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Box>
       )}
 

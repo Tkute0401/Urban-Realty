@@ -26,7 +26,9 @@ import {
   CardMedia,
   CardContent,
   CardActions,
-  LinearProgress
+  LinearProgress,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import {
   Add,
@@ -42,7 +44,8 @@ import {
   Image,
   PictureAsPdf,
   VideoLibrary,
-  Map
+  Map,
+  Apartment
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
@@ -104,12 +107,25 @@ const AddProjectClient = () => {
     startingPrice: '',
     amenities: [],
     features: [],
-    keywords: []
+    keywords: [],
+    configurations: []
   });
 
   const [newAmenity, setNewAmenity] = useState('');
   const [newFeature, setNewFeature] = useState('');
   const [newKeyword, setNewKeyword] = useState('');
+  const [newConfiguration, setNewConfiguration] = useState({
+    name: '',
+    type: '2BHK',
+    bedrooms: 2,
+    bathrooms: 2,
+    area: '',
+    price: '',
+    pricePerSqFt: '',
+    description: '',
+    isAvailable: true,
+    unitsAvailable: ''
+  });
   
   // File upload states
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -191,6 +207,50 @@ const AddProjectClient = () => {
     setFormData(prev => ({
       ...prev,
       keywords: prev.keywords.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addConfiguration = () => {
+    if (newConfiguration.name.trim() && newConfiguration.area && newConfiguration.price) {
+      const config = {
+        ...newConfiguration,
+        area: parseFloat(newConfiguration.area),
+        price: parseFloat(newConfiguration.price),
+        pricePerSqFt: newConfiguration.pricePerSqFt ? parseFloat(newConfiguration.pricePerSqFt) : undefined,
+        unitsAvailable: newConfiguration.unitsAvailable ? parseInt(newConfiguration.unitsAvailable) : undefined
+      };
+      
+      setFormData(prev => ({
+        ...prev,
+        configurations: [...prev.configurations, config]
+      }));
+      
+      setNewConfiguration({
+        name: '',
+        type: '2BHK',
+        bedrooms: 2,
+        bathrooms: 2,
+        area: '',
+        price: '',
+        pricePerSqFt: '',
+        description: '',
+        isAvailable: true,
+        unitsAvailable: ''
+      });
+    }
+  };
+
+  const removeConfiguration = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      configurations: prev.configurations.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateConfiguration = (index, field, value) => {
+    setNewConfiguration(prev => ({
+      ...prev,
+      [field]: value
     }));
   };
 
@@ -694,6 +754,347 @@ const AddProjectClient = () => {
               />
             </Grid>
           </Grid>
+        </StyledPaper>
+
+        {/* Project Configurations Section */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <Apartment />
+            Project Configurations
+          </SectionHeader>
+          
+          <Typography variant="body2" sx={{ mb: 3, color: 'var(--color-text-muted)' }}>
+            Add different unit configurations (e.g., 2BHK, 3BHK) with their specific details
+          </Typography>
+
+          {/* Add Configuration Form */}
+          <Box sx={{ mb: 3, p: 2, border: '1px dashed var(--color-border)', borderRadius: 1 }}>
+            <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+              Add New Configuration
+            </Typography>
+            
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Configuration Name"
+                  value={newConfiguration.name}
+                  onChange={(e) => updateConfiguration(0, 'name', e.target.value)}
+                  placeholder="e.g., Premium 2BHK"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Unit Type</InputLabel>
+                  <Select
+                    value={newConfiguration.type}
+                    onChange={(e) => updateConfiguration(0, 'type', e.target.value)}
+                    sx={{
+                      color: 'var(--color-text-primary)',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--color-border)' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'var(--color-primary)' },
+                    }}
+                  >
+                    <MenuItem value="1BHK">1BHK</MenuItem>
+                    <MenuItem value="2BHK">2BHK</MenuItem>
+                    <MenuItem value="3BHK">3BHK</MenuItem>
+                    <MenuItem value="4BHK">4BHK</MenuItem>
+                    <MenuItem value="5BHK">5BHK</MenuItem>
+                    <MenuItem value="Studio">Studio</MenuItem>
+                    <MenuItem value="Penthouse">Penthouse</MenuItem>
+                    <MenuItem value="Villa">Villa</MenuItem>
+                    <MenuItem value="Duplex">Duplex</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Bedrooms"
+                  type="number"
+                  value={newConfiguration.bedrooms}
+                  onChange={(e) => updateConfiguration(0, 'bedrooms', parseInt(e.target.value) || 0)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={6} md={3}>
+                <TextField
+                  fullWidth
+                  label="Bathrooms"
+                  type="number"
+                  value={newConfiguration.bathrooms}
+                  onChange={(e) => updateConfiguration(0, 'bathrooms', parseInt(e.target.value) || 0)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Area (Sq Ft)"
+                  type="number"
+                  value={newConfiguration.area}
+                  onChange={(e) => updateConfiguration(0, 'area', e.target.value)}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Price (₹)"
+                  type="number"
+                  value={newConfiguration.price}
+                  onChange={(e) => updateConfiguration(0, 'price', e.target.value)}
+                  required
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Price per Sq Ft (₹)"
+                  type="number"
+                  value={newConfiguration.pricePerSqFt}
+                  onChange={(e) => updateConfiguration(0, 'pricePerSqFt', e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Units Available"
+                  type="number"
+                  value={newConfiguration.unitsAvailable}
+                  onChange={(e) => updateConfiguration(0, 'unitsAvailable', e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={newConfiguration.isAvailable}
+                      onChange={(e) => updateConfiguration(0, 'isAvailable', e.target.checked)}
+                      sx={{
+                        '& .MuiSwitch-switchBase.Mui-checked': {
+                          color: 'var(--color-primary)',
+                        },
+                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                          backgroundColor: 'var(--color-primary)',
+                        },
+                      }}
+                    />
+                  }
+                  label="Available for Sale"
+                  sx={{ color: 'var(--color-text-primary)' }}
+                />
+              </Grid>
+              
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Description (Optional)"
+                  multiline
+                  rows={2}
+                  value={newConfiguration.description}
+                  onChange={(e) => updateConfiguration(0, 'description', e.target.value)}
+                  placeholder="Brief description of this configuration..."
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': { borderColor: 'var(--color-border)' },
+                      '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                      '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                    },
+                    '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  onClick={addConfiguration}
+                  startIcon={<Add />}
+                  sx={{
+                    backgroundColor: 'var(--color-primary)',
+                    '&:hover': {
+                      backgroundColor: 'var(--color-primary-hover)',
+                    }
+                  }}
+                >
+                  Add Configuration
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Display Added Configurations */}
+          {formData.configurations.length > 0 && (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                Added Configurations ({formData.configurations.length})
+              </Typography>
+              
+              {formData.configurations.map((config, index) => (
+                <Card key={index} sx={{ mb: 2, border: '1px solid var(--color-border)' }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="h6" sx={{ color: 'var(--color-primary)', mb: 1 }}>
+                          {config.name}
+                        </Typography>
+                        <Grid container spacing={2}>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Type
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.type}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Bedrooms
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.bedrooms}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Bathrooms
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.bathrooms}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Area
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.area} sq ft
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Price
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
+                              ₹{config.price.toLocaleString()}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Price/Sq Ft
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.pricePerSqFt ? `₹${config.pricePerSqFt}` : 'N/A'}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Available
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.isAvailable ? 'Yes' : 'No'}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                              Units
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: 'var(--color-text-primary)' }}>
+                              {config.unitsAvailable || 'N/A'}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        {config.description && (
+                          <Typography variant="body2" sx={{ mt: 1, color: 'var(--color-text-muted)' }}>
+                            {config.description}
+                          </Typography>
+                        )}
+                      </Box>
+                      <IconButton
+                        onClick={() => removeConfiguration(index)}
+                        sx={{ color: 'var(--color-error)' }}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          )}
         </StyledPaper>
 
         {/* File Upload Section */}

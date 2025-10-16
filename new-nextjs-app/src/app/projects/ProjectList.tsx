@@ -364,6 +364,48 @@ const ProjectList = () => {
                     />
                   </Stack>
 
+                  {/* Configurations Preview */}
+                  {project.configurations && project.configurations.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mb: 1, fontSize: '0.875rem' }}>
+                        Available Configurations:
+                      </Typography>
+                      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                        {project.configurations.slice(0, 3).map((config: any, index: number) => (
+                          <Chip
+                            key={index}
+                            label={`${config.type} - ₹${config.price.toLocaleString()}`}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              fontSize: '0.75rem',
+                              height: '24px',
+                              borderColor: 'var(--color-primary)',
+                              color: 'var(--color-primary)',
+                              '&:hover': {
+                                backgroundColor: 'var(--color-primary)',
+                                color: 'white'
+                              }
+                            }}
+                          />
+                        ))}
+                        {project.configurations.length > 3 && (
+                          <Chip
+                            label={`+${project.configurations.length - 3} more`}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              fontSize: '0.75rem',
+                              height: '24px',
+                              borderColor: 'var(--color-border)',
+                              color: 'var(--color-text-muted)'
+                            }}
+                          />
+                        )}
+                      </Stack>
+                    </Box>
+                  )}
+
                   {/* Price and Stats */}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
