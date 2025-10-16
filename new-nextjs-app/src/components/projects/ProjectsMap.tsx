@@ -176,7 +176,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
           const marker = new window.mappls.Marker({
             map: mapInstanceRef.current,
-            position: { lat, lng },
+            position: [lng, lat], // Mappls expects [lng, lat] format
             icon: {
               url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                 <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
@@ -212,7 +212,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
                   </p>
                 </div>
               `,
-              position: { lat, lng }
+              position: [lng, lat] // Mappls expects [lng, lat] format
             });
 
             marker.addListener('click', () => {

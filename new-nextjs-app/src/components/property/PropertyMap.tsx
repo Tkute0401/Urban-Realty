@@ -133,7 +133,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           if (showMarker) {
             const marker = new window.mappls.Marker({
               map: mapInstanceRef.current,
-              position: { lat: latitude, lng: longitude },
+              position: [longitude, latitude], // Mappls expects [lng, lat] format
               fitbounds: false,
               icon: {
                 url: 'https://apis.mapmyindia.com/map_v3/1.png',

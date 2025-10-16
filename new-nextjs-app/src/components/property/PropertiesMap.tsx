@@ -413,7 +413,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           // Create a test marker with default coordinates (Delhi)
           const testMarker = new window.mappls.Marker({
             map: mapInstanceRef.current,
-            position: { lat: 28.6139, lng: 77.2090 }
+            position: [77.2090, 28.6139] // Mappls expects [lng, lat] format
           });
           markersRef.current = [testMarker];
           setMapLoaded(true);
@@ -436,6 +436,11 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           mapCenter = firstProperty.location!.coordinates;
           mapZoom = validProperties.length > 1 ? 10 : 12;
           console.log('Initializing map centered on first property:', mapCenter, 'from property:', firstProperty.title);
+          console.log('Property coordinates breakdown:', {
+            raw: firstProperty.location!.coordinates,
+            lng: firstProperty.location!.coordinates[0],
+            lat: firstProperty.location!.coordinates[1]
+          });
         } else {
           // Default to Delhi
           mapCenter = [77.2090, 28.6139];
