@@ -10,6 +10,7 @@ const MapTest: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [containerId] = useState(() => `map-test-container-${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
     if (typeof window === 'undefined' || mapInitialized) return;
@@ -58,12 +59,11 @@ const MapTest: React.FC = () => {
       try {
         await loadMapplsScript();
         
-        if (!mapRef.current) {
+        const container = document.getElementById(containerId) || mapRef.current;
+        if (!container) {
           setMapError('Map container not found');
           return;
         }
-
-        const container = mapRef.current;
         if (!container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
           setMapError('Map container not ready');
           return;
@@ -146,6 +146,7 @@ const MapTest: React.FC = () => {
       
       <div
         ref={mapRef}
+        id={containerId}
         style={{
           width: '100%',
           height: '100%',

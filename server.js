@@ -158,7 +158,7 @@ app.use('/api/v1/contacts', require('./server/src/api/routes/contactRoutes'));
 app.use('/api/v1/admin', require('./server/src/api/routes/adminRoutes'));
 app.use('/api/v1/subscriptions', require('./server/src/api/routes/subscriptionRoutes'));
 app.use('/api/v1/analytics', require('./server/src/api/routes/analyticsRoutes'));
-app.use('/api/v1/agent', require('./server/routes/agentRoutes'));
+app.use('/api/v1/agent', require('./server/src/api/routes/agentRoutes'));
 app.use('/media', require('./server/src/api/routes/mediaRoutes'));
 app.use('/api/v1/projects', require('./server/routes/projectRoutes'));
 app.use('/api/v1/developers', require('./server/src/api/routes/developerRoutes'));

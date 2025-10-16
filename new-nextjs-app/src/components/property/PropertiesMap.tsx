@@ -43,7 +43,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   console.log('🚀 PropertiesMap component rendering with:', {
     propertiesCount: properties?.length,
     userLocation,
-    selectedProperty: selectedProperty?._id
+    selectedProperty: selectedProperty?._id,
+    containerId
   });
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,12 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [containerId] = useState(() => `properties-map-container-${Math.random().toString(36).substr(2, 9)}`);
+
+  // Debug: Log when component mounts
+  useEffect(() => {
+    console.log('🔍 PropertiesMap component mounted, containerId:', containerId);
+  }, [containerId]);
 
   // Load Mappls script
   useEffect(() => {
@@ -316,12 +323,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       return;
     }
 
-    // Ensure mapRef.current exists
-    if (!mapRef.current) {
-      console.warn('Map ref not available');
-      return;
-    }
-
     // Clean up existing map
     if (mapInstanceRef.current) {
       try {
@@ -340,23 +341,32 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
         console.log('Initializing map with properties:', properties.length);
 
+        // Get the container element by ID instead of ref
+        const container = document.getElementById(containerId) || mapRef.current;
+        
+        if (!container) {
+          console.warn('Map container not found, retrying...');
+          setTimeout(initializeMap, 500);
+          return;
+        }
+
         // Verify the container element is valid and visible
-        const container = mapRef.current;
-        if (!container || !container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
+        if (!container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
           console.warn('Map container not ready, retrying...', {
             container: !!container,
             offsetParent: !!container?.offsetParent,
             width: container?.offsetWidth,
             height: container?.offsetHeight
           });
-          setTimeout(initializeMap, 1000);
+          setTimeout(initializeMap, 500);
           return;
         }
 
         console.log('Container ready:', {
           width: container.offsetWidth,
           height: container.offsetHeight,
-          visible: container.offsetParent !== null
+          visible: container.offsetParent !== null,
+          containerId
         });
 
         // Filter properties with valid coordinates
@@ -440,24 +450,31 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
     // Wait for the container to be ready with retry mechanism
     let retryCount = 0;
-    const maxRetries = 10;
+    const maxRetries = 20;
     
     const tryInitialize = () => {
-      const container = mapRef.current;
+      const container = document.getElementById(containerId) || mapRef.current;
       if (!container || !container.offsetParent || container.offsetWidth === 0 || container.offsetHeight === 0) {
         if (retryCount < maxRetries) {
           retryCount++;
-          console.log(`Map container not ready, retry ${retryCount}/${maxRetries}...`);
-          setTimeout(tryInitialize, 200);
+          console.log(`Map container not ready, retry ${retryCount}/${maxRetries}...`, {
+            container: !!container,
+            offsetParent: !!container?.offsetParent,
+            width: container?.offsetWidth,
+            height: container?.offsetHeight,
+            containerId
+          });
+          setTimeout(tryInitialize, 300);
         } else {
           setMapError('Map container failed to initialize after multiple retries');
         }
         return;
       }
+      console.log('Container is ready, initializing map...');
       initializeMap();
     };
     
-    const timer = setTimeout(tryInitialize, 1000);
+    const timer = setTimeout(tryInitialize, 500);
     
     return () => {
       clearTimeout(timer);
@@ -563,7 +580,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       
       <div
         ref={mapRef}
-        id={`properties-map-container-${Math.random().toString(36).substr(2, 9)}`}
+        id={containerId}
         style={{
           width: '100%',
           height: '100%',
