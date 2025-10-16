@@ -14,6 +14,8 @@ import {
   IconButton,
   CircularProgress,
   Alert,
+  Tabs,
+  Tab,
   useMediaQuery,
   useTheme as useMuiTheme,
   Card,
@@ -44,7 +46,6 @@ import { ThemeContext } from '@/contexts/ThemeProvider';
 import PropertyImageGallery from '@/components/property/PropertyImageGallery';
 import PropertyMap from '@/components/property/PropertyMap';
 import PropertySidebar from '@/components/property/PropertySidebar';
-import PropertyMoreInfo from '@/components/property/PropertyMoreInfo';
 import { formatPrice } from '@/lib/utils/format';
 import { toast } from 'react-toastify';
 import http from '@/lib/services/http';
@@ -52,6 +53,27 @@ import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyCard from '@/components/property/PropertyCard';
 import { Property } from '@/types/property';
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`property-tabpanel-${index}`}
+      aria-labelledby={`property-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 const PropertyDetailsPageContent: React.FC = () => {
   const params = useParams();
@@ -71,6 +93,7 @@ const PropertyDetailsPageContent: React.FC = () => {
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [similarPropertiesLoading, setSimilarPropertiesLoading] = useState(false);
   const [featuredPropertiesLoading, setFeaturedPropertiesLoading] = useState(false);
+  const [morePropertiesTab, setMorePropertiesTab] = useState(0);
 
   const isDark = theme === 'dark';
 
@@ -680,20 +703,9 @@ const PropertyDetailsPageContent: React.FC = () => {
                   Location & Nearby Places
                 </Typography>
                 
-                {property.location && property.location.coordinates && property.location.coordinates.length === 2 ? (
-                  <Box sx={{ mb: 3 }}>
-                    <PropertyMap
-                      latitude={property.location.coordinates[1]}
-                      longitude={property.location.coordinates[0]}
-                      address={fullAddress}
-                      height="400px"
-                    />
-                  </Box>
-                ) : (
-                  <Typography sx={{ color: 'var(--color-text-muted)', mb: 3 }}>
-                    Location information not available.
-                  </Typography>
-                )}
+                <Typography sx={{ color: 'var(--color-text-muted)', mb: 3 }}>
+                  View the interactive map in the sidebar for detailed location information.
+                </Typography>
 
                 {property.nearbyLocalities && (
                   <Box>
@@ -857,6 +869,217 @@ const PropertyDetailsPageContent: React.FC = () => {
                 </Paper>
               </motion.div>
             )}
+
+            {/* Brochure Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <Paper sx={{
+                p: { xs: 2, sm: 3 },
+                mb: 3,
+                background: 'var(--color-surface)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid var(--color-border)',
+                borderRadius: { xs: '8px', sm: '12px' },
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+              }}>
+                <Typography variant="h5" sx={{ 
+                  mb: 3, 
+                  color: 'var(--color-text-primary)',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <PictureAsPdf sx={{ color: 'var(--color-primary)' }} />
+                  Property Brochure & Virtual Tour
+                </Typography>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: 'var(--color-bg-secondary)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                          transform: 'translateY(-4px)'
+                        }
+                      }}
+                      onClick={() => {
+                        // In a real app, this would download the brochure PDF
+                        window.open('/api/placeholder/400/600', '_blank');
+                      }}
+                    >
+                      <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+                        <img
+                          src="/api/placeholder/400/600"
+                          alt="Property Brochure"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                        <Box sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: 'linear-gradient(45deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <Box sx={{ textAlign: 'center' }}>
+                            <PictureAsPdf sx={{ 
+                              fontSize: 48, 
+                              color: 'var(--color-primary)', 
+                              mb: 1 
+                            }} />
+                            <Typography variant="h6" sx={{ 
+                              color: 'white',
+                              fontWeight: 'bold'
+                            }}>
+                              Download Brochure
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                      
+                      <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                        <Typography variant="h6" sx={{ 
+                          fontWeight: 'bold', 
+                          color: 'var(--color-text-primary)',
+                          mb: 1
+                        }}>
+                          Property Brochure PDF
+                        </Typography>
+                        
+                        <Typography variant="body2" sx={{ 
+                          color: 'var(--color-text-muted)',
+                          mb: 2
+                        }}>
+                          Download the complete property brochure with detailed information, floor plans, and amenities.
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Download sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                          <Typography variant="body2" sx={{ color: 'var(--color-primary)' }}>
+                            Click to download
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                      </Card>
+                    </motion.div>
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        background: 'var(--color-bg-secondary)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                          transform: 'translateY(-4px)'
+                        }
+                      }}
+                      onClick={() => {
+                        // In a real app, this would open the virtual tour
+                        if (property.virtualTour?.url) {
+                          window.open(property.virtualTour.url, '_blank');
+                        }
+                      }}
+                    >
+                      <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+                        <img
+                          src="/api/placeholder/400/600"
+                          alt="Virtual Tour"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                        <Box sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: 'linear-gradient(45deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <Box sx={{ textAlign: 'center' }}>
+                            <VideoLibrary sx={{ 
+                              fontSize: 48, 
+                              color: 'var(--color-primary)', 
+                              mb: 1 
+                            }} />
+                            <Typography variant="h6" sx={{ 
+                              color: 'white',
+                              fontWeight: 'bold'
+                            }}>
+                              Virtual Tour
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                      
+                      <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                        <Typography variant="h6" sx={{ 
+                          fontWeight: 'bold', 
+                          color: 'var(--color-text-primary)',
+                          mb: 1
+                        }}>
+                          360° Virtual Tour
+                        </Typography>
+                        
+                        <Typography variant="body2" sx={{ 
+                          color: 'var(--color-text-muted)',
+                          mb: 2
+                        }}>
+                          Take a virtual walkthrough of the property with our interactive 360° tour experience.
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <PlayArrow sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
+                          <Typography variant="body2" sx={{ color: 'var(--color-primary)' }}>
+                            Start virtual tour
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                      </Card>
+                    </motion.div>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </motion.div>
           </Grid>
 
           {/* Property Sidebar */}
@@ -871,10 +1094,6 @@ const PropertyDetailsPageContent: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* More Information Section */}
-        <Box sx={{ mt: 4 }}>
-          <PropertyMoreInfo property={property} />
-        </Box>
 
         {/* Similar Properties Section */}
         <motion.div
@@ -900,20 +1119,29 @@ const PropertyDetailsPageContent: React.FC = () => {
                 More Properties
               </Typography>
 
-              {/* Similar Properties Section */}
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h5" sx={{ 
-                  mb: 3, 
-                  color: 'var(--color-text-primary)',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1
-                }}>
-                  <Home sx={{ color: 'var(--color-primary)' }} />
-                  Similar Properties
-                </Typography>
+              <Tabs
+                value={morePropertiesTab}
+                onChange={(_, newValue) => setMorePropertiesTab(newValue)}
+                variant={isMobile ? "scrollable" : "standard"}
+                scrollButtons="auto"
+                sx={{
+                  borderBottom: '1px solid var(--color-border)',
+                  mb: 3,
+                  '& .MuiTab-root': {
+                    color: 'var(--color-text-muted)',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    minHeight: { xs: 48, sm: 64 },
+                    '&.Mui-selected': {
+                      color: 'var(--color-primary)'
+                    }
+                  }
+                }}
+              >
+                <Tab label="Similar Properties" />
+                <Tab label="Featured Properties" />
+              </Tabs>
 
+              <TabPanel value={morePropertiesTab} index={0}>
                 {similarPropertiesLoading ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                     <CircularProgress size={40} sx={{ color: 'var(--color-primary)' }} />
@@ -1021,11 +1249,11 @@ const PropertyDetailsPageContent: React.FC = () => {
                               </Box>
                             </Box>
                           </CardContent>
-                          </Card>
-                        </motion.div>
-                      </Grid>
-                    ))}
-                  </Grid>
+                        </Card>
+                      </motion.div>
+                    </Grid>
+                  ))}
+                </Grid>
                 ) : (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
                     <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
@@ -1033,21 +1261,9 @@ const PropertyDetailsPageContent: React.FC = () => {
                     </Typography>
                   </Box>
                 )}
-              </Box>
+              </TabPanel>
 
-              {/* Featured Properties Section */}
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h5" sx={{ 
-                  mb: 3, 
-                  color: 'var(--color-text-primary)',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1
-                }}>
-                  <Star sx={{ color: 'var(--color-primary)' }} />
-                  Featured Properties
-                </Typography>
+              <TabPanel value={morePropertiesTab} index={1}>
                 {featuredPropertiesLoading ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                     <CircularProgress size={40} sx={{ color: 'var(--color-primary)' }} />
@@ -1079,219 +1295,11 @@ const PropertyDetailsPageContent: React.FC = () => {
                     </Typography>
                   </Box>
                 )}
-              </Box>
+              </TabPanel>
             </Paper>
           </Box>
         </motion.div>
 
-        {/* Brochure Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <Box sx={{ mt: 6 }}>
-            <Paper sx={{
-              background: 'var(--color-surface)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid var(--color-border)',
-              borderRadius: { xs: '8px', sm: '12px' },
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              p: { xs: 2, sm: 3 }
-            }}>
-              <Typography variant="h4" sx={{ 
-                mb: 3, 
-                color: 'var(--color-text-primary)',
-                fontWeight: 'bold',
-                textAlign: 'center'
-              }}>
-                Property Brochure
-              </Typography>
-
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      background: 'var(--color-bg-secondary)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                        transform: 'translateY(-4px)'
-                      }
-                    }}
-                    onClick={() => {
-                      // In a real app, this would download the brochure PDF
-                      window.open('/api/placeholder/400/600', '_blank');
-                    }}
-                  >
-                    <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                      <img
-                        src="/api/placeholder/400/600"
-                        alt="Property Brochure"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
-                      <Box sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'linear-gradient(45deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <PictureAsPdf sx={{ 
-                            fontSize: 48, 
-                            color: 'var(--color-primary)', 
-                            mb: 1 
-                          }} />
-                          <Typography variant="h6" sx={{ 
-                            color: 'white',
-                            fontWeight: 'bold'
-                          }}>
-                            Download Brochure
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                    
-                    <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                      <Typography variant="h6" sx={{ 
-                        fontWeight: 'bold', 
-                        color: 'var(--color-text-primary)',
-                        mb: 1
-                      }}>
-                        Property Brochure PDF
-                      </Typography>
-                      
-                      <Typography variant="body2" sx={{ 
-                        color: 'var(--color-text-muted)',
-                        mb: 2
-                      }}>
-                        Download the complete property brochure with detailed information, floor plans, and amenities.
-                      </Typography>
-
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Download sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
-                        <Typography variant="body2" sx={{ color: 'var(--color-primary)' }}>
-                          Click to download
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                    </Card>
-                  </motion.div>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Card sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      background: 'var(--color-bg-secondary)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                        transform: 'translateY(-4px)'
-                      }
-                    }}
-                    onClick={() => {
-                      // In a real app, this would open the virtual tour
-                      if (property.virtualTour?.url) {
-                        window.open(property.virtualTour.url, '_blank');
-                      }
-                    }}
-                  >
-                    <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                      <img
-                        src="/api/placeholder/400/600"
-                        alt="Virtual Tour"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
-                      <Box sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'linear-gradient(45deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <VideoLibrary sx={{ 
-                            fontSize: 48, 
-                            color: 'var(--color-primary)', 
-                            mb: 1 
-                          }} />
-                          <Typography variant="h6" sx={{ 
-                            color: 'white',
-                            fontWeight: 'bold'
-                          }}>
-                            Virtual Tour
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                    
-                    <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                      <Typography variant="h6" sx={{ 
-                        fontWeight: 'bold', 
-                        color: 'var(--color-text-primary)',
-                        mb: 1
-                      }}>
-                        360° Virtual Tour
-                      </Typography>
-                      
-                      <Typography variant="body2" sx={{ 
-                        color: 'var(--color-text-muted)',
-                        mb: 2
-                      }}>
-                        Take a virtual walkthrough of the property with our interactive 360° tour experience.
-                      </Typography>
-
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <PlayArrow sx={{ fontSize: 16, color: 'var(--color-primary)' }} />
-                        <Typography variant="body2" sx={{ color: 'var(--color-primary)' }}>
-                          Start virtual tour
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                    </Card>
-                  </motion.div>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Box>
-        </motion.div>
 
         {/* Back to Top Button */}
         {showBackToTop && (
