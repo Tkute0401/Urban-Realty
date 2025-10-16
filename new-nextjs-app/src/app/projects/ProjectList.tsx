@@ -271,7 +271,7 @@ const ProjectList = () => {
                 <CardMedia
                   component="img"
                   height="200"
-                  image={project.images?.[0]?.url || '/placeholder-project.jpg'}
+                  image={typeof project.images?.[0] === 'string' ? project.images[0] : (project.images?.[0]?.url || '/placeholder-project.jpg')}
                   alt={project.name}
                   sx={{ objectFit: 'cover' }}
                 />
