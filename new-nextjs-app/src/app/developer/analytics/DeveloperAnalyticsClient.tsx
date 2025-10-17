@@ -525,7 +525,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
                     />
                     <LinearProgress 
                       variant="determinate" 
-                      value={((count as number) / Math.max(...Object.values(performance.inquirySources || {}))) * 100} 
+                      value={((count as number) / Math.max(...(Object.values(performance.inquirySources || {}) as number[]))) * 100} 
                       sx={{ width: 100, mr: 2 }}
                     />
                   </ListItem>
