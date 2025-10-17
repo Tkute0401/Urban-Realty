@@ -112,7 +112,7 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
 
       {/* Contact Agent Card */}
       <PremiumPaper sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, color: 'var(--color-primary)' }}>
+        <Typography variant="h5" sx={{ fontWeight: 900, mb: 3, color: 'var(--color-secondary)' }}>
           Contact Agent
         </Typography>
         
