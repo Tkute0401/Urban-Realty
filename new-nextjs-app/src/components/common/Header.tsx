@@ -271,7 +271,6 @@ const Header: React.FC = () => {
 
             <button onClick={toggleTheme} className="nav-item theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
               {theme === 'light' ? <MoonIcon className="nav-icon" /> : <SunIcon className="nav-icon" />}
-              <span className="theme-label">{theme === 'light' ? 'Dark' : 'Light'}</span>
             </button>
 
             {/* Role-specific navigation items */}
