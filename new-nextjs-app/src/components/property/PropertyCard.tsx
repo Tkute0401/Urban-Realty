@@ -139,25 +139,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <Card 
         sx={{ 
           cursor: 'pointer',
-          borderRadius: '20px',
+          borderRadius: '24px',
           overflow: 'hidden',
           backgroundColor: 'var(--color-surface)',
           border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
           boxShadow: isSelected 
-            ? '0 20px 40px rgba(247, 107, 28, 0.25), 0 0 0 1px rgba(247, 107, 28, 0.1)' 
-            : '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1)',
+            ? '0 22px 44px rgba(247, 107, 28, 0.25), 0 0 0 1px rgba(247, 107, 28, 0.1)' 
+            : '0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
-          maxWidth: '380px',
+          maxWidth: '420px',
           height: 'auto',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
           background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(247, 107, 28, 0.02) 100%)',
           '&:hover': {
-            boxShadow: '0 25px 50px rgba(247, 107, 28, 0.15), 0 0 0 1px rgba(247, 107, 28, 0.1)',
+            boxShadow: '0 28px 56px rgba(247, 107, 28, 0.18), 0 0 0 1px rgba(247, 107, 28, 0.1)',
             border: '2px solid var(--color-primary)',
-            transform: 'translateY(-4px)'
+            transform: 'translateY(-6px)'
           }
         }}
         onClick={handleClick}
@@ -184,7 +184,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       {/* Image Section */}
       <Box sx={{ 
         position: 'relative', 
-        height: '240px', 
+        height: '260px', 
         flexShrink: 0,
         overflow: 'hidden',
         '&::before': {
@@ -299,7 +299,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </Box>
 
       {/* Content Section simplified */}
-      <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+      <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 1.75 }}>
         <Typography 
           variant="h6" 
           sx={{ fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -312,25 +312,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           {property.address?.city}{property.address?.state ? `, ${property.address.state}` : ''}
         </Typography>
 
-        <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--color-primary)', mt: 1 }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--color-primary)', mt: 1 }}>
           {formatPrice(property.price)}{property.status === 'For Rent' ? ' /mo' : ''}
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 2, mt: 1, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 2.5, mt: 1.5, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Bed sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+            <Bed sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
             <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
               {property.bedrooms || 0} BHK
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Bathtub sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+            <Bathtub sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
             <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
               {property.bathrooms || 0} Bath
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Home sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+            <Home sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
             <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
               {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
             </Typography>
