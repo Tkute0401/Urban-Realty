@@ -481,7 +481,7 @@ const DeveloperDashboardClient = () => {
           <Grid item xs={12} md={4}>
             <Card>
               <CardContent>
-                <Typography variant="h6" fontWeight="bold" mb={3}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
                   Recent Inquiries
                 </Typography>
                 <List>
@@ -510,9 +510,9 @@ const DeveloperDashboardClient = () => {
 
         {/* Performance Chart */}
         {dashboard.monthlyData && dashboard.monthlyData.length > 0 && (
-          <Card mb={4}>
+          <Card sx={{ mb: 4 }}>
             <CardContent>
-              <Typography variant="h6" fontWeight="bold" mb={3}>
+              <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
                 Project Performance
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
