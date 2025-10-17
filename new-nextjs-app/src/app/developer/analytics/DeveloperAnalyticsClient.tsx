@@ -422,7 +422,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={Object.entries(performance.inquiryStatusBreakdown || {}).map(([status, count]) => ({ name: status, value: count }))}
+                    data={Object.entries(performance.inquiryStatusBreakdown || {}).map(([status, count]: [string, any]) => ({ name: status, value: count }))}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -517,7 +517,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
                 Inquiry Sources
               </Typography>
               <List>
-                {Object.entries(performance.inquirySources || {}).map(([source, count]) => (
+                {Object.entries(performance.inquirySources || {}).map(([source, count]: [string, any]) => (
                   <ListItem key={source}>
                     <ListItemText
                       primary={source}
@@ -525,7 +525,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
                     />
                     <LinearProgress 
                       variant="determinate" 
-                      value={(count / Math.max(...Object.values(performance.inquirySources || {}))) * 100} 
+                      value={((count as number) / Math.max(...Object.values(performance.inquirySources || {}))) * 100} 
                       sx={{ width: 100, mr: 2 }}
                     />
                   </ListItem>
