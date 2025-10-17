@@ -30,3 +30,4 @@ export default function DeveloperAnalyticsPage() {
 
   return <DeveloperAnalyticsClient />;
 }
+

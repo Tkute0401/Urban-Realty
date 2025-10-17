@@ -149,10 +149,8 @@ const AdminDashboard: React.FC = () => {
     }
   });
 
-  const { data: dashboardData, isLoading, error, refetch: refetchDashboard, isFetching: dashboardFetching } = useAdminDashboard();
-  const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError, isFetching: analyticsFetching } = useAdminAnalytics({
-    timeframe: filters.dateRange + 'd'
-  });
+  const { data: dashboardData, isLoading, error, refetch: refetchDashboard } = useAdminDashboard();
+  const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useAdminAnalytics();
 
   const refreshMutation = useMutation({
     mutationFn: async () => {
@@ -367,21 +365,11 @@ const AdminDashboard: React.FC = () => {
       >
         <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} mb={4} gap={2}>
           <Box>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
-                color: 'var(--color-primary)'
-              }}>
-                Admin Dashboard 🚀
-              </Typography>
-              {(dashboardFetching || analyticsFetching) && (
-                <Box display="flex" alignItems="center" gap={1}>
-                  <CircularProgress size={16} />
-                  <Typography variant="caption" color="text.secondary">
-                    Updating...
-                  </Typography>
-                </Box>
-              )}
-            </Box>
+            <Typography variant="h3" gutterBottom fontWeight="bold" sx={{ 
+              color: 'var(--color-primary)'
+            }}>
+              Admin Dashboard 🚀
+            </Typography>
             <Typography variant="h6" color="text.secondary">
               Complete overview of your real estate platform
             </Typography>

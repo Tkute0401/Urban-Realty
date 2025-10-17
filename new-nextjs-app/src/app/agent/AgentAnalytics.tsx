@@ -331,7 +331,9 @@ const AgentAnalytics = () => {
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
                                 <LocationIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                {property.location}
+                                {typeof property.location === 'string' 
+                                  ? property.location 
+                                  : `${property.location?.city || ''}, ${property.location?.state || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Location not specified'}
                               </Typography>
                             </Box>
                           </Box>

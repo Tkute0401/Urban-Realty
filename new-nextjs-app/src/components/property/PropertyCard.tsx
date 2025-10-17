@@ -144,26 +144,30 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -8, scale: 1.02 }}
     >
       <Card 
         sx={{ 
           cursor: 'pointer',
-          borderRadius: '12px',
+          borderRadius: '20px',
           overflow: 'hidden',
           backgroundColor: 'var(--color-surface)',
-          border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-          boxShadow: isSelected ? '0 8px 25px rgba(247, 107, 28, 0.3)' : 'none',
-          transition: 'all 0.3s ease',
+          border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
+          boxShadow: isSelected 
+            ? '0 20px 40px rgba(247, 107, 28, 0.25), 0 0 0 1px rgba(247, 107, 28, 0.1)' 
+            : '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
-          maxWidth: '350px',
-          height: '520px',
+          maxWidth: '380px',
+          height: '580px',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
+          background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(247, 107, 28, 0.02) 100%)',
           '&:hover': {
-            boxShadow: '0 8px 25px rgba(247, 107, 28, 0.2)',
-            border: '1px solid var(--color-primary)'
+            boxShadow: '0 25px 50px rgba(247, 107, 28, 0.15), 0 0 0 1px rgba(247, 107, 28, 0.1)',
+            border: '2px solid var(--color-primary)',
+            transform: 'translateY(-4px)'
           }
         }}
         onClick={handleClick}
@@ -173,16 +177,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <Box
           sx={{
             position: 'absolute',
-            top: 12,
-            left: 12,
-            zIndex: 1,
-            px: 2,
-            py: 1,
-            borderRadius: '6px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            backgroundColor: property.status === 'For Sale' ? 'var(--color-primary)' : 'var(--color-error)',
-            color: property.status === 'For Sale' ? 'var(--color-primary-contrast)' : 'var(--color-white)'
+            top: 16,
+            left: 16,
+            zIndex: 2,
+            px: 3,
+            py: 1.5,
+            borderRadius: '12px',
+            fontSize: '13px',
+            fontWeight: '700',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            backgroundColor: property.status === 'For Sale' 
+              ? 'linear-gradient(135deg, var(--color-primary) 0%, #FF8C42 100%)' 
+              : 'linear-gradient(135deg, var(--color-error) 0%, #FF6B6B 100%)',
+            color: 'var(--color-white)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
           }}
         >
           {property.status}
@@ -190,19 +201,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       )}
 
       {/* Image Section */}
-      <Box sx={{ position: 'relative', height: '200px', flexShrink: 0 }}>
+      <Box sx={{ 
+        position: 'relative', 
+        height: '240px', 
+        flexShrink: 0,
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }
+      }}>
         {property.images?.length > 0 ? (
           <>
             {!imageLoaded && (
               <Box sx={{
                 position: 'absolute',
                 inset: 0,
-                background: 'var(--color-bg)',
+                background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(247, 107, 28, 0.05) 100%)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                zIndex: 1
               }}>
-                <CircularProgress size={32} sx={{ color: 'var(--color-primary)' }} />
+                <CircularProgress size={40} sx={{ color: 'var(--color-primary)' }} />
               </Box>
             )}
             <CardMedia
@@ -211,8 +239,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               alt={property.title}
               sx={{
                 height: '100%',
+                width: '100%',
+                objectFit: 'cover',
                 opacity: imageLoaded ? 1 : 0,
-                transition: 'opacity 0.3s ease'
+                transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: imageLoaded ? 'scale(1)' : 'scale(1.1)',
+                filter: 'brightness(0.95) contrast(1.05)'
               }}
               onLoad={() => setImageLoaded(true)}
             />
@@ -221,12 +253,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <Box sx={{
             width: '100%',
             height: '100%',
-            background: 'var(--color-bg)',
+            background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(247, 107, 28, 0.05) 100%)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: 2
           }}>
-            <Home sx={{ color: 'var(--color-primary)', opacity: 0.5, fontSize: 48 }} />
+            <Home sx={{ color: 'var(--color-primary)', opacity: 0.6, fontSize: 56 }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', fontSize: '14px' }}>
+              No Image Available
+            </Typography>
           </Box>
         )}
         
@@ -236,51 +273,105 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             component="button"
             sx={{
               position: 'absolute',
-              top: { xs: 8, sm: 16 },
-              right: { xs: 8, sm: 16 },
-              p: { xs: 1.5, sm: 2 },
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              backdropFilter: 'blur(4px)',
+              top: 16,
+              right: 16,
+              p: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(12px)',
               borderRadius: '50%',
-              border: 'none',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              zIndex: 2,
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 1)'
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+                transform: 'scale(1.1)',
+                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
               }
             }}
             onClick={handleFavoriteClick}
             disabled={loadingFavorite}
           >
             {loadingFavorite ? (
-              <CircularProgress size={20} sx={{ color: 'var(--color-white)' }} />
+              <CircularProgress size={22} sx={{ color: 'var(--color-primary)' }} />
             ) : isFavorite ? (
-              <Favorite sx={{ color: 'var(--color-error)', fontSize: { xs: 16, sm: 20 } }} />
+              <Favorite sx={{ 
+                color: 'var(--color-error)', 
+                fontSize: 22,
+                filter: 'drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3))'
+              }} />
             ) : (
-              <FavoriteBorder sx={{ color: 'var(--color-white)', fontSize: { xs: 16, sm: 20 } }} />
+              <FavoriteBorder sx={{ 
+                color: 'var(--color-text-muted)', 
+                fontSize: 22,
+                '&:hover': {
+                  color: 'var(--color-error)'
+                }
+              }} />
             )}
           </Box>
         </Tooltip>
       </Box>
 
       {/* Content Section */}
-      <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <CardContent sx={{ 
+        p: 4, 
+        flexGrow: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        background: 'linear-gradient(180deg, transparent 0%, rgba(247, 107, 28, 0.02) 100%)'
+      }}>
         {/* Rating and Type */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} sx={{ color: 'var(--color-warning)', fontSize: { xs: 12, sm: 16 } }} />
-            ))}
-            <Typography variant="caption" sx={{ color: 'var(--color-text-muted)', ml: 1, fontSize: { xs: '12px', sm: '14px' } }}>
-              5.0 (??)
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 3,
+          p: 2,
+          backgroundColor: 'rgba(247, 107, 28, 0.05)',
+          borderRadius: '12px',
+          border: '1px solid rgba(247, 107, 28, 0.1)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} sx={{ 
+                  color: 'var(--color-warning)', 
+                  fontSize: 16,
+                  filter: 'drop-shadow(0 1px 2px rgba(245, 158, 11, 0.3))'
+                }} />
+              ))}
+            </Box>
+            <Typography variant="caption" sx={{ 
+              color: 'var(--color-text-primary)', 
+              ml: 1, 
+              fontSize: '14px',
+              fontWeight: 600
+            }}>
+              5.0 (24 reviews)
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1.5,
+            px: 2,
+            py: 1,
+            backgroundColor: 'var(--color-primary)',
+            borderRadius: '8px',
+            color: 'var(--color-white)'
+          }}>
             {getPropertyTypeIcon()}
-            <Typography variant="caption" sx={{ color: 'var(--color-primary)', textTransform: 'capitalize', fontSize: { xs: '12px', sm: '14px' } }}>
+            <Typography variant="caption" sx={{ 
+              textTransform: 'uppercase', 
+              fontSize: '12px',
+              fontWeight: 700,
+              letterSpacing: '0.5px'
+            }}>
               {property.type || 'Property'}
             </Typography>
           </Box>
@@ -288,31 +379,56 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         
         {/* Title */}
         <Typography 
-          variant="h6" 
+          variant="h5" 
           sx={{ 
-            fontWeight: 'bold', 
+            fontWeight: 700, 
             color: 'var(--color-text-primary)', 
-            mb: { xs: 1, sm: 2 },
-            fontSize: { xs: '18px', sm: '20px' },
+            mb: 2,
+            fontSize: '22px',
+            lineHeight: 1.3,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            background: 'linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-primary) 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
           }}
         >
           {property.buildingName || property.title}
         </Typography>
         
         {/* Location */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, mb: { xs: 2, sm: 3 } }}>
-          <LocationOn sx={{ color: 'var(--color-primary)', fontSize: { xs: 12, sm: 16 } }} />
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 2, 
+          mb: 3,
+          p: 2,
+          backgroundColor: 'rgba(26, 43, 255, 0.05)',
+          borderRadius: '10px',
+          border: '1px solid rgba(26, 43, 255, 0.1)'
+        }}>
+          <Box sx={{
+            p: 1,
+            backgroundColor: 'var(--color-secondary)',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <LocationOn sx={{ color: 'var(--color-white)', fontSize: 18 }} />
+          </Box>
           <Typography 
             variant="body2" 
             sx={{ 
-              color: 'var(--color-primary)',
-              fontSize: { xs: '12px', sm: '14px' },
+              color: 'var(--color-text-primary)',
+              fontSize: '14px',
+              fontWeight: 500,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              flex: 1
             }}
           >
             {property.address?.street && `${property.address.street}, `}
@@ -325,68 +441,200 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           variant="body2" 
           sx={{ 
             color: 'var(--color-text-muted)', 
-            mb: { xs: 3, sm: 4 },
-            fontSize: { xs: '12px', sm: '14px' },
+            mb: 4,
+            fontSize: '14px',
+            lineHeight: 1.6,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
             WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical'
+            WebkitBoxOrient: 'vertical',
+            fontStyle: 'italic'
           }}
         >
           {property.description || 'No description available'}
         </Typography>
         
         {/* Features */}
-        <Box sx={{ display: 'flex', gap: { xs: 3, sm: 6 }, mb: { xs: 3, sm: 4 } }}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          gap: 2, 
+          mb: 4,
+          p: 3,
+          backgroundColor: 'rgba(247, 107, 28, 0.03)',
+          borderRadius: '12px',
+          border: '1px solid rgba(247, 107, 28, 0.08)'
+        }}>
           <Tooltip title="Area" arrow>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Home sx={{ color: 'var(--color-primary)', fontSize: { xs: 14, sm: 16 } }} />
-              <Typography variant="caption" sx={{ color: 'var(--color-text-primary)', fontSize: { xs: '12px', sm: '14px' } }}>
-                {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: 'center', 
+              gap: 1,
+              p: 2,
+              backgroundColor: 'var(--color-white)',
+              borderRadius: '10px',
+              border: '1px solid rgba(247, 107, 28, 0.1)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(247, 107, 28, 0.05)',
+                transform: 'translateY(-2px)'
+              }
+            }}>
+              <Home sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-primary)', 
+                fontSize: '12px',
+                fontWeight: 600,
+                textAlign: 'center'
+              }}>
+                {property.area ? `${property.area.toLocaleString()}` : 'N/A'}
+              </Typography>
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-muted)', 
+                fontSize: '10px',
+                textAlign: 'center'
+              }}>
+                sqft
               </Typography>
             </Box>
           </Tooltip>
           
           <Tooltip title="Bedrooms" arrow>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Bed sx={{ color: 'var(--color-primary)', fontSize: { xs: 14, sm: 16 } }} />
-              <Typography variant="caption" sx={{ color: 'var(--color-text-primary)', fontSize: { xs: '12px', sm: '14px' } }}>
-                {property.bedrooms || '0'} Bed
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: 'center', 
+              gap: 1,
+              p: 2,
+              backgroundColor: 'var(--color-white)',
+              borderRadius: '10px',
+              border: '1px solid rgba(247, 107, 28, 0.1)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(247, 107, 28, 0.05)',
+                transform: 'translateY(-2px)'
+              }
+            }}>
+              <Bed sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-primary)', 
+                fontSize: '12px',
+                fontWeight: 600,
+                textAlign: 'center'
+              }}>
+                {property.bedrooms || '0'}
+              </Typography>
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-muted)', 
+                fontSize: '10px',
+                textAlign: 'center'
+              }}>
+                Bed
               </Typography>
             </Box>
           </Tooltip>
           
           <Tooltip title="Bathrooms" arrow>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
-              <Bathtub sx={{ color: 'var(--color-primary)', fontSize: { xs: 14, sm: 16 } }} />
-              <Typography variant="caption" sx={{ color: 'var(--color-text-primary)', fontSize: { xs: '12px', sm: '14px' } }}>
-                {property.bathrooms || '0'} Bath
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: 'center', 
+              gap: 1,
+              p: 2,
+              backgroundColor: 'var(--color-white)',
+              borderRadius: '10px',
+              border: '1px solid rgba(247, 107, 28, 0.1)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(247, 107, 28, 0.05)',
+                transform: 'translateY(-2px)'
+              }
+            }}>
+              <Bathtub sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-primary)', 
+                fontSize: '12px',
+                fontWeight: 600,
+                textAlign: 'center'
+              }}>
+                {property.bathrooms || '0'}
+              </Typography>
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-muted)', 
+                fontSize: '10px',
+                textAlign: 'center'
+              }}>
+                Bath
               </Typography>
             </Box>
           </Tooltip>
         </Box>
         
         {/* Price and CTA */}
-        <Box sx={{ pt: 3, borderTop: '1px solid var(--color-border)', mt: 'auto' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)', fontSize: { xs: '20px', sm: '24px' } }}>
-              {formatPrice(property.price)}
-              {property.status === 'For Rent' && (
-                <Typography component="span" variant="caption" sx={{ color: 'var(--color-text-muted)', fontSize: { xs: '12px', sm: '14px' } }}>
-                  /mo
-                </Typography>
-              )}
-            </Typography>
+        <Box sx={{ 
+          pt: 4, 
+          borderTop: '2px solid rgba(247, 107, 28, 0.1)', 
+          mt: 'auto',
+          background: 'linear-gradient(135deg, rgba(247, 107, 28, 0.02) 0%, transparent 100%)'
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            mb: 3,
+            p: 3,
+            backgroundColor: 'var(--color-white)',
+            borderRadius: '12px',
+            border: '1px solid rgba(247, 107, 28, 0.1)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
+          }}>
+            <Box>
+              <Typography variant="h4" sx={{ 
+                fontWeight: 800, 
+                color: 'var(--color-text-primary)', 
+                fontSize: '28px',
+                lineHeight: 1.2,
+                background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                {formatPrice(property.price)}
+                {property.status === 'For Rent' && (
+                  <Typography component="span" variant="body2" sx={{ 
+                    color: 'var(--color-text-muted)', 
+                    fontSize: '16px',
+                    fontWeight: 500,
+                    ml: 1
+                  }}>
+                    /mo
+                  </Typography>
+                )}
+              </Typography>
+              <Typography variant="caption" sx={{ 
+                color: 'var(--color-text-muted)', 
+                fontSize: '12px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                {property.status || 'For Sale'}
+              </Typography>
+            </Box>
             {property.projectDetails?.launchDate && (
               <Box
                 sx={{
-                  backgroundColor: 'var(--color-primary-light)',
-                  color: 'var(--color-primary)',
-                  px: 2,
-                  py: 1,
-                  borderRadius: '4px',
-                  fontSize: '12px'
+                  background: 'linear-gradient(135deg, var(--color-primary) 0%, #FF8C42 100%)',
+                  color: 'var(--color-white)',
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  boxShadow: '0 4px 12px rgba(247, 107, 28, 0.3)'
                 }}
               >
                 {typeof window !== 'undefined' && new Date(property.projectDetails.launchDate) > new Date() ? 
@@ -399,24 +647,32 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <motion.button
             style={{
               width: '100%',
-              backgroundColor: 'transparent',
-              border: '1px solid var(--color-primary)',
-              color: 'var(--color-text-primary)',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: 500,
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, #FF8C42 100%)',
+              border: 'none',
+              color: 'var(--color-white)',
+              padding: '16px 24px',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: 700,
               cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              boxShadow: '0 4px 15px rgba(247, 107, 28, 0.3)',
+              position: 'relative',
+              overflow: 'hidden'
             }}
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ 
+              scale: 1.02,
+              boxShadow: '0 8px 25px rgba(247, 107, 28, 0.4)'
+            }}
             whileTap={{ scale: 0.98 }}
             onClick={(e) => {
               e.stopPropagation();
               handleClick();
             }}
           >
-            View Details
+            <span style={{ position: 'relative', zIndex: 1 }}>View Details</span>
           </motion.button>
         </Box>
       </CardContent>
@@ -431,8 +687,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             content: '""',
             position: 'absolute',
             inset: 0,
-            border: '2px solid var(--color-primary)',
-            borderRadius: { xs: '12px', sm: '24px' },
+            border: '3px solid var(--color-primary)',
+            borderRadius: '20px',
             opacity: 0,
             animation: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite'
           }

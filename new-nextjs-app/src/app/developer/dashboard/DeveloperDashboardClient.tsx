@@ -448,7 +448,9 @@ const DeveloperDashboardClient = () => {
                         secondary={
                           <Box>
                             <Typography variant="body2" color="text.secondary">
-                              {project.location?.address || project.location?.city || 'Location not specified'}
+                              {typeof project.location === 'object' && project.location !== null 
+                                ? `${project.location?.address || ''} ${project.location?.city || ''}`.trim() || 'Location not specified'
+                                : project.location || 'Location not specified'}
                             </Typography>
                             <Box display="flex" alignItems="center" gap={1} mt={0.5}>
                               <LocationIcon sx={{ fontSize: 14, mr: 0.5 }} />

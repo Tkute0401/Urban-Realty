@@ -32,6 +32,24 @@ router
   .route('/profile/me')
   .get(protect, authorize('developer'), getMyDeveloperProfile);
 
+// Developer dashboard and analytics routes (MUST come before /:id route)
+router
+  .route('/dashboard')
+  .get(protect, authorize('developer'), getDeveloperDashboard);
+
+router
+  .route('/analytics')
+  .get(protect, authorize('developer'), getDeveloperAnalytics);
+
+router
+  .route('/inquiries')
+  .get(protect, authorize('developer'), getDeveloperInquiries);
+
+router
+  .route('/inquiries/:inquiryId')
+  .put(protect, authorize('developer'), updateDeveloperInquiry);
+
+// Dynamic routes (MUST come after specific routes)
 router
   .route('/:id')
   .get(getDeveloper)
@@ -50,23 +68,6 @@ router
     upload.single('logo'),
     uploadDeveloperLogo
   );
-
-// Developer dashboard and analytics routes
-router
-  .route('/dashboard')
-  .get(protect, authorize('developer'), getDeveloperDashboard);
-
-router
-  .route('/analytics')
-  .get(protect, authorize('developer'), getDeveloperAnalytics);
-
-router
-  .route('/inquiries')
-  .get(protect, authorize('developer'), getDeveloperInquiries);
-
-router
-  .route('/inquiries/:inquiryId')
-  .put(protect, authorize('developer'), updateDeveloperInquiry);
 
 module.exports = router;
 
