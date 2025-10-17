@@ -89,7 +89,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
   });
 
   // Use real analytics data from API
-  const analytics = analyticsData?.data || analyticsData || {
+  const analytics = (analyticsData as any)?.data || analyticsData || {
     overview: {
       totalProjects: 0,
       activeProjects: 0,
@@ -374,7 +374,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
                   <Typography variant="h4" fontWeight="bold" color="var(--color-primary)">
-                    {analytics?.trends?.growthRate || 0}%
+                    {(analytics as any)?.trends?.growthRate || 0}%
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Growth Rate
@@ -399,7 +399,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
                 Project Performance Over Time
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={analytics?.monthlyData || []}>
+                <AreaChart data={(analytics as any)?.monthlyData || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
@@ -543,7 +543,7 @@ const DeveloperAnalyticsClient: React.FC = () => {
                 Recent Activity
               </Typography>
               <List>
-                {(analytics?.recentActivity || []).slice(0, 5).map((activity, index) => (
+                {((analytics as any)?.recentActivity || []).slice(0, 5).map((activity, index) => (
                   <ListItem key={index} divider>
                     <ListItemAvatar>
                       <Avatar sx={{ bgcolor: 'var(--color-primary)' }}>
