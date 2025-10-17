@@ -1306,12 +1306,13 @@ const PropertiesPageContent: React.FC = () => {
             gap: { xs: 2, md: 3 }, 
             flexDirection: { xs: 'column', lg: 'row' },
             maxWidth: '100%',
-            overflow: 'hidden'
+            alignItems: 'flex-start',
+            overflow: 'visible'
           }}>
             <Box sx={{ 
               flex: { xs: 1, lg: '0 0 60%' },
               minWidth: 0,
-              overflow: 'hidden'
+              overflow: 'visible'
             }}>
               <PropertyList
                 properties={properties}
@@ -1326,9 +1327,9 @@ const PropertiesPageContent: React.FC = () => {
               flex: { xs: 1, lg: '0 0 40%' }, 
               position: { xs: 'static', lg: 'sticky' }, 
               top: { lg: 20 }, 
-              height: { lg: 'fit-content' },
+              height: { lg: 'auto' },
               minWidth: 0,
-              overflow: 'hidden'
+              alignSelf: 'flex-start'
             }}>
               <PropertiesMap 
                 properties={properties}

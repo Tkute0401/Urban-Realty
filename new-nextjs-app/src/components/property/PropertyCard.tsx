@@ -8,11 +8,8 @@ import {
   CardMedia, 
   Typography, 
   Box, 
-  Chip, 
-  IconButton,
   Tooltip,
-  CircularProgress,
-  Button
+  CircularProgress
 } from '@mui/material';
 import { 
   Favorite, 
@@ -20,8 +17,7 @@ import {
   LocationOn, 
   Home, 
   Bed, 
-  Bathtub,
-  Star
+  Bathtub
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -123,19 +119,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     return `₹ ${price.toLocaleString()}`;
   };
 
-  const getPropertyTypeIcon = () => {
-    switch (property.type?.toLowerCase()) {
-      case 'apartment':
-        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
-      case 'villa':
-        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
-      case 'land':
-        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
-      case 'commercial':
-        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
-      default:
-        return <Home sx={{ color: 'var(--color-primary)', fontSize: 16 }} />;
+  const getPossessionLabel = () => {
+    const launch = property.projectDetails?.launchDate;
+    if (launch) {
+      const isFuture = typeof window !== 'undefined' && new Date(launch) > new Date();
+      return isFuture ? `Possession ${new Date(launch).toLocaleDateString()}` : 'Ready to Move';
     }
+    return 'Ready to Move';
   };
 
   return (
@@ -159,7 +149,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
           maxWidth: '380px',
-          height: '580px',
+          height: 'auto',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
@@ -172,33 +162,24 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         }}
         onClick={handleClick}
       >
-      {/* Status Badge */}
-      {property.status && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            left: 16,
-            zIndex: 2,
-            px: 3,
-            py: 1.5,
-            borderRadius: '12px',
-            fontSize: '13px',
-            fontWeight: '700',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            backgroundColor: property.status === 'For Sale' 
-              ? 'linear-gradient(135deg, var(--color-primary) 0%, #FF8C42 100%)' 
-              : 'linear-gradient(135deg, var(--color-error) 0%, #FF6B6B 100%)',
-            color: 'var(--color-white)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}
-        >
-          {property.status}
-        </Box>
-      )}
+      {/* Status/Possession Badge simplified */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 16,
+          left: 16,
+          zIndex: 2,
+          px: 2,
+          py: 1,
+          borderRadius: '10px',
+          fontSize: '12px',
+          fontWeight: 700,
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-white)'
+        }}
+      >
+        {getPossessionLabel()}
+      </Box>
 
       {/* Image Section */}
       <Box sx={{ 
@@ -317,363 +298,43 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </Tooltip>
       </Box>
 
-      {/* Content Section */}
-      <CardContent sx={{ 
-        p: 4, 
-        flexGrow: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        background: 'linear-gradient(180deg, transparent 0%, rgba(247, 107, 28, 0.02) 100%)'
-      }}>
-        {/* Rating and Type */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          mb: 3,
-          p: 2,
-          backgroundColor: 'rgba(247, 107, 28, 0.05)',
-          borderRadius: '12px',
-          border: '1px solid rgba(247, 107, 28, 0.1)'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} sx={{ 
-                  color: 'var(--color-warning)', 
-                  fontSize: 16,
-                  filter: 'drop-shadow(0 1px 2px rgba(245, 158, 11, 0.3))'
-                }} />
-              ))}
-            </Box>
-            <Typography variant="caption" sx={{ 
-              color: 'var(--color-text-primary)', 
-              ml: 1, 
-              fontSize: '14px',
-              fontWeight: 600
-            }}>
-              5.0 (24 reviews)
-            </Typography>
-          </Box>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1.5,
-            px: 2,
-            py: 1,
-            backgroundColor: 'var(--color-primary)',
-            borderRadius: '8px',
-            color: 'var(--color-white)'
-          }}>
-            {getPropertyTypeIcon()}
-            <Typography variant="caption" sx={{ 
-              textTransform: 'uppercase', 
-              fontSize: '12px',
-              fontWeight: 700,
-              letterSpacing: '0.5px'
-            }}>
-              {property.type || 'Property'}
-            </Typography>
-          </Box>
-        </Box>
-        
-        {/* Title */}
+      {/* Content Section simplified */}
+      <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         <Typography 
-          variant="h5" 
-          sx={{ 
-            fontWeight: 700, 
-            color: 'var(--color-text-primary)', 
-            mb: 2,
-            fontSize: '22px',
-            lineHeight: 1.3,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            background: 'linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-primary) 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}
+          variant="h6" 
+          sx={{ fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {property.buildingName || property.title}
         </Typography>
-        
-        {/* Location */}
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: 2, 
-          mb: 3,
-          p: 2,
-          backgroundColor: 'rgba(26, 43, 255, 0.05)',
-          borderRadius: '10px',
-          border: '1px solid rgba(26, 43, 255, 0.1)'
-        }}>
-          <Box sx={{
-            p: 1,
-            backgroundColor: 'var(--color-secondary)',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <LocationOn sx={{ color: 'var(--color-white)', fontSize: 18 }} />
-          </Box>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: 'var(--color-text-primary)',
-              fontSize: '14px',
-              fontWeight: 500,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              flex: 1
-            }}
-          >
-            {property.address?.street && `${property.address.street}, `}
-            {property.address?.city}, {property.address?.state}
-          </Typography>
-        </Box>
-        
-        {/* Description */}
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            color: 'var(--color-text-muted)', 
-            mb: 4,
-            fontSize: '14px',
-            lineHeight: 1.6,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            fontStyle: 'italic'
-          }}
-        >
-          {property.description || 'No description available'}
+
+        <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+          <LocationOn sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} />
+          {property.address?.city}{property.address?.state ? `, ${property.address.state}` : ''}
         </Typography>
-        
-        {/* Features */}
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: 2, 
-          mb: 4,
-          p: 3,
-          backgroundColor: 'rgba(247, 107, 28, 0.03)',
-          borderRadius: '12px',
-          border: '1px solid rgba(247, 107, 28, 0.08)'
-        }}>
-          <Tooltip title="Area" arrow>
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              alignItems: 'center', 
-              gap: 1,
-              p: 2,
-              backgroundColor: 'var(--color-white)',
-              borderRadius: '10px',
-              border: '1px solid rgba(247, 107, 28, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(247, 107, 28, 0.05)',
-                transform: 'translateY(-2px)'
-              }
-            }}>
-              <Home sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-primary)', 
-                fontSize: '12px',
-                fontWeight: 600,
-                textAlign: 'center'
-              }}>
-                {property.area ? `${property.area.toLocaleString()}` : 'N/A'}
-              </Typography>
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-muted)', 
-                fontSize: '10px',
-                textAlign: 'center'
-              }}>
-                sqft
-              </Typography>
-            </Box>
-          </Tooltip>
-          
-          <Tooltip title="Bedrooms" arrow>
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              alignItems: 'center', 
-              gap: 1,
-              p: 2,
-              backgroundColor: 'var(--color-white)',
-              borderRadius: '10px',
-              border: '1px solid rgba(247, 107, 28, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(247, 107, 28, 0.05)',
-                transform: 'translateY(-2px)'
-              }
-            }}>
-              <Bed sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-primary)', 
-                fontSize: '12px',
-                fontWeight: 600,
-                textAlign: 'center'
-              }}>
-                {property.bedrooms || '0'}
-              </Typography>
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-muted)', 
-                fontSize: '10px',
-                textAlign: 'center'
-              }}>
-                Bed
-              </Typography>
-            </Box>
-          </Tooltip>
-          
-          <Tooltip title="Bathrooms" arrow>
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              alignItems: 'center', 
-              gap: 1,
-              p: 2,
-              backgroundColor: 'var(--color-white)',
-              borderRadius: '10px',
-              border: '1px solid rgba(247, 107, 28, 0.1)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(247, 107, 28, 0.05)',
-                transform: 'translateY(-2px)'
-              }
-            }}>
-              <Bathtub sx={{ color: 'var(--color-primary)', fontSize: 20 }} />
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-primary)', 
-                fontSize: '12px',
-                fontWeight: 600,
-                textAlign: 'center'
-              }}>
-                {property.bathrooms || '0'}
-              </Typography>
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-muted)', 
-                fontSize: '10px',
-                textAlign: 'center'
-              }}>
-                Bath
-              </Typography>
-            </Box>
-          </Tooltip>
-        </Box>
-        
-        {/* Price and CTA */}
-        <Box sx={{ 
-          pt: 4, 
-          borderTop: '2px solid rgba(247, 107, 28, 0.1)', 
-          mt: 'auto',
-          background: 'linear-gradient(135deg, rgba(247, 107, 28, 0.02) 0%, transparent 100%)'
-        }}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            mb: 3,
-            p: 3,
-            backgroundColor: 'var(--color-white)',
-            borderRadius: '12px',
-            border: '1px solid rgba(247, 107, 28, 0.1)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-          }}>
-            <Box>
-              <Typography variant="h4" sx={{ 
-                fontWeight: 800, 
-                color: 'var(--color-text-primary)', 
-                fontSize: '28px',
-                lineHeight: 1.2,
-                background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                {formatPrice(property.price)}
-                {property.status === 'For Rent' && (
-                  <Typography component="span" variant="body2" sx={{ 
-                    color: 'var(--color-text-muted)', 
-                    fontSize: '16px',
-                    fontWeight: 500,
-                    ml: 1
-                  }}>
-                    /mo
-                  </Typography>
-                )}
-              </Typography>
-              <Typography variant="caption" sx={{ 
-                color: 'var(--color-text-muted)', 
-                fontSize: '12px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                {property.status || 'For Sale'}
-              </Typography>
-            </Box>
-            {property.projectDetails?.launchDate && (
-              <Box
-                sx={{
-                  background: 'linear-gradient(135deg, var(--color-primary) 0%, #FF8C42 100%)',
-                  color: 'var(--color-white)',
-                  px: 3,
-                  py: 1.5,
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  boxShadow: '0 4px 12px rgba(247, 107, 28, 0.3)'
-                }}
-              >
-                {typeof window !== 'undefined' && new Date(property.projectDetails.launchDate) > new Date() ? 
-                  `Launch ${new Date(property.projectDetails.launchDate).toLocaleDateString()}` : 
-                  'Ready to Move'}
-              </Box>
-            )}
+
+        <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--color-primary)', mt: 1 }}>
+          {formatPrice(property.price)}{property.status === 'For Rent' ? ' /mo' : ''}
+        </Typography>
+
+        <Box sx={{ display: 'flex', gap: 2, mt: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Bed sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+              {property.bedrooms || 0} BHK
+            </Typography>
           </Box>
-          
-          <motion.button
-            style={{
-              width: '100%',
-              background: 'linear-gradient(135deg, var(--color-primary) 0%, #FF8C42 100%)',
-              border: 'none',
-              color: 'var(--color-white)',
-              padding: '16px 24px',
-              borderRadius: '12px',
-              fontSize: '16px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              boxShadow: '0 4px 15px rgba(247, 107, 28, 0.3)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-            whileHover={{ 
-              scale: 1.02,
-              boxShadow: '0 8px 25px rgba(247, 107, 28, 0.4)'
-            }}
-            whileTap={{ scale: 0.98 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            <span style={{ position: 'relative', zIndex: 1 }}>View Details</span>
-          </motion.button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Bathtub sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+              {property.bathrooms || 0} Bath
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Home sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+              {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
+            </Typography>
+          </Box>
         </Box>
       </CardContent>
 
