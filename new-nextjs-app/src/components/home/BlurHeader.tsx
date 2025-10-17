@@ -48,7 +48,7 @@ const BlurHeader = () => {
               <img 
                 src="/vite.png" 
                 alt="Logo" 
-                className="h-10 w-auto sm:h-12 md:h-14 lg:h-16 xl:h-18 2xl:h-20 transition-all duration-300 hover:scale-105 object-contain" 
+                className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 xl:h-14 2xl:h-16 transition-all duration-300 hover:scale-105 object-contain" 
               />
             </div>
 
