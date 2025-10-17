@@ -1,21 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock user favorites data - in a real app, this would come from a database
-const userFavorites = new Set<string>();
+// Import database connection and models
+import { connectDB } from '@/lib/database';
+import User from '@/models/User';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Connect to database
+    await connectDB();
+
     const { id } = params;
-    
-    // In a real application, you would:
-    // 1. Get the user from the session/token
-    // 2. Check if the property is in their favorites from the database
-    
-    // For now, we'll use a simple mock
-    const isFavorite = userFavorites.has(id);
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if property is in user's favorites
+    const user = await User.findById(userId).select('favorites');
+    const isFavorite = user?.favorites?.includes(id) || false;
+
+    console.log(`🔧 API: Checked favorite status for property ${id} and user ${userId}: ${isFavorite}`);
 
     return NextResponse.json({
       isFavorite,

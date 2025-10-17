@@ -183,6 +183,16 @@ export const api = {
                 create: (payload: any) => unwrap<any>(http.post("/api/v1/contacts", payload)),
                 update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/contacts/${id}`, payload)),
                 delete: (id: string) => unwrap<any>(http.delete(`/api/v1/contacts/${id}`)),
+                // Property-specific contact
+                createPropertyContact: (propertyId: string, payload: any) => unwrap<any>(http.post(`/api/v1/contacts/property/${propertyId}`, payload)),
+                // Agent contact requests
+                getAgentContacts: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/contacts/agent", { params })),
+                // Developer contact requests
+                getDeveloperContacts: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/contacts/developer", { params })),
+                // Send copy to user
+                sendUserCopy: (payload: any) => unwrap<any>(http.post("/api/v1/contacts/send-copy", payload)),
+                // Contact stats
+                getStats: () => unwrap<any>(http.get("/api/v1/contacts/stats")),
         },
         analytics: {
                 track: (payload: { action: string; data: any }) => unwrap<any>(http.post("/api/v1/analytics/track", payload)),

@@ -1,60 +1,61 @@
 import 'package:flutter/material.dart';
+import 'design_tokens.dart';
 
 class AppTheme {
-  // SQUARE FOOOT Brand Colors
-  static const Color brandOrange = Color(0xFFF75B00); // Vibrant orange from logo
-  static const Color brandOrangeLight = Color(0xFFFF6600); // Lighter orange variant
-  static const Color brandOrangeDark = Color(0xFFE54D00); // Darker orange variant
-  static const Color brandWhite = Color(0xFFFFFFFF); // Clean white from logo
+  // SQUARE FOOOT Brand Colors - Matching Next.js exactly
+  static const Color brandOrange = Color(0xFFF76B1C); // Primary orange from Next.js
+  static const Color brandOrangeLight = Color(0xFFFB923C); // Lighter orange variant
+  static const Color brandOrangeDark = Color(0xFFEA580C); // Darker orange variant
+  static const Color brandWhite = Color(0xFFFFFFFF); // Clean white
   static const Color brandBlack = Color(0xFF000000); // Black for contrast
-  static const Color brandBlue = Color(0xFF1A00FF); // Deep blue variant from logo
-  static const Color brandBlueLight = Color(0xFF3A20FF); // Lighter blue variant
+  static const Color brandBlue = Color(0xFF1A2BFF); // Deep blue from Next.js
+  static const Color brandBlueLight = Color(0xFF3B82F6); // Lighter blue variant
 
-  // Light Theme Colors - Based on SQUARE FOOOT brand
+  // Light Theme Colors - Matching Next.js exactly
   static const ColorScheme lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: Color(0xFFF75B00), // SQUARE FOOOT orange
+    primary: Color(0xFFF76B1C), // Primary orange from Next.js
     onPrimary: Color(0xFFFFFFFF), // White text on orange
     primaryContainer: Color(0xFFFFE8D6), // Light orange background
-    onPrimaryContainer: Color(0xFFE54D00), // Dark orange text
-    secondary: Color(0xFF1A00FF), // Deep blue accent
+    onPrimaryContainer: Color(0xFFEA580C), // Dark orange text
+    secondary: Color(0xFF1A2BFF), // Deep blue from Next.js
     onSecondary: Color(0xFFFFFFFF), // White text on blue
     secondaryContainer: Color(0xFFE6E0FF), // Light blue background
-    onSecondaryContainer: Color(0xFF1A00FF), // Blue text
-    tertiary: Color(0xFF059669), // Green for success states
+    onSecondaryContainer: Color(0xFF1A2BFF), // Blue text
+    tertiary: Color(0xFF16A34A), // Green for success states
     onTertiary: Color(0xFFFFFFFF),
     tertiaryContainer: Color(0xFFD1FAE5),
     onTertiaryContainer: Color(0xFF047857),
-    error: Color(0xFFDC2626), // Red for errors
+    error: Color(0xFFEF4444), // Red for errors
     onError: Color(0xFFFFFFFF),
     errorContainer: Color(0xFFFEE2E2),
     onErrorContainer: Color(0xFF991B1B),
-    surface: Color(0xFFFAFAFA), // Light gray background
-    onSurface: Color(0xFF1F2937), // Dark text
-    surfaceContainerHighest: Color(0xFFF8F9FA), // Very light gray
+    surface: Color(0xFFFFFFFF), // White background
+    onSurface: Color(0xFF111827), // Dark text from Next.js
+    surfaceContainerHighest: Color(0xFFF7F7F7), // Light gray surface
     onSurfaceVariant: Color(0xFF6B7280), // Medium gray text
     outline: Color(0xFFE5E7EB), // Light gray outline
     outlineVariant: Color(0xFFF3F4F6), // Very light gray outline
     shadow: Color(0x00000000),
     scrim: Color(0x00000000),
-    inverseSurface: Color(0xFF1F2937),
+    inverseSurface: Color(0xFF111827),
     onInverseSurface: Color(0xFFF9FAFB),
     inversePrimary: Color(0xFFFFB366), // Light orange for inverse
-    surfaceTint: Color(0xFFF75B00), // Orange tint
+    surfaceTint: Color(0xFFF76B1C), // Orange tint
   );
 
-  // Dark Theme Colors - Based on SQUARE FOOOT brand
+  // Dark Theme Colors - Matching Next.js exactly
   static const ColorScheme darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: Color(0xFFFF6600), // Lighter orange for dark theme
+    primary: Color(0xFFF76B1C), // Same orange for consistency
     onPrimary: Color(0xFF000000), // Black text on orange
-    primaryContainer: Color(0xFFE54D00), // Darker orange container
+    primaryContainer: Color(0xFFEA580C), // Darker orange container
     onPrimaryContainer: Color(0xFFFFE8D6), // Light orange text
-    secondary: Color(0xFF3A20FF), // Lighter blue for dark theme
-    onSecondary: Color(0xFF000000), // Black text on blue
-    secondaryContainer: Color(0xFF1A00FF), // Dark blue container
+    secondary: Color(0xFF1A2BFF), // Same blue for consistency
+    onSecondary: Color(0xFFFFFFFF), // White text on blue
+    secondaryContainer: Color(0xFF1A2BFF), // Dark blue container
     onSecondaryContainer: Color(0xFFE6E0FF), // Light blue text
-    tertiary: Color(0xFF34D399), // Lighter green for dark theme
+    tertiary: Color(0xFF22C55E), // Lighter green for dark theme
     onTertiary: Color(0xFF064E3B),
     tertiaryContainer: Color(0xFF047857),
     onTertiaryContainer: Color(0xFFD1FAE5),
@@ -62,18 +63,18 @@ class AppTheme {
     onError: Color(0xFF7F1D1D),
     errorContainer: Color(0xFF991B1B),
     onErrorContainer: Color(0xFFFEE2E2),
-    surface: Color(0xFF0F172A), // Dark blue-gray background
-    onSurface: Color(0xFFF1F5F9), // Light text
-    surfaceContainerHighest: Color(0xFF334155), // Medium dark surface
-    onSurfaceVariant: Color(0xFFCBD5E1), // Light gray text
-    outline: Color(0xFF475569), // Medium gray outline
-    outlineVariant: Color(0xFF334155), // Dark gray outline
+    surface: Color(0xFF0B132B), // Dark background from Next.js
+    onSurface: Color(0xFFF9FAFB), // Light text from Next.js
+    surfaceContainerHighest: Color(0xFF1F2937), // Medium dark surface
+    onSurfaceVariant: Color(0xFF9CA3AF), // Light gray text from Next.js
+    outline: Color(0xFF374151), // Medium gray outline from Next.js
+    outlineVariant: Color(0xFF374151), // Dark gray outline
     shadow: Color(0x00000000),
     scrim: Color(0x00000000),
-    inverseSurface: Color(0xFFF1F5F9),
-    onInverseSurface: Color(0xFF0F172A),
-    inversePrimary: Color(0xFFE54D00), // Dark orange for inverse
-    surfaceTint: Color(0xFFFF6600), // Orange tint
+    inverseSurface: Color(0xFFF9FAFB),
+    onInverseSurface: Color(0xFF0B132B),
+    inversePrimary: Color(0xFFEA580C), // Dark orange for inverse
+    surfaceTint: Color(0xFFF76B1C), // Orange tint
   );
 
   // Light Theme
@@ -93,37 +94,49 @@ class AppTheme {
     
     // Card Theme
     cardTheme: CardThemeData(
-      elevation: 2,
+      elevation: DesignTokens.elevation2,
       shadowColor: const Color(0xFF000000).withValues(alpha: 0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radius2xl)),
+      margin: const EdgeInsets.symmetric(horizontal: DesignTokens.space5, vertical: DesignTokens.space3),
     ),
     
     // Elevated Button Theme
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: DesignTokens.elevation2,
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.space7, vertical: DesignTokens.space5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusXl)),
         backgroundColor: lightColorScheme.primary,
         foregroundColor: lightColorScheme.onPrimary,
+        textStyle: const TextStyle(
+          fontSize: DesignTokens.fontSizeLg,
+          fontWeight: DesignTokens.fontWeightMedium,
+        ),
       ),
     ),
     
     // Outlined Button Theme
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.space7, vertical: DesignTokens.space5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusXl)),
         side: BorderSide(color: lightColorScheme.outline),
+        textStyle: const TextStyle(
+          fontSize: DesignTokens.fontSizeLg,
+          fontWeight: DesignTokens.fontWeightMedium,
+        ),
       ),
     ),
     
     // Text Button Theme
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: DesignTokens.space5, vertical: DesignTokens.space4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(DesignTokens.radiusLg)),
+        textStyle: const TextStyle(
+          fontSize: DesignTokens.fontSizeLg,
+          fontWeight: DesignTokens.fontWeightMedium,
+        ),
       ),
     ),
     
@@ -132,22 +145,30 @@ class AppTheme {
       filled: true,
       fillColor: lightColorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
         borderSide: BorderSide(color: lightColorScheme.outlineVariant),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: lightColorScheme.primary, width: 2),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
+        borderSide: BorderSide(color: lightColorScheme.primary, width: DesignTokens.borderWidth2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusXl),
         borderSide: BorderSide(color: lightColorScheme.error),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: DesignTokens.space5, vertical: DesignTokens.space5),
+      labelStyle: const TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightNormal,
+      ),
+      hintStyle: const TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightNormal,
+      ),
     ),
     
     // Bottom Navigation Bar Theme
@@ -189,23 +210,98 @@ class AppTheme {
       size: 24,
     ),
     
-    // Text Theme
+    // Text Theme - Matching Next.js typography
     textTheme: const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-      displaySmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-      headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-      headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-      titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      titleMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      titleSmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-      bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-      bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-      bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-      labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+      displayLarge: TextStyle(
+        fontSize: DesignTokens.fontSize5xl,
+        fontWeight: DesignTokens.fontWeightBold,
+        height: DesignTokens.lineHeightTight,
+        letterSpacing: DesignTokens.letterSpacingTight,
+      ),
+      displayMedium: TextStyle(
+        fontSize: DesignTokens.fontSize4xl,
+        fontWeight: DesignTokens.fontWeightBold,
+        height: DesignTokens.lineHeightTight,
+        letterSpacing: DesignTokens.letterSpacingTight,
+      ),
+      displaySmall: TextStyle(
+        fontSize: DesignTokens.fontSize3xl,
+        fontWeight: DesignTokens.fontWeightBold,
+        height: DesignTokens.lineHeightTight,
+        letterSpacing: DesignTokens.letterSpacingTight,
+      ),
+      headlineLarge: TextStyle(
+        fontSize: DesignTokens.fontSize2xl,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightSnug,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeXl,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightSnug,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: DesignTokens.fontSizeLg,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightSnug,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      titleLarge: TextStyle(
+        fontSize: DesignTokens.fontSizeLg,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: DesignTokens.fontSizeSm,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: DesignTokens.fontSizeLg,
+        fontWeight: DesignTokens.fontWeightNormal,
+        height: DesignTokens.lineHeightRelaxed,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightNormal,
+        height: DesignTokens.lineHeightRelaxed,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      bodySmall: TextStyle(
+        fontSize: DesignTokens.fontSizeSm,
+        fontWeight: DesignTokens.fontWeightNormal,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      labelLarge: TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      labelMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeSm,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      labelSmall: TextStyle(
+        fontSize: DesignTokens.fontSizeXs,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWider,
+      ),
     ),
   );
 
@@ -322,23 +418,98 @@ class AppTheme {
       size: 24,
     ),
     
-    // Text Theme
+    // Text Theme - Matching Next.js typography
     textTheme: const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-      displaySmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-      headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-      headlineSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-      titleLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      titleMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      titleSmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-      bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-      bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-      bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
-      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      labelMedium: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-      labelSmall: TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+      displayLarge: TextStyle(
+        fontSize: DesignTokens.fontSize5xl,
+        fontWeight: DesignTokens.fontWeightBold,
+        height: DesignTokens.lineHeightTight,
+        letterSpacing: DesignTokens.letterSpacingTight,
+      ),
+      displayMedium: TextStyle(
+        fontSize: DesignTokens.fontSize4xl,
+        fontWeight: DesignTokens.fontWeightBold,
+        height: DesignTokens.lineHeightTight,
+        letterSpacing: DesignTokens.letterSpacingTight,
+      ),
+      displaySmall: TextStyle(
+        fontSize: DesignTokens.fontSize3xl,
+        fontWeight: DesignTokens.fontWeightBold,
+        height: DesignTokens.lineHeightTight,
+        letterSpacing: DesignTokens.letterSpacingTight,
+      ),
+      headlineLarge: TextStyle(
+        fontSize: DesignTokens.fontSize2xl,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightSnug,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeXl,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightSnug,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: DesignTokens.fontSizeLg,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightSnug,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      titleLarge: TextStyle(
+        fontSize: DesignTokens.fontSizeLg,
+        fontWeight: DesignTokens.fontWeightSemibold,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      titleMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      titleSmall: TextStyle(
+        fontSize: DesignTokens.fontSizeSm,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: DesignTokens.fontSizeLg,
+        fontWeight: DesignTokens.fontWeightNormal,
+        height: DesignTokens.lineHeightRelaxed,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightNormal,
+        height: DesignTokens.lineHeightRelaxed,
+        letterSpacing: DesignTokens.letterSpacingNormal,
+      ),
+      bodySmall: TextStyle(
+        fontSize: DesignTokens.fontSizeSm,
+        fontWeight: DesignTokens.fontWeightNormal,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      labelLarge: TextStyle(
+        fontSize: DesignTokens.fontSizeMd,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      labelMedium: TextStyle(
+        fontSize: DesignTokens.fontSizeSm,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWide,
+      ),
+      labelSmall: TextStyle(
+        fontSize: DesignTokens.fontSizeXs,
+        fontWeight: DesignTokens.fontWeightMedium,
+        height: DesignTokens.lineHeightNormal,
+        letterSpacing: DesignTokens.letterSpacingWider,
+      ),
     ),
   );
 }

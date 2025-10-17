@@ -1,21 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock user favorites data - in a real app, this would come from a database
-const userFavorites = new Set<string>();
+// Import database connection and models
+import { connectDB } from '@/lib/database';
+import User from '@/models/User';
+import Property from '@/models/Property';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    // Connect to database
+    await connectDB();
+
     const { id } = params;
-    
-    // In a real application, you would:
-    // 1. Get the user from the session/token
-    // 2. Add the property to their favorites in the database
-    
-    // For now, we'll use a simple mock
-    userFavorites.add(id);
+    const { userId } = await request.json();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if property exists
+    const property = await Property.findById(id);
+    if (!property) {
+      return NextResponse.json(
+        { error: 'Property not found' },
+        { status: 404 }
+      );
+    }
+
+    // Add property to user's favorites
+    await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { favorites: id } },
+      { new: true }
+    );
+
+    console.log(`🔧 API: Added property ${id} to user ${userId} favorites`);
 
     return NextResponse.json({
       success: true,
@@ -35,14 +59,27 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Connect to database
+    await connectDB();
+
     const { id } = params;
-    
-    // In a real application, you would:
-    // 1. Get the user from the session/token
-    // 2. Remove the property from their favorites in the database
-    
-    // For now, we'll use a simple mock
-    userFavorites.delete(id);
+    const { userId } = await request.json();
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Remove property from user's favorites
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { favorites: id } },
+      { new: true }
+    );
+
+    console.log(`🔧 API: Removed property ${id} from user ${userId} favorites`);
 
     return NextResponse.json({
       success: true,

@@ -4,10 +4,9 @@ const User = require('../models/User');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
-// Mock subscription data for fallback
-const mockSubscriptions = [
+// Helper function to get default subscriptions if none exist in database
+const getDefaultSubscriptions = () => [
   {
-    _id: '1',
     name: 'Free Plan',
     type: 'free',
     description: 'Perfect for getting started with basic features',
@@ -22,12 +21,9 @@ const mockSubscriptions = [
       customBranding: false,
       apiAccess: false
     },
-    maxUsers: 1,
-    createdAt: new Date(),
-    updatedAt: new Date()
+    maxUsers: 1
   },
   {
-    _id: '2',
     name: 'Basic Plan',
     type: 'basic',
     description: 'Great for small teams and growing businesses',
@@ -42,12 +38,9 @@ const mockSubscriptions = [
       customBranding: false,
       apiAccess: false
     },
-    maxUsers: 3,
-    createdAt: new Date(),
-    updatedAt: new Date()
+    maxUsers: 3
   },
   {
-    _id: '3',
     name: 'Premium Plan',
     type: 'premium',
     description: 'Advanced features for professional real estate agents',
@@ -62,12 +55,9 @@ const mockSubscriptions = [
       customBranding: true,
       apiAccess: true
     },
-    maxUsers: 10,
-    createdAt: new Date(),
-    updatedAt: new Date()
+    maxUsers: 10
   },
   {
-    _id: '4',
     name: 'Enterprise Plan',
     type: 'enterprise',
     description: 'Complete solution for large organizations',
@@ -98,40 +88,49 @@ exports.getSubscriptions = asyncHandler(async (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
     console.warn('MongoDB not connected, using mock subscription data');
     
+    // If no subscriptions exist, create default ones
+    if (subscriptions.length === 0) {
+      console.log('No subscriptions found in database, creating default subscriptions');
+      
+      const defaultSubscriptions = getDefaultSubscriptions();
+      for (const defaultSub of defaultSubscriptions) {
+        try {
+          await Subscription.create(defaultSub);
+        } catch (error) {
+          console.error('Error creating default subscription:', error);
+        }
+      }
+      
+      // Fetch the newly created subscriptions
+      subscriptions = await Subscription.find({ isActive: true }).sort('price');
+    }
+
     return res.status(200).json({
       success: true,
-      count: mockSubscriptions.length,
-      data: mockSubscriptions,
-      source: 'mock'
+      count: subscriptions.length,
+      data: subscriptions,
+      source: 'database'
     });
   }
 
   try {
     let subscriptions = await Subscription.find({ isActive: true }).sort({ price: 1 });
 
-    // If no subscriptions in database, seed with mock data
+    // If no subscriptions in database, create default subscriptions
     if (!subscriptions || subscriptions.length === 0) {
-      console.log('No subscriptions found in database, seeding with mock data');
+      console.log('No subscriptions found in database, creating default subscriptions');
       
-      // Create subscriptions from mock data
-      for (const mockSub of mockSubscriptions) {
+      // Create subscriptions from default data
+      const defaultSubscriptions = getDefaultSubscriptions();
+      for (const defaultSub of defaultSubscriptions) {
         try {
-          await Subscription.create({
-            name: mockSub.name,
-            type: mockSub.type,
-            description: mockSub.description,
-            price: mockSub.price,
-            billingCycle: mockSub.billingCycle,
-            isActive: mockSub.isActive,
-            features: mockSub.features,
-            maxUsers: mockSub.maxUsers
-          });
+          await Subscription.create(defaultSub);
         } catch (seedError) {
-          console.warn('Error seeding subscription:', mockSub.name, seedError.message);
+          console.warn('Error creating default subscription:', defaultSub.name, seedError.message);
         }
       }
       
-      // Retry fetching after seeding
+      // Retry fetching after creating
       subscriptions = await Subscription.find({ isActive: true }).sort({ price: 1 });
     }
 

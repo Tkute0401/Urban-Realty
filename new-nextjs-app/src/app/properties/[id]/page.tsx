@@ -1098,7 +1098,6 @@ const PropertyDetailsPageContent: React.FC = () => {
               fullAddress={fullAddress}
               isSticky={true}
               headerHeight={100}
-              handleContactOpen={() => handleContact('email')}
             />
           </Grid>
         </Grid>

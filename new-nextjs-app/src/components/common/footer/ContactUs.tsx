@@ -31,11 +31,33 @@ const ContactUs = () => {
 
   const onSubmit = async (data) => {
     try {
-      // Placeholder: integrate API hook when backend endpoint is ready
-      await new Promise((r) => setTimeout(r, 600));
+      // Send contact request to backend
+      const response = await fetch('/api/v1/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...data,
+          contactType: 'general',
+          reason: 'general',
+          urgency: 'medium',
+          timestamp: new Date().toISOString(),
+          source: 'contact_us_page'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send contact request');
+      }
+
+      const result = await response.json();
+      console.log('Contact request sent:', result);
       reset();
-    } catch (_) {
-      // Intentionally swallow for now; standardized error toasts handled globally
+    } catch (error) {
+      console.error('Contact form error:', error);
+      // Error handling is done globally via toast
     }
   };
 

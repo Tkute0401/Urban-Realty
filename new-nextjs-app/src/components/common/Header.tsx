@@ -180,8 +180,8 @@ const Header: React.FC = () => {
                 
                 <div className="menu-item" onClick={toggleTheme}>
                   {theme === 'light' ? 
-                    <MoonIcon className="menu-item-icon" /> : 
-                    <SunIcon className="menu-item-icon" />
+                    <MoonIcon className="menu-item-icon theme-icon" /> : 
+                    <SunIcon className="menu-item-icon theme-icon" />
                   }
                   <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
                 </div>
@@ -269,8 +269,8 @@ const Header: React.FC = () => {
               <span>Plans</span>
             </Link>
 
-            <button onClick={toggleTheme} className="nav-item theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
-              {theme === 'light' ? <MoonIcon className="nav-icon" /> : <SunIcon className="nav-icon" />}
+            <button onClick={toggleTheme} className="theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+              {theme === 'light' ? <MoonIcon className="theme-icon" /> : <SunIcon className="theme-icon" />}
             </button>
 
             {/* Role-specific navigation items */}

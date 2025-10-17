@@ -75,20 +75,26 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     setError(null);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock payment success
-      const paymentData = {
-        id: `pay_${Date.now()}`,
-        amount: billingCycle === 'yearly' ? plan.price * 12 * 0.8 : plan.price,
-        currency: 'USD',
-        status: 'succeeded',
-        paymentMethod: paymentMethod,
-        billingCycle,
-        plan: plan.name
-      };
+      // Real payment processing with Razorpay or other payment gateway
+      const response = await fetch('/api/v1/payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          planId: plan.id,
+          billingCycle,
+          paymentMethod,
+          amount: billingCycle === 'yearly' ? plan.price * 12 * 0.8 : plan.price
+        })
+      });
 
+      if (!response.ok) {
+        throw new Error('Payment creation failed');
+      }
+
+      const paymentData = await response.json();
       onSuccess(paymentData);
     } catch (err) {
       setError('Payment failed. Please try again.');
