@@ -9,7 +9,7 @@ import {
   Tabs, Tab, Grid
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings } from '@mui/icons-material';
+import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings, Dashboard, Business } from '@mui/icons-material';
 import { useProperties } from '../../../contexts/PropertiesContext';
 import { api } from '@/lib/services/api';
 import PropertyCard from '@/components/property/PropertyCard';
@@ -97,6 +97,14 @@ const ProfileClient = () => {
 
   const handleAdminDashboard = () => {
     router.push('/admin');
+  };
+
+  const handleAgentDashboard = () => {
+    router.push('/agent');
+  };
+
+  const handleDeveloperDashboard = () => {
+    router.push('/developer/dashboard');
   };
 
   const handleViewProperty = (propertyId: number) => {
@@ -235,6 +243,28 @@ const ProfileClient = () => {
                   sx={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-dark)' }}
                 >
                   Admin Dashboard
+                </Button>
+              )}
+
+              {user?.role === 'agent' && (
+                <Button 
+                  variant="contained"
+                  startIcon={<Dashboard />}
+                  onClick={handleAgentDashboard}
+                  sx={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-dark)' }}
+                >
+                  Agent Dashboard
+                </Button>
+              )}
+
+              {user?.role === 'developer' && (
+                <Button 
+                  variant="contained"
+                  startIcon={<Business />}
+                  onClick={handleDeveloperDashboard}
+                  sx={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-dark)' }}
+                >
+                  Developer Dashboard
                 </Button>
               )}
             </Box>

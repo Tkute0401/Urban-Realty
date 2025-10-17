@@ -209,7 +209,7 @@ const Header: React.FC = () => {
                 
                 {user?.role === 'developer' && (
                   <>
-                    <Link href="/developers" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/developer/dashboard" className="menu-item" onClick={handleMenuClose}>
                       <BuildingIcon className="menu-item-icon" />
                       <span>Developer Dashboard</span>
                     </Link>
@@ -297,7 +297,7 @@ const Header: React.FC = () => {
 
             {user?.role === 'developer' && (
               <>
-                <Link href="/developers" className="nav-item">
+                <Link href="/developer/dashboard" className="nav-item">
                   <BuildingIcon />
                   <span>Dashboard</span>
                 </Link>
