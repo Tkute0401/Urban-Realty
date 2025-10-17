@@ -1,85 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock agent properties data
-const mockAgentProperties = [
-  {
-    _id: '1',
-    title: 'Luxury Apartment in Downtown',
-    buildingName: 'Skyline Towers',
-    price: 15000000,
-    area: 1200,
-    bedrooms: 3,
-    bathrooms: 2,
-    type: 'Apartment',
-    status: 'For Sale',
-    description: 'Beautiful luxury apartment with modern amenities and stunning city views.',
-    address: {
-      street: '123 Main Street',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      zipCode: '400001'
-    },
-    images: [
-      { url: '/api/placeholder/400/300', alt: 'Living room' },
-      { url: '/api/placeholder/400/300', alt: 'Kitchen' },
-      { url: '/api/placeholder/400/300', alt: 'Bedroom' }
-    ],
-    projectDetails: {
-      launchDate: '2024-06-01',
-      developer: 'ABC Developers'
-    },
-    location: {
-      latitude: 19.0760,
-      longitude: 72.8777
-    },
-    amenities: ['Parking', 'Gym', 'Swimming Pool', 'Security', 'Lift'],
-    highlights: ['Prime Location', 'Modern Design', 'High Floor'],
-    agentId: 'agent1'
-  },
-  {
-    _id: '2',
-    title: 'Spacious Villa with Garden',
-    buildingName: 'Garden Villa Complex',
-    price: 25000000,
-    area: 2000,
-    bedrooms: 4,
-    bathrooms: 3,
-    type: 'Villa',
-    status: 'For Sale',
-    description: 'Spacious villa with private garden and modern amenities.',
-    address: {
-      street: '456 Park Avenue',
-      city: 'Delhi',
-      state: 'Delhi',
-      zipCode: '110001'
-    },
-    images: [
-      { url: '/api/placeholder/400/300', alt: 'Exterior view' },
-      { url: '/api/placeholder/400/300', alt: 'Garden' },
-      { url: '/api/placeholder/400/300', alt: 'Living area' }
-    ],
-    projectDetails: {
-      launchDate: '2024-08-01',
-      developer: 'XYZ Builders'
-    },
-    location: {
-      latitude: 28.6139,
-      longitude: 77.2090
-    },
-    amenities: ['Garden', 'Parking', 'Security', 'Power Backup'],
-    highlights: ['Private Garden', 'Spacious Layout', 'Premium Location'],
-    agentId: 'agent1'
-  }
-];
+// Import database connection and models
+import { connectDB } from '@/lib/database';
+import Property from '@/models/Property';
 
 export async function GET(request: NextRequest) {
+  console.log('🔧 API: /api/agent/properties GET request received');
   try {
+    // Connect to database
+    await connectDB();
+
     const { searchParams } = new URL(request.url);
-    
-    // Parse query parameters
     const agentId = searchParams.get('agentId');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const status = searchParams.get('status') || 'all';
+    const type = searchParams.get('type') || 'all';
 
     if (!agentId) {
       return NextResponse.json(
@@ -88,20 +24,36 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Filter properties by agent ID
-    const agentProperties = mockAgentProperties.filter(property => 
-      property.agentId === agentId
-    );
+    // Build filter
+    const filter: any = { agent: agentId };
+
+    if (status !== 'all') {
+      filter.status = status;
+    }
+
+    if (type !== 'all') {
+      filter.type = type;
+    }
 
     // Calculate pagination
-    const total = agentProperties.length;
+    const skip = (page - 1) * limit;
+
+    // Get total count and properties from database
+    const [total, properties] = await Promise.all([
+      Property.countDocuments(filter),
+      Property.find(filter)
+        .populate('agent', 'name email phone')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit)
+    ]);
+
     const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedProperties = agentProperties.slice(startIndex, endIndex);
+
+    console.log(`🔧 API: Returning ${properties.length} agent properties from database (page ${page}/${totalPages})`);
 
     return NextResponse.json({
-      properties: paginatedProperties,
+      properties,
       page,
       limit,
       total,
@@ -112,6 +64,61 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching agent properties:', error);
     return NextResponse.json(
       { error: 'Failed to fetch agent properties' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // Connect to database
+    await connectDB();
+
+    const formData = await request.formData();
+    
+    // Extract property data from form data
+    const propertyData = {
+      title: formData.get('title') as string,
+      buildingName: formData.get('buildingName') as string,
+      price: parseInt(formData.get('price') as string),
+      area: parseInt(formData.get('area') as string),
+      bedrooms: parseInt(formData.get('bedrooms') as string),
+      bathrooms: parseInt(formData.get('bathrooms') as string),
+      type: formData.get('type') as string,
+      status: formData.get('status') as string,
+      description: formData.get('description') as string,
+      address: JSON.parse(formData.get('address') as string),
+      amenities: formData.getAll('amenities') as string[],
+      highlights: formData.getAll('highlights') as string[],
+      images: [], // Handle image uploads separately
+      projectDetails: {
+        developer: formData.get('developer') as string || 'Unknown'
+      },
+      location: {
+        latitude: parseFloat(formData.get('latitude') as string) || 0,
+        longitude: parseFloat(formData.get('longitude') as string) || 0
+      },
+      agent: formData.get('agentId') as string
+    };
+
+    // Create new property in database
+    const newProperty = new Property(propertyData);
+    await newProperty.save();
+
+    // Populate agent data
+    await newProperty.populate('agent', 'name email phone');
+
+    console.log(`🔧 API: Created agent property ${newProperty._id} in database`);
+
+    return NextResponse.json({
+      property: newProperty,
+      success: true,
+      message: 'Property created successfully'
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating agent property:', error);
+    return NextResponse.json(
+      { error: 'Failed to create property' },
       { status: 500 }
     );
   }

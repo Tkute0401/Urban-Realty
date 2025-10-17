@@ -1,109 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock data for development - replace with actual database calls
-const mockProperties = [
-  {
-    _id: '1',
-    title: 'Luxury Apartment in Downtown',
-    buildingName: 'Skyline Towers',
-    price: 15000000,
-    area: 1200,
-    bedrooms: 3,
-    bathrooms: 2,
-    type: 'Apartment',
-    status: 'For Sale',
-    description: 'Beautiful luxury apartment with modern amenities and stunning city views.',
-    address: {
-      street: '123 Main Street',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      zipCode: '400001'
-    },
-    images: [
-      { url: '/api/placeholder/400/300', alt: 'Living room' },
-      { url: '/api/placeholder/400/300', alt: 'Kitchen' },
-      { url: '/api/placeholder/400/300', alt: 'Bedroom' }
-    ],
-    projectDetails: {
-      launchDate: '2024-06-01',
-      developer: 'ABC Developers'
-    },
-    location: {
-      latitude: 19.0760,
-      longitude: 72.8777
-    },
-    amenities: ['Parking', 'Gym', 'Swimming Pool', 'Security', 'Lift'],
-    highlights: ['Prime Location', 'Modern Design', 'High Floor']
-  },
-  {
-    _id: '2',
-    title: 'Spacious Villa with Garden',
-    buildingName: 'Garden Villa Complex',
-    price: 25000000,
-    area: 2000,
-    bedrooms: 4,
-    bathrooms: 3,
-    type: 'Villa',
-    status: 'For Sale',
-    description: 'Spacious villa with private garden and modern amenities.',
-    address: {
-      street: '456 Park Avenue',
-      city: 'Delhi',
-      state: 'Delhi',
-      zipCode: '110001'
-    },
-    images: [
-      { url: '/api/placeholder/400/300', alt: 'Exterior view' },
-      { url: '/api/placeholder/400/300', alt: 'Garden' },
-      { url: '/api/placeholder/400/300', alt: 'Living area' }
-    ],
-    projectDetails: {
-      launchDate: '2024-08-01',
-      developer: 'XYZ Builders'
-    },
-    location: {
-      latitude: 28.6139,
-      longitude: 77.2090
-    },
-    amenities: ['Garden', 'Parking', 'Security', 'Power Backup'],
-    highlights: ['Private Garden', 'Spacious Layout', 'Premium Location']
-  },
-  {
-    _id: '3',
-    title: 'Modern Office Space',
-    buildingName: 'Business Center',
-    price: 5000000,
-    area: 800,
-    bedrooms: 0,
-    bathrooms: 2,
-    type: 'Commercial',
-    status: 'For Rent',
-    description: 'Modern office space in prime business district.',
-    address: {
-      street: '789 Business Street',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      zipCode: '560001'
-    },
-    images: [
-      { url: '/api/placeholder/400/300', alt: 'Office space' },
-      { url: '/api/placeholder/400/300', alt: 'Conference room' }
-    ],
-    projectDetails: {
-      developer: 'Commercial Developers'
-    },
-    location: {
-      latitude: 12.9716,
-      longitude: 77.5946
-    },
-    amenities: ['Parking', 'Security', 'Lift', 'Power Backup', 'Internet'],
-    highlights: ['Prime Business Location', 'Modern Infrastructure']
-  }
-];
+// Import database connection and models
+import { connectDB } from '@/lib/database';
+import Property from '@/models/Property';
 
 export async function GET(request: NextRequest) {
   console.log('🔧 API: /api/properties GET request received');
   try {
+    // Connect to database
+    await connectDB();
+
     const { searchParams } = new URL(request.url);
     console.log('🔧 API: Search params:', Object.fromEntries(searchParams.entries()));
     
@@ -122,75 +28,81 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get('city') || '';
     const amenities = searchParams.get('amenities')?.split(',') || [];
 
-    // Filter properties based on query parameters
-    let filteredProperties = mockProperties.filter(property => {
-      // Search filter
-      if (search && !property.title.toLowerCase().includes(search.toLowerCase()) &&
-          !property.description?.toLowerCase().includes(search.toLowerCase()) &&
-          !property.address?.city.toLowerCase().includes(search.toLowerCase())) {
-        return false;
-      }
+    // Build MongoDB filter
+    const filter: any = {};
 
-      // Type filter
-      if (type && property.type !== type) {
-        return false;
-      }
+    // Search filter
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { 'address.city': { $regex: search, $options: 'i' } }
+      ];
+    }
 
-      // Status filter
-      if (status && property.status !== status) {
-        return false;
-      }
+    // Type filter
+    if (type) {
+      filter.type = type;
+    }
 
-      // Price range filter
-      if (property.price < minPrice || property.price > maxPrice) {
-        return false;
-      }
+    // Status filter
+    if (status) {
+      filter.status = status;
+    }
 
-      // Area range filter
-      if (property.area < minArea || property.area > maxArea) {
-        return false;
-      }
+    // Price range filter
+    if (minPrice > 0 || maxPrice < 100000000) {
+      filter.price = {};
+      if (minPrice > 0) filter.price.$gte = minPrice;
+      if (maxPrice < 100000000) filter.price.$lte = maxPrice;
+    }
 
-      // Bedrooms filter
-      if (bedrooms.length > 0 && !bedrooms.includes(property.bedrooms)) {
-        return false;
-      }
+    // Area range filter
+    if (minArea > 0 || maxArea < 10000) {
+      filter.area = {};
+      if (minArea > 0) filter.area.$gte = minArea;
+      if (maxArea < 10000) filter.area.$lte = maxArea;
+    }
 
-      // Bathrooms filter
-      if (bathrooms.length > 0 && !bathrooms.includes(property.bathrooms)) {
-        return false;
-      }
+    // Bedrooms filter
+    if (bedrooms.length > 0) {
+      filter.bedrooms = { $in: bedrooms };
+    }
 
-      // City filter
-      if (city && property.address?.city !== city) {
-        return false;
-      }
+    // Bathrooms filter
+    if (bathrooms.length > 0) {
+      filter.bathrooms = { $in: bathrooms };
+    }
 
-      // Amenities filter
-      if (amenities.length > 0) {
-        const propertyAmenities = property.amenities || [];
-        const hasAllAmenities = amenities.every(amenity => 
-          propertyAmenities.some(propAmenity => 
-            propAmenity.toLowerCase().includes(amenity.toLowerCase())
-          )
-        );
-        if (!hasAllAmenities) {
-          return false;
-        }
-      }
+    // City filter
+    if (city) {
+      filter['address.city'] = city;
+    }
 
-      return true;
-    });
+    // Amenities filter
+    if (amenities.length > 0) {
+      filter.amenities = { $all: amenities };
+    }
 
     // Calculate pagination
-    const total = filteredProperties.length;
+    const skip = (page - 1) * limit;
+
+    // Get total count and properties from database
+    const [total, properties] = await Promise.all([
+      Property.countDocuments(filter),
+      Property.find(filter)
+        .populate('agent', 'name email phone')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit)
+    ]);
+
     const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedProperties = filteredProperties.slice(startIndex, endIndex);
+
+    console.log(`🔧 API: Returning ${properties.length} properties from database (page ${page}/${totalPages})`);
 
     return NextResponse.json({
-      properties: paginatedProperties,
+      properties,
       page,
       limit,
       total,
@@ -208,6 +120,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Connect to database
+    await connectDB();
+
     const formData = await request.formData();
     
     // Extract property data from form data
@@ -223,13 +138,7 @@ export async function POST(request: NextRequest) {
       description: formData.get('description') as string,
       address: JSON.parse(formData.get('address') as string),
       amenities: formData.getAll('amenities') as string[],
-      highlights: formData.getAll('highlights') as string[]
-    };
-
-    // Create new property with generated ID
-    const newProperty = {
-      _id: Date.now().toString(),
-      ...propertyData,
+      highlights: formData.getAll('highlights') as string[],
       images: [], // Handle image uploads separately
       projectDetails: {
         developer: formData.get('developer') as string || 'Unknown'
@@ -237,11 +146,19 @@ export async function POST(request: NextRequest) {
       location: {
         latitude: parseFloat(formData.get('latitude') as string) || 0,
         longitude: parseFloat(formData.get('longitude') as string) || 0
-      }
+      },
+      agent: formData.get('agentId') as string || null
     };
 
-    // In a real application, save to database here
-    // For now, just return the created property
+    // Create new property in database
+    const newProperty = new Property(propertyData);
+    await newProperty.save();
+
+    // Populate agent data
+    await newProperty.populate('agent', 'name email phone');
+
+    console.log(`🔧 API: Created property ${newProperty._id} in database`);
+
     return NextResponse.json({
       property: newProperty,
       success: true,

@@ -98,8 +98,19 @@ const SubscriptionManagement = () => {
 
   const handlePlanSubmit = async () => {
     try {
-      // Mock API call - in real implementation, this would call the actual API
-      console.log('Saving plan:', planForm);
+      // Real API call to save subscription plan
+      const response = await fetch('/api/v1/admin/subscriptions', {
+        method: editingPlan ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(planForm)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save plan');
+      }
       
       setPlanDialog(false);
       setEditingPlan(null);
@@ -113,8 +124,18 @@ const SubscriptionManagement = () => {
   const handleDeletePlan = async (planId) => {
     if (window.confirm('Are you sure you want to delete this plan?')) {
       try {
-        // Mock API call - in real implementation, this would call the actual API
-        console.log('Deleting plan:', planId);
+        // Real API call to delete subscription plan
+        const response = await fetch(`/api/v1/admin/subscriptions/${planId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete plan');
+        }
+        
         fetchData();
       } catch (err) {
         setError('Failed to delete plan');
@@ -124,8 +145,20 @@ const SubscriptionManagement = () => {
 
   const handleUpdateSubscriptionStatus = async (subscriptionId, status) => {
     try {
-      // Mock API call - in real implementation, this would call the actual API
-      console.log('Updating subscription status:', subscriptionId, status);
+      // Real API call to update subscription status
+      const response = await fetch(`/api/v1/admin/subscriptions/${subscriptionId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update subscription status');
+      }
+      
       fetchData();
     } catch (err) {
       setError('Failed to update subscription status');

@@ -44,34 +44,47 @@ const AnalyticsDashboard = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const [dashboardRes] = await Promise.all([
+      const [dashboardRes, searchRes, systemRes] = await Promise.all([
         api.admin.analytics(),
+        api.analytics.dashboard({ timeframe }),
+        api.analytics.dashboard({ type: 'system' })
       ]);
       
       setAnalytics({
         dashboard: dashboardRes?.data,
-        search: {
-          totalSearches: 1250,
-          uniqueUsers: 450,
-          averageResults: 12.5,
-          noResultsRate: 8.2,
-          trend: '+12%',
-          topQueries: [
-            { query: 'apartment downtown', count: 45 },
-            { query: 'house with pool', count: 32 },
-            { query: 'condo near metro', count: 28 },
-            { query: 'luxury villa', count: 25 },
-            { query: 'studio apartment', count: 22 }
-          ]
+        search: searchRes?.data || {
+          totalSearches: 0,
+          uniqueUsers: 0,
+          averageResults: 0,
+          noResultsRate: 0,
+          trend: '0%',
+          topQueries: []
         },
-        system: {
-          memory: { used: 2048, total: 4096 },
-          uptime: 86400,
-          users: { active: 25 }
+        system: systemRes?.data || {
+          memory: { used: 0, total: 0 },
+          uptime: 0,
+          users: { active: 0 }
         }
       });
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
+      // Fallback to empty data instead of mock data
+      setAnalytics({
+        dashboard: null,
+        search: {
+          totalSearches: 0,
+          uniqueUsers: 0,
+          averageResults: 0,
+          noResultsRate: 0,
+          trend: '0%',
+          topQueries: []
+        },
+        system: {
+          memory: { used: 0, total: 0 },
+          uptime: 0,
+          users: { active: 0 }
+        }
+      });
     } finally {
       setLoading(false);
     }

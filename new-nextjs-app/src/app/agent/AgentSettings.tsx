@@ -46,12 +46,21 @@ const AgentSettings = () => {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: any) => {
-      // Mock API call - in real app this would update the user profile
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ success: true, data: { ...(user || {}), ...(data || {}) } });
-        }, 1000);
+      // Real API call to update the user profile
+      const response = await fetch('/api/v1/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(data)
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+      
+      return response.json();
     },
     onSuccess: (data: any) => {
       updateUser(data.data);

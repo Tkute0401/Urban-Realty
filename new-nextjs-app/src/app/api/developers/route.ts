@@ -1,53 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock developers data
-const mockDevelopers = [
-  {
-    _id: '1',
-    name: 'ABC Developers',
-    logo: { url: '/api/placeholder/100/100' },
-    headquarters: {
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      country: 'India'
-    },
-    description: 'Leading real estate developer with over 20 years of experience in luxury residential and commercial projects.',
-    establishedYear: 2000,
-    projectsCompleted: 150,
-    currentProjects: 25
-  },
-  {
-    _id: '2',
-    name: 'XYZ Builders',
-    logo: { url: '/api/placeholder/100/100' },
-    headquarters: {
-      city: 'Delhi',
-      state: 'Delhi',
-      country: 'India'
-    },
-    description: 'Premium real estate developer specializing in luxury villas and high-end residential projects.',
-    establishedYear: 1995,
-    projectsCompleted: 200,
-    currentProjects: 30
-  },
-  {
-    _id: '3',
-    name: 'Commercial Developers',
-    logo: { url: '/api/placeholder/100/100' },
-    headquarters: {
-      city: 'Bangalore',
-      state: 'Karnataka',
-      country: 'India'
-    },
-    description: 'Focused on commercial real estate development including office spaces, retail centers, and business parks.',
-    establishedYear: 2005,
-    projectsCompleted: 75,
-    currentProjects: 15
-  }
-];
+// Import database connection and models
+import { connectDB } from '@/lib/database';
+import User from '@/models/User';
+import Project from '@/models/Project';
 
 export async function GET(request: NextRequest) {
   try {
+    // Connect to database
+    await connectDB();
+
     const { searchParams } = new URL(request.url);
     
     // Parse query parameters
@@ -56,31 +18,57 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    // Filter developers based on query parameters
-    let filteredDevelopers = mockDevelopers.filter(developer => {
-      // Search filter
-      if (search && !developer.name.toLowerCase().includes(search.toLowerCase()) &&
-          !developer.description?.toLowerCase().includes(search.toLowerCase())) {
-        return false;
-      }
+    // Build MongoDB filter
+    const filter: any = { role: 'developer' };
 
-      // City filter
-      if (city && developer.headquarters?.city !== city) {
-        return false;
-      }
+    // Search filter
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
 
-      return true;
-    });
+    // City filter
+    if (city) {
+      filter['headquarters.city'] = city;
+    }
 
     // Calculate pagination
-    const total = filteredDevelopers.length;
+    const skip = (page - 1) * limit;
+
+    // Get total count and developers from database
+    const [total, developers] = await Promise.all([
+      User.countDocuments(filter),
+      User.find(filter)
+        .populate('projects', 'title status')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit)
+    ]);
+
     const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedDevelopers = filteredDevelopers.slice(startIndex, endIndex);
+
+    // Transform developers data to include project counts
+    const transformedDevelopers = developers.map(developer => ({
+      _id: developer._id,
+      name: developer.name,
+      logo: developer.logo || { url: '/api/placeholder/100/100' },
+      headquarters: developer.headquarters || {
+        city: 'Unknown',
+        state: 'Unknown',
+        country: 'Unknown'
+      },
+      description: developer.description || 'No description available',
+      establishedYear: developer.establishedYear || new Date().getFullYear(),
+      projectsCompleted: developer.projects?.filter((p: any) => p.status === 'completed').length || 0,
+      currentProjects: developer.projects?.filter((p: any) => p.status === 'active').length || 0
+    }));
+
+    console.log(`🔧 API: Returning ${transformedDevelopers.length} developers from database (page ${page}/${totalPages})`);
 
     return NextResponse.json({
-      developers: paginatedDevelopers,
+      developers: transformedDevelopers,
       page,
       limit,
       total,
