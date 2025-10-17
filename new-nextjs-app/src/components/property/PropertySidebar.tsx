@@ -6,6 +6,7 @@ import { Phone, WhatsApp, Email, LocationOn } from '@mui/icons-material';
 import PremiumPaper from './PremiumPaper';
 import PropertyMap from './PropertyMap';
 import PremiumButton from './PremiumButton';
+import ContactModal from '../contact/ContactModal';
 import { formatPrice } from '@/lib/utils/format';
 import { pulse } from '@/lib/animations';
 
@@ -38,7 +39,7 @@ interface PropertySidebarProps {
   fullAddress: string;
   isSticky?: boolean;
   headerHeight?: number;
-  handleContactOpen: () => void;
+  handleContactOpen?: () => void;
 }
 
 const PropertySidebar: React.FC<PropertySidebarProps> = ({ 
@@ -49,6 +50,7 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
   handleContactOpen 
 }) => {
   const [contactMethod, setContactMethod] = useState<'phone' | 'whatsapp' | 'email'>('email');
+  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   return (
     <Box sx={{ 
@@ -96,7 +98,7 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
         <PremiumButton 
           fullWidth
           size="large"
-          onClick={handleContactOpen}
+          onClick={() => setContactModalOpen(true)}
           startIcon={<Email sx={{ fontSize: '1.4rem' }} />}
           sx={{
             py: 2,
@@ -156,7 +158,7 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
           startIcon={<Phone />}
           onClick={() => {
             setContactMethod('phone');
-            handleContactOpen();
+            setContactModalOpen(true);
           }}
           sx={{
             mb: 2,
@@ -175,7 +177,7 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
           startIcon={<WhatsApp />}
           onClick={() => {
             setContactMethod('whatsapp');
-            handleContactOpen();
+            setContactModalOpen(true);
           }}
           sx={{
             backgroundColor: 'var(--color-whatsapp)',
@@ -241,6 +243,30 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
           {fullAddress}
         </Typography>
       </PremiumPaper>
+
+      {/* Contact Modal */}
+      {property.agent && (
+        <ContactModal
+          open={contactModalOpen}
+          onClose={() => setContactModalOpen(false)}
+          contactType="agent"
+          contactInfo={{
+            id: property.agent._id,
+            name: property.agent.name,
+            email: property.agent.email,
+            phone: property.agent.mobile,
+            avatar: property.agent.avatar,
+            company: property.agent.company,
+            role: 'Real Estate Agent'
+          }}
+          propertyInfo={{
+            id: property._id,
+            title: property.buildingName || property.title,
+            price: property.price,
+            address: fullAddress
+          }}
+        />
+      )}
     </Box>
   );
 };

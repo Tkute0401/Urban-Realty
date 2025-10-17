@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import PropertyMap from '../../../components/property/PropertyMap';
+import ContactButton from '../../../components/contact/ContactButton';
 import {
   Box,
   Container,
@@ -777,14 +778,26 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                       Visit Website
                     </Button>
                   )}
-                  <Button
-                    variant="outlined"
-                    startIcon={<Phone />}
+                  <ContactButton
+                    contactType="developer"
+                    contactInfo={{
+                      id: project.developer._id,
+                      name: project.developer.name,
+                      email: project.developer.email,
+                      phone: project.developer.phone,
+                      avatar: project.developer.logo?.url,
+                      company: project.developer.name,
+                      role: 'Property Developer'
+                    }}
+                    projectInfo={{
+                      id: project._id,
+                      name: project.name,
+                      developer: project.developer.name
+                    }}
+                    variant="button"
                     size="small"
                     fullWidth
-                  >
-                    Contact Developer
-                  </Button>
+                  />
                 </Stack>
               </CardContent>
             </Card>

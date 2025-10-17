@@ -606,6 +606,7 @@ const AgentDashboard = () => {
           <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
             <Tab label="Recent Properties" />
             <Tab label="Recent Leads" />
+            <Tab label="Contact Management" />
             <Tab label="Analytics" />
           </Tabs>
         </Box>
@@ -787,6 +788,12 @@ const AgentDashboard = () => {
           )}
 
           {selectedTab === 2 && (
+            <Box>
+              <ContactDashboard userRole="agent" userId={user?._id} />
+            </Box>
+          )}
+
+          {selectedTab === 3 && (
             <Box>
               <Typography variant="h6" fontWeight="bold" gutterBottom>
                 Advanced Analytics
