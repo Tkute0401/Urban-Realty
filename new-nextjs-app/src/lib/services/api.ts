@@ -168,6 +168,11 @@ export const api = {
                 create: (payload: any) => unwrap<any>(http.post("/api/v1/developers", payload)),
                 update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/developers/${id}`, payload)),
                 delete: (id: string) => unwrap<any>(http.delete(`/api/v1/developers/${id}`)),
+                // Developer dashboard and analytics
+                dashboard: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/developers/dashboard", { params })),
+                analytics: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/developers/analytics", { params })),
+                inquiries: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/developers/inquiries", { params })),
+                updateInquiry: (inquiryId: string, payload: { status?: string; response?: string }) => unwrap<any>(http.put(`/api/v1/developers/inquiries/${inquiryId}`, payload)),
         },
         search: {
                 suggestions: (query: string) => unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { query } })),

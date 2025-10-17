@@ -8,7 +8,11 @@ const {
   updateDeveloper,
   deleteDeveloper,
   uploadDeveloperLogo,
-  getMyDeveloperProfile
+  getMyDeveloperProfile,
+  getDeveloperDashboard,
+  getDeveloperAnalytics,
+  getDeveloperInquiries,
+  updateDeveloperInquiry
 } = require('../../../controllers/developers');
 const upload = require('../middleware/multer');
 const advancedResults = require('../middleware/advancedResults');
@@ -46,6 +50,23 @@ router
     upload.single('logo'),
     uploadDeveloperLogo
   );
+
+// Developer dashboard and analytics routes
+router
+  .route('/dashboard')
+  .get(protect, authorize('developer'), getDeveloperDashboard);
+
+router
+  .route('/analytics')
+  .get(protect, authorize('developer'), getDeveloperAnalytics);
+
+router
+  .route('/inquiries')
+  .get(protect, authorize('developer'), getDeveloperInquiries);
+
+router
+  .route('/inquiries/:inquiryId')
+  .put(protect, authorize('developer'), updateDeveloperInquiry);
 
 module.exports = router;
 
