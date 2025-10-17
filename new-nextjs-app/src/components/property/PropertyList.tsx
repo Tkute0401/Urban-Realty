@@ -87,19 +87,27 @@ const PropertyList: React.FC<PropertyListProps> = ({
       px: { xs: 2, md: 3 },
       py: 6,
       minHeight: '400px',
-      overflow: 'hidden',
+      overflow: 'visible',
       background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(247, 107, 28, 0.01) 100%)'
     }}>
       {/* Properties Grid */}
       <Box sx={{
         display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(2, 1fr)',
-          md: 'repeat(2, 1fr)',
-          lg: 'repeat(3, 1fr)',
-          xl: 'repeat(3, 1fr)'
-        },
+        gridTemplateColumns: (() => {
+          const toCount = (val?: number) => (val ? Math.max(1, Math.floor(12 / val)) : undefined);
+          const xs = toCount(columns?.xs) ?? 1;
+          const sm = toCount(columns?.sm) ?? 2;
+          const md = toCount(columns?.md) ?? 2;
+          const lg = toCount(columns?.lg) ?? 3;
+          const xl = toCount(columns?.xl) ?? 3;
+          return {
+            xs: `repeat(${xs}, 1fr)`,
+            sm: `repeat(${sm}, 1fr)`,
+            md: `repeat(${md}, 1fr)`,
+            lg: `repeat(${lg}, 1fr)`,
+            xl: `repeat(${xl}, 1fr)`
+          };
+        })(),
         gap: { xs: 3, sm: 4, md: 5 },
         justifyItems: 'center',
         alignItems: 'start',

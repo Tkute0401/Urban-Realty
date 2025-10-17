@@ -1311,14 +1311,14 @@ const PropertiesPageContent: React.FC = () => {
             <Box sx={{ 
               flex: { xs: 1, lg: '0 0 60%' },
               minWidth: 0,
-              overflow: 'hidden'
+              overflow: 'visible'
             }}>
               <PropertyList
                 properties={properties}
                 loading={loading}
                 error={error}
                 emptyMessage="No properties found matching your criteria"
-                columns={{ xs: 12, sm: 6, md: 4 }}
+                columns={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}
                 onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
               />
             </Box>
@@ -1326,9 +1326,9 @@ const PropertiesPageContent: React.FC = () => {
               flex: { xs: 1, lg: '0 0 40%' }, 
               position: { xs: 'static', lg: 'sticky' }, 
               top: { lg: 20 }, 
-              height: { lg: 'fit-content' },
+              height: { lg: 'auto' },
               minWidth: 0,
-              overflow: 'hidden'
+              overflow: 'visible'
             }}>
               <PropertiesMap 
                 properties={properties}
