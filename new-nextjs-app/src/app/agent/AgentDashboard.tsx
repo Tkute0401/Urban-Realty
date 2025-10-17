@@ -83,6 +83,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatDate } from '@/lib/utils/format';
 import { motion } from 'framer-motion';
 import LoadingSkeleton from '@/components/common/LoadingSkeleton';
+import ContactDashboard from '@/components/contact/ContactDashboard';
 
 const AgentDashboard = () => {
   const { user } = useAuth();
