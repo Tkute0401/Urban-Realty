@@ -79,7 +79,7 @@ export const api = {
         admin: {
                 stats: () => unwrap<any>(http.get("/api/v1/admin/stats")),
                 dashboard: () => unwrap<any>(http.get("/api/v1/admin/stats")), // Fixed: Use stats endpoint for dashboard data
-                analytics: () => unwrap<any>(http.get("/api/v1/admin/analytics")),
+                analytics: (params?: Record<string, any>) => unwrap<any>(http.get("/api/v1/admin/analytics", { params })),
                 users: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/users", { params })),
                 properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/properties", { params })),
                 contacts: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/admin/contacts", { params })),
