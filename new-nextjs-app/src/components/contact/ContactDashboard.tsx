@@ -162,7 +162,7 @@ const ContactDashboard: React.FC<ContactDashboardProps> = ({ userRole, userId })
     }
   };
 
-  const filteredContacts = contactRequests?.data?.filter((contact: any) => {
+  const filteredContacts = contactRequests?.data?.items?.filter((contact: any) => {
     const matchesSearch = searchQuery === '' || 
       contact.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       contact.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -172,10 +172,10 @@ const ContactDashboard: React.FC<ContactDashboardProps> = ({ userRole, userId })
   }) || [];
 
   const stats = {
-    total: contactRequests?.data?.length || 0,
-    pending: contactRequests?.data?.filter((c: any) => c.status === 'pending').length || 0,
-    contacted: contactRequests?.data?.filter((c: any) => c.status === 'contacted').length || 0,
-    completed: contactRequests?.data?.filter((c: any) => c.status === 'completed').length || 0
+    total: contactRequests?.data?.totalItems || contactRequests?.data?.items?.length || 0,
+    pending: contactRequests?.data?.items?.filter((c: any) => c.status === 'pending').length || 0,
+    contacted: contactRequests?.data?.items?.filter((c: any) => c.status === 'contacted').length || 0,
+    completed: contactRequests?.data?.items?.filter((c: any) => c.status === 'completed').length || 0
   };
 
   if (isLoading) {
