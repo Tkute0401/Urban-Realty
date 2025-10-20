@@ -29,7 +29,6 @@ import {
   Cancel,
   Add,
   Delete,
-  Upload,
   Link,
   LocationOn,
   Phone,
@@ -548,7 +547,7 @@ const DeveloperProfileClient = () => {
               onChange={(e) => handleInputChange('socialMedia.facebook', e.target.value)}
               disabled={!editMode}
               InputProps={{
-                startAdornment: <Facebook sx={{ mr: 1, color: '#1877F2' }} />
+                startAdornment: <Facebook sx={{ mr: 1, color: 'var(--color-primary)' }} />
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -569,7 +568,7 @@ const DeveloperProfileClient = () => {
               onChange={(e) => handleInputChange('socialMedia.twitter', e.target.value)}
               disabled={!editMode}
               InputProps={{
-                startAdornment: <Twitter sx={{ mr: 1, color: '#1DA1F2' }} />
+                startAdornment: <Twitter sx={{ mr: 1, color: 'var(--color-secondary)' }} />
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -590,7 +589,7 @@ const DeveloperProfileClient = () => {
               onChange={(e) => handleInputChange('socialMedia.linkedin', e.target.value)}
               disabled={!editMode}
               InputProps={{
-                startAdornment: <LinkedIn sx={{ mr: 1, color: '#0077B5' }} />
+                startAdornment: <LinkedIn sx={{ mr: 1, color: 'var(--color-primary)' }} />
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -611,7 +610,7 @@ const DeveloperProfileClient = () => {
               onChange={(e) => handleInputChange('socialMedia.instagram', e.target.value)}
               disabled={!editMode}
               InputProps={{
-                startAdornment: <Instagram sx={{ mr: 1, color: '#E4405F' }} />
+                startAdornment: <Instagram sx={{ mr: 1, color: 'var(--color-error)' }} />
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
@@ -624,6 +623,296 @@ const DeveloperProfileClient = () => {
               }}
             />
           </Grid>
+        </Grid>
+      </StyledPaper>
+
+      {/* Projects Counters */}
+      <StyledPaper>
+        <SectionHeader variant="h5">
+          Projects Summary
+        </SectionHeader>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Completed Projects"
+              type="number"
+              value={formData.completedProjects}
+              onChange={(e) => handleInputChange('completedProjects', Number(e.target.value))}
+              disabled={!editMode}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'var(--color-text-primary)',
+                  '& fieldset': { borderColor: 'var(--color-border)' },
+                  '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                  '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                },
+                '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Ongoing Projects"
+              type="number"
+              value={formData.ongoingProjects}
+              onChange={(e) => handleInputChange('ongoingProjects', Number(e.target.value))}
+              disabled={!editMode}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'var(--color-text-primary)',
+                  '& fieldset': { borderColor: 'var(--color-border)' },
+                  '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                  '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                },
+                '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Upcoming Projects"
+              type="number"
+              value={formData.upcomingProjects}
+              onChange={(e) => handleInputChange('upcomingProjects', Number(e.target.value))}
+              disabled={!editMode}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'var(--color-text-primary)',
+                  '& fieldset': { borderColor: 'var(--color-border)' },
+                  '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                  '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                },
+                '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+              }}
+            />
+          </Grid>
+        </Grid>
+      </StyledPaper>
+
+      {/* Flagship Projects */}
+      <StyledPaper>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <SectionHeader variant="h5">Flagship Projects</SectionHeader>
+          {editMode && (
+            <Button startIcon={<Add />} onClick={() => setFormData(prev => ({ ...prev, flagshipProjects: [...prev.flagshipProjects, { name: '', description: '' }] }))}>
+              Add Project
+            </Button>
+          )}
+        </Box>
+        <Grid container spacing={2}>
+          {formData.flagshipProjects.map((proj, idx) => (
+            <Grid item xs={12} key={idx}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Project Name"
+                    value={proj.name || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData(prev => {
+                        const arr = [...prev.flagshipProjects];
+                        arr[idx] = { ...arr[idx], name: value };
+                        return { ...prev, flagshipProjects: arr };
+                      });
+                    }}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                <Grid item xs={12} md={7}>
+                  <TextField
+                    fullWidth
+                    label="Description"
+                    value={proj.description || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData(prev => {
+                        const arr = [...prev.flagshipProjects];
+                        arr[idx] = { ...arr[idx], description: value };
+                        return { ...prev, flagshipProjects: arr };
+                      });
+                    }}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                {editMode && (
+                  <Grid item xs={12} md={1}>
+                    <IconButton onClick={() => setFormData(prev => ({ ...prev, flagshipProjects: prev.flagshipProjects.filter((_, i) => i !== idx) }))}>
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          ))}
+          {formData.flagshipProjects.length === 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>No flagship projects added.</Typography>
+            </Grid>
+          )}
+        </Grid>
+      </StyledPaper>
+
+      {/* Team */}
+      <StyledPaper>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <SectionHeader variant="h5">Team</SectionHeader>
+          {editMode && (
+            <Button startIcon={<Add />} onClick={() => setFormData(prev => ({ ...prev, team: [...prev.team, { name: '', designation: '' }] }))}>
+              Add Member
+            </Button>
+          )}
+        </Box>
+        <Grid container spacing={2}>
+          {formData.team.map((member, idx) => (
+            <Grid item xs={12} key={idx}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} md={5}>
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    value={member.name || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.team]; arr[idx] = { ...arr[idx], name: e.target.value }; return { ...prev, team: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Designation"
+                    value={member.designation || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.team]; arr[idx] = { ...arr[idx], designation: e.target.value }; return { ...prev, team: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                {editMode && (
+                  <Grid item xs={12} md={1}>
+                    <IconButton onClick={() => setFormData(prev => ({ ...prev, team: prev.team.filter((_, i) => i !== idx) }))}>
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          ))}
+          {formData.team.length === 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>No team members added.</Typography>
+            </Grid>
+          )}
+        </Grid>
+      </StyledPaper>
+
+      {/* Specializations */}
+      <StyledPaper>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <SectionHeader variant="h5">Specializations</SectionHeader>
+          {editMode && (
+            <Button startIcon={<Add />} onClick={() => setFormData(prev => ({ ...prev, specializations: [...prev.specializations, { name: '', description: '' }] }))}>
+              Add Specialization
+            </Button>
+          )}
+        </Box>
+        <Grid container spacing={2}>
+          {formData.specializations.map((spec, idx) => (
+            <Grid item xs={12} key={idx}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    value={spec.name || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.specializations]; arr[idx] = { ...arr[idx], name: e.target.value }; return { ...prev, specializations: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                <Grid item xs={12} md={7}>
+                  <TextField
+                    fullWidth
+                    label="Description"
+                    value={spec.description || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.specializations]; arr[idx] = { ...arr[idx], description: e.target.value }; return { ...prev, specializations: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                {editMode && (
+                  <Grid item xs={12} md={1}>
+                    <IconButton onClick={() => setFormData(prev => ({ ...prev, specializations: prev.specializations.filter((_, i) => i !== idx) }))}>
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          ))}
+          {formData.specializations.length === 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>No specializations added.</Typography>
+            </Grid>
+          )}
+        </Grid>
+      </StyledPaper>
+
+      {/* Awards */}
+      <StyledPaper>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <SectionHeader variant="h5">Awards</SectionHeader>
+          {editMode && (
+            <Button startIcon={<Add />} onClick={() => setFormData(prev => ({ ...prev, awards: [...prev.awards, { name: '', year: '', category: '' }] }))}>
+              Add Award
+            </Button>
+          )}
+        </Box>
+        <Grid container spacing={2}>
+          {formData.awards.map((award, idx) => (
+            <Grid item xs={12} key={idx}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Award Name"
+                    value={award.name || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.awards]; arr[idx] = { ...arr[idx], name: e.target.value }; return { ...prev, awards: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <TextField
+                    fullWidth
+                    label="Year"
+                    type="number"
+                    value={award.year || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.awards]; arr[idx] = { ...arr[idx], year: e.target.value }; return { ...prev, awards: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TextField
+                    fullWidth
+                    label="Category"
+                    value={award.category || ''}
+                    onChange={(e) => setFormData(prev => { const arr = [...prev.awards]; arr[idx] = { ...arr[idx], category: e.target.value }; return { ...prev, awards: arr }; })}
+                    disabled={!editMode}
+                  />
+                </Grid>
+                {editMode && (
+                  <Grid item xs={12} md={1}>
+                    <IconButton onClick={() => setFormData(prev => ({ ...prev, awards: prev.awards.filter((_, i) => i !== idx) }))}>
+                      <Delete />
+                    </IconButton>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          ))}
+          {formData.awards.length === 0 && (
+            <Grid item xs={12}>
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>No awards added.</Typography>
+            </Grid>
+          )}
         </Grid>
       </StyledPaper>
 

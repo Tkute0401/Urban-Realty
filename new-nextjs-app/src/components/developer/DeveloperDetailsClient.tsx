@@ -17,6 +17,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDevelopers } from '../../contexts/DevelopersContext';
+import { useProjects } from '../../contexts/ProjectsContext';
 import { api } from '../../lib/services/api';
 import { formatNumber } from '../../lib/utils/format';
 import http from '../../lib/services/http';
@@ -48,6 +49,7 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
   const router = useRouter();
   const { user } = useAuth();
   const { developers, getDevelopers } = useDevelopers();
+  const { projects, loading: projectsLoading, error: projectsError, getProjectsByDeveloper } = useProjects();
 
   // Fallback data if developer is null or undefined
   const safeDeveloper = developer || {
@@ -106,6 +108,14 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headerHeight]);
+
+  // Load projects for this developer
+  useEffect(() => {
+    const developerId = Array.isArray(id) ? id[0] : id;
+    if (developerId) {
+      getProjectsByDeveloper(developerId).catch(() => {});
+    }
+  }, [id, getProjectsByDeveloper]);
 
   const scrollToSection = (ref) => {
     if (!ref.current) return;
@@ -377,6 +387,86 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
                   </Typography>
                 </Box>
               </Grid>
+              <Divider sx={{ my: 4, borderColor: 'rgba(120, 202, 220, 0.3)' }} />
+
+              {/* Developer Projects Grid */}
+              {projectsLoading ? (
+                <Grid item xs={12}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress />
+                  </Box>
+                </Grid>
+              ) : projectsError ? (
+                <Grid item xs={12}>
+                  <Alert severity="error">{projectsError}</Alert>
+                </Grid>
+              ) : (
+                <>
+                  {projects && projects.length > 0 ? (
+                    <Grid item xs={12}>
+                      <Grid container spacing={3}>
+                        {projects.map((proj: any) => (
+                          <Grid item xs={12} sm={6} md={4} lg={3} key={proj._id}>
+                            <Box sx={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                              border: '1px solid rgba(120, 202, 220, 0.2)',
+                              borderRadius: 2,
+                              overflow: 'hidden',
+                              height: '100%'
+                            }}>
+                              <Box sx={{
+                                position: 'relative',
+                                pt: '56.25%',
+                                backgroundColor: 'rgba(255, 255, 255, 0.06)'
+                              }}>
+                                {proj.images?.length ? (
+                                  <img
+                                    src={proj.images.find((i: any) => i.isPrimary)?.url || proj.images[0].url}
+                                    alt={proj.name}
+                                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                                  />
+                                ) : null}
+                              </Box>
+                              <Box sx={{ p: 2.5 }}>
+                                <Typography variant="h6" sx={{ mb: 1, color: 'white' }}>
+                                  {proj.name}
+                                </Typography>
+                                {proj.location?.city && (
+                                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1 }}>
+                                    {proj.location.city}{proj.location?.state ? `, ${proj.location.state}` : ''}
+                                  </Typography>
+                                )}
+                                <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: 'wrap' }}>
+                                  {proj.status && (
+                                    <Chip size="small" label={proj.status} sx={{ color: 'white', borderColor: 'rgba(120, 202, 220, 0.5)' }} variant="outlined" />
+                                  )}
+                                  {proj.type && (
+                                    <Chip size="small" label={proj.type} sx={{ color: 'white', borderColor: 'rgba(120, 202, 220, 0.5)' }} variant="outlined" />
+                                  )}
+                                </Stack>
+                                <Button
+                                  fullWidth
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={() => router.push(`/projects/${proj._id}`)}
+                                >
+                                  View Details
+                                </Button>
+                              </Box>
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    <Grid item xs={12}>
+                      <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        No projects found for this developer.
+                      </Typography>
+                    </Grid>
+                  )}
+                </>
+              )}
             </Grid>
           </Paper>
         </Box>
