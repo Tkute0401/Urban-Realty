@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 
 const SectionHeader = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
-  color: '#78CADC',
+  color: 'var(--color-primary)',
   position: 'relative',
   paddingBottom: theme.spacing(2),
   marginBottom: theme.spacing(4),
@@ -17,7 +17,7 @@ const SectionHeader = styled(Typography)(({ theme }) => ({
     left: 0,
     width: '60px',
     height: '3px',
-    backgroundColor: '#78CADC',
+    backgroundColor: 'var(--color-primary)',
     borderRadius: '3px'
   }
 }));

@@ -108,26 +108,26 @@ const DeveloperList = () => {
         justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '50vh',
-        background: '#08171A'
+        background: 'var(--color-bg-dark)'
       }}>
-        <CircularProgress size={isMobile ? 40 : 60} sx={{ color: '#78CADC' }} />
+        <CircularProgress size={isMobile ? 40 : 60} sx={{ color: 'var(--color-primary)' }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center', color: 'white', background: '#08171A' }}>
+      <Container maxWidth="md" sx={{ py: 4, textAlign: 'center', color: 'var(--color-text-inverse)', background: 'var(--color-bg-dark)' }}>
         <Typography color="error" gutterBottom>
           Error loading developers
         </Typography>
-        <Typography variant="body2" sx={{ mb: 2, color: 'white' }}>{error}</Typography>
+        <Typography variant="body2" sx={{ mb: 2, color: 'var(--color-text-inverse)' }}>{error}</Typography>
         <Button 
           variant="contained" 
           onClick={() => getDevelopers()}
           startIcon={<Refresh />}
           size={isMobile ? 'small' : 'medium'}
-          sx={{ backgroundColor: '#78CADC', '&:hover': { backgroundColor: '#5cb3c5' } }}
+          sx={{ backgroundColor: 'var(--color-primary)', '&:hover': { backgroundColor: 'var(--color-primary-hover)' } }}
         >
           Retry
         </Button>
@@ -173,9 +173,9 @@ const DeveloperList = () => {
             size={isMobile ? 'small' : 'medium'}
             sx={{ 
               mr: 1, 
-              backgroundColor: '#78CADC', 
+              backgroundColor: 'var(--color-primary)', 
               '&:hover': { 
-                backgroundColor: '#5cb3c5', 
+                backgroundColor: 'var(--color-primary-hover)', 
                 transform: 'translateY(-2px)', 
                 boxShadow: '0 6px 10px rgba(0,0,0,0.2)' 
               },
@@ -213,14 +213,14 @@ const DeveloperList = () => {
                 className="custom-pagination"
                 sx={{
                   '& .MuiPaginationItem-root': { 
-                    color: 'white',
+                    color: 'var(--color-text-inverse)',
                     fontSize: isMobile ? '0.75rem' : '0.875rem'
                   },
                   '& .MuiPaginationItem-root.Mui-selected': { 
-                    backgroundColor: '#78CADC', 
-                    color: '#08171A',
+                    backgroundColor: 'var(--color-primary)', 
+                    color: 'var(--color-text-inverse)',
                     '&:hover': {
-                      backgroundColor: '#5cb3c5'
+                      backgroundColor: 'var(--color-primary-hover)'
                     }
                   },
                   '& .MuiPaginationItem-root:hover': { 

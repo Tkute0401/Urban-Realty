@@ -54,17 +54,17 @@ const PremiumButton = styled(Button)(({ theme }) => ({
   fontSize: '1rem',
   letterSpacing: '0.5px',
   '&:hover': {
-    backgroundColor: '#5fb4c9',
+    backgroundColor: 'var(--color-primary-hover)',
     transform: 'translateY(-3px)',
-    boxShadow: '0 6px 12px rgba(120, 202, 220, 0.4)',
+    boxShadow: '0 6px 12px rgba(var(--color-primary-rgb), 0.4)',
   },
   transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-  boxShadow: '0 4px 8px rgba(120, 202, 220, 0.2)',
+  boxShadow: '0 4px 8px rgba(var(--color-primary-rgb), 0.2)',
 }));
 
 const SectionHeader = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
-  color: '#78CADC',
+  color: 'var(--color-primary)',
   position: 'relative',
   paddingBottom: theme.spacing(1),
   marginBottom: theme.spacing(3),
@@ -76,7 +76,7 @@ const SectionHeader = styled(Typography)(({ theme }) => ({
     left: 0,
     width: '60px',
     height: '3px',
-    backgroundColor: '#78CADC',
+    backgroundColor: 'var(--color-primary)',
     borderRadius: '3px'
   }
 }));
@@ -478,7 +478,7 @@ const AddDeveloperClient = () => {
                     helperText={formErrors.name}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <Business />
                         </InputAdornment>
                       )
@@ -486,18 +486,18 @@ const AddDeveloperClient = () => {
                     sx={{
                       mb: 2,
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -520,18 +520,18 @@ const AddDeveloperClient = () => {
                     sx={{
                       mb: 2,
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -550,25 +550,25 @@ const AddDeveloperClient = () => {
                     helperText={formErrors.website}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <Language />
                         </InputAdornment>
                       )
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -589,18 +589,18 @@ const AddDeveloperClient = () => {
                     inputProps={{ min: 1800, max: typeof window !== 'undefined' ? new Date().getFullYear() : 2024 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -629,13 +629,13 @@ const AddDeveloperClient = () => {
                       height: 120,
                       objectFit: 'contain',
                       borderRadius: '8px',
-                      border: '2px solid #78CADC',
+                      border: '2px solid var(--color-primary)',
                       mr: 2
                     }}
                   />
                   <IconButton
                     onClick={handleRemoveLogo}
-                    sx={{ color: '#ff6b6b' }}
+                    sx={{ color: 'var(--color-error)' }}
                   >
                     <Delete />
                   </IconButton>
@@ -648,11 +648,11 @@ const AddDeveloperClient = () => {
                 startIcon={<CloudUpload />}
                 size={isMobile ? 'small' : 'medium'}
                 sx={{
-                  backgroundColor: '#78CADC',
-                  color: '#0B1011',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-text-inverse)',
                   fontWeight: 600,
                   '&:hover': {
-                    backgroundColor: '#5fb4c9'
+                    backgroundColor: 'var(--color-primary-hover)'
                   }
                 }}
               >
@@ -686,18 +686,18 @@ const AddDeveloperClient = () => {
                     helperText={formErrors.city}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -716,18 +716,18 @@ const AddDeveloperClient = () => {
                     helperText={formErrors.state}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -743,18 +743,18 @@ const AddDeveloperClient = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -781,18 +781,18 @@ const AddDeveloperClient = () => {
                     inputProps={{ min: 0 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -810,18 +810,18 @@ const AddDeveloperClient = () => {
                     inputProps={{ min: 0 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -839,18 +839,18 @@ const AddDeveloperClient = () => {
                     inputProps={{ min: 0 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -877,25 +877,25 @@ const AddDeveloperClient = () => {
                     helperText={formErrors.email}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <Email />
                         </InputAdornment>
                       )
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -911,25 +911,25 @@ const AddDeveloperClient = () => {
                     size={isMobile ? 'small' : 'medium'}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start" sx={{ color: '#78CADC' }}>
+                        <InputAdornment position="start" sx={{ color: 'var(--color-primary)' }}>
                           <Phone />
                         </InputAdornment>
                       )
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: '#fff',
+                        color: 'var(--color-white)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: '#78CADC',
+                        color: 'var(--color-primary)',
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                         '&:hover fieldset': {
-                          borderColor: '#78CADC',
+                          borderColor: 'var(--color-primary)',
                         },
                       }
                     }}
@@ -950,12 +950,12 @@ const AddDeveloperClient = () => {
                 type="submit"
                 size="large"
                 disabled={loading || isSubmitting}
-                startIcon={(loading || isSubmitting) ? <CircularProgress size={20} sx={{ color: '#0B1011' }} /> : null}
+                startIcon={(loading || isSubmitting) ? <CircularProgress size={20} sx={{ color: 'var(--color-text-inverse)' }} /> : null}
                 sx={{ 
                   flex: 1,
                   py: 1.5,
                   '&:disabled': {
-                    backgroundColor: 'rgba(120, 202, 220, 0.5)'
+                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.5)'
                   }
                 }}
               >
@@ -968,12 +968,12 @@ const AddDeveloperClient = () => {
                 sx={{ 
                   flex: 1,
                   py: 1.5,
-                  color: '#78CADC',
-                  borderColor: '#78CADC',
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
                   fontWeight: 600,
                   '&:hover': {
-                    backgroundColor: 'rgba(120, 202, 220, 0.1)',
-                    borderColor: '#78CADC'
+                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)',
+                    borderColor: 'var(--color-primary)'
                   }
                 }}
                 onClick={() => router.push('/developers')}
@@ -1002,9 +1002,9 @@ const AddDeveloperClient = () => {
         }
         sx={{
           '& .MuiSnackbarContent-root': {
-            backgroundColor: '#0B1011',
-            color: '#fff',
-            border: '2px solid #78CADC',
+            backgroundColor: 'var(--color-text-primary)',
+            color: 'var(--color-white)',
+            border: '2px solid var(--color-primary)',
             fontFamily: '"Poppins", sans-serif'
           }
         }}

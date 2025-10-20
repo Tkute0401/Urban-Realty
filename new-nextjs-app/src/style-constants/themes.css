@@ -7,6 +7,7 @@
   --color-warning:#f59e0b; --color-danger:#ef4444; --color-border:#e5e7eb; --focus-ring:#1A2BFF;
   --color-white:#ffffff; --color-error:#ef4444; --color-error-light:#fef2f2;
   --color-primary-light:#fed7c7; --color-primary-dark:#c44e14;
+  --color-primary-rgb: 247, 107, 28; --color-secondary-rgb: 26, 43, 255; --color-error-rgb: 239, 68, 68;
   --chart-gradient-1:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --chart-gradient-2:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --chart-gradient-3:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);

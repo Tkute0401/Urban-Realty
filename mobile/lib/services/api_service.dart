@@ -1,93 +1,131 @@
-
+import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../config/api_config.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final Dio _dio;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  final int _maxRetries = 2;
+  late Dio _dio;
+  late SharedPreferences _prefs;
+  String? _authToken;
 
-  static final String _baseUrl =
-      dotenv.env['API_BASE_URL']?.trim().isNotEmpty == true
-          ? dotenv.env['API_BASE_URL']!.trim()
-          : ApiConfig.baseUrl;
+  ApiService() {
+    _init();
+  }
 
-  ApiService() : _dio = Dio() {
-    _dio.options.baseUrl = _baseUrl;
-    _dio.options.connectTimeout = const Duration(seconds: 30);
-    _dio.options.receiveTimeout = const Duration(seconds: 30);
+  Future<void> _init() async {
+    _prefs = await SharedPreferences.getInstance();
+    _authToken = _prefs.getString('auth_token');
+
+    _dio = Dio(BaseOptions(
+      baseUrl: 'https://api.urbanrealty.com', // Replace with your actual API base URL
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ));
+
     _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final token = await _secureStorage.read(key: 'jwt_token');
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
+      onRequest: (options, handler) {
+        if (_authToken != null) {
+          options.headers['Authorization'] = 'Bearer $_authToken';
         }
-        options.headers['Accept'] = 'application/json';
         return handler.next(options);
       },
-      onResponse: (response, handler) {
-        return handler.next(response);
-      },
       onError: (DioException e, handler) async {
-        final requestOptions = e.requestOptions;
-
-        // Network issues: retry with simple exponential backoff
-        final isNetworkError = e.type == DioExceptionType.connectionTimeout ||
-            e.type == DioExceptionType.sendTimeout ||
-            e.type == DioExceptionType.receiveTimeout ||
-            e.type == DioExceptionType.connectionError;
-
-        final int currentRetry = (requestOptions.extra['retryCount'] as int?) ?? 0;
-        if ((isNetworkError || e.response?.statusCode == 503) && currentRetry < _maxRetries) {
-          final int delayMs = 300 * (1 << currentRetry); // 300ms, 600ms
-          await Future.delayed(Duration(milliseconds: delayMs));
-          requestOptions.extra['retryCount'] = currentRetry + 1;
-          try {
-            final Response retryResponse = await _dio.fetch(requestOptions);
-            return handler.resolve(retryResponse);
-          } catch (err) {
-            // Fall through to normalized error below
-          }
+        if (e.response?.statusCode == 401) {
+          // Handle token refresh or re-login
+          _clearAuthToken();
+          // Optionally, navigate to login screen
         }
-
-        // Normalize error structure
-        final normalized = DioException(
-          requestOptions: requestOptions,
-          response: e.response,
-          type: e.type,
-          error: _normalizeErrorMessage(e),
-        );
-        return handler.next(normalized);
+        return handler.next(e);
       },
     ));
   }
 
-  Dio get dio => _dio;
+  String? get authToken => _authToken;
 
-  String _normalizeErrorMessage(DioException e) {
-    try {
-      final status = e.response?.statusCode;
-      if (status != null) {
-        final data = e.response?.data;
-        if (data is Map && data['message'] is String) {
-          return 'HTTP $status: ${data['message']}';
-        }
-        return 'HTTP $status: ${e.message ?? 'Request failed'}';
-      }
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        return 'Network timeout. Please check your connection and try again.';
-      }
-      if (e.type == DioExceptionType.connectionError) {
-        return 'Network error. You appear to be offline.';
-      }
-      return e.message ?? 'Unexpected error occurred.';
-    } catch (_) {
-      return 'Unexpected error occurred.';
-    }
+  void setAuthToken(String token) {
+    _authToken = token;
+    _prefs.setString('auth_token', token);
+  }
+
+  void _clearAuthToken() {
+    _authToken = null;
+    _prefs.remove('auth_token');
+  }
+
+  Future<bool> isConnected() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
+  }
+
+  Future<Response<T>> get<T>(String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    return await _dio.get(
+      path,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+      onReceiveProgress: onReceiveProgress,
+    );
+  }
+
+  Future<Response<T>> post<T>(String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    return await _dio.post(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+  }
+
+  Future<Response<T>> put<T>(String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    return await _dio.put(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+  }
+
+  Future<Response<T>> delete<T>(String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    return await _dio.delete(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+      cancelToken: cancelToken,
+    );
   }
 }

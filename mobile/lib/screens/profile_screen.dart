@@ -1,317 +1,310 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
+import '../config/design_tokens.dart';
+import 'static_pages/index.dart';
+import 'profile_edit_screen.dart';
+import 'user_edit_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final user = authState.user;
 
-class _ProfileScreenState extends State<ProfileScreen> {
-
-  bool _loading = true;
-  String? _error;
-  Map<String, dynamic>? _me;
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _name = TextEditingController();
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _mobile = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetch();
-  }
-
-  Future<void> _fetch() async {
-    setState(() { _loading = true; _error = null; });
-    try {
-      final me = await AuthService().getCurrentUser();
-      _me = me.toJson();
-      _name.text = me.name;
-      _email.text = me.email;
-      _mobile.text = _me?['mobile']?.toString() ?? '';
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      if (mounted) setState(() { _loading = false; });
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await ref.read(authStateProvider.notifier).logout();
+              if (context.mounted) {
+                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+              }
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Profile Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                  ],
+                ),
+              ),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: user.profileImage != null && user.profileImage!.isNotEmpty
+                        ? NetworkImage(user.profileImage!)
+                        : null,
+                    child: user.profileImage == null || user.profileImage!.isEmpty
+                        ? const Icon(Icons.person, size: 50)
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    user.name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user.email,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      user.role.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Profile Options
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _buildProfileOption(
+                    context,
+                    Icons.person,
+                    'Edit Profile',
+                    'Update your personal information',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileEditScreen()),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.settings,
+                    'Account Settings',
+                    'Manage your account preferences',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const UserEditScreen()),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.favorite,
+                    'My Favorites',
+                    'View your favorite properties',
+                    () {
+                      // TODO: Implement favorites
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Favorites functionality not implemented yet')),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.history,
+                    'Viewing History',
+                    'Properties you\'ve viewed recently',
+                    () {
+                      // TODO: Implement viewing history
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Viewing history functionality not implemented yet')),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.settings,
+                    'Settings',
+                    'App preferences and notifications',
+                    () {
+                      // TODO: Implement settings
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Settings functionality not implemented yet')),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.help,
+                    'Help & Support',
+                    'Get help and contact support',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HelpPage()),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.info,
+                    'About',
+                    'App version and information',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AboutPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: DesignTokens.spaceLg),
+
+            // Legal Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Legal',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: DesignTokens.spaceMd),
+                  _buildProfileOption(
+                    context,
+                    Icons.privacy_tip,
+                    'Privacy Policy',
+                    'How we collect and use your data',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.description,
+                    'Terms of Service',
+                    'Terms and conditions of use',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TermsOfServicePage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: DesignTokens.spaceLg),
+
+            // Company Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Company',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: DesignTokens.spaceMd),
+                  _buildProfileOption(
+                    context,
+                    Icons.work,
+                    'Careers',
+                    'Join our team',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CareerPage()),
+                      );
+                    },
+                  ),
+                  _buildProfileOption(
+                    context,
+                    Icons.contact_mail,
+                    'Contact Us',
+                    'Get in touch with us',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ContactPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
   }
 
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _error = null; });
-    try {
-      await AuthService().updateProfile({
-        'name': _name.text.trim(),
-        'email': _email.text.trim(),
-        'mobile': _mobile.text.trim(),
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated')));
-      }
-    } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); });
-    } finally {
-      if (mounted) setState(() { _loading = false; });
-    }
-  }
-
-  Widget _buildProfileActionTile(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+  Widget _buildProfileOption(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(subtitle),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
       ),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.pushNamed(context, '/settings'),
-        icon: const Icon(Icons.settings),
-        label: const Text('Settings'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      ),
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
-            tooltip: 'Settings',
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => Navigator.pushNamed(context, '/help'),
-            tooltip: 'Help',
-          ),
-        ],
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: Form(
-                    key: _formKey,
-                    child: ListView(
-                      children: [
-                        if (_error != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(_error!, style: const TextStyle(color: Colors.red)),
-                          ),
-                        TextFormField(
-                          controller: _name,
-                          decoration: const InputDecoration(labelText: 'Name'),
-                          validator: (v) => (v == null || v.isEmpty) ? 'Enter name' : null,
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _email,
-                          decoration: const InputDecoration(labelText: 'Email'),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Enter email' : null,
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _mobile,
-                          decoration: const InputDecoration(labelText: 'Mobile'),
-                          keyboardType: TextInputType.phone,
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(onPressed: _save, child: const Text('Save changes')),
-                        const SizedBox(height: 20),
-                        
-                        // Role-based Navigation Options
-                        Consumer<AuthProvider>(
-                          builder: (context, authProvider, child) {
-                            final user = authProvider.user;
-                            if (user == null) return const SizedBox.shrink();
-                            
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Quick Access',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                
-                                // Agent options
-                                if (user.role.toLowerCase() == 'agent') ...[
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Agent Dashboard',
-                                    Icons.dashboard,
-                                    () => Navigator.pushNamed(context, '/agent/dashboard'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'My Properties',
-                                    Icons.home_work,
-                                    () => Navigator.pushNamed(context, '/agent/properties'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Analytics',
-                                    Icons.analytics,
-                                    () => Navigator.pushNamed(context, '/agent/analytics'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Inquiries',
-                                    Icons.inbox,
-                                    () => Navigator.pushNamed(context, '/agent/inquiries'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Leads',
-                                    Icons.leaderboard,
-                                    () => Navigator.pushNamed(context, '/agent/leads'),
-                                  ),
-                                ],
-                                
-                                // Admin options
-                                if (user.role.toLowerCase() == 'admin') ...[
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Admin Dashboard',
-                                    Icons.admin_panel_settings,
-                                    () => Navigator.pushNamed(context, '/admin/dashboard'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Manage Users',
-                                    Icons.people,
-                                    () => Navigator.pushNamed(context, '/admin/users'),
-                                  ),
-                                ],
-                                
-                                // Developer options
-                                if (user.role.toLowerCase() == 'developer') ...[
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Developers List',
-                                    Icons.developer_mode,
-                                    () => Navigator.pushNamed(context, '/developers'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Add Property',
-                                    Icons.add_home,
-                                    () => Navigator.pushNamed(context, '/add-property'),
-                                  ),
-                                ],
-                                
-                                // Regular user options
-                                if (user.role.toLowerCase() == 'user' || user.role.toLowerCase() == 'buyer' || user.role.toLowerCase() == 'seller') ...[
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Add Property',
-                                    Icons.add_home,
-                                    () => Navigator.pushNamed(context, '/add-property'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Favorites',
-                                    Icons.favorite,
-                                    () => Navigator.pushNamed(context, '/favorites'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Recently Viewed',
-                                    Icons.history,
-                                    () => Navigator.pushNamed(context, '/recently-viewed'),
-                                  ),
-                                  _buildProfileActionTile(
-                                    context,
-                                    'Subscription',
-                                    Icons.card_membership,
-                                    () => Navigator.pushNamed(context, '/subscription/manage'),
-                                  ),
-                                ],
-                                
-                                // Common options for all users
-                                const SizedBox(height: 16),
-                                _buildProfileActionTile(
-                                  context,
-                                  'Settings',
-                                  Icons.settings,
-                                  () => Navigator.pushNamed(context, '/settings'),
-                                ),
-                                _buildProfileActionTile(
-                                  context,
-                                  'Favorites',
-                                  Icons.favorite,
-                                  () => Navigator.pushNamed(context, '/favorites'),
-                                ),
-                                _buildProfileActionTile(
-                                  context,
-                                  'Help & Support',
-                                  Icons.help,
-                                  () => Navigator.pushNamed(context, '/help'),
-                                ),
-                                _buildProfileActionTile(
-                                  context,
-                                  'About Us',
-                                  Icons.info,
-                                  () => Navigator.pushNamed(context, '/about'),
-                                ),
-                                _buildProfileActionTile(
-                                  context,
-                                  'Privacy Policy',
-                                  Icons.privacy_tip,
-                                  () => Navigator.pushNamed(context, '/privacy'),
-                                ),
-                                _buildProfileActionTile(
-                                  context,
-                                  'Terms of Service',
-                                  Icons.description,
-                                  () => Navigator.pushNamed(context, '/terms'),
-                                ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final navigator = Navigator.of(context);
-                                    await authProvider.logout();
-                                    if (mounted) {
-                                      navigator.pushReplacementNamed('/');
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Logout'),
-                                ),
-                                const SizedBox(height: 8),
-                              ],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-    );
-  }
 }
-

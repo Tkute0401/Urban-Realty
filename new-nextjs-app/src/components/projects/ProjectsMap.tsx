@@ -181,10 +181,10 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
               url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                 <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
                   <path d="M15 0C8.373 0 3 5.373 3 12c0 8.25 12 28 12 28s12-19.75 12-28c0-6.627-5.373-12-12-12z" 
-                        fill="${isSelected ? '#FF4081' : '#78CADC'}" 
-                        stroke="#fff" 
+                        fill="${isSelected ? 'var(--color-primary)' : 'var(--color-secondary)'}" 
+                        stroke="var(--color-white)" 
                         stroke-width="2"/>
-                  <circle cx="15" cy="12" r="5" fill="#fff"/>
+                  <circle cx="15" cy="12" r="5" fill="var(--color-white)"/>
                 </svg>
               `)}`,
               width: 30,
@@ -232,8 +232,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
               icon: {
                 url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
-                    <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                    <circle cx="12" cy="12" r="10" fill="var(--color-success)" stroke="var(--color-success)" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="4" fill="var(--color-white)"/>
                   </svg>
                 `)}`,
                 scaledSize: { width: 24, height: 24 }

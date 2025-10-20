@@ -4,6 +4,8 @@ import React, { Suspense } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 import HeroSection from "@/components/home/HeroSection";
 import PropertiesSection from "@/components/home/PropertiesSection";
+import PopularProjectsSection from "@/components/home/PopularProjectsSection";
+import PopularDevelopersSection from "@/components/home/PopularDevelopersSection";
 import OwnerServiceBlock from "@/components/home/OwnerServiceBox";
 import ServiceBlocksGroup from "@/components/home/ServiceBlocksGroup";
 import Reviews from "@/components/common/footer/Reviews";
@@ -21,6 +23,8 @@ function HomePageContent() {
     <div className="font-poppins bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
       <HeroSection/>
       <PropertiesSection />
+      <PopularProjectsSection />
+      <PopularDevelopersSection />
       <ServiceBlocksGroup />
       <OwnerServiceBlock />
       <Reviews />

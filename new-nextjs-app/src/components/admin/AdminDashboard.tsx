@@ -555,7 +555,7 @@ const AdminDashboard: React.FC = () => {
                   <React.Fragment key={index}>
                     <ListItem>
                       <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32' }}>
+                        <Avatar sx={{ bgcolor: index === 0 ? 'var(--color-warning)' : index === 1 ? 'var(--color-text-muted)' : 'var(--color-primary-dark)' }}>
                           {agent.name.charAt(0)}
                         </Avatar>
                       </ListItemAvatar>

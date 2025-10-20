@@ -1,74 +1,168 @@
+import 'package:urban_realty_mobile/models/user.dart';
+import 'package:urban_realty_mobile/services/api_service.dart';
 
-import 'package:dio/dio.dart';
-import 'dart:developer' as developer;
-import '../models/user.dart';
-import 'api_service.dart';
+/// Represents the result of an authentication operation
+class AuthResult {
+  final bool isSuccess;
+  final String message;
+  final User? user;
+  final String? token;
 
+  AuthResult({
+    required this.isSuccess,
+    required this.message,
+    this.user,
+    this.token,
+  });
+
+  factory AuthResult.success({User? user, String? token, String message = 'Success'}) {
+    return AuthResult(isSuccess: true, message: message, user: user, token: token);
+  }
+
+  factory AuthResult.error(String message) {
+    return AuthResult(isSuccess: false, message: message);
+  }
+}
+
+/// Authentication Service
 class AuthService {
-  final ApiService _apiService = ApiService();
+  final ApiService _apiService;
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  AuthService({required ApiService apiService}) : _apiService = apiService;
+
+  /// Login user (Mock implementation)
+  Future<AuthResult> login(String email, String password) async {
     try {
-      final response = await _apiService.dio.post(
-        '/auth/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception('Error during login: ${e.message}');
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Mock validation - accept any email/password for demo
+      if (email.isNotEmpty && password.isNotEmpty) {
+        // Create mock user based on email
+        final user = User(
+          id: 'mock_user_${DateTime.now().millisecondsSinceEpoch}',
+          name: email.split('@')[0].replaceAll('.', ' ').split(' ').map((word) =>
+            word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : ''
+          ).join(' '),
+          email: email,
+          phone: '+1234567890',
+          role: email.contains('admin') ? 'admin' :
+                email.contains('agent') ? 'agent' :
+                email.contains('dev') ? 'developer' : 'user',
+          profileImage: null,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        final token = 'mock_token_${DateTime.now().millisecondsSinceEpoch}';
+
+        // Set auth token
+        _apiService.setAuthToken(token);
+
+        return AuthResult.success(
+          user: user,
+          token: token,
+          message: 'Login successful (Demo Mode)',
+        );
+      } else {
+        return AuthResult.error('Please enter both email and password');
+      }
+    } catch (e) {
+      return AuthResult.error('Login failed: ${e.toString()}');
     }
   }
 
-  Future<Map<String, dynamic>> register(String email, String password, String name, String role) async {
+  /// Register user (Mock implementation)
+  Future<AuthResult> register({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+    String role = 'user',
+  }) async {
     try {
-      final response = await _apiService.dio.post(
-        '/auth/register',
-        data: {
-          'email': email,
-          'password': password,
-          'name': name,
-          'role': role,
-        },
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception('Error during registration: ${e.message}');
+      // Simulate network delay
+      await Future.delayed(const Duration(seconds: 1));
+
+      // Mock validation
+      if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty && phone.isNotEmpty) {
+        // Create mock user
+        final user = User(
+          id: 'mock_user_${DateTime.now().millisecondsSinceEpoch}',
+          name: name,
+          email: email,
+          phone: phone,
+          role: role,
+          profileImage: null,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        final token = 'mock_token_${DateTime.now().millisecondsSinceEpoch}';
+
+        // Set auth token
+        _apiService.setAuthToken(token);
+
+        return AuthResult.success(
+          user: user,
+          token: token,
+          message: 'Registration successful (Demo Mode)',
+        );
+      } else {
+        return AuthResult.error('Please fill in all fields');
+      }
+    } catch (e) {
+      return AuthResult.error('Registration failed: ${e.toString()}');
     }
   }
 
+  /// Get current user (Mock implementation)
+  Future<User?> getCurrentUser() async {
+    try {
+      // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Check if we have a stored token (mock check)
+      final token = _apiService.authToken;
+      if (token != null && token.isNotEmpty) {
+        // Return a mock user based on stored token
+        return User(
+          id: 'mock_user_123',
+          name: 'Demo User',
+          email: 'demo@urbanrealty.com',
+          phone: '+1234567890',
+          role: 'user',
+          profileImage: null,
+          createdAt: DateTime.now().subtract(const Duration(days: 30)),
+          updatedAt: DateTime.now(),
+        );
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Logout user
   Future<void> logout() async {
     try {
-      // The backend doesn't seem to have a formal logout endpoint to invalidate tokens.
-      // For now, logout is a client-side operation (handled by AuthProvider).
-      // We'll skip the API call to avoid the error since the backend doesn't have this endpoint.
-      developer.log('Logout completed (client-side only)', name: 'AuthService.logout');
+      // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 500));
+      // Clear local auth data
+      _apiService.setAuthToken('');
     } catch (e) {
-      // Don't throw exception for logout failures, just log it without using print.
-      developer.log('Logout error: ${e.toString()}', name: 'AuthService.logout');
+      // Handle logout error if needed
+      print('Logout error: $e');
     }
   }
 
-  Future<User> getCurrentUser() async {
+  /// Check if user is authenticated
+  Future<bool> isAuthenticated() async {
     try {
-      final response = await _apiService.dio.get('/auth/me');
-      return User.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw Exception('Error getting current user: ${e.message}');
-    }
-  }
-
-  Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> userData) async {
-    try {
-      final response = await _apiService.dio.put(
-        '/auth/update', // Corrected endpoint based on API docs
-        data: userData,
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception('Error updating profile: ${e.message}');
+      final user = await getCurrentUser();
+      return user != null;
+    } catch (e) {
+      return false;
     }
   }
 }

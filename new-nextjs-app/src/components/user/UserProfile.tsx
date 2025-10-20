@@ -196,7 +196,7 @@ const UserProfile = () => {
                       href="/admin"
                       sx={{ 
                         bgcolor: 'var(--color-primary)', 
-                        color: '#0B1011',
+                        color: 'var(--color-text-inverse)',
                         '&:hover': { 
                           bgcolor: 'var(--color-primary)', 
                           opacity: 0.9 
@@ -215,7 +215,7 @@ const UserProfile = () => {
                         href="/agent"
                         sx={{ 
                           bgcolor: 'var(--color-primary)', 
-                          color: '#0B1011',
+                          color: 'var(--color-text-inverse)',
                           '&:hover': { 
                             bgcolor: 'var(--color-primary)', 
                             opacity: 0.9 
@@ -234,7 +234,7 @@ const UserProfile = () => {
                           '&:hover': { 
                             borderColor: 'var(--color-primary)',
                             bgcolor: 'var(--color-primary)',
-                            color: '#0B1011'
+                            color: 'var(--color-text-inverse)'
                           }
                         }}
                       >

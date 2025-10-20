@@ -240,7 +240,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           marker.setIcon({
             url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
               <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="10" cy="10" r="8" fill="${isSelected ? '#FF4081' : '#78CADC'}" stroke="#0B1011" stroke-width="2"/>
+                <circle cx="10" cy="10" r="8" fill="${isSelected ? 'var(--color-primary)' : 'var(--color-secondary)'}" stroke="var(--color-text-primary)" stroke-width="2"/>
               </svg>
             `)}`,
             scaledSize: { width: 20, height: 20 }
@@ -277,8 +277,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           icon: {
             url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
               <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
-                <circle cx="12" cy="12" r="4" fill="#FFFFFF"/>
+                <circle cx="12" cy="12" r="10" fill="var(--color-success)" stroke="var(--color-success)" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4" fill="var(--color-white)"/>
               </svg>
             `)}`,
             scaledSize: { width: 24, height: 24 }

@@ -1,0 +1,132 @@
+# Urban Realty Mobile E2E Test Configuration
+
+# Test Environment Settings
+environment:
+  api_base_url: "https://urban-realty-production.up.railway.app/api/v1"
+  test_timeout: 30
+  screenshot_enabled: true
+  video_recording: false
+
+# Test Data
+test_data:
+  users:
+    valid_user:
+      email: "test@example.com"
+      password: "testpassword123"
+      name: "Test User"
+      phone: "+1234567890"
+    
+    invalid_user:
+      email: "invalid@example.com"
+      password: "wrongpassword"
+  
+  properties:
+    test_property_id: "68f22d6c2a0dece5cccdd865"
+    search_queries:
+      - "apartment"
+      - "villa"
+      - "luxury home"
+      - "2 bedroom"
+      - "near metro"
+    
+    filter_options:
+      min_price: 100000
+      max_price: 1000000
+      bedrooms: 2
+      bathrooms: 2
+      property_type: "apartment"
+
+# Performance Thresholds
+performance:
+  app_launch_time: 3000  # milliseconds
+  scroll_fps: 60
+  image_loading_time: 5000  # milliseconds
+  api_response_time: 2000  # milliseconds
+  memory_usage_mb: 200
+  battery_drain_percent: 5
+
+# Test Scenarios
+scenarios:
+  - name: "Complete User Journey"
+    description: "Test complete user flow from login to property booking"
+    steps:
+      - "Launch app"
+      - "Login with valid credentials"
+      - "Search for properties"
+      - "Apply filters"
+      - "View property details"
+      - "Add to favorites"
+      - "Contact agent"
+      - "Logout"
+  
+  - name: "Property Discovery"
+    description: "Test property search and discovery features"
+    steps:
+      - "Launch app"
+      - "Search with various queries"
+      - "Apply different filters"
+      - "Test sorting options"
+      - "View property details"
+      - "Test comparison feature"
+  
+  - name: "Performance Test"
+    description: "Test app performance under various conditions"
+    steps:
+      - "Measure app launch time"
+      - "Test scroll performance"
+      - "Test image loading"
+      - "Test memory usage"
+      - "Test battery usage"
+  
+  - name: "Error Handling"
+    description: "Test app behavior under error conditions"
+    steps:
+      - "Test network errors"
+      - "Test invalid data"
+      - "Test empty states"
+      - "Test offline mode"
+
+# Device Configurations
+devices:
+  android:
+    - name: "Pixel 8a"
+      api_level: 35
+      screen_size: "1080x2400"
+      density: "420dpi"
+    
+    - name: "Pixel 9 Pro XL"
+      api_level: 35
+      screen_size: "1440x3120"
+      density: "560dpi"
+  
+  ios:
+    - name: "iPhone 15"
+      ios_version: "17.0"
+      screen_size: "1179x2556"
+      density: "460dpi"
+
+# Test Reports
+reports:
+  output_directory: "test_reports"
+  formats: ["html", "json", "xml"]
+  include_screenshots: true
+  include_videos: false
+  include_performance_metrics: true
+
+# CI/CD Integration
+ci_cd:
+  github_actions: true
+  jenkins: false
+  gitlab_ci: false
+  notification:
+    email: "test-results@urbanrealty.com"
+    slack: "#mobile-testing"
+
+# Test Data Management
+data_management:
+  cleanup_after_tests: true
+  use_test_database: true
+  mock_external_apis: true
+  reset_state_between_tests: true
+
+

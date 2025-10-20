@@ -144,7 +144,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           backgroundColor: 'var(--color-surface)',
           border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
           boxShadow: isSelected 
-            ? '0 22px 44px rgba(247, 107, 28, 0.25), 0 0 0 1px rgba(247, 107, 28, 0.1)' 
+            ? '0 22px 44px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)' 
             : '0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
@@ -153,9 +153,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(247, 107, 28, 0.02) 100%)',
+          background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(var(--color-primary-rgb), 0.02) 100%)',
           '&:hover': {
-            boxShadow: '0 28px 56px rgba(247, 107, 28, 0.18), 0 0 0 1px rgba(247, 107, 28, 0.1)',
+            boxShadow: '0 28px 56px rgba(var(--color-primary-rgb), 0.18), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)',
             border: '2px solid var(--color-primary)',
             transform: 'translateY(-6px)'
           }
@@ -205,7 +205,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Box sx={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(247, 107, 28, 0.05) 100%)',
+                background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-primary-rgb), 0.05) 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -234,7 +234,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <Box sx={{
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(247, 107, 28, 0.05) 100%)',
+            background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-primary-rgb), 0.05) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -283,7 +283,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Favorite sx={{ 
                 color: 'var(--color-error)', 
                 fontSize: 22,
-                filter: 'drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3))'
+                filter: 'drop-shadow(0 2px 4px rgba(var(--color-error-rgb), 0.3))'
               }} />
             ) : (
               <FavoriteBorder sx={{ 

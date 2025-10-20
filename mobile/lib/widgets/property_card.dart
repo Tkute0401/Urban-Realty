@@ -1,346 +1,365 @@
-import "package:flutter/material.dart";
-import "package:cached_network_image/cached_network_image.dart";
-import "../models/property.dart";
-import "../config/design_tokens.dart";
-import "../components/ui/index.dart";
+import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../models/property.dart';
+import '../config/design_tokens.dart';
 
-class PropertyCard extends StatefulWidget {
+class PropertyCard extends StatelessWidget {
   final Property property;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
   final VoidCallback? onFavorite;
   final bool isFavorite;
-  final PropertyCardType type;
-  final bool enableSwipeActions;
-  final VoidCallback? onShare;
-  final VoidCallback? onCompare;
 
   const PropertyCard({
     super.key,
     required this.property,
-    this.onTap,
+    required this.onTap,
     this.onFavorite,
     this.isFavorite = false,
-    this.type = PropertyCardType.grid,
-    this.enableSwipeActions = true,
-    this.onShare,
-    this.onCompare,
   });
 
   @override
-  State<PropertyCard> createState() => _PropertyCardState();
-}
-
-class _PropertyCardState extends State<PropertyCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: DesignTokens.durationFast,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: DesignTokens.curveEaseOut,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: _buildCard(context),
-        );
-      },
-    );
-  }
-
-  Widget _buildCard(BuildContext context) {
-    return switch (widget.type) {
-      PropertyCardType.grid => _buildGridCard(context),
-      PropertyCardType.list => _buildListCard(context),
-      PropertyCardType.featured => _buildFeaturedCard(context),
-    };
-  }
-
-  Widget _buildGridCard(BuildContext context) {
-    return AppCard(
-      onTap: widget.onTap,
-      margin: const EdgeInsets.all(DesignTokens.space3),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildImageSection(context),
-          const SizedBox(height: DesignTokens.space4),
-          _buildContentSection(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildListCard(BuildContext context) {
-    return AppCard(
-      onTap: widget.onTap,
+    return Card(
       margin: const EdgeInsets.symmetric(
-        horizontal: DesignTokens.space5,
-        vertical: DesignTokens.space2,
+        horizontal: DesignTokens.spaceMd,
+        vertical: DesignTokens.spaceSm,
       ),
-      child: Row(
-        children: [
-          _buildImageSection(context, isList: true),
-          const SizedBox(width: DesignTokens.space4),
-          Expanded(child: _buildContentSection(context)),
-        ],
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMdd),
       ),
-    );
-  }
-
-  Widget _buildFeaturedCard(BuildContext context) {
-    return AppCard(
-      onTap: widget.onTap,
-      margin: const EdgeInsets.all(DesignTokens.space3),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildImageSection(context, isFeatured: true),
-          const SizedBox(height: DesignTokens.space4),
-          _buildContentSection(context, isFeatured: true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImageSection(BuildContext context, {bool isList = false, bool isFeatured = false}) {
-    final aspectRatio = isList ? 1.0 : (isFeatured ? 1.5 : 16 / 9);
-    final height = isList ? 100 : (isFeatured ? 200 : null);
-
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(DesignTokens.radius2xl),
-          child: AspectRatio(
-            aspectRatio: aspectRatio,
-            child: SizedBox(
-              height: height,
-              child: widget.property.images.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: widget.property.images.first.url,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(
-                          Icons.home,
-                          size: 50,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      color: Colors.grey.shade200,
-                      child: const Icon(
-                        Icons.home,
-                        size: 50,
-                        color: Colors.grey,
-                      ),
-                    ),
-            ),
-          ),
-        ),
-        _buildImageOverlay(context),
-      ],
-    );
-  }
-
-  Widget _buildImageOverlay(BuildContext context) {
-    return Positioned(
-      top: DesignTokens.space3,
-      right: DesignTokens.space3,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.property.isFeatured)
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignTokens.space3,
-                vertical: DesignTokens.space1,
+              child: InkWell(
+          onTap: onTap,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusMdd),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Property Image with Overlay
+            _buildImageSection(context),
+            
+            // Property Info
+            Padding(
+              padding: const EdgeInsets.all(DesignTokens.spaceMd),
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+                  // Price and Title
+                  _buildPriceAndTitle(context),
+                  
+                  const SizedBox(height: DesignTokens.spaceSm),
+                  
+                  // Location
+                  _buildLocation(context),
+                  
+                  const SizedBox(height: DesignTokens.spaceMd),
+                  
+                  // Property Details
+                  _buildPropertyDetails(context),
+                  
+                  const SizedBox(height: DesignTokens.spaceMd),
+                  
+                  // Tags and Actions
+                  _buildTagsAndActions(context),
+                ],
               ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF76B1C),
-                borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageSection(BuildContext context) {
+    return Stack(
+              children: [
+        // Property Image
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(DesignTokens.radiusMd),
+          ),
+          child: Container(
+            height: 200,
+            width: double.infinity,
+            color: Colors.grey[300],
+                    child: property.images.isNotEmpty
+                        ? CachedNetworkImage(
+                    imageUrl: property.images.first,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                      color: Colors.grey[300],
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.home,
+                        size: 60,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          )
+                        : Container(
+                    color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.home,
+                      size: 60,
+                              color: Colors.grey,
+                            ),
+                          ),
+                  ),
+                ),
+
+        // Featured Badge
+        if (property.featured)
+                Positioned(
+            top: DesignTokens.spaceSm,
+            left: DesignTokens.spaceSm,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                horizontal: DesignTokens.spaceSm,
+                vertical: DesignTokens.spacingXS,
+                    ),
+                    decoration: BoxDecoration(
+                color: DesignTokens.warning,
+                borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
               ),
               child: const Text(
                 'FEATURED',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: DesignTokens.fontSizeXs,
+                        color: Colors.white,
+                  fontSize: DesignTokens.fontSizeXS,
                   fontWeight: DesignTokens.fontWeightBold,
+                      ),
+                    ),
+                  ),
+                ),
+
+        // Favorite Button
+                if (onFavorite != null)
+                  Positioned(
+            top: DesignTokens.spaceSm,
+            right: DesignTokens.spaceSm,
+                    child: GestureDetector(
+                      onTap: onFavorite,
+                      child: Container(
+                padding: const EdgeInsets.all(DesignTokens.spaceSm),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                  boxShadow: DesignTokens.shadowSmall,
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : Colors.grey[600],
+                          size: 20,
                 ),
               ),
             ),
-          const SizedBox(width: DesignTokens.space2),
-          GestureDetector(
-            onTap: widget.onFavorite,
-            child: Container(
-              padding: const EdgeInsets.all(DesignTokens.space3),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.9),
-                shape: BoxShape.circle,
-                boxShadow: DesignTokens.shadowSm,
-              ),
-              child: Icon(
-                widget.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: widget.isFavorite ? Colors.red : Colors.grey,
-                size: DesignTokens.iconSizeMd,
-              ),
-            ),
           ),
-        ],
-      ),
+
+        // Status Badge
+        Positioned(
+          bottom: DesignTokens.spaceSm,
+          right: DesignTokens.spaceSm,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DesignTokens.spaceSm,
+              vertical: DesignTokens.spacingXS,
+            ),
+            decoration: BoxDecoration(
+              color: _getStatusColor(property.status).withOpacity(0.9),
+              borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
+            ),
+            child: Text(
+              property.status.toUpperCase(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: DesignTokens.fontSizeXS,
+                fontWeight: DesignTokens.fontWeightBold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
     );
   }
 
-  Widget _buildContentSection(BuildContext context, {bool isFeatured = false}) {
+  Widget _buildPriceAndTitle(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTitle(context),
-        const SizedBox(height: DesignTokens.space2),
-        _buildLocation(context),
-        const SizedBox(height: DesignTokens.space3),
-        _buildPriceAndDetails(context),
-        if (isFeatured) ...[
-          const SizedBox(height: DesignTokens.space3),
-          _buildAmenities(context),
-        ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+        Text(
+          _formatPrice(property.price, property.currency),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: DesignTokens.fontWeightBold,
+            color: DesignTokens.primary,
+          ),
+        ),
+        const SizedBox(height: DesignTokens.spacingXS),
+                  Text(
+                    property.title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: DesignTokens.fontWeightSemiBold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
       ],
-    );
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    return Text(
-      widget.property.title,
-      style: const TextStyle(
-        fontSize: DesignTokens.fontSizeLg,
-        fontWeight: DesignTokens.fontWeightSemibold,
-      ),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
     );
   }
 
   Widget _buildLocation(BuildContext context) {
     return Row(
-      children: [
-        Icon(
-          Icons.location_on_outlined,
-          size: DesignTokens.iconSizeSm,
+                      children: [
+                        Icon(
+          Icons.location_on,
+                          size: 16,
           color: Colors.grey[600],
         ),
-        const SizedBox(width: DesignTokens.space1),
-        Expanded(
-          child: Text(
-            widget.property.location,
-            style: TextStyle(
+        const SizedBox(width: DesignTokens.spacingXS),
+                      Expanded(
+                        child: Text(
+            '${property.location.neighborhood}, ${property.location.city}',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.grey[600],
-              fontSize: DesignTokens.fontSizeSm,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
     );
   }
 
-  Widget _buildPriceAndDetails(BuildContext context) {
+  Widget _buildPropertyDetails(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          Icons.currency_rupee,
-          size: DesignTokens.iconSizeSm,
-          color: Colors.green[700],
+        _buildDetailChip(
+          context,
+          Icons.bed,
+          '${property.specifications.bedrooms} bed',
         ),
-        Text(
-          '${widget.property.price}',
-          style: TextStyle(
-            fontSize: DesignTokens.fontSizeLg,
-            fontWeight: DesignTokens.fontWeightBold,
-            color: Colors.green[700],
-          ),
+        const SizedBox(width: DesignTokens.spaceSm),
+        _buildDetailChip(
+          context,
+          Icons.bathroom,
+          '${property.specifications.bathrooms} bath',
         ),
-        const Spacer(),
-        AppBadgeVariants.bhk('${widget.property.bedrooms} BHK'),
-        const SizedBox(width: DesignTokens.space2),
-        AppBadgeVariants.area('${widget.property.area} sq ft'),
+        const SizedBox(width: DesignTokens.spaceSm),
+        _buildDetailChip(
+          context,
+          Icons.square_foot,
+          '${property.specifications.area.toInt()} ${property.specifications.areaUnit}',
+        ),
       ],
     );
   }
 
-  Widget _buildAmenities(BuildContext context) {
-    final amenities = widget.property.amenities.take(3).toList();
-    return Wrap(
-      spacing: DesignTokens.space2,
-      runSpacing: DesignTokens.space1,
-      children: amenities.map((amenity) => AppBadge(
-        text: amenity,
-        variant: AppBadgeVariant.outline,
-        size: AppBadgeSize.small,
-      )).toList(),
+  Widget _buildDetailChip(BuildContext context, IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spaceSm,
+        vertical: DesignTokens.spacingXS,
+      ),
+      decoration: BoxDecoration(
+        color: DesignTokens.primary.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: DesignTokens.primary,
+          ),
+          const SizedBox(width: DesignTokens.spacingXS),
+                  Text(
+            text,
+            style: TextStyle(
+              color: DesignTokens.primary,
+              fontSize: DesignTokens.fontSizeXS,
+              fontWeight: DesignTokens.fontWeightMedium,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  void _onTapDown(TapDownDetails details) {
-    if (widget.enableSwipeActions) {
-      setState(() {
-        _isPressed = true;
-      });
-      _animationController.forward();
+  Widget _buildTagsAndActions(BuildContext context) {
+    return Row(
+      children: [
+        // Property Type Tag
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: DesignTokens.spaceSm,
+            vertical: DesignTokens.spacingXS,
+          ),
+          decoration: BoxDecoration(
+            color: DesignTokens.accent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
+          ),
+          child: Text(
+            property.type.toUpperCase(),
+                        style: TextStyle(
+              color: DesignTokens.accent,
+              fontSize: DesignTokens.fontSizeXS,
+              fontWeight: DesignTokens.fontWeightBold,
+                        ),
+                      ),
+                    ),
+        
+        const Spacer(),
+        
+        // Views Count
+        if (property.views > 0)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+                    children: [
+              Icon(
+                Icons.visibility,
+                size: 14,
+                color: Colors.grey[600],
+              ),
+              const SizedBox(width: DesignTokens.spacingXS),
+                      Text(
+                '${property.views} views',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: DesignTokens.fontSizeXS,
+                ),
+                      ),
+                    ],
+                  ),
+                ],
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'available':
+        return DesignTokens.success;
+      case 'sold':
+        return DesignTokens.error;
+      case 'rented':
+        return DesignTokens.warning;
+      case 'under_construction':
+        return DesignTokens.info;
+      default:
+        return Colors.grey;
     }
   }
 
-  void _onTapUp(TapUpDetails details) {
-    if (widget.enableSwipeActions) {
-      setState(() {
-        _isPressed = false;
-      });
-      _animationController.reverse();
+  String _formatPrice(double price, String currency) {
+    if (price >= 1000000) {
+      return '${currency}${(price / 1000000).toStringAsFixed(1)}M';
+    } else if (price >= 1000) {
+      return '${currency}${(price / 1000).toStringAsFixed(0)}K';
+    } else {
+      return '$currency${price.toStringAsFixed(0)}';
     }
   }
-
-  void _onTapCancel() {
-    if (widget.enableSwipeActions) {
-      setState(() {
-        _isPressed = false;
-      });
-      _animationController.reverse();
-    }
-  }
-}
-
-enum PropertyCardType {
-  grid,
-  list,
-  featured,
 }

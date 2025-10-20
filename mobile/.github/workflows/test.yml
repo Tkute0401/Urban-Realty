@@ -1,0 +1,78 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+    
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
+    - name: Install dependencies
+      run: |
+        cd mobile
+        flutter pub get
+    
+    - name: Run unit tests
+      run: |
+        cd mobile
+        flutter test test/models/
+        flutter test test/services/
+        flutter test test/utils/
+        flutter test test/factories/
+    
+    - name: Run widget tests
+      run: |
+        cd mobile
+        flutter test test/widgets/
+    
+    - name: Run integration tests
+      run: |
+        cd mobile
+        flutter test integration_test/
+    
+    - name: Generate coverage report
+      run: |
+        cd mobile
+        flutter test --coverage
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: mobile/coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: mobile/test/reports/
+    
+    - name: Upload screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: test-screenshots
+        path: mobile/test/screenshots/
+
+

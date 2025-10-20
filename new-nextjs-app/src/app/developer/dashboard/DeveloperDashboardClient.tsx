@@ -524,8 +524,8 @@ const DeveloperDashboardClient = () => {
                   <YAxis />
                   <RechartsTooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="views" stroke="#8884d8" strokeWidth={2} />
-                  <Line type="monotone" dataKey="inquiries" stroke="#82ca9d" strokeWidth={2} />
+                  <Line type="monotone" dataKey="views" stroke="var(--color-primary)" strokeWidth={2} />
+                  <Line type="monotone" dataKey="inquiries" stroke="var(--color-secondary)" strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
