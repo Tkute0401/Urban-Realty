@@ -31,6 +31,8 @@ interface Property {
     name: string;
     company?: string;
     avatar?: string;
+    email?: string;
+    mobile?: string;
   };
 }
 
