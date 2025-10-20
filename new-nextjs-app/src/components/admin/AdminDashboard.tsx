@@ -115,10 +115,13 @@ const AdminDashboard: React.FC = () => {
   const [quickActions, setQuickActions] = useState([
     { id: 1, title: 'Manage Users', icon: <PeopleIcon />, action: () => router.push('/admin/users'), color: 'primary' as const },
     { id: 2, title: 'View Properties', icon: <HomeIcon />, action: () => router.push('/admin/properties'), color: 'success' as const },
-    { id: 3, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/admin/analytics'), color: 'info' as const },
-    { id: 4, title: 'Settings', icon: <SettingsIcon />, action: () => router.push('/admin/settings'), color: 'warning' as const },
-    { id: 5, title: 'Reports', icon: <AssessmentIcon />, action: () => router.push('/admin/reports'), color: 'secondary' as const },
-    { id: 6, title: 'Media', icon: <StorageIcon />, action: () => router.push('/admin/media'), color: 'error' as const }
+    { id: 3, title: 'Developer Users', icon: <BusinessIcon />, action: () => router.push('/admin/developers/users'), color: 'primary' as const },
+    { id: 4, title: 'Developer Profiles', icon: <BusinessIcon />, action: () => router.push('/admin/developers/profiles'), color: 'info' as const },
+    { id: 5, title: 'Projects', icon: <HomeIcon />, action: () => router.push('/admin/projects'), color: 'success' as const },
+    { id: 6, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/admin/analytics'), color: 'info' as const },
+    { id: 7, title: 'Settings', icon: <SettingsIcon />, action: () => router.push('/admin/settings'), color: 'warning' as const },
+    { id: 8, title: 'Reports', icon: <AssessmentIcon />, action: () => router.push('/admin/reports'), color: 'secondary' as const },
+    { id: 9, title: 'Media', icon: <StorageIcon />, action: () => router.push('/admin/media'), color: 'error' as const }
   ]);
 
   const [stats, setStats] = useState({

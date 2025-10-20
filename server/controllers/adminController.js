@@ -3,6 +3,8 @@ const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
 const Property = require('../models/Property');
 const ContactRequest = require('../models/ContactRequest');
+const Developer = require('../models/Developer');
+const Project = require('../models/Project');
 
 // @desc    Get all users
 // @route   GET /api/v1/admin/users
@@ -1103,5 +1105,520 @@ exports.getMedia = asyncHandler(async (req, res, next) => {
   } catch (err) {
     console.error('Error fetching media:', err);
     next(new ErrorResponse('Failed to fetch media', 500));
+  }
+});
+
+// ==================== DEVELOPER USER MANAGEMENT ====================
+
+// @desc    Get all developer users
+// @route   GET /api/v1/admin/developers/users
+// @access  Private/Admin
+exports.getDeveloperUsers = asyncHandler(async (req, res, next) => {
+  const developers = await User.find({ role: 'developer' })
+    .populate('developerId', 'name logo website')
+    .sort('-createdAt');
+  
+  res.status(200).json({
+    success: true,
+    count: developers.length,
+    data: developers
+  });
+});
+
+// @desc    Get single developer user
+// @route   GET /api/v1/admin/developers/users/:id
+// @access  Private/Admin
+exports.getDeveloperUser = asyncHandler(async (req, res, next) => {
+  const developer = await User.findOne({
+    _id: req.params.id,
+    role: 'developer'
+  }).populate('developerId');
+  
+  if (!developer) {
+    return next(
+      new ErrorResponse(`Developer user not found with id of ${req.params.id}`, 404)
+    );
+  }
+  
+  // Get developer's projects
+  const projects = await Project.find({ developer: developer.developerId });
+  
+  res.status(200).json({
+    success: true,
+    data: {
+      user: developer,
+      projects
+    }
+  });
+});
+
+// @desc    Create developer user
+// @route   POST /api/v1/admin/developers/users
+// @access  Private/Admin
+exports.createDeveloperUser = asyncHandler(async (req, res, next) => {
+  const { name, email, mobile, password, occupation, professionalInfo } = req.body;
+
+  // Check if user already exists
+  const existingUser = await User.findOne({ 
+    email: { $regex: new RegExp(`^${email}$`, 'i') }
+  });
+  
+  if (existingUser) {
+    return next(new ErrorResponse('User with this email already exists', 400));
+  }
+
+  // Create user
+  const user = await User.create({
+    name,
+    email,
+    mobile,
+    password,
+    role: 'developer',
+    occupation,
+    professionalInfo,
+    isVerified: true
+  });
+
+  res.status(201).json({
+    success: true,
+    data: user
+  });
+});
+
+// @desc    Update developer user
+// @route   PUT /api/v1/admin/developers/users/:id
+// @access  Private/Admin
+exports.updateDeveloperUser = asyncHandler(async (req, res, next) => {
+  const { name, email, mobile, occupation, professionalInfo, active } = req.body;
+  const userId = req.params.id;
+
+  const updateFields = {};
+  if (name) updateFields.name = name;
+  if (email) updateFields.email = email;
+  if (mobile !== undefined) updateFields.mobile = mobile;
+  if (occupation !== undefined) updateFields.occupation = occupation;
+  if (professionalInfo) updateFields.professionalInfo = professionalInfo;
+  if (active !== undefined) updateFields.active = active;
+
+  // Check if email is being updated and if it's already in use
+  if (email) {
+    const existingUser = await User.findOne({ 
+      email: { $regex: new RegExp(`^${email}$`, 'i') },
+      _id: { $ne: userId }
+    });
+    
+    if (existingUser) {
+      return next(new ErrorResponse('Email already in use', 400));
+    }
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    updateFields,
+    { new: true, runValidators: true }
+  ).select('-password');
+
+  if (!user || user.role !== 'developer') {
+    return next(new ErrorResponse('Developer user not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});
+
+// @desc    Delete developer user
+// @route   DELETE /api/v1/admin/developers/users/:id
+// @access  Private/Admin
+exports.deleteDeveloperUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({
+    _id: req.params.id,
+    role: 'developer'
+  });
+  
+  if (!user) {
+    return next(
+      new ErrorResponse(`Developer user not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Delete associated developer profile if exists
+  if (user.developerId) {
+    await Developer.findByIdAndDelete(user.developerId);
+  }
+
+  // Delete all projects associated with this developer
+  if (user.developerId) {
+    await Project.deleteMany({ developer: user.developerId });
+  }
+
+  // Delete the user
+  await User.findByIdAndDelete(req.params.id);
+  
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
+// ==================== DEVELOPER PROFILE MANAGEMENT ====================
+
+// @desc    Get all developer profiles
+// @route   GET /api/v1/admin/developers/profiles
+// @access  Private/Admin
+exports.getDeveloperProfiles = asyncHandler(async (req, res, next) => {
+  const developers = await Developer.find()
+    .populate('userId', 'name email mobile')
+    .sort('-createdAt');
+  
+  res.status(200).json({
+    success: true,
+    count: developers.length,
+    data: developers
+  });
+});
+
+// @desc    Get single developer profile
+// @route   GET /api/v1/admin/developers/profiles/:id
+// @access  Private/Admin
+exports.getDeveloperProfile = asyncHandler(async (req, res, next) => {
+  const developer = await Developer.findById(req.params.id)
+    .populate('userId', 'name email mobile');
+  
+  if (!developer) {
+    return next(
+      new ErrorResponse(`Developer profile not found with id of ${req.params.id}`, 404)
+    );
+  }
+  
+  // Get developer's projects
+  const projects = await Project.find({ developer: developer._id });
+  
+  res.status(200).json({
+    success: true,
+    data: {
+      developer,
+      projects
+    }
+  });
+});
+
+// @desc    Create developer profile
+// @route   POST /api/v1/admin/developers/profiles
+// @access  Private/Admin
+exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
+  const { userId, name, description, website, foundedYear, headquarters, contact, socialMedia } = req.body;
+
+  // Check if developer profile already exists for this user
+  if (userId) {
+    const existingProfile = await Developer.findOne({ userId });
+    if (existingProfile) {
+      return next(new ErrorResponse('Developer profile already exists for this user', 400));
+    }
+  }
+
+  // Check if developer name already exists
+  const existingName = await Developer.findOne({ 
+    name: { $regex: new RegExp(`^${name}$`, 'i') }
+  });
+  
+  if (existingName) {
+    return next(new ErrorResponse('Developer with this name already exists', 400));
+  }
+
+  const developer = await Developer.create({
+    userId,
+    name,
+    description,
+    website,
+    foundedYear,
+    headquarters,
+    contact,
+    socialMedia
+  });
+
+  // Update user's developerId if userId is provided
+  if (userId) {
+    await User.findByIdAndUpdate(userId, { developerId: developer._id });
+  }
+
+  res.status(201).json({
+    success: true,
+    data: developer
+  });
+});
+
+// @desc    Update developer profile
+// @route   PUT /api/v1/admin/developers/profiles/:id
+// @access  Private/Admin
+exports.updateDeveloperProfile = asyncHandler(async (req, res, next) => {
+  const { name, description, website, foundedYear, headquarters, contact, socialMedia, team, specializations, awards } = req.body;
+  const developerId = req.params.id;
+
+  const updateFields = {};
+  if (name) updateFields.name = name;
+  if (description) updateFields.description = description;
+  if (website) updateFields.website = website;
+  if (foundedYear) updateFields.foundedYear = foundedYear;
+  if (headquarters) updateFields.headquarters = headquarters;
+  if (contact) updateFields.contact = contact;
+  if (socialMedia) updateFields.socialMedia = socialMedia;
+  if (team) updateFields.team = team;
+  if (specializations) updateFields.specializations = specializations;
+  if (awards) updateFields.awards = awards;
+
+  // Check if developer name is being updated and if it's already in use
+  if (name) {
+    const existingDeveloper = await Developer.findOne({ 
+      name: { $regex: new RegExp(`^${name}$`, 'i') },
+      _id: { $ne: developerId }
+    });
+    
+    if (existingDeveloper) {
+      return next(new ErrorResponse('Developer with this name already exists', 400));
+    }
+  }
+
+  const developer = await Developer.findByIdAndUpdate(
+    developerId,
+    updateFields,
+    { new: true, runValidators: true }
+  ).populate('userId', 'name email mobile');
+
+  if (!developer) {
+    return next(new ErrorResponse('Developer profile not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: developer
+  });
+});
+
+// @desc    Delete developer profile
+// @route   DELETE /api/v1/admin/developers/profiles/:id
+// @access  Private/Admin
+exports.deleteDeveloperProfile = asyncHandler(async (req, res, next) => {
+  const developer = await Developer.findById(req.params.id);
+  
+  if (!developer) {
+    return next(
+      new ErrorResponse(`Developer profile not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Update user's developerId to null if exists
+  if (developer.userId) {
+    await User.findByIdAndUpdate(developer.userId, { developerId: null });
+  }
+
+  // Delete all projects associated with this developer
+  await Project.deleteMany({ developer: developer._id });
+
+  // Delete the developer profile
+  await Developer.findByIdAndDelete(req.params.id);
+  
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
+// ==================== PROJECT MANAGEMENT ====================
+
+// @desc    Get all projects
+// @route   GET /api/v1/admin/projects
+// @access  Private/Admin
+exports.getProjects = asyncHandler(async (req, res, next) => {
+  const projects = await Project.find()
+    .populate('developer', 'name logo website')
+    .sort('-createdAt');
+  
+  res.status(200).json({
+    success: true,
+    count: projects.length,
+    data: projects
+  });
+});
+
+// @desc    Get single project
+// @route   GET /api/v1/admin/projects/:id
+// @access  Private/Admin
+exports.getProject = asyncHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.id)
+    .populate('developer', 'name logo website contact');
+  
+  if (!project) {
+    return next(
+      new ErrorResponse(`Project not found with id of ${req.params.id}`, 404)
+    );
+  }
+  
+  res.status(200).json({
+    success: true,
+    data: project
+  });
+});
+
+// @desc    Create project
+// @route   POST /api/v1/admin/projects
+// @access  Private/Admin
+exports.createProject = asyncHandler(async (req, res, next) => {
+  const { developer, name, description, type, status, location, totalUnits, totalArea, unitTypes, amenities, features } = req.body;
+
+  // Verify developer exists
+  const developerExists = await Developer.findById(developer);
+  if (!developerExists) {
+    return next(new ErrorResponse('Developer not found', 404));
+  }
+
+  const project = await Project.create({
+    developer,
+    name,
+    description,
+    type,
+    status,
+    location,
+    totalUnits,
+    totalArea,
+    unitTypes,
+    amenities,
+    features
+  });
+
+  // Update developer's project counts
+  await Developer.findByIdAndUpdate(developer, {
+    $inc: { 
+      [status === 'Completed' ? 'completedProjects' : 
+       status === 'Under Construction' ? 'ongoingProjects' : 
+       'upcomingProjects']: 1 
+    }
+  });
+
+  res.status(201).json({
+    success: true,
+    data: project
+  });
+});
+
+// @desc    Update project
+// @route   PUT /api/v1/admin/projects/:id
+// @access  Private/Admin
+exports.updateProject = asyncHandler(async (req, res, next) => {
+  const { name, description, type, status, location, totalUnits, totalArea, unitTypes, amenities, features } = req.body;
+  const projectId = req.params.id;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    return next(new ErrorResponse('Project not found', 404));
+  }
+
+  const oldStatus = project.status;
+  const updateFields = {};
+  if (name) updateFields.name = name;
+  if (description) updateFields.description = description;
+  if (type) updateFields.type = type;
+  if (status) updateFields.status = status;
+  if (location) updateFields.location = location;
+  if (totalUnits) updateFields.totalUnits = totalUnits;
+  if (totalArea) updateFields.totalArea = totalArea;
+  if (unitTypes) updateFields.unitTypes = unitTypes;
+  if (amenities) updateFields.amenities = amenities;
+  if (features) updateFields.features = features;
+
+  const updatedProject = await Project.findByIdAndUpdate(
+    projectId,
+    updateFields,
+    { new: true, runValidators: true }
+  ).populate('developer', 'name logo website');
+
+  // Update developer's project counts if status changed
+  if (status && status !== oldStatus) {
+    const developerId = project.developer;
+    
+    // Decrease old status count
+    await Developer.findByIdAndUpdate(developerId, {
+      $inc: { 
+        [oldStatus === 'Completed' ? 'completedProjects' : 
+         oldStatus === 'Under Construction' ? 'ongoingProjects' : 
+         'upcomingProjects']: -1 
+      }
+    });
+
+    // Increase new status count
+    await Developer.findByIdAndUpdate(developerId, {
+      $inc: { 
+        [status === 'Completed' ? 'completedProjects' : 
+         status === 'Under Construction' ? 'ongoingProjects' : 
+         'upcomingProjects']: 1 
+      }
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: updatedProject
+  });
+});
+
+// @desc    Delete project
+// @route   DELETE /api/v1/admin/projects/:id
+// @access  Private/Admin
+exports.deleteProject = asyncHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.id);
+  
+  if (!project) {
+    return next(
+      new ErrorResponse(`Project not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Update developer's project counts
+  await Developer.findByIdAndUpdate(project.developer, {
+    $inc: { 
+      [project.status === 'Completed' ? 'completedProjects' : 
+       project.status === 'Under Construction' ? 'ongoingProjects' : 
+       'upcomingProjects']: -1 
+    }
+  });
+
+  // Delete the project
+  await Project.findByIdAndDelete(req.params.id);
+  
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
+// @desc    Get developer statistics
+// @route   GET /api/v1/admin/developers/stats
+// @access  Private/Admin
+exports.getDeveloperStats = asyncHandler(async (req, res, next) => {
+  try {
+    const [totalDevelopers, activeDevelopers, totalProjects, completedProjects, ongoingProjects, upcomingProjects] = await Promise.all([
+      User.countDocuments({ role: 'developer' }),
+      User.countDocuments({ role: 'developer', active: true }),
+      Project.countDocuments(),
+      Project.countDocuments({ status: 'Completed' }),
+      Project.countDocuments({ status: 'Under Construction' }),
+      Project.countDocuments({ status: 'Planning' })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalDevelopers,
+        activeDevelopers,
+        totalProjects,
+        completedProjects,
+        ongoingProjects,
+        upcomingProjects
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching developer stats:', err);
+    next(new ErrorResponse('Failed to fetch developer statistics', 500));
   }
 });
