@@ -52,7 +52,7 @@ export function Button({
           color: 'var(--color-primary-contrast)',
           '&:hover': {
             backgroundColor: 'var(--color-secondary-dark)',
-            boxShadow: '0 4px 12px rgba(26, 43, 255, 0.15)',
+            boxShadow: 'var(--shadow-lg)',
           },
         };
       case 'outline':
@@ -64,7 +64,7 @@ export function Button({
           '&:hover': {
             backgroundColor: 'var(--color-primary)',
             color: 'var(--color-primary-contrast)',
-            boxShadow: '0 4px 12px rgba(247, 107, 28, 0.15)',
+            boxShadow: 'var(--shadow-lg)',
           },
         };
       case 'ghost':
@@ -82,8 +82,8 @@ export function Button({
           backgroundColor: 'var(--color-danger)',
           color: 'white',
           '&:hover': {
-            backgroundColor: '#dc2626',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)',
+            backgroundColor: 'var(--color-danger-dark)',
+            boxShadow: 'var(--shadow-lg)',
           },
         };
       case 'primary':
@@ -94,7 +94,7 @@ export function Button({
           color: 'var(--color-primary-contrast)',
           '&:hover': {
             backgroundColor: 'var(--color-primary-hover)',
-            boxShadow: '0 4px 12px rgba(247, 107, 28, 0.15)',
+            boxShadow: 'var(--shadow-lg)',
           },
         };
     }
@@ -110,6 +110,10 @@ export function Button({
       endIcon={!loading ? endIcon : undefined}
       sx={{
         ...getVariantStyles(),
+        minHeight: { xs: '44px', sm: '40px' }, // Touch target minimum on mobile
+        '@media (max-width: 640px)': {
+          padding: '12px 20px', // Larger padding on mobile
+        },
         '&.Mui-disabled': {
           opacity: 0.6,
         },

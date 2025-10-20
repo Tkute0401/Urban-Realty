@@ -846,7 +846,7 @@ const PropertiesPageContent: React.FC = () => {
                     justifyContent: 'space-between',
                     '&:hover': {
                       borderColor: 'var(--color-primary)',
-                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                      backgroundColor: 'var(--color-hover-overlay)'
                     }
                   }}
                 >
@@ -863,7 +863,7 @@ const PropertiesPageContent: React.FC = () => {
                     background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
+                    boxShadow: 'var(--shadow-xl)',
                     zIndex: 1000,
                     p: 3,
                     minWidth: '280px'
@@ -888,10 +888,10 @@ const PropertiesPageContent: React.FC = () => {
                               p: 2,
                               borderRadius: '12px',
                               cursor: 'pointer',
-                              backgroundColor: isActive ? 'rgba(120, 202, 220, 0.15)' : 'transparent',
+                              backgroundColor: isActive ? 'var(--color-primary-light)' : 'transparent',
                               border: `1px solid ${isActive ? 'var(--color-primary)' : 'transparent'}`,
                               '&:hover': {
-                                backgroundColor: 'rgba(120, 202, 220, 0.08)',
+                                backgroundColor: 'var(--color-hover-overlay)',
                                 borderColor: 'var(--color-primary)'
                               }
                             }}
@@ -943,7 +943,7 @@ const PropertiesPageContent: React.FC = () => {
                     justifyContent: 'space-between',
                     '&:hover': {
                       borderColor: 'var(--color-primary)',
-                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                      backgroundColor: 'var(--color-hover-overlay)'
                     }
                   }}
                 >
@@ -960,7 +960,7 @@ const PropertiesPageContent: React.FC = () => {
                     background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
+                    boxShadow: 'var(--shadow-xl)',
                     zIndex: 1000,
                     p: 3,
                     minWidth: '320px'
@@ -1051,7 +1051,7 @@ const PropertiesPageContent: React.FC = () => {
                     justifyContent: 'space-between',
                     '&:hover': {
                       borderColor: 'var(--color-primary)',
-                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                      backgroundColor: 'var(--color-hover-overlay)'
                     }
                   }}
                 >
@@ -1068,7 +1068,7 @@ const PropertiesPageContent: React.FC = () => {
                     background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
+                    boxShadow: 'var(--shadow-xl)',
                     zIndex: 1000,
                     p: 3,
                     minWidth: '320px'
@@ -1161,7 +1161,7 @@ const PropertiesPageContent: React.FC = () => {
                     justifyContent: 'space-between',
                     '&:hover': {
                       borderColor: 'var(--color-primary)',
-                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                      backgroundColor: 'var(--color-hover-overlay)'
                     }
                   }}
                 >
@@ -1178,7 +1178,7 @@ const PropertiesPageContent: React.FC = () => {
                     background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
-                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
+                    boxShadow: 'var(--shadow-xl)',
                     zIndex: 1000,
                     p: 3,
                     minWidth: '400px'

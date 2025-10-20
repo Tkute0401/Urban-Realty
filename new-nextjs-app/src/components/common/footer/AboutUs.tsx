@@ -89,8 +89,8 @@ const AboutUs = () => {
               Today, we&apos;re a market leader with a national presence, recognized for our client-first approach and data-driven solutions that simplify buying, selling, and renting properties.
             </p>
             <div className="relative">
-              <div className="absolute -left-4 -top-4 w-24 h-24 border-t-2 border-l-2 border-[#78cadc]" />
-              <div className="absolute -right-4 -bottom-4 w-24 h-24 border-b-2 border-r-2 border-[#78cadc]" />
+              <div className="absolute -left-4 -top-4 w-24 h-24 border-t-2 border-l-2 border-primary" />
+              <div className="absolute -right-4 -bottom-4 w-24 h-24 border-b-2 border-r-2 border-primary" />
               <img src="/building_4.jpg" alt="Our Office" className="relative z-10 rounded-lg w-full h-auto" />
             </div>
           </motion.div>

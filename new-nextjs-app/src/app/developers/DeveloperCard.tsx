@@ -27,12 +27,12 @@ const DeveloperCard = ({ developer, isMobile }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col`}
+      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col min-h-[400px] sm:min-h-[450px]`}
       style={{
         backgroundColor: 'var(--color-surface)',
         borderColor: 'var(--color-primary)',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        minHeight: '400px'
+        boxShadow: 'var(--shadow-md)',
+        minHeight: { xs: '400px', sm: '450px' }
       }}
       onClick={handleClick}
       whileHover={{ y: -5 }}

@@ -145,17 +145,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
           boxShadow: isSelected 
             ? '0 22px 44px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)' 
-            : '0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
+            : 'var(--shadow-md)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: { xs: '100%', sm: '420px' },
           height: 'auto',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(var(--color-primary-rgb), 0.02) 100%)',
+          background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-hover-overlay) 100%)',
           '&:hover': {
-            boxShadow: '0 28px 56px rgba(var(--color-primary-rgb), 0.18), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)',
+            boxShadow: 'var(--shadow-xl)',
             border: '2px solid var(--color-primary)',
             transform: 'translateY(-6px)'
           }
@@ -194,7 +194,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
+          background: 'linear-gradient(180deg, transparent 0%, var(--color-hover-overlay) 100%)',
           zIndex: 1,
           pointerEvents: 'none'
         }
@@ -205,7 +205,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Box sx={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-primary-rgb), 0.05) 100%)',
+                background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-hover-overlay) 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -234,7 +234,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <Box sx={{
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-primary-rgb), 0.05) 100%)',
+            background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-hover-overlay) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -257,21 +257,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               top: 16,
               right: 16,
               p: 2,
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backgroundColor: 'var(--color-surface)',
               backdropFilter: 'blur(12px)',
               borderRadius: '50%',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
+              border: '1px solid var(--color-border-light)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              boxShadow: 'var(--shadow-lg)',
               zIndex: 2,
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 1)',
+                backgroundColor: 'var(--color-surface)',
                 transform: 'scale(1.1)',
-                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
+                boxShadow: 'var(--shadow-xl)'
               }
             }}
             onClick={handleFavoriteClick}
@@ -283,7 +283,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Favorite sx={{ 
                 color: 'var(--color-error)', 
                 fontSize: 22,
-                filter: 'drop-shadow(0 2px 4px rgba(var(--color-error-rgb), 0.3))'
+                filter: 'var(--shadow-sm)'
               }} />
             ) : (
               <FavoriteBorder sx={{ 

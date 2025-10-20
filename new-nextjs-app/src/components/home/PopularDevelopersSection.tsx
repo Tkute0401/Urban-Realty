@@ -153,7 +153,7 @@ const PopularDevelopersSection: React.FC = () => {
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-primary)',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--shadow-md)',
                   minHeight: '400px'
                 }}
                 onClick={() => router.push(`/developers/${developer._id}`)}

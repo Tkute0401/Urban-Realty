@@ -240,7 +240,7 @@ const SubscriptionPlans = () => {
                 transition: 'all 0.3s ease-in-out',
                 '&:hover': {
                   transform: 'translateY(-8px)',
-                  boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
+                  boxShadow: 'var(--shadow-xl)',
                 }
               }}
             >
