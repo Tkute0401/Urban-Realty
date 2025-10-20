@@ -46,7 +46,8 @@ import {
   Close, 
   Save,
   PersonAdd,
-  Visibility
+  Visibility,
+  BusinessCenter
 } from '@mui/icons-material';
 import http from '@/lib/services/http';
 
@@ -87,6 +88,7 @@ const DeveloperUsersTable = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [createProfileDialogOpen, setCreateProfileDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
     name: '',
     email: '',
@@ -117,6 +119,33 @@ const DeveloperUsersTable = () => {
       yearsOfExperience: 0,
       specializations: [] as string[],
       certifications: [] as string[]
+    }
+  });
+  const [createProfileFormData, setCreateProfileFormData] = useState({
+    name: '',
+    description: '',
+    website: '',
+    foundedYear: '',
+    headquarters: {
+      city: '',
+      state: '',
+      country: 'India'
+    },
+    team: {
+      totalMembers: 0,
+      keyPersonnel: [] as string[]
+    },
+    specializations: [] as string[],
+    contact: {
+      email: '',
+      phone: '',
+      address: ''
+    },
+    socialMedia: {
+      linkedin: '',
+      twitter: '',
+      facebook: '',
+      instagram: ''
     }
   });
 
@@ -175,6 +204,41 @@ const DeveloperUsersTable = () => {
     handleMenuClose();
   };
 
+  const handleCreateProfileClick = () => {
+    if (selectedUser) {
+      // Pre-fill form with user data
+      setCreateProfileFormData({
+        name: selectedUser.professionalInfo?.businessName || selectedUser.name,
+        description: `Professional developer profile for ${selectedUser.name}`,
+        website: selectedUser.professionalInfo?.businessWebsite || '',
+        foundedYear: '',
+        headquarters: {
+          city: '',
+          state: '',
+          country: 'India'
+        },
+        team: {
+          totalMembers: 0,
+          keyPersonnel: []
+        },
+        specializations: selectedUser.professionalInfo?.specializations || [],
+        contact: {
+          email: selectedUser.email,
+          phone: selectedUser.mobile || selectedUser.professionalInfo?.businessPhone || '',
+          address: selectedUser.professionalInfo?.businessAddress || ''
+        },
+        socialMedia: {
+          linkedin: '',
+          twitter: '',
+          facebook: '',
+          instagram: ''
+        }
+      });
+      setCreateProfileDialogOpen(true);
+    }
+    handleMenuClose();
+  };
+
   const handleDeleteClick = async () => {
     if (selectedUser && window.confirm('Are you sure you want to delete this developer user? This will also delete their profile and projects.')) {
       try {
@@ -225,6 +289,25 @@ const DeveloperUsersTable = () => {
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create developer user');
+    }
+  };
+
+  const handleCreateProfileSubmit = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const profileData = {
+        ...createProfileFormData,
+        userId: selectedUser._id,
+        foundedYear: createProfileFormData.foundedYear ? parseInt(createProfileFormData.foundedYear) : undefined
+      };
+      
+      await http.post('/api/v1/admin/developers/profiles', profileData);
+      await fetchDeveloperUsers();
+      setCreateProfileDialogOpen(false);
+      setError(null);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to create developer profile');
     }
   };
 
@@ -383,6 +466,12 @@ const DeveloperUsersTable = () => {
           <Edit sx={{ mr: 1 }} />
           Edit
         </MenuItem>
+        {selectedUser && !selectedUser.developerId && (
+          <MenuItem onClick={handleCreateProfileClick}>
+            <BusinessCenter sx={{ mr: 1 }} />
+            Create Developer Profile
+          </MenuItem>
+        )}
         <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
           <Delete sx={{ mr: 1 }} />
           Delete
@@ -767,6 +856,151 @@ const DeveloperUsersTable = () => {
         <DialogActions>
           <Button onClick={() => setViewDialogOpen(false)}>
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Create Developer Profile Dialog */}
+      <Dialog open={createProfileDialogOpen} onClose={() => setCreateProfileDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Create Developer Profile for {selectedUser?.name}</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Developer Name"
+                value={createProfileFormData.name}
+                onChange={(e) => setCreateProfileFormData({ ...createProfileFormData, name: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Website"
+                value={createProfileFormData.website}
+                onChange={(e) => setCreateProfileFormData({ ...createProfileFormData, website: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Founded Year"
+                type="number"
+                value={createProfileFormData.foundedYear}
+                onChange={(e) => setCreateProfileFormData({ ...createProfileFormData, foundedYear: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Team Size"
+                type="number"
+                value={createProfileFormData.team.totalMembers}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  team: { ...createProfileFormData.team, totalMembers: parseInt(e.target.value) || 0 }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Description"
+                multiline
+                rows={3}
+                value={createProfileFormData.description}
+                onChange={(e) => setCreateProfileFormData({ ...createProfileFormData, description: e.target.value })}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Headquarters</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="City"
+                value={createProfileFormData.headquarters.city}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  headquarters: { ...createProfileFormData.headquarters, city: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="State"
+                value={createProfileFormData.headquarters.state}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  headquarters: { ...createProfileFormData.headquarters, state: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Country"
+                value={createProfileFormData.headquarters.country}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  headquarters: { ...createProfileFormData.headquarters, country: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Contact Information</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Contact Email"
+                type="email"
+                value={createProfileFormData.contact.email}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  contact: { ...createProfileFormData.contact, email: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Contact Phone"
+                value={createProfileFormData.contact.phone}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  contact: { ...createProfileFormData.contact, phone: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Contact Address"
+                multiline
+                rows={2}
+                value={createProfileFormData.contact.address}
+                onChange={(e) => setCreateProfileFormData({
+                  ...createProfileFormData,
+                  contact: { ...createProfileFormData.contact, address: e.target.value }
+                })}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateProfileDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleCreateProfileSubmit} variant="contained" startIcon={<BusinessCenter />}>
+            Create Profile
           </Button>
         </DialogActions>
       </Dialog>
