@@ -35,7 +35,7 @@ const ContactManagementPage = () => {
         <Paper sx={{ p: 4, borderRadius: '16px' }}>
           <ContactDashboard 
             userRole={getUserRole() as 'agent' | 'developer' | 'admin'}
-            userId={user._id}
+            userId={user.id || (user as any)?._id}
           />
         </Paper>
       </Container>
