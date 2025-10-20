@@ -68,5 +68,31 @@ router.delete('/user-types/:id', protect, authorize('admin'), userTypeController
 // Media Management (Admin can delete any media)
 router.delete('/media/:id', protect, authorize('admin'), mediaController.deleteMedia);
 
+// ==================== DEVELOPER MANAGEMENT ====================
+
+// Developer Users Management
+router.get('/developers/users', protect, authorize('admin'), adminController.getDeveloperUsers);
+router.get('/developers/users/:id', protect, authorize('admin'), adminController.getDeveloperUser);
+router.post('/developers/users', protect, authorize('admin'), adminController.createDeveloperUser);
+router.put('/developers/users/:id', protect, authorize('admin'), adminController.updateDeveloperUser);
+router.delete('/developers/users/:id', protect, authorize('admin'), adminController.deleteDeveloperUser);
+
+// Developer Profiles Management
+router.get('/developers/profiles', protect, authorize('admin'), adminController.getDeveloperProfiles);
+router.get('/developers/profiles/:id', protect, authorize('admin'), adminController.getDeveloperProfile);
+router.post('/developers/profiles', protect, authorize('admin'), adminController.createDeveloperProfile);
+router.put('/developers/profiles/:id', protect, authorize('admin'), adminController.updateDeveloperProfile);
+router.delete('/developers/profiles/:id', protect, authorize('admin'), adminController.deleteDeveloperProfile);
+
+// Project Management
+router.get('/projects', protect, authorize('admin'), adminController.getProjects);
+router.get('/projects/:id', protect, authorize('admin'), adminController.getProject);
+router.post('/projects', protect, authorize('admin'), adminController.createProject);
+router.put('/projects/:id', protect, authorize('admin'), adminController.updateProject);
+router.delete('/projects/:id', protect, authorize('admin'), adminController.deleteProject);
+
+// Developer Statistics
+router.get('/developers/stats', protect, authorize('admin'), adminController.getDeveloperStats);
+
 module.exports = router;
 
