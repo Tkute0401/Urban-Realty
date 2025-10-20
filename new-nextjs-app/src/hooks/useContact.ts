@@ -164,10 +164,10 @@ export const useContactStats = () => {
       ]);
       
       return {
-        total: total.count || 0,
-        pending: pending.count || 0,
-        contacted: contacted.count || 0,
-        completed: completed.count || 0
+        total: total.data?.totalItems || 0,
+        pending: pending.data?.totalItems || 0,
+        contacted: contacted.data?.totalItems || 0,
+        completed: completed.data?.totalItems || 0
       };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
