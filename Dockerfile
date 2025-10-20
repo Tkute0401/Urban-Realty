@@ -1,5 +1,7 @@
 # Multi-stage Docker build for Next.js + Express backend
-FROM node:20-alpine AS base
+# Pin base image to avoid Docker Hub metadata flakiness
+ARG NODE_IMAGE=node:20-alpine@sha256:1ab6fc5a31d515dc7b6b25f6acfda2001821f2c2400252b6cb61044bd9f9ad48
+FROM ${NODE_IMAGE} AS base
 
 # Install dependencies only when needed
 FROM base AS deps
