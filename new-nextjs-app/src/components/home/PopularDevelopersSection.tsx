@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Box, Container, Typography, Button, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
-import { ArrowForward, StarIcon, MapPinIcon, BuildingOfficeIcon } from '@mui/icons-material';
+import { ArrowForward, Star, LocationOn, Business } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useDevelopers } from '@/contexts/DevelopersContext';
 import { motion } from 'framer-motion';
@@ -133,7 +133,7 @@ const PopularDevelopersSection: React.FC = () => {
 
         {developers.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
-            <BuildingOfficeIcon sx={{ fontSize: 64, color: 'var(--color-text-muted)', mb: 2 }} />
+            <Business sx={{ fontSize: 64, color: 'var(--color-text-muted)', mb: 2 }} />
             <Typography variant="h5" sx={{ color: 'var(--color-text-primary)', mb: 1 }}>
               No Developers Available
             </Typography>
@@ -190,7 +190,7 @@ const PopularDevelopersSection: React.FC = () => {
                       className="w-full h-full flex items-center justify-center"
                       style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)' }}
                     >
-                      <BuildingOfficeIcon className="text-[var(--color-primary)]/50 w-12 h-12" />
+                      <Business className="text-[var(--color-primary)]/50 w-12 h-12" />
                     </div>
                   )}
                 </div>
@@ -200,7 +200,7 @@ const PopularDevelopersSection: React.FC = () => {
                   {/* Rating */}
                   <div className="flex items-center mb-2 sm:mb-3">
                     {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+                      <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
                     ))}
                     <span className="text-xs sm:text-sm text-gray-400 ml-1">5.0 (??)</span>
                   </div>
@@ -212,7 +212,7 @@ const PopularDevelopersSection: React.FC = () => {
                   
                   {/* Location */}
                   <div className="flex items-center gap-1 sm:gap-2 text-[var(--color-primary)] mb-2 sm:mb-3">
-                    <MapPinIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <LocationOn className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span className="font-poppins text-xs sm:text-sm line-clamp-1">
                       {developer.headquarters?.city && `${developer.headquarters.city}, `}
                       {developer.headquarters?.state}
@@ -228,14 +228,14 @@ const PopularDevelopersSection: React.FC = () => {
                   {/* Features */}
                   <div className="flex gap-3 sm:gap-6 mb-3 sm:mb-4">
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <BuildingOfficeIcon className="text-[var(--color-primary)] w-4 h-4" />
+                      <Business className="text-[var(--color-primary)] w-4 h-4" />
                       <span className="text-[var(--color-text-muted)] text-xs sm:text-sm">
                         {developer.foundedYear || 'N/A'}
                       </span>
                     </div>
                     
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <BuildingOfficeIcon className="text-[var(--color-primary)] w-4 h-4" />
+                      <Business className="text-[var(--color-primary)] w-4 h-4" />
                       <span className="text-[var(--color-text-muted)] text-xs sm:text-sm">
                         {formatProjectsCount(developer.completedProjects)} Projects
                       </span>

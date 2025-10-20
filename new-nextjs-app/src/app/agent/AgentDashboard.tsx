@@ -790,7 +790,7 @@ const AgentDashboard = () => {
 
           {selectedTab === 2 && (
             <Box>
-              <ContactDashboard userRole="agent" userId={user?._id} />
+              <ContactDashboard userRole="agent" userId={user?.id || (user as any)?._id} />
             </Box>
           )}
 
