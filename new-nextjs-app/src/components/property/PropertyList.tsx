@@ -84,8 +84,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
   return (
     <Box sx={{ 
       width: '100%',
-      px: { xs: 2, md: 3 },
-      py: 6,
+      px: { xs: 1, sm: 2, md: 3 },
+      py: { xs: 3, sm: 4, md: 6 },
       minHeight: '400px',
       overflow: 'visible',
       background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(247, 107, 28, 0.01) 100%)'
@@ -93,22 +93,14 @@ const PropertyList: React.FC<PropertyListProps> = ({
       {/* Properties Grid */}
       <Box sx={{
         display: 'grid',
-        gridTemplateColumns: (() => {
-          const toCount = (val?: number) => (val ? Math.max(1, Math.floor(12 / val)) : undefined);
-          const xs = toCount(columns?.xs) ?? 1;
-          const sm = toCount(columns?.sm) ?? 2;
-          const md = toCount(columns?.md) ?? 2;
-          const lg = toCount(columns?.lg) ?? 3;
-          const xl = toCount(columns?.xl) ?? 3;
-          return {
-            xs: `repeat(${xs}, 1fr)`,
-            sm: `repeat(${sm}, 1fr)`,
-            md: `repeat(${md}, 1fr)`,
-            lg: `repeat(${lg}, 1fr)`,
-            xl: `repeat(${xl}, 1fr)`
-          };
-        })(),
-        gap: { xs: 3, sm: 4, md: 5 },
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(2, 1fr)',
+          lg: 'repeat(3, 1fr)',
+          xl: 'repeat(3, 1fr)'
+        },
+        gap: { xs: 2, sm: 3, md: 4, lg: 5 },
         justifyItems: 'center',
         alignItems: 'start',
         width: '100%',

@@ -139,23 +139,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <Card 
         sx={{ 
           cursor: 'pointer',
-          borderRadius: '24px',
+          borderRadius: { xs: '16px', sm: '20px', md: '24px' },
           overflow: 'hidden',
           backgroundColor: 'var(--color-surface)',
           border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
           boxShadow: isSelected 
             ? '0 22px 44px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)' 
-            : 'var(--shadow-md)',
+            : '0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
-          maxWidth: { xs: '100%', sm: '420px' },
+          maxWidth: { xs: '100%', sm: '380px', md: '420px' },
           height: 'auto',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-hover-overlay) 100%)',
+          background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(var(--color-primary-rgb), 0.02) 100%)',
           '&:hover': {
-            boxShadow: 'var(--shadow-xl)',
+            boxShadow: '0 28px 56px rgba(var(--color-primary-rgb), 0.18), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)',
             border: '2px solid var(--color-primary)',
             transform: 'translateY(-6px)'
           }
@@ -184,7 +184,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       {/* Image Section */}
       <Box sx={{ 
         position: 'relative', 
-        height: '260px', 
+        height: { xs: '200px', sm: '240px', md: '260px' }, 
         flexShrink: 0,
         overflow: 'hidden',
         '&::before': {
@@ -194,7 +194,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'linear-gradient(180deg, transparent 0%, var(--color-hover-overlay) 100%)',
+          background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
           zIndex: 1,
           pointerEvents: 'none'
         }
@@ -205,7 +205,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Box sx={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-hover-overlay) 100%)',
+                background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-primary-rgb), 0.05) 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -234,7 +234,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <Box sx={{
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-hover-overlay) 100%)',
+            background: 'linear-gradient(135deg, var(--color-bg) 0%, rgba(var(--color-primary-rgb), 0.05) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -257,21 +257,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               top: 16,
               right: 16,
               p: 2,
-              backgroundColor: 'var(--color-surface)',
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(12px)',
               borderRadius: '50%',
-              border: '1px solid var(--color-border-light)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: 'var(--shadow-lg)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
               zIndex: 2,
               '&:hover': {
-                backgroundColor: 'var(--color-surface)',
+                backgroundColor: 'rgba(255, 255, 255, 1)',
                 transform: 'scale(1.1)',
-                boxShadow: 'var(--shadow-xl)'
+                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
               }
             }}
             onClick={handleFavoriteClick}
@@ -283,7 +283,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Favorite sx={{ 
                 color: 'var(--color-error)', 
                 fontSize: 22,
-                filter: 'var(--shadow-sm)'
+                filter: 'drop-shadow(0 2px 4px rgba(var(--color-error-rgb), 0.3))'
               }} />
             ) : (
               <FavoriteBorder sx={{ 
@@ -299,39 +299,73 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </Box>
 
       {/* Content Section simplified */}
-      <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 1.75 }}>
+      <CardContent sx={{ 
+        p: { xs: 2, sm: 3, md: 4 }, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: { xs: 1, sm: 1.5, md: 1.75 } 
+      }}>
         <Typography 
           variant="h6" 
-          sx={{ fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          sx={{ 
+            fontWeight: 700, 
+            color: 'var(--color-text-primary)', 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap',
+            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+          }}
         >
           {property.buildingName || property.title}
         </Typography>
 
-        <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-          <LocationOn sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} />
+        <Typography variant="body2" sx={{ 
+          color: 'var(--color-text-muted)',
+          fontSize: { xs: '0.75rem', sm: '0.875rem' }
+        }}>
+          <LocationOn sx={{ fontSize: { xs: 14, sm: 16 }, verticalAlign: 'middle', mr: 0.5 }} />
           {property.address?.city}{property.address?.state ? `, ${property.address.state}` : ''}
         </Typography>
 
-        <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--color-primary)', mt: 1 }}>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 800, 
+          color: 'var(--color-primary)', 
+          mt: 1,
+          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+        }}>
           {formatPrice(property.price)}{property.status === 'For Rent' ? ' /mo' : ''}
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 2.5, mt: 1.5, flexWrap: 'wrap' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: { xs: 1.5, sm: 2, md: 2.5 }, 
+          mt: { xs: 1, sm: 1.25, md: 1.5 }, 
+          flexWrap: 'wrap' 
+        }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Bed sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
-            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+            <Bed sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ 
+              color: 'var(--color-text-primary)',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            }}>
               {property.bedrooms || 0} BHK
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Bathtub sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
-            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+            <Bathtub sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ 
+              color: 'var(--color-text-primary)',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            }}>
               {property.bathrooms || 0} Bath
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Home sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
-            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+            <Home sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ 
+              color: 'var(--color-text-primary)',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            }}>
               {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
             </Typography>
           </Box>

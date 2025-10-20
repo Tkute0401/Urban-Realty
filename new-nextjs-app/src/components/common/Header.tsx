@@ -121,7 +121,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const handleResize = () => {
       if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth <= 768);
+        setIsMobile(window.innerWidth < 768);
       }
     };
     handleResize();
@@ -153,7 +153,7 @@ const Header: React.FC = () => {
         </div>
 
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Show on screens < 768px */}
         {isMobile ? (
           <div>
             <button className="menu-button" onClick={handleMenuToggle}>

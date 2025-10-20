@@ -24,7 +24,7 @@ const MobileBottomNav = () => {
       bottom: 0, 
       left: 0, 
       right: 0, 
-      zIndex: 1030, // Use fixed layer
+      zIndex: 1000,
       borderTop: '1px solid',
       borderColor: 'divider'
     }} elevation={3}>
@@ -36,15 +36,6 @@ const MobileBottomNav = () => {
         }}
         sx={{
           backgroundColor: 'background.paper',
-          minHeight: '56px', // Ensure proper touch target
-          '& .MuiBottomNavigationAction-root': {
-            minHeight: '56px',
-            padding: '6px 12px',
-            '& .MuiBottomNavigationAction-label': {
-              fontSize: '0.75rem',
-              marginTop: '4px'
-            }
-          },
           '& .Mui-selected': {
             color: 'primary.main'
           }

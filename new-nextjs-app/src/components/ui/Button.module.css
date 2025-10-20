@@ -14,10 +14,10 @@
 
 .primary {
   background: var(--color-primary);
-  color: var(--color-primary-contrast);
+  color: #fff;
 }
 
 .secondary {
   background: var(--color-secondary);
-  color: var(--color-secondary-contrast);
+  color: #fff;
 }

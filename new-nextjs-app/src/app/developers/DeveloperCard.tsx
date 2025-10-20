@@ -27,18 +27,18 @@ const DeveloperCard = ({ developer, isMobile }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col min-h-[400px] sm:min-h-[450px]`}
+      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col`}
       style={{
         backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-primary)',
-        boxShadow: 'var(--shadow-md)',
-        minHeight: '400px'
+        borderColor: 'var(--color-border)',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        minHeight: '350px'
       }}
       onClick={handleClick}
       whileHover={{ y: -5 }}
     >
       {/* Image Section */}
-      <div className="relative aspect-video" style={{ minHeight: '120px' }}>
+      <div className="relative aspect-video" style={{ minHeight: '100px' }}>
         {developer.logo?.url ? (
           <>
             {!imageLoaded && (

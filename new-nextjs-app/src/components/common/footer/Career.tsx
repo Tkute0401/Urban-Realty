@@ -163,7 +163,7 @@ const Career = () => {
         </div>
 
         <div className="relative">
-          <div className="absolute -inset-4 border-2 border-primary/30 rounded-2xl"></div>
+          <div className="absolute -inset-4 border-2 border-[#78cadc]/30 rounded-2xl"></div>
           <div className="relative bg-[color:var(--color-surface-elevated)] p-8 sm:p-12 rounded-xl overflow-hidden">
             <div className="absolute inset-0 bg-[url('/team-pattern.png')] opacity-10"></div>
             <div className="relative z-10">

@@ -423,7 +423,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-16 sm:top-20 left-4 right-4 z-[9997] bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
+            className="fixed top-16 sm:top-20 left-4 right-4 z-mobile-menu bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
           >
             <div className="flex flex-col p-2 sm:p-3 md:p-4">
               {navigation.map((item) => (
@@ -496,9 +496,9 @@ const HeroSection = () => {
       </AnimatePresence>
       
       {/* Search and filter bar */}
-      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center z-[100] px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2">
+      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center z-search-bar px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2">
         {/* Main search container */}
-        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative z-[200]">
+        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative z-search-bar">
           {/* Property type tabs */}
           <div className="flex gap-0 mb-1 sm:mb-1.5 rounded-lg sm:rounded-xl p-1">
             {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
@@ -556,7 +556,7 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-full sm:w-48 md:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-[9999] max-h-48 md:max-h-60 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-full sm:w-48 md:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-mobile-menu max-h-48 md:max-h-60 overflow-y-auto"
                       >
                         <div className="max-h-[200px] overflow-y-auto">
                           {filteredCities.length > 0 ? (

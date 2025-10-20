@@ -158,13 +158,13 @@ const HowWeWork = () => {
                   </div>
                 </div>
               </div>
-              <div className="lg:w-3/4 bg-surface-elevated p-8 rounded-xl border border-primary/20 hover:border-primary/50 transition-all">
+              <div className="lg:w-3/4 bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all">
                 <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
                 <p className="text-gray-300 mb-6">{step.description}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {step.features.map((feature, i) => (
                     <div key={i} className="flex items-start">
-                      <div className="w-1.5 h-1.5 mt-2 mr-2 bg-primary rounded-full flex-shrink-0"></div>
+                      <div className="w-1.5 h-1.5 mt-2 mr-2 bg-[#78cadc] rounded-full flex-shrink-0"></div>
                       <span className="text-gray-300">{feature}</span>
                     </div>
                   ))}
