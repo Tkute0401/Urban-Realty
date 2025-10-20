@@ -164,20 +164,26 @@ const PropertiesPageContent: React.FC = () => {
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+    
+    // Auto-trigger search for specific filters
+    if (key === 'bedrooms' || key === 'bathrooms') {
+      setTimeout(() => {
+        loadProperties();
+      }, 100);
+    }
   };
 
   const handlePropertyTypeChange = (newType: string) => {
-    setFilters(prev => ({ ...prev, propertyType: newType }));
+    const newFilters = { ...filters, propertyType: newType };
+    setFilters(newFilters);
     setActiveBtn(newType === 'RENT' ? 'RENT' : 'BUY');
     
     if (isMobile && showFiltersDrawer) {
       setShowFiltersDrawer(false);
     }
     
-    // Trigger search with new filter
-    setTimeout(() => {
-      loadProperties();
-    }, 100);
+    // Trigger search immediately with new filter
+    loadProperties();
   };
 
   const clearAllFilters = () => {
@@ -741,6 +747,10 @@ const PropertiesPageContent: React.FC = () => {
                           ? filters.amenities.filter(a => a !== amenity)
                           : [...filters.amenities, amenity];
                         handleFilterChange('amenities', newAmenities);
+                        // Trigger search after amenities change
+                        setTimeout(() => {
+                          loadProperties();
+                        }, 100);
                       }}
                       sx={{
                         backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',

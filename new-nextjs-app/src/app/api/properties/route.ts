@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     // Amenities filter
     if (amenities.length > 0) {
-      filter.amenities = { $all: amenities };
+      filter.amenities = { $in: amenities };
     }
 
     // Calculate pagination
