@@ -167,7 +167,7 @@ const PropertiesPageContent: React.FC = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
     
     // Auto-trigger search for specific filters
-    if (key === 'bedrooms' || key === 'bathrooms') {
+    if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType') {
       setTimeout(() => {
         loadProperties();
       }, 100);
@@ -687,6 +687,14 @@ const PropertiesPageContent: React.FC = () => {
                     <Select
                       value={filters.bedrooms}
                       onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            zIndex: 'var(--z-drawer)',
+                            maxHeight: '300px'
+                          }
+                        }
+                      }}
                       sx={{
                         background: 'var(--color-surface)',
                         color: 'var(--color-text-primary)',
@@ -710,6 +718,14 @@ const PropertiesPageContent: React.FC = () => {
                     <Select
                       value={filters.bathrooms}
                       onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            zIndex: 'var(--z-drawer)',
+                            maxHeight: '300px'
+                          }
+                        }
+                      }}
                       sx={{
                         background: 'var(--color-surface)',
                         color: 'var(--color-text-primary)',
@@ -749,10 +765,6 @@ const PropertiesPageContent: React.FC = () => {
                           ? filters.amenities.filter(a => a !== amenity)
                           : [...filters.amenities, amenity];
                         handleFilterChange('amenities', newAmenities);
-                        // Trigger search after amenities change
-                        setTimeout(() => {
-                          loadProperties();
-                        }, 100);
                       }}
                       sx={{
                         backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
@@ -1085,6 +1097,14 @@ const PropertiesPageContent: React.FC = () => {
                           <Select
                             value={filters.bedrooms}
                             onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                            MenuProps={{
+                              PaperProps: {
+                                sx: {
+                                  zIndex: 'var(--z-dropdown)',
+                                  maxHeight: '300px'
+                                }
+                              }
+                            }}
                             sx={{
                               background: 'var(--color-bg)',
                               color: 'var(--color-text-primary)',
@@ -1108,6 +1128,14 @@ const PropertiesPageContent: React.FC = () => {
                           <Select
                             value={filters.bathrooms}
                             onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                            MenuProps={{
+                              PaperProps: {
+                                sx: {
+                                  zIndex: 'var(--z-dropdown)',
+                                  maxHeight: '300px'
+                                }
+                              }
+                            }}
                             sx={{
                               background: 'var(--color-bg)',
                               color: 'var(--color-text-primary)',

@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       filter['address.city'] = city;
     }
 
-    // Amenities filter
+    // Amenities filter - show properties that have ANY of the selected amenities
     if (amenities.length > 0) {
       filter.amenities = { $in: amenities };
     }

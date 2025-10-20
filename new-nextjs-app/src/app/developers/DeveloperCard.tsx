@@ -59,7 +59,12 @@ const DeveloperCard = ({ developer, isMobile }) => {
               src={developer.logo.url} 
               alt={developer.name} 
               className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              style={{ 
+                backgroundColor: 'var(--color-surface)',
+                height: '120px',
+                minHeight: '120px',
+                maxHeight: '120px'
+              }}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
             />
