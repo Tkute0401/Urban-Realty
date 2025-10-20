@@ -32,7 +32,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
         backgroundColor: 'var(--color-surface)',
         borderColor: 'var(--color-primary)',
         boxShadow: 'var(--shadow-md)',
-        minHeight: { xs: '400px', sm: '450px' }
+        minHeight: '400px'
       }}
       onClick={handleClick}
       whileHover={{ y: -5 }}
