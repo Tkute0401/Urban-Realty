@@ -139,7 +139,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <Card 
         sx={{ 
           cursor: 'pointer',
-          borderRadius: { xs: '16px', sm: '20px', md: '24px' },
+          borderRadius: '24px',
           overflow: 'hidden',
           backgroundColor: 'var(--color-surface)',
           border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
@@ -148,7 +148,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             : '0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           width: '100%',
-          maxWidth: { xs: '100%', sm: '380px', md: '420px' },
+          maxWidth: '420px',
           height: 'auto',
           display: 'flex',
           flexDirection: 'column',
@@ -184,7 +184,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       {/* Image Section */}
       <Box sx={{ 
         position: 'relative', 
-        height: { xs: '200px', sm: '240px', md: '260px' }, 
+        height: '260px', 
         flexShrink: 0,
         overflow: 'hidden',
         '&::before': {
@@ -248,35 +248,42 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </Box>
         )}
         
-        {/* Favorite Button */}
-        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
-          <Box
-            component="button"
-            sx={{
-              position: 'absolute',
-              top: 16,
-              right: 16,
-              p: 2,
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(12px)',
-              borderRadius: '50%',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              zIndex: 2,
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 1)',
-                transform: 'scale(1.1)',
-                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
-              }
-            }}
-            onClick={handleFavoriteClick}
-            disabled={loadingFavorite}
-          >
+      {/* Favorite Button */}
+      <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
+        <Box
+          component="button"
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            p: 2,
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '50%',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            zIndex: 2,
+            minWidth: 44,
+            minHeight: 44,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              transform: 'scale(1.1)',
+              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
+            },
+            '@media (max-width: 768px)': {
+              minWidth: 48,
+              minHeight: 48,
+              p: 2.5
+            }
+          }}
+          onClick={handleFavoriteClick}
+          disabled={loadingFavorite}
+        >
             {loadingFavorite ? (
               <CircularProgress size={22} sx={{ color: 'var(--color-primary)' }} />
             ) : isFavorite ? (
@@ -299,73 +306,39 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </Box>
 
       {/* Content Section simplified */}
-      <CardContent sx={{ 
-        p: { xs: 2, sm: 3, md: 4 }, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: { xs: 1, sm: 1.5, md: 1.75 } 
-      }}>
+      <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 1.75 }}>
         <Typography 
           variant="h6" 
-          sx={{ 
-            fontWeight: 700, 
-            color: 'var(--color-text-primary)', 
-            overflow: 'hidden', 
-            textOverflow: 'ellipsis', 
-            whiteSpace: 'nowrap',
-            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
-          }}
+          sx={{ fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
           {property.buildingName || property.title}
         </Typography>
 
-        <Typography variant="body2" sx={{ 
-          color: 'var(--color-text-muted)',
-          fontSize: { xs: '0.75rem', sm: '0.875rem' }
-        }}>
-          <LocationOn sx={{ fontSize: { xs: 14, sm: 16 }, verticalAlign: 'middle', mr: 0.5 }} />
+        <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+          <LocationOn sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} />
           {property.address?.city}{property.address?.state ? `, ${property.address.state}` : ''}
         </Typography>
 
-        <Typography variant="h5" sx={{ 
-          fontWeight: 800, 
-          color: 'var(--color-primary)', 
-          mt: 1,
-          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
-        }}>
+        <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--color-primary)', mt: 1 }}>
           {formatPrice(property.price)}{property.status === 'For Rent' ? ' /mo' : ''}
         </Typography>
 
-        <Box sx={{ 
-          display: 'flex', 
-          gap: { xs: 1.5, sm: 2, md: 2.5 }, 
-          mt: { xs: 1, sm: 1.25, md: 1.5 }, 
-          flexWrap: 'wrap' 
-        }}>
+        <Box sx={{ display: 'flex', gap: 2.5, mt: 1.5, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Bed sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'var(--color-text-muted)' }} />
-            <Typography variant="body2" sx={{ 
-              color: 'var(--color-text-primary)',
-              fontSize: { xs: '0.75rem', sm: '0.875rem' }
-            }}>
+            <Bed sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
               {property.bedrooms || 0} BHK
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Bathtub sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'var(--color-text-muted)' }} />
-            <Typography variant="body2" sx={{ 
-              color: 'var(--color-text-primary)',
-              fontSize: { xs: '0.75rem', sm: '0.875rem' }
-            }}>
+            <Bathtub sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
               {property.bathrooms || 0} Bath
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Home sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'var(--color-text-muted)' }} />
-            <Typography variant="body2" sx={{ 
-              color: 'var(--color-text-primary)',
-              fontSize: { xs: '0.75rem', sm: '0.875rem' }
-            }}>
+            <Home sx={{ fontSize: 20, color: 'var(--color-text-muted)' }} />
+            <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
               {property.area ? `${property.area.toLocaleString()} sqft` : 'N/A'}
             </Typography>
           </Box>

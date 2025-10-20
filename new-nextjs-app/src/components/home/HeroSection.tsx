@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import AccountSidebar from './AccountSidebar';
 import { useProperties } from '@/contexts/PropertiesContext';
 import { ThemeContext } from '@/contexts/ThemeProvider';
+import '@/style-constants/z-index.css';
 
 // Theme toggle icons
 const SunIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -305,7 +306,7 @@ const HeroSection = () => {
               </button>
 
               <button 
-                className="lg:hidden p-1 sm:p-1.5 text-white hover:bg-white/20 rounded-lg transition-colors duration-300"
+                className="lg:hidden p-2 sm:p-2.5 text-white hover:bg-white/20 rounded-lg transition-colors duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
@@ -423,14 +424,15 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-16 sm:top-20 left-4 right-4 z-mobile-menu bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
+            className="fixed top-16 sm:top-20 left-4 right-4 bg-black/90 backdrop-blur-sm rounded-2xl border border-white/10 lg:hidden shadow-xl"
+            style={{ zIndex: 'var(--z-mobile-menu)' }}
           >
             <div className="flex flex-col p-2 sm:p-3 md:p-4">
               {navigation.map((item) => (
                 <div key={item.name} className="mb-1 sm:mb-1.5 last:mb-0">
                   <button
                     onClick={() => toggleMobileDropdown(item.name)}
-                    className="w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-200 text-xs sm:text-sm"
+                    className="w-full flex items-center justify-between px-3 sm:px-4 py-3 sm:py-3 text-white hover:bg-white/10 rounded-lg transition-colors duration-200 text-sm sm:text-base min-h-[44px]"
                   >
                     <span className="font-poppins font-medium">{item.name}</span>
                     {mobileActiveDropdown === item.name ? (
@@ -454,7 +456,7 @@ const HeroSection = () => {
                             <a
                               key={subItem}
                               href="#"
-                              className="block px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200"
+                              className="block px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200 min-h-[44px] flex items-center"
                             >
                               {subItem}
                             </a>
@@ -472,7 +474,7 @@ const HeroSection = () => {
                   toggleTheme();
                   setIsMenuOpen(false);
                 }} 
-                className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 mt-1 sm:mt-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-xs sm:text-sm"
+                className="flex items-center justify-center gap-2 sm:gap-2 px-3 sm:px-4 py-3 sm:py-3 mt-2 sm:mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-sm sm:text-base min-h-[44px]"
               >
                 {theme === 'light' ? <MoonIcon className="w-3 h-3 sm:w-4 sm:h-4" /> : <SunIcon className="w-3 h-3 sm:w-4 sm:h-4" />}
                 <span className="font-poppins font-semibold">
@@ -485,7 +487,7 @@ const HeroSection = () => {
                   setIsAccountSidebarOpen(true);
                   setIsMenuOpen(false);
                 }} 
-                className="lg:hidden flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 mt-1 sm:mt-1.5 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-xs sm:text-sm"
+                className="lg:hidden flex items-center justify-center gap-2 sm:gap-2 px-3 sm:px-4 py-3 sm:py-3 mt-2 sm:mt-2 rounded-lg text-white bg-transparent border border-white hover:bg-white/10 transition-colors text-sm sm:text-base min-h-[44px]"
               >
                 <UserIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="font-poppins font-semibold">ACCOUNT</span>
@@ -496,9 +498,11 @@ const HeroSection = () => {
       </AnimatePresence>
       
       {/* Search and filter bar */}
-      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center z-search-bar px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2">
+      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2"
+           style={{ zIndex: 'var(--z-sticky)' }}>
         {/* Main search container */}
-        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative z-search-bar">
+        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative"
+             style={{ zIndex: 'var(--z-elevated)' }}>
           {/* Property type tabs */}
           <div className="flex gap-0 mb-1 sm:mb-1.5 rounded-lg sm:rounded-xl p-1">
             {['ALL', 'BUY', 'RENT', 'COMMERCIAL'].map((tab) => (
@@ -535,7 +539,8 @@ const HeroSection = () => {
             <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-visible border border-white/20 max-h-8 sm:max-h-10 md:max-h-12">
               {/* City dropdown */}
               {availableCities.length > 0 && (
-                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12 z-[9000]">
+                <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12"
+                     style={{ zIndex: 'var(--z-dropdown)' }}>
                   <button
                     type="button"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}
@@ -556,7 +561,8 @@ const HeroSection = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute left-0 top-full mt-1 w-full sm:w-48 md:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 z-mobile-menu max-h-48 md:max-h-60 overflow-y-auto"
+                        className="absolute left-0 top-full mt-1 w-full sm:w-48 md:w-56 bg-white/40 backdrop-blur-3xl rounded-lg shadow-lg overflow-hidden border border-white/20 max-h-48 md:max-h-60 overflow-y-auto"
+                        style={{ zIndex: 'var(--z-popover)' }}
                       >
                         <div className="max-h-[200px] overflow-y-auto">
                           {filteredCities.length > 0 ? (

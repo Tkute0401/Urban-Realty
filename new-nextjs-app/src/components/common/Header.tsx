@@ -121,7 +121,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const handleResize = () => {
       if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth < 768);
+        setIsMobile(window.innerWidth <= 768);
       }
     };
     handleResize();
@@ -153,12 +153,20 @@ const Header: React.FC = () => {
         </div>
 
 
-        {/* Mobile Menu Button - Show on screens < 768px */}
+        {/* Mobile Menu Button */}
         {isMobile ? (
           <div>
             <button className="menu-button" onClick={handleMenuToggle}>
               <MenuIcon />
             </button>
+            
+            {/* Mobile Menu Backdrop */}
+            {mobileMenuOpen && (
+              <div 
+                className={`mobile-menu-backdrop ${mobileMenuOpen ? 'active' : ''}`}
+                onClick={handleMenuClose}
+              />
+            )}
             
             {/* Mobile Menu */}
             {mobileMenuOpen && (

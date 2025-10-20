@@ -1,0 +1,45 @@
+/* Z-Index Hierarchy Documentation
+ * 
+ * This file establishes a consistent z-index system across the application
+ * to prevent overlapping issues, especially on mobile devices.
+ * 
+ * Hierarchy (from lowest to highest):
+ * - Base page content: 0-10
+ * - Sticky headers/filters: 1000-1099
+ * - Header component: 1100-1199
+ * - Dropdowns/popovers: 1200-1299
+ * - Mobile menu: 1300-1399
+ * - Modals/drawers: 1400-1499
+ * - Toast/notifications: 1500+
+ */
+
+:root {
+  /* Base content */
+  --z-base: 0;
+  --z-content: 1;
+  --z-elevated: 10;
+
+  /* Sticky elements */
+  --z-sticky: 1000;
+  --z-sticky-filters: 1050;
+
+  /* Header */
+  --z-header: 1100;
+  --z-header-menu: 1150;
+
+  /* Dropdowns and popovers */
+  --z-dropdown: 1200;
+  --z-popover: 1250;
+
+  /* Mobile menu */
+  --z-mobile-menu: 1350;
+  --z-mobile-menu-backdrop: 1340;
+
+  /* Modals and drawers */
+  --z-modal: 1400;
+  --z-drawer: 1450;
+
+  /* Toast and notifications */
+  --z-toast: 1500;
+  --z-notification: 1550;
+}

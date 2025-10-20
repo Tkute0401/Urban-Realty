@@ -38,6 +38,7 @@ import PropertyList from '@/components/property/PropertyList';
 import PropertiesMap from '@/components/property/PropertiesMap';
 import { useLocation } from '@/hooks/useLocation';
 import { useMediaQuery, useTheme } from '@mui/material';
+import '@/style-constants/z-index.css';
 
 const PropertiesPageContent: React.FC = () => {
   const router = useRouter();
@@ -279,7 +280,7 @@ const PropertiesPageContent: React.FC = () => {
         <Box sx={{
           position: 'sticky',
           top: 0,
-          zIndex: 1000,
+          zIndex: 'var(--z-sticky-filters)',
           background: 'var(--color-bg)',
           borderBottom: '1px solid var(--color-border)',
           p: 2
@@ -527,6 +528,7 @@ const PropertiesPageContent: React.FC = () => {
               borderTopRightRadius: '16px',
               backgroundColor: 'var(--color-surface)',
               color: 'var(--color-text-primary)',
+              zIndex: 'var(--z-drawer)',
             }
           }}
         >
@@ -864,7 +866,7 @@ const PropertiesPageContent: React.FC = () => {
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
-                    zIndex: 1000,
+                    zIndex: 'var(--z-dropdown)',
                     p: 3,
                     minWidth: '280px'
                   }}>
@@ -961,7 +963,7 @@ const PropertiesPageContent: React.FC = () => {
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
-                    zIndex: 1000,
+                    zIndex: 'var(--z-dropdown)',
                     p: 3,
                     minWidth: '320px'
                   }}>
@@ -1069,7 +1071,7 @@ const PropertiesPageContent: React.FC = () => {
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
-                    zIndex: 1000,
+                    zIndex: 'var(--z-dropdown)',
                     p: 3,
                     minWidth: '320px'
                   }}>
@@ -1179,7 +1181,7 @@ const PropertiesPageContent: React.FC = () => {
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
-                    zIndex: 1000,
+                    zIndex: 'var(--z-dropdown)',
                     p: 3,
                     minWidth: '400px'
                   }}>
