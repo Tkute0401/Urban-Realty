@@ -169,6 +169,7 @@ const PopularProjectsSection: React.FC = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Card
+                  onClick={() => router.push(`/projects/${project._id}`)}
                   sx={{
                     height: '100%',
                     display: 'flex',
@@ -178,8 +179,9 @@ const PopularProjectsSection: React.FC = () => {
                     borderRadius: 3,
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
+                    cursor: 'pointer',
                     '&:hover': {
-                      boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                      boxShadow: '0 8px 25px rgba(var(--color-shadow-rgb), 0.15)',
                       transform: 'translateY(-4px)',
                     }
                   }}
@@ -288,7 +290,10 @@ const PopularProjectsSection: React.FC = () => {
                     <Button
                       variant="outlined"
                       fullWidth
-                      onClick={() => router.push(`/projects/${project._id}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/projects/${project._id}`);
+                      }}
                       sx={{
                         borderColor: 'var(--color-primary)',
                         color: 'var(--color-primary)',

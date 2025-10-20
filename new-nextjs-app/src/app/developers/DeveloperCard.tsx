@@ -30,15 +30,15 @@ const DeveloperCard = ({ developer, isMobile }) => {
       className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col`}
       style={{
         backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-border)',
+        borderColor: 'var(--color-primary)',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        minHeight: '350px'
+        minHeight: '400px'
       }}
       onClick={handleClick}
       whileHover={{ y: -5 }}
     >
       {/* Image Section */}
-      <div className="relative aspect-video" style={{ minHeight: '100px' }}>
+      <div className="relative" style={{ height: '120px', minHeight: '120px', maxHeight: '120px' }}>
         {developer.logo?.url ? (
           <>
             {!imageLoaded && (
@@ -59,7 +59,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
               src={developer.logo.url} 
               alt={developer.name} 
               className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-              style={{ backgroundColor: 'var(--color-surface)', minHeight: '120px' }}
+              style={{ backgroundColor: 'var(--color-surface)' }}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
             />
@@ -67,7 +67,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
         ) : (
           <div 
             className="w-full h-full flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)', minHeight: '120px' }}
+            style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)' }}
           >
             <BuildingOfficeIcon className="text-[var(--color-primary)]/50 w-12 h-12" />
           </div>

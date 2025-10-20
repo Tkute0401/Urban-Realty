@@ -80,10 +80,10 @@ export function Button({
         return {
           ...baseStyles,
           backgroundColor: 'var(--color-danger)',
-          color: 'white',
+          color: 'var(--color-text-inverse)',
           '&:hover': {
-            backgroundColor: '#dc2626',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)',
+            backgroundColor: 'var(--color-danger-dark)',
+            boxShadow: '0 4px 12px rgba(var(--color-danger-rgb), 0.15)',
           },
         };
       case 'primary':

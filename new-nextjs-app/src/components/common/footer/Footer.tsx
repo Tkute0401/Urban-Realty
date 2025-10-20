@@ -46,21 +46,21 @@ const Footer = () => {
         borderTop: '1px solid var(--color-primary)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
         {/* Top section with links */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 mb-8 sm:mb-10 md:mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
           {/* Cities */}
           <div>
-            <h3 className="font-poppins text-base sm:text-lg font-bold mb-3 sm:mb-4" style={{ color: 'var(--color-text)' }}>Popular Cities</h3>
-            <ul className="space-y-1 sm:space-y-2">
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>Popular Cities</h3>
+            <ul className="space-y-2">
               {cities.map((city, index) => (
                 <li key={index}>
                   <a 
                     href={`/properties?city=${city}`} 
-                    className="font-poppins text-xs sm:text-sm hover:text-primary transition-colors"
+                    className="font-poppins text-sm hover:text-primary transition-colors"
                     style={{ 
                       color: 'var(--color-text-muted)',
-                      fontSize: '0.75rem'
+                      fontSize: '0.875rem'
                     }}
                     onMouseEnter={(e) => {
                       (e.target as HTMLElement).style.color = 'var(--color-primary)';
@@ -78,16 +78,16 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="font-poppins text-base sm:text-lg font-bold mb-3 sm:mb-4" style={{ color: 'var(--color-text)' }}>Resources</h3>
-            <ul className="space-y-1 sm:space-y-2">
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>Resources</h3>
+            <ul className="space-y-2">
               {resources.map((item, index) => (
                 <li key={index}>
                   <Link 
                     href={typeof item === 'string' ? '#' : item.path} 
-                    className="font-poppins text-xs sm:text-sm transition-colors"
+                    className="font-poppins text-sm transition-colors"
                     style={{ 
                       color: 'var(--color-text-muted)',
-                      fontSize: '0.75rem',
+                      fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
@@ -106,16 +106,16 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h3 className="font-poppins text-base sm:text-lg font-bold mb-3 sm:mb-4" style={{ color: 'var(--color-text)' }}>About</h3>
-            <ul className="space-y-1 sm:space-y-2">
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>About</h3>
+            <ul className="space-y-2">
               {about.map((item, index) => (
                 <li key={index}>
                   <Link 
                     href={typeof item === 'string' ? '#' : item.path}
-                    className="font-poppins text-xs sm:text-sm transition-colors"
+                    className="font-poppins text-sm transition-colors"
                     style={{ 
                       color: 'var(--color-text-muted)',
-                      fontSize: '0.75rem',
+                      fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
@@ -134,16 +134,16 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="font-poppins text-base sm:text-lg font-bold mb-3 sm:mb-4" style={{ color: 'var(--color-text)' }}>Services</h3>
-            <ul className="space-y-1 sm:space-y-2">
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>Services</h3>
+            <ul className="space-y-2">
               {services.map((item, index) => (
                 <li key={index}>
                   <Link 
                     href={typeof item === 'string' ? '#' : item.path} 
-                    className="font-poppins text-xs sm:text-sm transition-colors"
+                    className="font-poppins text-sm transition-colors"
                     style={{ 
                       color: 'var(--color-text-muted)',
-                      fontSize: '0.75rem',
+                      fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
                     onMouseEnter={(e) => {
@@ -162,9 +162,9 @@ const Footer = () => {
         </div>
 
         {/* Our Partners */}
-        <div className="mt-6 sm:mt-8">
-            <h3 className="font-poppins text-base sm:text-lg font-bold mb-3 sm:mb-4" style={{ color: 'var(--color-text)' }}>Our Partners</h3>
-            <ul className="space-y-1 sm:space-y-2">
+        <div>
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>Our Partners</h3>
+            <ul className="space-y-2">
               {partners.map((item, index) => (
                 <li key={index}>
                   <Link 
@@ -195,9 +195,9 @@ const Footer = () => {
         <div className="h-px my-8" style={{ backgroundColor: 'var(--color-primary)', opacity: '0.2' }}></div>
 
         {/* Middle section - social links centered */}
-        <div className="flex flex-col items-center mb-8 sm:mb-10 md:mb-12">
-          <h3 className="font-poppins text-base sm:text-lg font-bold mb-4 sm:mb-6" style={{ color: 'var(--color-text)' }}>Connect with Us</h3>
-          <div className="flex gap-4 sm:gap-6">
+        <div className="flex flex-col items-center mb-12">
+          <h3 className="font-poppins text-lg font-bold mb-6" style={{ color: 'var(--color-text)' }}>Connect with Us</h3>
+          <div className="flex gap-6">
             <a href="https://www.facebook.com/share/16U1BQ69Un/?mibextid=wwXIfr" 
                className="p-2 rounded-full transition-colors"
                style={{ 
@@ -256,17 +256,17 @@ const Footer = () => {
         <div className="h-px my-8" style={{ backgroundColor: 'var(--color-primary)', opacity: '0.2' }}></div>
 
         {/* Bottom section with copyright and logo */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src="/vite.png" alt="Logo" className="h-6 sm:h-8 w-auto object-contain" />
-            <span className="font-poppins font-bold text-sm sm:text-base" style={{ color: 'var(--color-text)' }}>SQUAREFOOT</span>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/vite.png" alt="Logo" className="h-8 w-auto object-contain" />
+            <span className="font-poppins font-bold" style={{ color: 'var(--color-text)' }}>SQUAREFOOT</span>
           </div>
           
-          <div className="text-center sm:text-right">
-            <p className="font-poppins text-xs sm:text-sm">
+          <div className="text-center md:text-right">
+            <p className="font-poppins text-xs">
               © {new Date().getFullYear()} SQUAREFOOT, Inc. All rights reserved.
             </p>
-            <p className="font-poppins text-xs sm:text-sm mt-1">
+            <p className="font-poppins text-xs mt-1">
               SQUAREFOOT® is a registered trademark of SQUAREFOOT, Inc.
             </p>
           </div>
