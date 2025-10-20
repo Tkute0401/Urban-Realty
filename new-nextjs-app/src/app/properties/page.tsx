@@ -451,26 +451,6 @@ const PropertiesPageContent: React.FC = () => {
                 Search
               </Button>
               
-              <Button
-                variant="outlined"
-                onClick={() => setShowFiltersDrawer(true)}
-                startIcon={<FilterList />}
-                sx={{
-                  borderColor: 'var(--color-primary)',
-                  color: 'var(--color-primary)',
-                  borderRadius: '12px',
-                  px: 3,
-                  py: 1.5,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  '&:hover': {
-                    borderColor: 'var(--color-primary-hover)',
-                    backgroundColor: 'var(--color-primary-light)'
-                  }
-                }}
-              >
-                Filters
-              </Button>
             </Box>
 
             {/* Buy/Rent Toggle */}
@@ -587,7 +567,56 @@ const PropertiesPageContent: React.FC = () => {
               </Box>
             </Box>
 
-            {/* Price Range */}
+            {/* Buy/Rent Toggle */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
+                Buy or Rent
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Chip
+                  label="All"
+                  clickable
+                  variant={filters.propertyType === 'ALL' ? 'filled' : 'outlined'}
+                  onClick={() => handleFilterChange('propertyType', 'ALL')}
+                  sx={{ 
+                    backgroundColor: filters.propertyType === 'ALL' ? 'var(--color-primary)' : 'transparent',
+                    color: filters.propertyType === 'ALL' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
+                    '&:hover': {
+                      backgroundColor: filters.propertyType === 'ALL' ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
+                    }
+                  }}
+                />
+                <Chip
+                  label="Buy"
+                  clickable
+                  variant={filters.propertyType === 'BUY' ? 'filled' : 'outlined'}
+                  onClick={() => handleFilterChange('propertyType', 'BUY')}
+                  sx={{ 
+                    backgroundColor: filters.propertyType === 'BUY' ? 'var(--color-primary)' : 'transparent',
+                    color: filters.propertyType === 'BUY' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
+                    '&:hover': {
+                      backgroundColor: filters.propertyType === 'BUY' ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
+                    }
+                  }}
+                />
+                <Chip
+                  label="Rent"
+                  clickable
+                  variant={filters.propertyType === 'RENT' ? 'filled' : 'outlined'}
+                  onClick={() => handleFilterChange('propertyType', 'RENT')}
+                  sx={{ 
+                    backgroundColor: filters.propertyType === 'RENT' ? 'var(--color-primary)' : 'transparent',
+                    color: filters.propertyType === 'RENT' ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
+                    '&:hover': {
+                      backgroundColor: filters.propertyType === 'RENT' ? 'var(--color-primary-hover)' : 'var(--color-primary-light)'
+                    }
+                  }}
+                />
+              </Box>
+            </Box>
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
                 Price Range
@@ -786,41 +815,6 @@ const PropertiesPageContent: React.FC = () => {
             mb: 3,
             flexWrap: 'wrap'
           }}>
-            {/* Buy/Rent Toggle */}
-            <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
-              <Button
-                variant={filters.propertyType === 'BUY' ? 'contained' : 'outlined'}
-                onClick={() => handlePropertyTypeChange('BUY')}
-                sx={{
-                  backgroundColor: filters.propertyType === 'BUY' ? 'var(--color-primary)' : 'transparent',
-                  color: filters.propertyType === 'BUY' ? 'var(--color-primary-contrast)' : 'var(--color-text-primary)',
-                  borderColor: 'var(--color-primary)',
-                  borderRadius: '4px',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 2,
-                  py: 1
-                }}
-              >
-                BUY
-              </Button>
-              <Button
-                variant={filters.propertyType === 'RENT' ? 'contained' : 'outlined'}
-                onClick={() => handlePropertyTypeChange('RENT')}
-                sx={{
-                  backgroundColor: filters.propertyType === 'RENT' ? 'var(--color-primary)' : 'transparent',
-                  color: filters.propertyType === 'RENT' ? 'var(--color-primary-contrast)' : 'var(--color-text-primary)',
-                  borderColor: 'var(--color-primary)',
-                  borderRadius: '4px',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 2,
-                  py: 1
-                }}
-              >
-                RENT
-              </Button>
-            </Box>
 
             {/* Filter Dropdowns */}
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -1228,24 +1222,6 @@ const PropertiesPageContent: React.FC = () => {
                 )}
               </Box>
 
-              {/* Save Search Button */}
-              <Button
-                variant="contained"
-                sx={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-primary-contrast)',
-                  borderRadius: '4px',
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 2,
-                  py: 1,
-                  '&:hover': {
-                    backgroundColor: 'var(--color-primary-hover)'
-                  }
-                }}
-              >
-                SAVE SEARCH
-              </Button>
             </Box>
           </Box>
 
