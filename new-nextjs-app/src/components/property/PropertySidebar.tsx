@@ -14,6 +14,8 @@ interface Property {
   _id: string;
   price: number;
   area: number;
+  title?: string;
+  buildingName?: string;
   projectDetails?: {
     launchDate?: string;
   };
