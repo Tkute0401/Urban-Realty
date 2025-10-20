@@ -160,7 +160,10 @@ const PopularDevelopersSection: React.FC = () => {
               >
                 {/* Image Section */}
                 <div className="relative aspect-video">
-                  {developer.logo?.url ? (
+                  {(
+                    (typeof developer.logo === 'object' && developer.logo?.url) ||
+                    (typeof developer.logo === 'string' && developer.logo)
+                  ) ? (
                     <>
                       {!imageLoaded[developer._id] && (
                         <div 
@@ -177,7 +180,7 @@ const PopularDevelopersSection: React.FC = () => {
                         </div>
                       )}
                       <img 
-                        src={developer.logo.url} 
+                        src={typeof developer.logo === 'string' ? developer.logo : developer.logo.url} 
                         alt={developer.name} 
                         className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded[developer._id] ? 'opacity-100' : 'opacity-0'}`}
                         style={{ backgroundColor: 'var(--color-surface)' }}
