@@ -1,4 +1,4 @@
-import DeveloperUsersTable from '../DeveloperUsersTable';
+import DeveloperUsersTable from '../../DeveloperUsersTable';
 
 export default function DeveloperUsersPage() {
   return <DeveloperUsersTable />;
