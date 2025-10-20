@@ -150,6 +150,7 @@
   position: absolute;
   right: 1rem;
   top: 4rem;
+  z-index: 9999;
   transition: all 0.3s ease;
 }
 
@@ -282,5 +283,28 @@
   
   .logo-text {
     font-size: 1.2rem;
+  }
+  
+  .mobile-menu {
+    right: 0.5rem;
+    left: 0.5rem;
+    min-width: auto;
+    width: calc(100vw - 1rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .header-container {
+    padding: 0.75rem;
+  }
+  
+  .mobile-menu {
+    right: 0.25rem;
+    left: 0.25rem;
+    width: calc(100vw - 0.5rem);
+  }
+  
+  .menu-item {
+    padding: 0.75rem 1rem;
   }
 }

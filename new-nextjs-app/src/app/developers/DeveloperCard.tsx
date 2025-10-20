@@ -27,17 +27,18 @@ const DeveloperCard = ({ developer, isMobile }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group`}
+      className={`relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col`}
       style={{
         backgroundColor: 'var(--color-surface)',
         borderColor: 'var(--color-primary)',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        minHeight: '400px'
       }}
       onClick={handleClick}
       whileHover={{ y: -5 }}
     >
       {/* Image Section */}
-      <div className="relative aspect-video">
+      <div className="relative aspect-video" style={{ minHeight: '120px' }}>
         {developer.logo?.url ? (
           <>
             {!imageLoaded && (
@@ -58,7 +59,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
               src={developer.logo.url} 
               alt={developer.name} 
               className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-              style={{ backgroundColor: 'var(--color-surface)' }}
+              style={{ backgroundColor: 'var(--color-surface)', minHeight: '120px' }}
               loading="lazy"
               onLoad={() => setImageLoaded(true)}
             />
@@ -66,7 +67,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
         ) : (
           <div 
             className="w-full h-full flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)' }}
+            style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)', minHeight: '120px' }}
           >
             <BuildingOfficeIcon className="text-[var(--color-primary)]/50 w-12 h-12" />
           </div>
@@ -74,17 +75,17 @@ const DeveloperCard = ({ developer, isMobile }) => {
       </div>
 
       {/* Content Section */}
-      <div className="p-3 sm:p-5">
+      <div className="p-3 sm:p-5 flex-grow flex flex-col">
         {/* Rating */}
         <div className="flex items-center mb-2 sm:mb-3">
           {[...Array(5)].map((_, i) => (
-            <StarIcon key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+            <StarIcon key={i} className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--color-warning)' }} />
           ))}
-          <span className="text-xs sm:text-sm text-gray-400 ml-1">5.0 (??)</span>
+          <span className="text-xs sm:text-sm ml-1" style={{ color: 'var(--color-text-muted)' }}>5.0 (??)</span>
         </div>
         
         {/* Title */}
-        <h3 className="font-poppins text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2 line-clamp-1">
+        <h3 className="font-poppins text-lg sm:text-xl font-bold mb-1 sm:mb-2 line-clamp-1" style={{ color: 'var(--color-text-primary)' }}>
           {developer.name}
         </h3>
         
@@ -99,7 +100,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
         </div>
         
         {/* Description */}
-        <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
+        <p className="text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
           {developer.description || 'No description available'}
         </p>
         
@@ -108,7 +109,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
           <Tooltip title="Founded Year" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
               <BuildingOfficeIcon className="text-[var(--color-primary)] w-4 h-4" />
-              <span className="text-gray-300 text-xs sm:text-sm">
+              <span className="text-xs sm:text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 {developer.foundedYear || 'N/A'}
               </span>
             </div>
@@ -117,7 +118,7 @@ const DeveloperCard = ({ developer, isMobile }) => {
           <Tooltip title="Completed Projects" arrow>
             <div className="flex items-center gap-1 sm:gap-2">
               <BuildingOfficeIcon className="text-[var(--color-primary)] w-4 h-4" />
-              <span className="text-gray-300 text-xs sm:text-sm">
+              <span className="text-xs sm:text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 {formatProjectsCount(developer.completedProjects)} Projects
               </span>
             </div>
@@ -127,15 +128,15 @@ const DeveloperCard = ({ developer, isMobile }) => {
         {/* Specializations */}
         {developer.specializations?.length > 0 && (
           <div className="mb-3 sm:mb-4">
-            <div className="text-xs text-gray-400 mb-1">Specializations:</div>
+            <div className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Specializations:</div>
             <div className="flex flex-wrap gap-1">
               {developer.specializations.slice(0, 3).map((spec, index) => (
-                <span key={index} className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
+                <span key={index} className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}>
                   {spec.name}
                 </span>
               ))}
               {developer.specializations.length > 3 && (
-                <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
+                <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}>
                   +{developer.specializations.length - 3} more
                 </span>
               )}
@@ -144,10 +145,15 @@ const DeveloperCard = ({ developer, isMobile }) => {
         )}
         
         {/* CTA */}
-        <div className="pt-3 border-t border-gray-800">
+        <div className="pt-3 mt-auto" style={{ borderTop: '1px solid var(--color-border)' }}>
           <motion.button 
-            className="w-full bg-transparent border border-[var(--color-primary)] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[var(--color-primary)]/20 transition-all text-xs sm:text-sm
-                      group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-bg-dark)] group-hover:font-bold"
+            className="w-full bg-transparent border px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all text-xs sm:text-sm
+                      group-hover:font-bold"
+            style={{ 
+              borderColor: 'var(--color-primary)', 
+              color: 'var(--color-text-primary)',
+              backgroundColor: 'transparent'
+            }}
             onClick={(e) => {
               e.stopPropagation();
               handleClick();

@@ -226,9 +226,9 @@ const SubscriptionPlans = () => {
       </Box>
 
       {/* Plans Grid */}
-      <Grid container spacing={4} sx={{ mb: 6 }}>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} sx={{ mb: 6 }}>
         {plans.map((plan) => (
-          <Grid item xs={12} md={4} key={plan._id}>
+          <Grid item xs={12} sm={6} md={4} key={plan._id}>
             <Card 
               elevation={plan.isPopular ? 8 : 2}
               sx={{ 
@@ -260,7 +260,8 @@ const SubscriptionPlans = () => {
                     fontWeight: 'bold',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1,
+                    zIndex: 1
                   }}
                 >
                   <StarIcon sx={{ fontSize: 16 }} />
@@ -268,7 +269,7 @@ const SubscriptionPlans = () => {
                 </Box>
               )}
 
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center', pt: plan.isPopular ? 4 : 3 }}>
+              <CardContent sx={{ flexGrow: 1, textAlign: 'center', pt: plan.isPopular ? 6 : 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                   {plan.isPopular && <StarIcon sx={{ color: 'var(--color-primary)', mr: 1 }} />}
                   <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>

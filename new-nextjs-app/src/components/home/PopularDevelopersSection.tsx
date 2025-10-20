@@ -142,24 +142,25 @@ const PopularDevelopersSection: React.FC = () => {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: { xs: 2, sm: 3, md: 3 } }}>
             {developers.slice(0, 6).map((developer, index) => (
               <motion.div
                 key={developer._id}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group"
+                className="relative rounded-xl sm:rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer hover:shadow-lg group h-full flex flex-col"
                 style={{
                   backgroundColor: 'var(--color-surface)',
                   borderColor: 'var(--color-primary)',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  minHeight: '400px'
                 }}
                 onClick={() => router.push(`/developers/${developer._id}`)}
                 whileHover={{ y: -5 }}
               >
                 {/* Image Section */}
-                <div className="relative aspect-video">
+                <div className="relative aspect-video" style={{ minHeight: '120px' }}>
                   {(() => {
                     const rawLogo: any = (developer as any).logo;
                     const logoUrl: string | undefined = typeof rawLogo === 'string' ? rawLogo : rawLogo?.url;
@@ -187,7 +188,7 @@ const PopularDevelopersSection: React.FC = () => {
                         })()} 
                         alt={developer.name} 
                         className={`w-full h-full object-contain transition-opacity duration-300 ${imageLoaded[developer._id] ? 'opacity-100' : 'opacity-0'}`}
-                        style={{ backgroundColor: 'var(--color-surface)' }}
+                        style={{ backgroundColor: 'var(--color-surface)', minHeight: '120px' }}
                         loading="lazy"
                         onLoad={() => handleImageLoad(developer._id)}
                       />
@@ -195,7 +196,7 @@ const PopularDevelopersSection: React.FC = () => {
                   ) : (
                     <div 
                       className="w-full h-full flex items-center justify-center"
-                      style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)' }}
+                      style={{ background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)', minHeight: '120px' }}
                     >
                       <Business className="text-[var(--color-primary)]/50 w-12 h-12" />
                     </div>
@@ -203,13 +204,13 @@ const PopularDevelopersSection: React.FC = () => {
                 </div>
 
                 {/* Content Section */}
-                <div className="p-3 sm:p-5">
+                <div className="p-3 sm:p-5 flex-grow flex flex-col">
                   {/* Rating */}
                   <div className="flex items-center mb-2 sm:mb-3">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
+                      <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4" style={{ color: 'var(--color-warning)' }} />
                     ))}
-                    <span className="text-xs sm:text-sm text-gray-400 ml-1">5.0 (??)</span>
+                    <span className="text-xs sm:text-sm ml-1" style={{ color: 'var(--color-text-muted)' }}>5.0 (??)</span>
                   </div>
                   
                   {/* Title */}
@@ -255,12 +256,12 @@ const PopularDevelopersSection: React.FC = () => {
                       <div className="text-xs text-[var(--color-text-muted)] mb-1">Specializations:</div>
                       <div className="flex flex-wrap gap-1">
                         {developer.specializations.slice(0, 3).map((spec, index) => (
-                          <span key={index} className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
+                          <span key={index} className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}>
                             {spec.name}
                           </span>
                         ))}
                         {developer.specializations.length > 3 && (
-                          <span className="text-xs bg-[var(--color-primary)]/10 text-[var(--color-primary)] px-2 py-1 rounded">
+                          <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}>
                             +{developer.specializations.length - 3} more
                           </span>
                         )}
@@ -269,10 +270,14 @@ const PopularDevelopersSection: React.FC = () => {
                   )}
                   
                   {/* CTA */}
-                  <div className="pt-3 border-t border-[var(--color-border)]">
+                  <div className="pt-3 mt-auto" style={{ borderTop: '1px solid var(--color-border)' }}>
                     <motion.button 
-                      className="w-full bg-transparent border border-[var(--color-primary)] text-[var(--color-text-primary)] px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-[var(--color-primary)]/20 transition-all text-xs sm:text-sm
-                                group-hover:bg-[var(--color-primary)] group-hover:text-[var(--color-bg-dark)] group-hover:font-bold"
+                      className="w-full bg-transparent border px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all text-xs sm:text-sm group-hover:font-bold"
+                      style={{ 
+                        borderColor: 'var(--color-primary)', 
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'transparent'
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/developers/${developer._id}`);
