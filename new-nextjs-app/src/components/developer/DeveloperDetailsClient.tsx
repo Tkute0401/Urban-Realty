@@ -153,7 +153,6 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-  const [isSticky, setIsSticky] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const isMobile = useMediaQuery('(max-width:900px)');
@@ -165,7 +164,6 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
   const specializationsRef = useRef(null);
   const contactRef = useRef(null);
   const navRef = useRef(null);
-  const tabsRef = useRef(null);
 
   useEffect(() => {
     const calculateHeaderHeight = () => {
@@ -182,16 +180,11 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setShowBackToTop(scrollPosition > 300);
-      
-      if (navRef.current) {
-        const navOffset = navRef.current.offsetTop;
-        setIsSticky(scrollPosition > (navOffset - headerHeight) && scrollPosition > 50);
-      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [headerHeight]);
+  }, []);
 
   // Load projects for this developer
   useEffect(() => {
@@ -203,7 +196,7 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
 
   const scrollToSection = (ref) => {
     if (!ref.current) return;
-    const offset = isSticky ? headerHeight + 80 : 150;
+    const offset = headerHeight + 80; // Account for sticky header and navigation
     window.scrollTo({
       top: ref.current.offsetTop - offset,
       behavior: 'smooth'
@@ -462,18 +455,16 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
       <Box 
         ref={navRef}
         sx={{
-          position: isSticky ? 'fixed' : 'relative',
-          top: isSticky ? `${headerHeight}px` : 'auto',
+          position: 'sticky',
+          top: `${headerHeight}px`,
           left: 0,
           right: 0,
           zIndex: 1000,
-          background: isSticky 
-            ? 'rgba(11, 16, 17, 0.95)' 
-            : 'linear-gradient(135deg, rgba(11, 16, 17, 0.8) 0%, rgba(26, 42, 62, 0.8) 100%)',
+          background: 'rgba(11, 16, 17, 0.95)',
           backdropFilter: 'blur(10px)',
           borderBottom: '1px solid rgba(247, 107, 28, 0.2)',
           transition: 'all 0.3s ease',
-          boxShadow: isSticky ? '0 4px 20px rgba(0, 0, 0, 0.1)' : 'none'
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
         }}
       >
         <Container maxWidth="xl">
@@ -588,7 +579,7 @@ const DeveloperDetailsClient = ({ developer }: DeveloperDetailsClientProps) => {
       </Box>
 
       {/* Main Content */}
-      <Container maxWidth="xl" sx={{ py: 6, pt: isSticky ? `${headerHeight + 100}px` : '40px' }}>
+      <Container maxWidth="xl" sx={{ py: 6 }}>
         {/* Overview Section */}
         <Box ref={overviewRef} sx={{ mb: 8 }}>
           <Fade in timeout={1200}>
