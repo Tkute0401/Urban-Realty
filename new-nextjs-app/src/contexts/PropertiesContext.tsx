@@ -53,14 +53,25 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
       const queryParams = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          queryParams.append(key, value.toString());
+          if (Array.isArray(value)) {
+            queryParams.append(key, value.join(','));
+          } else {
+            queryParams.append(key, value.toString());
+          }
         }
       });
+      
+      console.log('🔍 Frontend: Query params:', queryParams.toString());
 
       const url = `/api/v1/properties?${queryParams.toString()}`;
+      console.log('🔍 Frontend: Making API request to:', url);
       const response = await http.get(url);
       
       const data = response.data;
+      console.log('🔍 Frontend: API response:', data);
+      console.log('🔍 Frontend: Properties received:', data.data);
+      console.log('🔍 Frontend: Pagination:', data.pagination);
+      
       setProperties(data.data || []);
       setPagination({
         page: data.pagination?.currentPage || 1,
