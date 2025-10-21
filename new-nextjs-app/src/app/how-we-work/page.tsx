@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 
 // Generate structured data for How We Work Page
 function generateHowWeWorkStructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   
   return {
     "@context": "https://schema.org",

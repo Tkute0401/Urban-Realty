@@ -124,7 +124,7 @@ const structuredData = {
     ]
   },
   "priceRange": "Consultation fees vary based on service complexity",
-  "url": "https://urbanrealty.com/lawyer-consultancy"
+  "url": "https://squarefooot.com/lawyer-consultancy"
 };
 
 export default function LawyerConsultancyPage() {

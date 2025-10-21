@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 
 // Generate structured data for About page
 function generateAboutPageStructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   
   return {
     "@context": "https://schema.org",
@@ -76,7 +76,7 @@ function generateAboutPageStructuredData() {
         "addressCountry": "US"
       },
       "telephone": "+1-XXX-XXX-XXXX",
-      "email": "contact@urbanrealty.com"
+      "email": "contact@squarefooot.com"
     }
   };
 }

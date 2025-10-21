@@ -68,10 +68,10 @@ function generateHomePageStructuredData() {
       "query-input": "required name=search_term_string"
     },
     "sameAs": [
-      "https://facebook.com/urbanrealty",
-      "https://twitter.com/urbanrealty",
-      "https://linkedin.com/company/urbanrealty",
-      "https://instagram.com/urbanrealty"
+      "https://facebook.com/squarefooot",
+      "https://twitter.com/squarefooot",
+      "https://linkedin.com/company/squarefooot",
+      "https://instagram.com/squarefooot"
     ]
   }
 }

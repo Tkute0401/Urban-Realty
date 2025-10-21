@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 
 // Generate structured data for Contact page
 function generateContactPageStructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   
   return {
     "@context": "https://schema.org",
@@ -90,10 +90,10 @@ function generateContactPageStructuredData() {
         }
       ],
       "sameAs": [
-        "https://facebook.com/urbanrealty",
-        "https://twitter.com/urbanrealty",
-        "https://linkedin.com/company/urbanrealty",
-        "https://instagram.com/urbanrealty"
+        "https://facebook.com/squarefooot",
+        "https://twitter.com/squarefooot",
+        "https://linkedin.com/company/squarefooot",
+        "https://instagram.com/squarefooot"
       ]
     }
   };

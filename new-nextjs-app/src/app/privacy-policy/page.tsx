@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 
 // Generate structured data for Privacy Policy Page
 function generatePrivacyPolicyStructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   
   return {
     "@context": "https://schema.org",

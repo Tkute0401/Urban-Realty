@@ -43,7 +43,7 @@ export class SEOOptimizer {
   private defaultImage: string;
 
   private constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+    this.baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
     this.defaultImage = `${this.baseUrl}/images/og-default.jpg`;
   }
 
@@ -137,9 +137,9 @@ export class SEOOptimizer {
         availableLanguage: ['English', 'Hindi'],
       },
       sameAs: [
-        'https://facebook.com/urbanrealty',
-        'https://twitter.com/urbanrealty',
-        'https://linkedin.com/company/urbanrealty',
+        'https://facebook.com/squarefooot',
+        'https://twitter.com/squarefooot',
+        'https://linkedin.com/company/squarefooot',
       ],
     };
   }

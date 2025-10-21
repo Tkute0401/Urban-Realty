@@ -154,7 +154,7 @@ const PrivacyPolicy = () => {
         >
           <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Privacy Questions?</h3>
           <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>
-            Contact our Data Protection Officer at <span style={{ color: 'var(--color-primary)' }}>privacy@urbanrealty360.com</span>
+            Contact our Data Protection Officer at <span style={{ color: 'var(--color-primary)' }}>privacy@squarefooot.com</span>
           </p>
           <button 
             className="font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"

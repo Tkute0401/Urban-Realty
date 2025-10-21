@@ -67,11 +67,11 @@ const structuredData = {
   "description": "Professional relocation services for residential and commercial moves",
   "provider": {
     "@type": "RealEstateAgent",
-    "name": "Urban Realty",
-    "url": "https://urbanrealty.com",
+    "name": "Squarefooot",
+    "url": "https://squarefooot.com",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://urbanrealty.com/images/logo.png"
+      "url": "https://squarefooot.com/images/logo.png"
     },
     "address": {
       "@type": "PostalAddress",
@@ -125,7 +125,7 @@ const structuredData = {
     ]
   },
   "priceRange": "Affordable pricing based on distance and services",
-  "url": "https://urbanrealty.com/packers-and-movers"
+  "url": "https://squarefooot.com/packers-and-movers"
 };
 
 export default function PackersAndMoversPage() {

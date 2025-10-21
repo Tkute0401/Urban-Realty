@@ -102,7 +102,7 @@ const ComingSoonPopup = ({ isOpen, onClose }) => {
                 </div>
                 <div className="mt-8 pt-4 border-t border-[#78cadc]/20">
                   <p className="text-xs text-[var(--color-primary)]/70">
-                    Want early access? Contact us at info@urbanrealty360.com
+                    Want early access? Contact us at info@squarefooot.com
                   </p>
                 </div>
               </div>

@@ -14,7 +14,7 @@ export interface SocialAssets {
   linkedin: SocialAsset;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urbanrealty.com';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
 
 // Default social media assets
 export const defaultSocialAssets: SocialAssets = {
@@ -193,8 +193,8 @@ export function generateTwitterTags(assets: SocialAssets, title: string, descrip
     'twitter:description': description,
     'twitter:image': assets.twitter.url,
     'twitter:image:alt': assets.twitter.alt,
-    'twitter:site': '@urbanrealty',
-    'twitter:creator': '@urbanrealty'
+    'twitter:site': '@squarefooot',
+    'twitter:creator': '@squarefooot'
   };
 }
 

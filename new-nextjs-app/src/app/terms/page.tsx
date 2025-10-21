@@ -61,21 +61,21 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "WebPage",
-  "name": "Terms & Conditions - Urban Realty",
-  "description": "Comprehensive terms and conditions for Urban Realty real estate platform",
-  "url": "https://urbanrealty.com/terms",
+  "name": "Terms & Conditions - Squarefooot",
+  "description": "Comprehensive terms and conditions for Squarefooot real estate platform",
+  "url": "https://squarefooot.com/terms",
   "isPartOf": {
     "@type": "WebSite",
-    "name": "Urban Realty",
-    "url": "https://urbanrealty.com"
+    "name": "Squarefooot",
+    "url": "https://squarefooot.com"
   },
   "publisher": {
     "@type": "RealEstateAgent",
-    "name": "Urban Realty",
-    "url": "https://urbanrealty.com",
+    "name": "Squarefooot",
+    "url": "https://squarefooot.com",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://urbanrealty.com/images/logo.png"
+      "url": "https://squarefooot.com/images/logo.png"
     }
   },
   "dateModified": new Date().toISOString(),

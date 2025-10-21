@@ -262,7 +262,7 @@ const TrustSafety = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2" style={{ color: colors.text.primary }}>Email</h4>
-                  <p style={{ color: colors.text.secondary }}>safety@urbanrealty360.com</p>
+                  <p style={{ color: colors.text.secondary }}>safety@squarefooot.com</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2" style={{ color: colors.text.primary }}>Response Time</h4>

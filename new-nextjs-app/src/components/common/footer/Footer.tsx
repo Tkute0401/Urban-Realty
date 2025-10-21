@@ -1,19 +1,28 @@
 'use client'
 
-import React from "react";
+import React, { useState } from "react";
 import Link from 'next/link';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import XIcon from '@mui/icons-material/X';
 import YoutubeIcon from '@mui/icons-material/YouTube';
+import ComingSoonPopup from './ComingSoonPopup';
 
 const Footer = () => {
   console.log('🔧 Footer component rendering...');
   
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  
   React.useEffect(() => {
     console.log('🔧 Footer mounted on client side!');
   }, []);
+
+  // Function to handle coming soon links
+  const handleComingSoon = (e) => {
+    e.preventDefault();
+    setShowComingSoon(true);
+  };
 
   const cities = [
     "Nashik", "Delhi", "Mumbai", "Pune", "Bangalore", "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", 
@@ -39,13 +48,15 @@ const Footer = () => {
   ];
 
   return (
-    <footer 
-      style={{
-        backgroundColor: '#0b132b',
-        color: '#d1d5db',
-        borderTop: '1px solid var(--color-primary)'
-      }}
-    >
+    <>
+      <ComingSoonPopup isOpen={showComingSoon} onClose={() => setShowComingSoon(false)} />
+      <footer 
+        style={{
+          backgroundColor: '#0b132b',
+          color: '#d1d5db',
+          borderTop: '1px solid var(--color-primary)'
+        }}
+      >
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">
         {/* Top section with links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
@@ -56,8 +67,9 @@ const Footer = () => {
               {cities.map((city, index) => (
                 <li key={index}>
                   <a 
-                    href={`/properties?city=${city}`} 
-                    className="font-poppins text-sm transition-colors"
+                    href="#"
+                    onClick={handleComingSoon}
+                    className="font-poppins text-sm transition-colors cursor-pointer"
                     style={{ 
                       color: '#d1d5db',
                       fontSize: '0.875rem'
@@ -82,23 +94,44 @@ const Footer = () => {
             <ul className="space-y-2">
               {resources.map((item, index) => (
                 <li key={index}>
-                  <Link 
-                    href={typeof item === 'string' ? '#' : item.path} 
-                    className="font-poppins text-sm transition-colors"
-                    style={{ 
-                      color: '#d1d5db',
-                      fontSize: '0.875rem',
-                      textDecoration: 'none'
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = '#d1d5db';
-                    }}
-                  >
-                    {typeof item === 'string' ? item : item.name}
-                  </Link>
+                  {typeof item === 'string' ? (
+                    <a 
+                      href="#"
+                      onClick={handleComingSoon}
+                      className="font-poppins text-sm transition-colors cursor-pointer"
+                      style={{ 
+                        color: '#d1d5db',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = '#d1d5db';
+                      }}
+                    >
+                      {item}
+                    </a>
+                  ) : (
+                    <Link 
+                      href={item.path} 
+                      className="font-poppins text-sm transition-colors"
+                      style={{ 
+                        color: '#d1d5db',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = '#d1d5db';
+                      }}
+                    >
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -110,23 +143,44 @@ const Footer = () => {
             <ul className="space-y-2">
               {about.map((item, index) => (
                 <li key={index}>
-                  <Link 
-                    href={typeof item === 'string' ? '#' : item.path}
-                    className="font-poppins text-sm transition-colors"
-                    style={{ 
-                      color: '#d1d5db',
-                      fontSize: '0.875rem',
-                      textDecoration: 'none'
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = '#d1d5db';
-                    }}
-                  >
-                    {typeof item === 'string' ? item : item.name}
-                  </Link>
+                  {typeof item === 'string' ? (
+                    <a 
+                      href="#"
+                      onClick={handleComingSoon}
+                      className="font-poppins text-sm transition-colors cursor-pointer"
+                      style={{ 
+                        color: '#d1d5db',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = '#d1d5db';
+                      }}
+                    >
+                      {item}
+                    </a>
+                  ) : (
+                    <Link 
+                      href={item.path}
+                      className="font-poppins text-sm transition-colors"
+                      style={{ 
+                        color: '#d1d5db',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = '#d1d5db';
+                      }}
+                    >
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -138,23 +192,44 @@ const Footer = () => {
             <ul className="space-y-2">
               {services.map((item, index) => (
                 <li key={index}>
-                  <Link 
-                    href={typeof item === 'string' ? '#' : item.path} 
-                    className="font-poppins text-sm transition-colors"
-                    style={{ 
-                      color: '#d1d5db',
-                      fontSize: '0.875rem',
-                      textDecoration: 'none'
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-primary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = '#d1d5db';
-                    }}
-                  >
-                    {typeof item === 'string' ? item : item.name}
-                  </Link>
+                  {typeof item === 'string' ? (
+                    <a 
+                      href="#"
+                      onClick={handleComingSoon}
+                      className="font-poppins text-sm transition-colors cursor-pointer"
+                      style={{ 
+                        color: '#d1d5db',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = '#d1d5db';
+                      }}
+                    >
+                      {item}
+                    </a>
+                  ) : (
+                    <Link 
+                      href={item.path} 
+                      className="font-poppins text-sm transition-colors"
+                      style={{ 
+                        color: '#d1d5db',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--color-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = '#d1d5db';
+                      }}
+                    >
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -215,7 +290,7 @@ const Footer = () => {
             >
               <FacebookIcon className="w-6 h-6" style={{ color: '#f9fafb' }} />
             </a>
-            <a href="https://www.instagram.com/urbanrealty360?igsh=cmUyOXdweDd2ZjVr" 
+            <a href="https://www.instagram.com/squarefooot?igsh=cmUyOXdweDd2ZjVr" 
                className="p-2 rounded-full transition-colors"
                style={{ 
                  backgroundColor: 'rgba(247, 107, 28, 0.1)',
@@ -232,7 +307,7 @@ const Footer = () => {
             >
               <InstagramIcon className="w-6 h-6" style={{ color: '#f9fafb' }} />
             </a>
-            <a href="https://www.linkedin.com/company/uraban-realty-360"
+            <a href="https://www.linkedin.com/company/squarefooot"
                className="p-2 rounded-full transition-colors"
                style={{ 
                  backgroundColor: 'rgba(247, 107, 28, 0.1)',
@@ -273,6 +348,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
+    </>
   );
 };
 

@@ -116,7 +116,7 @@ const structuredData = {
       }
     ]
   },
-  "url": "https://urbanrealty.com/interior-design"
+  "url": "https://squarefooot.com/interior-design"
 };
 
 export default function InteriorDesignPage() {

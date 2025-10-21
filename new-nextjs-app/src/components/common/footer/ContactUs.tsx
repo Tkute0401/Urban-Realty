@@ -135,9 +135,9 @@ const ContactUs = () => {
           </div>
           <h3 className="font-poppins text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Email</h3>
           <p className="mb-2" style={{ color: colors.text.muted }}>General Inquiries</p>
-          <p className="text-lg" style={{ color: colors.text.primary }}>info@urbanrealty360.com</p>
+          <p className="text-lg" style={{ color: colors.text.primary }}>info@squarefooot.com</p>
           <p className="mt-4 mb-2" style={{ color: colors.text.muted }}>Support</p>
-          <p className="text-lg" style={{ color: colors.text.primary }}>support@urbanrealty360.com</p>
+          <p className="text-lg" style={{ color: colors.text.primary }}>support@squarefooot.com</p>
         </motion.div>
 
         <motion.div
