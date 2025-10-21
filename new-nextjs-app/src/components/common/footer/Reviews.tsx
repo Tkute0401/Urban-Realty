@@ -97,7 +97,7 @@ const Reviews = () => {
   };
 
   return (
-    <div className="bg-[var(--color-surface)] text-[var(--color-text)] border-t border-[var(--color-primary)]/20 min-h-screen">
+    <div className="bg-[var(--color-surface)] text-[var(--color-text)] min-h-screen">
       {/* Testimonials Section */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <motion.div 
@@ -164,7 +164,7 @@ const Reviews = () => {
             onClick={prevTestimonial}
             className="p-2 sm:p-3 rounded-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/10 transition-colors"
           >
-            <ArrowLeftIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
+            <ArrowLeftIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)] bg-[var(--color-surface)]" />
           </button>
           <div className="flex items-center gap-1 sm:gap-2">
             {testimonials.map((_, index) => (
@@ -182,7 +182,7 @@ const Reviews = () => {
             onClick={nextTestimonial}
             className="p-2 sm:p-3 rounded-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/10 transition-colors"
           >
-            <ArrowRightIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
+            <ArrowRightIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)] bg-[var(--color-surface)]" />
           </button>
         </div>
       </section>
