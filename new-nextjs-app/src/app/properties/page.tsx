@@ -164,15 +164,46 @@ const PropertiesPageContent: React.FC = () => {
   };
 
   const handleFilterChange = (key: string, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
     
-    // Auto-trigger search for specific filters
+    // Auto-trigger search for specific filters with updated state
     if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType') {
       setTimeout(() => {
-        loadProperties();
+        loadPropertiesWithFilters(newFilters);
       }, 100);
     }
   };
+
+  const loadPropertiesWithFilters = useCallback((filterState: any) => {
+    const params: any = {
+      page: pagination.page,
+      limit: 12
+    };
+
+    if (filterState.search) params.search = filterState.search;
+    if (filterState.type) params.type = filterState.type;
+    if (filterState.city) params.city = filterState.city;
+    if (filterState.state) params.state = filterState.state;
+    if (filterState.priceMin) params.minPrice = Number(filterState.priceMin);
+    if (filterState.priceMax) params.maxPrice = Number(filterState.priceMax);
+    if (filterState.bedrooms) params.bedrooms = Number(filterState.bedrooms);
+    if (filterState.bathrooms) params.bathrooms = Number(filterState.bathrooms);
+    if (filterState.amenities.length > 0) params.amenities = filterState.amenities.join(',');
+    if (filterState.minArea) params.minArea = Number(filterState.minArea);
+    if (filterState.maxArea) params.maxArea = Number(filterState.maxArea);
+    if (filterState.propertyType !== 'ALL') {
+      params.status = filterState.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
+    }
+
+    // Add user location for distance-based sorting
+    if (userLocation) {
+      params.userLat = userLocation.latitude;
+      params.userLng = userLocation.longitude;
+    }
+
+    getProperties(params);
+  }, [pagination.page, userLocation, getProperties]);
 
   const handlePropertyTypeChange = (newType: string) => {
     const newFilters = { ...filters, propertyType: newType };
@@ -184,11 +215,11 @@ const PropertiesPageContent: React.FC = () => {
     }
     
     // Trigger search immediately with new filter
-    loadProperties();
+    loadPropertiesWithFilters(newFilters);
   };
 
   const clearAllFilters = () => {
-    setFilters({
+    const clearedFilters = {
       search: '',
       propertyType: 'ALL',
       type: '',
@@ -201,11 +232,16 @@ const PropertiesPageContent: React.FC = () => {
       amenities: [],
       minArea: '',
       maxArea: ''
-    });
+    };
+    
+    setFilters(clearedFilters);
     
     if (isMobile) {
       setShowFiltersDrawer(false);
     }
+    
+    // Trigger search with cleared filters
+    loadPropertiesWithFilters(clearedFilters);
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
@@ -224,6 +260,13 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.propertyType !== 'ALL') {
       params.status = filters.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
     }
+    
+    // Add user location for distance-based sorting
+    if (userLocation) {
+      params.userLat = userLocation.latitude;
+      params.userLng = userLocation.longitude;
+    }
+    
     getProperties(params);
   };
 
