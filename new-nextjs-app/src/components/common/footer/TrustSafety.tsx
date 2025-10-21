@@ -92,15 +92,12 @@ const TrustSafety = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex items-center justify-center mb-4">
-            <ShieldCheckIcon className="w-10 h-10 mr-3" style={{ color: colors.primary.main }} />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
-              Trust & <span style={{ color: colors.primary.main }}>Safety</span>
+            <ShieldCheckIcon className="w-10 h-10 mr-3" style={{ color: '#F76B1C' }} />
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins text-white">
+              Trust & <span style={{ color: '#F76B1C' }}>Safety</span>
             </h1>
           </div>
-          <p 
-            className="text-lg sm:text-xl max-w-2xl mx-auto"
-            style={{ color: colors.text.secondary }}
-          >
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-200">
             Your security and peace of mind are at the heart of everything we do
           </p>
         </motion.div>

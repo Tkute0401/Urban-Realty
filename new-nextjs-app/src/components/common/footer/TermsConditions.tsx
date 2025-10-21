@@ -295,14 +295,14 @@ const TermsConditions = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex flex-col items-center justify-center mb-4">
-            <div className="p-3 rounded-full mb-4" style={{ backgroundColor: 'var(--color-primary)' }}>
-              <ScaleIcon className="w-10 h-10" style={{ color: 'var(--color-primary-contrast)' }} />
+            <div className="p-3 rounded-full mb-4" style={{ backgroundColor: '#F76B1C' }}>
+              <ScaleIcon className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins" style={{ color: 'var(--color-text-primary)' }}>
-              Terms & <span style={{ color: 'var(--color-primary)' }}>Conditions</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins text-white">
+              Terms & <span style={{ color: '#F76B1C' }}>Conditions</span>
             </h1>
           </div>
-          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4 text-gray-200">
             Last Updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </motion.div>

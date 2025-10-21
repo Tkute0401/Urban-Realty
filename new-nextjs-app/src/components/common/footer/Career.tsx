@@ -84,13 +84,10 @@ const Career = () => {
           transition={{ duration: 0.8 }}
           className="relative z-20 text-center px-4"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 font-poppins">
-            Build Your <span style={{ color: colors.primary.main }}>Career</span> With Us
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 font-poppins text-white">
+            Build Your <span style={{ color: '#F76B1C' }}>Career</span> With Us
           </h1>
-          <p 
-            className="text-xl sm:text-2xl max-w-3xl mx-auto mb-10"
-            style={{ color: colors.text.secondary }}
-          >
+          <p className="text-xl sm:text-2xl max-w-3xl mx-auto mb-10 text-gray-200">
             Join a team that&apos;s redefining real estate through innovation, integrity, and exceptional service.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">

@@ -141,12 +141,12 @@ const HelpCenter = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex flex-col sm:flex-row items-center justify-center mb-4">
-            <LifebuoyIcon className="w-10 h-10 mb-2 sm:mb-0 sm:mr-3" style={{ color: 'var(--color-primary)' }} />
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins" style={{ color: 'var(--color-text-primary)' }}>
-              Help <span style={{ color: 'var(--color-primary)' }}>Center</span>
+            <LifebuoyIcon className="w-10 h-10 mb-2 sm:mb-0 sm:mr-3" style={{ color: '#F76B1C' }} />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins text-white">
+              Help <span style={{ color: '#F76B1C' }}>Center</span>
             </h1>
           </div>
-          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 px-4" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 px-4 text-gray-200">
             Find answers, guides, and expert support for all your real estate needs
           </p>
           <div className="relative max-w-xl mx-auto px-4">

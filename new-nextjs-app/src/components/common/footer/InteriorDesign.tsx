@@ -139,11 +139,11 @@ const InteriorDesign = () => {
         >
           <div className="flex items-center justify-center mb-4">
             <HomeModernIcon className="w-10 h-10 text-[#78cadc] mr-3" />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins text-white">
               Design <span className="text-[#78cadc]">Studio</span>
             </h1>
           </div>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-200">
             Transforming spaces with innovative architecture and bespoke interior design
           </p>
           <button 

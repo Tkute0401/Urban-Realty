@@ -110,13 +110,10 @@ const HowWeWork = () => {
           transition={{ duration: 0.8 }}
           className="relative z-20 text-center px-4"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-poppins">
-            How We <span style={{ color: colors.primary.main }}>Work</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 font-poppins text-white">
+            How We <span style={{ color: '#F76B1C' }}>Work</span>
           </h1>
-          <p 
-            className="text-lg sm:text-xl max-w-2xl mx-auto"
-            style={{ color: colors.text.secondary }}
-          >
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-200">
             A transparent look at our client-focused process that delivers exceptional results
           </p>
         </motion.div>

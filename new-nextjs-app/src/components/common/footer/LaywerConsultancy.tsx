@@ -94,15 +94,12 @@ const LawyerConsultancy = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex items-center justify-center mb-4">
-            <ScaleIcon className="w-10 h-10 mr-3" style={{ color: colors.primary.main }} />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
-              Legal <span style={{ color: colors.primary.main }}>Consultancy</span>
+            <ScaleIcon className="w-10 h-10 mr-3" style={{ color: '#F76B1C' }} />
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins text-white">
+              Legal <span style={{ color: '#F76B1C' }}>Consultancy</span>
             </h1>
           </div>
-          <p 
-            className="text-lg sm:text-xl max-w-2xl mx-auto"
-            style={{ color: colors.text.secondary }}
-          >
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-200">
             Expert legal guidance for property transactions - ensuring your investment is safe and compliant
           </p>
           <button 
