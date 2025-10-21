@@ -130,7 +130,7 @@ const Reviews = () => {
                 scale: index === currentIndex ? 1 : 0.9
               }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[var(--color-bg-dark)] rounded-xl border border-[var(--color-primary)]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
+              className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[var(--color-surface)] rounded-xl border border-[var(--color-primary)]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
             >
               <div className="w-full md:w-1/3 flex justify-center">
                 <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[var(--color-primary)]/30 mt-2">
@@ -164,7 +164,7 @@ const Reviews = () => {
             onClick={prevTestimonial}
             className="p-2 sm:p-3 rounded-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/10 transition-colors"
           >
-            <ArrowLeftIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
+            <ArrowLeftIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)] bg-[var(--color-surface)]" />
           </button>
           <div className="flex items-center gap-1 sm:gap-2">
             {testimonials.map((_, index) => (
@@ -182,13 +182,13 @@ const Reviews = () => {
             onClick={nextTestimonial}
             className="p-2 sm:p-3 rounded-full bg-[var(--color-bg-dark)] border border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)]/10 transition-colors"
           >
-            <ArrowRightIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)]" />
+            <ArrowRightIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--color-primary)] bg-[var(--color-surface)]" />
           </button>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[#0c2327]">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[var(--color-surface)]">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <motion.div
@@ -196,40 +196,40 @@ const Reviews = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">500+</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Five-Star Reviews</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">500+</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Five-Star Reviews</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">98%</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Client Satisfaction</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">98%</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Client Satisfaction</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">10K+</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Happy Clients</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">10K+</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Happy Clients</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">24/7</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Support Available</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">24/7</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Support Available</div>
             </motion.div>
           </div>
         </div>
@@ -241,15 +241,15 @@ const Reviews = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="bg-[#0c2327] p-6 sm:p-8 md:p-12 rounded-xl border border-[#78cadc]/20 text-center"
+          className="bg-[var(--color-surface)] p-6 sm:p-8 md:p-12 rounded-xl border border-[var(--color-primary)]/20 text-center"
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">
             Ready to Share Your Experience?
           </h2>
-          <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-[var(--color-text-secondary)] mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
             We&apos;d love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
           </p>
-          <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
+          <button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-[var(--color-white)] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
             Write a Review
           </button>
         </motion.div>

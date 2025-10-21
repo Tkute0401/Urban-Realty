@@ -158,14 +158,14 @@ const HowWeWork = () => {
                   </div>
                 </div>
               </div>
-              <div className="lg:w-3/4 bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all">
+              <div className="lg:w-3/4 bg-[var(--color-surface)] p-8 rounded-xl border border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/50 transition-all">
                 <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
-                <p className="text-gray-300 mb-6">{step.description}</p>
+                <p className="text-[var(--color-text-secondary)] mb-6">{step.description}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {step.features.map((feature, i) => (
                     <div key={i} className="flex items-start">
-                      <div className="w-1.5 h-1.5 mt-2 mr-2 bg-[#78cadc] rounded-full flex-shrink-0"></div>
-                      <span className="text-gray-300">{feature}</span>
+                      <div className="w-1.5 h-1.5 mt-2 mr-2 bg-[var(--color-primary)] rounded-full flex-shrink-0"></div>
+                      <span className="text-[var(--color-text-secondary)]">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -214,7 +214,7 @@ const HowWeWork = () => {
             <p className="mb-8 max-w-2xl mx-auto">
               Whether you&apos;re buying, selling, or investing, our proven process delivers better results with less stress.
             </p>
-            <button className="bg-[var(--color-bg-dark)] hover:bg-[#0c2327] style={{ color: colors.primary.main }} font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+            <button className="bg-[var(--color-surface)] hover:bg-[var(--color-bg-secondary)] text-[var(--color-primary)] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
               Get Started Today
             </button>
           </div>
@@ -222,7 +222,7 @@ const HowWeWork = () => {
       </section>
 
       {/* Results Section */}
-      <section className="py-16 px-4 sm:px-8 bg-[#0c2327]">
+      <section className="py-16 px-4 sm:px-8 bg-[var(--color-surface)]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -244,40 +244,40 @@ const HowWeWork = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
               <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">32%</div>
-              <div className="text-gray-300">Faster Transactions</div>
+              <div className="text-[var(--color-text-secondary)]">Faster Transactions</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
               <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">98.7%</div>
-              <div className="text-gray-300">Client Satisfaction</div>
+              <div className="text-[var(--color-text-secondary)]">Client Satisfaction</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
               <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">5.2%</div>
-              <div className="text-gray-300">Higher Sale Prices</div>
+              <div className="text-[var(--color-text-secondary)]">Higher Sale Prices</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
               <div className="text-3xl font-bold style={{ color: colors.primary.main }} mb-2">500+</div>
-              <div className="text-gray-300">Five-Star Reviews</div>
+              <div className="text-[var(--color-text-secondary)]">Five-Star Reviews</div>
             </motion.div>
           </div>
         </div>
