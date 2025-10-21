@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
       filter.price = {};
       if (minPrice > 0) filter.price.$gte = minPrice;
       if (maxPrice < 100000000) filter.price.$lte = maxPrice;
+      console.log('🔍 Filtering by price range:', { minPrice, maxPrice });
     }
 
     // Area range filter
@@ -82,6 +83,7 @@ export async function GET(request: NextRequest) {
     // Amenities filter - show properties that have ANY of the selected amenities
     if (amenities.length > 0) {
       filter.amenities = { $in: amenities };
+      console.log('🔍 Filtering by amenities:', amenities);
     }
 
     // Calculate pagination

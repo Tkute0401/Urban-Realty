@@ -168,7 +168,7 @@ const PropertiesPageContent: React.FC = () => {
     setFilters(newFilters);
     
     // Auto-trigger search for specific filters with updated state
-    if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType') {
+    if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType' || key === 'priceMin' || key === 'priceMax') {
       setTimeout(() => {
         loadPropertiesWithFilters(newFilters);
       }, 100);
@@ -189,7 +189,9 @@ const PropertiesPageContent: React.FC = () => {
     if (filterState.priceMax) params.maxPrice = Number(filterState.priceMax);
     if (filterState.bedrooms) params.bedrooms = Number(filterState.bedrooms);
     if (filterState.bathrooms) params.bathrooms = Number(filterState.bathrooms);
-    if (filterState.amenities.length > 0) params.amenities = filterState.amenities.join(',');
+    if (filterState.amenities && filterState.amenities.length > 0) {
+      params.amenities = filterState.amenities.join(',');
+    }
     if (filterState.minArea) params.minArea = Number(filterState.minArea);
     if (filterState.maxArea) params.maxArea = Number(filterState.maxArea);
     if (filterState.propertyType !== 'ALL') {
@@ -202,6 +204,7 @@ const PropertiesPageContent: React.FC = () => {
       params.userLng = userLocation.longitude;
     }
 
+    console.log('🔍 Loading properties with filters:', params);
     getProperties(params);
   }, [pagination.page, userLocation, getProperties]);
 
