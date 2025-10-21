@@ -665,21 +665,38 @@ const unitData = {
             {/* Loan Tenure and Interest Rate */}
             <div className="grid grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-gray-300 text-sm mb-2">Loan Tenure</label>
+                <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>Loan Tenure</label>
                 <div className="relative">
                   <div 
-                    className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none cursor-pointer flex justify-between items-center"
+                    className="w-full p-3 rounded-md cursor-pointer flex justify-between items-center focus:outline-none"
+                    style={{
+                      backgroundColor: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-text-primary)'
+                    }}
                     onClick={() => setShowTenureDropdown(!showTenureDropdown)}
                   >
                     <span>{loanTenure} yrs</span>
-                    <ExpandMoreIcon className={`w-5 h-5 text-gray-400 transition-transform ${showTenureDropdown ? 'transform rotate-180' : ''}`} />
+                    <ExpandMoreIcon className={`w-5 h-5 transition-transform ${showTenureDropdown ? 'transform rotate-180' : ''}`} style={{ color: 'var(--color-text-muted)' }} />
                   </div>
                   {showTenureDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md shadow-lg">
+                    <div className="absolute z-10 w-full mt-1 rounded-md shadow-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
                       {tenureOptions.map((option) => (
                         <div
                           key={option}
-                          className="px-4 py-2 text-white hover:bg-[color:var(--color-primary)]/10 cursor-pointer"
+                          className="px-4 py-2 cursor-pointer"
+                          style={{ 
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'transparent'
+                          }}
+                          onMouseEnter={(e) => {
+                            (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                            (e.target as HTMLElement).style.opacity = '0.1';
+                          }}
+                          onMouseLeave={(e) => {
+                            (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                            (e.target as HTMLElement).style.opacity = '1';
+                          }}
                           onClick={() => {
                             setLoanTenure(option);
                             setShowTenureDropdown(false);
@@ -693,13 +710,18 @@ const unitData = {
                 </div>
               </div>
               <div>
-                <label className="block text-gray-300 text-sm mb-2">Interest Rate % (p.a.)</label>
+                <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>Interest Rate % (p.a.)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={interestRate}
                   onChange={(e) => setInterestRate(parseFloat(e.target.value) || 0)}
-                  className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white placeholder-gray-400 focus:border-[color:var(--color-primary)] focus:outline-none"
+                  className="w-full p-3 rounded-md focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-primary)'
+                  }}
                   placeholder="8.15"
                 />
               </div>
@@ -734,18 +756,18 @@ const unitData = {
 
             {/* Default message for non-logged users */}
             {!user && !hasCalculatedWithChanges && (
-              <div className="bg-[#08171A] border border-[color:var(--color-primary)]/50 rounded-lg p-4 mb-4">
-                <p className="text-[color:var(--color-primary)] text-sm text-center">
+              <div className="border rounded-lg p-4 mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+                <p className="text-sm text-center" style={{ color: 'var(--color-primary)' }}>
                   Showing default calculation. Login to calculate with your custom values.
                 </p>
               </div>
             )}
 
             {/* EMI Result - Always show (either default or calculated) */}
-            <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
+            <div className="border rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
               <div className="text-center mb-6">
-                <p className="text-gray-300 text-lg mb-2">Your Monthly EMI Amount</p>
-                <p className="text-3xl font-bold text-[color:var(--color-primary)]">{formatCurrency(displayValues.emi)}</p>
+                <p className="text-lg mb-2" style={{ color: 'var(--color-text-muted)' }}>Your Monthly EMI Amount</p>
+                <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>{formatCurrency(displayValues.emi)}</p>
               </div>
 
               {/* Donut Chart */}
@@ -757,7 +779,7 @@ const unitData = {
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="#1f2937"
+                      stroke="var(--color-border)"
                       strokeWidth="8"
                     />
                     <circle
@@ -775,7 +797,7 @@ const unitData = {
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="#fbbf24"
+                      stroke="var(--color-secondary)"
                       strokeWidth="8"
                       strokeDasharray={`${(displayValues.interestPercentage / 100) * 251.33} 251.33`}
                       strokeDashoffset={`-${(displayValues.principalPercentage / 100) * 251.33}`}
@@ -784,8 +806,8 @@ const unitData = {
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-xs text-gray-400">Total</div>
-                      <div className="text-sm font-bold text-white">
+                      <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Total</div>
+                      <div className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>
                         {formatIndianNumber(displayValues.loanAmount + displayValues.totalInterest)}
                       </div>
                     </div>
@@ -797,44 +819,44 @@ const unitData = {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-[color:var(--color-primary)] rounded-sm mr-3"></div>
-                    <span className="text-gray-300">Principal Amount</span>
+                    <div className="w-4 h-4 rounded-sm mr-3" style={{ backgroundColor: 'var(--color-primary)' }}></div>
+                    <span style={{ color: 'var(--color-text-muted)' }}>Principal Amount</span>
                   </div>
-                  <span className="font-semibold text-white">{formatIndianNumber(displayValues.loanAmount)}</span>
+                  <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{formatIndianNumber(displayValues.loanAmount)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-yellow-400 rounded-sm mr-3"></div>
-                    <span className="text-gray-300">Interest Amount</span>
+                    <div className="w-4 h-4 rounded-sm mr-3" style={{ backgroundColor: 'var(--color-secondary)' }}></div>
+                    <span style={{ color: 'var(--color-text-muted)' }}>Interest Amount</span>
                   </div>
-                  <span className="font-semibold text-white">{formatIndianNumber(displayValues.totalInterest)}</span>
+                  <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{formatIndianNumber(displayValues.totalInterest)}</span>
                 </div>
               </div>
             </div>
 
             {/* Loan Summary */}
-            <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-[color:var(--color-primary)] mb-4">Loan Summary</h3>
+            <div className="border rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-primary)' }}>Loan Summary</h3>
               
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-[#0c2227] rounded-lg">
-                  <span className="text-gray-300">Monthly EMI</span>
-                  <span className="font-semibold text-[color:var(--color-primary)]">{formatCurrency(displayValues.emi)}</span>
+                <div className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Monthly EMI</span>
+                  <span className="font-semibold" style={{ color: 'var(--color-primary)' }}>{formatCurrency(displayValues.emi)}</span>
                 </div>
                 
-                <div className="flex justify-between items-center p-3 bg-[#0c2227] rounded-lg">
-                  <span className="text-gray-300">Principal Amount</span>
-                  <span className="font-semibold text-white">{formatCurrency(displayValues.loanAmount)}</span>
+                <div className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Principal Amount</span>
+                  <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{formatCurrency(displayValues.loanAmount)}</span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-[#0c2227] rounded-lg">
-                  <span className="text-gray-300">Total Interest</span>
-                  <span className="font-semibold text-white">{formatCurrency(displayValues.totalInterest)}</span>
+                <div className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Total Interest</span>
+                  <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{formatCurrency(displayValues.totalInterest)}</span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-[#0c2227] rounded-lg">
-                  <span className="text-gray-300">Total Amount</span>
-                  <span className="font-semibold text-white">{formatCurrency(displayValues.loanAmount + displayValues.totalInterest)}</span>
+                <div className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+                  <span style={{ color: 'var(--color-text-muted)' }}>Total Amount</span>
+                  <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{formatCurrency(displayValues.loanAmount + displayValues.totalInterest)}</span>
                 </div>
               </div>
             </div>
@@ -842,13 +864,22 @@ const unitData = {
             {/* Action Buttons */}
             <div className="space-y-3">
               <button 
-                className="w-full bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/90 text-[#08171A] font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="w-full font-semibold py-3 px-6 rounded-lg transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)'
+                }}
                 disabled={!user}
               >
                 Apply for Loan
               </button>
               <button 
-                className="w-full border border-[color:var(--color-primary)] text-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/10 font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="w-full border font-semibold py-3 px-6 rounded-lg transition-colors"
+                style={{
+                  borderColor: 'var(--color-primary)',
+                  color: 'var(--color-primary)',
+                  backgroundColor: 'transparent'
+                }}
                 disabled={!user}
               >
                 Download EMI Schedule
@@ -858,47 +889,61 @@ const unitData = {
         </div>
         {/* Information Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-          <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">About Home Loan EMI Calculator</h2>
-            <p className="text-gray-300 mb-4">
+          <div className="border rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>About Home Loan EMI Calculator</h2>
+            <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
               Easily plan your home loan with our Home Loan EMI Calculator. Whether you&apos;re a first-time homebuyer or refinancing your mortgage, this tool helps you estimate your monthly EMI (Equated Monthly Installment) based on the loan amount, interest rate, and loan tenure. Just enter the values, and the calculator will instantly show your monthly repayment amount, helping you make informed financial decisions and manage your budget effectively.
             </p>
-            <p className="text-gray-300">
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Our calculator provides a detailed breakdown of your payment schedule, showing the principal and interest components of each EMI, the total interest payable over the loan tenure, and the total amount payable (principal + interest). You can adjust the loan parameters to see how different loan amounts, tenures, or interest rates affect your monthly payments.
             </p>
           </div>
           
-          <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">What is a Home Loan?</h2>
-            <p className="text-gray-300 mb-4">
+          <div className="border rounded-lg p-6" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>What is a Home Loan?</h2>
+            <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
               A home loan is a sum of money borrowed from a financial institution or bank to purchase or construct a house. The loan is repaid through Equated Monthly Installments (EMIs) over a predetermined period, which typically ranges from 5 to 30 years. The EMI consists of both the principal amount and the interest charged by the lender.
             </p>
-            <p className="text-gray-300">
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Home loans are secured loans, meaning the property being purchased serves as collateral. Interest rates can be fixed or floating, and borrowers may be eligible for tax benefits on both the principal repayment and interest payments under various sections of the Income Tax Act. The loan amount is determined based on factors like the property value, borrower&apos;s income, credit score, and existing financial obligations.
             </p>
           </div>
         </div>
       {/* Unit Converter Section */}
-      <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-6 mt-8">
-        <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">Area Converter</h2>
+      <div className="border rounded-lg p-6 mt-8" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+        <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>Area Converter</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {/* From Unit Dropdown */}
           <div className="relative">
-            <label className="block text-gray-300 text-sm mb-2">From Unit</label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>From Unit</label>
             <div 
-              className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white cursor-pointer flex justify-between items-center"
+              className="w-full p-3 rounded-md cursor-pointer flex justify-between items-center"
+              style={{
+                backgroundColor: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text-primary)'
+              }}
               onClick={() => setShowFromUnitDropdown(!showFromUnitDropdown)}
             >
               <span>{converterState.fromUnit}</span>
-              <ExpandMoreIcon className={`w-5 h-5 text-gray-400 transition-transform ${showFromUnitDropdown ? 'transform rotate-180' : ''}`} />
+              <ExpandMoreIcon className={`w-5 h-5 transition-transform ${showFromUnitDropdown ? 'transform rotate-180' : ''}`} style={{ color: 'var(--color-text-muted)' }} />
             </div>
             {showFromUnitDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
                 {Object.keys(unitData).map((unit) => (
                   <div
                     key={`from-${unit}`}
-                    className="px-4 py-2 text-white hover:bg-[color:var(--color-primary)]/10 cursor-pointer"
+                    className="px-4 py-2 cursor-pointer"
+                    style={{ color: 'var(--color-text-primary)' }}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.opacity = '0.1';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                      (e.target as HTMLElement).style.opacity = '1';
+                    }}
                     onClick={() => selectFromUnit(unit)}
                   >
                     {unit}
@@ -910,32 +955,51 @@ const unitData = {
           
           {/* Value Input */}
           <div>
-            <label className="block text-gray-300 text-sm mb-2">Value</label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>Value</label>
             <input
               type="number"
               name="fromValue"
               value={converterState.fromValue}
               onChange={handleConverterChange}
-              className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white focus:border-[color:var(--color-primary)] focus:outline-none"
+              className="w-full p-3 rounded-md focus:outline-none"
+              style={{
+                backgroundColor: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text-primary)'
+              }}
             />
           </div>
           
           {/* To Unit Dropdown */}
           <div className="relative">
-            <label className="block text-gray-300 text-sm mb-2">To Unit</label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>To Unit</label>
             <div 
-              className="w-full p-3 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md text-white cursor-pointer flex justify-between items-center"
+              className="w-full p-3 rounded-md cursor-pointer flex justify-between items-center"
+              style={{
+                backgroundColor: 'var(--color-bg)',
+                border: '1px solid var(--color-border)',
+                color: 'var(--color-text-primary)'
+              }}
               onClick={() => setShowToUnitDropdown(!showToUnitDropdown)}
             >
               <span>{converterState.toUnit}</span>
-              <ExpandMoreIcon className={`w-5 h-5 text-gray-400 transition-transform ${showToUnitDropdown ? 'transform rotate-180' : ''}`} />
+              <ExpandMoreIcon className={`w-5 h-5 transition-transform ${showToUnitDropdown ? 'transform rotate-180' : ''}`} style={{ color: 'var(--color-text-muted)' }} />
             </div>
             {showToUnitDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-[#0c2227] border border-[color:var(--color-primary)]/30 rounded-md shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-10 w-full mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
                 {Object.keys(unitData).map((unit) => (
                   <div
                     key={`to-${unit}`}
-                    className="px-4 py-2 text-white hover:bg-[color:var(--color-primary)]/10 cursor-pointer"
+                    className="px-4 py-2 cursor-pointer"
+                    style={{ color: 'var(--color-text-primary)' }}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
+                      (e.target as HTMLElement).style.opacity = '0.1';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                      (e.target as HTMLElement).style.opacity = '1';
+                    }}
                     onClick={() => selectToUnit(unit)}
                   >
                     {unit}
@@ -947,8 +1011,8 @@ const unitData = {
         </div>
         
         {/* Conversion Result */}
-        <div className="bg-[#0c2227] p-4 rounded-lg">
-          <p className="text-gray-300 text-center">
+        <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg)' }}>
+          <p className="text-center" style={{ color: 'var(--color-text-muted)' }}>
             {converterState.fromValue} {converterState.fromUnit} = {converterState.toValue} {converterState.toUnit}
           </p>
         </div>
@@ -956,9 +1020,9 @@ const unitData = {
 
         {/* Information Sections */}
         <div className="flex flex-col md:flex-row gap-8 mt-8">
-        <div className="bg-[#08171A] border border-[color:var(--color-primary)] rounded-lg p-8 md:w-full">
-          <h2 className="text-2xl font-bold text-[color:var(--color-primary)] mb-4">About {selectedUnitInfo.name}</h2>
-          <p className="text-gray-300">
+        <div className="border rounded-lg p-8 md:w-full" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>About {selectedUnitInfo.name}</h2>
+          <p style={{ color: 'var(--color-text-muted)' }}>
             {selectedUnitInfo.description}
           </p>
         </div>

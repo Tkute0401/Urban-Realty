@@ -279,10 +279,10 @@ const TermsConditions = () => {
   ];
 
   return (
-    <div className="bg-[#08171A] text-white min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}>
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/20 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/40 z-10" />
         <img 
           src="/terms-con-2.jpg" 
           alt="Terms & Conditions" 
@@ -295,14 +295,14 @@ const TermsConditions = () => {
           className="relative z-20 text-center px-4"
         >
           <div className="flex flex-col items-center justify-center mb-4">
-            <div className="bg-[#78cadc] p-3 rounded-full mb-4">
-              <ScaleIcon className="w-10 h-10 text-[#08171A]" />
+            <div className="p-3 rounded-full mb-4" style={{ backgroundColor: 'var(--color-primary)' }}>
+              <ScaleIcon className="w-10 h-10" style={{ color: 'var(--color-primary-contrast)' }} />
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
-              Terms & <span className="text-[#78cadc]">Conditions</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins" style={{ color: 'var(--color-text-primary)' }}>
+              Terms & <span style={{ color: 'var(--color-primary)' }}>Conditions</span>
             </h1>
           </div>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
+          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4" style={{ color: 'var(--color-text-muted)' }}>
             Last Updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </motion.div>
@@ -316,7 +316,7 @@ const TermsConditions = () => {
           transition={{ duration: 0.8 }}
           className="mb-16 text-center"
         >
-          <p className="text-gray-400 max-w-4xl mx-auto text-lg leading-relaxed">
+          <p className="max-w-4xl mx-auto text-lg leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
             These Terms of Service govern your use of SQUAREFOOT&apos;s website, mobile applications, 
             and related services. By accessing our platform, you agree to comply with these terms, 
             our Privacy Policy, and all applicable laws and regulations.
@@ -331,17 +331,21 @@ const TermsConditions = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20 hover:border-[#78cadc]/50 transition-all"
+              className="p-8 rounded-xl border transition-all"
+              style={{ 
+                backgroundColor: 'var(--color-surface)', 
+                borderColor: 'var(--color-border)'
+              }}
             >
               <div className="flex items-start mb-6">
-                <div className="bg-[#78cadc] p-2 rounded-lg mr-4">
+                <div className="p-2 rounded-lg mr-4" style={{ backgroundColor: 'var(--color-primary)' }}>
                   {section.icon}
                 </div>
-                <h2 className="text-2xl font-bold">{section.title}</h2>
+                <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{section.title}</h2>
               </div>
               <div className="pl-14 space-y-4">
                 {section.content.map((paragraph, pIndex) => (
-                  <p key={pIndex} className="text-gray-300">
+                  <p key={pIndex} style={{ color: 'var(--color-text-muted)' }}>
                     {paragraph}
                   </p>
                 ))}
@@ -356,10 +360,11 @@ const TermsConditions = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20"
+            className="p-8 rounded-xl border"
+            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
-            <h2 className="text-2xl font-bold mb-6">Governing Law & Dispute Resolution</h2>
-            <div className="space-y-4 text-gray-300">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>Governing Law & Dispute Resolution</h2>
+            <div className="space-y-4" style={{ color: 'var(--color-text-muted)' }}>
               <p>
                 These Terms shall be governed by and construed in accordance with the laws of the State of Delaware, 
                 without regard to its conflict of law provisions.
@@ -379,10 +384,11 @@ const TermsConditions = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20"
+            className="p-8 rounded-xl border"
+            style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
-            <h2 className="text-2xl font-bold mb-6">General Provisions</h2>
-            <div className="space-y-4 text-gray-300">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>General Provisions</h2>
+            <div className="space-y-4" style={{ color: 'var(--color-text-muted)' }}>
               <p>
                 These Terms constitute the entire agreement between you and SQUAREFOOT regarding our services, 
                 superseding any prior agreements.
@@ -408,9 +414,9 @@ const TermsConditions = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <div className="inline-flex items-center justify-center bg-[#0c2327] px-6 py-4 rounded-xl border border-[#78cadc]/20">
-            <DocumentTextIcon className="w-6 h-6 mr-3 text-[#78cadc]" />
-            <span className="text-gray-300">
+          <div className="inline-flex items-center justify-center px-6 py-4 rounded-xl border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+            <DocumentTextIcon className="w-6 h-6 mr-3" style={{ color: 'var(--color-primary)' }} />
+            <span style={{ color: 'var(--color-text-muted)' }}>
               By using our services, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
             </span>
           </div>

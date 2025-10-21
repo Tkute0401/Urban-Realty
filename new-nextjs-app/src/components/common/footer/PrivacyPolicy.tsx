@@ -54,10 +54,10 @@ const PrivacyPolicy = () => {
   ];
 
   return (
-    <div className="bg-[#08171A] text-white min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}>
       {/* Hero Section */}
       <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 to-black/30 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/40 z-10" />
         <img 
           src="/privacy-policy-2.jpg" 
           alt="Privacy Policy" 
@@ -69,13 +69,13 @@ const PrivacyPolicy = () => {
           transition={{ duration: 0.8 }}
           className="relative z-20 text-center px-4"
         >
-          <div className="flex items-center justify-center mb-4">
-            <ShieldCheckIcon className="w-10 h-10 text-[#78cadc] mr-3" />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-poppins">
-              Privacy <span className="text-[#78cadc]">Policy</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center mb-4">
+            <ShieldCheckIcon className="w-10 h-10 mb-2 sm:mb-0 sm:mr-3" style={{ color: 'var(--color-primary)' }} />
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-poppins" style={{ color: 'var(--color-text-primary)' }}>
+              Privacy <span style={{ color: 'var(--color-primary)' }}>Policy</span>
             </h1>
           </div>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-gray-300">
+          <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto px-4" style={{ color: 'var(--color-text-muted)' }}>
             Last Updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </motion.div>
@@ -89,11 +89,11 @@ const PrivacyPolicy = () => {
           transition={{ duration: 0.8 }}
           className="mb-12 text-center"
         >
-          <p className="text-gray-400 mb-6">
+          <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>
             At SQUAREFOOT, we are committed to protecting your privacy and ensuring the security of your personal information. 
             This policy outlines how we collect, use, and safeguard your data.
           </p>
-          <div className="inline-flex items-center text-[#78cadc]">
+          <div className="inline-flex items-center" style={{ color: 'var(--color-primary)' }}>
             <LockClosedIcon className="w-5 h-5 mr-2" />
             <span>Your information is protected with 256-bit SSL encryption</span>
           </div>
@@ -107,17 +107,18 @@ const PrivacyPolicy = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20"
+              className="p-8 rounded-xl border"
+              style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
             >
               <div className="flex items-start mb-6">
-                <div className="bg-[#78cadc] p-2 rounded-lg mr-4">
-                  <DocumentTextIcon className="w-5 h-5 text-[#08171A]" />
+                <div className="p-2 rounded-lg mr-4" style={{ backgroundColor: 'var(--color-primary)' }}>
+                  <DocumentTextIcon className="w-5 h-5" style={{ color: 'var(--color-primary-contrast)' }} />
                 </div>
-                <h2 className="text-2xl font-bold">{section.title}</h2>
+                <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{section.title}</h2>
               </div>
               <div className="pl-14">
                 {section.content.map((paragraph, pIndex) => (
-                  <p key={pIndex} className="text-gray-300 mb-4">
+                  <p key={pIndex} className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
                     {paragraph}
                   </p>
                 ))}
@@ -131,14 +132,15 @@ const PrivacyPolicy = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 bg-[#0c2327] p-8 rounded-xl border border-[#78cadc]/20"
+          className="mt-16 p-8 rounded-xl border"
+          style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
         >
-          <h2 className="text-2xl font-bold mb-4">Policy Updates</h2>
-          <p className="text-gray-300 mb-4">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>Policy Updates</h2>
+          <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
             We may update this policy periodically to reflect changes in our practices or legal requirements. 
             Significant changes will be communicated through email or platform notifications.
           </p>
-          <p className="text-gray-300">
+          <p style={{ color: 'var(--color-text-muted)' }}>
             By continuing to use our services after updates take effect, you acknowledge and agree to the revised policy.
           </p>
         </motion.div>
@@ -150,11 +152,17 @@ const PrivacyPolicy = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-12 text-center"
         >
-          <h3 className="text-xl font-bold mb-2">Privacy Questions?</h3>
-          <p className="text-gray-400 mb-6">
-            Contact our Data Protection Officer at <span className="text-[#78cadc]">privacy@urbanrealty360.com</span>
+          <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Privacy Questions?</h3>
+          <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>
+            Contact our Data Protection Officer at <span style={{ color: 'var(--color-primary)' }}>privacy@urbanrealty360.com</span>
           </p>
-          <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-3 px-8 rounded-lg transition-colors shadow-lg">
+          <button 
+            className="font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-primary-contrast)'
+            }}
+          >
             Contact Privacy Team
           </button>
         </motion.div>
