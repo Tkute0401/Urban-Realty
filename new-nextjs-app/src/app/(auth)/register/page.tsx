@@ -96,40 +96,40 @@ const Register = () => {
   const textFieldStyles = {
     mb: 2,
     '& .MuiOutlinedInput-root': {
-      backgroundColor: 'var(--color-bg-dark)',
-      color: 'var(--color-text-inverse)',
+      backgroundColor: 'var(--color-surface)',
+      color: 'var(--color-text-primary)',
       '& fieldset': {
-        borderColor: 'var(--color-primary)',
+        borderColor: 'var(--color-border)',
       },
       '&:hover fieldset': {
         borderColor: 'var(--color-primary)',
       },
       '&.Mui-focused': {
-        backgroundColor: 'var(--color-bg-dark)',
+        backgroundColor: 'var(--color-surface)',
       },
       '&.Mui-focused fieldset': {
         borderColor: 'var(--color-primary)',
       },
     },
     '& .MuiInputLabel-root': {
-      color: 'var(--color-text-inverse)',
+      color: 'var(--color-text-muted)',
     },
     '& .MuiInputLabel-root.Mui-focused': {
-      color: 'var(--color-text-inverse)',
+      color: 'var(--color-primary)',
     },
     input: {
-      color: 'var(--color-text-inverse)',
+      color: 'var(--color-text-primary)',
     }
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: 4, border: "1px solid var(--color-primary)", bgcolor: "var(--color-bg-dark)", color: "var(--color-text-inverse)" }}>
+    <Container maxWidth="sm" sx={{ py: 4, backgroundColor: 'var(--color-bg)' }}>
+      <Paper elevation={3} sx={{ p: 4, border: "1px solid var(--color-primary)", bgcolor: "var(--color-surface)", color: "var(--color-text-primary)" }}>
         <Box sx={{ mb: 4, textAlign: 'center' }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
             Create Account
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
             Join Squarefooot as buyer, individual seller, agent, or developer
           </Typography>
         </Box>
@@ -221,7 +221,7 @@ const Register = () => {
             {['agent', 'developer'].includes(formData.role) && (
               <>
                 <Grid item xs={12}>
-                  <Typography variant="h6" sx={{ mt: 2, mb: 2, color: 'var(--color-primary)' }}>
+                  <Typography variant="h6" sx={{ mt: 2, mb: 2, color: 'var(--color-primary)', fontWeight: 'bold' }}>
                     Professional Information (RERA for India)
                   </Typography>
                 </Grid>
@@ -330,7 +330,17 @@ const Register = () => {
             variant="contained"
             size="large"
             startIcon={<PersonAdd />}
-            sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: "var(--color-primary)", color: "var(--color-bg-dark)", fontWeight: "bold" }}
+            sx={{ 
+              mt: 3, 
+              mb: 2, 
+              py: 1.5, 
+              bgcolor: "var(--color-primary)", 
+              color: "var(--color-primary-contrast)", 
+              fontWeight: "bold",
+              '&:hover': {
+                bgcolor: "var(--color-primary-hover)"
+              }
+            }}
             disabled={loading}
           >
             {loading ? 'Registering...' : 'Register'}
