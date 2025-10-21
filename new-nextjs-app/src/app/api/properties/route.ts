@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
     const bathrooms = searchParams.get('bathrooms')?.split(',').map(Number) || [];
     const city = searchParams.get('city') || '';
     const amenities = searchParams.get('amenities')?.split(',') || [];
+    console.log('🔍 Raw amenities from URL:', searchParams.get('amenities'));
+    console.log('🔍 Processed amenities array:', amenities);
 
     // Build MongoDB filter
     const filter: any = {};
@@ -86,6 +88,8 @@ export async function GET(request: NextRequest) {
       console.log('🔍 Filtering by amenities:', amenities);
     }
 
+    console.log('🔍 Final MongoDB filter:', JSON.stringify(filter, null, 2));
+
     // Calculate pagination
     const skip = (page - 1) * limit;
 
@@ -98,6 +102,19 @@ export async function GET(request: NextRequest) {
         .skip(skip)
         .limit(limit)
     ]);
+
+    console.log('🔍 Found properties:', properties.length);
+    console.log('🔍 Total count:', total);
+
+    // Debug: Show sample properties and their amenities
+    if (properties.length > 0) {
+      console.log('🔍 Sample property amenities:', properties[0].amenities);
+      console.log('🔍 Sample property price:', properties[0].price);
+    }
+    
+    // Debug: Check total properties in database
+    const totalInDB = await Property.countDocuments({});
+    console.log('🔍 Total properties in database:', totalInDB);
 
     const totalPages = Math.ceil(total / limit);
 

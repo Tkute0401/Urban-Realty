@@ -205,6 +205,7 @@ const PropertiesPageContent: React.FC = () => {
     }
 
     console.log('🔍 Loading properties with filters:', params);
+    console.log('🔍 Amenities being sent:', filterState.amenities);
     getProperties(params);
   }, [pagination.page, userLocation, getProperties]);
 
