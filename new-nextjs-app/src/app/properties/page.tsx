@@ -101,7 +101,9 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.priceMax) params.maxPrice = Number(filters.priceMax);
     if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
     if (filters.bathrooms) params.bathrooms = Number(filters.bathrooms);
-    if (filters.amenities.length > 0) params.amenities = filters.amenities.join(',');
+    if (filters.amenities && Array.isArray(filters.amenities) && filters.amenities.length > 0) {
+      params.amenities = filters.amenities.join(',');
+    }
     if (filters.minArea) params.minArea = Number(filters.minArea);
     if (filters.maxArea) params.maxArea = Number(filters.maxArea);
     if (filters.propertyType !== 'ALL') {
@@ -167,11 +169,13 @@ const PropertiesPageContent: React.FC = () => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     
+    console.log('🔍 Filter change:', { key, value, newFilters });
+    
     // Auto-trigger search for specific filters with updated state
     if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType' || key === 'priceMin' || key === 'priceMax') {
-      setTimeout(() => {
-        loadPropertiesWithFilters(newFilters);
-      }, 100);
+      console.log('🔍 Auto-triggering search for:', key);
+      // Use the newFilters directly to avoid state synchronization issues
+      loadPropertiesWithFilters(newFilters);
     }
   };
 
@@ -189,7 +193,7 @@ const PropertiesPageContent: React.FC = () => {
     if (filterState.priceMax) params.maxPrice = Number(filterState.priceMax);
     if (filterState.bedrooms) params.bedrooms = Number(filterState.bedrooms);
     if (filterState.bathrooms) params.bathrooms = Number(filterState.bathrooms);
-    if (filterState.amenities && filterState.amenities.length > 0) {
+    if (filterState.amenities && Array.isArray(filterState.amenities) && filterState.amenities.length > 0) {
       params.amenities = filterState.amenities.join(',');
     }
     if (filterState.minArea) params.minArea = Number(filterState.minArea);
@@ -206,6 +210,8 @@ const PropertiesPageContent: React.FC = () => {
 
     console.log('🔍 Loading properties with filters:', params);
     console.log('🔍 Amenities being sent:', filterState.amenities);
+    console.log('🔍 Amenities array length:', filterState.amenities?.length || 0);
+    console.log('🔍 Amenities joined string:', filterState.amenities?.join(',') || '');
     getProperties(params);
   }, [pagination.page, userLocation, getProperties]);
 
@@ -258,7 +264,9 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.priceMax) params.maxPrice = Number(filters.priceMax);
     if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
     if (filters.bathrooms) params.bathrooms = Number(filters.bathrooms);
-    if (filters.amenities.length > 0) params.amenities = filters.amenities.join(',');
+    if (filters.amenities && Array.isArray(filters.amenities) && filters.amenities.length > 0) {
+      params.amenities = filters.amenities.join(',');
+    }
     if (filters.minArea) params.minArea = Number(filters.minArea);
     if (filters.maxArea) params.maxArea = Number(filters.maxArea);
     if (filters.propertyType !== 'ALL') {
@@ -807,6 +815,7 @@ const PropertiesPageContent: React.FC = () => {
                         const newAmenities = isActive
                           ? filters.amenities.filter(a => a !== amenity)
                           : [...filters.amenities, amenity];
+                        console.log('🔍 Amenity clicked:', { amenity, isActive, newAmenities });
                         handleFilterChange('amenities', newAmenities);
                       }}
                       sx={{
@@ -1267,6 +1276,7 @@ const PropertiesPageContent: React.FC = () => {
                               const newAmenities = isActive
                                 ? filters.amenities.filter(a => a !== amenity)
                                 : [...filters.amenities, amenity];
+                              console.log('🔍 Desktop amenity clicked:', { amenity, isActive, newAmenities });
                               handleFilterChange('amenities', newAmenities);
                             }}
                             size="small"
@@ -1460,8 +1470,10 @@ const PropertiesPageContent: React.FC = () => {
                     key={`${key}-${item}`}
                     label={`${key}: ${item}`}
                     onDelete={() => {
-                      const newAmenities = filters.amenities.filter(a => a !== item);
-                      handleFilterChange('amenities', newAmenities);
+                      if (key === 'amenities') {
+                        const newAmenities = filters.amenities.filter(a => a !== item);
+                        handleFilterChange('amenities', newAmenities);
+                      }
                     }}
                           sx={{ 
                       backgroundColor: 'var(--color-primary-light)',

@@ -71,6 +71,14 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
       console.log('🔍 Frontend: API response:', data);
       console.log('🔍 Frontend: Properties received:', data.data);
       console.log('🔍 Frontend: Pagination:', data.pagination);
+      console.log('🔍 Frontend: Properties count:', data.data?.length || 0);
+      console.log('🔍 Frontend: First property amenities:', data.data?.[0]?.amenities);
+      console.log('🔍 Frontend: Response structure check:', {
+        hasData: !!data.data,
+        dataIsArray: Array.isArray(data.data),
+        dataLength: data.data?.length,
+        hasPagination: !!data.pagination
+      });
       
       setProperties(data.data || []);
       setPagination({

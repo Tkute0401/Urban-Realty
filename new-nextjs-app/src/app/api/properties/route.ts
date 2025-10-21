@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
     const amenities = searchParams.get('amenities')?.split(',') || [];
     console.log('🔍 Raw amenities from URL:', searchParams.get('amenities'));
     console.log('🔍 Processed amenities array:', amenities);
+    console.log('🔍 Amenities array length:', amenities.length);
+    console.log('🔍 Amenities array items:', amenities.map(a => `"${a}"`));
 
     // Build MongoDB filter
     const filter: any = {};
@@ -111,6 +113,9 @@ export async function GET(request: NextRequest) {
       console.log('🔍 Sample property amenities:', properties[0].amenities);
       console.log('🔍 Sample property price:', properties[0].price);
       console.log('🔍 Sample property title:', properties[0].title);
+      console.log('🔍 All properties amenities:', properties.map(p => ({ title: p.title, amenities: p.amenities })));
+    } else {
+      console.log('🔍 No properties found with current filters');
     }
     
     // Debug: Check total properties in database
