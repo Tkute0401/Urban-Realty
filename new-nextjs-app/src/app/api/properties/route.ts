@@ -99,20 +99,6 @@ export async function GET(request: NextRequest) {
         .limit(limit)
     ]);
 
-    console.log('🔍 Final MongoDB filter:', JSON.stringify(filter, null, 2));
-    console.log('🔍 Found properties:', properties.length);
-    console.log('🔍 Total count:', total);
-    
-    // Debug: Show sample properties and their amenities
-    if (properties.length > 0) {
-      console.log('🔍 Sample property amenities:', properties[0].amenities);
-      console.log('🔍 Sample property price:', properties[0].price);
-    }
-    
-    // Debug: Check total properties in database
-    const totalInDB = await Property.countDocuments({});
-    console.log('🔍 Total properties in database:', totalInDB);
-
     const totalPages = Math.ceil(total / limit);
 
     console.log(`🔧 API: Returning ${properties.length} properties from database (page ${page}/${totalPages})`);

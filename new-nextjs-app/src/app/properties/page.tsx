@@ -736,10 +736,13 @@ const PropertiesPageContent: React.FC = () => {
                       MenuProps={{
                         PaperProps: {
                           sx: {
-                            zIndex: 'var(--z-drawer)',
-                            maxHeight: '300px'
+                            zIndex: 9999,
+                            maxHeight: '300px',
+                            position: 'relative'
                           }
-                        }
+                        },
+                        disablePortal: false,
+                        container: document.body
                       }}
                       sx={{
                         background: 'var(--color-surface)',
@@ -767,10 +770,13 @@ const PropertiesPageContent: React.FC = () => {
                       MenuProps={{
                         PaperProps: {
                           sx: {
-                            zIndex: 'var(--z-drawer)',
-                            maxHeight: '300px'
+                            zIndex: 9999,
+                            maxHeight: '300px',
+                            position: 'relative'
                           }
-                        }
+                        },
+                        disablePortal: false,
+                        container: document.body
                       }}
                       sx={{
                         background: 'var(--color-surface)',
@@ -1146,10 +1152,13 @@ const PropertiesPageContent: React.FC = () => {
                             MenuProps={{
                               PaperProps: {
                                 sx: {
-                                  zIndex: 'var(--z-dropdown)',
-                                  maxHeight: '300px'
+                                  zIndex: 9999,
+                                  maxHeight: '300px',
+                                  position: 'relative'
                                 }
-                              }
+                              },
+                              disablePortal: false,
+                              container: document.body
                             }}
                             sx={{
                               background: 'var(--color-bg)',
@@ -1177,10 +1186,13 @@ const PropertiesPageContent: React.FC = () => {
                             MenuProps={{
                               PaperProps: {
                                 sx: {
-                                  zIndex: 'var(--z-dropdown)',
-                                  maxHeight: '300px'
+                                  zIndex: 9999,
+                                  maxHeight: '300px',
+                                  position: 'relative'
                                 }
-                              }
+                              },
+                              disablePortal: false,
+                              container: document.body
                             }}
                             sx={{
                               background: 'var(--color-bg)',
