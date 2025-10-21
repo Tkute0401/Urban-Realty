@@ -130,7 +130,7 @@ const Reviews = () => {
                 scale: index === currentIndex ? 1 : 0.9
               }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
-              className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[var(--color-bg-dark)] rounded-xl border border-[var(--color-primary)]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
+              className={`absolute inset-0 flex flex-col md:flex-row items-center gap-6 p-4 sm:p-6 md:p-8 bg-[var(--color-surface)] rounded-xl border border-[var(--color-primary)]/20 ${index === currentIndex ? 'z-10' : 'z-0'}`}
             >
               <div className="w-full md:w-1/3 flex justify-center">
                 <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[var(--color-primary)]/30 mt-2">
@@ -241,15 +241,15 @@ const Reviews = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="bg-[#0c2327] p-6 sm:p-8 md:p-12 rounded-xl border border-[#78cadc]/20 text-center"
+          className="bg-[var(--color-surface)] p-6 sm:p-8 md:p-12 rounded-xl border border-[var(--color-primary)]/20 text-center"
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">
             Ready to Share Your Experience?
           </h2>
-          <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
+          <p className="text-[var(--color-text-secondary)] mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
             We&apos;d love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
           </p>
-          <button className="bg-[#78cadc] hover:bg-[#8DD9E5] text-[#08171A] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
+          <button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-[var(--color-white)] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
             Write a Review
           </button>
         </motion.div>
