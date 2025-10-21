@@ -18,27 +18,10 @@ if (isProduction) {
   console.log('📦 Production mode detected, building Next.js...');
   
   try {
-    // Change to Next.js app directory
-    const nextAppDir = path.join(__dirname, 'new-nextjs-app');
-    
-    if (!fs.existsSync(nextAppDir)) {
-      console.error('❌ Next.js app directory not found:', nextAppDir);
-      process.exit(1);
-    }
-    
-    // Install dependencies if needed
-    if (!fs.existsSync(path.join(nextAppDir, 'node_modules'))) {
-      console.log('📦 Installing Next.js dependencies...');
-      execSync('npm install', { 
-        cwd: nextAppDir, 
-        stdio: 'inherit' 
-      });
-    }
-    
-    // Build Next.js
-    console.log('🔨 Building Next.js application...');
-    execSync('npm run build', { 
-      cwd: nextAppDir, 
+    // Use the build script
+    console.log('🔨 Running Next.js build script...');
+    execSync('node build-nextjs.js', { 
+      cwd: __dirname, 
       stdio: 'inherit' 
     });
     
