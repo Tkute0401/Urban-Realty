@@ -734,15 +734,10 @@ const PropertiesPageContent: React.FC = () => {
                       value={filters.bedrooms}
                       onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
                       MenuProps={{
-                        PaperProps: {
-                          sx: {
-                            zIndex: 9999,
-                            maxHeight: '300px',
-                            position: 'relative'
-                          }
+                        sx: {
+                          zIndex: 9999
                         },
-                        disablePortal: false,
-                        container: document.body
+                        disablePortal: true
                       }}
                       sx={{
                         background: 'var(--color-surface)',
@@ -768,15 +763,10 @@ const PropertiesPageContent: React.FC = () => {
                       value={filters.bathrooms}
                       onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
                       MenuProps={{
-                        PaperProps: {
-                          sx: {
-                            zIndex: 9999,
-                            maxHeight: '300px',
-                            position: 'relative'
-                          }
+                        sx: {
+                          zIndex: 9999
                         },
-                        disablePortal: false,
-                        container: document.body
+                        disablePortal: true
                       }}
                       sx={{
                         background: 'var(--color-surface)',
@@ -1130,14 +1120,13 @@ const PropertiesPageContent: React.FC = () => {
                     position: 'absolute',
                     top: 'calc(100% + 8px)',
                     left: 0,
-                    right: 0,
+                    width: '280px',
                     background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-elevated) 100%)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '16px',
                     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.2)',
-                    zIndex: 'var(--z-dropdown)',
-                    p: 3,
-                    minWidth: '320px'
+                    zIndex: 9999,
+                    p: 2
                   }}>
                     <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)', fontWeight: 600 }}>
                       🛏️ Beds & Baths
@@ -1150,15 +1139,10 @@ const PropertiesPageContent: React.FC = () => {
                             value={filters.bedrooms}
                             onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
                             MenuProps={{
-                              PaperProps: {
-                                sx: {
-                                  zIndex: 9999,
-                                  maxHeight: '300px',
-                                  position: 'relative'
-                                }
+                              sx: {
+                                zIndex: 9999
                               },
-                              disablePortal: false,
-                              container: document.body
+                              disablePortal: true
                             }}
                             sx={{
                               background: 'var(--color-bg)',
@@ -1184,15 +1168,10 @@ const PropertiesPageContent: React.FC = () => {
                             value={filters.bathrooms}
                             onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
                             MenuProps={{
-                              PaperProps: {
-                                sx: {
-                                  zIndex: 9999,
-                                  maxHeight: '300px',
-                                  position: 'relative'
-                                }
+                              sx: {
+                                zIndex: 9999
                               },
-                              disablePortal: false,
-                              container: document.body
+                              disablePortal: true
                             }}
                             sx={{
                               background: 'var(--color-bg)',
