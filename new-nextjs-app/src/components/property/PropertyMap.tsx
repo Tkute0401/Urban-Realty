@@ -155,18 +155,45 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
             if (showMarker && !markerCreatedRef.current) {
               console.log('Creating marker with position:', [latitude, longitude]);
               
-              try {
+              // Add a small delay to ensure map is fully ready
+              setTimeout(() => {
+                try {
+                // Create marker first without icon
                 const marker = new window.mappls.Marker({
                   map: mapInstanceRef.current,
                   position: [latitude, longitude], // Mappls expects [lat, lng] array format
-                  icon: {
-                    url: 'https://apis.mapmyindia.com/map_v3/1.png',
-                    width: 35,
-                    height: 50
-                  }
+                  title: address || 'Property Location'
                 });
                 console.log('Marker created successfully:', marker);
+                console.log('Marker position:', marker.getPosition?.() || 'Position method not available');
+                console.log('Marker map:', marker.getMap?.() || 'Map method not available');
                 markerCreatedRef.current = true;
+
+                // Try to add custom icon after marker creation
+                try {
+                  marker.setIcon({
+                    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                      <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 0C6.716 0 0 6.716 0 15c0 10.5 15 25 15 25s15-14.5 15-25C30 6.716 23.284 0 15 0zm0 20c-2.761 0-5-2.239-5-5s2.239-5 5-5 5 2.239 5 5-2.239 5-5 5z" fill="#1976d2" stroke="#fff" stroke-width="2"/>
+                      </svg>
+                    `)}`,
+                    scaledSize: { width: 30, height: 40 }
+                  });
+                  console.log('Custom icon set successfully');
+                } catch (iconError) {
+                  console.warn('Failed to set custom icon, using default marker:', iconError);
+                  // Try fallback icon
+                  try {
+                    marker.setIcon({
+                      url: 'https://apis.mapmyindia.com/map_v3/1.png',
+                      scaledSize: { width: 35, height: 50 }
+                    });
+                    console.log('Fallback icon set successfully');
+                  } catch (fallbackError) {
+                    console.warn('Failed to set fallback icon, marker will use default:', fallbackError);
+                    // Marker should still be visible with default icon
+                  }
+                }
 
                 // Add popup with address if provided
                 if (address) {
@@ -186,18 +213,19 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                 }
                 
                 console.log('PropertyMap: Marker created successfully');
-              } catch (markerError) {
-                console.error('Error creating marker:', markerError);
-                // Fallback: just center the map on the coordinates without marker
-                try {
-                  mapInstanceRef.current.setCenter([longitude, latitude]);
-                  mapInstanceRef.current.setZoom(zoom);
-                  console.log('PropertyMap: Map centered as fallback');
-                } catch (centerError) {
-                  console.error('Error centering map:', centerError);
-                  setMapError(`Failed to create marker and center map: ${markerError?.message || 'Unknown error'}`);
+                } catch (markerError) {
+                  console.error('Error creating marker:', markerError);
+                  // Fallback: just center the map on the coordinates without marker
+                  try {
+                    mapInstanceRef.current.setCenter([longitude, latitude]);
+                    mapInstanceRef.current.setZoom(zoom);
+                    console.log('PropertyMap: Map centered as fallback');
+                  } catch (centerError) {
+                    console.error('Error centering map:', centerError);
+                    setMapError(`Failed to create marker and center map: ${markerError?.message || 'Unknown error'}`);
+                  }
                 }
-              }
+              }, 100); // Small delay to ensure map is ready
             } else if (!showMarker) {
               // If no marker, ensure map is centered on coordinates
               mapInstanceRef.current.setCenter([longitude, latitude]);

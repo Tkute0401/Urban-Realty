@@ -29,6 +29,9 @@ const TestMapPage: React.FC = () => {
         <Typography variant="body2" sx={{ mb: 2, color: 'warning.main' }}>
           ⚠️ Watch for infinite zoom loops - this should be fixed now!
         </Typography>
+        <Typography variant="body2" sx={{ mb: 2, color: 'info.main' }}>
+          🔍 Check browser console for marker creation logs
+        </Typography>
         
         <PropertyMap
           latitude={testLatitude}

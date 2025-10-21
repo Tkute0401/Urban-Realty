@@ -41,8 +41,8 @@ const Footer = () => {
   return (
     <footer 
       style={{
-        backgroundColor: 'var(--color-bg-dark)',
-        color: 'var(--color-text-muted)',
+        backgroundColor: '#0b132b',
+        color: '#d1d5db',
         borderTop: '1px solid var(--color-primary)'
       }}
     >
@@ -51,7 +51,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
           {/* Cities */}
           <div>
-            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>Popular Cities</h3>
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: '#f9fafb' }}>Popular Cities</h3>
             <ul className="space-y-2">
               {cities.map((city, index) => (
                 <li key={index}>
@@ -59,14 +59,14 @@ const Footer = () => {
                     href={`/properties?city=${city}`} 
                     className="font-poppins text-sm transition-colors"
                     style={{ 
-                      color: 'var(--color-text-muted)',
+                      color: '#d1d5db',
                       fontSize: '0.875rem'
                     }}
                     onMouseEnter={(e) => {
                       (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = '#d1d5db';
                     }}
                   >
                     {city} Real Estate
@@ -78,7 +78,7 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>Resources</h3>
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: '#f9fafb' }}>Resources</h3>
             <ul className="space-y-2">
               {resources.map((item, index) => (
                 <li key={index}>
@@ -86,7 +86,7 @@ const Footer = () => {
                     href={typeof item === 'string' ? '#' : item.path} 
                     className="font-poppins text-sm transition-colors"
                     style={{ 
-                      color: 'var(--color-text-muted)',
+                      color: '#d1d5db',
                       fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
@@ -94,7 +94,7 @@ const Footer = () => {
                       (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = '#d1d5db';
                     }}
                   >
                     {typeof item === 'string' ? item : item.name}
@@ -106,7 +106,7 @@ const Footer = () => {
 
           {/* About */}
           <div>
-            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>About</h3>
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: '#f9fafb' }}>About</h3>
             <ul className="space-y-2">
               {about.map((item, index) => (
                 <li key={index}>
@@ -114,7 +114,7 @@ const Footer = () => {
                     href={typeof item === 'string' ? '#' : item.path}
                     className="font-poppins text-sm transition-colors"
                     style={{ 
-                      color: 'var(--color-text-muted)',
+                      color: '#d1d5db',
                       fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
@@ -122,7 +122,7 @@ const Footer = () => {
                       (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = '#d1d5db';
                     }}
                   >
                     {typeof item === 'string' ? item : item.name}
@@ -134,7 +134,7 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>Services</h3>
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: '#f9fafb' }}>Services</h3>
             <ul className="space-y-2">
               {services.map((item, index) => (
                 <li key={index}>
@@ -142,7 +142,7 @@ const Footer = () => {
                     href={typeof item === 'string' ? '#' : item.path} 
                     className="font-poppins text-sm transition-colors"
                     style={{ 
-                      color: 'var(--color-text-muted)',
+                      color: '#d1d5db',
                       fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
@@ -150,7 +150,7 @@ const Footer = () => {
                       (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = '#d1d5db';
                     }}
                   >
                     {typeof item === 'string' ? item : item.name}
@@ -163,7 +163,7 @@ const Footer = () => {
 
         {/* Our Partners */}
         <div>
-            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>Our Partners</h3>
+            <h3 className="font-poppins text-lg font-bold mb-4" style={{ color: '#f9fafb' }}>Our Partners</h3>
             <ul className="space-y-2">
               {partners.map((item, index) => (
                 <li key={index}>
@@ -173,7 +173,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ 
-                      color: 'var(--color-text-muted)',
+                      color: '#d1d5db',
                       fontSize: '0.875rem',
                       textDecoration: 'none'
                     }}
@@ -181,7 +181,7 @@ const Footer = () => {
                       (e.target as HTMLElement).style.color = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--color-text-muted)';
+                      (e.target as HTMLElement).style.color = '#d1d5db';
                     }}
                   >
                     {item.name}
@@ -196,58 +196,58 @@ const Footer = () => {
 
         {/* Middle section - social links centered */}
         <div className="flex flex-col items-center mb-12">
-          <h3 className="font-poppins text-lg font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>Connect with Us</h3>
+          <h3 className="font-poppins text-lg font-bold mb-6" style={{ color: '#f9fafb' }}>Connect with Us</h3>
           <div className="flex gap-6">
             <a href="https://www.facebook.com/share/16U1BQ69Un/?mibextid=wwXIfr" 
                className="p-2 rounded-full transition-colors"
                style={{ 
-                 backgroundColor: 'var(--color-primary)', 
-                 opacity: '0.1' 
+                 backgroundColor: 'rgba(247, 107, 28, 0.1)',
+                 border: '1px solid rgba(247, 107, 28, 0.3)'
                }}
                onMouseEnter={(e) => {
-                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                 (e.target as HTMLElement).style.opacity = '0.2';
+                 (e.target as HTMLElement).style.backgroundColor = 'rgba(247, 107, 28, 0.2)';
+                 (e.target as HTMLElement).style.borderColor = 'rgba(247, 107, 28, 0.5)';
                }}
                onMouseLeave={(e) => {
-                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                 (e.target as HTMLElement).style.opacity = '0.1';
+                 (e.target as HTMLElement).style.backgroundColor = 'rgba(247, 107, 28, 0.1)';
+                 (e.target as HTMLElement).style.borderColor = 'rgba(247, 107, 28, 0.3)';
                }}
             >
-              <FacebookIcon className="w-6 h-6" style={{ color: 'var(--color-text-primary)' }} />
+              <FacebookIcon className="w-6 h-6" style={{ color: '#f9fafb' }} />
             </a>
             <a href="https://www.instagram.com/urbanrealty360?igsh=cmUyOXdweDd2ZjVr" 
                className="p-2 rounded-full transition-colors"
                style={{ 
-                 backgroundColor: 'var(--color-primary)', 
-                 opacity: '0.1' 
+                 backgroundColor: 'rgba(247, 107, 28, 0.1)',
+                 border: '1px solid rgba(247, 107, 28, 0.3)'
                }}
                onMouseEnter={(e) => {
-                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                 (e.target as HTMLElement).style.opacity = '0.2';
+                 (e.target as HTMLElement).style.backgroundColor = 'rgba(247, 107, 28, 0.2)';
+                 (e.target as HTMLElement).style.borderColor = 'rgba(247, 107, 28, 0.5)';
                }}
                onMouseLeave={(e) => {
-                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                 (e.target as HTMLElement).style.opacity = '0.1';
+                 (e.target as HTMLElement).style.backgroundColor = 'rgba(247, 107, 28, 0.1)';
+                 (e.target as HTMLElement).style.borderColor = 'rgba(247, 107, 28, 0.3)';
                }}
             >
-              <InstagramIcon className="w-6 h-6" style={{ color: 'var(--color-text-primary)' }} />
+              <InstagramIcon className="w-6 h-6" style={{ color: '#f9fafb' }} />
             </a>
-            <a href="https://www.linkedin.com/company/uraban-realty-360" 
+            <a href="https://www.linkedin.com/company/uraban-realty-360"
                className="p-2 rounded-full transition-colors"
                style={{ 
-                 backgroundColor: 'var(--color-primary)', 
-                 opacity: '0.1' 
+                 backgroundColor: 'rgba(247, 107, 28, 0.1)',
+                 border: '1px solid rgba(247, 107, 28, 0.3)'
                }}
                onMouseEnter={(e) => {
-                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                 (e.target as HTMLElement).style.opacity = '0.2';
+                 (e.target as HTMLElement).style.backgroundColor = 'rgba(247, 107, 28, 0.2)';
+                 (e.target as HTMLElement).style.borderColor = 'rgba(247, 107, 28, 0.5)';
                }}
                onMouseLeave={(e) => {
-                 (e.target as HTMLElement).style.backgroundColor = 'var(--color-primary)';
-                 (e.target as HTMLElement).style.opacity = '0.1';
+                 (e.target as HTMLElement).style.backgroundColor = 'rgba(247, 107, 28, 0.1)';
+                 (e.target as HTMLElement).style.borderColor = 'rgba(247, 107, 28, 0.3)';
                }}
             >
-              <LinkedInIcon className="w-6 h-6" style={{ color: 'var(--color-text-primary)' }} />
+              <LinkedInIcon className="w-6 h-6" style={{ color: '#f9fafb' }} />
             </a>
           </div>
         </div>
@@ -259,14 +259,14 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <img src="/vite.png" alt="Logo" className="h-8 w-auto object-contain" />
-            <span className="font-poppins font-bold" style={{ color: 'var(--color-text-primary)' }}>SQUAREFOOT</span>
+            <span className="font-poppins font-bold" style={{ color: '#f9fafb' }}>SQUAREFOOT</span>
           </div>
           
           <div className="text-center md:text-right">
-            <p className="font-poppins text-xs" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="font-poppins text-xs" style={{ color: '#d1d5db' }}>
               © {new Date().getFullYear()} SQUAREFOOT, Inc. All rights reserved.
             </p>
-            <p className="font-poppins text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="font-poppins text-xs mt-1" style={{ color: '#d1d5db' }}>
               SQUAREFOOT® is a registered trademark of SQUAREFOOT, Inc.
             </p>
           </div>
