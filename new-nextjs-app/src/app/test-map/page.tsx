@@ -18,13 +18,16 @@ const TestMapPage: React.FC = () => {
       
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-          Test Map with Marker and Centering
+          Test Map with Marker and Centering (No Infinite Loop)
         </Typography>
         <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
           Coordinates: {testLatitude}, {testLongitude}
         </Typography>
         <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
           Address: {testAddress}
+        </Typography>
+        <Typography variant="body2" sx={{ mb: 2, color: 'warning.main' }}>
+          ⚠️ Watch for infinite zoom loops - this should be fixed now!
         </Typography>
         
         <PropertyMap
