@@ -121,11 +121,13 @@ export async function GET(request: NextRequest) {
     console.log(`🔧 API: Returning ${properties.length} properties from database (page ${page}/${totalPages})`);
 
     return NextResponse.json({
-      properties,
-      page,
-      limit,
-      total,
-      totalPages,
+      data: properties,
+      pagination: {
+        currentPage: page,
+        limit,
+        totalResults: total,
+        totalPages
+      },
       success: true
     });
   } catch (error) {
