@@ -143,46 +143,73 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
         // Add a delay to ensure Mappls SDK is fully ready
         setTimeout(() => {
-          mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
-          console.log('PropertyMap: Map created successfully');
+          try {
+            mapInstanceRef.current = new window.mappls.Map(container, mapOptions);
+            console.log('PropertyMap: Map created successfully');
 
-          // Add marker if enabled
-          if (showMarker) {
-            console.log('Creating marker with position:', [latitude, longitude]);
-            const marker = new window.mappls.Marker({
-              map: mapInstanceRef.current,
-              position: [latitude, longitude], // Mappls expects [lat, lng] format
-              fitbounds: false,
-              icon: {
-                url: 'https://apis.mapmyindia.com/map_v3/1.png',
-                width: 35,
-                height: 50
-              }
-            });
-            console.log('Marker created successfully:', marker);
+            // Add marker if enabled
+            if (showMarker) {
+              console.log('Creating marker with position:', [latitude, longitude]);
+              
+              // Ensure the map is ready before adding marker
+              mapInstanceRef.current.addListener('idle', () => {
+                try {
+                  const marker = new window.mappls.Marker({
+                    map: mapInstanceRef.current,
+                    position: [latitude, longitude], // Mappls expects [lat, lng] array format
+                    fitbounds: true, // This will center the map on the marker
+                    icon: {
+                      url: 'https://apis.mapmyindia.com/map_v3/1.png',
+                      width: 35,
+                      height: 50
+                    }
+                  });
+                  console.log('Marker created successfully:', marker);
 
-            // Add popup with address if provided
-            if (address) {
-              const infoWindow = new window.mappls.InfoWindow({
-                content: `
-                  <div style="padding: 10px; max-width: 200px;">
-                    <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">Property Location</h3>
-                    <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">${address}</p>
-                  </div>
-                `,
-                position: { lat: latitude, lng: longitude }
+                  // Add popup with address if provided
+                  if (address) {
+                    const infoWindow = new window.mappls.InfoWindow({
+                      content: `
+                        <div style="padding: 10px; max-width: 200px;">
+                          <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">Property Location</h3>
+                          <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">${address}</p>
+                        </div>
+                      `,
+                      position: [latitude, longitude] // Use [lat, lng] array format
+                    });
+
+                    marker.addListener('click', () => {
+                      infoWindow.open(mapInstanceRef.current);
+                    });
+                  }
+                  
+                  console.log('PropertyMap: Marker created successfully');
+                } catch (markerError) {
+                  console.error('Error creating marker:', markerError);
+                  // Fallback: just center the map on the coordinates without marker
+                  try {
+                    mapInstanceRef.current.setCenter([longitude, latitude]);
+                    mapInstanceRef.current.setZoom(zoom);
+                    console.log('PropertyMap: Map centered as fallback');
+                  } catch (centerError) {
+                    console.error('Error centering map:', centerError);
+                    setMapError(`Failed to create marker and center map: ${markerError?.message || 'Unknown error'}`);
+                  }
+                }
               });
-
-              marker.addListener('click', () => {
-                infoWindow.open(mapInstanceRef.current);
-              });
+            } else {
+              // If no marker, ensure map is centered on coordinates
+              mapInstanceRef.current.setCenter([longitude, latitude]);
+              mapInstanceRef.current.setZoom(zoom);
+              console.log('PropertyMap: Map centered without marker');
             }
-            
-            console.log('PropertyMap: Marker created successfully');
-          }
 
-          setMapLoaded(true);
-          setMapError(null);
+            setMapLoaded(true);
+            setMapError(null);
+          } catch (mapError) {
+            console.error('Error creating map:', mapError);
+            setMapError(`Failed to create map: ${mapError?.message || 'Unknown error'}`);
+          }
         }, 500);
       } catch (error: any) {
         console.error('Error initializing map:', error);

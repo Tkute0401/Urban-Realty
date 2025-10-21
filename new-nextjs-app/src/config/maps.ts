@@ -10,6 +10,7 @@ export const MAPPLS_CONFIG = {
   // API key - use the valid key from your console
   apiKey: process.env.NEXT_PUBLIC_MAPPLS_API_KEY || 
           process.env.NEXT_PUBLIC_MAPMYINDIA_API_KEY || 
+          process.env.MAPPLS_API_KEY ||
           '82f5c384638d8cfc7d13e310780bae89', // Your valid API key from console
   
   // Default map settings
