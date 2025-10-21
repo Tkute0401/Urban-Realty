@@ -188,7 +188,7 @@ const Reviews = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[#0c2327]">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[var(--color-surface)]">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <motion.div
@@ -196,40 +196,40 @@ const Reviews = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">500+</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Five-Star Reviews</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">500+</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Five-Star Reviews</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">98%</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Client Satisfaction</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">98%</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Client Satisfaction</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">10K+</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Happy Clients</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">10K+</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Happy Clients</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
               viewport={{ once: true }}
-              className="bg-[#08171A] p-4 sm:p-6 rounded-xl text-center border border-[#78cadc]/20"
+              className="bg-[var(--color-bg-secondary)] p-4 sm:p-6 rounded-xl text-center border border-[var(--color-primary)]/20"
             >
-              <div className="text-2xl sm:text-3xl font-bold text-[#78cadc] mb-1 sm:mb-2">24/7</div>
-              <div className="text-xs sm:text-sm md:text-base text-gray-300">Support Available</div>
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-1 sm:mb-2">24/7</div>
+              <div className="text-xs sm:text-sm md:text-base text-[var(--color-text-secondary)]">Support Available</div>
             </motion.div>
           </div>
         </div>
