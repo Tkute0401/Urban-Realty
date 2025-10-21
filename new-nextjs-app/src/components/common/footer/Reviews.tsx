@@ -97,7 +97,7 @@ const Reviews = () => {
   };
 
   return (
-    <div className="bg-[var(--color-surface)] text-[var(--color-text)] min-h-screen">
+    <div className="bg-[var(--color-surface)] text-[var(--color-text)] border-t border-[var(--color-primary)]/20 min-h-screen">
       {/* Testimonials Section */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <motion.div 
