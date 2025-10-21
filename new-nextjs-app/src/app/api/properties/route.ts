@@ -110,11 +110,26 @@ export async function GET(request: NextRequest) {
     if (properties.length > 0) {
       console.log('🔍 Sample property amenities:', properties[0].amenities);
       console.log('🔍 Sample property price:', properties[0].price);
+      console.log('🔍 Sample property title:', properties[0].title);
     }
     
     // Debug: Check total properties in database
     const totalInDB = await Property.countDocuments({});
     console.log('🔍 Total properties in database:', totalInDB);
+    
+    // Debug: Check if any properties have the requested amenities
+    if (amenities.length > 0) {
+      const propertiesWithAmenities = await Property.find({
+        amenities: { $in: amenities }
+      }).limit(5);
+      console.log('🔍 Properties with requested amenities:', propertiesWithAmenities.length);
+      if (propertiesWithAmenities.length > 0) {
+        console.log('🔍 Sample property with amenities:', {
+          title: propertiesWithAmenities[0].title,
+          amenities: propertiesWithAmenities[0].amenities
+        });
+      }
+    }
 
     const totalPages = Math.ceil(total / limit);
 
