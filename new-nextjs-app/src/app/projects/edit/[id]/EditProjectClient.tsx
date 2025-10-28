@@ -765,7 +765,15 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
                 multiline
                 rows={2}
                 value={formData.shortDescription}
-                onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Limit to 500 characters
+                  if (value.length <= 500) {
+                    handleInputChange('shortDescription', value);
+                  }
+                }}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${formData.shortDescription.length}/500 characters`}
                 placeholder="Brief description for project cards..."
                 sx={{
                   '& .MuiOutlinedInput-root': {

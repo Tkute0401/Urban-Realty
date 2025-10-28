@@ -409,7 +409,9 @@ const AddProjectClient = () => {
             formData[key].forEach((item, index) => {
               if (typeof item === 'object') {
                 Object.keys(item).forEach(subKey => {
-                  formDataToSend.append(`${key}[${index}][${subKey}]`, item[subKey]);
+                  if (typeof item[subKey] !== 'undefined' && item[subKey] !== null) {
+                    formDataToSend.append(`${key}[${index}][${subKey}]`, String(item[subKey]));
+                  }
                 });
               } else {
                 formDataToSend.append(`${key}[${index}]`, item);
@@ -417,11 +419,15 @@ const AddProjectClient = () => {
             });
           } else {
             Object.keys(formData[key]).forEach(subKey => {
-              formDataToSend.append(`${key}[${subKey}]`, formData[key][subKey]);
+              if (typeof formData[key][subKey] !== 'undefined' && formData[key][subKey] !== null) {
+                formDataToSend.append(`${key}[${subKey}]`, String(formData[key][subKey]));
+              }
             });
           }
         } else {
-          formDataToSend.append(key, formData[key]);
+          if (typeof formData[key] !== 'undefined' && formData[key] !== null) {
+            formDataToSend.append(key, String(formData[key]));
+          }
         }
       });
 
@@ -605,7 +611,15 @@ const AddProjectClient = () => {
                 rows={2}
                 label="Short Description (for cards)"
                 value={formData.shortDescription}
-                onChange={(e) => handleInputChange('shortDescription', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Limit to 500 characters
+                  if (value.length <= 500) {
+                    handleInputChange('shortDescription', value);
+                  }
+                }}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${formData.shortDescription.length}/500 characters`}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     color: 'var(--color-text-primary)',

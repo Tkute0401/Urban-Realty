@@ -1,4 +1,5 @@
 const parseFormData = (req, res, next) => {
+  console.log('🔍 parseFormData middleware - raw req.body keys:', Object.keys(req.body));
   
   // Parse nested object fields from FormData
   const parseNestedFields = (body) => {
@@ -411,6 +412,10 @@ const parseFormData = (req, res, next) => {
       delete parsedBody[field];
     }
   });
+  
+  console.log('✅ parseFormData - parsed body keys:', Object.keys(parsedBody));
+  console.log('📝 shortDescription value:', parsedBody.shortDescription?.substring(0, 100));
+  console.log('📏 shortDescription length:', parsedBody.shortDescription?.length);
   
   req.body = parsedBody;
   next();

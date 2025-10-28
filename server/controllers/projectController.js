@@ -177,6 +177,14 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     req.body.developer = developer._id;
   }
 
+  // Log incoming data for debugging
+  console.log('📦 Received project data:', {
+    name: req.body.name,
+    shortDescription: req.body.shortDescription,
+    shortDescriptionLength: req.body.shortDescription?.length || 0,
+    shortDescriptionPreview: req.body.shortDescription?.substring(0, 100) || 'N/A'
+  });
+
   // Ensure req.body is clean and doesn't contain any file upload fields
   const cleanReqBody = { ...req.body };
   const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours', 'logo', 'teamPhotos'];
@@ -299,6 +307,11 @@ exports.createProject = asyncHandler(async (req, res, next) => {
         coordinates: [77.2090, 28.6139] // Default to Delhi coordinates
       };
     }
+  }
+
+  // Truncate shortDescription to 500 characters if it exists
+  if (cleanReqBody.shortDescription && cleanReqBody.shortDescription.length > 500) {
+    cleanReqBody.shortDescription = cleanReqBody.shortDescription.substring(0, 500);
   }
 
   // Create new project instance
@@ -500,6 +513,11 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     } catch (error) {
       console.error('Geocoding error:', error);
     }
+  }
+
+  // Truncate shortDescription to 500 characters if it exists
+  if (cleanReqBody.shortDescription && cleanReqBody.shortDescription.length > 500) {
+    cleanReqBody.shortDescription = cleanReqBody.shortDescription.substring(0, 500);
   }
 
   // Update project fields
