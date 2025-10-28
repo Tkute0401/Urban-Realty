@@ -23,8 +23,19 @@ export async function GET(request: NextRequest) {
     const maxPrice = parseInt(searchParams.get('maxPrice') || '100000000');
     const minArea = parseInt(searchParams.get('minArea') || '0');
     const maxArea = parseInt(searchParams.get('maxArea') || '10000');
-    const bedrooms = searchParams.get('bedrooms')?.split(',').map(Number) || [];
-    const bathrooms = searchParams.get('bathrooms')?.split(',').map(Number) || [];
+    // Handle both single number and comma-separated values
+    const bedroomsParam = searchParams.get('bedrooms');
+    const bedrooms = bedroomsParam 
+      ? (bedroomsParam.includes(',') ? bedroomsParam.split(',').map(Number) : [Number(bedroomsParam)])
+      : [];
+    
+    const bathroomsParam = searchParams.get('bathrooms');
+    const bathrooms = bathroomsParam
+      ? (bathroomsParam.includes(',') ? bathroomsParam.split(',').map(Number) : [Number(bathroomsParam)])
+      : [];
+    
+    console.log('🔍 Bedrooms param:', bedroomsParam, 'Processed:', bedrooms);
+    console.log('🔍 Bathrooms param:', bathroomsParam, 'Processed:', bathrooms);
     const city = searchParams.get('city') || '';
     const amenities = searchParams.get('amenities')?.split(',') || [];
     console.log('🔍 Raw amenities from URL:', searchParams.get('amenities'));
