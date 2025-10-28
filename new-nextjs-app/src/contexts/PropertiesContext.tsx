@@ -7,6 +7,7 @@ import { Property, PropertyFilters } from '@/types/property';
 interface PropertiesContextType {
   properties: Property[];
   featuredProperties: Property[];
+  similarProperties: Property[];
   property: Property | null;
   agentProperties: Property[];
   loading: boolean;
@@ -19,6 +20,7 @@ interface PropertiesContextType {
   };
   getProperties: (filters?: PropertyFilters) => Promise<void>;
   getFeaturedProperties: () => Promise<Property[]>;
+  getSimilarProperties: (filters?: PropertyFilters) => Promise<Property[]>;
   getProperty: (id: string) => Promise<Property | null>;
   getAgentProperties: (user: any) => Promise<void>;
   addProperty: (propertyData: any) => Promise<Property>;
@@ -32,6 +34,7 @@ const PropertiesContext = createContext<PropertiesContextType | undefined>(undef
 export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
   const [property, setProperty] = useState<Property | null>(null);
   const [agentProperties, setAgentProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
@@ -117,6 +120,34 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   }, []);
 
+  const getSimilarProperties = useCallback(async (filters: PropertyFilters = {}) => {
+    try {
+      setError(null);
+      
+      const queryParams = new URLSearchParams();
+      // Remove restrictive filters to get broader results
+      if (filters.search) queryParams.append('search', filters.search);
+      if (filters.city) queryParams.append('city', filters.city);
+      
+      // Limit to 6 similar properties
+      queryParams.append('limit', '6');
+      
+      console.log('🔍 Fetching similar properties with:', queryParams.toString());
+      
+      const url = `/api/v1/properties?${queryParams.toString()}`;
+      const response = await http.get(url);
+      const data = response.data;
+      const properties = data.data || [];
+      
+      setSimilarProperties(properties);
+      return properties;
+    } catch (err) {
+      console.error('Error fetching similar properties:', err);
+      setSimilarProperties([]);
+      return [];
+    }
+  }, []);
+
   const getProperty = useCallback(async (id: string) => {
     if (!id) return null;
     
@@ -196,6 +227,7 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
   const value = {
     properties,
     featuredProperties,
+    similarProperties,
     property,
     agentProperties,
     loading,
@@ -203,6 +235,7 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
     pagination,
     getProperties,
     getFeaturedProperties,
+    getSimilarProperties,
     getProperty,
     getAgentProperties,
     addProperty,

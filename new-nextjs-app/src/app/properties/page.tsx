@@ -36,6 +36,7 @@ import {
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyList from '@/components/property/PropertyList';
 import PropertiesMap from '@/components/property/PropertiesMap';
+import SearchAutocomplete from '@/components/property/SearchAutocomplete';
 import { useLocation } from '@/hooks/useLocation';
 import { useMediaQuery, useTheme } from '@mui/material';
 import '@/style-constants/z-index.css';
@@ -43,7 +44,7 @@ import '@/style-constants/z-index.css';
 const PropertiesPageContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { properties, loading, error, pagination, getProperties } = useProperties();
+  const { properties, similarProperties, loading, error, pagination, getProperties, getSimilarProperties } = useProperties();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -97,8 +98,21 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.type) params.type = filters.type;
     if (filters.city) params.city = filters.city;
     if (filters.state) params.state = filters.state;
-    if (filters.priceMin) params.minPrice = Number(filters.priceMin);
-    if (filters.priceMax) params.maxPrice = Number(filters.priceMax);
+    
+    // Check for price min/max with proper string validation
+    if (filters.priceMin && filters.priceMin.trim() !== '') {
+      const minPrice = Number(filters.priceMin);
+      if (!isNaN(minPrice) && minPrice > 0) {
+        params.minPrice = minPrice;
+      }
+    }
+    if (filters.priceMax && filters.priceMax.trim() !== '') {
+      const maxPrice = Number(filters.priceMax);
+      if (!isNaN(maxPrice) && maxPrice > 0) {
+        params.maxPrice = maxPrice;
+      }
+    }
+    
     if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
     if (filters.bathrooms) params.bathrooms = Number(filters.bathrooms);
     if (filters.amenities && Array.isArray(filters.amenities) && filters.amenities.length > 0) {
@@ -116,6 +130,7 @@ const PropertiesPageContent: React.FC = () => {
       params.userLng = userLocation.longitude;
     }
 
+    console.log('🔍 Loading properties with params:', params);
     getProperties(params);
   }, [filters, pagination.page, userLocation, getProperties]);
 
@@ -139,6 +154,17 @@ const PropertiesPageContent: React.FC = () => {
       loadProperties();
     }
   }, [mounted, loadProperties]);
+
+  // Fetch similar properties when there are any filters applied (search or city)
+  useEffect(() => {
+    if (!loading && (filters.search || filters.city)) {
+      console.log('Fetching similar properties...');
+      const similarParams: any = {};
+      if (filters.search) similarParams.search = filters.search;
+      if (filters.city) similarParams.city = filters.city;
+      getSimilarProperties(similarParams);
+    }
+  }, [loading, filters.search, filters.city, getSimilarProperties]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -189,8 +215,21 @@ const PropertiesPageContent: React.FC = () => {
     if (filterState.type) params.type = filterState.type;
     if (filterState.city) params.city = filterState.city;
     if (filterState.state) params.state = filterState.state;
-    if (filterState.priceMin) params.minPrice = Number(filterState.priceMin);
-    if (filterState.priceMax) params.maxPrice = Number(filterState.priceMax);
+    
+    // Check for price min/max with proper string validation
+    if (filterState.priceMin && filterState.priceMin.trim() !== '') {
+      const minPrice = Number(filterState.priceMin);
+      if (!isNaN(minPrice) && minPrice > 0) {
+        params.minPrice = minPrice;
+      }
+    }
+    if (filterState.priceMax && filterState.priceMax.trim() !== '') {
+      const maxPrice = Number(filterState.priceMax);
+      if (!isNaN(maxPrice) && maxPrice > 0) {
+        params.maxPrice = maxPrice;
+      }
+    }
+    
     if (filterState.bedrooms) params.bedrooms = Number(filterState.bedrooms);
     if (filterState.bathrooms) params.bathrooms = Number(filterState.bathrooms);
     if (filterState.amenities && Array.isArray(filterState.amenities) && filterState.amenities.length > 0) {
@@ -209,9 +248,8 @@ const PropertiesPageContent: React.FC = () => {
     }
 
     console.log('🔍 Loading properties with filters:', params);
+    console.log('🔍 Price filters:', { priceMin: filterState.priceMin, priceMax: filterState.priceMax });
     console.log('🔍 Amenities being sent:', filterState.amenities);
-    console.log('🔍 Amenities array length:', filterState.amenities?.length || 0);
-    console.log('🔍 Amenities joined string:', filterState.amenities?.join(',') || '');
     getProperties(params);
   }, [pagination.page, userLocation, getProperties]);
 
@@ -260,8 +298,21 @@ const PropertiesPageContent: React.FC = () => {
     if (filters.type) params.type = filters.type;
     if (filters.city) params.city = filters.city;
     if (filters.state) params.state = filters.state;
-    if (filters.priceMin) params.minPrice = Number(filters.priceMin);
-    if (filters.priceMax) params.maxPrice = Number(filters.priceMax);
+    
+    // Check for price min/max with proper string validation
+    if (filters.priceMin && filters.priceMin.trim() !== '') {
+      const minPrice = Number(filters.priceMin);
+      if (!isNaN(minPrice) && minPrice > 0) {
+        params.minPrice = minPrice;
+      }
+    }
+    if (filters.priceMax && filters.priceMax.trim() !== '') {
+      const maxPrice = Number(filters.priceMax);
+      if (!isNaN(maxPrice) && maxPrice > 0) {
+        params.maxPrice = maxPrice;
+      }
+    }
+    
     if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
     if (filters.bathrooms) params.bathrooms = Number(filters.bathrooms);
     if (filters.amenities && Array.isArray(filters.amenities) && filters.amenities.length > 0) {
@@ -342,32 +393,10 @@ const PropertiesPageContent: React.FC = () => {
         }}>
           {/* Enhanced Mobile Search */}
           <Box sx={{ mb: 2 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Search location, property type, or amenities..."
+            <SearchAutocomplete
               value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  background: 'var(--color-surface)',
-                  color: 'var(--color-text-primary)',
-                  borderRadius: '12px',
-                  '& fieldset': {
-                    borderColor: 'var(--color-border)'
-                  },
-                  '&:hover fieldset': {
-                    borderColor: 'var(--color-primary)'
-                  }
-                },
-                '& .MuiInputLabel-root': {
-                  color: 'var(--color-text-muted)'
-                }
-              }}
-              InputProps={{
-                startAdornment: <Search sx={{ mr: 1, color: 'var(--color-primary)' }} />
-              }}
+              onChange={(value) => handleFilterChange('search', value)}
+              placeholder="Search location, property type, or amenities..."
             />
           </Box>
           
@@ -465,34 +494,13 @@ const PropertiesPageContent: React.FC = () => {
         }}>
           <Box sx={{ maxWidth: '1400px', mx: 'auto', px: 4 }}>
             <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', mb: 3 }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                placeholder="Search by location, property type, or amenities..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                sx={{
-                  flex: 1,
-                  '& .MuiOutlinedInput-root': {
-                    background: 'var(--color-surface)',
-                    color: 'var(--color-text-primary)',
-                    borderRadius: '12px',
-                    '& fieldset': {
-                      borderColor: 'var(--color-border)'
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'var(--color-primary)'
-                    }
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'var(--color-text-muted)'
-                  }
-                }}
-                InputProps={{
-                  startAdornment: <Search sx={{ mr: 1, color: 'var(--color-primary)' }} />
-                }}
-              />
+              <Box sx={{ flex: 1 }}>
+                <SearchAutocomplete
+                  value={filters.search}
+                  onChange={(value) => handleFilterChange('search', value)}
+                  placeholder="Search by location, property type, or amenities..."
+                />
+              </Box>
               
               <Button
                 variant="contained"
@@ -1379,6 +1387,7 @@ const PropertiesPageContent: React.FC = () => {
             }}>
               <PropertyList
                 properties={properties}
+                similarProperties={similarProperties}
                 loading={loading}
                 error={error}
                 emptyMessage="No properties found matching your criteria"
@@ -1411,6 +1420,7 @@ const PropertiesPageContent: React.FC = () => {
       {isMobile && (
         <PropertyList
           properties={properties}
+          similarProperties={similarProperties}
           loading={loading}
           error={error}
           emptyMessage="No properties found matching your criteria"

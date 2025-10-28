@@ -136,12 +136,14 @@ interface Project {
 interface ProjectsContextType {
   projects: Project[];
   myProjects: Project[];
+  similarProjects: Project[];
   project: Project | null;
   loading: boolean;
   error: string | null;
   clearErrors: () => void;
   getProjects: (filters?: any) => Promise<void>;
   getMyProjects: () => Promise<void>;
+  getSimilarProjects: (filters?: any) => Promise<Project[]>;
   getProject: (id: string) => Promise<Project | null>;
   getProjectsByDeveloper: (developerId: string) => Promise<void>;
   createProject: (formData: FormData, config?: any) => Promise<any>;
@@ -159,6 +161,7 @@ const ProjectsContext = createContext<ProjectsContextType | undefined>(undefined
 export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [myProjects, setMyProjects] = useState<Project[]>([]);
+  const [similarProjects, setSimilarProjects] = useState<Project[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -193,6 +196,33 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
       setMyProjects([]);
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const getSimilarProjects = useCallback(async (filters?: any): Promise<Project[]> => {
+    try {
+      setError(null);
+      
+      // Build query with less restrictive filters
+      const queryParams: any = {};
+      if (filters?.location) queryParams.city = filters.location.city;
+      if (filters?.type) queryParams.type = filters.type;
+      
+      // Limit to 6 similar projects
+      queryParams.limit = 6;
+      
+      console.log('🔍 Fetching similar projects with:', queryParams);
+      
+      const response = await api.projects.list(queryParams);
+      const data = response.data;
+      const projects = Array.isArray(data) ? data : (data?.items || []);
+      
+      setSimilarProjects(projects);
+      return projects;
+    } catch (err: any) {
+      console.error('Error fetching similar projects:', err);
+      setSimilarProjects([]);
+      return [];
     }
   }, []);
 
@@ -280,12 +310,14 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
   const value: ProjectsContextType = useMemo(() => ({
     projects,
     myProjects,
+    similarProjects,
     project,
     loading,
     error,
     clearErrors,
     getProjects,
     getMyProjects,
+    getSimilarProjects,
     getProject,
     getProjectsByDeveloper,
     createProject,
@@ -294,11 +326,13 @@ export const ProjectsProvider: React.FC<ProjectsProviderProps> = ({ children }) 
   }), [
     projects,
     myProjects,
+    similarProjects,
     project,
     loading,
     error,
     getProjects,
     getMyProjects,
+    getSimilarProjects,
     getProject,
     getProjectsByDeveloper,
     createProject,

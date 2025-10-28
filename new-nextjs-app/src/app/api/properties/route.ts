@@ -69,14 +69,18 @@ export async function GET(request: NextRequest) {
       if (maxArea < 10000) filter.area.$lte = maxArea;
     }
 
-    // Bedrooms filter
+    // Bedrooms filter - use minimum (>=) instead of exact match
     if (bedrooms.length > 0) {
-      filter.bedrooms = { $in: bedrooms };
+      const minBedrooms = Math.min(...bedrooms);
+      filter.bedrooms = { $gte: minBedrooms };
+      console.log('🔍 Filtering by bedrooms (>=):', minBedrooms);
     }
 
-    // Bathrooms filter
+    // Bathrooms filter - use minimum (>=) instead of exact match
     if (bathrooms.length > 0) {
-      filter.bathrooms = { $in: bathrooms };
+      const minBathrooms = Math.min(...bathrooms);
+      filter.bathrooms = { $gte: minBathrooms };
+      console.log('🔍 Filtering by bathrooms (>=):', minBathrooms);
     }
 
     // City filter

@@ -7,6 +7,7 @@ import { Property } from '@/types/property';
 
 interface PropertyListProps {
   properties: Property[];
+  similarProperties?: Property[];
   loading?: boolean;
   error?: string | null;
   emptyMessage?: string;
@@ -22,6 +23,7 @@ interface PropertyListProps {
 
 const PropertyList: React.FC<PropertyListProps> = ({
   properties,
+  similarProperties = [],
   loading = false,
   error = null,
   emptyMessage = 'No properties found',
@@ -64,19 +66,75 @@ const PropertyList: React.FC<PropertyListProps> = ({
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column',
-        justifyContent: 'center', 
         alignItems: 'center',
         minHeight: '50vh',
         background: 'var(--color-bg)',
         p: 4,
         textAlign: 'center'
       }}>
-        <Typography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
-          {emptyMessage}
-        </Typography>
-        <Typography variant="body1" sx={{ color: 'var(--color-text-muted)', mb: 3 }}>
-          Try adjusting your search criteria or check back later for new listings.
-        </Typography>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
+            {emptyMessage}
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'var(--color-text-muted)', mb: 2 }}>
+            Try adjusting your search criteria or check back later for new listings.
+          </Typography>
+        </Box>
+        
+        {/* Similar Properties Section */}
+        {similarProperties && similarProperties.length > 0 && (
+          <Box sx={{ width: '100%', mt: 4 }}>
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                color: 'var(--color-primary)', 
+                mb: 3,
+                fontWeight: 600,
+                textAlign: 'left',
+                maxWidth: '1400px',
+                mx: 'auto',
+                px: { xs: 2, md: 4 }
+              }}
+            >
+              You might also like:
+            </Typography>
+            
+            <Box sx={{
+              display: 'grid',
+              gridTemplateColumns: (() => {
+                const toCount = (val?: number) => (val ? Math.max(1, Math.floor(12 / val)) : undefined);
+                const xs = toCount(columns?.xs) ?? 1;
+                const sm = toCount(columns?.sm) ?? 2;
+                const md = toCount(columns?.md) ?? 2;
+                const lg = toCount(columns?.lg) ?? 3;
+                const xl = toCount(columns?.xl) ?? 3;
+                return {
+                  xs: `repeat(${xs}, 1fr)`,
+                  sm: `repeat(${sm}, 1fr)`,
+                  md: `repeat(${md}, 1fr)`,
+                  lg: `repeat(${lg}, 1fr)`,
+                  xl: `repeat(${xl}, 1fr)`
+                };
+              })(),
+              gap: { xs: 2, sm: 3, md: 4, lg: 5 },
+              justifyItems: 'center',
+              alignItems: 'start',
+              width: '100%',
+              maxWidth: '1400px',
+              mx: 'auto',
+              px: { xs: 1, sm: 2, md: 3 }
+            }}>
+              {similarProperties.map((property, index) => (
+                <PropertyCard 
+                  key={property._id}
+                  property={property}
+                  index={index}
+                  onClick={onPropertyClick}
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
       </Box>
     );
   }
@@ -128,6 +186,60 @@ const PropertyList: React.FC<PropertyListProps> = ({
           />
         ))}
       </Box>
+
+      {/* Similar Properties Section - Show even when there are results */}
+      {similarProperties && similarProperties.length > 0 && (
+        <Box sx={{ width: '100%', mt: 8 }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              color: 'var(--color-primary)', 
+              mb: 3,
+              fontWeight: 600,
+              textAlign: 'left',
+              maxWidth: '1400px',
+              mx: 'auto',
+              px: { xs: 1, sm: 2, md: 3 }
+            }}
+          >
+            You might also like:
+          </Typography>
+          
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: (() => {
+              const toCount = (val?: number) => (val ? Math.max(1, Math.floor(12 / val)) : undefined);
+              const xs = toCount(columns?.xs) ?? 1;
+              const sm = toCount(columns?.sm) ?? 2;
+              const md = toCount(columns?.md) ?? 2;
+              const lg = toCount(columns?.lg) ?? 3;
+              const xl = toCount(columns?.xl) ?? 3;
+              return {
+                xs: `repeat(${xs}, 1fr)`,
+                sm: `repeat(${sm}, 1fr)`,
+                md: `repeat(${md}, 1fr)`,
+                lg: `repeat(${lg}, 1fr)`,
+                xl: `repeat(${xl}, 1fr)`
+              };
+            })(),
+            gap: { xs: 2, sm: 3, md: 4, lg: 5 },
+            justifyItems: 'center',
+            alignItems: 'start',
+            width: '100%',
+            maxWidth: '1400px',
+            mx: 'auto'
+          }}>
+            {similarProperties.map((property, index) => (
+              <PropertyCard 
+                key={property._id}
+                property={property}
+                index={index}
+                onClick={onPropertyClick}
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 };

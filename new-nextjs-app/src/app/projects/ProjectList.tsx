@@ -20,7 +20,7 @@ import { useLocation } from '../../hooks/useLocation';
 const ProjectList = () => {
   noStore();
   
-  const { projects, myProjects, loading, error, getProjects, getMyProjects, deleteProject } = useProjects();
+  const { projects, myProjects, similarProjects, loading, error, getProjects, getMyProjects, getSimilarProjects, deleteProject } = useProjects();
   const { user } = useAuth();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const router = useRouter();
@@ -45,6 +45,15 @@ const ProjectList = () => {
     }
     getProjects(params);
   }, [user, getProjects, getMyProjects, userLocation]);
+
+  // Fetch similar projects when no results are found
+  useEffect(() => {
+    if (!loading && !showMyProjects && projects.length === 0) {
+      console.log('No projects found, fetching similar projects...');
+      // Fetch similar projects without filters to get recommendations
+      getSimilarProjects({});
+    }
+  }, [loading, projects.length, showMyProjects, getSimilarProjects]);
 
   const handleDeleteProject = async (projectId: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
@@ -239,6 +248,117 @@ const ProjectList = () => {
             >
               Add Your First Project
             </Button>
+          )}
+
+          {/* Similar Projects Section - Only show when not showing "My Projects" */}
+          {!showMyProjects && similarProjects && similarProjects.length > 0 && (
+            <Box sx={{ width: '100%', mt: 6 }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  color: 'var(--color-primary)', 
+                  mb: 3,
+                  fontWeight: 600,
+                  textAlign: 'left'
+                }}
+              >
+                You might also like:
+              </Typography>
+              
+              <Grid container spacing={3}>
+                {similarProjects.map((project) => (
+                  <Grid item xs={12} sm={6} md={4} key={project._id}>
+                    <Card 
+                      sx={{ 
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                        '&:hover': {
+                          boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                          transform: 'translateY(-2px)',
+                          transition: 'all 0.3s ease'
+                        }
+                      }}
+                    >
+                      {/* Project Image */}
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={typeof project.images?.[0] === 'string' ? project.images[0] : (project.images?.[0]?.url || '/placeholder-project.jpg')}
+                        alt={project.name}
+                        sx={{ objectFit: 'cover' }}
+                      />
+                      
+                      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                        <Typography 
+                          variant="h6" 
+                          sx={{ 
+                            color: 'var(--color-text-primary)',
+                            fontWeight: 600,
+                            lineHeight: 1.2,
+                            mb: 1
+                          }}
+                        >
+                          {project.name}
+                        </Typography>
+
+                        {/* Location */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                          <LocationOn sx={{ fontSize: 16, color: 'var(--color-text-muted)', mr: 0.5 }} />
+                          <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                            {project.location?.city}, {project.location?.state}
+                          </Typography>
+                        </Box>
+
+                        {/* Status and Type Chips */}
+                        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                          <Chip 
+                            label={project.status} 
+                            size="small" 
+                            color={getStatusColor(project.status) as any}
+                            variant="outlined"
+                          />
+                          <Chip 
+                            label={project.type} 
+                            size="small" 
+                            color={getTypeColor(project.type) as any}
+                            variant="outlined"
+                          />
+                        </Stack>
+
+                        {/* Price */}
+                        {project.startingPrice && (
+                          <Typography variant="h6" sx={{ color: 'var(--color-primary)', fontWeight: 600, mb: 2 }}>
+                            {formatPrice(project.startingPrice)}
+                          </Typography>
+                        )}
+
+                        {/* Action Button */}
+                        <Button
+                          variant="outlined"
+                          fullWidth
+                          onClick={() => router.push(`/projects/${project._id}`)}
+                          sx={{
+                            mt: 'auto',
+                            borderColor: 'var(--color-primary)',
+                            color: 'var(--color-primary)',
+                            '&:hover': {
+                              borderColor: 'var(--color-primary)',
+                              bgcolor: 'var(--color-primary)',
+                              color: 'var(--color-primary-contrast)'
+                            }
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           )}
         </Box>
       ) : (
