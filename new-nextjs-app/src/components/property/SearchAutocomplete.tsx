@@ -114,11 +114,12 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
             {suggestions.map((suggestion, index) => (
               <ListItem
                 key={index}
-                button
+                component="div"
                 onClick={() => handleSuggestionClick(suggestion)}
                 sx={{
                   py: 1.5,
                   px: 2,
+                  cursor: 'pointer',
                   '&:hover': {
                     backgroundColor: 'var(--color-primary-light)'
                   }
