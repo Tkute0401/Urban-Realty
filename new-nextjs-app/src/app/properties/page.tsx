@@ -155,16 +155,25 @@ const PropertiesPageContent: React.FC = () => {
     }
   }, [mounted, loadProperties]);
 
-  // Fetch similar properties when there are any filters applied (search or city)
+  // Fetch similar properties when there are any filters applied
   useEffect(() => {
-    if (!loading && (filters.search || filters.city)) {
-      console.log('Fetching similar properties...');
-      const similarParams: any = {};
-      if (filters.search) similarParams.search = filters.search;
-      if (filters.city) similarParams.city = filters.city;
-      getSimilarProperties(similarParams);
+    if (!loading) {
+      // Check if any filter is active
+      const hasActiveFilters = filters.search || filters.city || filters.type || 
+                               filters.bedrooms || filters.bathrooms || 
+                               filters.priceMin || filters.priceMax ||
+                               filters.amenities.length > 0;
+      
+      if (hasActiveFilters) {
+        console.log('Fetching similar properties...');
+        const similarParams: any = {};
+        if (filters.search) similarParams.search = filters.search;
+        if (filters.city) similarParams.city = filters.city;
+        if (filters.type) similarParams.type = filters.type;
+        getSimilarProperties(similarParams);
+      }
     }
-  }, [loading, filters.search, filters.city, getSimilarProperties]);
+  }, [loading, filters.search, filters.city, filters.type, filters.bedrooms, filters.bathrooms, filters.priceMin, filters.priceMax, filters.amenities.length, getSimilarProperties]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
