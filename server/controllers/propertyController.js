@@ -1054,84 +1054,73 @@ const uploadVideoToCloudinary = async (file, folder = 'properties/videos') => {
 // @access  Public
 exports.getSearchSuggestions = asyncHandler(async (req, res, next) => {
   try {
-    const { query, type } = req.query;
+    const { q, limit = 10 } = req.query;
     
-    if (!query || query.length < 2) {
+    if (!q || q.length < 2) {
       return res.status(200).json({
         success: true,
-        data: {
-          cities: [],
-          states: [],
-          propertyTypes: [],
-          amenities: [],
-          recentSearches: []
-        }
+        suggestions: []
       });
     }
 
-    const searchRegex = new RegExp(query, 'i');
-    let suggestions = {};
+    const searchRegex = new RegExp(q, 'i');
 
-    // Get city suggestions
-    const cities = await Property.distinct('address.city', {
-      'address.city': searchRegex
-    }).limit(10);
-
-    // Get state suggestions
-    const states = await Property.distinct('address.state', {
-      'address.state': searchRegex
-    }).limit(10);
-
-    // Get property type suggestions
-    const propertyTypes = await Property.distinct('type', {
-      type: searchRegex
-    }).limit(5);
-
-    // Get amenity suggestions
-    const amenities = await Property.distinct('amenities', {
-      amenities: searchRegex
-    }).limit(8);
-
-    // Get recent popular searches (based on property titles and descriptions)
-    const recentSearches = await Property.aggregate([
+    // Get unique suggestions from multiple fields
+    const suggestions = await Property.aggregate([
       {
         $match: {
           $or: [
-            { title: searchRegex },
-            { description: searchRegex },
             { 'address.city': searchRegex },
-            { 'address.state': searchRegex }
+            { 'address.state': searchRegex },
+            { type: searchRegex },
+            { title: searchRegex },
+            { amenities: searchRegex }
           ]
+        }
+      },
+      {
+        $project: {
+          city: '$address.city',
+          state: '$address.state',
+          type: '$type',
+          amenities: '$amenities'
         }
       },
       {
         $group: {
           _id: null,
-          uniqueCities: { $addToSet: '$address.city' },
-          uniqueStates: { $addToSet: '$address.state' },
-          uniqueTypes: { $addToSet: '$type' }
+          cities: { $addToSet: '$city' },
+          states: { $addToSet: '$state' },
+          types: { $addToSet: '$type' },
+          allAmenities: { $push: '$amenities' }
         }
       },
       {
         $project: {
-          cities: { $slice: ['$uniqueCities', 5] },
-          states: { $slice: ['$uniqueStates', 5] },
-          types: { $slice: ['$uniqueTypes', 5] }
+          all: {
+            $concatArrays: [
+              { $filter: { input: '$cities', as: 'city', cond: { $ne: ['$$city', null] } } },
+              { $filter: { input: '$states', as: 'state', cond: { $ne: ['$$state', null] } } },
+              { $filter: { input: '$types', as: 'type', cond: { $ne: ['$$type', null] } } },
+              { $reduce: { input: '$allAmenities', initialValue: [], in: { $concatArrays: ['$$value', { $filter: { input: '$$this', as: 'am', cond: { $ne: ['$$am', null] } } }] } } }
+            ]
+          }
+        }
+      },
+      {
+        $project: {
+          suggestions: {
+            $slice: ['$all', parseInt(limit)]
+          }
         }
       }
     ]);
 
-    suggestions = {
-      cities: cities.filter(city => city && city.trim()),
-      states: states.filter(state => state && state.trim()),
-      propertyTypes: propertyTypes.filter(type => type && type.trim()),
-      amenities: amenities.filter(amenity => amenity && amenity.trim()),
-      recentSearches: recentSearches.length > 0 ? recentSearches[0] : { cities: [], states: [], types: [] }
-    };
-
+    const flatSuggestions = suggestions[0]?.suggestions || [];
+    
     res.status(200).json({
       success: true,
-      data: suggestions
+      suggestions: flatSuggestions
     });
   } catch (error) {
     console.error('Error getting search suggestions:', error);
