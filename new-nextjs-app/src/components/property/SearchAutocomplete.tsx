@@ -32,7 +32,7 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
 
     try {
       setLoading(true);
-      const response = await fetch(`/api/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=5`);
+      const response = await fetch(`/api/v1/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=5`);
       const data = await response.json();
       setSuggestions(data.suggestions || []);
       setShowSuggestions(true);

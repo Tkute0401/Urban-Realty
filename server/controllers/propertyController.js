@@ -53,6 +53,14 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     excludedFields.forEach(el => delete queryObj[el]);
 
     // 2. Handle numeric filters (price, bedrooms, bathrooms)
+    // Use >= for bedrooms and bathrooms instead of exact match
+    if (queryObj.bedrooms) {
+      queryObj.bedrooms = { $gte: Number(queryObj.bedrooms) };
+    }
+    if (queryObj.bathrooms) {
+      queryObj.bathrooms = { $gte: Number(queryObj.bathrooms) };
+    }
+    
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
     
@@ -121,7 +129,12 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 25;
     const skip = (page - 1) * limit;
-    const total = await Property.countDocuments(JSON.parse(queryStr));
+    
+    // Count using the same query object with $gte operators
+    const countQuery = JSON.parse(JSON.stringify(queryObj));
+    if (req.query.bedrooms) countQuery.bedrooms = { $gte: Number(req.query.bedrooms) };
+    if (req.query.bathrooms) countQuery.bathrooms = { $gte: Number(req.query.bathrooms) };
+    const total = await Property.countDocuments(countQuery);
 
     query = query.skip(skip).limit(limit);
 
