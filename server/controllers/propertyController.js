@@ -49,25 +49,24 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   try {
     // 1. Initial query setup
     const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minArea', 'maxArea'];
+    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minArea', 'maxArea', 'bedrooms', 'bathrooms'];
     excludedFields.forEach(el => delete queryObj[el]);
-
-    // 2. Handle numeric filters (price, bedrooms, bathrooms)
-    // Use >= for bedrooms and bathrooms instead of exact match
-    if (queryObj.bedrooms) {
-      queryObj.bedrooms = { $gte: Number(queryObj.bedrooms) };
-    }
-    if (queryObj.bathrooms) {
-      queryObj.bathrooms = { $gte: Number(queryObj.bathrooms) };
-    }
     
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
     
     // 3. Parse the base query
     let query = Property.find(JSON.parse(queryStr));
+    
+    // 4. Handle bedrooms and bathrooms with >= operator
+    if (req.query.bedrooms) {
+      query = query.where('bedrooms').gte(Number(req.query.bedrooms));
+    }
+    if (req.query.bathrooms) {
+      query = query.where('bathrooms').gte(Number(req.query.bathrooms));
+    }
 
-    // 4. Handle area filtering separately
+    // 5. Handle area filtering separately
     if (req.query.minArea || req.query.maxArea) {
       const areaFilter = {};
       if (req.query.minArea) areaFilter.$gte = Number(req.query.minArea);
@@ -75,7 +74,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       query = query.where('area', areaFilter);
     }
 
-    // 5. Handle search
+    // 6. Handle search
     if (req.query.search) {
       query = query.or([
         { title: { $regex: req.query.search, $options: 'i' } },
@@ -85,7 +84,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       ]);
     }
 
-    // 6. Handle status filtering
+    // 7. Handle status filtering
     if (req.query.status) {
       const validStatuses = ['For Sale', 'For Rent', 'Sold', 'Rented'];
       if (!validStatuses.includes(req.query.status)) {
@@ -93,11 +92,11 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       }
     }
 
-    // 7. Populate related data
+    // 8. Populate related data
     query = query.populate('agent', 'name email phone')
                 .populate('developer', 'name logo');
 
-    // 8. Handle location-based sorting
+    // 9. Handle location-based sorting
     let userLocation = null;
     if (req.query.userLat && req.query.userLng) {
       userLocation = {
@@ -106,7 +105,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       };
     }
 
-    // 9. Sorting
+    // 10. Sorting
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
@@ -117,7 +116,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       query = query.sort('-createdAt');
     }
 
-    // 9. Field limiting
+    // 11. Field limiting
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
@@ -125,23 +124,44 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       query = query.select('-__v');
     }
 
-    // 10. Pagination
+    // 12. Pagination - need to count with the same filters
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 25;
     const skip = (page - 1) * limit;
     
-    // Count using the same query object with $gte operators
-    const countQuery = JSON.parse(JSON.stringify(queryObj));
-    if (req.query.bedrooms) countQuery.bedrooms = { $gte: Number(req.query.bedrooms) };
-    if (req.query.bathrooms) countQuery.bathrooms = { $gte: Number(req.query.bathrooms) };
-    const total = await Property.countDocuments(countQuery);
+    // Build count query with all filters
+    let countQueryObj = { ...req.query };
+    excludedFields.forEach(el => delete countQueryObj[el]);
+    let countQueryStr = JSON.stringify(countQueryObj);
+    countQueryStr = countQueryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    const countQuery = Property.find(JSON.parse(countQueryStr));
+    
+    // Apply the same filters to count
+    if (req.query.bedrooms) countQuery.where('bedrooms').gte(Number(req.query.bedrooms));
+    if (req.query.bathrooms) countQuery.where('bathrooms').gte(Number(req.query.bathrooms));
+    if (req.query.search) {
+      countQuery.or([
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } },
+        { 'address.city': { $regex: req.query.search, $options: 'i' } },
+        { 'address.state': { $regex: req.query.search, $options: 'i' } }
+      ]);
+    }
+    if (req.query.minArea || req.query.maxArea) {
+      const areaFilter = {};
+      if (req.query.minArea) areaFilter.$gte = Number(req.query.minArea);
+      if (req.query.maxArea) areaFilter.$lte = Number(req.query.maxArea);
+      countQuery.where('area', areaFilter);
+    }
+    
+    const total = await countQuery.countDocuments();
 
     query = query.skip(skip).limit(limit);
 
-    // 11. Execute query
+    // 13. Execute query
     const properties = await query;
 
-    // 12. Calculate distances if user location is provided
+    // 14. Calculate distances if user location is provided
     let propertiesWithDistance = properties;
     if (userLocation) {
       propertiesWithDistance = properties.map(property => {
@@ -173,7 +193,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       }
     }
 
-    // 13. Send response
+    // 15. Send response
     res.status(200).json({
       success: true,
       count: propertiesWithDistance.length,
