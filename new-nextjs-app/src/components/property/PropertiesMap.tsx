@@ -50,6 +50,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
   const [containerId] = useState(() => `properties-map-container-${Math.random().toString(36).substr(2, 9)}`);
+  const [refreshKey, setRefreshKey] = useState(0);
 
 
 
@@ -514,6 +515,21 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       }
     }
   }, [searchQuery, properties, mapInitialized]);
+
+  // Auto-refresh map every 15 seconds
+  useEffect(() => {
+    if (!mapInitialized) return;
+
+    const interval = setInterval(() => {
+      console.log('Auto-refreshing map markers...');
+      setRefreshKey(prev => prev + 1);
+      if (mapInstanceRef.current) {
+        addMarkersToMap();
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(interval);
+  }, [mapInitialized, addMarkersToMap]);
 
   if (!properties || properties.length === 0) {
     return (
