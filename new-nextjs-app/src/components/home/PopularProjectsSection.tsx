@@ -5,6 +5,7 @@ import { Box, Container, Typography, Button, Card, CardContent, CardMedia, Chip,
 import { ArrowForward, Business, LocationOn, CalendarToday, AttachMoney, Visibility } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useProjects } from '@/contexts/ProjectsContext';
+import ProjectCard from '../projects/ProjectCard';
 import { motion } from 'framer-motion';
 
 const PopularProjectsSection: React.FC = () => {

@@ -11,7 +11,10 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "install-all": "npm install && cd new-nextjs-app && npm install",
     "test": "cd new-nextjs-app && npm run test",
-    "heroku-postbuild": "cd new-nextjs-app && npm install && npm run build"
+    "heroku-postbuild": "cd new-nextjs-app && npm install && npm run build",
+    "migrate:project-favorites": "node scripts/migrate-project-favorites.js",
+    "migrate:project-favorites:rollback": "node scripts/migrate-project-favorites.js --rollback",
+    "test:migration": "node scripts/test-project-favorites-migration.js"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.7.2",

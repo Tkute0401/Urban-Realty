@@ -15,6 +15,7 @@ import {
   AttachMoney, Visibility, Edit, Delete, MoreVert, Map as MapIcon, MyLocation
 } from '@mui/icons-material';
 import ProjectsMap from '../../components/projects/ProjectsMap';
+import ProjectCard from '../../components/projects/ProjectCard';
 import { useLocation } from '../../hooks/useLocation';
 
 const ProjectList = () => {
@@ -372,205 +373,13 @@ const ProjectList = () => {
             <Grid container spacing={3}>
               {displayProjects.map((project) => (
                 <Grid item xs={12} sm={showMap ? 12 : 6} md={showMap ? 12 : 4} key={project._id}>
-              <Card 
-                id={`project-${project._id}`}
-                sx={{ 
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: 'var(--color-surface)',
-                  border: selectedProject?._id === project._id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-                  '&:hover': {
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                    transform: 'translateY(-2px)',
-                    transition: 'all 0.3s ease'
-                  }
-                }}
-              >
-                {/* Project Image */}
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={typeof project.images?.[0] === 'string' ? project.images[0] : (project.images?.[0]?.url || '/placeholder-project.jpg')}
-                  alt={project.name}
-                  sx={{ objectFit: 'cover' }}
-                />
-                
-                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  {/* Project Header */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        color: 'var(--color-text-primary)',
-                        fontWeight: 600,
-                        lineHeight: 1.2,
-                        flex: 1,
-                        mr: 1
-                      }}
-                    >
-                      {project.name}
-                    </Typography>
-                    
-                    {user?.role === 'developer' && showMyProjects && (
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <Tooltip title="Edit Project">
-                          <IconButton 
-                            size="small"
-                            onClick={() => router.push(`/projects/edit/${project._id}`)}
-                            sx={{ color: 'var(--color-primary)' }}
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Project">
-                          <IconButton 
-                            size="small"
-                            onClick={() => handleDeleteProject(project._id)}
-                            sx={{ color: 'var(--color-danger)' }}
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    )}
-                  </Box>
-
-                  {/* Developer Info */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Business sx={{ fontSize: 16, color: 'var(--color-text-muted)', mr: 0.5 }} />
-                    <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                      {project.developer?.name}
-                    </Typography>
-                  </Box>
-
-                  {/* Location */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <LocationOn sx={{ fontSize: 16, color: 'var(--color-text-muted)', mr: 0.5 }} />
-                    <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                      {project.location?.city}, {project.location?.state}
-                    </Typography>
-                  </Box>
-
-                  {/* Description */}
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      color: 'var(--color-text-muted)',
-                      mb: 2,
-                      flexGrow: 1,
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {project.shortDescription || project.description}
-                  </Typography>
-
-                  {/* Status and Type Chips */}
-                  <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                    <Chip 
-                      label={project.status} 
-                      size="small" 
-                      color={getStatusColor(project.status) as any}
-                      variant="outlined"
-                    />
-                    <Chip 
-                      label={project.type} 
-                      size="small" 
-                      color={getTypeColor(project.type) as any}
-                      variant="outlined"
-                    />
-                  </Stack>
-
-                  {/* Configurations Preview */}
-                  {project.configurations && project.configurations.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mb: 1, fontSize: '0.875rem' }}>
-                        Available Configurations:
-                      </Typography>
-                      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                        {project.configurations.slice(0, 3).map((config: any, index: number) => (
-                          <Chip
-                            key={index}
-                            label={`${config.type} - ₹${config.price.toLocaleString()}`}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              fontSize: '0.75rem',
-                              height: '24px',
-                              borderColor: 'var(--color-primary)',
-                              color: 'var(--color-primary)',
-                              '&:hover': {
-                                backgroundColor: 'var(--color-primary)',
-                                color: 'white'
-                              }
-                            }}
-                          />
-                        ))}
-                        {project.configurations.length > 3 && (
-                          <Chip
-                            label={`+${project.configurations.length - 3} more`}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              fontSize: '0.75rem',
-                              height: '24px',
-                              borderColor: 'var(--color-border)',
-                              color: 'var(--color-text-muted)'
-                            }}
-                          />
-                        )}
-                      </Stack>
-                    </Box>
-                  )}
-
-                  {/* Price and Stats */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box>
-                      {project.startingPrice && (
-                        <Typography variant="h6" sx={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-                          {formatPrice(project.startingPrice)}
-                          {project.pricePerSqFt && (
-                            <Typography component="span" variant="body2" sx={{ color: 'var(--color-text-muted)', ml: 0.5 }}>
-                              /sq ft
-                            </Typography>
-                          )}
-                        </Typography>
-                      )}
-                    </Box>
-                    
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Visibility sx={{ fontSize: 14, color: 'var(--color-text-muted)', mr: 0.5 }} />
-                        <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
-                          {project.views}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  {/* Action Button */}
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    onClick={() => router.push(`/projects/${project._id}`)}
+                  <ProjectCard
+                    project={project}
+                    showFavoriteButton={true}
                     sx={{
-                      mt: 2,
-                      borderColor: 'var(--color-primary)',
-                      color: 'var(--color-primary)',
-                      '&:hover': {
-                        borderColor: 'var(--color-primary)',
-                        bgcolor: 'var(--color-primary)',
-                        color: 'var(--color-primary-contrast)'
-                      }
+                      border: selectedProject?._id === project._id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
                     }}
-                  >
-                    View Details
-                  </Button>
-                </CardContent>
-              </Card>
+                  />
             </Grid>
           ))}
             </Grid>

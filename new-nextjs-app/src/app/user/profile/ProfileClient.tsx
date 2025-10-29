@@ -9,7 +9,7 @@ import {
   Tabs, Tab, Grid
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings, Dashboard, Business } from '@mui/icons-material';
+import { Favorite, Person, ExitToApp, Edit, AdminPanelSettings, Dashboard, Business, HomeWork } from '@mui/icons-material';
 import { useProperties } from '../../../contexts/PropertiesContext';
 import { api } from '@/lib/services/api';
 import PropertyCard from '@/components/property/PropertyCard';
@@ -142,6 +142,13 @@ const ProfileClient = () => {
               iconPosition="start"
               sx={{ color: 'var(--color-primary)' }}
             />
+            <Tab 
+              value="project-favorites" 
+              label="Project Favorites" 
+              icon={<HomeWork />} 
+              iconPosition="start"
+              sx={{ color: 'var(--color-primary)' }}
+            />
           </Tabs>
         </Box>
 
@@ -269,7 +276,7 @@ const ProfileClient = () => {
               )}
             </Box>
           </>
-        ) : (
+        ) : activeTab === 'favorites' ? (
           <Box>
             <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-primary)' }}>
               Your Favorite Properties
@@ -280,7 +287,27 @@ const ProfileClient = () => {
               <FavoritesGrid items={favorites} onView={handleViewProperty} />
             )}
           </Box>
-        )}
+        ) : activeTab === 'project-favorites' ? (
+          <Box>
+            <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-primary)' }}>
+              Your Favorite Projects
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={() => router.push('/user/project-favorites')}
+              sx={{ 
+                borderColor: 'var(--color-primary)', 
+                color: 'var(--color-primary)',
+                '&:hover': {
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)'
+                }
+              }}
+            >
+              View All Project Favorites
+            </Button>
+          </Box>
+        ) : null}
         {user?.role === 'agent' && (
           <Box sx={{ mt: 4 }}>
             <Typography variant="h5" sx={{ mb: 3, color: 'var(--color-primary)' }}>

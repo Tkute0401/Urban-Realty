@@ -75,6 +75,7 @@ import {
   Favorite,
   FavoriteBorder
 } from '@mui/icons-material';
+import { toast } from 'react-toastify';
 
 interface ProjectDetailsClientProps {
   projectId: string;
@@ -93,6 +94,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -111,6 +113,63 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       fetchProject();
     }
   }, [projectId, getProject]);
+
+  // Check if project is in favorites when component mounts
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (!user || !projectId) return;
+      
+      try {
+        const response = await fetch(
+          `/api/auth/project-favorites/${projectId}/status?userId=${user._id}`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setIsFavorite(data.isFavorite);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [user, projectId]);
+
+  const handleFavoriteToggle = async () => {
+    if (!user) {
+      router.push('/login');
+      toast.info('Please login to save favorites');
+      return;
+    }
+
+    setLoadingFavorite(true);
+    try {
+      const url = `/api/auth/project-favorites/${projectId}`;
+      const method = isFavorite ? 'DELETE' : 'PUT';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user._id }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsFavorite(!isFavorite);
+        toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites');
+      } else {
+        toast.error(data.error || 'Failed to update favorites');
+      }
+    } catch (error) {
+      console.error('Error updating favorite:', error);
+      toast.error('Failed to update favorites');
+    } finally {
+      setLoadingFavorite(false);
+    }
+  };
 
   const handleDeleteProject = async () => {
     try {
@@ -698,19 +757,24 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                     >
                       Print
                     </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
+                      onClick={handleFavoriteToggle}
+                      disabled={loadingFavorite}
+                      sx={{ 
+                        flex: 1,
+                        color: isFavorite ? 'red' : 'var(--color-primary)',
+                        borderColor: isFavorite ? 'red' : 'var(--color-primary)',
+                        '&:hover': {
+                          backgroundColor: isFavorite ? 'rgba(255, 0, 0, 0.1)' : 'rgba(var(--color-primary-rgb), 0.1)',
+                        }
+                      }}
+                    >
+                      {loadingFavorite ? '...' : (isFavorite ? 'Favorited' : 'Add to Favorites')}
+                    </Button>
                   </Stack>
 
-                  <Button
-                    variant="outlined"
-                    startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
-                    onClick={() => setIsFavorite(!isFavorite)}
-                    sx={{
-                      color: isFavorite ? 'var(--color-danger)' : 'var(--color-primary)',
-                      borderColor: isFavorite ? 'var(--color-danger)' : 'var(--color-primary)'
-                    }}
-                  >
-                    {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-                  </Button>
 
                   {user?.role === 'developer' && user?.id === project.developer?.userId && (
                     <>
@@ -916,18 +980,39 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
 
       {/* Floating Action Button for Mobile */}
       {isMobile && (
-        <Fab
-          color="primary"
-          sx={{
-            position: 'fixed',
-            bottom: 16,
-            right: 16,
-            zIndex: 1000
-          }}
-          onClick={() => router.push('/projects')}
-        >
-          <ArrowBack />
-        </Fab>
+        <>
+          <Fab
+            color="primary"
+            sx={{
+              position: 'fixed',
+              bottom: 16,
+              right: 16,
+              zIndex: 1000
+            }}
+            onClick={() => router.push('/projects')}
+          >
+            <ArrowBack />
+          </Fab>
+          <Fab
+            color={isFavorite ? "error" : "primary"}
+            sx={{
+              position: 'fixed',
+              bottom: 80,
+              right: 16,
+              zIndex: 1000
+            }}
+            onClick={handleFavoriteToggle}
+            disabled={loadingFavorite}
+          >
+            {loadingFavorite ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : isFavorite ? (
+              <Favorite />
+            ) : (
+              <FavoriteBorder />
+            )}
+          </Fab>
+        </>
       )}
     </Box>
   );

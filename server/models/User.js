@@ -68,6 +68,12 @@ const UserSchema = new mongoose.Schema({
       ref: 'Property'
     }
   ],
+  projectFavorites: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Project'
+    }
+  ],
   recentlyViewed: [
     {
       property: {

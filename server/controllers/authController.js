@@ -325,6 +325,86 @@ exports.toggleFavorite = asyncHandler(async (req, res, next) => {
     favorites: user.favorites
   });
 });
+
+// @desc    Add/remove project from favorites
+// @route   PUT /api/v1/auth/project-favorites/:projectId
+// @access  Private
+exports.toggleProjectFavorite = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  // Ensure projectFavorites array exists
+  if (!Array.isArray(user.projectFavorites)) {
+    user.projectFavorites = [];
+  }
+
+  // Normalize ObjectId comparison by using string values
+  const projectId = req.params.projectId.toString();
+  const projectFavorites = user.projectFavorites;
+  const index = projectFavorites.findIndex(id => id.toString() === projectId);
+
+  let isFavorite;
+  if (index === -1) {
+    // Add to favorites (Mongoose will cast string to ObjectId)
+    user.projectFavorites.push(projectId);
+    isFavorite = true;
+  } else {
+    // Remove from favorites
+    user.projectFavorites.splice(index, 1);
+    isFavorite = false;
+  }
+  
+  await user.save();
+  
+  res.status(200).json({
+    success: true,
+    isFavorite,
+    projectFavorites: user.projectFavorites
+  });
+});
+
+// @desc    Check if project is in favorites
+// @route   GET /api/v1/auth/project-favorites/:projectId/status
+// @access  Private
+exports.checkProjectFavoriteStatus = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  // Normalize ObjectId comparison by using string values
+  const projectId = req.params.projectId.toString();
+  const projectFavorites = (user.projectFavorites || []).map(id => id.toString());
+  const isFavorite = projectFavorites.includes(projectId);
+  
+  res.status(200).json({
+    success: true,
+    isFavorite
+  });
+});
+
+// @desc    Get user project favorites
+// @route   GET /api/v1/auth/project-favorites
+// @access  Private
+exports.getProjectFavorites = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).populate({
+    path: 'projectFavorites',
+    select: 'name description type status startingPrice priceRange location images developer'
+  });
+  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: user.projectFavorites
+  });
+});
 // @desc    Add property to recently viewed
 // @route   POST /api/v1/users/recently-viewed/:propertyId
 // @access  Private
