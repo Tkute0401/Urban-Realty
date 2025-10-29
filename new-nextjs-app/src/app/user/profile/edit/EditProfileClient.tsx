@@ -18,6 +18,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { Save, Cancel } from '@mui/icons-material';
 import { api } from '@/lib/services/api';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const ProfileCard = styled(Paper)(({ theme }) => ({
   maxWidth: 800,
@@ -141,6 +142,7 @@ const EditProfileClient = () => {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator required helperText="Your full legal name" />
               <TextField
                 fullWidth
                 label="Full Name"
@@ -151,8 +153,8 @@ const EditProfileClient = () => {
                 variant="outlined"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    color: 'var(--color-text-inverse)',
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-text-primary)',
                   },
                   '& .MuiInputLabel-root': {
                     color: 'var(--color-primary)',
@@ -165,6 +167,7 @@ const EditProfileClient = () => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
+              <FieldIndicator required helperText="Cannot be changed after registration" />
               <TextField
                 fullWidth
                 label="Email"
@@ -177,20 +180,21 @@ const EditProfileClient = () => {
                 disabled
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: 'var(--color-surface)',
                     color: 'var(--color-text-muted)',
                   },
                   '& .MuiInputLabel-root': {
                     color: 'var(--color-text-muted)',
                   },
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(120, 202, 220, 0.3)',
+                    borderColor: 'var(--color-border)',
                   },
                 }}
               />
             </Grid>
 
             <Grid item xs={12} sm={6}>
+              <FieldIndicator optional helperText="For better communication" />
               <TextField
                 fullWidth
                 label="Phone Number"
@@ -200,8 +204,8 @@ const EditProfileClient = () => {
                 variant="outlined"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    color: 'var(--color-text-inverse)',
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-text-primary)',
                   },
                   '& .MuiInputLabel-root': {
                     color: 'var(--color-primary)',
@@ -214,6 +218,7 @@ const EditProfileClient = () => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
+              <FieldIndicator optional helperText="Your profession or job title" />
               <TextField
                 fullWidth
                 label="Occupation"
@@ -223,8 +228,8 @@ const EditProfileClient = () => {
                 variant="outlined"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    color: 'var(--color-text-inverse)',
+                    backgroundColor: 'var(--color-surface)',
+                    color: 'var(--color-text-primary)',
                   },
                   '& .MuiInputLabel-root': {
                     color: 'var(--color-primary)',

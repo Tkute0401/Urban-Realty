@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const HelpCenter = () => {
 
@@ -262,6 +263,7 @@ const HelpCenter = () => {
             <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>Can&apos;t find what you&apos;re looking for?</h3>
             <form onSubmit={handleSubmit(handleQuestionSubmit)}>
               <div className="mb-4">
+                <FieldIndicator required helperText="Describe your question or issue in detail" />
                 <label htmlFor="userQuestion" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>
                   Ask your question
                 </label>

@@ -113,3 +113,6 @@ After these fixes:
 4. Click the marker to see property information popup
 5. Test with different properties to ensure consistency
 6. Visit `/test-map` for comprehensive testing
+
+
+

@@ -28,6 +28,7 @@ import {
   Security as SecurityIcon,
   Check as CheckIcon
 } from '@mui/icons-material';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 interface PaymentFormProps {
   open: boolean;
@@ -207,6 +208,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               
               <Grid container spacing={2}>
                 <Grid item xs={12}>
+                  <FieldIndicator required helperText="16-digit card number" />
                   <TextField
                     fullWidth
                     label="Card Number"
@@ -222,6 +224,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 </Grid>
                 
                 <Grid item xs={6}>
+                  <FieldIndicator required helperText="MM/YY format" />
                   <TextField
                     fullWidth
                     label="Expiry Date"
@@ -237,6 +240,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 </Grid>
                 
                 <Grid item xs={6}>
+                  <FieldIndicator required helperText="3-4 digit security code" />
                   <TextField
                     fullWidth
                     label="CVV"
@@ -252,6 +256,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 </Grid>
                 
                 <Grid item xs={12}>
+                  <FieldIndicator required helperText="Name as it appears on card" />
                   <TextField
                     fullWidth
                     label="Cardholder Name"
@@ -266,6 +271,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 </Grid>
                 
                 <Grid item xs={12}>
+                  <FieldIndicator required helperText="Billing ZIP code" />
                   <TextField
                     fullWidth
                     label="ZIP Code"
@@ -290,6 +296,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             
             <Grid container spacing={2}>
               <Grid item xs={12}>
+                <FieldIndicator required helperText="Complete street address" />
                 <TextField
                   fullWidth
                   label="Street Address"
@@ -304,6 +311,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               </Grid>
               
               <Grid item xs={6}>
+                <FieldIndicator required helperText="City name" />
                 <TextField
                   fullWidth
                   label="City"
@@ -318,6 +326,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               </Grid>
               
               <Grid item xs={3}>
+                <FieldIndicator required helperText="State abbreviation" />
                 <TextField
                   fullWidth
                   label="State"
@@ -332,6 +341,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               </Grid>
               
               <Grid item xs={3}>
+                <FieldIndicator required helperText="ZIP code" />
                 <TextField
                   fullWidth
                   label="ZIP Code"

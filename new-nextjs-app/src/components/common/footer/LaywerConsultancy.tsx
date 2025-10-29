@@ -6,6 +6,7 @@ import { ScaleIcon, DocumentTextIcon, ShieldCheckIcon, HomeIcon, BuildingLibrary
 import ComingSoonPopup from './ComingSoonPopup';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import { createThemeColors } from '@/lib/theme/colors';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const LawyerConsultancy = () => {
   const { theme } = useContext(ThemeContext);
@@ -240,69 +241,87 @@ const LawyerConsultancy = () => {
               Please fill out this form to join our team of legal professionals.
             </p>
             <div className="space-y-4 mb-6">
-              <input 
-                type="text" 
-                placeholder="Full Name" 
-                className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ 
-                  backgroundColor: colors.bg.primary,
-                  borderColor: `${colors.primary.main}50`,
-                  color: colors.text.primary
-                }}
-              />
-              <input 
-                type="email" 
-                placeholder="Email" 
-                className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ 
-                  backgroundColor: colors.bg.primary,
-                  borderColor: `${colors.primary.main}50`,
-                  color: colors.text.primary
-                }}
-              />
-              <input 
-                type="text" 
-                placeholder="Bar Association Number" 
-                className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ 
-                  backgroundColor: colors.bg.primary,
-                  borderColor: `${colors.primary.main}50`,
-                  color: colors.text.primary
-                }}
-              />
-              <input 
-                type="text" 
-                placeholder="Years of Practice" 
-                className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ 
-                  backgroundColor: colors.bg.primary,
-                  borderColor: `${colors.primary.main}50`,
-                  color: colors.text.primary
-                }}
-              />
-              <select 
-                className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-                style={{ 
-                  backgroundColor: colors.bg.primary,
-                  borderColor: `${colors.primary.main}50`,
-                  color: colors.text.primary
-                }}
-              >
-                <option value="">Select Specialization</option>
-                <option value="property">Property Law</option>
-                <option value="contract">Contract Law</option>
-                <option value="realestate">Real Estate Law</option>
-                <option value="other">Other</option>
-              </select>
-              <textarea 
-                placeholder="Briefly describe your experience in property law" 
-                className="w-full rounded-lg px-4 py-2 h-24 focus:outline-none focus:ring-2"
-                style={{ 
-                  backgroundColor: colors.bg.primary,
-                  borderColor: `${colors.primary.main}50`,
-                  color: colors.text.primary
-                }}
-              ></textarea>
+              <div>
+                <FieldIndicator required helperText="Enter your full legal name" />
+                <input 
+                  type="text" 
+                  placeholder="Full Name" 
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: colors.bg.primary,
+                    borderColor: `${colors.primary.main}50`,
+                    color: colors.text.primary
+                  }}
+                />
+              </div>
+              <div>
+                <FieldIndicator required helperText="We'll use this for communication" />
+                <input 
+                  type="email" 
+                  placeholder="Email" 
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: colors.bg.primary,
+                    borderColor: `${colors.primary.main}50`,
+                    color: colors.text.primary
+                  }}
+                />
+              </div>
+              <div>
+                <FieldIndicator required helperText="Your official bar association registration number" />
+                <input 
+                  type="text" 
+                  placeholder="Bar Association Number" 
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: colors.bg.primary,
+                    borderColor: `${colors.primary.main}50`,
+                    color: colors.text.primary
+                  }}
+                />
+              </div>
+              <div>
+                <FieldIndicator optional helperText="Number of years practicing law" />
+                <input 
+                  type="text" 
+                  placeholder="Years of Practice" 
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: colors.bg.primary,
+                    borderColor: `${colors.primary.main}50`,
+                    color: colors.text.primary
+                  }}
+                />
+              </div>
+              <div>
+                <FieldIndicator required helperText="Select your primary legal specialization" />
+                <select 
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: colors.bg.primary,
+                    borderColor: `${colors.primary.main}50`,
+                    color: colors.text.primary
+                  }}
+                >
+                  <option value="">Select Specialization</option>
+                  <option value="property">Property Law</option>
+                  <option value="contract">Contract Law</option>
+                  <option value="realestate">Real Estate Law</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <FieldIndicator optional helperText="Describe your experience in property law" />
+                <textarea 
+                  placeholder="Briefly describe your experience in property law" 
+                  className="w-full rounded-lg px-4 py-2 h-24 focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: colors.bg.primary,
+                    borderColor: `${colors.primary.main}50`,
+                    color: colors.text.primary
+                  }}
+                ></textarea>
+              </div>
             </div>
             <div className="flex justify-end space-x-3">
               <button 

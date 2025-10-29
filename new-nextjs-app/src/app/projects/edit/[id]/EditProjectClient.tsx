@@ -59,6 +59,7 @@ import {
   DeleteForever
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: 'var(--color-surface)',
@@ -672,6 +673,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
           
           <Grid container spacing={3}>
             <Grid item xs={12}>
+              <FieldIndicator required helperText="Enter a unique project name" />
               <TextField
                 fullWidth
                 label="Project Name"
@@ -691,6 +693,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
             </Grid>
             
             <Grid item xs={12} md={6}>
+              <FieldIndicator optional helperText="Select the type of development" />
               <FormControl fullWidth>
                 <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Project Type</InputLabel>
                 <Select
@@ -738,6 +741,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
             </Grid>
             
             <Grid item xs={12}>
+              <FieldIndicator required helperText="Detailed description of the project" />
               <TextField
                 fullWidth
                 label="Project Description"
@@ -759,6 +763,7 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
             </Grid>
             
             <Grid item xs={12}>
+              <FieldIndicator optional helperText="Brief summary for project cards (500 characters max)" />
               <TextField
                 fullWidth
                 label="Short Description"

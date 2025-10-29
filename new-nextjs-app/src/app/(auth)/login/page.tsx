@@ -15,6 +15,7 @@ import {
   Paper
 } from '@mui/material';
 import { Login as LoginIcon } from '@mui/icons-material';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 
 const Login = () => {
@@ -58,6 +59,9 @@ const Login = () => {
         )}
 
         <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+          <Box sx={{ mb: 2 }}>
+            <FieldIndicator required helperText="Enter your registered email address" />
+          </Box>
           <TextField
             fullWidth
             label="Email Address"
@@ -94,6 +98,9 @@ const Login = () => {
               }
             }}
           />
+          <Box sx={{ mb: 2 }}>
+            <FieldIndicator required helperText="Minimum 6 characters" />
+          </Box>
           <TextField
             fullWidth
             label="Password"

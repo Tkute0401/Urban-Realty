@@ -44,6 +44,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAgents } from '@/contexts/AgentsContext';
 import { useDevelopers } from '@/contexts/DevelopersContext';
 import { useRouter } from 'next/navigation';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
@@ -711,6 +712,7 @@ const AddPropertyPageContent: React.FC = () => {
               <Grid item xs={12}>
             <SectionHeader variant="h6">Basic Information</SectionHeader>
             <PremiumPaper>
+                <FieldIndicator required helperText="Enter a descriptive title for your property" />
                 <TextField
                   fullWidth
                   label="Property Title"
@@ -741,6 +743,7 @@ const AddPropertyPageContent: React.FC = () => {
                 }}
               />
 
+                <FieldIndicator required helperText="Detailed description of the property" />
                 <TextField
                   fullWidth
                 label="Description"
@@ -776,6 +779,7 @@ const AddPropertyPageContent: React.FC = () => {
               <Grid container spacing={2}>
                 {/* Property Type */}
                 <Grid item xs={12} sm={6} md={4}>
+                  <FieldIndicator required helperText="Select the type of property" />
                   <TextField
                     select
                     fullWidth

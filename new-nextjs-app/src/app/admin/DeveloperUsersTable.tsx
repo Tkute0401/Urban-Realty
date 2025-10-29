@@ -50,6 +50,7 @@ import {
   BusinessCenter
 } from '@mui/icons-material';
 import http from '@/lib/services/http';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 interface DeveloperUser {
   _id: string;
@@ -484,6 +485,7 @@ const DeveloperUsersTable = () => {
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator required helperText="Full name of the developer" />
               <TextField
                 fullWidth
                 label="Name"
@@ -493,6 +495,7 @@ const DeveloperUsersTable = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator required helperText="Valid email address for login" />
               <TextField
                 fullWidth
                 label="Email"
@@ -503,6 +506,7 @@ const DeveloperUsersTable = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator optional helperText="Contact phone number" />
               <TextField
                 fullWidth
                 label="Mobile"
@@ -511,6 +515,7 @@ const DeveloperUsersTable = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator required helperText="Minimum 6 characters" />
               <TextField
                 fullWidth
                 label="Password"
@@ -521,6 +526,7 @@ const DeveloperUsersTable = () => {
               />
             </Grid>
             <Grid item xs={12}>
+              <FieldIndicator optional helperText="Professional occupation" />
               <TextField
                 fullWidth
                 label="Occupation"

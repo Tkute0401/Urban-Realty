@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import { createThemeColors } from '@/lib/theme/colors';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const ContactUs = () => {
   const { theme } = useContext(ThemeContext);
@@ -183,6 +184,7 @@ const ContactUs = () => {
           
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
+              <FieldIndicator required helperText="How should we address you?" />
               <label 
                 htmlFor="name" 
                 className="block text-sm font-medium mb-2"
@@ -214,6 +216,7 @@ const ContactUs = () => {
               )}
             </div>
             <div>
+              <FieldIndicator required helperText="We'll respond to this email" />
               <label 
                 htmlFor="email" 
                 className="block text-sm font-medium mb-2"
@@ -245,6 +248,7 @@ const ContactUs = () => {
               )}
             </div>
             <div className="md:col-span-2">
+              <FieldIndicator required helperText="Brief description of your inquiry" />
               <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
               <input
                 type="text"
@@ -259,6 +263,7 @@ const ContactUs = () => {
               )}
             </div>
             <div className="md:col-span-2">
+              <FieldIndicator required helperText="Please provide detailed information" />
               <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">Message</label>
               <textarea
                 id="message"

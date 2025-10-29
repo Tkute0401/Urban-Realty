@@ -20,6 +20,7 @@ import {
 import { useMediaQuery, useTheme } from '@mui/material';
 import sessionManager from '../../../lib/utils/sessionManager';
 import { styled } from '@mui/material/styles';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
@@ -466,6 +467,7 @@ const AddDeveloperClient = () => {
             <PremiumPaper>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
+                  <FieldIndicator required helperText="Enter the company or developer name" />
                   <TextField
                     fullWidth
                     label="Developer Name"
@@ -505,6 +507,7 @@ const AddDeveloperClient = () => {
                 </Grid>
 
                 <Grid item xs={12}>
+                  <FieldIndicator required helperText="Detailed description of the developer" />
                   <TextField
                     fullWidth
                     label="Description"
@@ -539,6 +542,7 @@ const AddDeveloperClient = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Company website URL" />
                   <TextField
                     fullWidth
                     label="Website"
@@ -576,6 +580,7 @@ const AddDeveloperClient = () => {
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Year the company was founded" />
                   <TextField
                     fullWidth
                     label="Founded Year"
@@ -674,6 +679,7 @@ const AddDeveloperClient = () => {
             <PremiumPaper>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
+                  <FieldIndicator required helperText="Main office city" />
                   <TextField
                     fullWidth
                     label="City"
@@ -704,6 +710,7 @@ const AddDeveloperClient = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>
+                  <FieldIndicator required helperText="State or province" />
                   <TextField
                     fullWidth
                     label="State"
@@ -734,6 +741,7 @@ const AddDeveloperClient = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={4}>
+                  <FieldIndicator optional helperText="Country of operation" />
                   <TextField
                     fullWidth
                     label="Country"

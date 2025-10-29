@@ -15,6 +15,7 @@ import {
   Paper
 } from '@mui/material';
 import { PersonAdd } from '@mui/icons-material';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const Register = () => {
   console.log('🔧 Register Page rendering...');
@@ -143,6 +144,7 @@ const Register = () => {
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
+              <FieldIndicator required helperText="Enter your full legal name" />
               <TextField
                 fullWidth
                 label="Full Name"
@@ -154,6 +156,7 @@ const Register = () => {
               />
             </Grid>
             <Grid item xs={12}>
+              <FieldIndicator required helperText="We'll use this for account verification" />
               <TextField
                 fullWidth
                 label="Email Address"
@@ -166,6 +169,7 @@ const Register = () => {
               />
             </Grid>
             <Grid item xs={12}>
+              <FieldIndicator required helperText="Minimum 6 characters for security" />
               <TextField
                 fullWidth
                 label="Password"
@@ -179,6 +183,7 @@ const Register = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator optional helperText="For better communication" />
               <TextField
                 fullWidth
                 label="Mobile Number"
@@ -189,17 +194,18 @@ const Register = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <FieldIndicator optional helperText="What do you do?" />
               <TextField
                 fullWidth
                 label="Occupation"
                 name="occupation"
                 value={formData.occupation}
                 onChange={handleChange}
-                helperText="What do you do?"
                 sx={textFieldStyles}
               />
             </Grid>
             <Grid item xs={12}>
+              <FieldIndicator required helperText="Choose your primary role on the platform" />
               <TextField
                 select
                 fullWidth
@@ -226,6 +232,7 @@ const Register = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator required helperText="Required for Agents and Developers" />
                   <TextField
                     fullWidth
                     label="RERA ID"
@@ -233,12 +240,12 @@ const Register = () => {
                     value={formData.reraId}
                     onChange={handleChange}
                     required
-                    helperText="Required for Agents and Developers"
                     sx={textFieldStyles}
                   />
                 </Grid>
                 
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Your professional license number" />
                   <TextField
                     fullWidth
                     label="License Number"
@@ -249,6 +256,7 @@ const Register = () => {
                 </Grid>
                 
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Years in real estate business" />
                   <TextField
                     fullWidth
                     label="Years of Experience"
@@ -260,28 +268,29 @@ const Register = () => {
                 </Grid>
                 
                 <Grid item xs={12}>
+                  <FieldIndicator optional helperText="e.g., Residential, Commercial, Luxury" />
                   <TextField
                     fullWidth
                     label="Specializations (comma-separated)"
                     value={formData.professionalInfo.specializations.join(', ')}
                     onChange={(e) => handleSpecializationChange(e.target.value)}
-                    helperText="e.g., Residential, Commercial, Luxury"
                     sx={textFieldStyles}
                   />
                 </Grid>
                 
                 <Grid item xs={12}>
+                  <FieldIndicator optional helperText="e.g., Licensed Real Estate Agent, Interior Design Certification" />
                   <TextField
                     fullWidth
                     label="Certifications (comma-separated)"
                     value={formData.professionalInfo.certifications.join(', ')}
                     onChange={(e) => handleCertificationChange(e.target.value)}
-                    helperText="e.g., Licensed Real Estate Agent, Interior Design Certification"
                     sx={textFieldStyles}
                   />
                 </Grid>
                 
                 <Grid item xs={12}>
+                  <FieldIndicator optional helperText="Your company or agency name" />
                   <TextField
                     fullWidth
                     label="Business Name"
@@ -292,6 +301,7 @@ const Register = () => {
                 </Grid>
                 
                 <Grid item xs={12}>
+                  <FieldIndicator optional helperText="Complete business address" />
                   <TextField
                     fullWidth
                     label="Business Address"
@@ -302,6 +312,7 @@ const Register = () => {
                 </Grid>
                 
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Business contact number" />
                   <TextField
                     fullWidth
                     label="Business Phone"
@@ -312,6 +323,7 @@ const Register = () => {
                 </Grid>
                 
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Your business website URL" />
                   <TextField
                     fullWidth
                     label="Business Website"

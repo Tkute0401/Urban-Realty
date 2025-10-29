@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation } from '@tanstack/react-query';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 // removed mockApi import; using real apiService via context/mutations when needed
 
 const AgentSettings = () => {
@@ -130,6 +131,7 @@ const AgentSettings = () => {
 
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator required helperText="Your full legal name" />
                   <TextField
                     fullWidth
                     label="Full Name"
@@ -143,6 +145,7 @@ const AgentSettings = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator required helperText="Cannot be changed after registration" />
                   <TextField
                     fullWidth
                     label="Email"
@@ -157,6 +160,7 @@ const AgentSettings = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Primary contact number" />
                   <TextField
                     fullWidth
                     label="Phone"
@@ -170,6 +174,7 @@ const AgentSettings = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Mobile number for SMS notifications" />
                   <TextField
                     fullWidth
                     label="Mobile"
@@ -183,6 +188,7 @@ const AgentSettings = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Your professional license number" />
                   <TextField
                     fullWidth
                     label="License Number"
@@ -193,6 +199,7 @@ const AgentSettings = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                  <FieldIndicator optional helperText="Comma-separated list of specializations" />
                   <TextField
                     fullWidth
                     label="Specializations"

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { HomeModernIcon, SwatchIcon, ArrowsPointingOutIcon, PaintBrushIcon, LightBulbIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import ComingSoonPopup from './ComingSoonPopup';
+import FieldIndicator from '@/components/ui/FieldIndicator';
 
 const InteriorDesign = () => {
   useEffect(() => {
@@ -281,32 +282,47 @@ const InteriorDesign = () => {
               Please fill out this form to join our team of professional designers.
             </p>
             <div className="space-y-4 mb-6">
-              <input 
-                type="text" 
-                placeholder="Full Name" 
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc]" 
-              />
-              <input 
-                type="email" 
-                placeholder="Email" 
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc]" 
-              />
-              <input 
-                type="text" 
-                placeholder="Years of Experience" 
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc]" 
-              />
-              <select className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc]">
-                <option value="">Select Design Specialty</option>
-                <option value="residential">Residential Design</option>
-                <option value="commercial">Commercial Design</option>
-                <option value="hospitality">Hospitality Design</option>
-                <option value="other">Other</option>
-              </select>
-              <textarea 
-                placeholder="Portfolio Link or Description of Your Work" 
-                className="w-full bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-[#78cadc]"
-              ></textarea>
+              <div>
+                <FieldIndicator required helperText="Enter your full legal name" />
+                <input 
+                  type="text" 
+                  placeholder="Full Name" 
+                  className="w-full bg-white dark:bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc] text-gray-900 dark:text-white" 
+                />
+              </div>
+              <div>
+                <FieldIndicator required helperText="We'll use this for communication" />
+                <input 
+                  type="email" 
+                  placeholder="Email" 
+                  className="w-full bg-white dark:bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc] text-gray-900 dark:text-white" 
+                />
+              </div>
+              <div>
+                <FieldIndicator optional helperText="Number of years in design field" />
+                <input 
+                  type="text" 
+                  placeholder="Years of Experience" 
+                  className="w-full bg-white dark:bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc] text-gray-900 dark:text-white" 
+                />
+              </div>
+              <div>
+                <FieldIndicator required helperText="Select your primary design specialty" />
+                <select className="w-full bg-white dark:bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#78cadc] text-gray-900 dark:text-white">
+                  <option value="">Select Design Specialty</option>
+                  <option value="residential">Residential Design</option>
+                  <option value="commercial">Commercial Design</option>
+                  <option value="hospitality">Hospitality Design</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <FieldIndicator optional helperText="Share your portfolio or describe your work" />
+                <textarea 
+                  placeholder="Portfolio Link or Description of Your Work" 
+                  className="w-full bg-white dark:bg-[#08171A] border border-[#78cadc]/30 rounded-lg px-4 py-2 h-24 focus:outline-none focus:ring-2 focus:ring-[#78cadc] text-gray-900 dark:text-white"
+                ></textarea>
+              </div>
             </div>
             <div className="flex justify-end space-x-3">
               <button 
