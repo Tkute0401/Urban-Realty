@@ -1,0 +1,273 @@
+2025-10-29T06:30:31.948537436Z [inf]  
+2025-10-29T06:30:35.309117903Z [inf]  [35m[Region: asia-southeast1][0m
+2025-10-29T06:30:35.322926144Z [inf]  [35m=========================
+2025-10-29T06:30:35.322948981Z [inf]  Using Detected Dockerfile
+2025-10-29T06:30:35.322952528Z [inf]  =========================
+2025-10-29T06:30:35.322956104Z [inf]  [0m
+2025-10-29T06:30:35.322966749Z [inf]  context: tbq5-Lujc
+2025-10-29T06:30:35.461416286Z [inf]  [internal] load build definition from Dockerfile
+2025-10-29T06:30:35.461453773Z [inf]  [internal] load build definition from Dockerfile
+2025-10-29T06:30:35.461470790Z [inf]  [internal] load build definition from Dockerfile
+2025-10-29T06:30:35.470595109Z [inf]  [internal] load build definition from Dockerfile
+2025-10-29T06:30:35.473014455Z [inf]  [internal] load metadata for docker.io/library/node:20-alpine@sha256:1ab6fc5a31d515dc7b6b25f6acfda2001821f2c2400252b6cb61044bd9f9ad48
+2025-10-29T06:30:35.477308684Z [inf]  [internal] load metadata for docker.io/library/node:20-alpine@sha256:1ab6fc5a31d515dc7b6b25f6acfda2001821f2c2400252b6cb61044bd9f9ad48
+2025-10-29T06:30:35.477641603Z [inf]  [internal] load .dockerignore
+2025-10-29T06:30:35.477682651Z [inf]  [internal] load .dockerignore
+2025-10-29T06:30:35.477705805Z [inf]  [internal] load .dockerignore
+2025-10-29T06:30:35.486703209Z [inf]  [internal] load .dockerignore
+2025-10-29T06:30:35.498202958Z [inf]  [runner  3/21] RUN adduser --system --uid 1001 nextjs
+2025-10-29T06:30:35.498239686Z [inf]  [runner  2/21] RUN addgroup --system --gid 1001 nodejs
+2025-10-29T06:30:35.498253376Z [inf]  [builder  1/26] WORKDIR /app
+2025-10-29T06:30:35.498261735Z [inf]  [base 1/1] FROM docker.io/library/node:20-alpine@sha256:1ab6fc5a31d515dc7b6b25f6acfda2001821f2c2400252b6cb61044bd9f9ad48
+2025-10-29T06:30:35.498394501Z [inf]  [deps 2/7] WORKDIR /app
+2025-10-29T06:30:35.498421159Z [inf]  [deps 6/7] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./
+2025-10-29T06:30:35.498427869Z [inf]  [deps 4/7] RUN npm install --frozen-lockfile || npm install
+2025-10-29T06:30:35.498436993Z [inf]  [builder 13/26] COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
+2025-10-29T06:30:35.498443067Z [inf]  [builder  6/26] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-10-29T06:30:35.498450569Z [inf]  [deps 7/7] RUN npm install --frozen-lockfile --only=production || npm install --only=production
+2025-10-29T06:30:35.498456218Z [inf]  [builder  3/26] COPY package.json package-lock.json* ./
+2025-10-29T06:30:35.498461567Z [inf]  [builder  2/26] COPY --from=deps /app/node_modules ./node_modules
+2025-10-29T06:30:35.498467878Z [inf]  [builder  5/26] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./new-nextjs-app/
+2025-10-29T06:30:35.498473195Z [inf]  [builder  9/26] COPY new-nextjs-app/next-env.d.ts ./new-nextjs-app/
+2025-10-29T06:30:35.498483198Z [inf]  [builder  8/26] COPY new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-10-29T06:30:35.498488711Z [inf]  [deps 1/7] RUN apk add --no-cache libc6-compat
+2025-10-29T06:30:35.498494215Z [inf]  [internal] load build context
+2025-10-29T06:30:35.498499890Z [inf]  [builder  7/26] COPY new-nextjs-app/public ./new-nextjs-app/public
+2025-10-29T06:30:35.498504845Z [inf]  [deps 5/7] WORKDIR /app/new-nextjs-app
+2025-10-29T06:30:35.498510679Z [inf]  [deps 3/7] COPY package.json package-lock.json* ./
+2025-10-29T06:30:35.498515870Z [inf]  [builder 12/26] COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
+2025-10-29T06:30:35.498521176Z [inf]  [builder 11/26] COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
+2025-10-29T06:30:35.498529452Z [inf]  [builder 10/26] COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
+2025-10-29T06:30:35.498535317Z [inf]  [builder  4/26] COPY --from=deps /app/new-nextjs-app/node_modules ./new-nextjs-app/node_modules
+2025-10-29T06:30:35.498550179Z [inf]  [builder 14/26] COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+2025-10-29T06:30:35.498586213Z [inf]  [builder 26/26] RUN npm run build
+2025-10-29T06:30:35.498592573Z [inf]  [builder 25/26] WORKDIR /app/new-nextjs-app
+2025-10-29T06:30:35.498598115Z [inf]  [builder 24/26] COPY start-server.js ./
+2025-10-29T06:30:35.498603786Z [inf]  [builder 23/26] COPY server.js ./
+2025-10-29T06:30:35.498613682Z [inf]  [builder 22/26] COPY ecosystem.config.js ./
+2025-10-29T06:30:35.498622685Z [inf]  [builder 21/26] COPY uploads ./uploads
+2025-10-29T06:30:35.498631302Z [inf]  [builder 20/26] COPY shared ./shared
+2025-10-29T06:30:35.498640948Z [inf]  [builder 19/26] COPY server ./server
+2025-10-29T06:30:35.498649680Z [inf]  [builder 18/26] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-10-29T06:30:35.498658003Z [inf]  [builder 17/26] COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
+2025-10-29T06:30:35.498666303Z [inf]  [builder 16/26] COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
+2025-10-29T06:30:35.498674769Z [inf]  [builder 15/26] COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
+2025-10-29T06:30:35.498699591Z [inf]  [runner  8/21] COPY --from=builder /app/server ./server
+2025-10-29T06:30:35.498709695Z [inf]  [runner  7/21] COPY --from=builder /app/new-nextjs-app/package.json ./new-nextjs-app/
+2025-10-29T06:30:35.498715209Z [inf]  [runner  6/21] COPY --from=builder /app/new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-10-29T06:30:35.498723531Z [inf]  [runner  5/21] COPY --from=builder /app/new-nextjs-app/.next ./new-nextjs-app/.next
+2025-10-29T06:30:35.498731453Z [inf]  [runner  4/21] COPY --from=builder /app/new-nextjs-app/public ./new-nextjs-app/public
+2025-10-29T06:30:35.498759203Z [inf]  [runner 11/21] COPY --from=builder /app/package.json ./
+2025-10-29T06:30:35.498768729Z [inf]  [runner 10/21] COPY --from=builder /app/uploads ./uploads
+2025-10-29T06:30:35.498774327Z [inf]  [runner  9/21] COPY --from=builder /app/shared ./shared
+2025-10-29T06:30:35.498802974Z [inf]  [runner 21/21] RUN chmod +x /app/start-server.js
+2025-10-29T06:30:35.498811225Z [inf]  [runner 20/21] RUN chmod +x /app/server.js
+2025-10-29T06:30:35.498818968Z [inf]  [runner 19/21] RUN chown -R nextjs:nodejs /app
+2025-10-29T06:30:35.498826797Z [inf]  [runner 18/21] RUN mkdir -p /app/logs
+2025-10-29T06:30:35.498834429Z [inf]  [runner 17/21] RUN npm install -g pm2
+2025-10-29T06:30:35.498842957Z [inf]  [runner 16/21] COPY --from=builder /app/node_modules ./node_modules
+2025-10-29T06:30:35.498851536Z [inf]  [runner 15/21] COPY --from=builder /app/start-server.js ./
+2025-10-29T06:30:35.498859581Z [inf]  [runner 14/21] COPY --from=builder /app/server.js ./
+2025-10-29T06:30:35.498867453Z [inf]  [runner 13/21] COPY --from=builder /app/ecosystem.config.js ./
+2025-10-29T06:30:35.498876269Z [inf]  [runner 12/21] COPY --from=builder /app/package-lock.json* ./
+2025-10-29T06:30:35.499030951Z [inf]  [internal] load build context
+2025-10-29T06:30:35.499578401Z [inf]  [base 1/1] FROM docker.io/library/node:20-alpine@sha256:1ab6fc5a31d515dc7b6b25f6acfda2001821f2c2400252b6cb61044bd9f9ad48
+2025-10-29T06:30:35.505468823Z [inf]  [base 1/1] FROM docker.io/library/node:20-alpine@sha256:1ab6fc5a31d515dc7b6b25f6acfda2001821f2c2400252b6cb61044bd9f9ad48
+2025-10-29T06:30:35.506948843Z [inf]  [internal] load build context
+2025-10-29T06:30:35.679826600Z [inf]  [internal] load build context
+2025-10-29T06:30:35.684263911Z [inf]  [deps 1/7] RUN apk add --no-cache libc6-compat
+2025-10-29T06:30:35.684295696Z [inf]  [deps 2/7] WORKDIR /app
+2025-10-29T06:30:35.684312621Z [inf]  [deps 3/7] COPY package.json package-lock.json* ./
+2025-10-29T06:30:35.708878878Z [inf]  [deps 3/7] COPY package.json package-lock.json* ./
+2025-10-29T06:30:35.710219246Z [inf]  [deps 4/7] RUN npm install --frozen-lockfile || npm install
+2025-10-29T06:30:37.94244701Z [inf]  npm warn deprecated xss-clean@0.1.4: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+2025-10-29T06:30:38.427196852Z [inf]  npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+
+2025-10-29T06:30:38.509501183Z [inf]  npm warn deprecated q@1.5.1: You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+npm warn deprecated
+npm warn deprecated (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+
+2025-10-29T06:30:38.598293845Z [inf]  npm warn deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
+
+2025-10-29T06:30:38.864533594Z [inf]  npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+
+2025-10-29T06:30:39.103296164Z [inf]  npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+
+2025-10-29T06:30:39.185839464Z [inf]  npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+2025-10-29T06:30:57.886450329Z [inf]  
+added 778 packages, and audited 779 packages in 22s
+
+2025-10-29T06:30:57.886464933Z [inf]  
+
+2025-10-29T06:30:57.886467979Z [inf]  127 packages are looking for funding
+  run `npm fund` for details
+
+2025-10-29T06:30:57.955747623Z [inf]  
+5 vulnerabilities (4 moderate, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+2025-10-29T06:30:57.956791543Z [inf]  npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.6.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.2
+npm notice To update run: npm install -g npm@11.6.2
+npm notice
+
+2025-10-29T06:30:58.766358848Z [inf]  [deps 4/7] RUN npm install --frozen-lockfile || npm install
+2025-10-29T06:30:58.768159999Z [inf]  [deps 5/7] WORKDIR /app/new-nextjs-app
+2025-10-29T06:30:59.220999118Z [inf]  [deps 5/7] WORKDIR /app/new-nextjs-app
+2025-10-29T06:30:59.224428117Z [inf]  [deps 6/7] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./
+2025-10-29T06:30:59.241391994Z [inf]  [deps 6/7] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./
+2025-10-29T06:30:59.242832963Z [inf]  [deps 7/7] RUN npm install --frozen-lockfile --only=production || npm install --only=production
+2025-10-29T06:30:59.408222777Z [inf]  npm warn config only Use `--omit=dev` to omit dev dependencies from the install.
+
+2025-10-29T06:31:10.332811122Z [inf]  
+added 334 packages, and audited 335 packages in 11s
+
+2025-10-29T06:31:10.332830158Z [inf]  
+
+2025-10-29T06:31:10.332882763Z [inf]  71 packages are looking for funding
+  run `npm fund` for details
+
+2025-10-29T06:31:10.401904424Z [inf]  
+1 critical severity vulnerability
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+2025-10-29T06:31:13.079524993Z [inf]  [deps 7/7] RUN npm install --frozen-lockfile --only=production || npm install --only=production
+2025-10-29T06:31:23.661618014Z [inf]  [builder  1/26] WORKDIR /app
+2025-10-29T06:31:23.661652658Z [inf]  [builder  2/26] COPY --from=deps /app/node_modules ./node_modules
+2025-10-29T06:31:23.661669869Z [inf]  [builder  3/26] COPY package.json package-lock.json* ./
+2025-10-29T06:31:23.678161046Z [inf]  [builder  3/26] COPY package.json package-lock.json* ./
+2025-10-29T06:31:23.679326943Z [inf]  [builder  4/26] COPY --from=deps /app/new-nextjs-app/node_modules ./new-nextjs-app/node_modules
+2025-10-29T06:31:27.734348577Z [inf]  [builder  4/26] COPY --from=deps /app/new-nextjs-app/node_modules ./new-nextjs-app/node_modules
+2025-10-29T06:31:27.735511340Z [inf]  [builder  5/26] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./new-nextjs-app/
+2025-10-29T06:31:27.999907263Z [inf]  [builder  5/26] COPY new-nextjs-app/package.json new-nextjs-app/package-lock.json* ./new-nextjs-app/
+2025-10-29T06:31:28.001392577Z [inf]  [builder  6/26] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-10-29T06:31:28.042736079Z [inf]  [builder  6/26] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-10-29T06:31:28.044181033Z [inf]  [builder  7/26] COPY new-nextjs-app/public ./new-nextjs-app/public
+2025-10-29T06:31:28.075418440Z [inf]  [builder  7/26] COPY new-nextjs-app/public ./new-nextjs-app/public
+2025-10-29T06:31:28.076516597Z [inf]  [builder  8/26] COPY new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-10-29T06:31:28.087806356Z [inf]  [builder  8/26] COPY new-nextjs-app/next.config.js ./new-nextjs-app/
+2025-10-29T06:31:28.088974329Z [inf]  [builder  9/26] COPY new-nextjs-app/next-env.d.ts ./new-nextjs-app/
+2025-10-29T06:31:28.099121904Z [inf]  [builder  9/26] COPY new-nextjs-app/next-env.d.ts ./new-nextjs-app/
+2025-10-29T06:31:28.100659801Z [inf]  [builder 10/26] COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
+2025-10-29T06:31:28.111236374Z [inf]  [builder 10/26] COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
+2025-10-29T06:31:28.112444964Z [inf]  [builder 11/26] COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
+2025-10-29T06:31:28.123718170Z [inf]  [builder 11/26] COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
+2025-10-29T06:31:28.124578003Z [inf]  [builder 12/26] COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
+2025-10-29T06:31:28.136094856Z [inf]  [builder 12/26] COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
+2025-10-29T06:31:28.137055871Z [inf]  [builder 13/26] COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
+2025-10-29T06:31:28.147127169Z [inf]  [builder 13/26] COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
+2025-10-29T06:31:28.148760127Z [inf]  [builder 14/26] COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+2025-10-29T06:31:28.159050207Z [inf]  [builder 14/26] COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+2025-10-29T06:31:28.159903486Z [inf]  [builder 15/26] COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
+2025-10-29T06:31:28.169458390Z [inf]  [builder 15/26] COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
+2025-10-29T06:31:28.170586420Z [inf]  [builder 16/26] COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
+2025-10-29T06:31:28.181171972Z [inf]  [builder 16/26] COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
+2025-10-29T06:31:28.182252738Z [inf]  [builder 17/26] COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
+2025-10-29T06:31:28.193876908Z [inf]  [builder 17/26] COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
+2025-10-29T06:31:28.195029849Z [inf]  [builder 18/26] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-10-29T06:31:28.238830762Z [inf]  [builder 18/26] COPY new-nextjs-app/src ./new-nextjs-app/src
+2025-10-29T06:31:28.239959041Z [inf]  [builder 19/26] COPY server ./server
+2025-10-29T06:31:28.261186328Z [inf]  [builder 19/26] COPY server ./server
+2025-10-29T06:31:28.261991301Z [inf]  [builder 20/26] COPY shared ./shared
+2025-10-29T06:31:28.275702595Z [inf]  [builder 20/26] COPY shared ./shared
+2025-10-29T06:31:28.276899370Z [inf]  [builder 21/26] COPY uploads ./uploads
+2025-10-29T06:31:28.290232026Z [inf]  [builder 21/26] COPY uploads ./uploads
+2025-10-29T06:31:28.291570861Z [inf]  [builder 22/26] COPY ecosystem.config.js ./
+2025-10-29T06:31:28.301844501Z [inf]  [builder 22/26] COPY ecosystem.config.js ./
+2025-10-29T06:31:28.302923502Z [inf]  [builder 23/26] COPY server.js ./
+2025-10-29T06:31:28.312965362Z [inf]  [builder 23/26] COPY server.js ./
+2025-10-29T06:31:28.313909181Z [inf]  [builder 24/26] COPY start-server.js ./
+2025-10-29T06:31:28.324081362Z [inf]  [builder 24/26] COPY start-server.js ./
+2025-10-29T06:31:28.325291867Z [inf]  [builder 25/26] WORKDIR /app/new-nextjs-app
+2025-10-29T06:31:28.335788202Z [inf]  [builder 25/26] WORKDIR /app/new-nextjs-app
+2025-10-29T06:31:28.336729156Z [inf]  [builder 26/26] RUN npm run build
+2025-10-29T06:31:28.71185915Z [inf]  
+> new-nextjs-app@0.1.0 build
+> next build
+
+
+2025-10-29T06:31:29.296963276Z [inf]  Attention: Next.js now collects completely anonymous telemetry regarding usage.
+
+2025-10-29T06:31:29.297514224Z [inf]  This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+2025-10-29T06:31:29.357228299Z [inf]    ▲ Next.js 14.2.14
+
+2025-10-29T06:31:29.357261869Z [inf]    - Experiments (use with caution):
+
+2025-10-29T06:31:29.357266384Z [inf]      · optimizeCss
+
+2025-10-29T06:31:29.357313952Z [inf]      · webpackBuildWorker
+
+2025-10-29T06:31:29.357319777Z [inf]      · parallelServerCompiles
+
+2025-10-29T06:31:29.35747227Z [inf]      · parallelServerBuildTraces
+
+2025-10-29T06:31:29.357726166Z [inf]  
+
+2025-10-29T06:31:29.460481916Z [inf]     Creating an optimized production build ...
+
+2025-10-29T06:31:48.860026229Z [inf]  Failed to compile.
+
+
+2025-10-29T06:31:48.860191506Z [inf]  ./src/app/user/project-favorites/page.tsx
+Error: 
+  [31mx[0m the name `dynamic` is defined multiple times
+    ,-[[36;1;4m/app/new-nextjs-app/src/app/user/project-favorites/page.tsx[0m:1:1]
+ [2m 1[0m | import dynamic from 'next/dynamic';
+    : [31;1m       ^^^|^^^[0m
+    :           [31;1m`-- [31;1mprevious definition of `dynamic` here[0m[0m
+ [2m 2[0m | 
+ [2m 3[0m | const dynamicImport = (importFunc: () => Promise<any>) => dynamic(importFunc, {
+ [2m 4[0m |   ssr: false,
+ [2m 5[0m |   loading: () => <div>Loading...</div>
+ [2m 6[0m | });
+ [2m 7[0m | 
+ [2m 8[0m | export const dynamic = 'force-dynamic';
+    : [33;1m             ^^^|^^^[0m
+    :                 [33;1m`-- [33;1m`dynamic` redefined here[0m[0m
+ [2m 9[0m | 
+ [2m10[0m | // Dynamically import the component to prevent SSR issues
+ [2m11[0m | const ProjectFavoritesClient = dynamicImport(() => import('./ProjectFavoritesClient'), {
+    `----
+
+Import trace for requested module:
+./src/app/user/project-favorites/page.tsx
+
+
+2025-10-29T06:31:48.877881936Z [inf]  
+
+2025-10-29T06:31:48.878165978Z [inf]  > Build failed because of webpack errors
+
+2025-10-29T06:31:48.894693215Z [inf]  npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.6.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.2
+npm notice To update run: npm install -g npm@11.6.2
+npm notice
+
+2025-10-29T06:31:49.289231902Z [err]  [builder 26/26] RUN npm run build
+2025-10-29T06:31:49.305070850Z [err]  Dockerfile:61
+2025-10-29T06:31:49.305103962Z [err]  -------------------
+2025-10-29T06:31:49.305108735Z [err]  59 |     WORKDIR /app/new-nextjs-app
+2025-10-29T06:31:49.305112335Z [err]  60 |     ENV SKIP_BUILD_STATIC_GENERATION=true
+2025-10-29T06:31:49.305117574Z [err]  61 | >>> RUN npm run build
+2025-10-29T06:31:49.305121856Z [err]  62 |
+2025-10-29T06:31:49.305127716Z [err]  63 |     # Production image, copy all the files and run next
+2025-10-29T06:31:49.305132588Z [err]  -------------------
+2025-10-29T06:31:49.305141318Z [err]  ERROR: failed to build: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 1

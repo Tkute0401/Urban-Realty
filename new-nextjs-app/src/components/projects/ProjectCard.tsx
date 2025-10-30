@@ -52,7 +52,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       
       try {
         const response = await fetch(
-          `/api/auth/project-favorites/${project._id}/status?userId=${user._id}`
+          `/api/auth/project-favorites/${project._id}/status?userId=${user.id}`
         );
         const data = await response.json();
         if (data.success) {
@@ -85,7 +85,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user._id }),
+        body: JSON.stringify({ userId: user.id }),
       });
 
       const data = await response.json();
