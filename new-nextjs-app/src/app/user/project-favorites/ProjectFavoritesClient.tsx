@@ -26,7 +26,7 @@ const ProjectFavoritesClient = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/auth/project-favorites?userId=${user._id}`);
+        const response = await fetch(`/api/auth/project-favorites?userId=${user.id}`);
         const data = await response.json();
         
         if (data.success) {
