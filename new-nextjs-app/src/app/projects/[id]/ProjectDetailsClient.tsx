@@ -121,7 +121,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       
       try {
         const response = await fetch(
-          `/api/auth/project-favorites/${projectId}/status?userId=${user._id}`
+          `/api/auth/project-favorites/${projectId}/status?userId=${user.id}`
         );
         const data = await response.json();
         if (data.success) {
@@ -152,7 +152,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user._id }),
+        body: JSON.stringify({ userId: user.id }),
       });
 
       const data = await response.json();
