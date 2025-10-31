@@ -1,9 +1,14 @@
-import dynamicComponent from 'next/dynamic';
+import dynamic from 'next/dynamic';
+
+const dynamicImport = (importFunc: () => Promise<any>) => dynamic(importFunc, {
+  ssr: false,
+  loading: () => <div>Loading...</div>
+});
 
 export const dynamic = 'force-dynamic';
 
 // Dynamically import the component to prevent SSR issues
-const ProjectFavoritesClient = dynamicComponent(() => import('./ProjectFavoritesClient'), {
+const ProjectFavoritesClient = dynamicImport(() => import('./ProjectFavoritesClient'), {
   ssr: false,
   loading: () => <div>Loading...</div>
 });

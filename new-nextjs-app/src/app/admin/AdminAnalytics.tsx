@@ -24,7 +24,7 @@ import {
   TrendingDown,
   People,
   Home,
-  AttachMoney,
+  CurrencyRupee,
   Business,
   Email,
   Visibility,
@@ -197,7 +197,7 @@ const AdminAnalytics = () => {
         }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <AttachMoney sx={{ mr: 1 }} />
+              <CurrencyRupee sx={{ mr: 1 }} />
               <Typography variant="h6">Revenue</Typography>
             </Box>
             <Typography variant="h3">${analytics.overview.totalRevenue || 0}</Typography>
@@ -394,7 +394,7 @@ const AdminAnalytics = () => {
                   {activity.type === 'user' && <People />}
                   {activity.type === 'property' && <Home />}
                   {activity.type === 'inquiry' && <Email />}
-                  {activity.type === 'subscription' && <AttachMoney />}
+                  {activity.type === 'subscription' && <CurrencyRupee />}
                 </Avatar>
               </ListItemIcon>
               <ListItemText

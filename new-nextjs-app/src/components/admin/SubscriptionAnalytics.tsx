@@ -23,7 +23,7 @@ import {
 import {
   TrendingUp as TrendingUpIcon,
   People as PeopleIcon,
-  AttachMoney as MoneyIcon,
+  CurrencyRupee as MoneyIcon,
   Cancel as CancelIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,

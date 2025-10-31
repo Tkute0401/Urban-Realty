@@ -36,7 +36,7 @@ import {
   Visibility as VisibilityIcon,
   People as PeopleIcon,
   Home as HomeIcon,
-  AttachMoney as MoneyIcon,
+  CurrencyRupee as MoneyIcon,
   CalendarToday as CalendarIcon,
   LocationOn as LocationIcon,
   Phone as PhoneIcon,

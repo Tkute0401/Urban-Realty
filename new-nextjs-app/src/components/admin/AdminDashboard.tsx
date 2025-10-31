@@ -46,7 +46,7 @@ import {
 import {
   TrendingUp as TrendingUpIcon, 
   People as PeopleIcon, 
-  AttachMoney as MoneyIcon, 
+  CurrencyRupee as MoneyIcon, 
   Business as BusinessIcon,
   Home as HomeIcon,
   Email as EmailIcon,

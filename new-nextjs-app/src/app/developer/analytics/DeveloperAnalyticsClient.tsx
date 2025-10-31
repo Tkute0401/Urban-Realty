@@ -38,7 +38,7 @@ import {
   Business as BusinessIcon,
   TrendingUp as TrendingUpIcon,
   People as PeopleIcon,
-  AttachMoney as MoneyIcon,
+  CurrencyRupee as MoneyIcon,
   Home as HomeIcon,
   Assessment as AnalyticsIcon,
   Add as AddIcon,

@@ -43,7 +43,7 @@ import {
   LocationOn,
   Business,
   CalendarToday,
-  AttachMoney,
+  CurrencyRupee,
   Visibility,
   Edit,
   Delete,
@@ -121,7 +121,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       
       try {
         const response = await fetch(
-          `/api/auth/project-favorites/${projectId}/status?userId=${user.id}`
+          `/api/auth/project-favorites/${projectId}/status?userId=${user._id}`
         );
         const data = await response.json();
         if (data.success) {
@@ -152,7 +152,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({ userId: user._id }),
       });
 
       const data = await response.json();
@@ -451,7 +451,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                     <List dense>
                       <ListItem>
                         <ListItemIcon>
-                          <AttachMoney color="primary" />
+                          <CurrencyRupee color="primary" />
                         </ListItemIcon>
                         <ListItemText
                           primary="Starting Price"
@@ -918,7 +918,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                   </ListItem>
                   <ListItem>
                     <ListItemIcon>
-                      <AttachMoney color="primary" />
+                      <CurrencyRupee color="primary" />
                     </ListItemIcon>
                     <ListItemText
                       primary="Price per Sq Ft"

@@ -55,7 +55,7 @@ import {
   Add as AddIcon,
   Refresh as RefreshIcon,
   CalendarToday as CalendarIcon,
-  AttachMoney as MoneyIcon,
+  CurrencyRupee as MoneyIcon,
   LocationOn as LocationIcon,
   Notifications as NotificationsIcon,
   Assessment as AssessmentIcon,

@@ -20,7 +20,7 @@ import {
   LocationOn,
   Business,
   CalendarToday,
-  AttachMoney,
+  CurrencyRupee,
   Visibility,
   Favorite,
   FavoriteBorder
@@ -277,7 +277,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
             {project.startingPrice && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AttachMoney sx={{ fontSize: 16, color: 'var(--color-text-secondary)' }} />
+                <CurrencyRupee sx={{ fontSize: 16, color: 'var(--color-text-secondary)' }} />
                 <Typography
                   variant="body2"
                   sx={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}

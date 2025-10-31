@@ -37,7 +37,7 @@ import {
   Cancel,
   Business,
   LocationOn,
-  AttachMoney,
+  CurrencyRupee,
   CalendarToday,
   Description,
   CloudUpload,
@@ -727,7 +727,7 @@ const AddProjectClient = () => {
 
         <StyledPaper>
           <SectionHeader variant="h5">
-            <AttachMoney />
+            <CurrencyRupee />
             Pricing Information
           </SectionHeader>
           
