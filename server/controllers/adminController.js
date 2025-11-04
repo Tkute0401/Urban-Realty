@@ -1536,7 +1536,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   // Update developer's project counts if status changed
   if (status && status !== oldStatus) {
     // Update counts for all developers associated with this project
-    const developerIds = project.developers || [];
+    const developerIds = updatedProject.developers || [];
     const oldStatusField = oldStatus === 'Completed' ? 'completedProjects' : 
                           oldStatus === 'Under Construction' ? 'ongoingProjects' : 
                           'upcomingProjects';
