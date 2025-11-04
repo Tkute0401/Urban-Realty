@@ -173,20 +173,42 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               position: 'absolute',
               top: 8,
               right: 8,
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              backdropFilter: 'blur(4px)',
-              zIndex: 1,
+              backgroundColor: isFavorite 
+                ? 'rgba(244, 67, 54, 0.9)' 
+                : 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 2,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 1)',
+                backgroundColor: isFavorite 
+                  ? 'rgba(244, 67, 54, 1)' 
+                  : 'rgba(244, 67, 54, 0.1)',
+                transform: 'scale(1.1)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              },
+              '&:active': {
+                transform: 'scale(0.95)',
+              },
+              '&:disabled': {
+                opacity: 0.7,
               },
             }}
           >
             {loadingFavorite ? (
-              <CircularProgress size={20} />
+              <CircularProgress size={20} sx={{ color: isFavorite ? 'white' : 'var(--color-primary)' }} />
             ) : isFavorite ? (
-              <Favorite sx={{ color: 'red' }} />
+              <Favorite sx={{ 
+                color: 'white',
+                fontSize: 24,
+                transition: 'all 0.3s ease',
+              }} />
             ) : (
-              <FavoriteBorder sx={{ color: 'gray' }} />
+              <FavoriteBorder sx={{ 
+                color: isFavorite ? 'white' : 'var(--color-text-secondary)',
+                fontSize: 24,
+                transition: 'all 0.3s ease',
+              }} />
             )}
           </IconButton>
         </Tooltip>
