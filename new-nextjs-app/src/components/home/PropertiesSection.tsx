@@ -20,6 +20,7 @@ const PropertiesSection: React.FC = () => {
       component="section"
       sx={{
         py: 8,
+        pt: { xs: 12, sm: 10, md: 8 }, // Extra top padding on mobile to account for search bar
         background: 'var(--color-bg)',
         borderTop: '1px solid var(--color-border)'
       }}

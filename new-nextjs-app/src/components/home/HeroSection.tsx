@@ -221,7 +221,7 @@ const HeroSection = () => {
   }
 
   return (
-    <section className="relative h-[70vh] sm:h-screen flex items-center justify-center overflow-visible z-0">
+    <section className="relative h-[75vh] min-h-[500px] sm:h-screen flex items-center justify-center overflow-visible z-0">
       {/* Background image */}
       <div className="absolute inset-0">
         <img 
@@ -498,10 +498,14 @@ const HeroSection = () => {
       </AnimatePresence>
       
       {/* Search and filter bar */}
-      <div className="absolute bottom-8 sm:bottom-12 md:bottom-16 left-0 right-0 flex flex-col items-center px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4 transform translate-y-1/2"
+      <div className="absolute bottom-4 sm:bottom-8 md:bottom-12 left-0 right-0 flex flex-col items-center px-2 sm:px-4 md:px-6 lg:px-8 gap-2 sm:gap-3 md:gap-4"
            style={{ zIndex: 'var(--z-sticky)' }}>
         {/* Main search container */}
-        <div className="w-full max-w-2xl bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1 border border-white/20 relative"
+        <div className={`w-full max-w-2xl backdrop-blur-md rounded-xl sm:rounded-2xl p-1 border relative shadow-xl ${
+          theme === 'light' 
+            ? 'bg-white/20 border-white/30' 
+            : 'bg-white/10 border-white/20'
+        }`}
              style={{ zIndex: 'var(--z-elevated)' }}>
           {/* Property type tabs */}
           <div className="flex gap-0 mb-1 sm:mb-1.5 rounded-lg sm:rounded-xl p-1">
@@ -536,7 +540,11 @@ const HeroSection = () => {
 
           {/* Search input section */}
           <div className="relative">
-            <form onSubmit={handleSearch} className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-visible border border-white/20 max-h-8 sm:max-h-10 md:max-h-12">
+            <form onSubmit={handleSearch} className={`flex items-center backdrop-blur-md rounded-lg sm:rounded-xl overflow-visible border max-h-8 sm:max-h-10 md:max-h-12 ${
+              theme === 'light' 
+                ? 'bg-white/20 border-white/30' 
+                : 'bg-white/10 border-white/20'
+            }`}>
               {/* City dropdown */}
               {availableCities.length > 0 && (
                 <div className="relative flex-shrink-0 border-r border-white/20 overflow-visible max-h-8 sm:max-h-10 md:max-h-12"
@@ -621,8 +629,9 @@ const HeroSection = () => {
         onClose={() => setIsAccountSidebarOpen(false)}
       />
 
-      {/* Gradient overlay at bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-8 sm:h-10 bg-gradient-to-b from-transparent to-[var(--color-bg-dark)] pointer-events-none"></div>
+      {/* Gradient overlay at bottom - ensures smooth transition */}
+      <div className="absolute bottom-0 left-0 w-full h-16 sm:h-20 md:h-24 bg-gradient-to-b from-transparent via-transparent to-[var(--color-bg-primary)] pointer-events-none" 
+           style={{ opacity: theme === 'light' ? 0.6 : 1 }}></div>
     </section>
   );
 };

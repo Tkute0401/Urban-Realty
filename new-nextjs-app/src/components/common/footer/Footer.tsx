@@ -34,7 +34,7 @@ const Footer = () => {
     const fetchCitiesAndLocalities = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/cities?limit=15');
+        const response = await fetch('/api/v1/cities?limit=15');
         const result = await response.json();
         
         if (result.success && result.data) {
