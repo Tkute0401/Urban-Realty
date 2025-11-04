@@ -34,7 +34,9 @@ import {
   Divider,
   Avatar,
   Link,
-  Autocomplete
+  Autocomplete,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import { 
   MoreVert, 
@@ -116,18 +118,36 @@ const ProjectsTable = () => {
     developer: '',
     name: '',
     description: '',
+    shortDescription: '',
     type: '',
     status: '',
     location: {
       address: '',
       city: '',
       state: '',
-      pincode: ''
+      pincode: '',
+      country: 'India'
     },
     totalUnits: '',
     totalArea: '',
+    launchDate: '',
+    possessionDate: '',
+    constructionStartDate: '',
+    estimatedCompletionDate: '',
+    startingPrice: '',
+    pricePerSqFt: '',
+    priceRange: {
+      min: '',
+      max: ''
+    },
     amenities: [] as string[],
-    features: [] as string[]
+    features: [] as string[],
+    keywords: [] as string[],
+    reraNumber: '',
+    metaDescription: '',
+    isActive: true,
+    isFeatured: false,
+    isPublished: false
   });
   const [createFormData, setCreateFormData] = useState({
     developer: '',
@@ -239,16 +259,34 @@ const ProjectsTable = () => {
         description: selectedProject.description,
         type: selectedProject.type,
         status: selectedProject.status,
+        shortDescription: selectedProject.shortDescription || '',
         location: {
           address: selectedProject.location.address,
           city: selectedProject.location.city,
           state: selectedProject.location.state,
-          pincode: selectedProject.location.pincode
+          pincode: selectedProject.location.pincode,
+          country: selectedProject.location.country || 'India'
         },
         totalUnits: selectedProject.totalUnits?.toString() || '',
         totalArea: selectedProject.totalArea?.toString() || '',
-        amenities: selectedProject.amenities || [],
-        features: selectedProject.features || []
+        launchDate: selectedProject.launchDate ? new Date(selectedProject.launchDate).toISOString().split('T')[0] : '',
+        possessionDate: selectedProject.possessionDate ? new Date(selectedProject.possessionDate).toISOString().split('T')[0] : '',
+        constructionStartDate: selectedProject.constructionStartDate ? new Date(selectedProject.constructionStartDate).toISOString().split('T')[0] : '',
+        estimatedCompletionDate: selectedProject.estimatedCompletionDate ? new Date(selectedProject.estimatedCompletionDate).toISOString().split('T')[0] : '',
+        startingPrice: selectedProject.startingPrice?.toString() || '',
+        pricePerSqFt: selectedProject.pricePerSqFt?.toString() || '',
+        priceRange: {
+          min: selectedProject.priceRange?.min?.toString() || '',
+          max: selectedProject.priceRange?.max?.toString() || ''
+        },
+        amenities: (selectedProject.amenities || []).map((a: any) => a.name || a),
+        features: (selectedProject.features || []).map((f: any) => f.name || f),
+        keywords: selectedProject.keywords || [],
+        reraNumber: selectedProject.reraNumber || '',
+        metaDescription: selectedProject.metaDescription || '',
+        isActive: selectedProject.isActive !== undefined ? selectedProject.isActive : true,
+        isFeatured: selectedProject.isFeatured || false,
+        isPublished: selectedProject.isPublished || false
       });
       setEditDialogOpen(true);
     }
@@ -280,7 +318,19 @@ const ProjectsTable = () => {
       const submitData = {
         ...editFormData,
         totalUnits: editFormData.totalUnits ? parseInt(editFormData.totalUnits) : undefined,
-        totalArea: editFormData.totalArea ? parseInt(editFormData.totalArea) : undefined
+        totalArea: editFormData.totalArea ? parseInt(editFormData.totalArea) : undefined,
+        startingPrice: editFormData.startingPrice ? parseFloat(editFormData.startingPrice) : undefined,
+        pricePerSqFt: editFormData.pricePerSqFt ? parseFloat(editFormData.pricePerSqFt) : undefined,
+        priceRange: {
+          min: editFormData.priceRange.min ? parseFloat(editFormData.priceRange.min) : undefined,
+          max: editFormData.priceRange.max ? parseFloat(editFormData.priceRange.max) : undefined
+        },
+        launchDate: editFormData.launchDate || undefined,
+        possessionDate: editFormData.possessionDate || undefined,
+        constructionStartDate: editFormData.constructionStartDate || undefined,
+        estimatedCompletionDate: editFormData.estimatedCompletionDate || undefined,
+        amenities: editFormData.amenities.map((a: string) => ({ name: a, description: '' })),
+        features: editFormData.features.map((f: string) => ({ name: f, description: '' }))
       };
       await http.put(`/api/v1/admin/projects/${selectedProject._id}`, submitData);
       await fetchProjects();
@@ -699,9 +749,9 @@ const ProjectsTable = () => {
       </Dialog>
 
       {/* Edit Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="lg" fullWidth>
         <DialogTitle>Edit Project</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <FormControl fullWidth required>
@@ -730,9 +780,27 @@ const ProjectsTable = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                label="Short Description"
+                multiline
+                rows={2}
+                value={editFormData.shortDescription}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 500) {
+                    setEditFormData({ ...editFormData, shortDescription: value });
+                  }
+                }}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${editFormData.shortDescription.length}/500 characters`}
+                placeholder="Brief summary for project cards..."
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
                 label="Description"
                 multiline
-                rows={3}
+                rows={4}
                 value={editFormData.description}
                 onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                 required
@@ -845,6 +913,103 @@ const ProjectsTable = () => {
               />
             </Grid>
             <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Timeline & Dates</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Launch Date"
+                type="date"
+                value={editFormData.launchDate}
+                onChange={(e) => setEditFormData({ ...editFormData, launchDate: e.target.value })}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Possession Date"
+                type="date"
+                value={editFormData.possessionDate}
+                onChange={(e) => setEditFormData({ ...editFormData, possessionDate: e.target.value })}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Construction Start Date"
+                type="date"
+                value={editFormData.constructionStartDate}
+                onChange={(e) => setEditFormData({ ...editFormData, constructionStartDate: e.target.value })}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Estimated Completion Date"
+                type="date"
+                value={editFormData.estimatedCompletionDate}
+                onChange={(e) => setEditFormData({ ...editFormData, estimatedCompletionDate: e.target.value })}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Pricing</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Starting Price (₹)"
+                type="number"
+                value={editFormData.startingPrice}
+                onChange={(e) => setEditFormData({ ...editFormData, startingPrice: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Price per Sq Ft (₹)"
+                type="number"
+                value={editFormData.pricePerSqFt}
+                onChange={(e) => setEditFormData({ ...editFormData, pricePerSqFt: e.target.value })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Price Range - Min (₹)"
+                type="number"
+                value={editFormData.priceRange.min}
+                onChange={(e) => setEditFormData({
+                  ...editFormData,
+                  priceRange: { ...editFormData.priceRange, min: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Price Range - Max (₹)"
+                type="number"
+                value={editFormData.priceRange.max}
+                onChange={(e) => setEditFormData({
+                  ...editFormData,
+                  priceRange: { ...editFormData.priceRange, max: e.target.value }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Amenities & Features</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12}>
               <Autocomplete
                 multiple
                 options={commonAmenities}
@@ -876,6 +1041,76 @@ const ProjectsTable = () => {
                     placeholder="Select features"
                   />
                 )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Legal & SEO</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="RERA Number"
+                value={editFormData.reraNumber}
+                onChange={(e) => setEditFormData({ ...editFormData, reraNumber: e.target.value })}
+                placeholder="Enter RERA registration number"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Meta Description (for SEO)"
+                multiline
+                rows={3}
+                value={editFormData.metaDescription}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 160) {
+                    setEditFormData({ ...editFormData, metaDescription: value });
+                  }
+                }}
+                inputProps={{ maxLength: 160 }}
+                helperText={`${editFormData.metaDescription.length}/160 characters`}
+                placeholder="Brief description for search engines..."
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }}>
+                <Typography variant="subtitle2">Project Status & Visibility</Typography>
+              </Divider>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editFormData.isActive}
+                    onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.checked })}
+                  />
+                }
+                label="Active Project"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editFormData.isFeatured}
+                    onChange={(e) => setEditFormData({ ...editFormData, isFeatured: e.target.checked })}
+                  />
+                }
+                label="Featured Project"
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editFormData.isPublished}
+                    onChange={(e) => setEditFormData({ ...editFormData, isPublished: e.target.checked })}
+                  />
+                }
+                label="Published"
               />
             </Grid>
           </Grid>
