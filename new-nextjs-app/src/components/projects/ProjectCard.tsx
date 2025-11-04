@@ -51,8 +51,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       if (!user || !project?._id) return;
       
       try {
+        const userId = (user as any)?.id || (user as any)?._id;
         const response = await fetch(
-          `/api/auth/project-favorites/${project._id}/status?userId=${user._id}`
+          `/api/auth/project-favorites/${project._id}/status?userId=${userId}`
         );
         const data = await response.json();
         if (data.success) {
@@ -77,6 +78,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
     setLoadingFavorite(true);
     try {
+      const userId = (user as any)?.id || (user as any)?._id;
       const url = `/api/auth/project-favorites/${project._id}`;
       const method = isFavorite ? 'DELETE' : 'PUT';
       
@@ -85,7 +87,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user._id }),
+        body: JSON.stringify({ userId }),
       });
 
       const data = await response.json();

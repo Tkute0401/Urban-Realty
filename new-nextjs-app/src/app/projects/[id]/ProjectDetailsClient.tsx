@@ -120,8 +120,9 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       if (!user || !projectId) return;
       
       try {
+        const userId = (user as any)?.id || (user as any)?._id;
         const response = await fetch(
-          `/api/auth/project-favorites/${projectId}/status?userId=${user._id}`
+          `/api/auth/project-favorites/${projectId}/status?userId=${userId}`
         );
         const data = await response.json();
         if (data.success) {
@@ -144,6 +145,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
 
     setLoadingFavorite(true);
     try {
+      const userId = (user as any)?.id || (user as any)?._id;
       const url = `/api/auth/project-favorites/${projectId}`;
       const method = isFavorite ? 'DELETE' : 'PUT';
       
@@ -152,7 +154,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user._id }),
+        body: JSON.stringify({ userId }),
       });
 
       const data = await response.json();
