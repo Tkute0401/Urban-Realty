@@ -340,6 +340,35 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     cleanReqBody.shortDescription = cleanReqBody.shortDescription.substring(0, 500);
   }
 
+  // Helper function to parse numeric fields
+  const parseNumber = (value) => {
+    if (!value || value === '' || value === 'undefined' || value === 'null') return undefined;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? undefined : parsed;
+  };
+
+  // Helper function to parse date fields
+  const parseDate = (value) => {
+    if (!value || value === '' || value === 'undefined' || value === 'null') return undefined;
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? undefined : parsed;
+  };
+
+  // Parse priceRange if it exists
+  let parsedPriceRange = undefined;
+  if (cleanReqBody.priceRange) {
+    parsedPriceRange = {};
+    if (cleanReqBody.priceRange.min !== undefined && cleanReqBody.priceRange.min !== '') {
+      const min = parseNumber(cleanReqBody.priceRange.min);
+      if (min !== undefined) parsedPriceRange.min = min;
+    }
+    if (cleanReqBody.priceRange.max !== undefined && cleanReqBody.priceRange.max !== '') {
+      const max = parseNumber(cleanReqBody.priceRange.max);
+      if (max !== undefined) parsedPriceRange.max = max;
+    }
+    if (Object.keys(parsedPriceRange).length === 0) parsedPriceRange = undefined;
+  }
+
   // Create new project instance
   const project = new Project({
     name: cleanReqBody.name,
@@ -347,18 +376,18 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     shortDescription: cleanReqBody.shortDescription,
     type: cleanReqBody.type,
     status: cleanReqBody.status,
-    totalUnits: cleanReqBody.totalUnits,
-    totalArea: cleanReqBody.totalArea,
+    totalUnits: parseNumber(cleanReqBody.totalUnits),
+    totalArea: parseNumber(cleanReqBody.totalArea),
     unitTypes: cleanReqBody.unitTypes,
     configurations: cleanReqBody.configurations,
     location: cleanReqBody.location,
-    launchDate: cleanReqBody.launchDate,
-    possessionDate: cleanReqBody.possessionDate,
-    constructionStartDate: cleanReqBody.constructionStartDate,
-    estimatedCompletionDate: cleanReqBody.estimatedCompletionDate,
-    pricePerSqFt: cleanReqBody.pricePerSqFt,
-    startingPrice: cleanReqBody.startingPrice,
-    priceRange: cleanReqBody.priceRange,
+    launchDate: parseDate(cleanReqBody.launchDate),
+    possessionDate: parseDate(cleanReqBody.possessionDate),
+    constructionStartDate: parseDate(cleanReqBody.constructionStartDate),
+    estimatedCompletionDate: parseDate(cleanReqBody.estimatedCompletionDate),
+    pricePerSqFt: parseNumber(cleanReqBody.pricePerSqFt),
+    startingPrice: parseNumber(cleanReqBody.startingPrice),
+    priceRange: parsedPriceRange,
     amenities: cleanReqBody.amenities,
     features: cleanReqBody.features,
     keywords: cleanReqBody.keywords,
@@ -583,9 +612,74 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     cleanReqBody.shortDescription = cleanReqBody.shortDescription.substring(0, 500);
   }
 
-  // Update project fields
+  // Helper function to parse numeric fields
+  const parseNumber = (value) => {
+    if (!value || value === '' || value === 'undefined' || value === 'null') return undefined;
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? undefined : parsed;
+  };
+
+  // Helper function to parse date fields
+  const parseDate = (value) => {
+    if (!value || value === '' || value === 'undefined' || value === 'null') return undefined;
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? undefined : parsed;
+  };
+
+  // Parse numeric and date fields before updating
+  const numericFields = ['totalUnits', 'totalArea', 'startingPrice', 'pricePerSqFt'];
+  const dateFields = ['launchDate', 'possessionDate', 'constructionStartDate', 'estimatedCompletionDate'];
+  
+  numericFields.forEach(field => {
+    if (cleanReqBody[field] !== undefined) {
+      const parsed = parseNumber(cleanReqBody[field]);
+      if (parsed !== undefined) {
+        project[field] = parsed;
+      } else if (cleanReqBody[field] === '' || cleanReqBody[field] === null) {
+        project[field] = undefined;
+      }
+    }
+  });
+
+  dateFields.forEach(field => {
+    if (cleanReqBody[field] !== undefined) {
+      const parsed = parseDate(cleanReqBody[field]);
+      if (parsed !== undefined) {
+        project[field] = parsed;
+      } else if (cleanReqBody[field] === '' || cleanReqBody[field] === null) {
+        project[field] = undefined;
+      }
+    }
+  });
+
+  // Parse priceRange if it exists
+  if (cleanReqBody.priceRange !== undefined) {
+    if (cleanReqBody.priceRange && typeof cleanReqBody.priceRange === 'object') {
+      const parsedPriceRange = {};
+      if (cleanReqBody.priceRange.min !== undefined && cleanReqBody.priceRange.min !== '') {
+        const min = parseNumber(cleanReqBody.priceRange.min);
+        if (min !== undefined) parsedPriceRange.min = min;
+      }
+      if (cleanReqBody.priceRange.max !== undefined && cleanReqBody.priceRange.max !== '') {
+        const max = parseNumber(cleanReqBody.priceRange.max);
+        if (max !== undefined) parsedPriceRange.max = max;
+      }
+      if (Object.keys(parsedPriceRange).length > 0) {
+        project.priceRange = parsedPriceRange;
+      } else {
+        project.priceRange = undefined;
+      }
+    } else {
+      project.priceRange = undefined;
+    }
+  }
+
+  // Update other project fields (excluding the ones we've already handled)
   Object.keys(cleanReqBody).forEach(key => {
-    if (cleanReqBody[key] !== undefined) {
+    if (cleanReqBody[key] !== undefined && 
+        !numericFields.includes(key) && 
+        !dateFields.includes(key) && 
+        key !== 'priceRange') {
       project[key] = cleanReqBody[key];
     }
   });
