@@ -159,9 +159,9 @@ const SubscriptionComparison = () => {
   const getPrice = (plan) => {
     if (showYearly) {
       const yearlyPrice = plan.price * 12 * 0.8; // 20% discount for yearly
-      return `$${yearlyPrice.toFixed(0)}/year`;
+      return `₹${yearlyPrice.toFixed(0)}/year`;
     }
-    return `$${plan.price}/month`;
+    return `₹${plan.price}/month`;
   };
 
   const getSavings = (plan) => {
@@ -169,7 +169,7 @@ const SubscriptionComparison = () => {
       const monthlyTotal = plan.price * 12;
       const yearlyPrice = plan.price * 12 * 0.8;
       const savings = monthlyTotal - yearlyPrice;
-      return `Save $${savings.toFixed(0)}/year`;
+      return `Save ₹${savings.toFixed(0)}/year`;
     }
     return '';
   };
@@ -368,7 +368,7 @@ const SubscriptionComparison = () => {
                   {plans.map((plan) => (
                     <TableCell key={plan._id} align="center">
                       <Typography variant="h6" color="primary" fontWeight="bold">
-                        ${plan.price}
+                        ₹{plan.price}
                       </Typography>
                     </TableCell>
                   ))}
@@ -380,10 +380,10 @@ const SubscriptionComparison = () => {
                   {plans.map((plan) => (
                     <TableCell key={plan._id} align="center">
                       <Typography variant="h6" color="warning.main" fontWeight="bold">
-                        ${(plan.price * 12 * 0.8).toFixed(0)}
+                        ₹{(plan.price * 12 * 0.8).toFixed(0)}
                       </Typography>
                       <Typography variant="caption" color="success.main">
-                        Save ${(plan.price * 12 * 0.2).toFixed(0)}/year
+                        Save ₹{(plan.price * 12 * 0.2).toFixed(0)}/year
                       </Typography>
                     </TableCell>
                   ))}

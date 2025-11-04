@@ -299,7 +299,7 @@ const SubscriptionManagement = () => {
                   </Typography>
                   
                   <Typography variant="h5" color="primary" gutterBottom>
-                    ${plan.price}/{plan.billingCycle}
+                    ₹{plan.price}/{plan.billingCycle}
                   </Typography>
                   
                   <Box sx={{ mt: 2 }}>
@@ -370,7 +370,7 @@ const SubscriptionManagement = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        ${subscription.amount} {subscription.currency}
+                        ₹{subscription.amount} {subscription.currency}
                       </TableCell>
                       <TableCell>
                         <Chip 
@@ -652,7 +652,7 @@ const SubscriptionManagement = () => {
               <Grid item xs={12} md={6}>
                 <Typography variant="subtitle2" color="text.secondary">Amount</Typography>
                 <Typography variant="body1" gutterBottom>
-                  ${selectedSubscription.amount} {selectedSubscription.currency}
+                  ₹{selectedSubscription.amount} {selectedSubscription.currency}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {selectedSubscription.billingCycle}

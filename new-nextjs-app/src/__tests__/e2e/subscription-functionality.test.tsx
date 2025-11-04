@@ -187,9 +187,9 @@ describe('💳 Subscription Functionality Tests', () => {
         expect(screen.getByText('Basic')).toBeInTheDocument()
         expect(screen.getByText('Enterprise')).toBeInTheDocument()
         
-        expect(screen.getByText('$0')).toBeInTheDocument()
-        expect(screen.getByText('$29')).toBeInTheDocument()
-        expect(screen.getByText('$299')).toBeInTheDocument()
+        expect(screen.getByText('₹0')).toBeInTheDocument()
+        expect(screen.getByText('₹29')).toBeInTheDocument()
+        expect(screen.getByText('₹299')).toBeInTheDocument()
       })
     })
 
@@ -225,8 +225,8 @@ describe('💳 Subscription Functionality Tests', () => {
 
       await waitFor(() => {
         // Yearly prices should be displayed (with discount)
-        expect(screen.getByText('$348')).toBeInTheDocument() // $29 * 12 with discount
-        expect(screen.getByText('$3588')).toBeInTheDocument() // $299 * 12 with discount
+        expect(screen.getByText('₹348')).toBeInTheDocument() // ₹29 * 12 with discount
+        expect(screen.getByText('₹3588')).toBeInTheDocument() // ₹299 * 12 with discount
       })
     })
   })
@@ -335,7 +335,7 @@ describe('💳 Subscription Functionality Tests', () => {
         expect(screen.getByText(/billing dashboard/i)).toBeInTheDocument()
         expect(screen.getByText(/current plan/i)).toBeInTheDocument()
         expect(screen.getByText('Basic')).toBeInTheDocument()
-        expect(screen.getByText('$29/month')).toBeInTheDocument()
+        expect(screen.getByText('₹29/month')).toBeInTheDocument()
       })
     })
 
@@ -357,7 +357,7 @@ describe('💳 Subscription Functionality Tests', () => {
         expect(screen.getByText(/billing history/i)).toBeInTheDocument()
         expect(screen.getByText('INV-001')).toBeInTheDocument()
         expect(screen.getByText('INV-002')).toBeInTheDocument()
-        expect(screen.getAllByText('$29')).toHaveLength(2) // Current plan + history
+        expect(screen.getAllByText('₹29')).toHaveLength(2) // Current plan + history
       })
     })
 

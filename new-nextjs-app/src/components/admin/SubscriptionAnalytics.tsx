@@ -190,7 +190,7 @@ const SubscriptionAnalytics = () => {
                 <Typography variant="h6">Monthly Revenue</Typography>
               </Box>
               <Typography variant="h4" color="success">
-                ${analytics.monthlyRevenue || 0}
+                ₹{analytics.monthlyRevenue || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {analytics.revenueGrowth > 0 ? '+' : ''}{analytics.revenueGrowth || 0}% from last month
@@ -340,7 +340,7 @@ const SubscriptionAnalytics = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        ${subscription.amount} {subscription.currency}
+                        ₹{subscription.amount} {subscription.currency}
                       </TableCell>
                       <TableCell>
                         <Chip 

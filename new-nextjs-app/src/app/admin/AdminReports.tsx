@@ -518,7 +518,7 @@ const AdminReports = () => {
                       <TableCell>{agent.name}</TableCell>
                       <TableCell>{agent.propertiesCount}</TableCell>
                       <TableCell>{agent.inquiriesCount}</TableCell>
-                      <TableCell>${agent.revenue}</TableCell>
+                      <TableCell>₹{agent.revenue}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Star sx={{ color: 'gold', fontSize: 'small', mr: 0.5 }} />

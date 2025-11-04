@@ -386,7 +386,7 @@ const UserProfile = () => {
                     <ListItem>
                       <ListItemText 
                         primary="Amount"
-                        secondary={`$${subscription.amount} ${subscription.currency}`}
+                        secondary={`₹${subscription.amount} ${subscription.currency}`}
                       />
                     </ListItem>
                     

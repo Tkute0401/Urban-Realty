@@ -249,8 +249,19 @@ const ContactModal: React.FC<ContactModalProps> = ({
       PaperProps={{
         sx: {
           borderRadius: '16px',
-          background: 'var(--color-bg-secondary)',
-          border: '1px solid var(--color-border)'
+          backgroundColor: (theme) => 
+            theme.palette.mode === 'dark' 
+              ? 'rgba(30, 30, 45, 0.98)' 
+              : 'rgba(255, 255, 255, 0.98)',
+          border: '1px solid var(--color-border)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
+        }
+      }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(4px)'
         }
       }}
     >

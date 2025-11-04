@@ -161,7 +161,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   {plan.name} Plan ({billingCycle})
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  ${billingCycle === 'yearly' ? `${(plan.price * 12).toFixed(2)}` : `${plan.price}`}
+                  ₹{billingCycle === 'yearly' ? `${(plan.price * 12).toFixed(2)}` : `${plan.price}`}
                 </Typography>
               </Box>
               {billingCycle === 'yearly' && (
@@ -170,7 +170,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     Yearly Discount (20%)
                   </Typography>
                   <Typography variant="body2" color="var(--color-success)" sx={{ fontWeight: 'bold' }}>
-                    -${getSavings().toFixed(2)}
+                    -₹{getSavings().toFixed(2)}
                   </Typography>
                 </Box>
               )}
@@ -180,7 +180,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   Total
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                  ${getTotalPrice().toFixed(2)}
+                  ₹{getTotalPrice().toFixed(2)}
                 </Typography>
               </Box>
             </CardContent>
@@ -455,7 +455,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             ) : (
               <>
                 <CheckIcon sx={{ mr: 1 }} />
-                Complete Payment (${getTotalPrice().toFixed(2)})
+                Complete Payment (₹{getTotalPrice().toFixed(2)})
               </>
             )}
           </Button>

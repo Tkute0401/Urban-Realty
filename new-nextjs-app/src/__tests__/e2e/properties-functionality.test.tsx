@@ -179,7 +179,7 @@ describe('🏘️ Properties Functionality Tests', () => {
       })
 
       // Check property details
-      expect(screen.getByText('$850,000')).toBeInTheDocument()
+      expect(screen.getByText('₹850,000')).toBeInTheDocument()
       expect(screen.getByText('4 bed')).toBeInTheDocument()
       expect(screen.getByText('3 bath')).toBeInTheDocument()
       expect(screen.getByText('2,500 sqft')).toBeInTheDocument()

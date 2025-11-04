@@ -120,9 +120,9 @@ const SubscriptionPlans = () => {
   const getPrice = (plan: SubscriptionPlan) => {
     if (showYearly) {
       const yearlyPrice = plan.price * 12 * 0.8; // 20% discount for yearly
-      return `$${yearlyPrice.toFixed(0)}/year`;
+      return `₹${yearlyPrice.toFixed(0)}/year`;
     }
-    return `$${plan.price}/month`;
+    return `₹${plan.price}/month`;
   };
 
   const getSavings = (plan: SubscriptionPlan) => {
@@ -130,7 +130,7 @@ const SubscriptionPlans = () => {
       const monthlyTotal = plan.price * 12;
       const yearlyPrice = plan.price * 12 * 0.8;
       const savings = monthlyTotal - yearlyPrice;
-      return `Save $${savings.toFixed(0)}/year`;
+      return `Save ₹${savings.toFixed(0)}/year`;
     }
     return '';
   };

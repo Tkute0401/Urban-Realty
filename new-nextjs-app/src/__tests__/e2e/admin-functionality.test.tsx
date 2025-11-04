@@ -183,7 +183,7 @@ describe('👨‍💼 Admin Functionality Tests', () => {
       )
 
       await waitFor(() => {
-        expect(screen.getByText(/\$50,000/)).toBeInTheDocument() // Revenue
+        expect(screen.getByText(/₹50,000/)).toBeInTheDocument() // Revenue
         expect(screen.getByText(/12/)).toBeInTheDocument()       // Properties sold
         expect(screen.getByText(/8/)).toBeInTheDocument()        // New users
         expect(screen.getByText(/63/)).toBeInTheDocument()       // Active listings

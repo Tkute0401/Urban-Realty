@@ -470,7 +470,7 @@ const AdminDashboard: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Revenue"
-            value={`$${stats.counts.revenue.toLocaleString()}`}
+            value={`₹${stats.counts.revenue.toLocaleString()}`}
             icon={<MoneyIcon />}
             color="var(--color-primary)"
             subtitle="Monthly revenue"
@@ -581,7 +581,7 @@ const AdminDashboard: React.FC = () => {
                               {agent.properties} properties
                             </Typography>
                             <Typography variant="body2" fontWeight="bold" color="primary">
-                              ${agent.revenue.toLocaleString()}
+                              ₹{agent.revenue.toLocaleString()}
                             </Typography>
                           </Box>
                         }

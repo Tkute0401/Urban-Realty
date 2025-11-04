@@ -142,7 +142,7 @@ const BillingDashboard = () => {
                 </Typography>
               </Box>
               <Typography variant="h4" component="div" sx={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>
-                ${calculateTotalSpent().toFixed(2)}
+                ₹{calculateTotalSpent().toFixed(2)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Lifetime spending
@@ -161,7 +161,7 @@ const BillingDashboard = () => {
                 </Typography>
               </Box>
               <Typography variant="h4" component="div" sx={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
-                ${billingData?.upcomingBilling?.amount || 0}
+                ₹{billingData?.upcomingBilling?.amount || 0}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {billingData?.upcomingBilling?.billingCycle || 'N/A'}
@@ -307,7 +307,7 @@ const BillingDashboard = () => {
                     <TableRow key={bill._id}>
                       <TableCell>{new Date(bill.date).toLocaleDateString()}</TableCell>
                       <TableCell>{bill.description}</TableCell>
-                      <TableCell>${bill.amount} {bill.currency}</TableCell>
+                      <TableCell>₹{bill.amount} {bill.currency}</TableCell>
                       <TableCell>
                         <Chip 
                           label={bill.status} 

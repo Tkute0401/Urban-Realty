@@ -228,7 +228,7 @@ const SubscriptionManagement = () => {
                   icon={getStatusIcon(subscription.status)}
                 />
                 <Typography variant="h4" color="var(--color-primary)" sx={{ fontWeight: 'bold' }}>
-                  ${plan.price}/month
+                  ₹{plan.price}/month
                 </Typography>
               </Box>
             </Box>
@@ -284,7 +284,7 @@ const SubscriptionManagement = () => {
                 </Typography>
               </Box>
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                ${subscription.totalPaid}
+                ₹{subscription.totalPaid}
               </Typography>
             </Grid>
           </Grid>
@@ -481,7 +481,7 @@ const SubscriptionManagement = () => {
                         {upgradePlan.name}
                       </Typography>
                       <Typography variant="h4" color="var(--color-primary)" sx={{ fontWeight: 'bold', mb: 2 }}>
-                        ${upgradePlan.price}/month
+                        ₹{upgradePlan.price}/month
                       </Typography>
                       <Typography variant="body2" color="var(--color-text-secondary)" sx={{ mb: 2 }}>
                         {upgradePlan.description}

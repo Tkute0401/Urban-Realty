@@ -200,7 +200,7 @@ const AdminAnalytics = () => {
               <CurrencyRupee sx={{ mr: 1 }} />
               <Typography variant="h6">Revenue</Typography>
             </Box>
-            <Typography variant="h3">${analytics.overview.totalRevenue || 0}</Typography>
+            <Typography variant="h3">₹{analytics.overview.totalRevenue || 0}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
               {analytics.overview.revenueGrowth > 0 ? (
                 <TrendingUp sx={{ mr: 0.5, fontSize: 'small' }} />
@@ -297,7 +297,7 @@ const AdminAnalytics = () => {
                 secondary={`${agent.propertiesCount} properties • ${agent.inquiriesCount} inquiries`}
               />
               <Chip 
-                label={`$${agent.revenue}`} 
+                label={`₹${agent.revenue}`} 
                 color="primary" 
                 variant="outlined"
               />

@@ -196,7 +196,7 @@ const TrustSafety = () => {
                   className="p-4 rounded-lg backdrop-blur-sm"
                   style={{ backgroundColor: `${colors.primary.contrast}20` }}
                 >
-                  <div className="text-2xl font-bold mb-1">$1M+</div>
+                  <div className="text-2xl font-bold mb-1">₹1M+</div>
                   <div className="text-sm">Transaction Protection</div>
                 </div>
                 <div 
