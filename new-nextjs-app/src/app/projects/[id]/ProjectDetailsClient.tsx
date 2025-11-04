@@ -43,7 +43,7 @@ import {
   LocationOn,
   Business,
   CalendarToday,
-  CurrencyRupee,
+  AttachMoney,
   Visibility,
   Edit,
   Delete,
@@ -121,7 +121,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       
       try {
         const response = await fetch(
-          `/api/auth/project-favorites/${projectId}/status?userId=${user.id}`
+          `/api/auth/project-favorites/${projectId}/status?userId=${user._id}`
         );
         const data = await response.json();
         if (data.success) {
@@ -152,7 +152,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({ userId: user._id }),
       });
 
       const data = await response.json();
@@ -451,7 +451,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                     <List dense>
                       <ListItem>
                         <ListItemIcon>
-                          <CurrencyRupee color="primary" />
+                          <AttachMoney color="primary" />
                         </ListItemIcon>
                         <ListItemText
                           primary="Starting Price"
@@ -757,22 +757,22 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                     >
                       Print
                     </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
+                  <Button
+                    variant="outlined"
+                    startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
                       onClick={handleFavoriteToggle}
                       disabled={loadingFavorite}
-                      sx={{ 
+                    sx={{
                         flex: 1,
                         color: isFavorite ? 'red' : 'var(--color-primary)',
                         borderColor: isFavorite ? 'red' : 'var(--color-primary)',
                         '&:hover': {
                           backgroundColor: isFavorite ? 'rgba(255, 0, 0, 0.1)' : 'rgba(var(--color-primary-rgb), 0.1)',
                         }
-                      }}
-                    >
+                    }}
+                  >
                       {loadingFavorite ? '...' : (isFavorite ? 'Favorited' : 'Add to Favorites')}
-                    </Button>
+                  </Button>
                   </Stack>
 
 
@@ -918,7 +918,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                   </ListItem>
                   <ListItem>
                     <ListItemIcon>
-                      <CurrencyRupee color="primary" />
+                      <AttachMoney color="primary" />
                     </ListItemIcon>
                     <ListItemText
                       primary="Price per Sq Ft"
@@ -981,18 +981,18 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       {/* Floating Action Button for Mobile */}
       {isMobile && (
         <>
-          <Fab
-            color="primary"
-            sx={{
-              position: 'fixed',
-              bottom: 16,
-              right: 16,
-              zIndex: 1000
-            }}
-            onClick={() => router.push('/projects')}
-          >
-            <ArrowBack />
-          </Fab>
+        <Fab
+          color="primary"
+          sx={{
+            position: 'fixed',
+            bottom: 16,
+            right: 16,
+            zIndex: 1000
+          }}
+          onClick={() => router.push('/projects')}
+        >
+          <ArrowBack />
+        </Fab>
           <Fab
             color={isFavorite ? "error" : "primary"}
             sx={{

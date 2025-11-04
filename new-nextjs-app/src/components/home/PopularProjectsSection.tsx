@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Box, Container, Typography, Button, Card, CardContent, CardMedia, Chip, Stack, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
-import { ArrowForward, Business, LocationOn, CalendarToday, CurrencyRupee, Visibility } from '@mui/icons-material';
+import { ArrowForward, Business, LocationOn, CalendarToday, AttachMoney, Visibility } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useProjects } from '@/contexts/ProjectsContext';
 import ProjectCard from '../projects/ProjectCard';
@@ -268,11 +268,6 @@ const PopularProjectsSection: React.FC = () => {
                         {project.startingPrice && (
                           <Typography variant="h6" sx={{ color: 'var(--color-primary)', fontWeight: 600 }}>
                             {formatPrice(project.startingPrice)}
-                            {project.pricePerSqFt && (
-                              <Typography component="span" variant="body2" sx={{ color: 'var(--color-text-muted)', ml: 0.5 }}>
-                                /sq ft
-                              </Typography>
-                            )}
                           </Typography>
                         )}
                       </Box>

@@ -20,7 +20,7 @@ import {
   LocationOn,
   Business,
   CalendarToday,
-  CurrencyRupee,
+  AttachMoney,
   Visibility,
   Favorite,
   FavoriteBorder
@@ -52,7 +52,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       
       try {
         const response = await fetch(
-          `/api/auth/project-favorites/${project._id}/status?userId=${user.id}`
+          `/api/auth/project-favorites/${project._id}/status?userId=${user._id}`
         );
         const data = await response.json();
         if (data.success) {
@@ -85,7 +85,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({ userId: user._id }),
       });
 
       const data = await response.json();
@@ -277,7 +277,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
             {project.startingPrice && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CurrencyRupee sx={{ fontSize: 16, color: 'var(--color-text-secondary)' }} />
+                <AttachMoney sx={{ fontSize: 16, color: 'var(--color-text-secondary)' }} />
                 <Typography
                   variant="body2"
                   sx={{ color: 'var(--color-text-secondary)', fontWeight: 500 }}

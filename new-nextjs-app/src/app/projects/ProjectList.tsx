@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { 
   Add, Business, LocationOn, CalendarToday, 
-  CurrencyRupee, Visibility, Edit, Delete, MoreVert, Map as MapIcon, MyLocation
+  AttachMoney, Visibility, Edit, Delete, MoreVert, Map as MapIcon, MyLocation
 } from '@mui/icons-material';
 import ProjectsMap from '../../components/projects/ProjectsMap';
 import ProjectCard from '../../components/projects/ProjectCard';
