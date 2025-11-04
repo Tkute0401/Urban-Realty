@@ -1531,7 +1531,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     projectId,
     updateFields,
     { new: true, runValidators: true }
-  ).populate('developer', 'name logo website');
+  ).populate('developers', 'name logo website');
 
   // Update developer's project counts if status changed
   if (status && status !== oldStatus) {
