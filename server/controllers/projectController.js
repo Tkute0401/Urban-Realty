@@ -444,8 +444,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   // Save the project
   await project.save();
 
-  // Populate developer information
-  await project.populate('developer', 'name logo website');
+  // Populate developers information
+  await project.populate('developers', 'name logo website');
 
   res.status(201).json({
     success: true,

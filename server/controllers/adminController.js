@@ -1141,7 +1141,7 @@ exports.getDeveloperUser = asyncHandler(async (req, res, next) => {
   }
   
   // Get developer's projects
-  const projects = await Project.find({ developer: developer.developerId });
+  const projects = await Project.find({ developers: developer.developerId });
   
   res.status(200).json({
     success: true,
@@ -1250,7 +1250,7 @@ exports.deleteDeveloperUser = asyncHandler(async (req, res, next) => {
 
   // Delete all projects associated with this developer
   if (user.developerId) {
-    await Project.deleteMany({ developer: user.developerId });
+    await Project.deleteMany({ developers: user.developerId });
   }
 
   // Delete the user
@@ -1293,7 +1293,7 @@ exports.getDeveloperProfile = asyncHandler(async (req, res, next) => {
   }
   
   // Get developer's projects
-  const projects = await Project.find({ developer: developer._id });
+  const projects = await Project.find({ developers: developer._id });
   
   res.status(200).json({
     success: true,
@@ -1414,7 +1414,7 @@ exports.deleteDeveloperProfile = asyncHandler(async (req, res, next) => {
   }
 
   // Delete all projects associated with this developer
-  await Project.deleteMany({ developer: developer._id });
+  await Project.deleteMany({ developers: developer._id });
 
   // Delete the developer profile
   await Developer.findByIdAndDelete(req.params.id);
@@ -1432,7 +1432,7 @@ exports.deleteDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getProjects = asyncHandler(async (req, res, next) => {
   const projects = await Project.find()
-    .populate('developer', 'name logo website')
+    .populate('developers', 'name logo website')
     .sort('-createdAt');
   
   res.status(200).json({
@@ -1447,7 +1447,7 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id)
-    .populate('developer', 'name logo website contact');
+    .populate('developers', 'name logo website contact');
   
   if (!project) {
     return next(
@@ -1535,25 +1535,24 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
 
   // Update developer's project counts if status changed
   if (status && status !== oldStatus) {
-    const developerId = project.developer;
+    // Update counts for all developers associated with this project
+    const developerIds = project.developers || [];
+    const oldStatusField = oldStatus === 'Completed' ? 'completedProjects' : 
+                          oldStatus === 'Under Construction' ? 'ongoingProjects' : 
+                          'upcomingProjects';
+    const newStatusField = status === 'Completed' ? 'completedProjects' : 
+                          status === 'Under Construction' ? 'ongoingProjects' : 
+                          'upcomingProjects';
     
-    // Decrease old status count
-    await Developer.findByIdAndUpdate(developerId, {
-      $inc: { 
-        [oldStatus === 'Completed' ? 'completedProjects' : 
-         oldStatus === 'Under Construction' ? 'ongoingProjects' : 
-         'upcomingProjects']: -1 
-      }
-    });
-
-    // Increase new status count
-    await Developer.findByIdAndUpdate(developerId, {
-      $inc: { 
-        [status === 'Completed' ? 'completedProjects' : 
-         status === 'Under Construction' ? 'ongoingProjects' : 
-         'upcomingProjects']: 1 
-      }
-    });
+    // Update counts for all developers
+    await Promise.all(developerIds.map(devId => 
+      Developer.findByIdAndUpdate(devId, {
+        $inc: { 
+          [oldStatusField]: -1,
+          [newStatusField]: 1
+        }
+      })
+    ));
   }
 
   res.status(200).json({
@@ -1574,14 +1573,16 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Update developer's project counts
-  await Developer.findByIdAndUpdate(project.developer, {
-    $inc: { 
-      [project.status === 'Completed' ? 'completedProjects' : 
-       project.status === 'Under Construction' ? 'ongoingProjects' : 
-       'upcomingProjects']: -1 
-    }
-  });
+  // Update developer's project counts for all developers
+  const developerIds = project.developers || [];
+  const statusField = project.status === 'Completed' ? 'completedProjects' : 
+                     project.status === 'Under Construction' ? 'ongoingProjects' : 
+                     'upcomingProjects';
+  await Promise.all(developerIds.map(devId => 
+    Developer.findByIdAndUpdate(devId, {
+      $inc: { [statusField]: -1 }
+    })
+  ));
 
   // Delete the project
   await Project.findByIdAndDelete(req.params.id);

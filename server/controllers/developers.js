@@ -221,7 +221,7 @@ exports.getDeveloperDashboard = asyncHandler(async (req, res, next) => {
     }
 
     // Build project filter
-    let projectFilter = { developer: developerId, ...dateFilter };
+    let projectFilter = { developers: developerId, ...dateFilter };
     if (status !== 'all') {
       projectFilter.status = status;
     }
@@ -231,7 +231,7 @@ exports.getDeveloperDashboard = asyncHandler(async (req, res, next) => {
 
     // Get developer projects
     const projects = await Project.find(projectFilter)
-      .populate('developer', 'name email')
+      .populate('developers', 'name email')
       .sort('-createdAt');
 
     // Get inquiries for projects
@@ -324,7 +324,7 @@ exports.getDeveloperAnalytics = asyncHandler(async (req, res, next) => {
 
     // Get developer data
     const projects = await Project.find({ 
-      developer: developerId,
+      developers: developerId,
       ...dateFilter 
     }).sort('-createdAt');
 
@@ -385,7 +385,7 @@ exports.getDeveloperInquiries = asyncHandler(async (req, res, next) => {
     const developerId = user._id.toString();
 
     // Get developer's projects
-    const projects = await Project.find({ developer: developerId });
+    const projects = await Project.find({ developers: developerId });
     const projectIds = projects.map(p => p._id);
 
     // Get inquiries for these projects
@@ -424,7 +424,12 @@ exports.updateDeveloperInquiry = asyncHandler(async (req, res, next) => {
       );
     }
 
-    if (inquiry.project.developer.toString() !== user._id.toString()) {
+    // Check if user's developer profile is in the project's developers array
+    const developer = await Developer.findOne({ userId: user._id });
+    if (!developer || !inquiry.project.developers || 
+        !inquiry.project.developers.some((dev: any) => 
+          (typeof dev === 'string' ? dev : dev._id || dev).toString() === developer._id.toString()
+        )) {
       return res.status(HTTP_STATUS.FORBIDDEN).json(
         createErrorResponse('Access denied - inquiry does not belong to your projects')
       );
