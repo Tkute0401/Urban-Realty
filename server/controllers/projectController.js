@@ -88,7 +88,7 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/projects/:id
 // @access  Public
 exports.getProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id).populate('developer', 'name logo website');
+  const project = await Project.findById(req.params.id).populate('developers', 'name logo website');
 
   if (!project) {
     return next(
@@ -110,8 +110,8 @@ exports.getProject = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/projects/developer/:developerId
 // @access  Public
 exports.getProjectsByDeveloper = asyncHandler(async (req, res, next) => {
-  const projects = await Project.find({ developer: req.params.developerId })
-    .populate('developer', 'name logo website')
+  const projects = await Project.find({ developers: req.params.developerId })
+    .populate('developers', 'name logo website')
     .sort({ createdAt: -1 });
 
   res.status(200).json({
@@ -143,8 +143,8 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
     });
   }
 
-  const projects = await Project.find({ developer: developer._id })
-    .populate('developer', 'name logo website')
+  const projects = await Project.find({ developers: developer._id })
+    .populate('developers', 'name logo website')
     .sort({ createdAt: -1 });
 
   res.status(200).json({
@@ -178,7 +178,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Check if user is developer
+  // Handle developers - convert to array format
   if (req.user.role === 'developer') {
     // Find developer profile for current user
     const developer = await Developer.findOne({ userId: req.user.id });
@@ -189,7 +189,27 @@ exports.createProject = asyncHandler(async (req, res, next) => {
       );
     }
     
-    req.body.developer = developer._id;
+    // If developers array is provided, ensure current developer is included
+    if (req.body.developers && Array.isArray(req.body.developers)) {
+      if (!req.body.developers.includes(developer._id.toString())) {
+        req.body.developers.push(developer._id.toString());
+      }
+    } else {
+      // If single developer provided, convert to array
+      if (req.body.developer) {
+        const devIds = Array.isArray(req.body.developer) ? req.body.developer : [req.body.developer];
+        if (!devIds.includes(developer._id.toString())) {
+          devIds.push(developer._id.toString());
+        }
+        req.body.developers = devIds;
+      } else {
+        // Default: add current developer
+        req.body.developers = [developer._id.toString()];
+      }
+    }
+  } else if (req.body.developer && !req.body.developers) {
+    // For admin users, convert single developer to array if developers not provided
+    req.body.developers = Array.isArray(req.body.developer) ? req.body.developer : [req.body.developer];
   }
 
   // Log incoming data for debugging
@@ -399,7 +419,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     isActive: cleanReqBody.isActive !== undefined ? cleanReqBody.isActive : true,
     isFeatured: cleanReqBody.isFeatured || false,
     isPublished: cleanReqBody.isPublished || false,
-    developer: cleanReqBody.developer
+    developers: cleanReqBody.developers || []
   });
 
   // Assign arrays by pushing items individually
@@ -445,11 +465,19 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Check if user is developer and owns this project
+  // Check if user is developer and owns this project (must be in developers array)
   if (req.user.role === 'developer') {
     const developer = await Developer.findOne({ userId: req.user.id });
     
-    if (!developer || project.developer.toString() !== developer._id.toString()) {
+    if (!developer) {
+      return next(
+        new ErrorResponse('Developer profile not found', 404)
+      );
+    }
+    
+    // Check if developer is in the developers array
+    const developerIds = project.developers.map(d => d.toString());
+    if (!developerIds.includes(developer._id.toString())) {
       return next(
         new ErrorResponse('Not authorized to update this project', 403)
       );
@@ -674,11 +702,34 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Handle developers update
+  if (cleanReqBody.developers !== undefined) {
+    // If user is developer, ensure they remain in the developers array
+    if (req.user.role === 'developer') {
+      const developer = await Developer.findOne({ userId: req.user.id });
+      if (developer) {
+        const devIds = Array.isArray(cleanReqBody.developers) 
+          ? cleanReqBody.developers.map(d => d.toString())
+          : [cleanReqBody.developers.toString()];
+        if (!devIds.includes(developer._id.toString())) {
+          devIds.push(developer._id.toString());
+        }
+        project.developers = devIds;
+      }
+    } else {
+      // Admin can set developers array directly
+      project.developers = Array.isArray(cleanReqBody.developers) 
+        ? cleanReqBody.developers 
+        : [cleanReqBody.developers];
+    }
+  }
+
   // Update other project fields (excluding the ones we've already handled)
   Object.keys(cleanReqBody).forEach(key => {
     if (cleanReqBody[key] !== undefined && 
         !numericFields.includes(key) && 
-        !dateFields.includes(key) && 
+        !dateFields.includes(key) &&
+        key !== 'developers' && 
         key !== 'priceRange') {
       project[key] = cleanReqBody[key];
     }
@@ -687,8 +738,8 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   // Save the project
   await project.save();
 
-  // Populate developer information
-  await project.populate('developer', 'name logo website');
+  // Populate developers information
+  await project.populate('developers', 'name logo website');
 
   res.status(200).json({
     success: true,
@@ -708,11 +759,19 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Check if user is developer and owns this project
+  // Check if user is developer and owns this project (must be in developers array)
   if (req.user.role === 'developer') {
     const developer = await Developer.findOne({ userId: req.user.id });
     
-    if (!developer || project.developer.toString() !== developer._id.toString()) {
+    if (!developer) {
+      return next(
+        new ErrorResponse('Developer profile not found', 404)
+      );
+    }
+    
+    // Check if developer is in the developers array
+    const developerIds = project.developers.map(d => d.toString());
+    if (!developerIds.includes(developer._id.toString())) {
       return next(
         new ErrorResponse('Not authorized to delete this project', 403)
       );

@@ -439,7 +439,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                         </ListItemIcon>
                         <ListItemText
                           primary="Developer"
-                          secondary={project.developer?.name}
+                          secondary={(project.developers || []).map((d: any) => d?.name || '').filter(Boolean).join(', ') || 'Multiple Developers'}
                         />
                       </ListItem>
                       <ListItem>
@@ -782,7 +782,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                   </Stack>
 
 
-                  {user?.role === 'developer' && user?.id === project.developer?.userId && (
+                  {user?.role === 'developer' && project.developers?.some((dev: any) => dev.userId === user?.id) && (
                     <>
                       <Divider />
                       <Button
@@ -807,68 +807,73 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
               </CardContent>
             </Card>
 
-            {/* Developer Info */}
+            {/* Developers Info */}
             <Card sx={{ mb: 3, backgroundColor: 'var(--color-surface)' }}>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
-                  Developer Information
+                  {project.developers?.length > 1 ? 'Developers Information' : 'Developer Information'}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Avatar
-                    src={typeof project.developer?.logo === 'string' ? project.developer.logo : project.developer?.logo?.url}
-                    sx={{ width: 56, height: 56, mr: 2 }}
-                  >
-                    <Business />
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h6" sx={{ color: 'var(--color-text-primary)' }}>
-                      {project.developer?.name}
-                    </Typography>
-                    <Typography variant="body2" color="var(--color-text-muted)">
-                      Developer
-                    </Typography>
-                  </Box>
-                </Box>
-                
-                {project.developer?.description && (
-                  <Typography variant="body2" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
-                    {project.developer.description}
-                  </Typography>
-                )}
+                {(project.developers || []).map((developer: any, index: number) => (
+                  <Box key={developer._id || index} sx={{ mb: index < (project.developers?.length || 0) - 1 ? 3 : 0 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Avatar
+                        src={typeof developer?.logo === 'string' ? developer.logo : developer?.logo?.url}
+                        sx={{ width: 56, height: 56, mr: 2 }}
+                      >
+                        <Business />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" sx={{ color: 'var(--color-text-primary)' }}>
+                          {developer?.name}
+                        </Typography>
+                        <Typography variant="body2" color="var(--color-text-muted)">
+                          Developer
+                        </Typography>
+                      </Box>
+                    </Box>
+                    
+                    {developer?.description && (
+                      <Typography variant="body2" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
+                        {developer.description}
+                      </Typography>
+                    )}
 
-                <Stack spacing={1}>
-                  {project.developer?.website && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<Language />}
-                      onClick={() => window.open(project.developer.website, '_blank')}
-                      size="small"
-                      fullWidth
-                    >
-                      Visit Website
-                    </Button>
-                  )}
-                  <ContactButton
-                    contactType="developer"
-                    contactInfo={{
-                      id: project.developer._id,
-                      name: project.developer.name,
-                      email: project.developer.email,
-                      phone: project.developer.phone,
-                      avatar: project.developer.logo?.url,
-                      company: project.developer.name,
-                      role: 'Property Developer'
-                    }}
-                    projectInfo={{
-                      id: project._id,
-                      name: project.name,
-                      developer: project.developer.name
-                    }}
-                    variant="button"
-                    size="small"
-                    fullWidth
-                  />
-                </Stack>
+                    <Stack spacing={1}>
+                      {developer?.website && (
+                        <Button
+                          variant="outlined"
+                          startIcon={<Language />}
+                          onClick={() => window.open(developer.website, '_blank')}
+                          size="small"
+                          fullWidth
+                        >
+                          Visit Website
+                        </Button>
+                      )}
+                      <ContactButton
+                        contactType="developer"
+                        contactInfo={{
+                          id: developer._id,
+                          name: developer.name,
+                          email: developer.email,
+                          phone: developer.phone,
+                          avatar: developer.logo?.url,
+                          company: developer.name,
+                          role: 'Property Developer'
+                        }}
+                        projectInfo={{
+                          id: project._id,
+                          name: project.name,
+                          developer: developer.name
+                        }}
+                        variant="button"
+                        size="small"
+                        fullWidth
+                      />
+                    </Stack>
+                    {index < (project.developers?.length || 0) - 1 && <Divider sx={{ mt: 2 }} />}
+                  </Box>
+                ))}
               </CardContent>
             </Card>
 

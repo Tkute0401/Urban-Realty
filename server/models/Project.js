@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const ProjectSchema = new mongoose.Schema({
-  // Developer connection
-  developer: {
+  // Developer connection - multiple developers can be associated with one project
+  developers: [{
     type: mongoose.Schema.ObjectId,
     ref: 'Developer',
-    required: [true, 'Please specify the developer']
-  },
+    required: true
+  }],
   
   // Project basic information
   name: {

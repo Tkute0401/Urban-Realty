@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProjects } from '@/contexts/ProjectsContext';
+import { useDevelopers } from '@/contexts/DevelopersContext';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -47,6 +48,7 @@ import {
   Map,
   Apartment
 } from '@mui/icons-material';
+import { Autocomplete } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FieldIndicator from '@/components/ui/FieldIndicator';
 
@@ -82,6 +84,7 @@ const ActionButton = styled(Button)(({ theme }) => ({
 const AddProjectClient = () => {
   const { user } = useAuth();
   const { createProject, loading, error } = useProjects();
+  const { developers, getDevelopers, loading: developersLoading } = useDevelopers();
   const router = useRouter();
   
   const [saving, setSaving] = useState(false);
@@ -109,7 +112,8 @@ const AddProjectClient = () => {
     amenities: [],
     features: [],
     keywords: [],
-    configurations: []
+    configurations: [],
+    developers: [] as string[]
   });
 
   const [newAmenity, setNewAmenity] = useState('');
@@ -140,8 +144,11 @@ const AddProjectClient = () => {
   useEffect(() => {
     if (user?.role !== 'developer') {
       router.push('/');
+    } else {
+      // Fetch developers list for multi-select
+      getDevelopers();
     }
-  }, [user, router]);
+  }, [user, router, getDevelopers]);
 
   const handleInputChange = (field, value) => {
     if (field.includes('.')) {
@@ -590,6 +597,42 @@ const AddProjectClient = () => {
                   <MenuItem value="Cancelled">Cancelled</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <FieldIndicator optional helperText="Select one or more developers for this project. Your developer profile will be automatically included." />
+              <Autocomplete
+                multiple
+                options={developers || []}
+                getOptionLabel={(option) => typeof option === 'string' ? option : option.name || ''}
+                value={formData.developers.map(id => developers.find(d => d._id === id)).filter(Boolean)}
+                onChange={(_, newValue) => {
+                  const developerIds = newValue.map(dev => typeof dev === 'string' ? dev : dev._id);
+                  handleInputChange('developers', developerIds);
+                }}
+                loading={developersLoading}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Developers"
+                    placeholder="Select developers..."
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        color: 'var(--color-text-primary)',
+                        '& fieldset': { borderColor: 'var(--color-border)' },
+                        '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                        '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                      },
+                      '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                    }}
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} key={typeof option === 'string' ? option : option._id}>
+                    {typeof option === 'string' ? option : option.name}
+                  </Box>
+                )}
+              />
             </Grid>
             
             <Grid item xs={12}>

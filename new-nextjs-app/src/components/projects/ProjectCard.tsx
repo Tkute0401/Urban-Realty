@@ -285,7 +285,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </Typography>
             </Box>
 
-            {project.developer && (
+            {project.developers && project.developers.length > 0 && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Business sx={{ fontSize: 16, color: 'var(--color-text-secondary)' }} />
                 <Typography
@@ -297,8 +297,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
                   }}
+                  title={(project.developers || []).map((d: any) => typeof d === 'string' ? d : d?.name || '').filter(Boolean).join(', ')}
                 >
-                  {typeof project.developer === 'string' ? project.developer : project.developer.name}
+                  {(project.developers || []).slice(0, 2).map((d: any) => typeof d === 'string' ? d : d?.name || '').filter(Boolean).join(', ')}
+                  {project.developers.length > 2 && ` +${project.developers.length - 2} more`}
                 </Typography>
               </Box>
             )}

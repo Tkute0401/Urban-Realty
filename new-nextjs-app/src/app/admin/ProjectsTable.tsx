@@ -132,7 +132,7 @@ const ProjectsTable = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
-    developer: '',
+    developers: [] as string[],
     name: '',
     description: '',
     shortDescription: '',
@@ -167,7 +167,7 @@ const ProjectsTable = () => {
     isPublished: false
   });
   const [createFormData, setCreateFormData] = useState({
-    developer: '',
+    developers: [] as string[],
     name: '',
     description: '',
     type: '',
@@ -271,7 +271,9 @@ const ProjectsTable = () => {
   const handleEditClick = () => {
     if (selectedProject) {
       setEditFormData({
-        developer: selectedProject.developer._id,
+        developers: (selectedProject.developers || []).map((dev: any) => 
+          typeof dev === 'string' ? dev : dev._id || dev
+        ),
         name: selectedProject.name,
         description: selectedProject.description,
         type: selectedProject.type,
@@ -369,7 +371,7 @@ const ProjectsTable = () => {
       await fetchProjects();
       setCreateDialogOpen(false);
       setCreateFormData({
-        developer: '',
+        developers: [],
         name: '',
         description: '',
         type: '',
@@ -485,23 +487,32 @@ const ProjectsTable = () => {
                   </Box>
                 </TableCell>
                 <TableCell>
-                  <Box display="flex" alignItems="center">
-                    <Avatar
-                      src={project.developer.logo?.url}
-                      sx={{ mr: 1, width: 32, height: 32 }}
-                    >
-                      <Business />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="body2" fontWeight="medium">
-                        {project.developer.name}
+                  <Box>
+                    {(project.developers || []).slice(0, 2).map((developer: any, index: number) => (
+                      <Box key={developer._id || index} display="flex" alignItems="center" sx={{ mb: index < Math.min((project.developers || []).length, 2) - 1 ? 1 : 0 }}>
+                        <Avatar
+                          src={typeof developer?.logo === 'string' ? developer.logo : developer?.logo?.url}
+                          sx={{ mr: 1, width: 32, height: 32 }}
+                        >
+                          <Business />
+                        </Avatar>
+                        <Box>
+                          <Typography variant="body2" fontWeight="medium">
+                            {typeof developer === 'string' ? developer : developer?.name || 'Unknown'}
+                          </Typography>
+                          {developer?.website && (
+                            <Link href={developer.website} target="_blank" variant="caption">
+                              Website
+                            </Link>
+                          )}
+                        </Box>
+                      </Box>
+                    ))}
+                    {(project.developers || []).length > 2 && (
+                      <Typography variant="caption" color="text.secondary">
+                        +{(project.developers || []).length - 2} more
                       </Typography>
-                      {project.developer.website && (
-                        <Link href={project.developer.website} target="_blank" variant="caption">
-                          Website
-                        </Link>
-                      )}
-                    </Box>
+                    )}
                   </Box>
                 </TableCell>
                 <TableCell>
@@ -579,19 +590,29 @@ const ProjectsTable = () => {
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Developer</InputLabel>
-                <Select
-                  value={createFormData.developer}
-                  onChange={(e) => setCreateFormData({ ...createFormData, developer: e.target.value })}
-                >
-                  {developers.map((developer) => (
-                    <MenuItem key={developer._id} value={developer._id}>
-                      {developer.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Autocomplete
+                multiple
+                options={developers || []}
+                getOptionLabel={(option) => typeof option === 'string' ? option : option.name || ''}
+                value={createFormData.developers.map(id => developers.find(d => d._id === id)).filter(Boolean)}
+                onChange={(_, newValue) => {
+                  const developerIds = newValue.map(dev => typeof dev === 'string' ? dev : dev._id);
+                  setCreateFormData({ ...createFormData, developers: developerIds });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Developers *"
+                    placeholder="Select developers..."
+                    required
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} key={typeof option === 'string' ? option : option._id}>
+                    {typeof option === 'string' ? option : option.name}
+                  </Box>
+                )}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -771,19 +792,29 @@ const ProjectsTable = () => {
         <DialogContent sx={{ maxHeight: '80vh', overflowY: 'auto' }}>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Developer</InputLabel>
-                <Select
-                  value={editFormData.developer}
-                  onChange={(e) => setEditFormData({ ...editFormData, developer: e.target.value })}
-                >
-                  {developers.map((developer) => (
-                    <MenuItem key={developer._id} value={developer._id}>
-                      {developer.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Autocomplete
+                multiple
+                options={developers || []}
+                getOptionLabel={(option) => typeof option === 'string' ? option : option.name || ''}
+                value={editFormData.developers.map(id => developers.find(d => d._id === id)).filter(Boolean)}
+                onChange={(_, newValue) => {
+                  const developerIds = newValue.map(dev => typeof dev === 'string' ? dev : dev._id);
+                  setEditFormData({ ...editFormData, developers: developerIds });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Developers *"
+                    placeholder="Select developers..."
+                    required
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props} key={typeof option === 'string' ? option : option._id}>
+                    {typeof option === 'string' ? option : option.name}
+                  </Box>
+                )}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -1172,15 +1203,21 @@ const ProjectsTable = () => {
                         </Box>
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="text.secondary">Developer</Typography>
-                        <Box display="flex" alignItems="center">
-                          <Avatar
-                            src={selectedProject.developer.logo?.url}
-                            sx={{ mr: 1, width: 24, height: 24 }}
-                          >
-                            <Business />
-                          </Avatar>
-                          <Typography variant="body1">{selectedProject.developer.name}</Typography>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          {(selectedProject.developers || []).length > 1 ? 'Developers' : 'Developer'}
+                        </Typography>
+                        <Box>
+                          {(selectedProject.developers || []).map((developer: any, index: number) => (
+                            <Box key={developer._id || index} display="flex" alignItems="center" sx={{ mb: index < (selectedProject.developers || []).length - 1 ? 1 : 0 }}>
+                              <Avatar
+                                src={typeof developer?.logo === 'string' ? developer.logo : developer?.logo?.url}
+                                sx={{ mr: 1, width: 24, height: 24 }}
+                              >
+                                <Business />
+                              </Avatar>
+                              <Typography variant="body1">{typeof developer === 'string' ? developer : developer?.name || 'Unknown'}</Typography>
+                            </Box>
+                          ))}
                         </Box>
                       </Grid>
                     </Grid>
