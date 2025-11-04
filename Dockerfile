@@ -38,7 +38,7 @@ COPY new-nextjs-app/tailwind.config.js ./new-nextjs-app/
 COPY new-nextjs-app/postcss.config.cjs ./new-nextjs-app/
 COPY new-nextjs-app/tsconfig.json ./new-nextjs-app/
 COPY new-nextjs-app/middleware.ts ./new-nextjs-app/
-COPY new-nextjs-app/eslint.config.js ./new-nextjs-app/
+
 COPY new-nextjs-app/vitest.config.ts ./new-nextjs-app/
 COPY new-nextjs-app/vitest.setup.ts ./new-nextjs-app/
 COPY new-nextjs-app/src/setupTests.ts ./new-nextjs-app/src/
