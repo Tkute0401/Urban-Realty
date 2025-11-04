@@ -427,9 +427,10 @@ exports.updateDeveloperInquiry = asyncHandler(async (req, res, next) => {
     // Check if user's developer profile is in the project's developers array
     const developer = await Developer.findOne({ userId: user._id });
     if (!developer || !inquiry.project.developers || 
-        !inquiry.project.developers.some((dev: any) => 
-          (typeof dev === 'string' ? dev : dev._id || dev).toString() === developer._id.toString()
-        )) {
+        !inquiry.project.developers.some((dev) => {
+          const devId = typeof dev === 'string' ? dev : (dev._id || dev);
+          return devId.toString() === developer._id.toString();
+        })) {
       return res.status(HTTP_STATUS.FORBIDDEN).json(
         createErrorResponse('Access denied - inquiry does not belong to your projects')
       );
