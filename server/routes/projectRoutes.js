@@ -17,7 +17,7 @@ const Project = require('../models/Project');
 
 router
   .route('/')
-  .get(advancedResults(Project, 'developer'), getProjects)
+  .get(advancedResults(Project, 'developers'), getProjects)
   .post(
     protect, 
     authorize('developer', 'admin'), 
