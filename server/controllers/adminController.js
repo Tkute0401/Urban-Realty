@@ -1465,16 +1465,25 @@ exports.getProject = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/admin/projects
 // @access  Private/Admin
 exports.createProject = asyncHandler(async (req, res, next) => {
-  const { developer, name, description, type, status, location, totalUnits, totalArea, unitTypes, amenities, features } = req.body;
+  const { developers, name, description, type, status, location, totalUnits, totalArea, unitTypes, amenities, features } = req.body;
 
-  // Verify developer exists
-  const developerExists = await Developer.findById(developer);
-  if (!developerExists) {
-    return next(new ErrorResponse('Developer not found', 404));
+  // Ensure developers is an array
+  const developerIds = Array.isArray(developers) ? developers : (developers ? [developers] : []);
+  
+  if (developerIds.length === 0) {
+    return next(new ErrorResponse('At least one developer is required', 400));
+  }
+
+  // Verify all developers exist
+  const developerExists = await Promise.all(
+    developerIds.map(id => Developer.findById(id))
+  );
+  if (developerExists.some(dev => !dev)) {
+    return next(new ErrorResponse('One or more developers not found', 404));
   }
 
   const project = await Project.create({
-    developer,
+    developers: developerIds,
     name,
     description,
     type,
@@ -1487,14 +1496,15 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     features
   });
 
-  // Update developer's project counts
-  await Developer.findByIdAndUpdate(developer, {
-    $inc: { 
-      [status === 'Completed' ? 'completedProjects' : 
-       status === 'Under Construction' ? 'ongoingProjects' : 
-       'upcomingProjects']: 1 
-    }
-  });
+  // Update project counts for all developers
+  const statusField = status === 'Completed' ? 'completedProjects' : 
+                     status === 'Under Construction' ? 'ongoingProjects' : 
+                     'upcomingProjects';
+  await Promise.all(developerIds.map(devId => 
+    Developer.findByIdAndUpdate(devId, {
+      $inc: { [statusField]: 1 }
+    })
+  ));
 
   res.status(201).json({
     success: true,
@@ -1515,6 +1525,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   }
 
   const oldStatus = project.status;
+  const oldDevelopers = project.developers || [];
   const updateFields = {};
   if (name) updateFields.name = name;
   if (description) updateFields.description = description;
@@ -1536,7 +1547,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   // Update developer's project counts if status changed
   if (status && status !== oldStatus) {
     // Update counts for all developers associated with this project
-    const developerIds = updatedProject.developers || [];
+    const developerIds = oldDevelopers;
     const oldStatusField = oldStatus === 'Completed' ? 'completedProjects' : 
                           oldStatus === 'Under Construction' ? 'ongoingProjects' : 
                           'upcomingProjects';
