@@ -65,7 +65,7 @@ export function Modal({
     }
   };
 
-  const handleClose = (event: {}, reason: 'backdropClick' | 'escapeKeyDown') => {
+  const handleClose = (event: object, reason: 'backdropClick' | 'escapeKeyDown') => {
     if (reason === 'backdropClick' && disableBackdropClick) return;
     if (reason === 'escapeKeyDown' && disableEscapeKeyDown) return;
     onClose();

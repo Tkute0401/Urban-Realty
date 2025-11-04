@@ -65,7 +65,7 @@ const DeveloperList = () => {
   // Fetch developers when filters change
   useEffect(() => {
     const fetchData = async () => {
-      let apiParams = {};
+      const apiParams = {};
       await getDevelopers();
       
       const newSearchParams = new URLSearchParams();

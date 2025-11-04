@@ -7,6 +7,11 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ProjectCard from '../../../components/projects/ProjectCard';
 
+interface Project {
+  _id: string;
+  // Add other project properties here if known
+}
+
 const ProjectFavoritesClient = () => {
   // Force dynamic rendering
   noStore();
@@ -16,7 +21,7 @@ const ProjectFavoritesClient = () => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +31,7 @@ const ProjectFavoritesClient = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/auth/project-favorites?userId=${user._id}`);
+        const response = await fetch(`/api/auth/project-favorites?userId=${user.id}`);
         const data = await response.json();
         
         if (data.success) {
@@ -77,7 +82,7 @@ const ProjectFavoritesClient = () => {
           color: 'var(--color-text-secondary)',
           mb: 4
         }}>
-          Projects you've saved for later viewing
+          Projects you&apos;ve saved for later viewing
         </Typography>
       </Box>
       

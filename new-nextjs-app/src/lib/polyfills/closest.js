@@ -5,13 +5,13 @@
 if (typeof window !== 'undefined' && typeof Element !== 'undefined') {
   if (!Element.prototype.closest) {
     Element.prototype.closest = function(selector) {
-      var element = this;
+      var el = this;
       
-      while (element && element.nodeType === 1) {
-        if (element.matches(selector)) {
-          return element;
+      while (el && el.nodeType === 1) {
+        if (el.matches(selector)) {
+          return el;
         }
-        element = element.parentElement;
+        el = el.parentElement;
       }
       
       return null;

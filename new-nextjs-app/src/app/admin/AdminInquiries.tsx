@@ -30,7 +30,7 @@ const AdminInquiries = () => {
       setLoading(true);
       setError(null);
       
-      let url = '/contacts';
+      const url = '/contacts';
       const params: any = {};
       if (statusFilter !== 'all') {
         params.status = statusFilter;

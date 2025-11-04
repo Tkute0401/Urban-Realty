@@ -42,18 +42,18 @@ class PerformanceMonitor {
               this.metrics.largestContentfulPaint = entry.startTime;
               break;
             case 'first-input':
-              // @ts-ignore
+              // @ts-expect-error property is not available on all entry types
               this.metrics.firstInputDelay = entry.processingStart - entry.startTime;
               break;
             case 'layout-shift':
-              // @ts-ignore
+              // @ts-expect-error property is not available on all entry types
               if (!entry.hadRecentInput) {
-                // @ts-ignore
+                // @ts-expect-error property is not available on all entry types
                 this.metrics.cumulativeLayoutShift = (this.metrics.cumulativeLayoutShift || 0) + entry.value;
               }
               break;
             case 'navigation':
-              // @ts-ignore
+              // @ts-expect-error property is not available on all entry types
               this.metrics.timeToInteractive = entry.loadEventEnd - entry.fetchStart;
               break;
           }
