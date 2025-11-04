@@ -43,7 +43,7 @@ import {
   LocationOn,
   Business,
   CalendarToday,
-  AttachMoney,
+  CurrencyRupee,
   Visibility,
   Edit,
   Delete,
@@ -457,7 +457,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                     <List dense>
                       <ListItem>
                         <ListItemIcon>
-                          <AttachMoney color="primary" />
+                          <CurrencyRupee color="primary" />
                         </ListItemIcon>
                         <ListItemText
                           primary="Starting Price"
@@ -929,7 +929,7 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                   </ListItem>
                   <ListItem>
                     <ListItemIcon>
-                      <AttachMoney color="primary" />
+                      <CurrencyRupee color="primary" />
                     </ListItemIcon>
                     <ListItemText
                       primary="Price per Sq Ft"
