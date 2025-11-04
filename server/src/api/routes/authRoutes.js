@@ -76,6 +76,15 @@ router.route('/favorites/:propertyId')
 
 router.get('/favorites', protect, authController.getFavorites);
 
+// Project favorites routes
+router.route('/project-favorites/:projectId')
+  .put(protect, authController.toggleProjectFavorite);
+
+router.route('/project-favorites/:projectId/status')
+  .get(protect, authController.checkProjectFavoriteStatus);
+
+router.get('/project-favorites', protect, authController.getProjectFavorites);
+
 // Recently viewed routes
 router.route('/recently-viewed/:propertyId')
   .post(protect, authController.addToRecentlyViewed);
