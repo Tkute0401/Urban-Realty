@@ -77,6 +77,7 @@ interface Project {
     city: string;
     state: string;
     pincode: string;
+    country?: string;
     coordinates?: {
       lat: number;
       lng: number;
@@ -84,6 +85,16 @@ interface Project {
   };
   totalUnits?: number;
   totalArea?: number;
+  launchDate?: string;
+  possessionDate?: string;
+  constructionStartDate?: string;
+  estimatedCompletionDate?: string;
+  startingPrice?: number;
+  pricePerSqFt?: number;
+  priceRange?: {
+    min?: number;
+    max?: number;
+  };
   unitTypes?: Array<{
     type: string;
     count: number;
@@ -93,8 +104,14 @@ interface Project {
       max: number;
     };
   }>;
-  amenities?: string[];
-  features?: string[];
+  amenities?: Array<{ name: string; description?: string }> | string[];
+  features?: Array<{ name: string; description?: string }> | string[];
+  keywords?: string[];
+  reraNumber?: string;
+  metaDescription?: string;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  isPublished?: boolean;
   createdAt: string;
   updatedAt: string;
 }
