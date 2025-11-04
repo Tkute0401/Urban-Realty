@@ -26,8 +26,12 @@ const ProjectFavoritesClient = () => {
       setLoading(true);
       setError(null);
       try {
-        const userId = (user as any)?.id || (user as any)?._id;
-        const response = await fetch(`/api/auth/project-favorites?userId=${userId}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/v1/auth/project-favorites`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const data = await response.json();
         
         if (data.success) {

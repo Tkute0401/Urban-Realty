@@ -120,9 +120,14 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
       if (!user || !projectId) return;
       
       try {
-        const userId = (user as any)?.id || (user as any)?._id;
+        const token = localStorage.getItem('token');
         const response = await fetch(
-          `/api/auth/project-favorites/${projectId}/status?userId=${userId}`
+          `/api/v1/auth/project-favorites/${projectId}/status`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
         const data = await response.json();
         if (data.success) {
@@ -145,16 +150,15 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
 
     setLoadingFavorite(true);
     try {
-      const userId = (user as any)?.id || (user as any)?._id;
-      const url = `/api/auth/project-favorites/${projectId}`;
-      const method = isFavorite ? 'DELETE' : 'PUT';
+      const token = localStorage.getItem('token');
+      const url = `/api/v1/auth/project-favorites/${projectId}`;
       
       const response = await fetch(url, {
-        method,
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       const data = await response.json();
