@@ -174,6 +174,8 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
   const [selectedFloorPlans, setSelectedFloorPlans] = useState<File[]>([]);
   const [selectedBrochures, setSelectedBrochures] = useState<File[]>([]);
   const [selectedVirtualTours, setSelectedVirtualTours] = useState<File[]>([]);
+  const [brochureUrls, setBrochureUrls] = useState<Array<{ url: string; name?: string }>>([]);
+  const [newBrochureUrl, setNewBrochureUrl] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
@@ -244,6 +246,13 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
           setExistingFloorPlans(projectData.floorPlans || []);
           setExistingBrochures(projectData.brochures || []);
           setExistingVirtualTours(projectData.virtualTours || []);
+          
+          // Set brochure URLs from existing brochures
+          const existingBrochureUrls = (projectData.brochures || []).map((b: any) => ({
+            url: b.url || '',
+            name: b.name || 'Brochure'
+          }));
+          setBrochureUrls(existingBrochureUrls);
         }
       } catch (err) {
         console.error('Error fetching project:', err);
@@ -567,9 +576,13 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
         formDataToSend.append('floorPlans', file);
       });
       
-      selectedBrochures.forEach((file, index) => {
-        formDataToSend.append('brochures', file);
-      });
+      // Add brochure URLs if provided
+      if (brochureUrls.length > 0) {
+        formDataToSend.append('brochures', JSON.stringify(brochureUrls.map(b => ({
+          url: b.url,
+          name: b.name || 'Brochure'
+        }))));
+      }
       
       selectedVirtualTours.forEach((file, index) => {
         formDataToSend.append('virtualTours', file);
@@ -961,6 +974,134 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
                 }}
               />
             </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Price Range - Min (₹)"
+                type="number"
+                value={formData.priceRange.min}
+                onChange={(e) => handleInputChange('priceRange.min', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Price Range - Max (₹)"
+                type="number"
+                value={formData.priceRange.max}
+                onChange={(e) => handleInputChange('priceRange.max', e.target.value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </StyledPaper>
+
+        {/* Timeline Section */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <CalendarToday />
+            Timeline & Important Dates
+          </SectionHeader>
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Launch Date"
+                type="date"
+                value={formData.launchDate}
+                onChange={(e) => handleInputChange('launchDate', e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Possession Date"
+                type="date"
+                value={formData.possessionDate}
+                onChange={(e) => handleInputChange('possessionDate', e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Construction Start Date"
+                type="date"
+                value={formData.constructionStartDate}
+                onChange={(e) => handleInputChange('constructionStartDate', e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Estimated Completion Date"
+                type="date"
+                value={formData.estimatedCompletionDate}
+                onChange={(e) => handleInputChange('estimatedCompletionDate', e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
           </Grid>
         </StyledPaper>
 
@@ -1329,6 +1470,343 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
           )}
         </StyledPaper>
 
+        {/* Amenities Section */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <Business />
+            Amenities
+          </SectionHeader>
+          
+          <Typography variant="body2" sx={{ mb: 2, color: 'var(--color-text-muted)' }}>
+            Add amenities available in the project
+          </Typography>
+          
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Enter amenity name (e.g., Swimming Pool)"
+              value={newAmenity}
+              onChange={(e) => setNewAmenity(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addAmenity();
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'var(--color-text-primary)',
+                  '& fieldset': { borderColor: 'var(--color-border)' },
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              onClick={addAmenity}
+              startIcon={<Add />}
+              sx={{
+                borderColor: 'var(--color-primary)',
+                color: 'var(--color-primary)',
+                '&:hover': {
+                  borderColor: 'var(--color-primary)',
+                  bgcolor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)'
+                }
+              }}
+            >
+              Add
+            </Button>
+          </Box>
+          
+          {formData.amenities.length > 0 && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {formData.amenities.map((amenity, index) => (
+                <Chip
+                  key={index}
+                  label={amenity.name}
+                  onDelete={() => removeAmenity(index)}
+                  sx={{
+                    backgroundColor: 'var(--color-primary-light)',
+                    color: 'var(--color-primary)',
+                    '& .MuiChip-deleteIcon': {
+                      color: 'var(--color-primary)',
+                    }
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+        </StyledPaper>
+
+        {/* Features Section */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <Description />
+            Features
+          </SectionHeader>
+          
+          <Typography variant="body2" sx={{ mb: 2, color: 'var(--color-text-muted)' }}>
+            Add features available in the project
+          </Typography>
+          
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Enter feature name (e.g., Smart Home)"
+              value={newFeature}
+              onChange={(e) => setNewFeature(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addFeature();
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'var(--color-text-primary)',
+                  '& fieldset': { borderColor: 'var(--color-border)' },
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              onClick={addFeature}
+              startIcon={<Add />}
+              sx={{
+                borderColor: 'var(--color-primary)',
+                color: 'var(--color-primary)',
+                '&:hover': {
+                  borderColor: 'var(--color-primary)',
+                  bgcolor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)'
+                }
+              }}
+            >
+              Add
+            </Button>
+          </Box>
+          
+          {formData.features.length > 0 && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {formData.features.map((feature, index) => (
+                <Chip
+                  key={index}
+                  label={feature.name}
+                  onDelete={() => removeFeature(index)}
+                  sx={{
+                    backgroundColor: 'var(--color-primary-light)',
+                    color: 'var(--color-primary)',
+                    '& .MuiChip-deleteIcon': {
+                      color: 'var(--color-primary)',
+                    }
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+        </StyledPaper>
+
+        {/* Keywords Section */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <Description />
+            Keywords
+          </SectionHeader>
+          
+          <Typography variant="body2" sx={{ mb: 2, color: 'var(--color-text-muted)' }}>
+            Add keywords for better search visibility
+          </Typography>
+          
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Enter keyword (e.g., luxury, waterfront)"
+              value={newKeyword}
+              onChange={(e) => setNewKeyword(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addKeyword();
+                }
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'var(--color-text-primary)',
+                  '& fieldset': { borderColor: 'var(--color-border)' },
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              onClick={addKeyword}
+              startIcon={<Add />}
+              sx={{
+                borderColor: 'var(--color-primary)',
+                color: 'var(--color-primary)',
+                '&:hover': {
+                  borderColor: 'var(--color-primary)',
+                  bgcolor: 'var(--color-primary)',
+                  color: 'var(--color-primary-contrast)'
+                }
+              }}
+            >
+              Add
+            </Button>
+          </Box>
+          
+          {formData.keywords.length > 0 && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {formData.keywords.map((keyword, index) => (
+                <Chip
+                  key={index}
+                  label={keyword}
+                  onDelete={() => removeKeyword(index)}
+                  sx={{
+                    backgroundColor: 'var(--color-primary-light)',
+                    color: 'var(--color-primary)',
+                    '& .MuiChip-deleteIcon': {
+                      color: 'var(--color-primary)',
+                    }
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+        </StyledPaper>
+
+        {/* Legal & SEO Section */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <Description />
+            Legal & SEO Information
+          </SectionHeader>
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="RERA Number"
+                value={formData.reraNumber}
+                onChange={(e) => handleInputChange('reraNumber', e.target.value)}
+                placeholder="Enter RERA registration number"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Meta Description (for SEO)"
+                multiline
+                rows={3}
+                value={formData.metaDescription}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 160) {
+                    handleInputChange('metaDescription', value);
+                  }
+                }}
+                inputProps={{ maxLength: 160 }}
+                helperText={`${formData.metaDescription.length}/160 characters`}
+                placeholder="Brief description for search engines..."
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': { borderColor: 'var(--color-border)' },
+                    '&:hover fieldset': { borderColor: 'var(--color-primary)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--color-primary)' },
+                  },
+                  '& .MuiInputLabel-root': { color: 'var(--color-text-muted)' },
+                }}
+              />
+            </Grid>
+          </Grid>
+        </StyledPaper>
+
+        {/* Project Status Flags */}
+        <StyledPaper>
+          <SectionHeader variant="h5">
+            <Business />
+            Project Status & Visibility
+          </SectionHeader>
+          
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isActive}
+                    onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: 'var(--color-primary)',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: 'var(--color-primary)',
+                      },
+                    }}
+                  />
+                }
+                label="Active Project"
+                sx={{ color: 'var(--color-text-primary)' }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isFeatured}
+                    onChange={(e) => handleInputChange('isFeatured', e.target.checked)}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: 'var(--color-primary)',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: 'var(--color-primary)',
+                      },
+                    }}
+                  />
+                }
+                label="Featured Project"
+                sx={{ color: 'var(--color-text-primary)' }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={4}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isPublished}
+                    onChange={(e) => handleInputChange('isPublished', e.target.checked)}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: 'var(--color-primary)',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: 'var(--color-primary)',
+                      },
+                    }}
+                  />
+                }
+                label="Published"
+                sx={{ color: 'var(--color-text-primary)' }}
+              />
+            </Grid>
+          </Grid>
+        </StyledPaper>
+
         {/* File Upload Section */}
         <StyledPaper>
           <SectionHeader variant="h5">
@@ -1529,6 +2007,197 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
                           <IconButton
                             size="small"
                             onClick={() => removeFile(index, 'floorPlans')}
+                            sx={{ color: 'var(--color-error)' }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+            </Grid>
+
+            {/* Brochures URL Input */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                <PictureAsPdf sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Brochures (URL Only) - Max 3
+              </Typography>
+              
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ mb: 1, color: 'var(--color-text-secondary)' }}>
+                  Enter brochure URL (Google Drive, Dropbox, AWS S3, etc.)
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="https://example.com/brochure.pdf"
+                    value={newBrochureUrl}
+                    onChange={(e) => setNewBrochureUrl(e.target.value)}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        color: 'var(--color-text-primary)',
+                        '& fieldset': {
+                          borderColor: 'var(--color-border)',
+                        },
+                      },
+                    }}
+                  />
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      if (newBrochureUrl.trim() && brochureUrls.length < 3) {
+                        setBrochureUrls([...brochureUrls, { url: newBrochureUrl.trim() }]);
+                        setNewBrochureUrl('');
+                      }
+                    }}
+                    disabled={!newBrochureUrl.trim() || brochureUrls.length >= 3}
+                    sx={{
+                      borderColor: 'var(--color-primary)',
+                      color: 'var(--color-primary)',
+                      '&:hover': {
+                        borderColor: 'var(--color-primary)',
+                        bgcolor: 'var(--color-primary)',
+                        color: 'var(--color-primary-contrast)'
+                      }
+                    }}
+                  >
+                    Add URL
+                  </Button>
+                </Box>
+              </Box>
+              
+              {/* Existing Brochures */}
+              {existingBrochures.length > 0 && (
+                <Box sx={{ mt: 2, mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    Current Brochures:
+                  </Typography>
+                  <List dense>
+                    {existingBrochures.map((brochure: any, index: number) => (
+                      <ListItem key={index} sx={{ px: 0 }}>
+                        <ListItemText
+                          primary={brochure.name || `Brochure ${index + 1}`}
+                          secondary={brochure.url?.substring(0, 50) || 'URL'}
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            size="small"
+                            onClick={() => removeExistingBrochure(index)}
+                            sx={{ color: 'var(--color-error)' }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+              
+              {/* New Brochure URLs */}
+              {brochureUrls.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    New Brochure URLs:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {brochureUrls.map((brochure, index) => (
+                      <Chip
+                        key={`url-${index}`}
+                        label={brochure.url.substring(0, 40) + (brochure.url.length > 40 ? '...' : '')}
+                        onDelete={() => setBrochureUrls(brochureUrls.filter((_, i) => i !== index))}
+                        color="primary"
+                        variant="outlined"
+                        sx={{ mb: 1 }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </Grid>
+
+            {/* Virtual Tours Upload */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
+                <VideoLibrary sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Virtual Tours (Max 2)
+              </Typography>
+              <input
+                accept="video/*"
+                style={{ display: 'none' }}
+                id="virtualtours-upload"
+                multiple
+                type="file"
+                onChange={(e) => e.target.files && handleFileSelect(e.target.files, 'virtualTours')}
+              />
+              <label htmlFor="virtualtours-upload">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  startIcon={<CloudUpload />}
+                  sx={{
+                    borderColor: 'var(--color-primary)',
+                    color: 'var(--color-primary)',
+                    '&:hover': {
+                      borderColor: 'var(--color-primary)',
+                      bgcolor: 'var(--color-primary)',
+                      color: 'var(--color-primary-contrast)'
+                    }
+                  }}
+                >
+                  Upload Virtual Tours
+                </Button>
+              </label>
+              
+              {/* Existing Virtual Tours */}
+              {existingVirtualTours.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    Current Virtual Tours:
+                  </Typography>
+                  <List dense>
+                    {existingVirtualTours.map((vt: any, index: number) => (
+                      <ListItem key={index} sx={{ px: 0 }}>
+                        <ListItemText
+                          primary={`Virtual Tour ${index + 1}`}
+                          secondary={vt.type || 'video'}
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            size="small"
+                            onClick={() => removeExistingVirtualTour(index)}
+                            sx={{ color: 'var(--color-error)' }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
+              
+              {/* New Virtual Tours */}
+              {selectedVirtualTours.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    New Virtual Tours:
+                  </Typography>
+                  <List dense>
+                    {selectedVirtualTours.map((file, index) => (
+                      <ListItem key={index} sx={{ px: 0 }}>
+                        <ListItemText
+                          primary={file.name}
+                          secondary={`${(file.size / 1024 / 1024).toFixed(2)} MB`}
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            size="small"
+                            onClick={() => removeFile(index, 'virtualTours')}
                             sx={{ color: 'var(--color-error)' }}
                           >
                             <Delete />
