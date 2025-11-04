@@ -59,14 +59,15 @@ import http from '@/lib/services/http';
 
 interface Project {
   _id: string;
-  developer: {
+  developers?: Array<{
     _id: string;
     name: string;
     logo?: {
       url: string;
     };
     website?: string;
-  };
+    userId?: string;
+  }>;
   name: string;
   description: string;
   shortDescription?: string;

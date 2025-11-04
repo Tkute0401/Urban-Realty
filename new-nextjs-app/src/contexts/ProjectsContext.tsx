@@ -4,12 +4,19 @@ import { api } from '@/lib/services/api';
 // Types
 interface Project {
   _id: string;
-  developer: {
+  developers?: Array<{
     _id: string;
     name: string;
-    logo?: string;
+    logo?: string | {
+      url?: string;
+      publicId?: string;
+    };
     website?: string;
-  };
+    userId?: string;
+    description?: string;
+    email?: string;
+    phone?: string;
+  }>;
   name: string;
   description: string;
   shortDescription?: string;
