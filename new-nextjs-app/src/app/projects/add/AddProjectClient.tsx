@@ -131,8 +131,9 @@ const AddProjectClient = () => {
   // File upload states
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [selectedFloorPlans, setSelectedFloorPlans] = useState<File[]>([]);
-  const [selectedBrochures, setSelectedBrochures] = useState<File[]>([]);
   const [selectedVirtualTours, setSelectedVirtualTours] = useState<File[]>([]);
+  const [brochureUrls, setBrochureUrls] = useState<Array<{ url: string; name?: string }>>([]);
+  const [newBrochureUrl, setNewBrochureUrl] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
@@ -286,7 +287,7 @@ const AddProjectClient = () => {
         setSelectedFloorPlans(prev => [...prev, ...fileArray].slice(0, 5)); // Max 5 floor plans
         break;
       case 'brochures':
-        setSelectedBrochures(prev => [...prev, ...fileArray].slice(0, 3)); // Max 3 brochures
+        // Brochures are now URL-only, no file upload
         break;
       case 'virtualTours':
         setSelectedVirtualTours(prev => [...prev, ...fileArray].slice(0, 2)); // Max 2 virtual tours
@@ -303,7 +304,7 @@ const AddProjectClient = () => {
         setSelectedFloorPlans(prev => prev.filter((_, i) => i !== index));
         break;
       case 'brochures':
-        setSelectedBrochures(prev => prev.filter((_, i) => i !== index));
+        // Brochures are now URL-only, no file removal needed
         break;
       case 'virtualTours':
         setSelectedVirtualTours(prev => prev.filter((_, i) => i !== index));
@@ -441,9 +442,13 @@ const AddProjectClient = () => {
         formDataToSend.append('floorPlans', file);
       });
       
-      selectedBrochures.forEach((file, index) => {
-        formDataToSend.append('brochures', file);
-      });
+      // Add brochure URLs if provided
+      if (brochureUrls.length > 0) {
+        formDataToSend.append('brochures', JSON.stringify(brochureUrls.map(b => ({
+          url: b.url,
+          name: b.name || 'Brochure'
+        }))));
+      }
       
       selectedVirtualTours.forEach((file, index) => {
         formDataToSend.append('virtualTours', file);
@@ -1269,46 +1274,67 @@ const AddProjectClient = () => {
               )}
             </Grid>
 
-            {/* Brochures Upload */}
+            {/* Brochures URL Input */}
             <Grid item xs={12} md={6}>
               <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                 <PictureAsPdf sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Brochures (Max 3)
+                Brochures (Max 3) - URL Only
               </Typography>
-              <input
-                accept=".pdf,.doc,.docx"
-                style={{ display: 'none' }}
-                id="brochures-upload"
-                multiple
-                type="file"
-                onChange={(e) => e.target.files && handleFileSelect(e.target.files, 'brochures')}
-              />
-              <label htmlFor="brochures-upload">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  startIcon={<CloudUpload />}
-                  sx={{
-                    borderColor: 'var(--color-primary)',
-                    color: 'var(--color-primary)',
-                    '&:hover': {
-                      borderColor: 'var(--color-primary)',
-                      bgcolor: 'var(--color-primary)',
-                      color: 'var(--color-primary-contrast)'
-                    }
-                  }}
-                >
-                  Upload Brochures
-                </Button>
-              </label>
               
-              {selectedBrochures.length > 0 && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ mb: 1, color: 'var(--color-text-secondary)' }}>
+                  Enter brochure URL (Google Drive, Dropbox, AWS S3, etc.)
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="https://example.com/brochure.pdf"
+                    value={newBrochureUrl}
+                    onChange={(e) => setNewBrochureUrl(e.target.value)}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        color: 'var(--color-text-primary)',
+                        '& fieldset': {
+                          borderColor: 'var(--color-border)',
+                        },
+                      },
+                    }}
+                  />
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      if (newBrochureUrl.trim() && brochureUrls.length < 3) {
+                        setBrochureUrls([...brochureUrls, { url: newBrochureUrl.trim() }]);
+                        setNewBrochureUrl('');
+                      }
+                    }}
+                    disabled={!newBrochureUrl.trim() || brochureUrls.length >= 3}
+                    sx={{
+                      borderColor: 'var(--color-primary)',
+                      color: 'var(--color-primary)',
+                      '&:hover': {
+                        borderColor: 'var(--color-primary)',
+                        bgcolor: 'var(--color-primary)',
+                        color: 'var(--color-primary-contrast)'
+                      }
+                    }}
+                  >
+                    Add URL
+                  </Button>
+                </Box>
+              </Box>
+              
+              {/* Display URLs */}
+              {brochureUrls.length > 0 && (
                 <Box sx={{ mt: 2 }}>
-                  {selectedBrochures.map((file, index) => (
+                  {brochureUrls.map((brochure, index) => (
                     <Chip
-                      key={index}
-                      label={file.name}
-                      onDelete={() => removeFile(index, 'brochures')}
+                      key={`url-${index}`}
+                      label={brochure.url.substring(0, 40) + (brochure.url.length > 40 ? '...' : '')}
+                      onDelete={() => setBrochureUrls(brochureUrls.filter((_, i) => i !== index))}
+                      color="primary"
+                      variant="outlined"
                       sx={{ mr: 1, mb: 1 }}
                     />
                   ))}

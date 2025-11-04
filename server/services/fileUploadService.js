@@ -116,38 +116,33 @@ const uploadVideos = async (files, folder = 'videos') => {
   return uploadedVideos;
 };
 
-// Upload documents (PDFs, DOC, etc.) to Railway's local storage
+// Upload documents (PDFs, DOC, etc.) to Cloudinary for persistent storage
 const uploadDocuments = async (files, subfolder = 'documents') => {
   const uploadedDocuments = [];
-  const targetDir = path.join(uploadsDir, subfolder);
-  
-  // Ensure target directory exists
-  if (!fs.existsSync(targetDir)) {
-    fs.mkdirSync(targetDir, { recursive: true });
-  }
   
   for (const file of files) {
     try {
-      const filename = generateUniqueFilename(file.originalname);
-      const filepath = path.join(targetDir, filename);
-      
-      // Copy file to target directory
-      fs.copyFileSync(file.path, filepath);
-      
-      // Get file stats
-      const stats = fs.statSync(filepath);
+      // Upload to Cloudinary as raw file
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: subfolder,
+        resource_type: 'raw', // Use 'raw' for documents (PDFs, DOC, etc.)
+        access_mode: 'public',
+        use_filename: true,
+        unique_filename: true,
+        overwrite: false
+      });
       
       uploadedDocuments.push({
-        url: getFileUrl(filename, subfolder),
-        publicId: filename, // Use filename as publicId for local storage
+        url: result.secure_url,
+        publicId: result.public_id,
         name: file.originalname,
         type: file.mimetype
       });
       
-      // Delete original temp file
+      // Delete local temp file
       fs.unlinkSync(file.path);
     } catch (error) {
-      console.error('Error uploading document to local storage:', error);
+      console.error('Error uploading document to Cloudinary:', error);
       // Delete local file even if upload failed
       if (fs.existsSync(file.path)) {
         fs.unlinkSync(file.path);
@@ -191,7 +186,7 @@ const uploadFiles = async (files, folder = 'documents') => {
     results.videos = await uploadVideos(videoFiles, `${folder}/videos`);
   }
   
-  // Upload documents to local storage
+  // Upload documents to Cloudinary
   if (documentFiles.length > 0) {
     results.documents = await uploadDocuments(documentFiles, folder);
   }
@@ -204,7 +199,20 @@ const deleteCloudinaryFiles = async (files) => {
   for (const file of files) {
     if (file.publicId) {
       try {
-        await cloudinary.uploader.destroy(file.publicId);
+        // Determine resource type based on file type or URL
+        // If it's a document (PDF, DOC, etc.), use 'raw', otherwise default to 'image'
+        const isDocument = file.type && (
+          file.type.includes('pdf') || 
+          file.type.includes('document') || 
+          file.type.includes('msword') ||
+          file.type.includes('openxmlformats')
+        );
+        
+        const resourceType = isDocument ? 'raw' : 'image';
+        
+        await cloudinary.uploader.destroy(file.publicId, {
+          resource_type: resourceType
+        });
       } catch (error) {
         console.error('Error deleting file from Cloudinary:', error);
       }

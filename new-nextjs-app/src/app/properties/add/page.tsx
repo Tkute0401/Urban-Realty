@@ -165,8 +165,7 @@ const AddPropertyPageContent: React.FC = () => {
   const [images, setImages] = useState<File[]>([]);
   const [floorPlanPreviews, setFloorPlanPreviews] = useState<string[]>([]);
   const [floorPlans, setFloorPlans] = useState<File[]>([]);
-  const [brochureFile, setBrochureFile] = useState<File | null>(null);
-  const [brochurePreview, setBrochurePreview] = useState<string | null>(null);
+  const [brochureUrl, setBrochureUrl] = useState<string>('');
   const [virtualTourFile, setVirtualTourFile] = useState<File | null>(null);
   const [virtualTourPreview, setVirtualTourPreview] = useState<string | null>(null);
   const [sectionVisibility, setSectionVisibility] = useState({
@@ -179,7 +178,6 @@ const AddPropertyPageContent: React.FC = () => {
 
   const imagesInputRef = useRef<HTMLInputElement>(null);
   const floorPlansInputRef = useRef<HTMLInputElement>(null);
-  const brochureInputRef = useRef<HTMLInputElement>(null);
   const virtualTourInputRef = useRef<HTMLInputElement>(null);
 
   // Load agents and developers data
@@ -341,19 +339,9 @@ const AddPropertyPageContent: React.FC = () => {
     setFloorPlans(newFiles);
   };
 
-  // Brochure handlers
-  const handleBrochureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setBrochureFile(file);
-      setBrochurePreview(URL.createObjectURL(file));
-      if (brochureInputRef.current) brochureInputRef.current.value = '';
-    }
-  };
-
-  const handleRemoveBrochure = () => {
-    setBrochureFile(null);
-    setBrochurePreview(null);
+  // Brochure URL handler
+  const handleBrochureUrlChange = (url: string) => {
+    setBrochureUrl(url);
   };
 
   // Virtual Tour handlers
@@ -489,9 +477,9 @@ const AddPropertyPageContent: React.FC = () => {
         formDataToSend.append('floorPlans', file);
       });
 
-      // Append brochure
-      if (brochureFile) {
-        formDataToSend.append('brochure', brochureFile);
+      // Append brochure URL
+      if (brochureUrl.trim()) {
+        formDataToSend.append('brochureUrl', brochureUrl.trim());
       }
 
       // Append virtual tour
@@ -2286,14 +2274,31 @@ const AddPropertyPageContent: React.FC = () => {
             {sectionVisibility.brochure && (
               <PremiumPaper>
                 <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
-                  Upload property brochure (PDF)
+                  Enter brochure URL (Google Drive, Dropbox, AWS S3, etc.)
                 </FormHelperText>
                 
-                {/* Brochure Preview */}
-                {brochurePreview && (
+                {/* URL Input */}
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder="https://example.com/brochure.pdf"
+                  value={brochureUrl}
+                  onChange={(e) => handleBrochureUrlChange(e.target.value)}
+                  sx={{
+                    mb: 2,
+                    '& .MuiOutlinedInput-root': {
+                      color: 'var(--color-text-primary)',
+                      '& fieldset': {
+                        borderColor: 'var(--color-border)',
+                      },
+                    },
+                  }}
+                />
+                
+                {brochureUrl && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
-                      Brochure Preview:
+                      Brochure URL:
                     </Typography>
                     <Box sx={{ 
                       display: 'flex', 
@@ -2304,12 +2309,14 @@ const AddPropertyPageContent: React.FC = () => {
                       borderRadius: '8px',
                       border: '1px solid var(--color-border)'
                     }}>
-                      <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
-                        📄 {brochureFile?.name}
+                      <Typography variant="body2" sx={{ color: 'var(--color-text-primary)', flex: 1, wordBreak: 'break-all' }}>
+                        🔗 {brochureUrl}
                       </Typography>
                       <IconButton
                         size="small"
-                        onClick={handleRemoveBrochure}
+                        onClick={() => {
+                          setBrochureUrl('');
+                        }}
                         sx={{
                           backgroundColor: 'var(--color-error)',
                           color: 'white',
@@ -2323,29 +2330,6 @@ const AddPropertyPageContent: React.FC = () => {
                     </Box>
                   </Box>
                 )}
-                
-                <Button
-                  component="label"
-                  startIcon={<CloudUpload />}
-                  sx={{
-                    color: 'var(--color-primary)',
-                    borderColor: 'var(--color-primary)',
-                    '&:hover': {
-                      borderColor: 'var(--color-primary-hover)',
-                      backgroundColor: 'rgba(120, 202, 220, 0.1)'
-                    }
-                  }}
-                  variant="outlined"
-                >
-                  Upload Brochure
-                  <input
-                    type="file"
-                    hidden
-                    accept=".pdf"
-                    onChange={handleBrochureChange}
-                    ref={brochureInputRef}
-                  />
-                </Button>
               </PremiumPaper>
             )}
           </Grid>

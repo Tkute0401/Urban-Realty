@@ -511,11 +511,37 @@ exports.createProperty = asyncHandler(async (req, res, next) => {
       : [];
     console.log('🏠 Processed floor plans:', floorPlanImages.length);
 
-    // Process brochure if uploaded
+    // Process brochure - URL only
     let brochure = null;
-    if (req.files?.brochure?.length > 0) {
-      brochure = await uploadFileToCloudinary(req.files.brochure[0], 'properties/brochures');
+    
+    // Check if brochure URL is provided in req.body
+    if (req.body.brochureUrl) {
+      try {
+        const url = String(req.body.brochureUrl).trim();
+        if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+          // Extract filename from URL if possible
+          let name = 'Brochure';
+          try {
+            const urlObj = new URL(url);
+            const pathname = urlObj.pathname;
+            const filename = pathname.split('/').pop() || 'Brochure';
+            name = filename.split('?')[0]; // Remove query params
+          } catch (e) {
+            // If URL parsing fails, use default name
+          }
+          
+          brochure = {
+            url: url,
+            publicId: req.body.brochurePublicId || '', // Optional
+            name: name
+          };
+          console.log('🏠 Processed brochure URL:', url);
+        }
+      } catch (error) {
+        console.error('Error processing brochure URL:', error);
+      }
     }
+    
     console.log('🏠 Processed brochure:', brochure ? 'Yes' : 'No');
 
     // Process virtual tour if uploaded
@@ -678,11 +704,53 @@ exports.updateProperty = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Update property
-  property = await Property.findByIdAndUpdate(req.params.id, {
+  // Process brochure - URL only
+  let brochure = null;
+  
+  // Check if brochure URL is provided in req.body
+  if (req.body.brochureUrl) {
+    try {
+      const url = String(req.body.brochureUrl).trim();
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        // Extract filename from URL if possible
+        let name = 'Brochure';
+        try {
+          const urlObj = new URL(url);
+          const pathname = urlObj.pathname;
+          const filename = pathname.split('/').pop() || 'Brochure';
+          name = filename.split('?')[0]; // Remove query params
+        } catch (e) {
+          // If URL parsing fails, use default name
+        }
+        
+        brochure = {
+          url: url,
+          publicId: req.body.brochurePublicId || '', // Optional
+          name: name
+        };
+      }
+    } catch (error) {
+      console.error('Error processing brochure URL:', error);
+    }
+  }
+
+  // Prepare update data
+  const updateData = {
     ...req.body,
     images: [...existingImages, ...newImages]
-  }, {
+  };
+  
+  // Add brochure if provided
+  if (brochure) {
+    updateData.brochure = brochure;
+  }
+  
+  // Remove brochureUrl and brochurePublicId from update data (they're not part of the schema)
+  delete updateData.brochureUrl;
+  delete updateData.brochurePublicId;
+
+  // Update property
+  property = await Property.findByIdAndUpdate(req.params.id, updateData, {
     new: true,
     runValidators: true
   });

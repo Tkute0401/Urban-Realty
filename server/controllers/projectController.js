@@ -158,9 +158,24 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/projects
 // @access  Private (Developer/Admin)
 exports.createProject = asyncHandler(async (req, res, next) => {
-  // Check if brochures is in req.body and remove it (it should come from files)
+  // Extract brochures from req.body before cleaning (they can be URLs or files)
+  let brochureUrls = [];
   if (req.body.brochures) {
-    delete req.body.brochures;
+    try {
+      // Parse brochures if it's a JSON string, otherwise use as-is
+      const brochuresData = typeof req.body.brochures === 'string' 
+        ? JSON.parse(req.body.brochures) 
+        : req.body.brochures;
+      
+      // Handle both array and single object
+      if (Array.isArray(brochuresData)) {
+        brochureUrls = brochuresData;
+      } else if (brochuresData && brochuresData.url) {
+        brochureUrls = [brochuresData];
+      }
+    } catch (error) {
+      console.error('Error parsing brochure URLs:', error);
+    }
   }
 
   // Check if user is developer
@@ -223,21 +238,32 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }))));
   }
 
-  // Process brochures if uploaded (to Railway's local storage)
+  // Process brochures - URLs only
   let brochures = [];
-  if (req.files?.brochures?.length > 0) {
-    try {
-      const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
-      brochures = uploadedBrochures.map(b => ({
+  
+  // Process brochure URLs from req.body (if provided)
+  if (brochureUrls.length > 0) {
+    brochures = brochureUrls.map(b => {
+      // Extract filename from URL if name not provided
+      let name = b.name || 'Brochure';
+      if (b.url && !b.name) {
+        try {
+          const urlObj = new URL(b.url);
+          const pathname = urlObj.pathname;
+          const filename = pathname.split('/').pop() || 'Brochure';
+          name = filename.split('?')[0]; // Remove query params
+        } catch (e) {
+          // If URL parsing fails, use default name
+        }
+      }
+      
+      return {
         url: b.url ? String(b.url) : '',
-        publicId: b.publicId ? String(b.publicId) : '',
-        name: b.name ? String(b.name) : '',
-        type: b.type ? String(b.type) : ''
-      }));
-    } catch (error) {
-      console.error('Error processing brochures:', error);
-      brochures = [];
-    }
+        publicId: b.publicId || '', // Optional, can be empty for external URLs
+        name: name,
+        type: b.type || 'application/pdf' // Default to PDF
+      };
+    }).filter(b => b.url); // Only include brochures with valid URLs
   }
 
   // Process virtual tours if uploaded (to Cloudinary)
@@ -401,6 +427,26 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Extract brochures from req.body before cleaning (they can be URLs or files)
+  let brochureUrls = [];
+  if (req.body.brochures) {
+    try {
+      // Parse brochures if it's a JSON string, otherwise use as-is
+      const brochuresData = typeof req.body.brochures === 'string' 
+        ? JSON.parse(req.body.brochures) 
+        : req.body.brochures;
+      
+      // Handle both array and single object
+      if (Array.isArray(brochuresData)) {
+        brochureUrls = brochuresData;
+      } else if (brochuresData && brochuresData.url) {
+        brochureUrls = [brochuresData];
+      }
+    } catch (error) {
+      console.error('Error parsing brochure URLs:', error);
+    }
+  }
+
   // Clean request body and remove file upload fields
   const cleanReqBody = { ...req.body };
   const fileUploadFields = ['images', 'floorPlans', 'brochures', 'virtualTours'];
@@ -434,20 +480,37 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     project.floorPlans = [...project.floorPlans, ...mappedFloorPlans];
   }
 
-  // Process new brochures if uploaded
-  if (req.files?.brochures?.length > 0) {
-    try {
-      const uploadedBrochures = await uploadDocuments(req.files.brochures, 'projects/brochures');
-      const mappedBrochures = uploadedBrochures.map(b => ({
+  // Process new brochures - URLs only
+  let newBrochures = [];
+  
+  // Process brochure URLs from req.body (if provided)
+  if (brochureUrls.length > 0) {
+    newBrochures = brochureUrls.map(b => {
+      // Extract filename from URL if name not provided
+      let name = b.name || 'Brochure';
+      if (b.url && !b.name) {
+        try {
+          const urlObj = new URL(b.url);
+          const pathname = urlObj.pathname;
+          const filename = pathname.split('/').pop() || 'Brochure';
+          name = filename.split('?')[0]; // Remove query params
+        } catch (e) {
+          // If URL parsing fails, use default name
+        }
+      }
+      
+      return {
         url: b.url ? String(b.url) : '',
-        publicId: b.publicId ? String(b.publicId) : '',
-        name: b.name ? String(b.name) : '',
-        type: b.type ? String(b.type) : ''
-      }));
-      project.brochures = [...project.brochures, ...mappedBrochures];
-    } catch (error) {
-      console.error('Error uploading brochures:', error);
-    }
+        publicId: b.publicId || '', // Optional, can be empty for external URLs
+        name: name,
+        type: b.type || 'application/pdf' // Default to PDF
+      };
+    }).filter(b => b.url); // Only include brochures with valid URLs
+  }
+  
+  // Add new brochures to existing ones
+  if (newBrochures.length > 0) {
+    project.brochures = [...project.brochures, ...newBrochures];
   }
 
   // Process new virtual tours if uploaded
