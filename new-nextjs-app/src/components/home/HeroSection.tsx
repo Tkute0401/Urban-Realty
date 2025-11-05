@@ -169,7 +169,7 @@ const HeroSection = () => {
       if (selectedCity) newSearchParams.set('city', selectedCity);
       if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
       
-      router.push(`/properties?${newSearchParams.toString()}`);
+      router.push(`/search?${newSearchParams.toString()}`);
     }
   };
 
@@ -363,7 +363,7 @@ const HeroSection = () => {
                                 newSearchParams.set('city', selectedCity);
                                 newSearchParams.set('search', String(locality));
                                 if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
-                                router.push(`/properties?${newSearchParams.toString()}`);
+                                router.push(`/search?${newSearchParams.toString()}`);
                               }}
                             >
                               {String(locality)}
@@ -604,7 +604,7 @@ const HeroSection = () => {
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder={selectedCity ? 
                     `Search in ${selectedCity}...` : 
-                    "Search for properties..."}
+                    "Search for properties and projects..."}
                   className="w-full bg-transparent text-xs sm:text-sm outline-none border-none focus:outline-none focus:border-none focus:ring-0 text-white placeholder:text-white/50"
                   disabled={propertiesLoading}
                 />
