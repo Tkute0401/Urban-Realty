@@ -303,7 +303,13 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
             reraId: property.projectDetails?.reraId || '',
             configurations: property.projectDetails?.configurations || ''
           },
-          approvals: property.approvals || []
+          approvals: (property.approvals || []).map(approval => ({
+            name: approval.name || '',
+            number: approval.number || '',
+            date: approval.date 
+              ? (typeof approval.date === 'string' ? approval.date : approval.date.toISOString().split('T')[0])
+              : ''
+          }))
         });
 
         // Set existing images
