@@ -148,6 +148,7 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
   const router = useRouter();
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const loadingPropertyIdRef = useRef<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -211,8 +212,18 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
 
   // Load property data and dependencies
   useEffect(() => {
+    if (!propertyId) {
+      return;
+    }
+
+    // Prevent multiple loads for the same propertyId
+    if (loadingPropertyIdRef.current === propertyId) {
+      return;
+    }
+
     const loadData = async () => {
       try {
+        loadingPropertyIdRef.current = propertyId;
         setLoading(true);
         setError(null);
 
@@ -289,15 +300,21 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
       } catch (err) {
         console.error('Error loading property:', err);
         setError(err instanceof Error ? err.message : 'Failed to load property');
+        loadingPropertyIdRef.current = null; // Reset on error so user can retry
       } finally {
         setLoading(false);
       }
     };
 
-    if (propertyId) {
-      loadData();
-    }
-  }, [propertyId, getProperty, getAgents, getDevelopers, user?.role]);
+    loadData();
+
+    // Cleanup: reset ref when propertyId changes
+    return () => {
+      if (loadingPropertyIdRef.current === propertyId) {
+        loadingPropertyIdRef.current = null;
+      }
+    };
+  }, [propertyId]); // Only depend on propertyId - functions are stable from context
 
   const handleInputChange = (field: string, value: any) => {
     if (formErrors[field]) {
