@@ -1308,7 +1308,23 @@ exports.getDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/admin/developers/profiles
 // @access  Private/Admin
 exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
-  const { userId, name, description, website, foundedYear, headquarters, contact, socialMedia } = req.body;
+  const { 
+    userId, 
+    name, 
+    description, 
+    website, 
+    foundedYear, 
+    headquarters, 
+    contact, 
+    socialMedia,
+    completedProjects,
+    ongoingProjects,
+    upcomingProjects,
+    flagshipProjects,
+    team,
+    specializations,
+    awards
+  } = req.body;
 
   // Check if developer profile already exists for this user
   if (userId) {
@@ -1335,7 +1351,14 @@ exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
     foundedYear,
     headquarters,
     contact,
-    socialMedia
+    socialMedia,
+    completedProjects,
+    ongoingProjects,
+    upcomingProjects,
+    flagshipProjects,
+    team,
+    specializations,
+    awards
   });
 
   // Update user's developerId if userId is provided
@@ -1353,20 +1376,39 @@ exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/admin/developers/profiles/:id
 // @access  Private/Admin
 exports.updateDeveloperProfile = asyncHandler(async (req, res, next) => {
-  const { name, description, website, foundedYear, headquarters, contact, socialMedia, team, specializations, awards } = req.body;
+  const { 
+    name, 
+    description, 
+    website, 
+    foundedYear, 
+    headquarters, 
+    contact, 
+    socialMedia, 
+    team, 
+    specializations, 
+    awards,
+    completedProjects,
+    ongoingProjects,
+    upcomingProjects,
+    flagshipProjects
+  } = req.body;
   const developerId = req.params.id;
 
   const updateFields = {};
   if (name) updateFields.name = name;
   if (description) updateFields.description = description;
-  if (website) updateFields.website = website;
-  if (foundedYear) updateFields.foundedYear = foundedYear;
+  if (website !== undefined) updateFields.website = website;
+  if (foundedYear !== undefined) updateFields.foundedYear = foundedYear;
   if (headquarters) updateFields.headquarters = headquarters;
   if (contact) updateFields.contact = contact;
   if (socialMedia) updateFields.socialMedia = socialMedia;
   if (team) updateFields.team = team;
   if (specializations) updateFields.specializations = specializations;
   if (awards) updateFields.awards = awards;
+  if (completedProjects !== undefined) updateFields.completedProjects = completedProjects;
+  if (ongoingProjects !== undefined) updateFields.ongoingProjects = ongoingProjects;
+  if (upcomingProjects !== undefined) updateFields.upcomingProjects = upcomingProjects;
+  if (flagshipProjects) updateFields.flagshipProjects = flagshipProjects;
 
   // Check if developer name is being updated and if it's already in use
   if (name) {

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/services/api';
 import {
   Table,
@@ -109,6 +110,7 @@ interface DeveloperProfile {
 }
 
 const DeveloperProfilesTable = () => {
+  const router = useRouter();
   const [profiles, setProfiles] = useState<DeveloperProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -234,11 +236,42 @@ const DeveloperProfilesTable = () => {
     handleMenuClose();
   };
 
-  const handleEditSubmit = async () => {
+  const handleEditSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (!selectedProfile) return;
 
     try {
-      await http.put(`/api/v1/admin/developers/profiles/${selectedProfile._id}`, editFormData);
+      // Convert foundedYear to number if it exists and is not empty
+      const foundedYearValue = editFormData.foundedYear && editFormData.foundedYear.toString().trim() 
+        ? parseInt(editFormData.foundedYear.toString()) 
+        : undefined;
+
+      // Clean up empty strings and prepare submission data
+      const submitData = {
+        name: editFormData.name?.trim() || '',
+        description: editFormData.description?.trim() || '',
+        website: editFormData.website?.trim() || undefined,
+        foundedYear: foundedYearValue,
+        headquarters: {
+          city: editFormData.headquarters?.city?.trim() || undefined,
+          state: editFormData.headquarters?.state?.trim() || undefined,
+          country: editFormData.headquarters?.country?.trim() || undefined
+        },
+        contact: {
+          email: editFormData.contact?.email?.trim() || undefined,
+          phone: editFormData.contact?.phone?.trim() || undefined
+        },
+        socialMedia: {
+          facebook: editFormData.socialMedia?.facebook?.trim() || undefined,
+          twitter: editFormData.socialMedia?.twitter?.trim() || undefined,
+          linkedin: editFormData.socialMedia?.linkedin?.trim() || undefined,
+          instagram: editFormData.socialMedia?.instagram?.trim() || undefined
+        }
+      };
+      
+      await http.put(`/api/v1/admin/developers/profiles/${selectedProfile._id}`, submitData);
       await fetchDeveloperProfiles();
       setEditDialogOpen(false);
       setError(null);
@@ -305,7 +338,7 @@ const DeveloperProfilesTable = () => {
         <Button
           variant="contained"
           startIcon={<Add />}
-          onClick={() => setCreateDialogOpen(true)}
+          onClick={() => router.push('/admin/developers/profiles/create')}
         >
           Add Developer Profile
         </Button>
@@ -451,7 +484,12 @@ const DeveloperProfilesTable = () => {
           <Visibility sx={{ mr: 1 }} />
           View Details
         </MenuItem>
-        <MenuItem onClick={handleEditClick}>
+        <MenuItem onClick={() => {
+          if (selectedProfile) {
+            router.push(`/admin/developers/profiles/edit/${selectedProfile._id}`);
+          }
+          handleMenuClose();
+        }}>
           <Edit sx={{ mr: 1 }} />
           Edit
         </MenuItem>
@@ -633,8 +671,9 @@ const DeveloperProfilesTable = () => {
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Edit Developer Profile</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+        <form onSubmit={handleEditSubmit}>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -788,15 +827,16 @@ const DeveloperProfilesTable = () => {
               />
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleEditSubmit} variant="contained" startIcon={<Save />}>
-            Update Profile
-          </Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button type="button" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" startIcon={<Save />}>
+              Update Profile
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
 
       {/* View Dialog */}
