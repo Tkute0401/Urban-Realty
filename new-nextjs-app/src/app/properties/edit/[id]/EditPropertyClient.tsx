@@ -556,19 +556,30 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
         }
       });
 
+      // Append existing images (must be sent as JSON string for backend to parse)
+      if (existingImages.length > 0) {
+        formDataToSend.append('existingImages', JSON.stringify(existingImages));
+      }
+
       // Append new images
       images.forEach(file => {
         formDataToSend.append('images', file);
       });
+
+      // Append existing floor plans (if backend supports it)
+      if (existingFloorPlans.length > 0) {
+        formDataToSend.append('existingFloorPlans', JSON.stringify(existingFloorPlans));
+      }
 
       // Append new floor plans
       floorPlans.forEach(file => {
         formDataToSend.append('floorPlans', file);
       });
 
-      // Append brochure URL
-      if (brochureUrl.trim()) {
-        formDataToSend.append('brochureUrl', brochureUrl.trim());
+      // Append brochure URL (only if it's a valid URL)
+      const trimmedBrochureUrl = brochureUrl.trim();
+      if (trimmedBrochureUrl && (trimmedBrochureUrl.startsWith('http://') || trimmedBrochureUrl.startsWith('https://'))) {
+        formDataToSend.append('brochureUrl', trimmedBrochureUrl);
       }
 
       // Append virtual tour

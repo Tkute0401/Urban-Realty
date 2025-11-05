@@ -924,20 +924,38 @@ const PropertyDetailsPageContent: React.FC = () => {
                         }
                       }}
                       onClick={() => {
-                        // In a real app, this would download the brochure PDF
-                        window.open('/api/placeholder/400/600', '_blank');
+                        if (property?.brochure?.url) {
+                          window.open(property.brochure.url, '_blank');
+                        }
                       }}
                     >
                       <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                        <img
-                          src="/api/placeholder/400/600"
-                          alt="Property Brochure"
-                          style={{
+                        {property?.brochure?.url ? (
+                          <img
+                            src={property.brochure.url}
+                            alt="Property Brochure"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover'
+                            }}
+                            onError={(e) => {
+                              // Fallback to placeholder if image fails to load
+                              (e.target as HTMLImageElement).src = '/api/placeholder/400/600';
+                            }}
+                          />
+                        ) : (
+                          <Box sx={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover'
-                          }}
-                        />
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'var(--color-bg-secondary)'
+                          }}>
+                            <PictureAsPdf sx={{ fontSize: 64, color: 'var(--color-text-muted)' }} />
+                          </Box>
+                        )}
                         <Box sx={{
                           position: 'absolute',
                           top: 0,
