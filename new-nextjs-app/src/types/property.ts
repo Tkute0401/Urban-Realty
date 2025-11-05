@@ -3,6 +3,7 @@ export interface Property {
   _id: string;
   title: string;
   buildingName?: string;
+  floorNumber?: number;
   price: number;
   area: number;
   bedrooms: number;
@@ -10,6 +11,9 @@ export interface Property {
   type: string;
   status: string;
   description?: string;
+  constructionStatus?: string;
+  possessionDate?: string;
+  ageOfProperty?: number;
   address?: {
     line1?: string;
     street?: string;
