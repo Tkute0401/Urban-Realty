@@ -84,7 +84,7 @@ interface EditProjectClientProps {
 }
 
 const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { getProject, updateProject, loading, error } = useProjects();
   const { developers, getDevelopers, loading: developersLoading } = useDevelopers();
   const router = useRouter();
@@ -160,11 +160,13 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
   const [existingVirtualTours, setExistingVirtualTours] = useState<any[]>([]);
 
   useEffect(() => {
-    if (user?.role !== 'developer') {
-      router.push('/');
-    } else {
+    // Allow both admin and developer roles to access this page
+    if (user && (user.role === 'admin' || user.role === 'developer')) {
       // Fetch developers list for multi-select
       getDevelopers();
+    } else if (user) {
+      // User is logged in but doesn't have the right role
+      router.push('/');
     }
   }, [user, router, getDevelopers]);
 
@@ -599,11 +601,21 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
     }
   };
 
-  if (user?.role !== 'developer') {
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <Container maxWidth="md" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  // Allow both admin and developer roles
+  if (user && user.role !== 'admin' && user.role !== 'developer') {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Alert severity="error">
-          Access denied. This page is only available for developer users.
+          Access denied. This page is only available for admin and developer users.
         </Alert>
       </Container>
     );
