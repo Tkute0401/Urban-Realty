@@ -690,8 +690,8 @@ exports.updateProperty = asyncHandler(async (req, res, next) => {
 
   // Process new images
   let newImages = [];
-  if (req.files?.length > 0) {
-    newImages = await uploadImagesToCloudinary(req.files);
+  if (req.files?.images?.length > 0) {
+    newImages = await uploadImagesToCloudinary(req.files.images, 'properties');
   }
 
   // Process existing images
@@ -701,6 +701,22 @@ exports.updateProperty = asyncHandler(async (req, res, next) => {
       existingImages = JSON.parse(req.body.existingImages);
     } catch (err) {
       return next(new ErrorResponse('Invalid existing images data', 400));
+    }
+  }
+
+  // Process new floor plan images
+  let newFloorPlanImages = [];
+  if (req.files?.floorPlans?.length > 0) {
+    newFloorPlanImages = await uploadImagesToCloudinary(req.files.floorPlans, 'properties/floor-plans');
+  }
+
+  // Process existing floor plan images
+  let existingFloorPlanImages = [];
+  if (req.body.existingFloorPlans) {
+    try {
+      existingFloorPlanImages = JSON.parse(req.body.existingFloorPlans);
+    } catch (err) {
+      return next(new ErrorResponse('Invalid existing floor plans data', 400));
     }
   }
 
@@ -734,20 +750,37 @@ exports.updateProperty = asyncHandler(async (req, res, next) => {
     }
   }
 
+  // Process virtual tour if uploaded
+  let virtualTour = null;
+  if (req.files?.virtualTour?.length > 0) {
+    virtualTour = await uploadVideoToCloudinary(req.files.virtualTour[0], 'properties/virtual-tours');
+  }
+
   // Prepare update data
   const updateData = {
     ...req.body,
-    images: [...existingImages, ...newImages]
+    images: [...existingImages, ...newImages],
+    floorPlanImages: [...existingFloorPlanImages, ...newFloorPlanImages]
   };
   
   // Add brochure if provided
   if (brochure) {
     updateData.brochure = brochure;
   }
+
+  // Add virtual tour if provided
+  if (virtualTour) {
+    updateData.virtualTour = {
+      url: virtualTour.secure_url,
+      type: 'video' // Default type, can be changed based on file analysis
+    };
+  }
   
   // Remove brochureUrl and brochurePublicId from update data (they're not part of the schema)
   delete updateData.brochureUrl;
   delete updateData.brochurePublicId;
+  delete updateData.existingImages;
+  delete updateData.existingFloorPlans;
 
   // Update property
   property = await Property.findByIdAndUpdate(req.params.id, updateData, {

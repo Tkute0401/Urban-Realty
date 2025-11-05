@@ -83,7 +83,11 @@ router.put(
   [
     protect,
     authorize('agent', 'admin', 'individual_seller', 'developer'),
-    upload.array('images', 10),
+    upload.fields([
+      { name: 'images', maxCount: 10 },
+      { name: 'floorPlans', maxCount: 5 },
+      { name: 'virtualTour', maxCount: 1 }
+    ]),
     [
       check('title', 'Title is required').optional().not().isEmpty(),
       check('description', 'Description is required').optional().not().isEmpty(),
