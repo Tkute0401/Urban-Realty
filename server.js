@@ -64,12 +64,28 @@ const {
 
 // Initialize Next.js app
 const dev = process.env.NODE_ENV !== 'production';
-const nextApp = next({ 
-  dev, 
-  dir: './new-nextjs-app',
-  conf: require('./new-nextjs-app/next.config.js')
-});
-const nextHandler = nextApp.getRequestHandler();
+let nextApp;
+let nextHandler = null;
+
+try {
+  // Try to load Next.js config if it exists
+  let nextConfig = null;
+  try {
+    nextConfig = require('./new-nextjs-app/next.config.js');
+  } catch (configError) {
+    console.log('⚠️  Next.js config file not found or invalid, using defaults');
+  }
+
+  nextApp = next({ 
+    dev, 
+    dir: './new-nextjs-app',
+    ...(nextConfig && { conf: nextConfig })
+  });
+} catch (nextInitError) {
+  console.error('❌ Failed to initialize Next.js:', nextInitError.message);
+  console.log('⚠️  Continuing without Next.js (some features may not work)');
+  nextApp = null;
+}
 
 // Initialize Express app
 const app = express();
@@ -213,13 +229,19 @@ app.use(errorHandler);
 // Start server
 async function startServer() {
   try {
-    // Prepare Next.js
-    try {
-      await nextApp.prepare();
-      console.log('✅ Next.js app prepared');
-    } catch (nextError) {
-      console.error('❌ Failed to build Next.js:', nextError.message);
-      console.log('⚠️  Continuing with server startup (some features may not work)');
+    // Prepare Next.js if available
+    if (nextApp) {
+      try {
+        await nextApp.prepare();
+        nextHandler = nextApp.getRequestHandler();
+        console.log('✅ Next.js app prepared');
+      } catch (nextError) {
+        console.error('❌ Failed to build Next.js:', nextError.message);
+        console.log('⚠️  Continuing with server startup (some features may not work)');
+        nextHandler = null;
+      }
+    } else {
+      console.log('⚠️  Next.js not initialized, serving API only');
     }
 
     // Handle all other routes with Next.js (but not API routes)
@@ -234,7 +256,7 @@ async function startServer() {
       }
       
       // If Next.js is not available, serve a basic response
-      if (!nextHandler) {
+      if (!nextHandler || !nextApp) {
         return res.status(200).send(`
           <!DOCTYPE html>
           <html>
@@ -245,16 +267,32 @@ async function startServer() {
             </head>
             <body>
               <h1>Urban Realty</h1>
-              <p>Server is running. Frontend is being prepared...</p>
-              <script>
-                setTimeout(() => location.reload(), 5000);
-              </script>
+              <p>Server is running. API is available at <a href="/api/v1/health">/api/v1/health</a></p>
+              <p>Next.js frontend is not available at this time.</p>
             </body>
           </html>
         `);
       }
       
-      return nextHandler(req, res);
+      // Safely call nextHandler
+      try {
+        return nextHandler(req, res);
+      } catch (handlerError) {
+        console.error('❌ Error in Next.js request handler:', handlerError.message);
+        return res.status(500).send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Urban Realty - Error</title>
+              <meta charset="utf-8">
+            </head>
+            <body>
+              <h1>Urban Realty</h1>
+              <p>Frontend error occurred. API is available at <a href="/api/v1/health">/api/v1/health</a></p>
+            </body>
+          </html>
+        `);
+      }
     });
 
     const PORT = process.env.PORT || 3000;
@@ -313,7 +351,23 @@ async function startServer() {
 // Handle unhandled rejections
 process.on('unhandledRejection', (err) => {
   console.error(`Unhandled Rejection: ${err.message}`);
-  process.exit(1);
+  console.error(`Stack: ${err.stack}`);
+  
+  // Don't exit immediately in production - log and continue
+  // This prevents the server from crashing on Next.js errors
+  if (err.message && err.message.includes('requestHandler')) {
+    console.error('⚠️  Next.js requestHandler error - this is likely a Next.js initialization issue');
+    console.error('⚠️  Server will continue running but Next.js routes may not work');
+    return; // Don't exit, let the server continue
+  }
+  
+  // For other critical errors, exit after a delay
+  if (process.env.NODE_ENV === 'production') {
+    console.error('⚠️  Critical error in production, exiting in 5 seconds...');
+    setTimeout(() => process.exit(1), 5000);
+  } else {
+    process.exit(1);
+  }
 });
 
 // Start the server with a small delay to ensure DB connection
