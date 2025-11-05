@@ -273,12 +273,12 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
             hasTransport: property.nearbyLocalities?.hasTransport || false,
             transport: property.nearbyLocalities?.transport || ''
           },
-          projectDetails: property.projectDetails || {
-            projectArea: '',
-            totalUnits: '',
-            launchDate: '',
-            reraId: '',
-            configurations: ''
+          projectDetails: {
+            projectArea: property.projectDetails?.projectArea || '',
+            totalUnits: property.projectDetails?.totalUnits || '',
+            launchDate: property.projectDetails?.launchDate || '',
+            reraId: property.projectDetails?.reraId || '',
+            configurations: property.projectDetails?.configurations || ''
           }
         });
 
