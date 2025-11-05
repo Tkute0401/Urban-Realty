@@ -21,9 +21,10 @@ import {
   Avatar,
   Snackbar,
   Divider,
+  FormHelperText,
 } from '@mui/material';
 import {
-  CloudUpload, Delete, Star, ArrowBack,
+  CloudUpload, Delete, Star, ArrowBack, Close, Add,
   Home, Apartment, Villa, Cottage, Factory, Landscape,
   LocalParking, Pool, FitnessCenter, Security, Spa,
   Balcony, Wifi, AcUnit, Chair, Pets, Elevator,
@@ -160,6 +161,16 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
   const [existingImages, setExistingImages] = useState<Array<{ url: string; publicId?: string }>>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [existingFloorPlans, setExistingFloorPlans] = useState<Array<{ url: string; publicId?: string }>>([]);
+  const [floorPlanPreviews, setFloorPlanPreviews] = useState<string[]>([]);
+  const [floorPlans, setFloorPlans] = useState<File[]>([]);
+  const [brochureUrl, setBrochureUrl] = useState<string>('');
+  const [virtualTourFile, setVirtualTourFile] = useState<File | null>(null);
+  const [virtualTourPreview, setVirtualTourPreview] = useState<string | null>(null);
+  
+  const imagesInputRef = useRef<HTMLInputElement>(null);
+  const floorPlansInputRef = useRef<HTMLInputElement>(null);
+  const virtualTourInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -207,7 +218,8 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
       launchDate: '',
       reraId: '',
       configurations: ''
-    }
+    },
+    approvals: [] as Array<{ name: string; number: string; date: string }>
   });
 
   // Load property data and dependencies
@@ -290,12 +302,24 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
             launchDate: property.projectDetails?.launchDate || '',
             reraId: property.projectDetails?.reraId || '',
             configurations: property.projectDetails?.configurations || ''
-          }
+          },
+          approvals: property.approvals || []
         });
 
         // Set existing images
         if (property.images && property.images.length > 0) {
           setExistingImages(property.images);
+        }
+        
+        // Set existing floor plans
+        if (property.floorPlanImages && property.floorPlanImages.length > 0) {
+          setExistingFloorPlans(property.floorPlanImages);
+        }
+        
+        // Set existing brochure and virtual tour
+        setBrochureUrl(property.brochure?.url || '');
+        if (property.virtualTour?.url) {
+          setVirtualTourPreview(property.virtualTour.url);
         }
       } catch (err) {
         console.error('Error loading property:', err);
@@ -369,6 +393,70 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
     }));
   };
 
+  const handleFloorPlanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).slice(0, 5 - floorPlanPreviews.length);
+    const previews = files.map(file => URL.createObjectURL(file));
+    setFloorPlanPreviews([...floorPlanPreviews, ...previews]);
+    setFloorPlans([...floorPlans, ...files]);
+    if (floorPlansInputRef.current) floorPlansInputRef.current.value = '';
+  };
+
+  const handleRemoveFloorPlan = (index: number, isExisting: boolean = false) => {
+    if (isExisting) {
+      const newPlans = [...existingFloorPlans];
+      newPlans.splice(index, 1);
+      setExistingFloorPlans(newPlans);
+    } else {
+      const newPreviews = [...floorPlanPreviews];
+      const newPlans = [...floorPlans];
+      newPreviews.splice(index, 1);
+      newPlans.splice(index, 1);
+      setFloorPlanPreviews(newPreviews);
+      setFloorPlans(newPlans);
+    }
+  };
+
+  const handleBrochureUrlChange = (url: string) => {
+    setBrochureUrl(url);
+  };
+
+  const handleVirtualTourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setVirtualTourFile(file);
+      setVirtualTourPreview(URL.createObjectURL(file));
+      if (virtualTourInputRef.current) virtualTourInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveVirtualTour = () => {
+    setVirtualTourFile(null);
+    setVirtualTourPreview(null);
+  };
+
+  const handleAddApproval = () => {
+    setFormData(prev => ({
+      ...prev,
+      approvals: [...prev.approvals, { name: '', number: '', date: '' }]
+    }));
+  };
+
+  const handleRemoveApproval = (index: number) => {
+    setFormData(prev => {
+      const newApprovals = [...prev.approvals];
+      newApprovals.splice(index, 1);
+      return { ...prev, approvals: newApprovals };
+    });
+  };
+
+  const handleApprovalChange = (index: number, field: string, value: string) => {
+    setFormData(prev => {
+      const newApprovals = [...prev.approvals];
+      newApprovals[index] = { ...newApprovals[index], [field]: value };
+      return { ...prev, approvals: newApprovals };
+    });
+  };
+
   const validateForm = () => {
     const errors: Record<string, string> = {};
     
@@ -397,38 +485,97 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
     setSaving(true);
 
     try {
-      // Prepare update data
-      const updateData: any = {
-        title: formData.title,
-        description: formData.description,
-        type: formData.type,
-        status: formData.status,
-        price: parseInt(formData.price),
-        bedrooms: parseInt(formData.bedrooms),
-        bathrooms: parseInt(formData.bathrooms),
-        area: parseInt(formData.area),
-        buildingName: formData.buildingName,
-        floorNumber: formData.floorNumber ? parseInt(formData.floorNumber) : undefined,
-        featured: formData.featured,
-        address: formData.address,
-        amenities: formData.amenities,
-        highlights: formData.highlights.filter(h => h.trim() !== ''),
-        nearbyLocalities: formData.nearbyLocalities,
-        projectDetails: formData.projectDetails,
-        constructionStatus: formData.constructionStatus,
-        possessionDate: formData.possessionDate || undefined,
-        ageOfProperty: formData.ageOfProperty ? parseInt(formData.ageOfProperty) : undefined
-      };
-
+      const formDataToSend = new FormData();
+      
+      // Append all simple fields
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('type', formData.type);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('bedrooms', formData.bedrooms);
+      formDataToSend.append('bathrooms', formData.bathrooms);
+      formDataToSend.append('area', formData.area);
+      formDataToSend.append('buildingName', formData.buildingName);
+      formDataToSend.append('floorNumber', formData.floorNumber);
+      formDataToSend.append('featured', formData.featured.toString());
+      formDataToSend.append('constructionStatus', formData.constructionStatus);
+      
       if (formData.developer) {
-        updateData.developer = formData.developer;
+        formDataToSend.append('developer', formData.developer);
       }
       if (formData.agent && user?.role === 'admin') {
-        updateData.agent = formData.agent;
+        formDataToSend.append('agent', formData.agent);
+      }
+      if (formData.possessionDate) {
+        formDataToSend.append('possessionDate', formData.possessionDate);
+      }
+      if (formData.ageOfProperty) {
+        formDataToSend.append('ageOfProperty', formData.ageOfProperty);
+      }
+      
+      // Append address fields individually
+      Object.entries(formData.address).forEach(([key, value]) => {
+        formDataToSend.append(`address[${key}]`, value);
+      });
+      
+      // Append amenities
+      formData.amenities.forEach(amenity => {
+        formDataToSend.append('amenities[]', amenity);
+      });
+
+      // Append highlights (filter out empty ones)
+      formData.highlights
+        .filter(h => h.trim() !== '')
+        .forEach((highlight, index) => {
+          formDataToSend.append(`highlights[${index}]`, highlight);
+        });
+
+      // Append nearby localities
+      Object.entries(formData.nearbyLocalities).forEach(([key, value]) => {
+        formDataToSend.append(`nearbyLocalities[${key}]`, value.toString());
+      });
+
+      // Append project details
+      Object.entries(formData.projectDetails).forEach(([key, value]) => {
+        if (value) formDataToSend.append(`projectDetails[${key}]`, value);
+      });
+
+      // Append approvals
+      formData.approvals.forEach((approval, index) => {
+        formDataToSend.append(`approvals[${index}][name]`, approval.name);
+        formDataToSend.append(`approvals[${index}][number]`, approval.number);
+        if (approval.date) {
+          formDataToSend.append(`approvals[${index}][date]`, approval.date);
+        }
+      });
+
+      // Append new images
+      images.forEach(file => {
+        formDataToSend.append('images', file);
+      });
+
+      // Append new floor plans
+      floorPlans.forEach(file => {
+        formDataToSend.append('floorPlans', file);
+      });
+
+      // Append brochure URL
+      if (brochureUrl.trim()) {
+        formDataToSend.append('brochureUrl', brochureUrl.trim());
       }
 
-      // Update property
-      await http.put(`/api/v1/properties/${propertyId}`, updateData);
+      // Append virtual tour
+      if (virtualTourFile) {
+        formDataToSend.append('virtualTour', virtualTourFile);
+      }
+
+      // Update property using FormData
+      await http.put(`/api/v1/properties/${propertyId}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       
       setSnackbarMessage('Property updated successfully!');
       setSnackbarOpen(true);
@@ -986,6 +1133,430 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
               </PremiumPaper>
             </Grid>
           )}
+
+          {/* New Images Upload */}
+          <Grid item xs={12}>
+            <SectionHeader variant="h6">Add New Images</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Upload up to 10 images (max {10 - imagePreviews.length} remaining)
+              </FormHelperText>
+              
+              {imagePreviews.length > 0 && (
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  {imagePreviews.map((preview, index) => (
+                    <Grid item xs={6} sm={4} md={3} key={index}>
+                      <Box sx={{ position: 'relative' }}>
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '150px',
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveImage(index, false)}
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 0, 0, 0.9)',
+                            }
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+              
+              <Button
+                component="label"
+                startIcon={<CloudUpload />}
+                variant="outlined"
+                disabled={imagePreviews.length >= 10}
+                sx={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                  '&:hover': {
+                    borderColor: 'var(--color-primary-hover)',
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                  }
+                }}
+              >
+                Upload Images
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={imagesInputRef}
+                />
+              </Button>
+            </PremiumPaper>
+          </Grid>
+
+          {/* Floor Plans Section */}
+          <Grid item xs={12}>
+            <SectionHeader variant="h6">Floor Plans</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Upload up to 5 floor plan images
+              </FormHelperText>
+              
+              {/* Existing Floor Plans */}
+              {existingFloorPlans.length > 0 && (
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  {existingFloorPlans.map((plan, index) => (
+                    <Grid item xs={6} sm={4} md={3} key={index}>
+                      <Box sx={{ position: 'relative' }}>
+                        <img
+                          src={plan.url}
+                          alt={`Floor Plan ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '150px',
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveFloorPlan(index, true)}
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 0, 0, 0.9)',
+                            }
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+              
+              {/* New Floor Plan Previews */}
+              {floorPlanPreviews.length > 0 && (
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  {floorPlanPreviews.map((preview, index) => (
+                    <Grid item xs={6} sm={4} md={3} key={index}>
+                      <Box sx={{ position: 'relative' }}>
+                        <img
+                          src={preview}
+                          alt={`Floor Plan Preview ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '150px',
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveFloorPlan(index, false)}
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 0, 0, 0.9)',
+                            }
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+              
+              <Button
+                component="label"
+                startIcon={<CloudUpload />}
+                variant="outlined"
+                disabled={floorPlanPreviews.length >= 5}
+                sx={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                  '&:hover': {
+                    borderColor: 'var(--color-primary-hover)',
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                  }
+                }}
+              >
+                Upload Floor Plans
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  accept="image/*"
+                  onChange={handleFloorPlanChange}
+                  ref={floorPlansInputRef}
+                />
+              </Button>
+            </PremiumPaper>
+          </Grid>
+
+          {/* Approvals & Certifications Section */}
+          <Grid item xs={12}>
+            <SectionHeader variant="h6">Approvals & Certifications</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Add property approvals and certifications
+              </FormHelperText>
+              
+              {formData.approvals.map((approval, index) => (
+                <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid var(--color-primary)', borderRadius: '8px' }}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} sm={4}>
+                      <TextField
+                        fullWidth
+                        label="Approval Name"
+                        value={approval.name}
+                        onChange={(e) => handleApprovalChange(index, 'name', e.target.value)}
+                        size={isMobile ? 'small' : 'medium'}
+                        sx={{
+                          '& .MuiInputBase-root': {
+                            color: 'var(--color-text-primary)',
+                            fontFamily: '"Poppins", sans-serif'
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'var(--color-primary)',
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <TextField
+                        fullWidth
+                        label="Approval Number"
+                        value={approval.number}
+                        onChange={(e) => handleApprovalChange(index, 'number', e.target.value)}
+                        size={isMobile ? 'small' : 'medium'}
+                        sx={{
+                          '& .MuiInputBase-root': {
+                            color: 'var(--color-text-primary)',
+                            fontFamily: '"Poppins", sans-serif'
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'var(--color-primary)',
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <TextField
+                        fullWidth
+                        label="Date"
+                        type="date"
+                        value={approval.date}
+                        onChange={(e) => handleApprovalChange(index, 'date', e.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        size={isMobile ? 'small' : 'medium'}
+                        sx={{
+                          '& .MuiInputBase-root': {
+                            color: 'var(--color-text-primary)',
+                            fontFamily: '"Poppins", sans-serif'
+                          },
+                          '& .MuiInputLabel-root': {
+                            color: 'var(--color-primary)',
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={1}>
+                      <IconButton
+                        onClick={() => handleRemoveApproval(index)}
+                        sx={{ color: 'var(--color-danger)' }}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Box>
+              ))}
+              
+              <Button
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={handleAddApproval}
+                sx={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                  '&:hover': {
+                    borderColor: 'var(--color-primary-hover)',
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                  }
+                }}
+              >
+                Add Approval
+              </Button>
+            </PremiumPaper>
+          </Grid>
+
+          {/* Brochure Section */}
+          <Grid item xs={12} sm={6}>
+            <SectionHeader variant="h6">Property Brochure</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Enter brochure URL (Google Drive, Dropbox, AWS S3, etc.)
+              </FormHelperText>
+              
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="https://example.com/brochure.pdf"
+                value={brochureUrl}
+                onChange={(e) => handleBrochureUrlChange(e.target.value)}
+                sx={{
+                  mb: 2,
+                  '& .MuiOutlinedInput-root': {
+                    color: 'var(--color-text-primary)',
+                    '& fieldset': {
+                      borderColor: 'var(--color-border)',
+                    },
+                  },
+                }}
+              />
+              
+              {brochureUrl && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    Brochure URL:
+                  </Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 2,
+                    p: 2,
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-border)'
+                  }}>
+                    <Typography variant="body2" sx={{ color: 'var(--color-text-primary)', flex: 1, wordBreak: 'break-all' }}>
+                      🔗 {brochureUrl}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => setBrochureUrl('')}
+                      sx={{
+                        backgroundColor: 'var(--color-error)',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'var(--color-error-hover)'
+                        }
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+            </PremiumPaper>
+          </Grid>
+
+          {/* Virtual Tour Section */}
+          <Grid item xs={12} sm={6}>
+            <SectionHeader variant="h6">Virtual Tour</SectionHeader>
+            <PremiumPaper>
+              <FormHelperText sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                Upload a virtual tour video (optional)
+              </FormHelperText>
+              
+              {/* Virtual Tour Preview */}
+              {virtualTourPreview && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: 'var(--color-text-primary)' }}>
+                    Virtual Tour Preview:
+                  </Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 2,
+                    p: 2,
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-border)'
+                  }}>
+                    <video
+                      src={virtualTourPreview}
+                      controls
+                      style={{
+                        width: '100px',
+                        height: '60px',
+                        borderRadius: '4px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" sx={{ color: 'var(--color-text-primary)' }}>
+                        🎥 {virtualTourFile?.name || 'Virtual Tour'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {(virtualTourFile?.size && (virtualTourFile.size / 1024 / 1024).toFixed(1)) || '0'} MB
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={handleRemoveVirtualTour}
+                      sx={{
+                        backgroundColor: 'var(--color-error)',
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: 'var(--color-error-hover)'
+                        }
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              )}
+              
+              <Button
+                component="label"
+                startIcon={<CloudUpload />}
+                sx={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-primary)',
+                  '&:hover': {
+                    borderColor: 'var(--color-primary-hover)',
+                    backgroundColor: 'rgba(120, 202, 220, 0.1)'
+                  }
+                }}
+                variant="outlined"
+              >
+                Upload Virtual Tour
+                <input
+                  type="file"
+                  hidden
+                  accept="video/*"
+                  onChange={handleVirtualTourChange}
+                  ref={virtualTourInputRef}
+                />
+              </Button>
+            </PremiumPaper>
+          </Grid>
 
           {/* Submit Buttons */}
           <Grid item xs={12}>
