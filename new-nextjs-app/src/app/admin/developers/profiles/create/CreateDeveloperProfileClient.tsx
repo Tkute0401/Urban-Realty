@@ -22,23 +22,14 @@ import http from '@/lib/services/http';
 // Styled components
 const PremiumPaper = styled(Paper)(({ theme }) => ({
   backgroundColor: 'var(--color-surface)',
-  color: 'var(--color-text)',
+  color: 'var(--color-text-primary)',
   borderRadius: '16px',
-  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
-  border: `2px solid var(--color-primary)`,
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  border: `1px solid var(--color-border-light)`,
   padding: theme.spacing(3),
   fontFamily: '"Poppins", sans-serif',
   position: 'relative',
   overflow: 'hidden',
-  '&:before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '4px',
-    background: 'linear-gradient(90deg, var(--color-primary) 0%, var(--color-surface) 100%)',
-  }
 }));
 
 const PremiumButton = styled(Button)(({ theme }) => ({
@@ -382,7 +373,7 @@ const CreateDeveloperProfileClient = () => {
   return (
     <Container maxWidth="lg" sx={{ 
       py: { xs: 2, md: 3 },
-      background: 'linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%)',
+      backgroundColor: 'var(--color-bg)',
       minHeight: '100vh'
     }}>
       <Box 
@@ -394,12 +385,22 @@ const CreateDeveloperProfileClient = () => {
           p: { xs: 1, sm: 2, md: 3 },
           backgroundColor: 'var(--color-surface)',
           borderRadius: '16px',
-          border: '2px solid var(--color-primary)',
-          boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)'
+          border: '1px solid var(--color-border-light)',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <IconButton onClick={() => router.push('/admin/developers/profiles')} sx={{ mr: 2 }}>
+          <IconButton 
+            onClick={() => router.push('/admin/developers/profiles')} 
+            sx={{ 
+              mr: 2,
+              color: 'var(--color-text-primary)',
+              '&:hover': {
+                backgroundColor: 'var(--color-primary-light)',
+                color: 'var(--color-primary)'
+              }
+            }}
+          >
             <ArrowBack />
           </IconButton>
           <Typography 
@@ -449,19 +450,29 @@ const CreateDeveloperProfileClient = () => {
                     sx={{
                       mb: 2,
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -484,19 +495,29 @@ const CreateDeveloperProfileClient = () => {
                     sx={{
                       mb: 2,
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -522,19 +543,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -555,19 +586,29 @@ const CreateDeveloperProfileClient = () => {
                     inputProps={{ min: 1800, max: new Date().getFullYear() }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -580,7 +621,7 @@ const CreateDeveloperProfileClient = () => {
           <Grid item xs={12}>
             <SectionHeader variant="h6">Developer Logo</SectionHeader>
             <PremiumPaper>
-              <FormHelperText sx={{ mb: 1, color: 'rgba(255, 255, 255, 0.7)' }}>
+              <FormHelperText sx={{ mb: 1, color: 'var(--color-text-muted)' }}>
                 Upload a logo image (5MB max)
               </FormHelperText>
               
@@ -650,19 +691,29 @@ const CreateDeveloperProfileClient = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -678,19 +729,29 @@ const CreateDeveloperProfileClient = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -706,19 +767,29 @@ const CreateDeveloperProfileClient = () => {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -744,19 +815,29 @@ const CreateDeveloperProfileClient = () => {
                     inputProps={{ min: 0 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -773,19 +854,29 @@ const CreateDeveloperProfileClient = () => {
                     inputProps={{ min: 0 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -802,19 +893,29 @@ const CreateDeveloperProfileClient = () => {
                     inputProps={{ min: 0 }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -830,7 +931,7 @@ const CreateDeveloperProfileClient = () => {
               {formData.flagshipProjects.map((project, index) => (
                 <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid var(--color-primary)', borderRadius: '8px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ color: 'var(--color-primary)' }}>
+                    <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                       Project {index + 1}
                     </Typography>
                     {formData.flagshipProjects.length > 1 && (
@@ -898,7 +999,8 @@ const CreateDeveloperProfileClient = () => {
                   color: 'var(--color-primary)',
                   '&:hover': {
                     borderColor: 'var(--color-primary-hover)',
-                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)'
+                    backgroundColor: 'var(--color-primary-light)',
+                    opacity: 0.8
                   }
                 }}
               >
@@ -914,7 +1016,7 @@ const CreateDeveloperProfileClient = () => {
               {formData.team.map((member, index) => (
                 <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid var(--color-primary)', borderRadius: '8px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ color: 'var(--color-primary)' }}>
+                    <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                       Team Member {index + 1}
                     </Typography>
                     {formData.team.length > 1 && (
@@ -982,7 +1084,8 @@ const CreateDeveloperProfileClient = () => {
                   color: 'var(--color-primary)',
                   '&:hover': {
                     borderColor: 'var(--color-primary-hover)',
-                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)'
+                    backgroundColor: 'var(--color-primary-light)',
+                    opacity: 0.8
                   }
                 }}
               >
@@ -998,7 +1101,7 @@ const CreateDeveloperProfileClient = () => {
               {formData.specializations.map((spec, index) => (
                 <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid var(--color-primary)', borderRadius: '8px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ color: 'var(--color-primary)' }}>
+                    <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                       Specialization {index + 1}
                     </Typography>
                     {formData.specializations.length > 1 && (
@@ -1066,7 +1169,8 @@ const CreateDeveloperProfileClient = () => {
                   color: 'var(--color-primary)',
                   '&:hover': {
                     borderColor: 'var(--color-primary-hover)',
-                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)'
+                    backgroundColor: 'var(--color-primary-light)',
+                    opacity: 0.8
                   }
                 }}
               >
@@ -1100,19 +1204,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -1134,19 +1248,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -1177,19 +1301,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -1211,19 +1345,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -1245,19 +1389,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -1279,19 +1433,29 @@ const CreateDeveloperProfileClient = () => {
                     }}
                     sx={{
                       '& .MuiInputBase-root': {
-                        color: 'var(--color-white)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-surface)',
                         fontFamily: '"Poppins", sans-serif'
                       },
                       '& .MuiInputLabel-root': {
-                        color: 'var(--color-primary)',
+                        color: 'var(--color-text-secondary)',
+                        '&.Mui-focused': {
+                          color: 'var(--color-primary)',
+                        }
                       },
                       '& .MuiOutlinedInput-root': {
                         '& fieldset': {
-                          borderColor: 'var(--color-primary)',
+                          borderColor: 'var(--color-border-medium)',
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--color-primary)',
                         },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--color-primary)',
+                        },
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: 'var(--color-text-muted)',
                       }
                     }}
                   />
@@ -1307,7 +1471,7 @@ const CreateDeveloperProfileClient = () => {
               {formData.awards.map((award, index) => (
                 <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid var(--color-primary)', borderRadius: '8px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="subtitle2" sx={{ color: 'var(--color-primary)' }}>
+                    <Typography variant="subtitle2" sx={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>
                       Award {index + 1}
                     </Typography>
                     {formData.awards.length > 1 && (
@@ -1400,7 +1564,8 @@ const CreateDeveloperProfileClient = () => {
                   color: 'var(--color-primary)',
                   '&:hover': {
                     borderColor: 'var(--color-primary-hover)',
-                    backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)'
+                    backgroundColor: 'var(--color-primary-light)',
+                    opacity: 0.8
                   }
                 }}
               >

@@ -19,3 +19,4 @@ export default function AdminEditProjectPage({ params }: AdminEditProjectPagePro
   return <EditProjectClient projectId={params.id} />;
 }
 
+

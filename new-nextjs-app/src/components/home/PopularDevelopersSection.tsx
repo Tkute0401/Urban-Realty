@@ -143,7 +143,7 @@ const PopularDevelopersSection: React.FC = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: { xs: 2, sm: 3, md: 3 } }}>
-            {developers.slice(0, 6).map((developer, index) => (
+            {developers.slice(0, 3).map((developer, index) => (
               <motion.div
                 key={developer._id}
                 initial={{ opacity: 0, y: 50 }}
