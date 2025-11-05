@@ -54,11 +54,12 @@ COPY uploads ./uploads
 COPY ecosystem.config.js ./
 COPY server.js ./
 COPY start-server.js ./
+COPY build-nextjs.js ./
 
-# Build the Next.js application
-WORKDIR /app/new-nextjs-app
+# Build the Next.js application using build script
+WORKDIR /app
 ENV SKIP_BUILD_STATIC_GENERATION=true
-RUN npm run build
+RUN node build-nextjs.js
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -85,6 +86,7 @@ COPY --from=builder /app/package-lock.json* ./
 COPY --from=builder /app/ecosystem.config.js ./
 COPY --from=builder /app/server.js ./
 COPY --from=builder /app/start-server.js ./
+COPY --from=builder /app/build-nextjs.js ./
 
 # Copy root node_modules for backend dependencies
 COPY --from=builder /app/node_modules ./node_modules
