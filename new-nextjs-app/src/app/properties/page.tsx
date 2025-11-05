@@ -55,6 +55,7 @@ const PropertiesPageContent: React.FC = () => {
   const [expandedFilters, setExpandedFilters] = useState(false);
   const [activeBtn, setActiveBtn] = useState('ALL');
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [isClearingFilters, setIsClearingFilters] = useState(false);
   
   const handlePropertyClick = (property: any) => {
     setSelectedProperty(property);
@@ -139,7 +140,7 @@ const PropertiesPageContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || isClearingFilters) return;
 
     const search = searchParams.get('search') || '';
     const type = searchParams.get('type') || '';
@@ -147,7 +148,7 @@ const PropertiesPageContent: React.FC = () => {
     const propertyType = searchParams.get('propertyType') || 'ALL';
 
     setFilters(prev => ({ ...prev, search, type, city, propertyType }));
-  }, [searchParams, mounted]);
+  }, [searchParams, mounted, isClearingFilters]);
 
   useEffect(() => {
     if (mounted && filters) {
@@ -206,6 +207,19 @@ const PropertiesPageContent: React.FC = () => {
     
     console.log('🔍 Filter change:', { key, value, newFilters });
     
+    // Update URL params for filters that can come from URL
+    if (key === 'search' || key === 'city' || key === 'type' || key === 'propertyType') {
+      const params = new URLSearchParams();
+      if (newFilters.search) params.set('search', newFilters.search);
+      if (newFilters.city) params.set('city', newFilters.city);
+      if (newFilters.type) params.set('type', newFilters.type);
+      if (newFilters.propertyType && newFilters.propertyType !== 'ALL') {
+        params.set('propertyType', newFilters.propertyType);
+      }
+      const queryString = params.toString();
+      router.replace(queryString ? `/properties?${queryString}` : '/properties');
+    }
+    
     // Auto-trigger search for specific filters with updated state
     if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType' || key === 'priceMin' || key === 'priceMax') {
       console.log('🔍 Auto-triggering search for:', key);
@@ -214,9 +228,9 @@ const PropertiesPageContent: React.FC = () => {
     }
   };
 
-  const loadPropertiesWithFilters = useCallback((filterState: any) => {
+  const loadPropertiesWithFilters = useCallback((filterState: any, resetPage: boolean = false) => {
     const params: any = {
-      page: pagination.page,
+      page: resetPage ? 1 : pagination.page,
       limit: 12
     };
 
@@ -291,14 +305,25 @@ const PropertiesPageContent: React.FC = () => {
       maxArea: ''
     };
     
+    // Set flag to prevent URL params useEffect from overriding
+    setIsClearingFilters(true);
+    
     setFilters(clearedFilters);
     
     if (isMobile) {
       setShowFiltersDrawer(false);
     }
     
-    // Trigger search with cleared filters
-    loadPropertiesWithFilters(clearedFilters);
+    // Clear URL params by navigating to properties page without query params
+    router.replace('/properties');
+    
+    // Trigger search with cleared filters and reset to page 1
+    loadPropertiesWithFilters(clearedFilters, true);
+    
+    // Reset flag after a short delay to allow URL update to complete
+    setTimeout(() => {
+      setIsClearingFilters(false);
+    }, 100);
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
