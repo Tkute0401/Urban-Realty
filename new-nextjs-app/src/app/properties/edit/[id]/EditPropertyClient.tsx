@@ -261,17 +261,17 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
           highlights: property.highlights && property.highlights.length > 0 
             ? [...property.highlights, ...Array(5 - property.highlights.length).fill('')].slice(0, 5)
             : ['', '', '', '', ''],
-          nearbyLocalities: property.nearbyLocalities || {
-            hasSchool: false,
-            school: '',
-            hasHospital: false,
-            hospital: '',
-            hasMall: false,
-            mall: '',
-            hasPark: false,
-            park: '',
-            hasTransport: false,
-            transport: ''
+          nearbyLocalities: {
+            hasSchool: property.nearbyLocalities?.hasSchool || false,
+            school: property.nearbyLocalities?.school || '',
+            hasHospital: property.nearbyLocalities?.hasHospital || false,
+            hospital: property.nearbyLocalities?.hospital || '',
+            hasMall: property.nearbyLocalities?.hasMall || false,
+            mall: property.nearbyLocalities?.mall || '',
+            hasPark: property.nearbyLocalities?.hasPark || false,
+            park: property.nearbyLocalities?.park || '',
+            hasTransport: property.nearbyLocalities?.hasTransport || false,
+            transport: property.nearbyLocalities?.transport || ''
           },
           projectDetails: property.projectDetails || {
             projectArea: '',
