@@ -108,16 +108,8 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       pincode: '',
       country: 'India'
     },
-    launchDate: '',
-    possessionDate: '',
-    constructionStartDate: '',
-    estimatedCompletionDate: '',
     pricePerSqFt: '',
     startingPrice: '',
-    priceRange: {
-      min: '',
-      max: ''
-    },
     amenities: [] as Array<{ name: string; description: string }>,
     features: [] as Array<{ name: string; description: string }>,
     keywords: [] as string[],
@@ -129,20 +121,10 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       area: number;
       price: number;
       pricePerSqFt?: number;
-      floorPlan?: {
-        url: string;
-        publicId: string;
-        caption?: string;
-      };
       description?: string;
       isAvailable: boolean;
       unitsAvailable?: number;
     }>,
-    reraNumber: '',
-    metaDescription: '',
-    isActive: true,
-    isFeatured: false,
-    isPublished: false,
     developers: [] as string[]
   });
 
@@ -209,16 +191,8 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
               pincode: projectData.location?.pincode || '',
               country: projectData.location?.country || 'India'
             },
-            launchDate: projectData.launchDate ? new Date(projectData.launchDate).toISOString().split('T')[0] : '',
-            possessionDate: projectData.possessionDate ? new Date(projectData.possessionDate).toISOString().split('T')[0] : '',
-            constructionStartDate: projectData.constructionStartDate ? new Date(projectData.constructionStartDate).toISOString().split('T')[0] : '',
-            estimatedCompletionDate: projectData.estimatedCompletionDate ? new Date(projectData.estimatedCompletionDate).toISOString().split('T')[0] : '',
             pricePerSqFt: projectData.pricePerSqFt?.toString() || '',
             startingPrice: projectData.startingPrice?.toString() || '',
-            priceRange: {
-              min: projectData.priceRange?.min?.toString() || '',
-              max: projectData.priceRange?.max?.toString() || ''
-            },
             amenities: (projectData.amenities || []).map((item: any) => ({
               name: item.name || '',
               description: item.description || ''
@@ -229,11 +203,6 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
             })),
             keywords: projectData.keywords || [],
             configurations: projectData.configurations || [],
-            reraNumber: projectData.reraNumber || '',
-            metaDescription: projectData.metaDescription || '',
-            isActive: projectData.isActive !== undefined ? projectData.isActive : true,
-            isFeatured: projectData.isFeatured || false,
-            isPublished: projectData.isPublished || false,
             developers: (projectData.developers || []).map((dev: any) => 
               typeof dev === 'string' ? dev : dev._id || dev
             )
@@ -531,41 +500,32 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       // Create FormData
       const formDataToSend = new FormData();
       
-      // Add all form fields
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'location') {
-          Object.entries(value).forEach(([locKey, locValue]) => {
-            formDataToSend.append(`location[${locKey}]`, locValue);
-          });
-        } else if (key === 'priceRange') {
-          Object.entries(value).forEach(([rangeKey, rangeValue]) => {
-            formDataToSend.append(`priceRange[${rangeKey}]`, rangeValue);
-          });
-        } else if (Array.isArray(value)) {
-          if (key === 'amenities' || key === 'features') {
-            value.forEach((item, index) => {
-              formDataToSend.append(`${key}[${index}][name]`, item.name);
-              formDataToSend.append(`${key}[${index}][description]`, item.description || '');
-            });
-          } else if (key === 'configurations') {
-            value.forEach((config, index) => {
-              Object.entries(config).forEach(([configKey, configValue]) => {
-                if (configKey === 'floorPlan' && configValue) {
-                  Object.entries(configValue).forEach(([fpKey, fpValue]) => {
-                    formDataToSend.append(`${key}[${index}][floorPlan][${fpKey}]`, fpValue);
-                  });
-                } else if (configValue !== undefined && configValue !== null) {
-                  formDataToSend.append(`${key}[${index}][${configKey}]`, configValue.toString());
-                }
-              });
+      // Append all form data (matching create form structure)
+      Object.keys(formData).forEach(key => {
+        if (typeof formData[key] === 'object' && formData[key] !== null) {
+          if (Array.isArray(formData[key])) {
+            formData[key].forEach((item, index) => {
+              if (typeof item === 'object') {
+                Object.keys(item).forEach(subKey => {
+                  if (typeof item[subKey] !== 'undefined' && item[subKey] !== null) {
+                    formDataToSend.append(`${key}[${index}][${subKey}]`, String(item[subKey]));
+                  }
+                });
+              } else {
+                formDataToSend.append(`${key}[${index}]`, item);
+              }
             });
           } else {
-            value.forEach((item, index) => {
-              formDataToSend.append(`${key}[${index}]`, item);
+            Object.keys(formData[key]).forEach(subKey => {
+              if (typeof formData[key][subKey] !== 'undefined' && formData[key][subKey] !== null) {
+                formDataToSend.append(`${key}[${subKey}]`, String(formData[key][subKey]));
+              }
             });
           }
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, value.toString());
+        } else {
+          if (typeof formData[key] !== 'undefined' && formData[key] !== null) {
+            formDataToSend.append(key, String(formData[key]));
+          }
         }
       });
 
