@@ -54,6 +54,11 @@ export interface Property {
     reraId?: string;
     configurations?: string;
   };
+  approvals?: Array<{
+    name?: string;
+    number?: string;
+    date?: string | Date;
+  }>;
   amenities?: string[];
   highlights?: string[];
   nearbyLocalities?: {
