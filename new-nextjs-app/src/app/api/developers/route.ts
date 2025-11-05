@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     const transformedDevelopers = developers.map(developer => ({
       _id: developer._id,
       name: developer.name,
-      logo: developer.logo || { url: '/api/placeholder/100/100' },
+      logo: developer.logo || null,
       headquarters: developer.headquarters || {
         city: 'Unknown',
         state: 'Unknown',

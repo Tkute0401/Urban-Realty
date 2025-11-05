@@ -940,8 +940,8 @@ const PropertyDetailsPageContent: React.FC = () => {
                               objectFit: 'cover'
                             }}
                             onError={(e) => {
-                              // Fallback to placeholder if image fails to load
-                              (e.target as HTMLImageElement).src = '/api/placeholder/400/600';
+                              // Hide broken image
+                              (e.target as HTMLImageElement).style.display = 'none';
                             }}
                           />
                         ) : (
@@ -1037,16 +1037,16 @@ const PropertyDetailsPageContent: React.FC = () => {
                         }
                       }}
                     >
-                      <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                        <img
-                          src="/api/placeholder/400/600"
-                          alt="Virtual Tour"
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
-                          }}
-                        />
+                      <Box sx={{ position: 'relative', height: 200, overflow: 'hidden', backgroundColor: 'var(--color-bg-secondary)' }}>
+                        <Box sx={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <VideoLibrary sx={{ fontSize: 64, color: 'var(--color-text-muted)' }} />
+                        </Box>
                         <Box sx={{
                           position: 'absolute',
                           top: 0,
@@ -1198,15 +1198,31 @@ const PropertyDetailsPageContent: React.FC = () => {
                           onClick={() => router.push(`/properties/${prop._id}`)}
                         >
                           <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-                            <img
-                              src={prop.images?.[0]?.url || '/api/placeholder/400/300'}
-                              alt={prop.title}
-                              style={{
+                            {prop.images?.[0]?.url ? (
+                              <img
+                                src={prop.images[0].url}
+                                alt={prop.title}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover'
+                                }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            ) : (
+                              <Box sx={{
                                 width: '100%',
                                 height: '100%',
-                                objectFit: 'cover'
-                              }}
-                            />
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'var(--color-bg-secondary)'
+                              }}>
+                                <Home sx={{ fontSize: 48, color: 'var(--color-text-muted)' }} />
+                              </Box>
+                            )}
                             <Chip
                               label={prop.status}
                               color={prop.status === 'For Sale' ? 'success' : 'warning'}
