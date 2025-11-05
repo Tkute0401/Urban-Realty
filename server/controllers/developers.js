@@ -152,10 +152,21 @@ exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Please upload a file', 400));
   }
 
+  // Validate file exists and is readable
+  if (!req.file.path || !fs.existsSync(req.file.path)) {
+    return next(new ErrorResponse('Uploaded file is not accessible', 400));
+  }
+
   const developer = await Developer.findById(req.params.id);
   if (!developer) {
     // Clean up uploaded file
-    fs.unlinkSync(req.file.path);
+    if (fs.existsSync(req.file.path)) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupErr) {
+        console.error('Error cleaning up file:', cleanupErr);
+      }
+    }
     return next(new ErrorResponse(`Developer not found with id of ${req.params.id}`, 404));
   }
 
@@ -164,10 +175,14 @@ exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
     const uploadedImages = await uploadImages([req.file], 'real-estate/developers');
     
     if (uploadedImages.length === 0) {
-      throw new Error('Failed to upload image');
+      throw new Error('Failed to upload image to Cloudinary. Please check Cloudinary configuration and ensure the file is a valid image.');
     }
 
     const result = uploadedImages[0];
+
+    if (!result.url || !result.publicId) {
+      throw new Error('Image upload succeeded but did not return valid URL or public ID');
+    }
 
     // Delete old logo if exists
     if (developer.logo?.publicId) {
@@ -175,6 +190,7 @@ exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
         await deleteFiles([developer.logo]);
       } catch (err) {
         console.error('Error deleting old logo:', err);
+        // Continue even if old logo deletion fails
       }
     }
 
@@ -185,19 +201,33 @@ exports.uploadDeveloperLogo = asyncHandler(async (req, res, next) => {
     };
     await developer.save();
 
-    // Delete temp file
-    fs.unlinkSync(req.file.path);
+    // Note: uploadImages already deletes the temp file, so we don't need to delete it again
 
     res.status(200).json({
       success: true,
       data: developer.logo.url
     });
   } catch (err) {
-    // Clean up temp file if error occurs
+    // Clean up temp file if error occurs (uploadImages might have failed before deleting)
     if (req.file?.path && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (cleanupErr) {
+        console.error('Error cleaning up temp file:', cleanupErr);
+      }
     }
-    next(new ErrorResponse('Logo upload failed', 500));
+    console.error('Logo upload error details:', {
+      message: err.message,
+      stack: err.stack,
+      file: req.file ? {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: req.file.path
+      } : 'No file'
+    });
+    const errorMessage = err.message || 'Logo upload failed. Please ensure the file is a valid image and try again.';
+    next(new ErrorResponse(errorMessage, 500));
   }
 });
 
