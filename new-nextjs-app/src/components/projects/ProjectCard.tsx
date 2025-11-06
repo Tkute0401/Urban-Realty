@@ -14,7 +14,8 @@ import {
   Box,
   Stack,
   Tooltip,
-  CircularProgress
+  CircularProgress,
+  useTheme
 } from '@mui/material';
 import {
   LocationOn,
@@ -41,9 +42,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   sx = {}
 }) => {
   const router = useRouter();
+  const theme = useTheme();
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
+  const isDarkMode = theme.palette.mode === 'dark';
 
   // Check if project is in favorites when component mounts
   useEffect(() => {
@@ -175,7 +178,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               right: 8,
               backgroundColor: isFavorite 
                 ? 'rgba(244, 67, 54, 0.9)' 
-                : 'rgba(255, 255, 255, 0.95)',
+                : isDarkMode 
+                  ? 'rgba(255, 255, 255, 0.15)' 
+                  : 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(8px)',
               zIndex: 2,
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
@@ -183,7 +188,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               '&:hover': {
                 backgroundColor: isFavorite 
                   ? 'rgba(244, 67, 54, 1)' 
-                  : 'rgba(244, 67, 54, 0.1)',
+                  : isDarkMode
+                    ? 'rgba(244, 67, 54, 0.2)'
+                    : 'rgba(244, 67, 54, 0.1)',
                 transform: 'scale(1.1)',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
               },
@@ -205,7 +212,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               }} />
             ) : (
               <FavoriteBorder sx={{ 
-                color: isFavorite ? 'white' : 'var(--color-text-secondary)',
+                color: isDarkMode ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                 fontSize: 24,
                 transition: 'all 0.3s ease',
               }} />
