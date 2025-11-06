@@ -24,6 +24,7 @@ import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
   Home as HomeIcon,
+  Business as BusinessIcon,
   People as PeopleIcon,
   Analytics as AnalyticsIcon,
   Settings as SettingsIcon,
@@ -71,6 +72,11 @@ const AgentLayout = ({ children }) => {
       text: 'Properties',
       icon: <HomeIcon />,
       path: '/agent/properties'
+    },
+    {
+      text: 'Projects',
+      icon: <BusinessIcon />,
+      path: '/agent/projects'
     },
     {
       text: 'Leads',

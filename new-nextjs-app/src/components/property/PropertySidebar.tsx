@@ -185,6 +185,7 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
           }}
           sx={{
             backgroundColor: 'var(--color-whatsapp)',
+            color: '#ffffff',
             '&:hover': {
               backgroundColor: 'var(--color-whatsapp-hover)'
             }

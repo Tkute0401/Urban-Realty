@@ -88,7 +88,9 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/projects/:id
 // @access  Public
 exports.getProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id).populate('developers', 'name logo website');
+  const project = await Project.findById(req.params.id)
+    .populate('developers', 'name logo website email phone')
+    .populate('agent', 'name email mobile');
 
   if (!project) {
     return next(
@@ -121,42 +123,55 @@ exports.getProjectsByDeveloper = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Get my projects (for developer users)
+// @desc    Get my projects (for developer and agent users)
 // @route   GET /api/v1/projects/my-projects
-// @access  Private (Developer)
+// @access  Private (Developer/Agent)
 exports.getMyProjects = asyncHandler(async (req, res, next) => {
-  if (req.user.role !== 'developer') {
+  if (req.user.role === 'developer') {
+    // Find developer profile for current user
+    const developer = await Developer.findOne({ userId: req.user.id });
+    
+    if (!developer) {
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        data: [],
+        message: 'No developer profile found. Create one to add projects.'
+      });
+    }
+
+    const projects = await Project.find({ developers: developer._id })
+      .populate('developers', 'name logo website email phone')
+      .populate('agent', 'name email mobile')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: projects.length,
+      data: projects
+    });
+  } else if (req.user.role === 'agent') {
+    // Find projects created by this agent
+    const projects = await Project.find({ agent: req.user.id })
+      .populate('developers', 'name logo website email phone')
+      .populate('agent', 'name email mobile')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: projects.length,
+      data: projects
+    });
+  } else {
     return next(
-      new ErrorResponse('Access denied. This endpoint is only for developer users.', 403)
+      new ErrorResponse('Access denied. This endpoint is only for developer and agent users.', 403)
     );
   }
-
-  // Find developer profile for current user
-  const developer = await Developer.findOne({ userId: req.user.id });
-  
-  if (!developer) {
-    return res.status(200).json({
-      success: true,
-      count: 0,
-      data: [],
-      message: 'No developer profile found. Create one to add projects.'
-    });
-  }
-
-  const projects = await Project.find({ developers: developer._id })
-    .populate('developers', 'name logo website')
-    .sort({ createdAt: -1 });
-
-  res.status(200).json({
-    success: true,
-    count: projects.length,
-    data: projects
-  });
 });
 
 // @desc    Create project
 // @route   POST /api/v1/projects
-// @access  Private (Developer/Admin)
+// @access  Private (Developer/Agent/Admin)
 exports.createProject = asyncHandler(async (req, res, next) => {
   // Extract brochures from req.body before cleaning (they can be URLs or files)
   let brochureUrls = [];
@@ -178,7 +193,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Handle developers - convert to array format
+  // Handle developers and agents - convert to array format
   if (req.user.role === 'developer') {
     // Find developer profile for current user
     const developer = await Developer.findOne({ userId: req.user.id });
@@ -207,9 +222,27 @@ exports.createProject = asyncHandler(async (req, res, next) => {
         req.body.developers = [developer._id.toString()];
       }
     }
+  } else if (req.user.role === 'agent') {
+    // For agents, set the agent field to current user
+    req.body.agent = req.user.id;
+    
+    // Developers are optional for agents, but if provided, convert to array
+    if (req.body.developer && !req.body.developers) {
+      req.body.developers = Array.isArray(req.body.developer) ? req.body.developer : [req.body.developer];
+    }
   } else if (req.body.developer && !req.body.developers) {
     // For admin users, convert single developer to array if developers not provided
     req.body.developers = Array.isArray(req.body.developer) ? req.body.developer : [req.body.developer];
+  }
+  
+  // Validate that either developers or agent is present
+  const hasDevelopers = req.body.developers && Array.isArray(req.body.developers) && req.body.developers.length > 0;
+  const hasAgent = req.body.agent;
+  
+  if (!hasDevelopers && !hasAgent) {
+    return next(
+      new ErrorResponse('Either developers or agent must be specified for the project', 400)
+    );
   }
 
   // Log incoming data for debugging
@@ -419,7 +452,8 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     isActive: cleanReqBody.isActive !== undefined ? cleanReqBody.isActive : true,
     isFeatured: cleanReqBody.isFeatured || false,
     isPublished: cleanReqBody.isPublished || false,
-    developers: cleanReqBody.developers || []
+    developers: cleanReqBody.developers || [],
+    agent: cleanReqBody.agent || null
   });
 
   // Assign arrays by pushing items individually
@@ -444,8 +478,11 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   // Save the project
   await project.save();
 
-  // Populate developers information
-  await project.populate('developers', 'name logo website');
+  // Populate developers and agent information
+  await project.populate('developers', 'name logo website email phone');
+  if (project.agent) {
+    await project.populate('agent', 'name email mobile');
+  }
 
   res.status(201).json({
     success: true,
@@ -455,7 +492,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 
 // @desc    Update project
 // @route   PUT /api/v1/projects/:id
-// @access  Private (Developer/Admin)
+// @access  Private (Developer/Agent/Admin)
 exports.updateProject = asyncHandler(async (req, res, next) => {
   let project = await Project.findById(req.params.id);
 
@@ -478,6 +515,15 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     // Check if developer is in the developers array
     const developerIds = project.developers.map(d => d.toString());
     if (!developerIds.includes(developer._id.toString())) {
+      return next(
+        new ErrorResponse('Not authorized to update this project', 403)
+      );
+    }
+  }
+  
+  // Check if user is agent and owns this project (must be the agent who created it)
+  if (req.user.role === 'agent') {
+    if (!project.agent || project.agent.toString() !== req.user.id) {
       return next(
         new ErrorResponse('Not authorized to update this project', 403)
       );
@@ -749,7 +795,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
 
 // @desc    Delete project
 // @route   DELETE /api/v1/projects/:id
-// @access  Private (Developer/Admin)
+// @access  Private (Developer/Agent/Admin)
 exports.deleteProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
 
@@ -772,6 +818,15 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
     // Check if developer is in the developers array
     const developerIds = project.developers.map(d => d.toString());
     if (!developerIds.includes(developer._id.toString())) {
+      return next(
+        new ErrorResponse('Not authorized to delete this project', 403)
+      );
+    }
+  }
+  
+  // Check if user is agent and owns this project (must be the agent who created it)
+  if (req.user.role === 'agent') {
+    if (!project.agent || project.agent.toString() !== req.user.id) {
       return next(
         new ErrorResponse('Not authorized to delete this project', 403)
       );

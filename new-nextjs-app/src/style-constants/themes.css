@@ -5,6 +5,7 @@
   --color-primary:#F76B1C; --color-primary-hover:#EA580C;
   --color-primary-contrast:#FFFFFF; --color-secondary:#1A2BFF; --color-accent:#f5f5f5; --color-success:#16a34a;
   --color-warning:#f59e0b; --color-danger:#ef4444; --color-border:#e5e7eb; --focus-ring:#1A2BFF;
+  --color-whatsapp:#25D366; --color-whatsapp-hover:#20BA5A; --color-success-hover:#15803d;
   --color-white:#ffffff; --color-error:#ef4444; --color-error-light:#fef2f2;
   --color-primary-light:#fed7c7; --color-primary-dark:#c44e14;
   --color-primary-rgb: 247, 107, 28; --color-secondary-rgb: 26, 43, 255; --color-error-rgb: 239, 68, 68;
@@ -18,8 +19,9 @@
   --color-bg:#0b132b; --color-bg-primary:#0b132b; --color-bg-dark:#0b132b;
   --color-surface:hsl(221, 39%, 11%); --color-surface-elevated:#1f2937; 
   --color-text:#f9fafb; --color-text-primary:#f9fafb; --color-text-muted:#9ca3af;
-  --color-primary:#F76B1C; --color-primary-hover:#FB923C; --color-primary-contrast:#0c0c0c; --color-secondary:#1A2BFF;
+  --color-primary:#F76B1C; --color-primary-hover:#FB923C;   --color-primary-contrast:#0c0c0c; --color-secondary:#1A2BFF;
   --color-accent:#374151; --color-success:#22c55e; --color-warning:#f59e0b; --color-danger:#f87171; --color-border:#374151; --focus-ring:#1A2BFF;
+  --color-whatsapp:#25D366; --color-whatsapp-hover:#20BA5A; --color-success-hover:#16a34a;
   --color-white:#ffffff; --color-error:#f87171; --color-error-light:#fef2f2;
   --color-primary-light:#fed7c7; --color-primary-dark:#c44e14;
   --chart-gradient-1:linear-gradient(135deg, #374151 0%, #4b5563 100%);

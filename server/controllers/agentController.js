@@ -6,14 +6,18 @@ const ErrorResponse = require('../utils/errorResponse');
 // @access  Private/Agent
 exports.getDashboard = asyncHandler(async (req, res, next) => {
   try {
-    // Get agent's properties, leads, and analytics
+    // Get agent's properties, projects, leads, and analytics
     const Property = require('../models/Property');
+    const Project = require('../models/Project');
     const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.user.id;
     
     // Get agent's properties count
     const propertiesCount = await Property.countDocuments({ agent: agentId });
+    
+    // Get agent's projects count
+    const projectsCount = await Project.countDocuments({ agent: agentId });
     
     // Get agent's leads count
     const leadsCount = await ContactRequest.countDocuments({ agent: agentId });
@@ -28,6 +32,7 @@ exports.getDashboard = asyncHandler(async (req, res, next) => {
       success: true,
       data: {
         propertiesCount,
+        projectsCount,
         leadsCount,
         recentLeads,
         agent: {
@@ -49,12 +54,14 @@ exports.getDashboard = asyncHandler(async (req, res, next) => {
 exports.getAnalytics = asyncHandler(async (req, res, next) => {
   try {
     const Property = require('../models/Property');
+    const Project = require('../models/Project');
     const ContactRequest = require('../models/ContactRequest');
     
     const agentId = req.user.id;
     
     // Get analytics data
     const totalProperties = await Property.countDocuments({ agent: agentId });
+    const totalProjects = await Project.countDocuments({ agent: agentId });
     const totalLeads = await ContactRequest.countDocuments({ agent: agentId });
     const monthlyLeads = await ContactRequest.countDocuments({
       agent: agentId,
@@ -67,6 +74,7 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
       success: true,
       data: {
         totalProperties,
+        totalProjects,
         totalLeads,
         monthlyLeads
       }
@@ -145,6 +153,43 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   } catch (err) {
     console.error('Error fetching agent properties:', err);
     next(new ErrorResponse('Failed to fetch properties', 500));
+  }
+});
+
+// @desc    Get agent projects
+// @route   GET /api/v1/agent/projects
+// @access  Private/Agent
+exports.getProjects = asyncHandler(async (req, res, next) => {
+  try {
+    const Project = require('../models/Project');
+    
+    const agentId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const projects = await Project.find({ agent: agentId })
+      .populate('developers', 'name logo website email phone')
+      .populate('agent', 'name email mobile')
+      .sort('-createdAt')
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Project.countDocuments({ agent: agentId });
+
+    res.status(200).json({
+      success: true,
+      data: projects,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching agent projects:', err);
+    next(new ErrorResponse('Failed to fetch projects', 500));
   }
 });
 

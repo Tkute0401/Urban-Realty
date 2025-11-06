@@ -17,6 +17,12 @@ interface Project {
     email?: string;
     phone?: string;
   }>;
+  agent?: {
+    _id: string;
+    name: string;
+    email?: string;
+    mobile?: string;
+  } | string;
   name: string;
   description: string;
   shortDescription?: string;

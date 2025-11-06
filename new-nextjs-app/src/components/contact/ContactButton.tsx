@@ -43,6 +43,8 @@ interface ContactButtonProps {
   showDirectOptions?: boolean;
   className?: string;
   sx?: any;
+  openModal?: (type: 'agent' | 'developer' | 'general', info: any, property?: any, project?: any) => void;
+  closeModal?: () => void;
 }
 
 const ContactButton: React.FC<ContactButtonProps> = ({
@@ -57,9 +59,12 @@ const ContactButton: React.FC<ContactButtonProps> = ({
   disabled = false,
   showDirectOptions = true,
   className,
-  sx
+  sx,
+  openModal: openModalProp,
+  closeModal: closeModalProp
 }) => {
-  const { openModal } = useContactModal();
+  const contactModalHook = useContactModal();
+  const openModal = openModalProp || contactModalHook.openModal;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 

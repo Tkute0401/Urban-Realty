@@ -4,9 +4,14 @@ const ProjectSchema = new mongoose.Schema({
   // Developer connection - multiple developers can be associated with one project
   developers: [{
     type: mongoose.Schema.ObjectId,
-    ref: 'Developer',
-    required: true
+    ref: 'Developer'
   }],
+  
+  // Agent connection - agent who created/added the project
+  agent: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User'
+  },
   
   // Project basic information
   name: {

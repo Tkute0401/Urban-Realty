@@ -6,6 +6,8 @@ import { useProjects } from '../../../contexts/ProjectsContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import PropertyMap from '../../../components/property/PropertyMap';
 import ContactButton from '../../../components/contact/ContactButton';
+import ContactModal from '../../../components/contact/ContactModal';
+import { useContactModal } from '../../../hooks/useContact';
 import {
   Box,
   Container,
@@ -87,6 +89,15 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user } = useAuth();
   const { getProject, deleteProject, loading, error } = useProjects();
+  const {
+    isOpen: contactModalOpen,
+    contactType,
+    contactInfo,
+    propertyInfo,
+    projectInfo,
+    openModal,
+    closeModal
+  } = useContactModal();
   
   const [project, setProject] = useState<any>(null);
   const [loadingProject, setLoadingProject] = useState(true);
@@ -731,20 +742,56 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
             <Card sx={{ mb: 3, backgroundColor: 'var(--color-surface)' }}>
               <CardContent sx={{ p: 3 }}>
                 <Stack spacing={2}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    startIcon={<Phone />}
-                    sx={{
-                      bgcolor: 'var(--color-primary)',
-                      color: 'var(--color-primary-contrast)',
-                      '&:hover': {
-                        bgcolor: 'var(--color-primary-hover)'
-                      }
-                    }}
-                  >
-                    Contact Developer
-                  </Button>
+                  {/* Show Contact Agent if project was created by an agent */}
+                  {project.agent ? (
+                    <ContactButton
+                      contactType="agent"
+                      contactInfo={{
+                        id: typeof project.agent === 'string' ? project.agent : project.agent._id,
+                        name: typeof project.agent === 'string' ? '' : project.agent.name || '',
+                        email: typeof project.agent === 'string' ? '' : project.agent.email || '',
+                        phone: typeof project.agent === 'string' ? '' : project.agent.mobile || '',
+                        avatar: undefined,
+                        company: '',
+                        role: 'Real Estate Agent'
+                      }}
+                      projectInfo={{
+                        id: project._id,
+                        name: project.name,
+                        developer: typeof project.agent === 'string' ? '' : project.agent.name || ''
+                      }}
+                      variant="button"
+                      fullWidth
+                      size="large"
+                      openModal={openModal}
+                      closeModal={closeModal}
+                    />
+                  ) : project.developers && project.developers.length > 0 ? (
+                    <ContactButton
+                      contactType="developer"
+                      contactInfo={{
+                        id: project.developers[0]._id,
+                        name: project.developers[0].name,
+                        email: project.developers[0].email,
+                        phone: project.developers[0].phone,
+                        avatar: typeof project.developers[0].logo === 'string' 
+                          ? project.developers[0].logo 
+                          : project.developers[0].logo?.url,
+                        company: project.developers[0].name,
+                        role: 'Property Developer'
+                      }}
+                      projectInfo={{
+                        id: project._id,
+                        name: project.name,
+                        developer: project.developers[0].name
+                      }}
+                      variant="button"
+                      fullWidth
+                      size="large"
+                      openModal={openModal}
+                      closeModal={closeModal}
+                    />
+                  ) : null}
                   
                   <Stack direction="row" spacing={1}>
                     <Button
@@ -857,7 +904,9 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                           name: developer.name,
                           email: developer.email,
                           phone: developer.phone,
-                          avatar: developer.logo?.url,
+                          avatar: typeof developer.logo === 'string' 
+                            ? developer.logo 
+                            : developer.logo?.url,
                           company: developer.name,
                           role: 'Property Developer'
                         }}
@@ -869,6 +918,8 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
                         variant="button"
                         size="small"
                         fullWidth
+                        openModal={openModal}
+                        closeModal={closeModal}
                       />
                     </Stack>
                     {index < (project.developers?.length || 0) - 1 && <Divider sx={{ mt: 2 }} />}
@@ -988,6 +1039,18 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectId }
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Contact Modal */}
+      {contactInfo && (
+        <ContactModal
+          open={contactModalOpen}
+          onClose={closeModal}
+          contactType={contactType}
+          contactInfo={contactInfo}
+          propertyInfo={propertyInfo}
+          projectInfo={projectInfo}
+        />
+      )}
 
       {/* Floating Action Button for Mobile */}
       {isMobile && (

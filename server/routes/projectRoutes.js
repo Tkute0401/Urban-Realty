@@ -20,7 +20,7 @@ router
   .get(advancedResults(Project, 'developers'), getProjects)
   .post(
     protect, 
-    authorize('developer', 'admin'), 
+    authorize('developer', 'agent', 'admin'), 
     upload.fields([
       { name: 'images', maxCount: 10 },
       { name: 'floorPlans', maxCount: 5 },
@@ -31,10 +31,10 @@ router
     createProject
   );
 
-// My projects route for developer users
+// My projects route for developer and agent users
 router
   .route('/my-projects')
-  .get(protect, authorize('developer'), getMyProjects);
+  .get(protect, authorize('developer', 'agent'), getMyProjects);
 
 // Projects by developer route
 router
@@ -46,7 +46,7 @@ router
   .get(getProject)
   .put(
     protect, 
-    authorize('developer', 'admin'),
+    authorize('developer', 'agent', 'admin'),
     upload.fields([
       { name: 'images', maxCount: 10 },
       { name: 'floorPlans', maxCount: 5 },
@@ -56,6 +56,6 @@ router
     parseFormData,
     updateProject
   )
-  .delete(protect, authorize('developer', 'admin'), deleteProject);
+  .delete(protect, authorize('developer', 'agent', 'admin'), deleteProject);
 
 module.exports = router;

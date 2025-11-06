@@ -46,6 +46,7 @@ import {
 } from '@mui/material';
 import {
   Home as HomeIcon,
+  Business as BusinessIcon,
   People as PeopleIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
@@ -100,14 +101,15 @@ const AgentDashboard = () => {
     propertyType: 'all'
   });
   const [quickActions, setQuickActions] = useState([
-    { id: 1, title: 'Add Property', icon: <AddIcon />, action: () => router.push('/add-property'), color: 'primary' },
-    { id: 2, title: 'View Leads', icon: <PeopleIcon />, action: () => router.push('/agent/leads'), color: 'success' },
-    { id: 3, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/agent/analytics'), color: 'info' },
-    { id: 4, title: 'Settings', icon: <EditIcon />, action: () => router.push('/agent/settings'), color: 'warning' }
+    { id: 1, title: 'Add Property', icon: <AddIcon />, action: () => router.push('/properties/add'), color: 'primary' },
+    { id: 2, title: 'Add Project', icon: <AddIcon />, action: () => router.push('/projects/add'), color: 'success' },
+    { id: 3, title: 'View Leads', icon: <PeopleIcon />, action: () => router.push('/agent/leads'), color: 'info' },
+    { id: 4, title: 'Analytics', icon: <AnalyticsIcon />, action: () => router.push('/agent/analytics'), color: 'warning' }
   ]);
 
   const [stats, setStats] = useState({
     totalProperties: 0,
+    totalProjects: 0,
     activeProperties: 0,
     activeLeads: 0,
     totalViews: 0,
@@ -155,20 +157,21 @@ const AgentDashboard = () => {
 
   // Calculate enhanced dashboard stats
   useEffect(() => {
-    if (dashboardData && dashboardData.stats) {
-      const { stats: dashboardStats, properties, leads } = dashboardData;
+    if (dashboardData) {
+      const { propertiesCount, projectsCount, leadsCount } = dashboardData;
       
-      setStats({
-        totalProperties: dashboardStats?.totalProperties || 0,
-        activeProperties: dashboardStats?.activeProperties || 0,
-        activeLeads: dashboardStats?.activeLeads || 0,
-        totalViews: dashboardStats?.totalViews || 0,
-        monthlyRevenue: dashboardStats?.monthlyRevenue || 0,
-        conversionRate: dashboardStats?.conversionRate || 0,
-        avgResponseTime: dashboardStats?.avgResponseTime || 0,
-        topPerformingProperty: properties?.[0] || null,
-        recentActivity: leads?.slice(0, 10) || []
-      });
+      setStats(prev => ({
+        ...prev,
+        totalProperties: propertiesCount || 0,
+        totalProjects: projectsCount || 0,
+        activeLeads: leadsCount || 0,
+        totalViews: dashboardData?.stats?.totalViews || 0,
+        monthlyRevenue: dashboardData?.stats?.monthlyRevenue || 0,
+        conversionRate: dashboardData?.stats?.conversionRate || 0,
+        avgResponseTime: dashboardData?.stats?.avgResponseTime || 0,
+        topPerformingProperty: dashboardData?.properties?.[0] || null,
+        recentActivity: dashboardData?.recentLeads?.slice(0, 10) || []
+      }));
     }
   }, [dashboardData]);
 
@@ -383,6 +386,16 @@ const AgentDashboard = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
+            title="Total Projects"
+            value={stats.totalProjects}
+            icon={<BusinessIcon />}
+            color="info"
+            subtitle="Development projects"
+            trend={dashboardData?.trends?.projects || null}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
             title="Active Leads"
             value={stats.activeLeads}
             icon={<PeopleIcon />}
@@ -399,16 +412,6 @@ const AgentDashboard = () => {
             color="success"
             subtitle="Property impressions"
             trend={dashboardData?.trends?.views || null}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Monthly Revenue"
-            value={`₹${stats.monthlyRevenue.toLocaleString()}`}
-            icon={<MoneyIcon />}
-            color="warning"
-            subtitle="Commission earned"
-            trend={dashboardData?.trends?.revenue || null}
           />
         </Grid>
       </Grid>

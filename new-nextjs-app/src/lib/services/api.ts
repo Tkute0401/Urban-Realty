@@ -117,6 +117,7 @@ export const api = {
                 analytics: (params?: Record<string, any>) => unwrap<any>(http.get(`/api/v1/agent/analytics`, { params })),
                 leads: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/agent/leads`, { params })),
                 properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/properties/agent/${params?.agentId || ''}`, { params })),
+                projects: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/agent/projects`, { params })),
                 updateLead: (leadId: string, payload: { status?: string }) => unwrap<any>(http.put(`/api/v1/contacts/${leadId}`, payload)),
                 
                 // Admin endpoints for accessing any agent's data (admin only)

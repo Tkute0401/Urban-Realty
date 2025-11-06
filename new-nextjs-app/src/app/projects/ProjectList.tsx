@@ -34,7 +34,7 @@ const ProjectList = () => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
 
   useEffect(() => {
-    if (user?.role === 'developer') {
+    if (user?.role === 'developer' || user?.role === 'agent') {
       getMyProjects();
     }
     
@@ -136,7 +136,7 @@ const ProjectList = () => {
             </IconButton>
           </Box>
           
-          {user?.role === 'developer' && (
+          {(user?.role === 'developer' || user?.role === 'agent') && (
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 variant={showMyProjects ? 'contained' : 'outlined'}
