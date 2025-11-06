@@ -296,12 +296,18 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
             hasTransport: property.nearbyLocalities?.hasTransport || false,
             transport: property.nearbyLocalities?.transport || ''
           },
-          projectDetails: {
-            projectArea: property.projectDetails?.projectArea || '',
-            totalUnits: property.projectDetails?.totalUnits || '',
-            launchDate: property.projectDetails?.launchDate || '',
-            reraId: property.projectDetails?.reraId || '',
-            configurations: property.projectDetails?.configurations || ''
+          projectDetails: property.projectDetails ? {
+            projectArea: property.projectDetails.projectArea || '',
+            totalUnits: property.projectDetails.totalUnits || '',
+            launchDate: property.projectDetails.launchDate || '',
+            reraId: property.projectDetails.reraId || '',
+            configurations: property.projectDetails.configurations || ''
+          } : {
+            projectArea: '',
+            totalUnits: '',
+            launchDate: '',
+            reraId: '',
+            configurations: ''
           },
           approvals: (property.approvals || []).map(approval => ({
             name: approval.name || '',
