@@ -134,14 +134,23 @@ app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
 let blogRoutes;
 try {
+  console.log('🔧 Attempting to load blog routes from ./routes/blogRoutes');
   blogRoutes = require('./routes/blogRoutes');
   console.log('✅ Blog routes file loaded successfully');
+  console.log('🔧 Blog routes type:', typeof blogRoutes);
+  console.log('🔧 Blog routes is router:', blogRoutes && typeof blogRoutes === 'function');
 } catch (error) {
   console.error('❌ Error loading blog routes:', error);
+  console.error('❌ Error stack:', error.stack);
   blogRoutes = express.Router(); // Fallback empty router
+  // Add a test route to the fallback router
+  blogRoutes.get('/test', (req, res) => {
+    res.json({ message: 'Blog routes test endpoint - routes file failed to load' });
+  });
 }
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/blogs', blogRoutes);
+console.log('🔧 Blog routes registered at /api/v1/blogs and /api/blogs');
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/contacts', require('./src/api/routes/contactRoutes'));
