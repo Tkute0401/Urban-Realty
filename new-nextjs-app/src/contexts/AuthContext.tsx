@@ -31,7 +31,7 @@ export type AuthContextValue = {
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
+  login: (credentials: { email: string; password: string }, redirectPath?: string | null) => Promise<{ success: boolean; error?: string }>;
   register: (payload: { name: string; email: string; password: string; mobile?: string; favorites?: any; occupation?: string; recentlyViewed?: any }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   clearError: () => void;

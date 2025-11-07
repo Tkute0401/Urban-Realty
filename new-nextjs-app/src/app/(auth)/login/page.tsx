@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,13 +12,14 @@ import {
   Button, 
   Typography, 
   Alert,
-  Paper
+  Paper,
+  CircularProgress
 } from '@mui/material';
 import { Login as LoginIcon } from '@mui/icons-material';
 import FieldIndicator from '@/components/ui/FieldIndicator';
 
 
-const Login = () => {
+const LoginContent = () => {
   console.log('🔧 Login Page rendering...');
   
   React.useEffect(() => {
@@ -162,6 +163,18 @@ const Login = () => {
         </Box>
       </Paper>
     </Container>
+  );
+};
+
+const Login = () => {
+  return (
+    <Suspense fallback={
+      <Container maxWidth="sm" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Container>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 };
 
