@@ -132,66 +132,7 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
-try {
-  console.log('🔧 Attempting to load city routes from ./src/api/routes/cityRoutes');
-  const cityRoutes = require('./src/api/routes/cityRoutes');
-  app.use('/api/v1/cities', cityRoutes);
-  console.log('✅ City routes registered at /api/v1/cities');
-} catch (error) {
-  console.error('❌ Error loading city routes:', error);
-  console.error('❌ Error message:', error.message);
-  console.error('❌ Error stack:', error.stack);
-}
-let blogRoutes;
-try {
-  console.log('🔧 Attempting to load blog routes from ./routes/blogRoutes');
-  blogRoutes = require('./routes/blogRoutes');
-  console.log('✅ Blog routes file loaded successfully');
-  console.log('🔧 Blog routes type:', typeof blogRoutes);
-  console.log('🔧 Blog routes is router:', blogRoutes && typeof blogRoutes === 'function');
-  console.log('🔧 Blog routes stack:', blogRoutes.stack ? blogRoutes.stack.length + ' routes registered' : 'No stack');
-  
-  // Log all registered routes
-  if (blogRoutes.stack) {
-    blogRoutes.stack.forEach((layer, index) => {
-      if (layer.route) {
-        const methods = Object.keys(layer.route.methods).join(', ').toUpperCase();
-        console.log(`  Route ${index + 1}: ${methods} ${layer.route.path}`);
-      }
-    });
-  }
-} catch (error) {
-  console.error('❌ Error loading blog routes:', error);
-  console.error('❌ Error message:', error.message);
-  console.error('❌ Error stack:', error.stack);
-  blogRoutes = express.Router(); // Fallback empty router
-  // Add a test route to the fallback router
-  blogRoutes.get('/test', (req, res) => {
-    res.json({ message: 'Blog routes test endpoint - routes file failed to load' });
-  });
-}
-// Add request logging middleware for blog routes
-app.use('/api/v1/blogs', (req, res, next) => {
-  console.log(`🔍 Blog route request: ${req.method} ${req.path}`, req.query);
-  next();
-});
-
-if (blogRoutes && typeof blogRoutes === 'function') {
-  app.use('/api/v1/blogs', blogRoutes);
-  app.use('/api/blogs', blogRoutes);
-  console.log('✅ Blog routes registered at /api/v1/blogs and /api/blogs');
-  if (blogRoutes.stack) {
-    console.log(`🔧 Blog routes stack: ${blogRoutes.stack.length} routes registered`);
-  }
-} else {
-  console.error('❌ Blog routes not loaded - blogRoutes is:', typeof blogRoutes);
-}
-
-// Add a direct test route to verify the path is working (before router)
-app.get('/api/v1/blogs/test-direct', (req, res) => {
-  console.log('✅ Test direct route hit!');
-  res.json({ message: 'Direct test route works - blog routes should be accessible' });
-});
+app.use('/api/v1/blogs', require('./src/api/routes/blogRoutes'));
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/contacts', require('./src/api/routes/contactRoutes'));
@@ -199,6 +140,7 @@ app.use('/api/admin', require('./src/api/routes/adminRoutes'));
 app.use('/api/subscriptions', require('./src/api/routes/subscriptionRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/developers', require('./src/api/routes/developerRoutes'));
+app.use('/api/blogs', require('./src/api/routes/blogRoutes'));
 console.log('✅ API routes registered');
 
 // Handle Next.js routes
@@ -211,12 +153,8 @@ if (shouldServeNextJS) {
     });
     const nextHandler = nextApp.getRequestHandler();
     
-    // Handle Next.js routes (but not API routes)
+    // Handle Next.js routes
     app.get('*', (req, res) => {
-      // Don't let Next.js handle API routes
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ error: 'API route not found' });
-      }
       return nextHandler(req, res);
     });
     
