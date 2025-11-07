@@ -53,6 +53,13 @@ const BlogListClient: React.FC = () => {
     return image.url;
   };
 
+  // Helper function to extract author name from string or object
+  const getAuthorName = (author: string | { name?: string } | undefined): string => {
+    if (!author) return 'Squarefooot Team';
+    if (typeof author === 'string') return author;
+    return author.name || 'Squarefooot Team';
+  };
+
   if (loading) {
     return (
       <Box
@@ -246,10 +253,10 @@ const BlogListClient: React.FC = () => {
 
                       {/* Meta Information */}
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2, fontSize: '0.875rem' }}>
-                        {post.author && (
+                        {(post.author || post.authorName) && (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'var(--color-text-muted)' }}>
                             <Person sx={{ fontSize: '1rem' }} />
-                            <Typography variant="caption">{post.author}</Typography>
+                            <Typography variant="caption">{post.authorName || getAuthorName(post.author)}</Typography>
                           </Box>
                         )}
                         {post.publishedAt && (
