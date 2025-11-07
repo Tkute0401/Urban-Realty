@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Container, 
   Box, 
@@ -37,10 +37,12 @@ const Login = () => {
 
   const { login, error, clearError, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get('redirect') || null;
 
   const onSubmit = async (values) => {
     clearError();
-    await login(values);
+    await login(values, redirectPath);
   };
 
   return (
