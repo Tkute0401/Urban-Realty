@@ -160,12 +160,19 @@ try {
     res.json({ message: 'Blog routes test endpoint - routes file failed to load' });
   });
 }
+// Add request logging middleware for blog routes
+app.use('/api/v1/blogs', (req, res, next) => {
+  console.log(`🔍 Blog route request: ${req.method} ${req.path}`, req.query);
+  next();
+});
+
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/blogs', blogRoutes);
 console.log('🔧 Blog routes registered at /api/v1/blogs and /api/blogs');
 
-// Add a direct test route to verify the path is working
+// Add a direct test route to verify the path is working (before router)
 app.get('/api/v1/blogs/test-direct', (req, res) => {
+  console.log('✅ Test direct route hit!');
   res.json({ message: 'Direct test route works - blog routes should be accessible' });
 });
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
