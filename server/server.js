@@ -139,8 +139,20 @@ try {
   console.log('✅ Blog routes file loaded successfully');
   console.log('🔧 Blog routes type:', typeof blogRoutes);
   console.log('🔧 Blog routes is router:', blogRoutes && typeof blogRoutes === 'function');
+  console.log('🔧 Blog routes stack:', blogRoutes.stack ? blogRoutes.stack.length + ' routes registered' : 'No stack');
+  
+  // Log all registered routes
+  if (blogRoutes.stack) {
+    blogRoutes.stack.forEach((layer, index) => {
+      if (layer.route) {
+        const methods = Object.keys(layer.route.methods).join(', ').toUpperCase();
+        console.log(`  Route ${index + 1}: ${methods} ${layer.route.path}`);
+      }
+    });
+  }
 } catch (error) {
   console.error('❌ Error loading blog routes:', error);
+  console.error('❌ Error message:', error.message);
   console.error('❌ Error stack:', error.stack);
   blogRoutes = express.Router(); // Fallback empty router
   // Add a test route to the fallback router
