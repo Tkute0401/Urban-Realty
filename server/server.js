@@ -132,7 +132,13 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
-app.use('/api/v1/blogs', require('./routes/blogRoutes'));
+try {
+  const blogRoutes = require('./routes/blogRoutes');
+  app.use('/api/v1/blogs', blogRoutes);
+  console.log('✅ Blog routes registered at /api/v1/blogs');
+} catch (error) {
+  console.error('❌ Error loading blog routes:', error);
+}
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/contacts', require('./src/api/routes/contactRoutes'));
@@ -140,7 +146,13 @@ app.use('/api/admin', require('./src/api/routes/adminRoutes'));
 app.use('/api/subscriptions', require('./src/api/routes/subscriptionRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/developers', require('./src/api/routes/developerRoutes'));
-app.use('/api/blogs', require('./routes/blogRoutes'));
+try {
+  const blogRoutes = require('./routes/blogRoutes');
+  app.use('/api/blogs', blogRoutes);
+  console.log('✅ Blog routes registered at /api/blogs');
+} catch (error) {
+  console.error('❌ Error loading blog routes:', error);
+}
 console.log('✅ API routes registered');
 
 // Handle Next.js routes
