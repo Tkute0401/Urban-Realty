@@ -39,6 +39,7 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/blogs', blogRoutes);
+console.log('✅ Blog routes mounted at /api/blogs');
 
 // Mount v1 routes for API versioning
 app.use('/api/v1/auth', authRoutes);
@@ -47,6 +48,7 @@ app.use('/api/v1/contacts', contactRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/subscriptions', subscriptionRoutes);
 app.use('/api/v1/blogs', blogRoutes);
+console.log('✅ Blog routes mounted at /api/v1/blogs');
 
 // Health check routes
 app.get('/api/health', (req, res) => {
