@@ -30,7 +30,14 @@ const propertyRoutes = require('./routes/propertyRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
-const blogRoutes = require('./routes/blogRoutes');
+let blogRoutes;
+try {
+  blogRoutes = require('./routes/blogRoutes');
+  console.log('✅ Blog routes file loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading blog routes:', error);
+  blogRoutes = express.Router(); // Fallback empty router
+}
 
 // Mount routes
 app.use('/api/auth', authRoutes);
