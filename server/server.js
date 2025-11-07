@@ -132,7 +132,16 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
-app.use('/api/v1/cities', require('./src/api/routes/cityRoutes'));
+try {
+  console.log('🔧 Attempting to load city routes from ./src/api/routes/cityRoutes');
+  const cityRoutes = require('./src/api/routes/cityRoutes');
+  app.use('/api/v1/cities', cityRoutes);
+  console.log('✅ City routes registered at /api/v1/cities');
+} catch (error) {
+  console.error('❌ Error loading city routes:', error);
+  console.error('❌ Error message:', error.message);
+  console.error('❌ Error stack:', error.stack);
+}
 let blogRoutes;
 try {
   console.log('🔧 Attempting to load blog routes from ./routes/blogRoutes');
@@ -167,9 +176,16 @@ app.use('/api/v1/blogs', (req, res, next) => {
   next();
 });
 
-app.use('/api/v1/blogs', blogRoutes);
-app.use('/api/blogs', blogRoutes);
-console.log('🔧 Blog routes registered at /api/v1/blogs and /api/blogs');
+if (blogRoutes && typeof blogRoutes === 'function') {
+  app.use('/api/v1/blogs', blogRoutes);
+  app.use('/api/blogs', blogRoutes);
+  console.log('✅ Blog routes registered at /api/v1/blogs and /api/blogs');
+  if (blogRoutes.stack) {
+    console.log(`🔧 Blog routes stack: ${blogRoutes.stack.length} routes registered`);
+  }
+} else {
+  console.error('❌ Blog routes not loaded - blogRoutes is:', typeof blogRoutes);
+}
 
 // Add a direct test route to verify the path is working (before router)
 app.get('/api/v1/blogs/test-direct', (req, res) => {
