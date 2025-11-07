@@ -46,6 +46,13 @@ const BlogListClient: React.FC = () => {
     });
   };
 
+  // Helper function to extract image URL from string or object
+  const getImageUrl = (image: string | { url?: string } | undefined): string | undefined => {
+    if (!image) return undefined;
+    if (typeof image === 'string') return image;
+    return image.url;
+  };
+
   if (loading) {
     return (
       <Box
@@ -172,11 +179,11 @@ const BlogListClient: React.FC = () => {
                     onClick={() => router.push(`/blog/${post.slug}`)}
                   >
                     {/* Featured Image */}
-                    {post.featuredImage && (
+                    {getImageUrl(post.featuredImage) && (
                       <CardMedia
                         component="img"
                         height="200"
-                        image={post.featuredImage}
+                        image={getImageUrl(post.featuredImage) || ''}
                         alt={post.title}
                         sx={{
                           objectFit: 'cover',
