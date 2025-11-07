@@ -8,13 +8,21 @@ import User from '@/models/User';
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join('/');
   
+  // Don't handle /api/v1/* routes - let Express handle them
+  if (path.startsWith('v1/')) {
+    return NextResponse.json(
+      { error: 'API endpoint not found. This should be handled by Express backend.' },
+      { status: 404 }
+    );
+  }
+  
   console.log('API route called with path:', path);
   
   try {
     // Connect to database
     await connectDB();
 
-    // Handle different API paths
+    // Handle different API paths (only non-v1 routes)
     switch (path) {
       case 'properties':
         const properties = await Property.find({ status: 'For Sale' })

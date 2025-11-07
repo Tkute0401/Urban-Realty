@@ -133,6 +133,7 @@ app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
 app.use('/api/v1/blogs', require('./src/api/routes/blogRoutes'));
+app.use('/api/v1/cities', require('./src/api/routes/cityRoutes'));
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/contacts', require('./src/api/routes/contactRoutes'));
