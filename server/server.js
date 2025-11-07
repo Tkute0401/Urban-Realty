@@ -132,8 +132,20 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
-app.use('/api/v1/blogs', require('./src/api/routes/blogRoutes'));
-app.use('/api/v1/cities', require('./src/api/routes/cityRoutes'));
+try {
+  console.log('🔧 Loading blog routes...');
+  app.use('/api/v1/blogs', require('./src/api/routes/blogRoutes'));
+  console.log('✅ Blog routes registered');
+} catch (error) {
+  console.error('❌ Error loading blog routes:', error);
+}
+try {
+  console.log('🔧 Loading city routes...');
+  app.use('/api/v1/cities', require('./src/api/routes/cityRoutes'));
+  console.log('✅ City routes registered');
+} catch (error) {
+  console.error('❌ Error loading city routes:', error);
+}
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/contacts', require('./src/api/routes/contactRoutes'));

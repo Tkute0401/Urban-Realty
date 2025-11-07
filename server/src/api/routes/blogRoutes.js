@@ -4,6 +4,15 @@ const blogController = require('../../../controllers/blogController');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/multer');
 
+console.log('🔧 Blog routes loaded');
+console.log('🔧 Blog controller functions:', {
+  getBlogs: typeof blogController.getBlogs,
+  getBlog: typeof blogController.getBlog,
+  createBlog: typeof blogController.createBlog,
+  updateBlog: typeof blogController.updateBlog,
+  deleteBlog: typeof blogController.deleteBlog
+});
+
 // @desc    Get all blogs
 // @route   GET /api/v1/blogs
 // @access  Public
