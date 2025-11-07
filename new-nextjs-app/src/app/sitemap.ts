@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getApiBaseUrl } from '@/lib/services/api.config'
+import { getAllBlogPosts } from '@/lib/services/blog.service'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-production.up.railway.app'
 
@@ -126,6 +127,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ]
 
   // Add dynamic property URLs
@@ -144,5 +151,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticUrls, ...propertyUrls, ...developerUrls]
+  // Add dynamic blog post URLs
+  let blogUrls: MetadataRoute.Sitemap = []
+  try {
+    const blogPosts = await getAllBlogPosts()
+    blogUrls = blogPosts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.updatedAt || post.publishedAt),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }))
+  } catch (error) {
+    console.warn('Sitemap: Error fetching blog posts:', error)
+  }
+
+  return [...staticUrls, ...propertyUrls, ...developerUrls, ...blogUrls]
 }

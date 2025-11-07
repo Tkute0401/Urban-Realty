@@ -22,7 +22,8 @@ import {
   VerifiedUser,
   Settings,
   Assessment,
-  Image
+  Image,
+  Article
 } from '@mui/icons-material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import Link from 'next/link';
@@ -36,6 +37,7 @@ const menuItems = [
   { text: 'Users', icon: <People />, path: '/admin/users' },
   { text: 'Agents', icon: <VerifiedUser />, path: '/admin/agents' },
   { text: 'Properties', icon: <Home />, path: '/admin/properties' },
+  { text: 'Blogs', icon: <Article />, path: '/admin/blogs' },
   { text: 'Contacts', icon: <Mail />, path: '/admin/contacts' },
   { text: 'Media', icon: <Image />, path: '/admin/media' },
   { text: 'Reports', icon: <Assessment />, path: '/admin/reports' },
