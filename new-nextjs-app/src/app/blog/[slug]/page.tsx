@@ -37,19 +37,24 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
     const imageUrl = post.featuredImage || '/blog-og-image.jpg';
+    
+    // Extract author name - use authorName if available, otherwise extract from author
+    const authorName = post.authorName || 
+      (typeof post.author === 'string' ? post.author : 
+       (typeof post.author === 'object' && post.author?.name ? post.author.name : 'Squarefooot Team'));
 
     return {
       title: `${post.title} | Squarefooot Blog`,
       description: post.excerpt || post.content.substring(0, 160) + '...',
       keywords: post.tags || [],
-      authors: post.author ? [{ name: post.author }] : undefined,
+      authors: [{ name: authorName }],
       openGraph: {
         title: post.title,
         description: post.excerpt || post.content.substring(0, 160) + '...',
         type: 'article',
         publishedTime: post.publishedAt,
         modifiedTime: post.updatedAt,
-        authors: post.author ? [post.author] : undefined,
+        authors: [authorName],
         tags: post.tags || [],
         images: [
           {
@@ -94,7 +99,9 @@ function generateBlogPostStructuredData(post: any) {
     "dateModified": post.updatedAt || post.publishedAt,
     "author": {
       "@type": "Person",
-      "name": post.author || "Squarefooot Team"
+      "name": post.authorName || 
+        (typeof post.author === 'string' ? post.author : 
+         (typeof post.author === 'object' && post.author?.name ? post.author.name : "Squarefooot Team"))
     },
     "publisher": {
       "@type": "Organization",
