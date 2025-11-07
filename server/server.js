@@ -132,6 +132,7 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
+app.use('/api/v1/cities', require('./src/api/routes/cityRoutes'));
 let blogRoutes;
 try {
   console.log('🔧 Attempting to load blog routes from ./routes/blogRoutes');
