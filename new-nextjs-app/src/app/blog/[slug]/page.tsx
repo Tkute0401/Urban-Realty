@@ -36,7 +36,16 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
-    const imageUrl = post.featuredImage || '/blog-og-image.jpg';
+    
+    // Extract image URL - handle both string and object types
+    const getImageUrl = (image: string | { url?: string } | undefined): string => {
+      if (!image) return '/blog-og-image.jpg';
+      if (typeof image === 'string') return image;
+      return image.url || '/blog-og-image.jpg';
+    };
+    
+    const imageUrl = getImageUrl(post.featuredImage);
+    const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
     
     // Extract author name - use authorName if available, otherwise extract from author
     const authorName = post.authorName || 
@@ -58,7 +67,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         tags: post.tags || [],
         images: [
           {
-            url: imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`,
+            url: fullImageUrl,
             width: 1200,
             height: 630,
             alt: post.title,
@@ -69,7 +78,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         card: 'summary_large_image',
         title: post.title,
         description: post.excerpt || post.content.substring(0, 160) + '...',
-        images: [imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`],
+        images: [fullImageUrl],
       },
       alternates: {
         canonical: `/blog/${params.slug}`,
@@ -87,14 +96,23 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 // Generate structured data for individual blog post
 function generateBlogPostStructuredData(post: any) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
-  const imageUrl = post.featuredImage || '/blog-og-image.jpg';
+  
+  // Extract image URL - handle both string and object types
+  const getImageUrl = (image: string | { url?: string } | undefined): string => {
+    if (!image) return '/blog-og-image.jpg';
+    if (typeof image === 'string') return image;
+    return image.url || '/blog-og-image.jpg';
+  };
+  
+  const imageUrl = getImageUrl(post.featuredImage);
+  const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
   
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title,
     "description": post.excerpt || post.content.substring(0, 160) + '...',
-    "image": imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`,
+    "image": fullImageUrl,
     "datePublished": post.publishedAt,
     "dateModified": post.updatedAt || post.publishedAt,
     "author": {
