@@ -65,7 +65,10 @@ router.post('/user-types', protect, authorize('admin'), userTypeController.creat
 router.put('/user-types/:id', protect, authorize('admin'), userTypeController.updateUserType);
 router.delete('/user-types/:id', protect, authorize('admin'), userTypeController.deleteUserType);
 
-// Media Management (Admin can delete any media)
+// Media Management (Admin can view, upload and delete any media)
+router.get('/media', protect, authorize('admin'), adminController.getMedia);
+router.post('/media/upload', protect, authorize('admin'), upload.single('file'), mediaController.uploadAdminMedia);
+router.put('/media/:id', protect, authorize('admin'), mediaController.updateMedia);
 router.delete('/media/:id', protect, authorize('admin'), mediaController.deleteMedia);
 
 // ==================== DEVELOPER MANAGEMENT ====================

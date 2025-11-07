@@ -12,12 +12,13 @@ const MediaSchema = new mongoose.Schema({
   mediaType: {
     type: String,
     required: true,
-    enum: ['image', 'video']
+    enum: ['image', 'video', 'document']
   },
   width: Number,
   height: Number,
   duration: Number, // for videos
   format: String,
+  size: Number, // file size in bytes
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -25,11 +26,31 @@ const MediaSchema = new mongoose.Schema({
   },
   entityType: {
     type: String,
-    required: true
+    required: false // Optional for admin media
   },
   entityId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: false // Optional for admin media
+  },
+  // Admin media fields
+  title: {
+    type: String,
+    default: ''
+  },
+  description: {
+    type: String,
+    default: ''
+  },
+  tags: [{
+    type: String
+  }],
+  category: {
+    type: String,
+    default: 'general'
+  },
+  altText: {
+    type: String,
+    default: ''
   },
   createdAt: {
     type: Date,

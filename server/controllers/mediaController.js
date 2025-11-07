@@ -143,3 +143,132 @@ exports.getEntityMedia = asyncHandler(async (req, res, next) => {
     data: media
   });
 });
+
+// @desc    Upload media for admin (standalone media not tied to entity)
+// @route   POST /api/v1/admin/media/upload
+// @access  Private/Admin
+exports.uploadAdminMedia = asyncHandler(async (req, res, next) => {
+  if (!req.file && !req.files?.file) {
+    return next(new ErrorResponse('Please upload a file', 400));
+  }
+
+  const file = req.file || req.files.file;
+  const { title, description, tags, category, altText } = req.body;
+
+  // Validate file type
+  const isImage = file.mimetype.startsWith('image');
+  const isVideo = file.mimetype.startsWith('video');
+  const isDocument = file.mimetype.startsWith('application') || file.mimetype.includes('pdf') || file.mimetype.includes('document');
+  
+  if (!isImage && !isVideo && !isDocument) {
+    return next(new ErrorResponse('Please upload an image, video, or document file', 400));
+  }
+
+  // Validate file size
+  const maxSize = isImage ? 
+    (process.env.MAX_IMAGE_UPLOAD || 5000000) : 
+    (isVideo ? (process.env.MAX_VIDEO_UPLOAD || 50000000) : (process.env.MAX_DOCUMENT_UPLOAD || 10000000));
+  
+  if (file.size > maxSize) {
+    return next(new ErrorResponse(
+      `Please upload a file less than ${maxSize / 1000000}MB`, 
+      400
+    ));
+  }
+
+  try {
+    // Upload to Cloudinary
+    const uploadOptions = {
+      folder: `real-estate/admin-media/${category || 'general'}`,
+      resource_type: isVideo ? 'video' : (isDocument ? 'raw' : 'image'),
+      quality: 'auto:good'
+    };
+
+    if (isImage) {
+      uploadOptions.width = 1200;
+      uploadOptions.height = 800;
+      uploadOptions.crop = 'fill';
+    }
+
+    // Handle both multer and express-fileupload file objects
+    const filePath = file.path || file.tempFilePath || (file.buffer ? null : file);
+    
+    let result;
+    if (file.buffer) {
+      // Upload from buffer (multer)
+      result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        });
+        uploadStream.end(file.buffer);
+      });
+    } else {
+      // Upload from file path
+      result = await cloudinary.uploader.upload(filePath, uploadOptions);
+    }
+
+    // Create media record
+    const mediaData = {
+      url: result.secure_url,
+      publicId: result.public_id,
+      mediaType: isVideo ? 'video' : (isDocument ? 'document' : 'image'),
+      width: result.width,
+      height: result.height,
+      duration: result.duration,
+      format: result.format,
+      size: file.size,
+      uploadedBy: req.user.id,
+      title: title || file.name,
+      description: description || '',
+      tags: tags ? tags.split(',').map(t => t.trim()) : [],
+      category: category || 'general',
+      altText: altText || title || file.name
+    };
+
+    const media = await Media.create(mediaData);
+
+    // Clean up temp file
+    if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    if (file.tempFilePath && fs.existsSync(file.tempFilePath)) fs.unlinkSync(file.tempFilePath);
+
+    res.status(201).json({
+      success: true,
+      data: media
+    });
+  } catch (err) {
+    console.error('Error uploading media:', err);
+    if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    if (file.tempFilePath && fs.existsSync(file.tempFilePath)) fs.unlinkSync(file.tempFilePath);
+    return next(new ErrorResponse('Problem with file upload', 500));
+  }
+});
+
+// @desc    Update media metadata
+// @route   PUT /api/v1/admin/media/:id
+// @access  Private/Admin
+exports.updateMedia = asyncHandler(async (req, res, next) => {
+  const media = await Media.findById(req.params.id);
+  
+  if (!media) {
+    return next(
+      new ErrorResponse(`Media not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Update fields
+  const { title, description, tags, category, altText } = req.body;
+  
+  if (title) media.title = title;
+  if (description !== undefined) media.description = description;
+  if (tags) media.tags = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim());
+  if (category) media.category = category;
+  if (altText !== undefined) media.altText = altText;
+
+  await media.save();
+
+  res.status(200).json({
+    success: true,
+    data: media
+  });
+});
