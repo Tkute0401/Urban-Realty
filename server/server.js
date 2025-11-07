@@ -151,6 +151,11 @@ try {
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/blogs', blogRoutes);
 console.log('🔧 Blog routes registered at /api/v1/blogs and /api/blogs');
+
+// Add a direct test route to verify the path is working
+app.get('/api/v1/blogs/test-direct', (req, res) => {
+  res.json({ message: 'Direct test route works - blog routes should be accessible' });
+});
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
 app.use('/api/contacts', require('./src/api/routes/contactRoutes'));
