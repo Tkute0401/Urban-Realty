@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -14,6 +14,8 @@ export default function AdminLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -29,6 +31,14 @@ export default function AdminLayout({
       }
     }
   }, [user, loading, router]);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleToggleCollapse = () => {
+    setCollapsed(!collapsed);
+  };
 
   // Show loading spinner while checking auth
   if (loading) {
@@ -52,13 +62,18 @@ export default function AdminLayout({
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'var(--color-bg-primary)' }}>
-      <AdminSidebar />
+      <AdminSidebar 
+        mobileOpen={mobileOpen}
+        collapsed={collapsed}
+        onDrawerToggle={handleDrawerToggle}
+        onToggleCollapse={handleToggleCollapse}
+      />
       <Box 
         component="main" 
         sx={{ 
           flexGrow: 1, 
           p: 3,
-          ml: { xs: 0, md: '240px' }, // Account for sidebar width
+          ml: { xs: 0, md: collapsed ? '80px' : '240px' }, // Account for sidebar width
         }}
       >
         {children}
