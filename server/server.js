@@ -211,8 +211,12 @@ if (shouldServeNextJS) {
     });
     const nextHandler = nextApp.getRequestHandler();
     
-    // Handle Next.js routes
+    // Handle Next.js routes (but not API routes)
     app.get('*', (req, res) => {
+      // Don't let Next.js handle API routes
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+      }
       return nextHandler(req, res);
     });
     
