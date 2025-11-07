@@ -1,10 +1,10 @@
 'use client'
-import React, { Suspense } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { 
   Container, 
   Box, 
@@ -12,14 +12,13 @@ import {
   Button, 
   Typography, 
   Alert,
-  Paper,
-  CircularProgress
+  Paper
 } from '@mui/material';
 import { Login as LoginIcon } from '@mui/icons-material';
 import FieldIndicator from '@/components/ui/FieldIndicator';
 
 
-const LoginContent = () => {
+const Login = () => {
   console.log('🔧 Login Page rendering...');
   
   React.useEffect(() => {
@@ -38,12 +37,10 @@ const LoginContent = () => {
 
   const { login, error, clearError, loading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || null;
 
   const onSubmit = async (values) => {
     clearError();
-    await login(values, redirectPath);
+    await login(values);
   };
 
   return (
@@ -163,18 +160,6 @@ const LoginContent = () => {
         </Box>
       </Paper>
     </Container>
-  );
-};
-
-const Login = () => {
-  return (
-    <Suspense fallback={
-      <Container maxWidth="sm" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <CircularProgress />
-      </Container>
-    }>
-      <LoginContent />
-    </Suspense>
   );
 };
 

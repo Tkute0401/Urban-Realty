@@ -1,28 +1,29 @@
 import React from "react";
 import type { Metadata } from 'next';
 import BlogListClient from "@/components/blog/BlogListClient";
+import { getApiBaseUrl } from '@/lib/services/api.config';
 
 // SEO Metadata for Blog Listing Page
 export const metadata: Metadata = {
-  title: 'Real Estate Blog - Property Tips, Market Insights & Guides | Squarefooot',
-  description: 'Stay informed with Squarefooot\'s real estate blog. Expert insights on property buying, selling, renting, market trends, home improvement tips, and investment strategies. Your trusted source for real estate knowledge.',
+  title: 'Real Estate Blog | Property Tips, Market Insights & Guides | Squarefooot',
+  description: 'Explore our comprehensive real estate blog featuring property buying guides, market insights, investment tips, home improvement advice, and expert real estate advice. Stay informed with the latest trends in the property market.',
   keywords: [
     'real estate blog',
-    'property tips',
-    'real estate guides',
-    'property market insights',
-    'home buying tips',
+    'property blog',
+    'real estate tips',
+    'property buying guide',
+    'real estate market insights',
     'property investment advice',
+    'home buying tips',
     'real estate news',
     'property market trends',
-    'home selling guide',
-    'rental property tips',
-    'real estate articles',
-    'property advice'
+    'real estate guides',
+    'property advice',
+    'home selling tips'
   ],
   openGraph: {
-    title: 'Real Estate Blog - Property Tips & Market Insights | Squarefooot',
-    description: 'Expert real estate insights, property tips, market trends, and comprehensive guides to help you make informed property decisions.',
+    title: 'Real Estate Blog | Property Tips & Market Insights | Squarefooot',
+    description: 'Discover expert real estate advice, property buying guides, market insights, and investment tips on our comprehensive blog.',
     type: 'website',
     images: [
       {
@@ -35,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Real Estate Blog - Property Tips & Market Insights | Squarefooot',
-    description: 'Expert real estate insights, property tips, market trends, and comprehensive guides.',
+    title: 'Real Estate Blog | Property Tips & Market Insights | Squarefooot',
+    description: 'Discover expert real estate advice, property buying guides, market insights, and investment tips.',
     images: ['/blog-og-image.jpg'],
   },
   alternates: {
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 // Generate structured data for Blog listing page
-function generateBlogListingStructuredData() {
+function generateBlogListStructuredData() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   
   return {
@@ -53,7 +54,7 @@ function generateBlogListingStructuredData() {
     "@type": "Blog",
     "name": "Squarefooot Real Estate Blog",
     "url": `${baseUrl}/blog`,
-    "description": "Expert real estate insights, property tips, market trends, and comprehensive guides to help you make informed property decisions.",
+    "description": "Expert real estate advice, property buying guides, market insights, and investment tips",
     "publisher": {
       "@type": "Organization",
       "name": "Squarefooot",
@@ -70,8 +71,8 @@ function generateBlogListingStructuredData() {
   };
 }
 
-export default function BlogPage() {
-  const structuredData = generateBlogListingStructuredData();
+export default async function BlogPage() {
+  const structuredData = generateBlogListStructuredData();
   
   return (
     <>

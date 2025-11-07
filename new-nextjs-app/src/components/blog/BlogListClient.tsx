@@ -1,63 +1,69 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { Box, Container, Typography, CircularProgress, Card, CardContent, CardMedia, Button, Chip, Grid } from '@mui/material';
+import { CalendarToday, Person, ArrowForward } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Box, Container, Typography, Card, CardContent, CardMedia, Chip, CircularProgress, Grid, useTheme, useMediaQuery } from '@mui/material';
-import { CalendarToday, Person, AccessTime, ArrowForward } from '@mui/icons-material';
-import { motion } from 'framer-motion';
-import { getAllBlogPosts, BlogPost } from '@/lib/services/blog.service';
+import { format } from 'date-fns';
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImage?: string;
+  author?: {
+    name: string;
+    avatar?: string;
+  };
+  category?: string;
+  tags?: string[];
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  metaKeywords?: string[];
+}
 
 const BlogListClient: React.FC = () => {
   const router = useRouter();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const allPosts = await getAllBlogPosts();
-        setPosts(allPosts);
-      } catch (error) {
-        console.error('Error fetching blog posts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPosts();
+    fetchBlogs();
   }, []);
 
-  const categories = Array.from(new Set(posts.map(post => post.category).filter(Boolean)));
-  const filteredPosts = selectedCategory
-    ? posts.filter(post => post.category === selectedCategory)
-    : posts;
+  const fetchBlogs = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/v1/blogs?limit=50&sort=-publishedAt');
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setBlogs(Array.isArray(data.data) ? data.data : []);
+      } else {
+        setBlogs([]);
+      }
+    } catch (err: any) {
+      console.error('Error fetching blogs:', err);
+      setError('Failed to load blog posts');
+      setBlogs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  // Helper function to extract image URL from string or object
-  const getImageUrl = (image: string | { url?: string } | undefined): string | undefined => {
-    if (!image) return undefined;
-    if (typeof image === 'string') return image;
-    return image.url;
-  };
-
-  // Helper function to extract author name from string or object
-  const getAuthorName = (author: string | { name?: string } | undefined): string => {
-    if (!author) return 'Squarefooot Team';
-    if (typeof author === 'string') return author;
-    return author.name || 'Squarefooot Team';
+    try {
+      return format(new Date(dateString), 'MMMM dd, yyyy');
+    } catch {
+      return dateString;
+    }
   };
 
   if (loading) {
@@ -77,11 +83,30 @@ const BlogListClient: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Box
+        sx={{
+          minHeight: '60vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          py: 8,
+          background: 'var(--color-bg)',
+        }}
+      >
+        <Typography variant="h6" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       component="main"
       sx={{
-        minHeight: '60vh',
+        minHeight: '100vh',
         background: 'var(--color-bg)',
         py: { xs: 4, md: 8 },
       }}
@@ -107,212 +132,174 @@ const BlogListClient: React.FC = () => {
               color: 'var(--color-text-muted)',
               maxWidth: 800,
               mx: 'auto',
-              fontSize: { xs: '1rem', md: '1.25rem' },
             }}
           >
-            Expert insights, tips, and guides to help you navigate the real estate market
+            Expert insights, market trends, and practical guides to help you navigate the real estate world
           </Typography>
         </Box>
 
-        {/* Category Filter */}
-        {categories.length > 0 && (
-          <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-            <Chip
-              label="All Posts"
-              onClick={() => setSelectedCategory(null)}
-              sx={{
-                backgroundColor: selectedCategory === null ? 'var(--color-primary)' : 'transparent',
-                color: selectedCategory === null ? 'var(--color-primary-contrast)' : 'var(--color-text-primary)',
-                border: '1px solid var(--color-primary)',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: selectedCategory === null ? 'var(--color-primary-hover)' : 'rgba(247, 107, 28, 0.1)',
-                },
-              }}
-            />
-            {categories.map((category) => (
-              <Chip
-                key={category}
-                label={category}
-                onClick={() => setSelectedCategory(category)}
-                sx={{
-                  backgroundColor: selectedCategory === category ? 'var(--color-primary)' : 'transparent',
-                  color: selectedCategory === category ? 'var(--color-primary-contrast)' : 'var(--color-text-primary)',
-                  border: '1px solid var(--color-primary)',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: selectedCategory === category ? 'var(--color-primary-hover)' : 'rgba(247, 107, 28, 0.1)',
-                  },
-                }}
-              />
-            ))}
-          </Box>
-        )}
-
         {/* Blog Posts Grid */}
-        {filteredPosts.length === 0 ? (
+        {blogs.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="h5" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
-              No blog posts found
+              No Blog Posts Yet
             </Typography>
             <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
-              Check back soon for new content!
+              Check back soon for expert real estate insights and guides.
             </Typography>
           </Box>
         ) : (
-          <Grid container spacing={3}>
-            {filteredPosts.map((post, index) => (
-              <Grid item xs={12} sm={6} lg={4} key={post.slug}>
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+          <Grid container spacing={4}>
+            {blogs.map((blog) => (
+              <Grid item xs={12} sm={6} md={4} key={blog._id}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    border: '1px solid var(--color-border)',
+                    backgroundColor: 'var(--color-surface)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.15)',
+                    },
+                  }}
+                  onClick={() => router.push(`/blog/${blog.slug}`)}
                 >
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      backgroundColor: 'var(--color-surface)',
-                      border: '1px solid var(--color-border)',
-                      '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: '0 12px 24px rgba(0, 0, 0, 0.15)',
-                        borderColor: 'var(--color-primary)',
-                      },
-                    }}
-                    onClick={() => router.push(`/blog/${post.slug}`)}
-                  >
-                    {/* Featured Image */}
-                    {getImageUrl(post.featuredImage) && (
-                      <CardMedia
-                        component="img"
-                        height="200"
-                        image={getImageUrl(post.featuredImage) || ''}
-                        alt={post.title}
+                  {/* Featured Image */}
+                  {blog.featuredImage && (
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={blog.featuredImage}
+                      alt={blog.title}
+                      sx={{
+                        objectFit: 'cover',
+                        backgroundColor: 'var(--color-bg)',
+                      }}
+                    />
+                  )}
+
+                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                    {/* Category */}
+                    {blog.category && (
+                      <Chip
+                        label={blog.category}
+                        size="small"
                         sx={{
-                          objectFit: 'cover',
-                          backgroundColor: 'var(--color-bg)',
+                          mb: 2,
+                          backgroundColor: 'var(--color-primary)',
+                          color: 'var(--color-primary-contrast)',
+                          fontSize: '0.75rem',
                         }}
                       />
                     )}
 
-                    <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
-                      {/* Category */}
-                      {post.category && (
-                        <Chip
-                          label={post.category}
-                          size="small"
-                          sx={{
-                            mb: 2,
-                            backgroundColor: 'var(--color-primary)',
-                            color: 'var(--color-primary-contrast)',
-                            fontSize: '0.75rem',
-                            height: '24px',
-                            width: 'fit-content',
-                          }}
-                        />
-                      )}
+                    {/* Title */}
+                    <Typography
+                      variant="h5"
+                      component="h2"
+                      sx={{
+                        fontWeight: 'bold',
+                        color: 'var(--color-text-primary)',
+                        mb: 2,
+                        fontSize: { xs: '1.25rem', md: '1.5rem' },
+                        lineHeight: 1.3,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {blog.title}
+                    </Typography>
 
-                      {/* Title */}
-                      <Typography
-                        variant="h5"
-                        component="h2"
-                        sx={{
-                          fontWeight: 'bold',
-                          color: 'var(--color-text-primary)',
-                          mb: 2,
-                          fontSize: { xs: '1.25rem', md: '1.5rem' },
-                          lineHeight: 1.3,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {post.title}
-                      </Typography>
+                    {/* Excerpt */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'var(--color-text-muted)',
+                        mb: 3,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        minHeight: '4.5rem',
+                      }}
+                    >
+                      {blog.excerpt || blog.content?.substring(0, 150) + '...'}
+                    </Typography>
 
-                      {/* Excerpt */}
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: 'var(--color-text-muted)',
-                          mb: 3,
-                          flexGrow: 1,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        {post.excerpt}
-                      </Typography>
-
-                      {/* Meta Information */}
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2, fontSize: '0.875rem' }}>
-                        {(post.author || post.authorName) && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'var(--color-text-muted)' }}>
-                            <Person sx={{ fontSize: '1rem' }} />
-                            <Typography variant="caption">{post.authorName || getAuthorName(post.author)}</Typography>
-                          </Box>
-                        )}
-                        {post.publishedAt && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'var(--color-text-muted)' }}>
-                            <CalendarToday sx={{ fontSize: '1rem' }} />
-                            <Typography variant="caption">{formatDate(post.publishedAt)}</Typography>
-                          </Box>
-                        )}
-                        {post.readingTime && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'var(--color-text-muted)' }}>
-                            <AccessTime sx={{ fontSize: '1rem' }} />
-                            <Typography variant="caption">{post.readingTime} min read</Typography>
-                          </Box>
-                        )}
-                      </Box>
-
-                      {/* Tags */}
-                      {post.tags && post.tags.length > 0 && (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Chip
-                              key={tag}
-                              label={tag}
-                              size="small"
-                              sx={{
-                                fontSize: '0.7rem',
-                                height: '20px',
-                                backgroundColor: 'rgba(247, 107, 28, 0.1)',
-                                color: 'var(--color-primary)',
-                                border: '1px solid rgba(247, 107, 28, 0.3)',
-                              }}
-                            />
-                          ))}
+                    {/* Meta Information */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        mb: 2,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      {blog.author && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Person sx={{ fontSize: 16, color: 'var(--color-text-muted)' }} />
+                          <Typography variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
+                            {blog.author.name || 'Admin'}
+                          </Typography>
                         </Box>
                       )}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <CalendarToday sx={{ fontSize: 16, color: 'var(--color-text-muted)' }} />
+                        <Typography variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
+                          {formatDate(blog.publishedAt || blog.createdAt)}
+                        </Typography>
+                      </Box>
+                    </Box>
 
-                      {/* Read More Link */}
-                      <Link
-                        href={`/blog/${post.slug}`}
-                        style={{
-                          textDecoration: 'none',
-                          color: 'var(--color-primary)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          fontWeight: 'bold',
-                          marginTop: 'auto',
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Read More
-                        <ArrowForward sx={{ fontSize: '1rem' }} />
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                    {/* Tags */}
+                    {blog.tags && blog.tags.length > 0 && (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                        {blog.tags.slice(0, 3).map((tag, index) => (
+                          <Chip
+                            key={index}
+                            label={tag}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              fontSize: '0.7rem',
+                              borderColor: 'var(--color-border)',
+                              color: 'var(--color-text-muted)',
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+
+                    {/* Read More Button */}
+                    <Button
+                      endIcon={<ArrowForward />}
+                      sx={{
+                        color: 'var(--color-primary)',
+                        textTransform: 'none',
+                        fontWeight: 'bold',
+                        mt: 'auto',
+                        '&:hover': {
+                          backgroundColor: 'rgba(247, 107, 28, 0.1)',
+                        },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/blog/${blog.slug}`);
+                      }}
+                    >
+                      Read More
+                    </Button>
+                  </CardContent>
+                </Card>
               </Grid>
             ))}
           </Grid>

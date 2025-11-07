@@ -2,124 +2,135 @@ import React from "react";
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import BlogPostClient from "@/components/blog/BlogPostClient";
-import { getBlogPost, getAllBlogPosts } from "@/lib/services/blog.service";
+import { getApiBaseUrl } from '@/lib/services/api.config';
 
-interface BlogPostPageProps {
-  params: {
-    slug: string;
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImage?: string;
+  author?: {
+    name: string;
+    avatar?: string;
   };
+  category?: string;
+  tags?: string[];
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  metaKeywords?: string[];
 }
 
-// Generate static params for all blog posts
-export async function generateStaticParams() {
+async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
-    const posts = await getAllBlogPosts();
-    return posts.map((post) => ({
-      slug: post.slug,
-    }));
-  } catch (error) {
-    console.error('Error generating static params for blog posts:', error);
-    return [];
-  }
-}
+    const apiUrl = getApiBaseUrl();
+    const response = await fetch(`${apiUrl}/api/v1/blogs?slug=${slug}`, {
+      next: { revalidate: 3600 }, // Revalidate every hour
+    });
 
-// Generate metadata for individual blog post
-export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  try {
-    const post = await getBlogPost(params.slug);
-    
-    if (!post) {
-      return {
-        title: 'Blog Post Not Found | Squarefooot',
-        description: 'The requested blog post could not be found.',
-      };
+    if (!response.ok) {
+      return null;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
+    const data = await response.json();
     
-    // Extract image URL - handle both string and object types
-    const getImageUrl = (image: string | { url?: string } | undefined): string => {
-      if (!image) return '/blog-og-image.jpg';
-      if (typeof image === 'string') return image;
-      return image.url || '/blog-og-image.jpg';
-    };
+    if (data.success && data.data) {
+      const blogs = Array.isArray(data.data) ? data.data : [data.data];
+      return blogs.length > 0 ? blogs[0] : null;
+    }
     
-    const imageUrl = getImageUrl(post.featuredImage);
-    const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
-    
-    // Extract author name - use authorName if available, otherwise extract from author
-    const authorName = post.authorName || 
-      (typeof post.author === 'string' ? post.author : 
-       (typeof post.author === 'object' && post.author?.name ? post.author.name : 'Squarefooot Team'));
-
-    return {
-      title: `${post.title} | Squarefooot Blog`,
-      description: post.excerpt || post.content.substring(0, 160) + '...',
-      keywords: post.tags || [],
-      authors: [{ name: authorName }],
-      openGraph: {
-        title: post.title,
-        description: post.excerpt || post.content.substring(0, 160) + '...',
-        type: 'article',
-        publishedTime: post.publishedAt,
-        modifiedTime: post.updatedAt,
-        authors: [authorName],
-        tags: post.tags || [],
-        images: [
-          {
-            url: fullImageUrl,
-            width: 1200,
-            height: 630,
-            alt: post.title,
-          },
-        ],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: post.title,
-        description: post.excerpt || post.content.substring(0, 160) + '...',
-        images: [fullImageUrl],
-      },
-      alternates: {
-        canonical: `/blog/${params.slug}`,
-      },
-    };
+    return null;
   } catch (error) {
-    console.error('Error generating metadata for blog post:', error);
-    return {
-      title: 'Blog Post | Squarefooot',
-      description: 'Read our latest real estate blog post.',
-    };
+    console.error('Error fetching blog post:', error);
+    return null;
   }
 }
 
-// Generate structured data for individual blog post
-function generateBlogPostStructuredData(post: any) {
+// Generate dynamic metadata for blog post
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const blog = await getBlogPost(params.slug);
+
+  if (!blog) {
+    return {
+      title: 'Blog Post Not Found | Squarefooot',
+      description: 'The blog post you are looking for could not be found.',
+    };
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
-  
-  // Extract image URL - handle both string and object types
-  const getImageUrl = (image: string | { url?: string } | undefined): string => {
-    if (!image) return '/blog-og-image.jpg';
-    if (typeof image === 'string') return image;
-    return image.url || '/blog-og-image.jpg';
+  const title = blog.seoTitle || blog.title;
+  const description = blog.seoDescription || blog.excerpt || blog.content?.substring(0, 160);
+  const keywords = blog.metaKeywords || blog.tags || [];
+
+  return {
+    title: `${title} | Squarefooot Blog`,
+    description,
+    keywords: [
+      ...keywords,
+      'real estate',
+      'property',
+      'real estate blog',
+      'property advice',
+    ],
+    authors: blog.author ? [{ name: blog.author.name }] : undefined,
+    openGraph: {
+      title: `${title} | Squarefooot Blog`,
+      description,
+      type: 'article',
+      publishedTime: blog.publishedAt || blog.createdAt,
+      modifiedTime: blog.updatedAt,
+      authors: blog.author ? [blog.author.name] : undefined,
+      tags: blog.tags,
+      images: blog.featuredImage
+        ? [
+            {
+              url: blog.featuredImage,
+              width: 1200,
+              height: 630,
+              alt: blog.title,
+            },
+          ]
+        : [
+            {
+              url: '/blog-og-image.jpg',
+              width: 1200,
+              height: 630,
+              alt: blog.title,
+            },
+          ],
+      url: `${baseUrl}/blog/${blog.slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Squarefooot Blog`,
+      description,
+      images: blog.featuredImage ? [blog.featuredImage] : ['/blog-og-image.jpg'],
+    },
+    alternates: {
+      canonical: `/blog/${blog.slug}`,
+    },
   };
-  
-  const imageUrl = getImageUrl(post.featuredImage);
-  const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`;
+}
+
+// Generate structured data for blog post
+function generateBlogPostStructuredData(blog: BlogPost) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.excerpt || post.content.substring(0, 160) + '...',
-    "image": fullImageUrl,
-    "datePublished": post.publishedAt,
-    "dateModified": post.updatedAt || post.publishedAt,
+    "headline": blog.title,
+    "description": blog.excerpt || blog.content?.substring(0, 200),
+    "image": blog.featuredImage || `${baseUrl}/blog-og-image.jpg`,
+    "datePublished": blog.publishedAt || blog.createdAt,
+    "dateModified": blog.updatedAt,
     "author": {
       "@type": "Person",
-      "name": post.authorName || 
-        (typeof post.author === 'string' ? post.author : 
-         (typeof post.author === 'object' && post.author?.name ? post.author.name : "Squarefooot Team"))
+      "name": blog.author?.name || "Squarefooot Team"
     },
     "publisher": {
       "@type": "Organization",
@@ -132,39 +143,34 @@ function generateBlogPostStructuredData(post: any) {
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${baseUrl}/blog/${post.slug}`
+      "@id": `${baseUrl}/blog/${blog.slug}`
     },
-    "keywords": post.tags?.join(', ') || '',
-    "articleSection": post.category || "Real Estate"
+    "articleSection": blog.category || "Real Estate",
+    "keywords": blog.tags?.join(", ") || "real estate, property"
   };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  try {
-    const post = await getBlogPost(params.slug);
-    
-    if (!post) {
-      notFound();
-    }
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const blog = await getBlogPost(params.slug);
 
-    const structuredData = generateBlogPostStructuredData(post);
-    
-    return (
-      <>
-        {/* Structured Data for Blog Post */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData)
-          }}
-        />
-        
-        <BlogPostClient post={post} />
-      </>
-    );
-  } catch (error) {
-    console.error('Error loading blog post:', error);
+  if (!blog) {
     notFound();
   }
+
+  const structuredData = generateBlogPostStructuredData(blog);
+
+  return (
+    <>
+      {/* Structured Data for Blog Post */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+      
+      <BlogPostClient blog={blog} />
+    </>
+  );
 }
 

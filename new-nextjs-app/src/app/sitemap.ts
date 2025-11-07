@@ -1,6 +1,5 @@
 import { MetadataRoute } from 'next'
 import { getApiBaseUrl } from '@/lib/services/api.config'
-import { getAllBlogPosts } from '@/lib/services/blog.service'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://urban-realty-production.up.railway.app'
 
@@ -127,12 +126,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
   ]
 
   // Add dynamic property URLs
@@ -151,19 +144,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Add dynamic blog post URLs
-  let blogUrls: MetadataRoute.Sitemap = []
-  try {
-    const blogPosts = await getAllBlogPosts()
-    blogUrls = blogPosts.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: new Date(post.updatedAt || post.publishedAt),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }))
-  } catch (error) {
-    console.warn('Sitemap: Error fetching blog posts:', error)
+  // Fetch blogs for sitemap
+  let blogs: any[] = []
+  if (process.env.SKIP_BUILD_STATIC_GENERATION !== 'true') {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000'
+      const blogsResponse = await fetch(`${apiUrl}/api/v1/blogs?limit=100&sort=-publishedAt`, {
+        next: { revalidate: 86400 }, // Revalidate every 24 hours
+      }).then(res => res.json())
+      
+      if (blogsResponse.success && blogsResponse.data) {
+        blogs = Array.isArray(blogsResponse.data) ? blogsResponse.data : []
+      }
+    } catch (error) {
+      console.warn('Sitemap: Error fetching blogs:', error)
+    }
   }
 
-  return [...staticUrls, ...propertyUrls, ...developerUrls, ...blogUrls]
+  // Add dynamic blog URLs
+  const blogUrls: MetadataRoute.Sitemap = blogs.map((blog: any) => ({
+    url: `${baseUrl}/blog/${blog.slug || blog._id}`,
+    lastModified: new Date(blog.updatedAt || blog.publishedAt || blog.createdAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  // Add blog listing page
+  const blogListingUrl: MetadataRoute.Sitemap = [{
+    url: `${baseUrl}/blog`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.8,
+  }]
+
+  return [...staticUrls, ...propertyUrls, ...developerUrls, ...blogListingUrl, ...blogUrls]
 }

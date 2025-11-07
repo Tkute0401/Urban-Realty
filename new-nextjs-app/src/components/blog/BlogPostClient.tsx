@@ -1,61 +1,46 @@
 'use client';
 
 import React from 'react';
+import { Box, Container, Typography, Chip, Avatar, Breadcrumbs, Link as MuiLink } from '@mui/material';
+import { CalendarToday, Person, Home, ArrowBack } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Box, Container, Typography, Chip, Breadcrumbs, IconButton, useTheme, useMediaQuery } from '@mui/material';
-import { CalendarToday, Person, AccessTime, ArrowBack, Share } from '@mui/icons-material';
-import { motion } from 'framer-motion';
+import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
-import { BlogPost } from '@/lib/services/blog.service';
 
-interface BlogPostClientProps {
-  post: BlogPost;
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImage?: string;
+  author?: {
+    name: string;
+    avatar?: string;
+  };
+  category?: string;
+  tags?: string[];
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  metaKeywords?: string[];
 }
 
-const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
+interface BlogPostClientProps {
+  blog: BlogPost;
+}
+
+const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
   const router = useRouter();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
-  // Helper function to extract image URL from string or object
-  const getImageUrl = (image: string | { url?: string } | undefined): string | undefined => {
-    if (!image) return undefined;
-    if (typeof image === 'string') return image;
-    return image.url;
-  };
-
-  // Helper function to extract author name from string or object
-  const getAuthorName = (author: string | { name?: string } | undefined): string => {
-    if (!author) return 'Squarefooot Team';
-    if (typeof author === 'string') return author;
-    return author.name || 'Squarefooot Team';
-  };
-
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: post.title,
-          text: post.excerpt,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log('Error sharing:', error);
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+    try {
+      return format(new Date(dateString), 'MMMM dd, yyyy');
+    } catch {
+      return dateString;
     }
   };
 
@@ -63,76 +48,73 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
     <Box
       component="main"
       sx={{
-        minHeight: '60vh',
+        minHeight: '100vh',
         background: 'var(--color-bg)',
         py: { xs: 4, md: 6 },
       }}
     >
       <Container maxWidth="lg">
-        {/* Back Button */}
-        <Box sx={{ mb: 3 }}>
-          <IconButton
-            onClick={() => router.push('/blog')}
+        {/* Breadcrumbs */}
+        <Breadcrumbs sx={{ mb: 4 }}>
+          <MuiLink
+            component={Link}
+            href="/"
             sx={{
-              color: 'var(--color-primary)',
-              '&:hover': {
-                backgroundColor: 'rgba(247, 107, 28, 0.1)',
-              },
+              color: 'var(--color-text-muted)',
+              textDecoration: 'none',
+              '&:hover': { color: 'var(--color-primary)' },
             }}
           >
-            <ArrowBack />
-            <Typography variant="body2" sx={{ ml: 1 }}>
-              Back to Blog
-            </Typography>
-          </IconButton>
-        </Box>
-
-        {/* Breadcrumbs */}
-        <Breadcrumbs
-          aria-label="breadcrumb"
-          sx={{ mb: 4, color: 'var(--color-text-muted)' }}
-        >
-          <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
             Home
-          </Link>
-          <Link href="/blog" style={{ color: 'inherit', textDecoration: 'none' }}>
+          </MuiLink>
+          <MuiLink
+            component={Link}
+            href="/blog"
+            sx={{
+              color: 'var(--color-text-muted)',
+              textDecoration: 'none',
+              '&:hover': { color: 'var(--color-primary)' },
+            }}
+          >
             Blog
-          </Link>
-          <Typography color="var(--color-text-primary)">
-            {post.title}
+          </MuiLink>
+          <Typography sx={{ color: 'var(--color-text-primary)' }}>
+            {blog.title}
           </Typography>
         </Breadcrumbs>
 
-        {/* Featured Image */}
-        {getImageUrl(post.featuredImage) && (
-          <Box
+        {/* Back Button */}
+        <Box sx={{ mb: 4 }}>
+          <MuiLink
+            component="button"
+            onClick={() => router.push('/blog')}
             sx={{
-              mb: 4,
-              borderRadius: 2,
-              overflow: 'hidden',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              color: 'var(--color-primary)',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              border: 'none',
+              background: 'none',
+              fontFamily: 'inherit',
+              fontSize: 'inherit',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
             }}
           >
-            <img
-              src={getImageUrl(post.featuredImage) || ''}
-              alt={post.title}
-              style={{
-                width: '100%',
-                height: 'auto',
-                maxHeight: '500px',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-          </Box>
-        )}
+            <ArrowBack sx={{ fontSize: 20 }} />
+            Back to Blog
+          </MuiLink>
+        </Box>
 
         {/* Article Header */}
         <Box sx={{ mb: 4 }}>
           {/* Category */}
-          {post.category && (
+          {blog.category && (
             <Chip
-              label={post.category}
+              label={blog.category}
               sx={{
                 mb: 2,
                 backgroundColor: 'var(--color-primary)',
@@ -144,84 +126,105 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
 
           {/* Title */}
           <Typography
-            variant="h3"
+            variant="h2"
             component="h1"
             sx={{
               fontWeight: 'bold',
               color: 'var(--color-text-primary)',
               mb: 3,
-              fontSize: { xs: '2rem', md: '2.75rem' },
+              fontSize: { xs: '2rem', md: '3rem' },
               lineHeight: 1.2,
             }}
           >
-            {post.title}
+            {blog.title}
           </Typography>
 
           {/* Meta Information */}
           <Box
             sx={{
               display: 'flex',
-              flexWrap: 'wrap',
+              alignItems: 'center',
               gap: 3,
               mb: 3,
-              pb: 3,
-              borderBottom: '1px solid var(--color-border)',
+              flexWrap: 'wrap',
             }}
           >
-            {(post.author || post.authorName) && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-muted)' }}>
-                <Person sx={{ fontSize: '1.25rem' }} />
-                <Typography variant="body1">{post.authorName || getAuthorName(post.author)}</Typography>
+            {blog.author && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {blog.author.avatar ? (
+                  <Avatar
+                    src={blog.author.avatar}
+                    alt={blog.author.name}
+                    sx={{ width: 40, height: 40 }}
+                  />
+                ) : (
+                  <Avatar sx={{ width: 40, height: 40, bgcolor: 'var(--color-primary)' }}>
+                    <Person />
+                  </Avatar>
+                )}
+                <Box>
+                  <Typography variant="body2" sx={{ color: 'var(--color-text-primary)', fontWeight: 'bold' }}>
+                    {blog.author.name || 'Admin'}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
+                    Author
+                  </Typography>
+                </Box>
               </Box>
             )}
-            {post.publishedAt && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-muted)' }}>
-                <CalendarToday sx={{ fontSize: '1.25rem' }} />
-                <Typography variant="body1">{formatDate(post.publishedAt)}</Typography>
-              </Box>
-            )}
-            {post.readingTime && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-muted)' }}>
-                <AccessTime sx={{ fontSize: '1.25rem' }} />
-                <Typography variant="body1">{post.readingTime} min read</Typography>
-              </Box>
-            )}
-            <IconButton
-              onClick={handleShare}
-              sx={{
-                color: 'var(--color-primary)',
-                ml: 'auto',
-                '&:hover': {
-                  backgroundColor: 'rgba(247, 107, 28, 0.1)',
-                },
-              }}
-            >
-              <Share />
-            </IconButton>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CalendarToday sx={{ fontSize: 18, color: 'var(--color-text-muted)' }} />
+              <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
+                {formatDate(blog.publishedAt || blog.createdAt)}
+              </Typography>
+            </Box>
           </Box>
 
           {/* Excerpt */}
-          {post.excerpt && (
+          {blog.excerpt && (
             <Typography
               variant="h6"
               sx={{
                 color: 'var(--color-text-muted)',
                 fontStyle: 'italic',
                 mb: 4,
-                fontSize: { xs: '1rem', md: '1.25rem' },
                 lineHeight: 1.6,
               }}
             >
-              {post.excerpt}
+              {blog.excerpt}
             </Typography>
           )}
         </Box>
+
+        {/* Featured Image */}
+        {blog.featuredImage && (
+          <Box
+            sx={{
+              mb: 4,
+              borderRadius: 3,
+              overflow: 'hidden',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <img
+              src={blog.featuredImage}
+              alt={blog.title}
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+                maxHeight: '500px',
+                objectFit: 'cover',
+              }}
+            />
+          </Box>
+        )}
 
         {/* Article Content */}
         <Box
           sx={{
             backgroundColor: 'var(--color-surface)',
-            borderRadius: 2,
+            borderRadius: 3,
             p: { xs: 3, md: 5 },
             mb: 4,
             border: '1px solid var(--color-border)',
@@ -231,33 +234,32 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
             sx={{
               '& p': {
                 color: 'var(--color-text-primary)',
-                fontSize: '1.125rem',
+                mb: 2,
                 lineHeight: 1.8,
-                mb: 3,
+                fontSize: '1.1rem',
               },
-              '& h1, & h2, & h3, & h4, & h5, & h6': {
+              '& h2': {
                 color: 'var(--color-text-primary)',
                 fontWeight: 'bold',
-                mb: 2,
                 mt: 4,
+                mb: 2,
+                fontSize: '1.75rem',
               },
-              '& h1': { fontSize: '2.5rem' },
-              '& h2': { fontSize: '2rem' },
-              '& h3': { fontSize: '1.75rem' },
-              '& h4': { fontSize: '1.5rem' },
+              '& h3': {
+                color: 'var(--color-text-primary)',
+                fontWeight: 'bold',
+                mt: 3,
+                mb: 2,
+                fontSize: '1.5rem',
+              },
               '& ul, & ol': {
                 color: 'var(--color-text-primary)',
-                mb: 3,
-                pl: 4,
+                mb: 2,
+                pl: 3,
               },
               '& li': {
                 mb: 1,
-                fontSize: '1.125rem',
                 lineHeight: 1.8,
-              },
-              '& strong': {
-                color: 'var(--color-text-primary)',
-                fontWeight: 'bold',
               },
               '& a': {
                 color: 'var(--color-primary)',
@@ -266,51 +268,45 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
                   textDecoration: 'underline',
                 },
               },
+              '& img': {
+                maxWidth: '100%',
+                height: 'auto',
+                borderRadius: 2,
+                my: 3,
+              },
               '& blockquote': {
                 borderLeft: '4px solid var(--color-primary)',
                 pl: 3,
-                ml: 0,
+                py: 1,
+                my: 3,
                 fontStyle: 'italic',
                 color: 'var(--color-text-muted)',
-                mb: 3,
-              },
-              '& code': {
                 backgroundColor: 'var(--color-bg)',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontSize: '0.9em',
-                fontFamily: 'monospace',
               },
             }}
           >
-            <ReactMarkdown>{post.content}</ReactMarkdown>
+            <ReactMarkdown>{blog.content}</ReactMarkdown>
           </Box>
         </Box>
 
         {/* Tags */}
-        {post.tags && post.tags.length > 0 && (
+        {blog.tags && blog.tags.length > 0 && (
           <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                color: 'var(--color-text-primary)',
-                mb: 2,
-                fontWeight: 'bold',
-              }}
-            >
+            <Typography variant="h6" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
               Tags:
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {post.tags.map((tag) => (
+              {blog.tags.map((tag, index) => (
                 <Chip
-                  key={tag}
+                  key={index}
                   label={tag}
+                  variant="outlined"
                   sx={{
-                    backgroundColor: 'rgba(247, 107, 28, 0.1)',
-                    color: 'var(--color-primary)',
-                    border: '1px solid rgba(247, 107, 28, 0.3)',
+                    borderColor: 'var(--color-border)',
+                    color: 'var(--color-text-primary)',
                     '&:hover': {
-                      backgroundColor: 'rgba(247, 107, 28, 0.2)',
+                      borderColor: 'var(--color-primary)',
+                      backgroundColor: 'rgba(247, 107, 28, 0.1)',
                     },
                   }}
                 />
@@ -319,23 +315,27 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
           </Box>
         )}
 
-        {/* Back to Blog Link */}
+        {/* Back to Blog Button */}
         <Box sx={{ textAlign: 'center', mt: 6 }}>
-          <Link
+          <MuiLink
+            component={Link}
             href="/blog"
-            style={{
+            sx={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: 1,
               color: 'var(--color-primary)',
               textDecoration: 'none',
               fontWeight: 'bold',
-              fontSize: '1.125rem',
+              fontSize: '1.1rem',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
             }}
           >
-            <ArrowBack />
-            Back to All Posts
-          </Link>
+            <Home sx={{ fontSize: 20 }} />
+            View All Blog Posts
+          </MuiLink>
         </Box>
       </Container>
     </Box>

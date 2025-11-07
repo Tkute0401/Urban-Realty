@@ -31,7 +31,7 @@ export type AuthContextValue = {
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
-  login: (credentials: { email: string; password: string }, redirectPath?: string | null) => Promise<{ success: boolean; error?: string }>;
+  login: (credentials: { email: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   register: (payload: { name: string; email: string; password: string; mobile?: string; favorites?: any; occupation?: string; recentlyViewed?: any }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   clearError: () => void;
@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [profileQuery.data, profileQuery.isError, profileQuery.error]);
 
-  const login = useCallback(async (credentials: { email: string; password: string }, redirectPath?: string | null) => {
+  const login = useCallback(async (credentials: { email: string; password: string }) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('🔧 AuthContext - Login attempt with email:', credentials.email);
     }
@@ -262,10 +262,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionManager.setUser(userInfo as any);
       setUser(userInfo);
       
-      // Use provided redirect path, or default based on role
-      const finalRedirectPath = redirectPath || (userData.role === 'admin' ? '/admin' : '/');
-      console.log('🔧 AuthContext - Redirecting to:', finalRedirectPath);
-      router.push(finalRedirectPath);
+      const redirectPath = userData.role === 'admin' ? '/admin' : '/';
+      console.log('🔧 AuthContext - Redirecting to:', redirectPath);
+      router.push(redirectPath);
       return { success: true };
     } catch (err: any) {
       console.error('🔧 AuthContext - Login error:', err);
