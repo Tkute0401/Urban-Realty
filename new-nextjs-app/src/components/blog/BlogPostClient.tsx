@@ -27,6 +27,20 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
     });
   };
 
+  // Helper function to extract image URL from string or object
+  const getImageUrl = (image: string | { url?: string } | undefined): string | undefined => {
+    if (!image) return undefined;
+    if (typeof image === 'string') return image;
+    return image.url;
+  };
+
+  // Helper function to extract author name from string or object
+  const getAuthorName = (author: string | { name?: string } | undefined): string => {
+    if (!author) return 'Squarefooot Team';
+    if (typeof author === 'string') return author;
+    return author.name || 'Squarefooot Team';
+  };
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -90,7 +104,7 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
         </Breadcrumbs>
 
         {/* Featured Image */}
-        {post.featuredImage && (
+        {getImageUrl(post.featuredImage) && (
           <Box
             sx={{
               mb: 4,
@@ -100,7 +114,7 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
             }}
           >
             <img
-              src={post.featuredImage}
+              src={getImageUrl(post.featuredImage) || ''}
               alt={post.title}
               style={{
                 width: '100%',
@@ -154,10 +168,10 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ post }) => {
               borderBottom: '1px solid var(--color-border)',
             }}
           >
-            {post.author && (
+            {(post.author || post.authorName) && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'var(--color-text-muted)' }}>
                 <Person sx={{ fontSize: '1.25rem' }} />
-                <Typography variant="body1">{post.author}</Typography>
+                <Typography variant="body1">{post.authorName || getAuthorName(post.author)}</Typography>
               </Box>
             )}
             {post.publishedAt && (
