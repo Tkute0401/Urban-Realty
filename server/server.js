@@ -288,12 +288,40 @@ if (config.env === 'production') {
 // Error handling
 console.log('🔧 Registering error handlers...');
 app.use(trackErrors);
+// 404 handler for API routes (before error handler)
+app.use('/api', (req, res, next) => {
+  // If we reach here, no API route matched
+  res.status(HTTP_STATUS.NOT_FOUND).json({ 
+    success: false,
+    error: `API endpoint not found: ${req.method} ${req.path}`,
+    availableEndpoints: [
+      '/api/v1/blogs',
+      '/api/v1/cities',
+      '/api/v1/properties',
+      '/api/v1/developers',
+      '/api/v1/projects',
+      '/api/v1/auth',
+      '/api/v1/contacts',
+      '/api/v1/admin',
+      '/api/v1/subscriptions'
+    ]
+  });
+});
+
 app.use(errorHandler);
 console.log('✅ Error handlers registered');
-app.use((req, res) => res.status(HTTP_STATUS.NOT_FOUND).json({ 
-  success: false, 
-  error: ERROR_MESSAGES.NOT_FOUND 
-}));
+
+// Final 404 handler for non-API routes
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    // Already handled above
+    return;
+  }
+  res.status(HTTP_STATUS.NOT_FOUND).json({ 
+    success: false, 
+    error: ERROR_MESSAGES.NOT_FOUND 
+  });
+});
 
 // Server
 const PORT = config.port;
