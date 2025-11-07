@@ -166,8 +166,50 @@ if (shouldServeNextJS) {
     });
     const nextHandler = nextApp.getRequestHandler();
     
-    // Handle Next.js routes
+    // Handle Next.js routes (but not API routes)
     app.get('*', (req, res) => {
+      // Skip API routes - they should be handled by Express
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'API endpoint not found',
+          path: req.path 
+        });
+      }
+      return nextHandler(req, res);
+    });
+    
+    // Handle POST, PUT, DELETE for Next.js (but not API routes)
+    app.post('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'API endpoint not found',
+          path: req.path 
+        });
+      }
+      return nextHandler(req, res);
+    });
+    
+    app.put('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'API endpoint not found',
+          path: req.path 
+        });
+      }
+      return nextHandler(req, res);
+    });
+    
+    app.delete('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'API endpoint not found',
+          path: req.path 
+        });
+      }
       return nextHandler(req, res);
     });
     
