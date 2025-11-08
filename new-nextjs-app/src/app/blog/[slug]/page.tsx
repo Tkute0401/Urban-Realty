@@ -28,7 +28,7 @@ interface BlogPost {
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
     const apiUrl = getApiBaseUrl();
-    const response = await fetch(`${apiUrl}/api/v1/blogs?slug=${slug}`, {
+    const response = await fetch(`${apiUrl}/api/v1/blogs/${slug}`, {
       next: { revalidate: 3600 }, // Revalidate every hour
     });
 
@@ -39,8 +39,7 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
     const data = await response.json();
     
     if (data.success && data.data) {
-      const blogs = Array.isArray(data.data) ? data.data : [data.data];
-      return blogs.length > 0 ? blogs[0] : null;
+      return data.data;
     }
     
     return null;

@@ -125,10 +125,28 @@ exports.getBlogs = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/blogs/:id
 // @access  Public
 exports.getBlog = asyncHandler(async (req, res, next) => {
-  const blog = await Blog.findById(req.params.id).populate('author', 'name email avatar');
+  // Support both MongoDB ID and slug lookups
+  const identifier = req.params.id;
+  let blog;
+  
+  // Check if it's a valid MongoDB ObjectId (24 hex characters)
+  if (/^[0-9a-fA-F]{24}$/.test(identifier)) {
+    blog = await Blog.findById(identifier).populate('author', 'name email avatar');
+  } else {
+    // Try slug lookup
+    blog = await Blog.findOne({ slug: identifier }).populate('author', 'name email avatar');
+  }
 
   if (!blog) {
-    return next(new ErrorResponse(`Blog not found with id of ${req.params.id}`, 404));
+    return next(new ErrorResponse(`Blog not found with id/slug of ${identifier}`, 404));
+  }
+
+  // Check if blog is published (unless user is admin)
+  const user = req.user;
+  if (!user || user.role !== 'admin') {
+    if (!blog.published) {
+      return next(new ErrorResponse(`Blog not found with id/slug of ${identifier}`, 404));
+    }
   }
 
   // Increment views
