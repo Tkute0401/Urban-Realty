@@ -132,8 +132,10 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
+
+// Blog routes - MUST be registered before Next.js handler
+console.log('🔧 Loading blog routes...');
 try {
-  console.log('🔧 Loading blog routes...');
   const blogRoutes = require('./src/api/routes/blogRoutes');
   console.log('🔧 Blog routes module loaded:', typeof blogRoutes);
   app.use('/api/v1/blogs', blogRoutes);
@@ -141,9 +143,12 @@ try {
 } catch (error) {
   console.error('❌ Error loading blog routes:', error.message);
   console.error('❌ Stack:', error.stack);
+  process.exit(1); // Fail fast if routes can't load
 }
+
+// City routes - MUST be registered before Next.js handler
+console.log('🔧 Loading city routes...');
 try {
-  console.log('🔧 Loading city routes...');
   const cityRoutes = require('./src/api/routes/cityRoutes');
   console.log('🔧 City routes module loaded:', typeof cityRoutes);
   app.use('/api/v1/cities', cityRoutes);
@@ -151,6 +156,7 @@ try {
 } catch (error) {
   console.error('❌ Error loading city routes:', error.message);
   console.error('❌ Stack:', error.stack);
+  process.exit(1); // Fail fast if routes can't load
 }
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
