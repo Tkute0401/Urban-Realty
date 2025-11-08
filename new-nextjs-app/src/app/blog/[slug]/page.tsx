@@ -39,6 +39,11 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
       ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/blogs/${slug}`
       : url;
     
+    // Log the fetch attempt (this will appear in server logs during SSR)
+    if (isServer) {
+      console.log(`[SSR] Fetching blog post: ${slug} from ${fetchUrl}`);
+    }
+    
     const response = await fetch(fetchUrl, {
       next: { revalidate: 3600 }, // Revalidate every hour
       headers: {
@@ -46,6 +51,10 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
         'Content-Type': 'application/json',
       },
     });
+    
+    if (isServer) {
+      console.log(`[SSR] Blog post fetch response: ${slug} - Status: ${response.status}`);
+    }
 
     if (!response.ok) {
       // Log the error for debugging
