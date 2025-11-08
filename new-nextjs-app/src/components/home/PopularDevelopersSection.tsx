@@ -17,6 +17,7 @@ const PopularDevelopersSection: React.FC = () => {
   useEffect(() => {
     // Fetch developers
     getDevelopers();
+    
   }, [getDevelopers]);
 
   const formatProjectsCount = (count: number) => {
