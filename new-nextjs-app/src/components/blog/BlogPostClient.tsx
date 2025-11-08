@@ -5,6 +5,7 @@ import { Box, Container, Typography, Chip, Avatar, Breadcrumbs, Link as MuiLink 
 import { CalendarToday, Person, Home, ArrowBack } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 
@@ -204,17 +205,23 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
               borderRadius: 3,
               overflow: 'hidden',
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
+              position: 'relative',
+              width: '100%',
+              height: { xs: '300px', md: '500px' },
             }}
           >
-            <img
+            <Image
               src={blog.featuredImage}
               alt={blog.title}
+              fill
               style={{
-                width: '100%',
-                height: 'auto',
-                display: 'block',
-                maxHeight: '500px',
                 objectFit: 'cover',
+              }}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+              onError={(e) => {
+                console.error('Image failed to load:', blog.featuredImage);
+                // Hide image on error
+                e.currentTarget.style.display = 'none';
               }}
             />
           </Box>
