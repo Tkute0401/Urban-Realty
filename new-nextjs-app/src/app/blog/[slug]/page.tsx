@@ -33,11 +33,17 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
     const isServer = typeof window === 'undefined';
     
-    // For SSR, always use the production API URL
-    // In production, Next.js and Express run on the same server
-    const apiUrl = isServer 
-      ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.squarefooot.com')
-      : getApiBaseUrl();
+    // For SSR, use localhost since Next.js and Express run on the same server
+    // For client-side, use the public API URL
+    let apiUrl: string;
+    if (isServer) {
+      // Server-side: use localhost for internal API calls
+      const port = process.env.PORT || '5000';
+      apiUrl = `http://localhost:${port}`;
+    } else {
+      // Client-side: use the public API URL
+      apiUrl = getApiBaseUrl();
+    }
     
     const fetchUrl = `${apiUrl}/api/v1/blogs/${slug}`;
     
@@ -47,8 +53,7 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
     console.log(`[getBlogPost] API Base URL: ${apiUrl}`);
     
     const response = await fetch(fetchUrl, {
-      cache: 'no-store', // Always fetch fresh data
-      next: { revalidate: 0 }, // Don't cache
+      cache: 'no-store', // Always fetch fresh data for dynamic pages
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
