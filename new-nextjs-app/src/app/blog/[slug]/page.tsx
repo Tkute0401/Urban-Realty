@@ -31,59 +31,60 @@ interface BlogPost {
 
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
-    const apiUrl = getApiBaseUrl();
-    // Use absolute URL for SSR to ensure proper resolution
-    const url = apiUrl.startsWith('http') 
-      ? `${apiUrl}/api/v1/blogs/${slug}`
-      : `https://www.squarefooot.com/api/v1/blogs/${slug}`;
-    
-    // For SSR, use internal API call if possible, otherwise use external URL
     const isServer = typeof window === 'undefined';
-    const fetchUrl = isServer && process.env.NEXT_PUBLIC_BASE_URL
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/blogs/${slug}`
-      : url;
+    
+    // For SSR, always use the production API URL
+    // In production, Next.js and Express run on the same server
+    const apiUrl = isServer 
+      ? (process.env.NEXT_PUBLIC_BASE_URL || 'https://www.squarefooot.com')
+      : getApiBaseUrl();
+    
+    const fetchUrl = `${apiUrl}/api/v1/blogs/${slug}`;
     
     // Log the fetch attempt (this will appear in server logs during SSR)
-    if (isServer) {
-      console.log(`[SSR] Fetching blog post: ${slug} from ${fetchUrl}`);
-    }
+    console.log(`[getBlogPost] ${isServer ? 'SSR' : 'Client'} - Fetching blog post: ${slug}`);
+    console.log(`[getBlogPost] Fetch URL: ${fetchUrl}`);
+    console.log(`[getBlogPost] API Base URL: ${apiUrl}`);
     
     const response = await fetch(fetchUrl, {
-      next: { revalidate: 3600 }, // Revalidate every hour
+      cache: 'no-store', // Always fetch fresh data
+      next: { revalidate: 0 }, // Don't cache
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     });
     
-    if (isServer) {
-      console.log(`[SSR] Blog post fetch response: ${slug} - Status: ${response.status}`);
-    }
+    console.log(`[getBlogPost] Response status: ${response.status} for slug: ${slug}`);
 
     if (!response.ok) {
       // Log the error for debugging
       if (response.status === 404) {
-        console.warn(`Blog post not found: ${slug} (status: ${response.status}, url: ${fetchUrl})`);
+        console.warn(`[getBlogPost] Blog post not found: ${slug} (status: ${response.status}, url: ${fetchUrl})`);
       } else {
-        console.error(`Blog post fetch failed: ${slug} (status: ${response.status}, url: ${fetchUrl})`);
+        console.error(`[getBlogPost] Blog post fetch failed: ${slug} (status: ${response.status}, url: ${fetchUrl})`);
+        const errorText = await response.text().catch(() => 'Unable to read error response');
+        console.error(`[getBlogPost] Error response body: ${errorText}`);
       }
       return null;
     }
 
     const data = await response.json();
+    console.log(`[getBlogPost] Response data for ${slug}:`, { success: data.success, hasData: !!data.data });
     
     if (data.success && data.data) {
+      console.log(`[getBlogPost] Successfully fetched blog post: ${data.data.title}`);
       return data.data;
     }
     
-    console.warn(`Blog post data format invalid: ${slug}`, data);
+    console.warn(`[getBlogPost] Blog post data format invalid: ${slug}`, data);
     return null;
   } catch (error) {
     // Handle network errors gracefully
+    console.error(`[getBlogPost] Exception fetching blog post ${slug}:`, error);
     if (error instanceof Error) {
-      console.error(`Error fetching blog post ${slug}:`, error.message);
-    } else {
-      console.error('Error fetching blog post:', error);
+      console.error(`[getBlogPost] Error message: ${error.message}`);
+      console.error(`[getBlogPost] Error stack: ${error.stack}`);
     }
     return null;
   }
@@ -91,14 +92,18 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
 
 // Generate dynamic metadata for blog post
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  console.log(`[generateMetadata] Generating metadata for slug: ${params.slug}`);
   const blog = await getBlogPost(params.slug);
 
   if (!blog) {
+    console.log(`[generateMetadata] Blog not found for slug: ${params.slug}, returning not found metadata`);
     return {
       title: 'Blog Post Not Found | Squarefooot',
       description: 'The blog post you are looking for could not be found.',
     };
   }
+  
+  console.log(`[generateMetadata] Blog found for slug: ${params.slug}, title: ${blog.title}`);
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://squarefooot.com';
   const title = blog.seoTitle || blog.title;
@@ -190,32 +195,49 @@ function generateBlogPostStructuredData(blog: BlogPost) {
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  // Add logging to track when the page component is called
+  // Add comprehensive logging to track when the page component is called
+  console.log(`[BlogPostPage] ========== START RENDERING ==========`);
   console.log(`[BlogPostPage] Rendering page for slug: ${params.slug}`);
+  console.log(`[BlogPostPage] Is server: ${typeof window === 'undefined'}`);
+  console.log(`[BlogPostPage] NEXT_PUBLIC_BASE_URL: ${process.env.NEXT_PUBLIC_BASE_URL}`);
+  console.log(`[BlogPostPage] NODE_ENV: ${process.env.NODE_ENV}`);
   
-  const blog = await getBlogPost(params.slug);
+  try {
+    const blog = await getBlogPost(params.slug);
+    console.log(`[BlogPostPage] getBlogPost returned:`, blog ? `Found: ${blog.title}` : 'null');
 
-  if (!blog) {
-    console.log(`[BlogPostPage] Blog post not found for slug: ${params.slug}, calling notFound()`);
-    notFound();
+    if (!blog) {
+      console.log(`[BlogPostPage] Blog post not found for slug: ${params.slug}, calling notFound()`);
+      notFound();
+    }
+
+    console.log(`[BlogPostPage] Blog post found: ${blog.title} (${blog.slug})`);
+    console.log(`[BlogPostPage] Blog published: ${blog.publishedAt ? 'Yes' : 'No'}`);
+
+    const structuredData = generateBlogPostStructuredData(blog);
+
+    console.log(`[BlogPostPage] ========== RENDERING SUCCESS ==========`);
+    return (
+      <>
+        {/* Structured Data for Blog Post */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData)
+          }}
+        />
+        
+        <BlogPostClient blog={blog} />
+      </>
+    );
+  } catch (error) {
+    console.error(`[BlogPostPage] ========== ERROR RENDERING ==========`);
+    console.error(`[BlogPostPage] Error in BlogPostPage:`, error);
+    if (error instanceof Error) {
+      console.error(`[BlogPostPage] Error message: ${error.message}`);
+      console.error(`[BlogPostPage] Error stack: ${error.stack}`);
+    }
+    throw error; // Re-throw to let Next.js handle it
   }
-
-  console.log(`[BlogPostPage] Blog post found: ${blog.title} (${blog.slug})`);
-
-  const structuredData = generateBlogPostStructuredData(blog);
-
-  return (
-    <>
-      {/* Structured Data for Blog Post */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData)
-        }}
-      />
-      
-      <BlogPostClient blog={blog} />
-    </>
-  );
 }
 
