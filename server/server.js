@@ -134,17 +134,23 @@ app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
 try {
   console.log('🔧 Loading blog routes...');
-  app.use('/api/v1/blogs', require('./src/api/routes/blogRoutes'));
-  console.log('✅ Blog routes registered');
+  const blogRoutes = require('./src/api/routes/blogRoutes');
+  console.log('🔧 Blog routes module loaded:', typeof blogRoutes);
+  app.use('/api/v1/blogs', blogRoutes);
+  console.log('✅ Blog routes registered at /api/v1/blogs');
 } catch (error) {
-  console.error('❌ Error loading blog routes:', error);
+  console.error('❌ Error loading blog routes:', error.message);
+  console.error('❌ Stack:', error.stack);
 }
 try {
   console.log('🔧 Loading city routes...');
-  app.use('/api/v1/cities', require('./src/api/routes/cityRoutes'));
-  console.log('✅ City routes registered');
+  const cityRoutes = require('./src/api/routes/cityRoutes');
+  console.log('🔧 City routes module loaded:', typeof cityRoutes);
+  app.use('/api/v1/cities', cityRoutes);
+  console.log('✅ City routes registered at /api/v1/cities');
 } catch (error) {
-  console.error('❌ Error loading city routes:', error);
+  console.error('❌ Error loading city routes:', error.message);
+  console.error('❌ Stack:', error.stack);
 }
 app.use('/api/auth', require('./src/api/routes/authRoutes'));
 app.use('/api/properties', require('./src/api/routes/propertyRoutes'));
