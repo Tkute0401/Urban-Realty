@@ -28,11 +28,23 @@ interface BlogPost {
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
     const apiUrl = getApiBaseUrl();
-    const response = await fetch(`${apiUrl}/api/v1/blogs/${slug}`, {
+    // Use absolute URL for SSR to ensure proper resolution
+    const url = apiUrl.startsWith('http') 
+      ? `${apiUrl}/api/v1/blogs/${slug}`
+      : `https://www.squarefooot.com/api/v1/blogs/${slug}`;
+    
+    const response = await fetch(url, {
       next: { revalidate: 3600 }, // Revalidate every hour
+      headers: {
+        'Accept': 'application/json',
+      },
     });
 
     if (!response.ok) {
+      // Log the error for debugging
+      if (response.status === 404) {
+        console.warn(`Blog post not found: ${slug} (status: ${response.status})`);
+      }
       return null;
     }
 
