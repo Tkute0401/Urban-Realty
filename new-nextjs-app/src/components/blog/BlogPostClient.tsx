@@ -220,7 +220,7 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
                 objectFit: 'cover',
               }}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-              unoptimized={blog.featuredImage?.includes('localhost') || blog.featuredImage?.startsWith('/uploads')}
+              unoptimized={blog.featuredImage?.includes('localhost') || blog.featuredImage?.includes('/uploads/')}
               onError={(e) => {
                 console.error('Image failed to load:', blog.featuredImage);
                 // Hide image container on error
