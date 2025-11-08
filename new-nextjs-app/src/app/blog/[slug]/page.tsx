@@ -33,17 +33,26 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
       ? `${apiUrl}/api/v1/blogs/${slug}`
       : `https://www.squarefooot.com/api/v1/blogs/${slug}`;
     
-    const response = await fetch(url, {
+    // For SSR, use internal API call if possible, otherwise use external URL
+    const isServer = typeof window === 'undefined';
+    const fetchUrl = isServer && process.env.NEXT_PUBLIC_BASE_URL
+      ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/blogs/${slug}`
+      : url;
+    
+    const response = await fetch(fetchUrl, {
       next: { revalidate: 3600 }, // Revalidate every hour
       headers: {
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
       // Log the error for debugging
       if (response.status === 404) {
-        console.warn(`Blog post not found: ${slug} (status: ${response.status})`);
+        console.warn(`Blog post not found: ${slug} (status: ${response.status}, url: ${fetchUrl})`);
+      } else {
+        console.error(`Blog post fetch failed: ${slug} (status: ${response.status}, url: ${fetchUrl})`);
       }
       return null;
     }
@@ -54,9 +63,15 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
       return data.data;
     }
     
+    console.warn(`Blog post data format invalid: ${slug}`, data);
     return null;
   } catch (error) {
-    console.error('Error fetching blog post:', error);
+    // Handle network errors gracefully
+    if (error instanceof Error) {
+      console.error(`Error fetching blog post ${slug}:`, error.message);
+    } else {
+      console.error('Error fetching blog post:', error);
+    }
     return null;
   }
 }
