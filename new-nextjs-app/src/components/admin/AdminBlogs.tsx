@@ -247,7 +247,7 @@ const AdminBlogs: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = sessionManager.getToken();
       const response = await fetch(`/api/v1/blogs/${blogId}`, {
         method: 'DELETE',
         headers: {
