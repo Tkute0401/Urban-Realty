@@ -28,7 +28,13 @@ export class SessionManager {
   // Get token from localStorage (client-side) or cookies (SSR)
   getToken(): string | null {
     if (this.isClient) {
-      return localStorage.getItem('token');
+      // Check localStorage first
+      const localToken = localStorage.getItem('token');
+      if (localToken) {
+        return localToken;
+      }
+      // Fallback to cookies if localStorage doesn't have it
+      return this.getCookie('token');
     }
     return this.getCookie('token');
   }
