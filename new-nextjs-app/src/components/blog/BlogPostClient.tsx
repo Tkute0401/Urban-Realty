@@ -200,6 +200,7 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
         {/* Featured Image */}
         {blog.featuredImage && (
           <Box
+            data-image-container
             sx={{
               mb: 4,
               borderRadius: 3,
@@ -208,6 +209,7 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
               position: 'relative',
               width: '100%',
               height: { xs: '300px', md: '500px' },
+              backgroundColor: 'var(--color-bg)',
             }}
           >
             <Image
@@ -218,10 +220,14 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
                 objectFit: 'cover',
               }}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+              unoptimized={blog.featuredImage?.includes('localhost') || blog.featuredImage?.startsWith('/uploads')}
               onError={(e) => {
                 console.error('Image failed to load:', blog.featuredImage);
-                // Hide image on error
-                e.currentTarget.style.display = 'none';
+                // Hide image container on error
+                const container = e.currentTarget.closest('[data-image-container]');
+                if (container) {
+                  (container as HTMLElement).style.display = 'none';
+                }
               }}
             />
           </Box>
