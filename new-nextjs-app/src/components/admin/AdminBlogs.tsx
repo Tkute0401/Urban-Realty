@@ -31,6 +31,8 @@ import {
   CardContent,
   CardActions,
   CardMedia,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -329,13 +331,21 @@ const AdminBlogs: React.FC = () => {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {blog.excerpt || blog.content?.substring(0, 100) + '...'}
                   </Typography>
-                  {blog.category && (
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                    {blog.category && (
+                      <Chip
+                        label={blog.category}
+                        size="small"
+                        sx={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+                      />
+                    )}
                     <Chip
-                      label={blog.category}
+                      label={blog.published !== false ? 'Published' : 'Draft'}
                       size="small"
-                      sx={{ mb: 1, backgroundColor: 'var(--color-primary)', color: 'white' }}
+                      color={blog.published !== false ? 'success' : 'default'}
+                      variant={blog.published !== false ? 'filled' : 'outlined'}
                     />
-                  )}
+                  </Box>
                 </CardContent>
                 <CardActions>
                   <IconButton
@@ -482,6 +492,22 @@ const AdminBlogs: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, metaKeywords: e.target.value })}
               helperText="Comma-separated keywords for SEO"
             />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.published}
+                  onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                  color="primary"
+                />
+              }
+              label="Published"
+              sx={{ mt: 1 }}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ mt: -1, ml: 4 }}>
+              {formData.published 
+                ? 'This blog post will be visible to all users' 
+                : 'This blog post will be hidden from public view'}
+            </Typography>
           </Box>
         </DialogContent>
         <DialogActions>
