@@ -253,8 +253,13 @@ exports.createBlog = asyncHandler(async (req, res, next) => {
     req.body.metaKeywords = req.body.metaKeywords.split(',').map(kw => kw.trim()).filter(kw => kw);
   }
 
+  // Convert published to boolean if it's a string
+  if (req.body.published !== undefined) {
+    req.body.published = req.body.published === true || req.body.published === 'true';
+  }
+
   // Set publishedAt if publishing
-  if (req.body.published === true || req.body.published === 'true') {
+  if (req.body.published === true) {
     req.body.publishedAt = new Date();
   }
 
@@ -333,8 +338,13 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
     req.body.metaKeywords = req.body.metaKeywords.split(',').map(kw => kw.trim()).filter(kw => kw);
   }
 
+  // Convert published to boolean if it's a string
+  if (req.body.published !== undefined) {
+    req.body.published = req.body.published === true || req.body.published === 'true';
+  }
+
   // Set publishedAt if publishing for the first time
-  if ((req.body.published === true || req.body.published === 'true') && !blog.publishedAt) {
+  if (req.body.published === true && !blog.publishedAt) {
     req.body.publishedAt = new Date();
   }
 
