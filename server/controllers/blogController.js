@@ -84,32 +84,43 @@ exports.getBlogs = asyncHandler(async (req, res, next) => {
   const results = await blogs;
   const total = await Blog.countDocuments(query);
 
+  // Convert relative image URLs to absolute URLs
+  const baseUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.squarefooot.com';
+  
   // Format response
-  const formattedBlogs = results.map(blog => ({
-    _id: blog._id,
-    title: blog.title,
-    slug: blog.slug,
-    excerpt: blog.excerpt,
-    content: blog.content,
-    featuredImage: blog.featuredImage,
-    author: blog.author ? {
-      _id: blog.author._id,
-      name: blog.authorName || blog.author.name || 'Admin',
-      avatar: blog.author.avatar
-    } : {
-      name: blog.authorName || 'Admin'
-    },
-    category: blog.category,
-    tags: blog.tags,
-    published: blog.published,
-    publishedAt: blog.publishedAt,
-    createdAt: blog.createdAt,
-    updatedAt: blog.updatedAt,
-    seoTitle: blog.seoTitle,
-    seoDescription: blog.seoDescription,
-    metaKeywords: blog.metaKeywords,
-    views: blog.views
-  }));
+  const formattedBlogs = results.map(blog => {
+    let featuredImageUrl = blog.featuredImage;
+    if (featuredImageUrl && !featuredImageUrl.startsWith('http')) {
+      // It's a relative path, convert to absolute URL
+      featuredImageUrl = `${baseUrl}${featuredImageUrl}`;
+    }
+    
+    return {
+      _id: blog._id,
+      title: blog.title,
+      slug: blog.slug,
+      excerpt: blog.excerpt,
+      content: blog.content,
+      featuredImage: featuredImageUrl,
+      author: blog.author ? {
+        _id: blog.author._id,
+        name: blog.authorName || blog.author.name || 'Admin',
+        avatar: blog.author.avatar
+      } : {
+        name: blog.authorName || 'Admin'
+      },
+      category: blog.category,
+      tags: blog.tags,
+      published: blog.published,
+      publishedAt: blog.publishedAt,
+      createdAt: blog.createdAt,
+      updatedAt: blog.updatedAt,
+      seoTitle: blog.seoTitle,
+      seoDescription: blog.seoDescription,
+      metaKeywords: blog.metaKeywords,
+      views: blog.views
+    };
+  });
 
   res.status(200).json({
     success: true,
@@ -164,6 +175,14 @@ exports.getBlog = asyncHandler(async (req, res, next) => {
   blog.views += 1;
   await blog.save();
 
+  // Convert relative image URLs to absolute URLs
+  let featuredImageUrl = blog.featuredImage;
+  if (featuredImageUrl && !featuredImageUrl.startsWith('http')) {
+    // It's a relative path, convert to absolute URL
+    const baseUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.squarefooot.com';
+    featuredImageUrl = `${baseUrl}${featuredImageUrl}`;
+  }
+
   res.status(200).json({
     success: true,
     data: {
@@ -172,7 +191,7 @@ exports.getBlog = asyncHandler(async (req, res, next) => {
       slug: blog.slug,
       excerpt: blog.excerpt,
       content: blog.content,
-      featuredImage: blog.featuredImage,
+      featuredImage: featuredImageUrl,
       author: blog.author ? {
         _id: blog.author._id,
         name: blog.authorName || blog.author.name || 'Admin',
