@@ -186,11 +186,17 @@ function generateBlogPostStructuredData(blog: BlogPost) {
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  // Add logging to track when the page component is called
+  console.log(`[BlogPostPage] Rendering page for slug: ${params.slug}`);
+  
   const blog = await getBlogPost(params.slug);
 
   if (!blog) {
+    console.log(`[BlogPostPage] Blog post not found for slug: ${params.slug}, calling notFound()`);
     notFound();
   }
+
+  console.log(`[BlogPostPage] Blog post found: ${blog.title} (${blog.slug})`);
 
   const structuredData = generateBlogPostStructuredData(blog);
 
