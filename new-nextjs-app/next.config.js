@@ -106,9 +106,22 @@ const nextConfig = {
         hostname: 'urban-realty-production.up.railway.app',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.squarefooot.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '5000',
+        pathname: '/**',
       }
     ],
     formats: ['image/webp', 'image/avif'],
+    unoptimized: process.env.NODE_ENV === 'development', // Disable optimization in dev for faster builds
   },
 
   // Output optimization for Railway - removed standalone since we use unified server
