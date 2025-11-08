@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 import BlogPostClient from "@/components/blog/BlogPostClient";
 import { getApiBaseUrl } from '@/lib/services/api.config';
 
+// Force dynamic rendering - don't statically generate this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface BlogPost {
   _id: string;
   title: string;
