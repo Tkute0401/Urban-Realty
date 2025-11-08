@@ -41,6 +41,7 @@ import {
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { sessionManager } from '@/lib/utils/sessionManager';
 
 interface BlogPost {
   _id: string;
@@ -93,7 +94,7 @@ const AdminBlogs: React.FC = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('accessToken');
+      const token = sessionManager.getToken();
       const response = await fetch('/api/v1/blogs?limit=100&sort=-createdAt', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -191,7 +192,7 @@ const AdminBlogs: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const token = localStorage.getItem('accessToken');
+      const token = sessionManager.getToken();
       const formDataToSend = new FormData();
 
       formDataToSend.append('title', formData.title);
