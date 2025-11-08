@@ -127,17 +127,25 @@ exports.getBlogs = asyncHandler(async (req, res, next) => {
 exports.getBlog = asyncHandler(async (req, res, next) => {
   // Support both MongoDB ID and slug lookups
   const identifier = req.params.id;
+  console.log(`🔍 Fetching blog with identifier: ${identifier}`);
+  
   let blog;
   
   // Check if it's a valid MongoDB ObjectId (24 hex characters)
   if (/^[0-9a-fA-F]{24}$/.test(identifier)) {
     blog = await Blog.findById(identifier).populate('author', 'name email avatar');
+    console.log(`🔍 Blog lookup by ID: ${blog ? 'Found' : 'Not found'}`);
   } else {
     // Try slug lookup
     blog = await Blog.findOne({ slug: identifier }).populate('author', 'name email avatar');
+    console.log(`🔍 Blog lookup by slug "${identifier}": ${blog ? 'Found' : 'Not found'}`);
+    if (blog) {
+      console.log(`🔍 Blog found - Published: ${blog.published}, Title: ${blog.title}`);
+    }
   }
 
   if (!blog) {
+    console.log(`❌ Blog not found with identifier: ${identifier}`);
     return next(new ErrorResponse(`Blog not found with id/slug of ${identifier}`, 404));
   }
 
@@ -145,8 +153,11 @@ exports.getBlog = asyncHandler(async (req, res, next) => {
   const user = req.user;
   if (!user || user.role !== 'admin') {
     if (!blog.published) {
+      console.log(`❌ Blog "${identifier}" exists but is not published`);
       return next(new ErrorResponse(`Blog not found with id/slug of ${identifier}`, 404));
     }
+  } else {
+    console.log(`✅ Admin access - allowing unpublished blog: ${identifier}`);
   }
 
   // Increment views
