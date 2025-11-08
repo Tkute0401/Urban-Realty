@@ -179,6 +179,32 @@ app.use('/media', require('./server/src/api/routes/mediaRoutes'));
 app.use('/api/v1/projects', require('./server/routes/projectRoutes'));
 app.use('/api/v1/developers', require('./server/src/api/routes/developerRoutes'));
 
+// Blog routes
+console.log('🔧 Loading blog routes...');
+try {
+  const blogRoutes = require('./server/src/api/routes/blogRoutes');
+  console.log('🔧 Blog routes module loaded:', typeof blogRoutes);
+  app.use('/api/v1/blogs', blogRoutes);
+  console.log('✅ Blog routes registered at /api/v1/blogs');
+} catch (error) {
+  console.error('❌ Error loading blog routes:', error.message);
+  console.error('❌ Stack:', error.stack);
+  process.exit(1);
+}
+
+// City routes
+console.log('🔧 Loading city routes...');
+try {
+  const cityRoutes = require('./server/src/api/routes/cityRoutes');
+  console.log('🔧 City routes module loaded:', typeof cityRoutes);
+  app.use('/api/v1/cities', cityRoutes);
+  console.log('✅ City routes registered at /api/v1/cities');
+} catch (error) {
+  console.error('❌ Error loading city routes:', error.message);
+  console.error('❌ Stack:', error.stack);
+  process.exit(1);
+}
+
 // Health endpoints
 app.get('/api/v1/health', (req, res) => {
   res.status(HTTP_STATUS.OK).json({ 
