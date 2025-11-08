@@ -295,7 +295,10 @@ if (config.env === 'production') {
 console.log('🔧 Registering error handlers...');
 app.use(trackErrors);
 // 404 handler for API routes (before error handler)
+// This should only catch unmatched API routes after all API routes have been checked
 app.use('/api', (req, res, next) => {
+  // Log the request to help debug
+  console.log(`⚠️  Unmatched API route: ${req.method} ${req.path}`);
   // If we reach here, no API route matched
   res.status(HTTP_STATUS.NOT_FOUND).json({ 
     success: false,
