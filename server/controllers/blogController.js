@@ -228,8 +228,9 @@ exports.createBlog = asyncHandler(async (req, res, next) => {
   req.body.authorName = req.user.name || 'Admin';
 
   // Handle featured image upload
-  if (req.files && req.files.featuredImage) {
-    const file = req.files.featuredImage;
+  // Check both req.file (Multer) and req.files (express-fileupload)
+  const file = req.file || (req.files && req.files.featuredImage);
+  if (file) {
     
     // Upload to Cloudinary if configured
     if (process.env.CLOUDINARY_CLOUD_NAME) {
@@ -307,8 +308,9 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
   }
 
   // Handle featured image upload or removal
-  if (req.files && req.files.featuredImage) {
-    const file = req.files.featuredImage;
+  // Check both req.file (Multer) and req.files (express-fileupload)
+  const file = req.file || (req.files && req.files.featuredImage);
+  if (file) {
     
     // Upload to Cloudinary if configured
     if (process.env.CLOUDINARY_CLOUD_NAME) {
