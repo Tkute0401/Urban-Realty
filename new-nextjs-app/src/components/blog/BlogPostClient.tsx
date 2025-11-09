@@ -212,24 +212,61 @@ const BlogPostClient: React.FC<BlogPostClientProps> = ({ blog }) => {
               backgroundColor: 'var(--color-bg)',
             }}
           >
-            <Image
-              src={blog.featuredImage}
-              alt={blog.title}
-              fill
-              style={{
-                objectFit: 'cover',
-              }}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-              unoptimized={blog.featuredImage?.includes('localhost') || blog.featuredImage?.includes('/uploads/')}
-              onError={(e) => {
-                console.error('Image failed to load:', blog.featuredImage);
-                // Hide image container on error
-                const container = e.currentTarget.closest('[data-image-container]');
-                if (container) {
-                  (container as HTMLElement).style.display = 'none';
-                }
-              }}
-            />
+            {(() => {
+              console.log('[BlogPostClient] Featured image URL:', blog.featuredImage);
+              const imageUrl = blog.featuredImage;
+              const isLocalUpload = imageUrl?.includes('/uploads/');
+              const isLocalhost = imageUrl?.includes('localhost');
+              
+              // Use regular img tag for local uploads or if Next.js Image fails
+              if (isLocalUpload || isLocalhost) {
+                return (
+                  <img
+                    src={imageUrl}
+                    alt={blog.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                    onError={(e) => {
+                      console.error('[BlogPostClient] Image failed to load:', imageUrl);
+                      const container = e.currentTarget.closest('[data-image-container]');
+                      if (container) {
+                        (container as HTMLElement).style.display = 'none';
+                      }
+                    }}
+                    onLoad={() => {
+                      console.log('[BlogPostClient] Image loaded successfully:', imageUrl);
+                    }}
+                  />
+                );
+              }
+              
+              // Use Next.js Image for external URLs (Cloudinary, etc.)
+              return (
+                <Image
+                  src={imageUrl}
+                  alt={blog.title}
+                  fill
+                  style={{
+                    objectFit: 'cover',
+                  }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  onError={(e) => {
+                    console.error('[BlogPostClient] Next.js Image failed to load:', imageUrl);
+                    const container = e.currentTarget.closest('[data-image-container]');
+                    if (container) {
+                      (container as HTMLElement).style.display = 'none';
+                    }
+                  }}
+                  onLoad={() => {
+                    console.log('[BlogPostClient] Next.js Image loaded successfully:', imageUrl);
+                  }}
+                />
+              );
+            })()}
           </Box>
         )}
 

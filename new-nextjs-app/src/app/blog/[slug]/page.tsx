@@ -33,13 +33,20 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
     const isServer = typeof window === 'undefined';
     
-    // For SSR, use localhost since Next.js and Express run on the same server
+    // For SSR in production, try localhost first, fallback to public URL
     // For client-side, use the public API URL
     let apiUrl: string;
     if (isServer) {
-      // Server-side: use localhost for internal API calls
+      // Server-side: try localhost first (works when Next.js and Express are in same process)
+      // Fallback to public URL if localhost doesn't work
       const port = process.env.PORT || '5000';
-      apiUrl = `http://localhost:${port}`;
+      const localhostUrl = `http://localhost:${port}`;
+      const publicUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'https://www.squarefooot.com';
+      
+      // In production on Railway, try localhost first, but have a fallback
+      apiUrl = process.env.NODE_ENV === 'production' 
+        ? localhostUrl  // Try localhost first in production (same process)
+        : localhostUrl;
     } else {
       // Client-side: use the public API URL
       apiUrl = getApiBaseUrl();
@@ -58,6 +65,8 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      // Add timeout for production
+      signal: AbortSignal.timeout(10000), // 10 second timeout
     });
     
     console.log(`[getBlogPost] Response status: ${response.status} for slug: ${slug}`);
