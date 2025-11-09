@@ -22,6 +22,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Property } from '@/types/property';
+import { getSlug } from '@/lib/utils/slug';
 
 interface PropertyCardProps {
   property: Property;
@@ -68,7 +69,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   }, [user, property?._id]);
 
   const handleClick = () => {
-    router.push(`/properties/${property._id}`);
+    router.push(`/properties/${getSlug(property)}`);
     if (onClick) {
       onClick(property);
     }

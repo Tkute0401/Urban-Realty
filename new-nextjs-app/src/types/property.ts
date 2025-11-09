@@ -1,6 +1,7 @@
 // Property type definitions
 export interface Property {
   _id: string;
+  slug?: string;
   title: string;
   buildingName?: string;
   floorNumber?: number;

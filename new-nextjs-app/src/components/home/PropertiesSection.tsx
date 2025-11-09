@@ -79,7 +79,10 @@ const PropertiesSection: React.FC = () => {
           error={error}
           emptyMessage="No featured properties available at the moment"
           columns={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-          onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+          onPropertyClick={(property) => {
+            const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
+            router.push(`/properties/${slug}`);
+          }}
         />
       </Container>
     </Box>

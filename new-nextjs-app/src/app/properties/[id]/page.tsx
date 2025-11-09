@@ -52,6 +52,7 @@ import http from '@/lib/services/http';
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyCard from '@/components/property/PropertyCard';
 import { Property } from '@/types/property';
+import { getSlug } from '@/lib/utils/slug';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -109,19 +110,30 @@ const PropertyDetailsPageContent: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const response = await http.get(`/api/v1/properties/${params.id}`);
+        // Try to fetch by slug first, fallback to ID if slug doesn't work
+        let response;
+        try {
+          // First try fetching by slug
+          response = await http.get(`/api/v1/properties/slug/${params.id}`);
+        } catch (slugError) {
+          // If slug fetch fails, try by ID (for backward compatibility)
+          response = await http.get(`/api/v1/properties/${params.id}`);
+        }
+        
         const data = response.data;
         // Backend sends { success: true, data: propertyObject }
         const propertyData = data.data || data;
         setProperty(propertyData);
 
-        // Check favorite status
-        try {
-          const favoriteResponse = await http.get(`/api/v1/auth/favorites/${params.id}/status`);
-          const favoriteData = favoriteResponse.data;
-          setIsFavorite(favoriteData.isFavorite);
-        } catch (err) {
-          console.log('Could not check favorite status:', err);
+        // Check favorite status (use property ID)
+        if (propertyData._id) {
+          try {
+            const favoriteResponse = await http.get(`/api/v1/auth/favorites/${propertyData._id}/status`);
+            const favoriteData = favoriteResponse.data;
+            setIsFavorite(favoriteData.isFavorite);
+          } catch (err) {
+            console.log('Could not check favorite status:', err);
+          }
         }
       } catch (err) {
         console.error('Error loading property:', err);
@@ -1195,7 +1207,7 @@ const PropertyDetailsPageContent: React.FC = () => {
                               transform: 'translateY(-4px)'
                             }
                           }}
-                          onClick={() => router.push(`/properties/${prop._id}`)}
+                          onClick={() => router.push(`/properties/${getSlug(prop)}`)}
                         >
                           <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
                             {prop.images?.[0]?.url ? (

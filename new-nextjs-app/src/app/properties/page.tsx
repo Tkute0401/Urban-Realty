@@ -59,7 +59,8 @@ const PropertiesPageContent: React.FC = () => {
   
   const handlePropertyClick = (property: any) => {
     setSelectedProperty(property);
-    router.push(`/properties/${property._id}`);
+    const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
+    router.push(`/properties/${slug}`);
   };
 
   
@@ -1426,7 +1427,10 @@ const PropertiesPageContent: React.FC = () => {
                 error={error}
                 emptyMessage="No properties found matching your criteria"
                 columns={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}
-                onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+                onPropertyClick={(property) => {
+                  const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
+                  router.push(`/properties/${slug}`);
+                }}
               />
             </Box>
             <Box sx={{ 

@@ -142,7 +142,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   const handleCardClick = () => {
-    router.push(`/projects/${project._id}`);
+    const slug = project.slug || project.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || project._id;
+    router.push(`/projects/${slug}`);
   };
 
   return (
