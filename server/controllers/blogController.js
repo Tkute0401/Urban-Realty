@@ -177,10 +177,16 @@ exports.getBlog = asyncHandler(async (req, res, next) => {
 
   // Convert relative image URLs to absolute URLs
   let featuredImageUrl = blog.featuredImage;
+  console.log(`[getBlog] Original featuredImage: ${featuredImageUrl}`);
   if (featuredImageUrl && !featuredImageUrl.startsWith('http')) {
     // It's a relative path, convert to absolute URL
     const baseUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_BASE_URL || 'https://www.squarefooot.com';
     featuredImageUrl = `${baseUrl}${featuredImageUrl}`;
+    console.log(`[getBlog] Converted featuredImage to absolute URL: ${featuredImageUrl}`);
+  } else if (featuredImageUrl) {
+    console.log(`[getBlog] FeaturedImage is already absolute: ${featuredImageUrl}`);
+  } else {
+    console.log(`[getBlog] No featuredImage for blog: ${blog.title}`);
   }
 
   res.status(200).json({
