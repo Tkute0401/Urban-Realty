@@ -113,14 +113,30 @@ const ProjectDetailsClient: React.FC<ProjectDetailsClientProps> = ({ projectSlug
     const fetchProject = async () => {
       try {
         setLoadingProject(true);
-        // Fetch by slug - try slug endpoint first, fallback to ID if needed
+        // Fetch by slug or ID (for backward compatibility)
         let response;
-        try {
-          response = await http.get(`/api/v1/projects/slug/${projectSlug}`);
-        } catch (slugError) {
-          // If slug fetch fails, try by ID (for backward compatibility)
-          response = await http.get(`/api/v1/projects/${projectSlug}`);
+        
+        // Check if it looks like a MongoDB ObjectId (24 hex characters)
+        const isObjectId = /^[0-9a-fA-F]{24}$/.test(projectSlug);
+        
+        if (isObjectId) {
+          // It's an ID, fetch by ID
+          try {
+            response = await http.get(`/api/v1/projects/${projectSlug}`);
+          } catch (idError) {
+            // If ID fetch fails, try as slug
+            response = await http.get(`/api/v1/projects/slug/${projectSlug}`);
+          }
+        } else {
+          // It's a slug, fetch by slug first
+          try {
+            response = await http.get(`/api/v1/projects/slug/${projectSlug}`);
+          } catch (slugError) {
+            // If slug fetch fails, try as ID (for backward compatibility)
+            response = await http.get(`/api/v1/projects/${projectSlug}`);
+          }
         }
+        
         const projectData = response.data.data || response.data;
         setProject(projectData);
       } catch (err) {

@@ -110,9 +110,31 @@ const PropertyDetailsPageContent: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch by slug
-        const slug = params.slug as string;
-        const response = await http.get(`/api/v1/properties/slug/${slug}`);
+        // Fetch by slug or ID (for backward compatibility)
+        const slugOrId = params.slug as string;
+        let response;
+        
+        // Check if it looks like a MongoDB ObjectId (24 hex characters)
+        const isObjectId = /^[0-9a-fA-F]{24}$/.test(slugOrId);
+        
+        if (isObjectId) {
+          // It's an ID, fetch by ID
+          try {
+            response = await http.get(`/api/v1/properties/${slugOrId}`);
+          } catch (idError) {
+            // If ID fetch fails, try as slug
+            response = await http.get(`/api/v1/properties/slug/${slugOrId}`);
+          }
+        } else {
+          // It's a slug, fetch by slug first
+          try {
+            response = await http.get(`/api/v1/properties/slug/${slugOrId}`);
+          } catch (slugError) {
+            // If slug fetch fails, try as ID (for backward compatibility)
+            response = await http.get(`/api/v1/properties/${slugOrId}`);
+          }
+        }
+        
         const data = response.data;
         // Backend sends { success: true, data: propertyObject }
         const propertyData = data.data || data;
