@@ -88,9 +88,32 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/projects/:id
 // @access  Public
 exports.getProject = asyncHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id)
-    .populate('developers', 'name logo website email phone')
-    .populate('agent', 'name email mobile');
+  // Check if it's a MongoDB ObjectId or a slug
+  const isObjectId = req.params.id && req.params.id.match(/^[0-9a-fA-F]{24}$/);
+  
+  let project;
+  if (isObjectId) {
+    // It's an ObjectId, find by ID
+    project = await Project.findById(req.params.id)
+      .populate('developers', 'name logo website email phone')
+      .populate('agent', 'name email mobile');
+  } else {
+    // It's a slug, find by slug or name
+    const slug = req.params.id;
+    project = await Project.findOne({ slug: slug })
+      .populate('developers', 'name logo website email phone')
+      .populate('agent', 'name email mobile');
+    
+    // If not found by slug, try by name (for backward compatibility)
+    if (!project) {
+      const nameSlug = slug.replace(/-/g, ' ');
+      project = await Project.findOne({ 
+        name: { $regex: new RegExp(`^${nameSlug}$`, 'i') }
+      })
+      .populate('developers', 'name logo website email phone')
+      .populate('agent', 'name email mobile');
+    }
+  }
 
   if (!project) {
     return next(

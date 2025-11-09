@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const ProjectSchema = new mongoose.Schema({
   // Developer connection - multiple developers can be associated with one project
@@ -20,6 +21,8 @@ const ProjectSchema = new mongoose.Schema({
     trim: true,
     maxlength: [200, 'Project name cannot be more than 200 characters']
   },
+  
+  slug: String,
   
   description: {
     type: String,
@@ -354,6 +357,17 @@ ProjectSchema.index({
   description: 'text', 
   'location.city': 'text',
   'location.state': 'text'
+});
+
+// Index for slug queries
+ProjectSchema.index({ slug: 1 });
+
+// Create project slug from the name
+ProjectSchema.pre('save', function(next) {
+  if (this.name && !this.slug) {
+    this.slug = slugify(this.name, { lower: true });
+  }
+  next();
 });
 
 // Update the updatedAt field before saving

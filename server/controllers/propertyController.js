@@ -248,22 +248,43 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
       headers: req.headers
     });
     
-    // Validate property ID format
-    if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-      console.log('❌ Invalid property ID format:', req.params.id);
-      return next(new ErrorResponse('Invalid property ID format', 400));
-    }
+    // Check if it's a MongoDB ObjectId or a slug
+    const isObjectId = req.params.id && req.params.id.match(/^[0-9a-fA-F]{24}$/);
     
     // Find property and populate agent details
     console.log('🔍 Searching for property in database...');
     let property;
     try {
-      console.log('🔧 Executing Property.findById with ID:', req.params.id);
+      if (isObjectId) {
+        // It's an ObjectId, find by ID
+        console.log('🔧 Executing Property.findById with ID:', req.params.id);
+        property = await Property.findById(req.params.id)
+          .populate('agent', 'name email phone mobile')
+          .populate('developer', 'name logo');
+      } else {
+        // It's a slug, find by slug
+        console.log('🔧 Executing Property.findOne with slug:', req.params.id);
+        property = await Property.findOne({ slug: req.params.id })
+          .populate('agent', 'name email phone mobile')
+          .populate('developer', 'name logo');
+        
+        // If not found by slug, try by title (for backward compatibility)
+        if (!property) {
+          console.log('🔧 Property not found by slug, trying by title...');
+          const titleSlug = req.params.id.replace(/-/g, ' ');
+          property = await Property.findOne({ 
+            $or: [
+              { title: { $regex: new RegExp(titleSlug, 'i') } },
+              { buildingName: { $regex: new RegExp(titleSlug, 'i') } }
+            ]
+          })
+          .populate('agent', 'name email phone mobile')
+          .populate('developer', 'name logo');
+        }
+      }
+      
       console.log('🔧 Property model available:', Property ? 'Yes' : 'No');
       console.log('🔧 Property model name:', Property ? Property.modelName : 'N/A');
-      property = await Property.findById(req.params.id)
-        .populate('agent', 'name email phone mobile')
-        .populate('developer', 'name logo');
       console.log('🔧 Query executed successfully');
     } catch (dbError) {
       console.error('❌ Database error:', dbError);
