@@ -146,7 +146,16 @@ const AdminBlogs: React.FC = () => {
         metaKeywords: blog.metaKeywords?.join(', ') || '',
         published: blog.published !== false,
       });
-      setImagePreview(blog.featuredImage || '');
+      // Set image preview to existing image URL if it exists
+      if (blog.featuredImage) {
+        // Ensure it's an absolute URL for preview
+        const imageUrl = blog.featuredImage.startsWith('http') 
+          ? blog.featuredImage 
+          : `${window.location.origin}${blog.featuredImage}`;
+        setImagePreview(imageUrl);
+      } else {
+        setImagePreview('');
+      }
     } else {
       setEditingBlog(null);
       setFormData({
@@ -208,9 +217,17 @@ const AdminBlogs: React.FC = () => {
       formDataToSend.append('metaKeywords', formData.metaKeywords);
       formDataToSend.append('published', formData.published.toString());
 
+      // Only append new image if a file was selected
+      // If editing and no new file is selected, the backend will preserve the existing image
+      // If imagePreview is empty (user clicked Remove), we need to clear the image
       if (featuredImage) {
+        // New file selected - upload it
         formDataToSend.append('featuredImage', featuredImage);
+      } else if (editingBlog && !imagePreview && editingBlog.featuredImage) {
+        // User removed the image - send a flag to clear it
+        formDataToSend.append('clearFeaturedImage', 'true');
       }
+      // If no new file and imagePreview exists, backend will preserve existing image
 
       const url = editingBlog
         ? `/api/v1/blogs/${editingBlog._id}`
@@ -449,23 +466,52 @@ const AdminBlogs: React.FC = () => {
                 type="file"
                 onChange={handleImageChange}
               />
-              <label htmlFor="featured-image-upload">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  startIcon={<ImageIcon />}
-                  fullWidth
-                >
-                  {featuredImage ? 'Change Featured Image' : 'Upload Featured Image'}
-                </Button>
-              </label>
+              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                <label htmlFor="featured-image-upload" style={{ flex: 1 }}>
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<ImageIcon />}
+                    fullWidth
+                  >
+                    {featuredImage || imagePreview ? 'Change Featured Image' : 'Upload Featured Image'}
+                  </Button>
+                </label>
+                {(featuredImage || imagePreview) && (
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => {
+                      setFeaturedImage(null);
+                      setImagePreview('');
+                    }}
+                  >
+                    Remove Image
+                  </Button>
+                )}
+              </Box>
               {imagePreview && (
                 <Box sx={{ mt: 2 }}>
                   <img
                     src={imagePreview}
                     alt="Preview"
-                    style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' }}
+                    style={{ 
+                      maxWidth: '100%', 
+                      maxHeight: '200px', 
+                      borderRadius: '8px',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                    onError={(e) => {
+                      console.error('Failed to load image preview:', imagePreview);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
+                  {editingBlog && editingBlog.featuredImage && !featuredImage && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                      Current featured image (upload a new image to replace)
+                    </Typography>
+                  )}
                 </Box>
               )}
             </Box>

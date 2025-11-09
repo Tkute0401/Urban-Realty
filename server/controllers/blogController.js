@@ -300,7 +300,7 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`Blog not found with id of ${req.params.id}`, 404));
   }
 
-  // Handle featured image upload
+  // Handle featured image upload or removal
   if (req.files && req.files.featuredImage) {
     const file = req.files.featuredImage;
     
@@ -334,6 +334,18 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
       
+      // Delete old local image if exists
+      if (blog.featuredImage && blog.featuredImage.startsWith('/uploads/blogs/')) {
+        const oldFilePath = path.join(__dirname, '..', blog.featuredImage);
+        if (fs.existsSync(oldFilePath)) {
+          try {
+            fs.unlinkSync(oldFilePath);
+          } catch (err) {
+            console.warn('Could not delete old image file:', err);
+          }
+        }
+      }
+      
       const fileName = `${Date.now()}-${file.name}`;
       const filePath = path.join(uploadsDir, fileName);
       
@@ -345,7 +357,34 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
       
       req.body.featuredImage = `/uploads/blogs/${fileName}`;
     }
+  } else if (req.body.clearFeaturedImage === 'true' || req.body.clearFeaturedImage === true) {
+    // User wants to remove the featured image
+    console.log('Clearing featured image for blog:', req.params.id);
+    
+    // Delete old image if exists
+    if (blog.featuredImage) {
+      if (blog.featuredImage.includes('cloudinary') && process.env.CLOUDINARY_CLOUD_NAME) {
+        try {
+          const publicId = blog.featuredImage.split('/').slice(-2).join('/').split('.')[0];
+          await cloudinary.uploader.destroy(publicId);
+        } catch (error) {
+          console.warn('Could not delete image from Cloudinary:', error);
+        }
+      } else if (blog.featuredImage.startsWith('/uploads/blogs/')) {
+        const oldFilePath = path.join(__dirname, '..', blog.featuredImage);
+        if (fs.existsSync(oldFilePath)) {
+          try {
+            fs.unlinkSync(oldFilePath);
+          } catch (err) {
+            console.warn('Could not delete old image file:', err);
+          }
+        }
+      }
+    }
+    
+    req.body.featuredImage = null;
   }
+  // If no new file and no clear flag, featuredImage is not in req.body, so it will be preserved
 
   // Parse tags if string
   if (req.body.tags && typeof req.body.tags === 'string') {
