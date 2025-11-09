@@ -235,15 +235,22 @@ exports.createBlog = asyncHandler(async (req, res, next) => {
     // Upload to Cloudinary if configured
     if (process.env.CLOUDINARY_CLOUD_NAME) {
       try {
-        const result = await cloudinary.uploader.upload(file.tempFilePath || file.path, {
+        // Multer stores file in file.path, express-fileupload uses file.tempFilePath
+        const filePath = file.path || file.tempFilePath;
+        console.log('[createBlog] Uploading to Cloudinary, file path:', filePath);
+        const result = await cloudinary.uploader.upload(filePath, {
           folder: 'blogs',
           resource_type: 'auto'
         });
         req.body.featuredImage = result.secure_url;
+        console.log('[createBlog] Cloudinary upload successful:', result.secure_url);
         
         // Delete temp file
         if (file.tempFilePath && fs.existsSync(file.tempFilePath)) {
           fs.unlinkSync(file.tempFilePath);
+        } else if (file.path && fs.existsSync(file.path)) {
+          // Delete Multer temp file
+          fs.unlinkSync(file.path);
         }
       } catch (error) {
         console.error('Cloudinary upload error:', error);
@@ -256,16 +263,23 @@ exports.createBlog = asyncHandler(async (req, res, next) => {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
       
-      const fileName = `${Date.now()}-${file.name}`;
-      const filePath = path.join(uploadsDir, fileName);
+      // Multer already saves the file, we just need to move it to blogs folder
+      // Multer filename format: featuredImage-timestamp-random.ext
+      const fileName = file.filename || `${Date.now()}-${file.originalname || file.name}`;
+      const blogsFilePath = path.join(uploadsDir, fileName);
       
-      if (file.tempFilePath) {
-        fs.renameSync(file.tempFilePath, filePath);
-      } else if (file.path) {
-        fs.copyFileSync(file.path, filePath);
+      if (file.path && fs.existsSync(file.path)) {
+        // Multer already saved it to uploads/, move to uploads/blogs/
+        if (file.path !== blogsFilePath) {
+          fs.renameSync(file.path, blogsFilePath);
+        }
+      } else if (file.tempFilePath) {
+        // express-fileupload: move from temp to blogs folder
+        fs.renameSync(file.tempFilePath, blogsFilePath);
       }
       
       req.body.featuredImage = `/uploads/blogs/${fileName}`;
+      console.log('[createBlog] Local file saved:', req.body.featuredImage);
     }
   }
 
@@ -321,15 +335,22 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
           await cloudinary.uploader.destroy(publicId);
         }
         
-        const result = await cloudinary.uploader.upload(file.tempFilePath || file.path, {
+        // Multer stores file in file.path, express-fileupload uses file.tempFilePath
+        const filePath = file.path || file.tempFilePath;
+        console.log('[updateBlog] Uploading to Cloudinary, file path:', filePath);
+        const result = await cloudinary.uploader.upload(filePath, {
           folder: 'blogs',
           resource_type: 'auto'
         });
         req.body.featuredImage = result.secure_url;
+        console.log('[updateBlog] Cloudinary upload successful:', result.secure_url);
         
         // Delete temp file
         if (file.tempFilePath && fs.existsSync(file.tempFilePath)) {
           fs.unlinkSync(file.tempFilePath);
+        } else if (file.path && fs.existsSync(file.path)) {
+          // Delete Multer temp file
+          fs.unlinkSync(file.path);
         }
       } catch (error) {
         console.error('Cloudinary upload error:', error);
@@ -354,16 +375,23 @@ exports.updateBlog = asyncHandler(async (req, res, next) => {
         }
       }
       
-      const fileName = `${Date.now()}-${file.name}`;
-      const filePath = path.join(uploadsDir, fileName);
+      // Multer already saves the file, we just need to move it to blogs folder
+      // Multer filename format: featuredImage-timestamp-random.ext
+      const fileName = file.filename || `${Date.now()}-${file.originalname || file.name}`;
+      const blogsFilePath = path.join(uploadsDir, fileName);
       
-      if (file.tempFilePath) {
-        fs.renameSync(file.tempFilePath, filePath);
-      } else if (file.path) {
-        fs.copyFileSync(file.path, filePath);
+      if (file.path && fs.existsSync(file.path)) {
+        // Multer already saved it to uploads/, move to uploads/blogs/
+        if (file.path !== blogsFilePath) {
+          fs.renameSync(file.path, blogsFilePath);
+        }
+      } else if (file.tempFilePath) {
+        // express-fileupload: move from temp to blogs folder
+        fs.renameSync(file.tempFilePath, blogsFilePath);
       }
       
       req.body.featuredImage = `/uploads/blogs/${fileName}`;
+      console.log('[updateBlog] Local file saved:', req.body.featuredImage);
     }
   } else if (req.body.clearFeaturedImage === 'true' || req.body.clearFeaturedImage === true) {
     // User wants to remove the featured image
