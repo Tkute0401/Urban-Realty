@@ -244,6 +244,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </Typography>
           </Box>
         )}
+      </Box>
         
       {/* Action Buttons */}
       <Box sx={{ 
