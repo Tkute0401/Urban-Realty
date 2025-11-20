@@ -17,10 +17,12 @@ import {
   LocationOn, 
   Home, 
   Bed, 
-  Bathtub
+  Bathtub,
+  CompareArrows
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useComparison } from '@/contexts/ComparisonContext';
 import { Property } from '@/types/property';
 import { getSlug } from '@/lib/utils/slug';
 
@@ -41,6 +43,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const router = useRouter();
   const { user } = useAuth();
+  const { addToComparison, isInComparison, canAddMore } = useComparison();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
