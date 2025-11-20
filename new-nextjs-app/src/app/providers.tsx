@@ -11,6 +11,7 @@ import { PropertiesProvider } from '@/contexts/PropertiesContext'
 import { AgentsProvider } from '@/contexts/AgentsContext'
 import { DevelopersProvider } from '@/contexts/DevelopersContext'
 import { ProjectsProvider } from '@/contexts/ProjectsContext'
+import { ComparisonProvider } from '@/contexts/ComparisonContext'
 import ErrorBoundary from '@/components/common/ErrorBoundary'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
 import HydrationWrapper from '@/components/common/HydrationWrapper'
@@ -55,9 +56,10 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
               <AgentsProvider>
                 <DevelopersProvider>
                   <ProjectsProvider>
-                    <HydrationWrapper>
-                      {children}
-                    </HydrationWrapper>
+                    <ComparisonProvider>
+                      <HydrationWrapper>
+                        {children}
+                      </HydrationWrapper>
                     
                     {/* Performance monitoring - only in production */}
                     {process.env.NODE_ENV === 'production' && (
@@ -71,6 +73,7 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
                         enableConsoleLogging={true} 
                       />
                     )}
+                    </ComparisonProvider>
                   </ProjectsProvider>
                 </DevelopersProvider>
               </AgentsProvider>

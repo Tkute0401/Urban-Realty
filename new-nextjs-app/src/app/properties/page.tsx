@@ -31,14 +31,24 @@ import {
   LocationOn,
   Add,
   Refresh,
-  MyLocation
+  MyLocation,
+  ViewList,
+  Map as MapIcon,
+  Layers,
+  CompareArrows,
+  Bookmark,
+  BookmarkBorder
 } from '@mui/icons-material';
 import { useProperties } from '@/contexts/PropertiesContext';
 import PropertyList from '@/components/property/PropertyList';
 import PropertiesMap from '@/components/property/PropertiesMap';
+import PropertyHeatMap from '@/components/property/PropertyHeatMap';
+import RecommendedProperties from '@/components/property/RecommendedProperties';
 import SearchAutocomplete from '@/components/property/SearchAutocomplete';
+import { useComparison } from '@/contexts/ComparisonContext';
 import { useLocation } from '@/hooks/useLocation';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { useAuth } from '@/contexts/AuthContext';
 import '@/style-constants/z-index.css';
 
 const PropertiesPageContent: React.FC = () => {
@@ -56,6 +66,9 @@ const PropertiesPageContent: React.FC = () => {
   const [activeBtn, setActiveBtn] = useState('ALL');
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isClearingFilters, setIsClearingFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'heatmap'>('list');
+  const { user } = useAuth();
+  const { comparisonProperties, addToComparison, removeFromComparison } = useComparison();
   
   const handlePropertyClick = (property: any) => {
     setSelectedProperty(property);
@@ -81,7 +94,24 @@ const PropertiesPageContent: React.FC = () => {
     bathrooms: '',
     amenities: [] as string[],
     minArea: '',
-    maxArea: ''
+    maxArea: '',
+    // New advanced filters
+    constructionStatus: [] as string[],
+    furnished: undefined as boolean | undefined,
+    facing: '',
+    floorRangeMin: '',
+    floorRangeMax: '',
+    parkingSpaces: '',
+    verified: undefined as boolean | undefined,
+    hasVirtualTour: undefined as boolean | undefined,
+    nearSchools: false,
+    nearHospitals: false,
+    nearMalls: false,
+    nearMetro: false,
+    nearParks: false,
+    maxCommuteTime: '',
+    commuteMode: 'driving' as 'driving' | 'transit' | 'walking',
+    affordable: false
   });
 
   const amenityOptions = [
@@ -303,7 +333,23 @@ const PropertiesPageContent: React.FC = () => {
       bathrooms: '',
       amenities: [],
       minArea: '',
-      maxArea: ''
+      maxArea: '',
+      constructionStatus: [],
+      furnished: undefined,
+      facing: '',
+      floorRangeMin: '',
+      floorRangeMax: '',
+      parkingSpaces: '',
+      verified: undefined,
+      hasVirtualTour: undefined,
+      nearSchools: false,
+      nearHospitals: false,
+      nearMalls: false,
+      nearMetro: false,
+      nearParks: false,
+      maxCommuteTime: '',
+      commuteMode: 'driving' as 'driving' | 'transit' | 'walking',
+      affordable: false
     };
     
     // Set flag to prevent URL params useEffect from overriding
@@ -874,6 +920,136 @@ const PropertiesPageContent: React.FC = () => {
                 })}
               </Box>
             </Box>
+
+            {/* Advanced Filters Section */}
+            <Box sx={{ mb: 3, borderTop: '1px solid var(--color-border)', pt: 3 }}>
+              <Typography variant="subtitle1" sx={{ color: 'var(--color-text-primary)', mb: 2, fontWeight: 600 }}>
+                Advanced Filters
+              </Typography>
+
+              {/* Construction Status */}
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mb: 1 }}>
+                  Construction Status
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {['Under Construction', 'Ready to Move', 'New Launch', 'Almost Ready'].map(status => {
+                    const isActive = filters.constructionStatus.includes(status);
+                    return (
+                      <Chip
+                        key={status}
+                        label={status}
+                        clickable
+                        size="small"
+                        variant={isActive ? 'filled' : 'outlined'}
+                        onClick={() => {
+                          const newStatus = isActive
+                            ? filters.constructionStatus.filter(s => s !== status)
+                            : [...filters.constructionStatus, status];
+                          handleFilterChange('constructionStatus', newStatus);
+                        }}
+                        sx={{
+                          backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                          color: isActive ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                          borderColor: 'var(--color-primary)'
+                        }}
+                      />
+                    );
+                  })}
+                </Box>
+              </Box>
+
+              {/* Furnished */}
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mb: 1 }}>
+                  Furnishing
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Chip
+                    label="Furnished"
+                    clickable
+                    size="small"
+                    variant={filters.furnished === true ? 'filled' : 'outlined'}
+                    onClick={() => handleFilterChange('furnished', filters.furnished === true ? undefined : true)}
+                    sx={{
+                      backgroundColor: filters.furnished === true ? 'var(--color-primary)' : 'transparent',
+                      color: filters.furnished === true ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)'
+                    }}
+                  />
+                  <Chip
+                    label="Unfurnished"
+                    clickable
+                    size="small"
+                    variant={filters.furnished === false ? 'filled' : 'outlined'}
+                    onClick={() => handleFilterChange('furnished', filters.furnished === false ? undefined : false)}
+                    sx={{
+                      backgroundColor: filters.furnished === false ? 'var(--color-primary)' : 'transparent',
+                      color: filters.furnished === false ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)'
+                    }}
+                  />
+                </Box>
+              </Box>
+
+              {/* Proximity Filters */}
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', mb: 1 }}>
+                  Nearby Amenities
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {[
+                    { key: 'nearSchools', label: 'Schools' },
+                    { key: 'nearHospitals', label: 'Hospitals' },
+                    { key: 'nearMalls', label: 'Malls' },
+                    { key: 'nearMetro', label: 'Metro' },
+                    { key: 'nearParks', label: 'Parks' }
+                  ].map(item => (
+                    <Chip
+                      key={item.key}
+                      label={item.label}
+                      clickable
+                      size="small"
+                      variant={filters[item.key as keyof typeof filters] ? 'filled' : 'outlined'}
+                      onClick={() => handleFilterChange(item.key, !filters[item.key as keyof typeof filters])}
+                      sx={{
+                        backgroundColor: filters[item.key as keyof typeof filters] ? 'var(--color-primary)' : 'transparent',
+                        color: filters[item.key as keyof typeof filters] ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                        borderColor: 'var(--color-primary)'
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+
+              {/* Verified & Virtual Tour */}
+              <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Chip
+                  label="Verified Only"
+                  clickable
+                  size="small"
+                  variant={filters.verified === true ? 'filled' : 'outlined'}
+                  onClick={() => handleFilterChange('verified', filters.verified === true ? undefined : true)}
+                  sx={{
+                    backgroundColor: filters.verified === true ? 'var(--color-primary)' : 'transparent',
+                    color: filters.verified === true ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)'
+                  }}
+                />
+                <Chip
+                  label="Has Virtual Tour"
+                  clickable
+                  size="small"
+                  variant={filters.hasVirtualTour === true ? 'filled' : 'outlined'}
+                  onClick={() => handleFilterChange('hasVirtualTour', filters.hasVirtualTour === true ? undefined : true)}
+                  sx={{
+                    backgroundColor: filters.hasVirtualTour === true ? 'var(--color-primary)' : 'transparent',
+                    color: filters.hasVirtualTour === true ? 'var(--color-primary-contrast)' : 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)'
+                  }}
+                />
+              </Box>
+            </Box>
           </Box>
 
           {/* Footer */}
@@ -1407,33 +1583,34 @@ const PropertiesPageContent: React.FC = () => {
             )}
           </Box>
 
-          {/* Properties List with Map */}
-          <Box sx={{ 
-            display: 'flex', 
-            gap: { xs: 2, md: 3 }, 
-            flexDirection: { xs: 'column', lg: 'row' },
-            maxWidth: '100%',
-            overflow: 'hidden'
-          }}>
+          {/* Properties View - List/Map/HeatMap */}
+          {viewMode === 'list' && (
             <Box sx={{ 
-              flex: { xs: 1, lg: '0 0 60%' },
-              minWidth: 0,
-              overflow: 'visible'
+              display: 'flex', 
+              gap: { xs: 2, md: 3 }, 
+              flexDirection: { xs: 'column', lg: 'row' },
+              maxWidth: '100%',
+              overflow: 'hidden'
             }}>
-              <PropertyList
-                properties={properties}
-                similarProperties={similarProperties}
-                loading={loading}
-                error={error}
-                emptyMessage="No properties found matching your criteria"
-                columns={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}
-                onPropertyClick={(property) => {
-                  const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
-                  router.push(`/properties/${slug}`);
-                }}
-              />
-            </Box>
-            <Box sx={{ 
+              <Box sx={{ 
+                flex: { xs: 1, lg: '0 0 60%' },
+                minWidth: 0,
+                overflow: 'visible'
+              }}>
+                <PropertyList
+                  properties={properties}
+                  similarProperties={similarProperties}
+                  loading={loading}
+                  error={error}
+                  emptyMessage="No properties found matching your criteria"
+                  columns={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}
+                  onPropertyClick={(property) => {
+                    const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
+                    router.push(`/properties/${slug}`);
+                  }}
+                />
+              </Box>
+              <Box sx={{ 
               flex: { xs: 1, lg: '0 0 40%' }, 
               position: { xs: 'static', lg: 'sticky' }, 
               top: { lg: 20 }, 
@@ -1451,20 +1628,73 @@ const PropertiesPageContent: React.FC = () => {
               />
             </Box>
           </Box>
+          )}
+
+          {/* Map View */}
+          {viewMode === 'map' && (
+            <Box sx={{ height: '80vh', width: '100%' }}>
+              <PropertiesMap 
+                properties={properties}
+                selectedProperty={selectedProperty}
+                userLocation={userLocation}
+                onMarkerClick={handlePropertyClick}
+                height="100%"
+                searchQuery={filters.search}
+                enableClustering={true}
+              />
+            </Box>
+          )}
+
+          {/* Heat Map View */}
+          {viewMode === 'heatmap' && (
+            <Box sx={{ height: '80vh', width: '100%' }}>
+              <PropertyHeatMap
+                properties={properties}
+                userLocation={userLocation}
+                searchQuery={filters.search}
+              />
+            </Box>
+          )}
         </Box>
       )}
 
       {/* Mobile Properties List */}
       {isMobile && (
-        <PropertyList
-          properties={properties}
-          similarProperties={similarProperties}
-          loading={loading}
-          error={error}
-          emptyMessage="No properties found matching your criteria"
-          columns={{ xs: 12, sm: 6, md: 4 }}
-          onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
-        />
+        <>
+          {viewMode === 'list' && (
+            <PropertyList
+              properties={properties}
+              similarProperties={similarProperties}
+              loading={loading}
+              error={error}
+              emptyMessage="No properties found matching your criteria"
+              columns={{ xs: 12, sm: 6, md: 4 }}
+              onPropertyClick={(property) => router.push(`/properties/${property._id}`)}
+            />
+          )}
+          {viewMode === 'map' && (
+            <Box sx={{ height: '70vh', width: '100%' }}>
+              <PropertiesMap 
+                properties={properties}
+                selectedProperty={selectedProperty}
+                userLocation={userLocation}
+                onMarkerClick={handlePropertyClick}
+                height="100%"
+                searchQuery={filters.search}
+                enableClustering={true}
+              />
+            </Box>
+          )}
+          {viewMode === 'heatmap' && (
+            <Box sx={{ height: '70vh', width: '100%' }}>
+              <PropertyHeatMap
+                properties={properties}
+                userLocation={userLocation}
+                searchQuery={filters.search}
+              />
+            </Box>
+          )}
+        </>
       )}
 
       {/* Page Title */}
