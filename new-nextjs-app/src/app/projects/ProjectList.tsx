@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useProjects } from '../../contexts/ProjectsContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { unstable_noStore as noStore } from 'next/cache';
