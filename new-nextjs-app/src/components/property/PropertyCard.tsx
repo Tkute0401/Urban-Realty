@@ -135,20 +135,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     <Box
       id={id}
       sx={{
-        animation: 'fadeInUp 0.4s ease-in-out',
-        '@keyframes fadeInUp': {
-          from: { 
-            opacity: 0, 
-            transform: 'translateY(50px)' 
-          },
-          to: { 
-            opacity: 1, 
-            transform: 'translateY(0)' 
-          }
-        },
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': {
-          transform: 'translateY(-8px) scale(1.02)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          transform: 'translateY(-8px) scale(1.02)'
         }
       }}
     >
