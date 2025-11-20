@@ -1687,8 +1687,6 @@ const PropertiesPageContent: React.FC = () => {
             <Box sx={{ height: '70vh', width: '100%' }}>
               <PropertyHeatMap
                 properties={properties}
-                userLocation={userLocation}
-                searchQuery={filters.search}
               />
             </Box>
           )}
