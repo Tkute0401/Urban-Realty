@@ -252,14 +252,17 @@ const PropertyHeatMap: React.FC<PropertyHeatMapProps> = ({
 
     const size = 10 + (intensity * 20); // 10-30px radius
 
+    // Use type assertion for Size and Point which may not be in type definition
+    const mapplsAny = window.mappls as any;
+
     return {
       url: `data:image/svg+xml;base64,${btoa(`
         <svg width="${size * 2}" height="${size * 2}" xmlns="http://www.w3.org/2000/svg">
           <circle cx="${size}" cy="${size}" r="${size}" fill="${color}" opacity="0.6"/>
         </svg>
       `)}`,
-      scaledSize: new window.mappls.Size(size * 2, size * 2),
-      anchor: new window.mappls.Point(size, size)
+      scaledSize: mapplsAny?.Size ? new mapplsAny.Size(size * 2, size * 2) : { width: size * 2, height: size * 2 },
+      anchor: mapplsAny?.Point ? new mapplsAny.Point(size, size) : { x: size, y: size }
     };
   };
 
