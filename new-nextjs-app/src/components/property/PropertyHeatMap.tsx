@@ -27,13 +27,6 @@ const MAPPLS_CONFIG = {
   getScriptUrl: () => `https://apis.mappls.com/advancedmaps/api/${MAPPLS_CONFIG.apiKey}/map_sdk?layer=vector&v=3.0&callback=initMap`
 };
 
-declare global {
-  interface Window {
-    mappls: any;
-    initMap: () => void;
-  }
-}
-
 const PropertyHeatMap: React.FC<PropertyHeatMapProps> = ({
   properties,
   heatMapType = 'price',
