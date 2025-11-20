@@ -252,54 +252,110 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </Box>
         )}
         
-      {/* Favorite Button */}
-      <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
-        <Box
-          component="button"
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            p: 2,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(12px)',
-            borderRadius: '50%',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            zIndex: 2,
-            minWidth: 44,
-            minHeight: 44,
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-              transform: 'scale(1.1)',
-              boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
-            },
-            '@media (max-width: 768px)': {
-              minWidth: 48,
-              minHeight: 48,
-              p: 2.5
-            }
-          }}
-          onClick={handleFavoriteClick}
-          disabled={loadingFavorite}
-        >
+      {/* Action Buttons */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: 16, 
+        right: 16, 
+        display: 'flex', 
+        gap: 1, 
+        zIndex: 2 
+      }}>
+        {/* Compare Button */}
+        <Tooltip title={isInComparison(property._id) ? "Remove from comparison" : canAddMore ? "Add to comparison" : "Maximum 4 properties can be compared"} arrow>
+          <Box
+            component="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isInComparison(property._id)) {
+                return;
+              }
+              if (canAddMore) {
+                addToComparison(property);
+              } else {
+                alert('You can compare up to 4 properties at a time');
+              }
+            }}
+            sx={{
+              p: 1.5,
+              backgroundColor: isInComparison(property._id) 
+                ? 'rgba(var(--color-primary-rgb), 0.9)' 
+                : 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '50%',
+              border: `1px solid ${isInComparison(property._id) ? 'var(--color-primary)' : 'rgba(255, 255, 255, 0.3)'}`,
+              cursor: canAddMore || isInComparison(property._id) ? 'pointer' : 'not-allowed',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              minWidth: 40,
+              minHeight: 40,
+              opacity: canAddMore || isInComparison(property._id) ? 1 : 0.6,
+              '&:hover': {
+                backgroundColor: isInComparison(property._id) 
+                  ? 'rgba(var(--color-primary-rgb), 1)' 
+                  : 'rgba(255, 255, 255, 1)',
+                transform: 'scale(1.1)',
+                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
+              }
+            }}
+          >
+            <CompareArrows sx={{ 
+              color: isInComparison(property._id) ? 'white' : 'var(--color-primary)', 
+              fontSize: 20 
+            }} />
+          </Box>
+        </Tooltip>
+
+        {/* Favorite Button */}
+        <Tooltip title={isFavorite ? "Remove from favorites" : "Add to favorites"} arrow>
+          <Box
+            component="button"
+            sx={{
+              p: 1.5,
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '50%',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              minWidth: 40,
+              minHeight: 40,
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+                transform: 'scale(1.1)',
+                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.2)'
+              },
+              '@media (max-width: 768px)': {
+                minWidth: 44,
+                minHeight: 44,
+                p: 2
+              }
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavoriteClick(e);
+            }}
+            disabled={loadingFavorite}
+          >
             {loadingFavorite ? (
-              <CircularProgress size={22} sx={{ color: 'var(--color-primary)' }} />
+              <CircularProgress size={20} sx={{ color: 'var(--color-primary)' }} />
             ) : isFavorite ? (
               <Favorite sx={{ 
                 color: 'var(--color-error)', 
-                fontSize: 22,
+                fontSize: 20,
                 filter: 'drop-shadow(0 2px 4px rgba(var(--color-error-rgb), 0.3))'
               }} />
             ) : (
               <FavoriteBorder sx={{ 
                 color: 'var(--color-text-muted)', 
-                fontSize: 22,
+                fontSize: 20,
                 '&:hover': {
                   color: 'var(--color-error)'
                 }
