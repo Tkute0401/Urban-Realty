@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { 
   Card, 
   CardContent, 
@@ -133,12 +132,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <motion.div
+    <Box
       id={id}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-      whileHover={{ y: -8, scale: 1.02 }}
+      sx={{
+        animation: 'fadeIn 0.4s ease-in-out',
+        '@keyframes fadeIn': {
+          from: { opacity: 0, transform: 'translateY(50px)' },
+          to: { opacity: 1, transform: 'translateY(0)' }
+        }
+      }}
     >
       <Card 
         sx={{ 

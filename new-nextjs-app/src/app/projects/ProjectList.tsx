@@ -20,18 +20,6 @@ import ProjectsMap from '../../components/projects/ProjectsMap';
 import ProjectCard from '../../components/projects/ProjectCard';
 import SearchAutocomplete from '../../components/property/SearchAutocomplete';
 import { useLocation } from '../../hooks/useLocation';
-import { 
-  Drawer, 
-  TextField, 
-  Chip, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem,
-  Button,
-  Paper,
-  Stack
-} from '@mui/material';
 
 const ProjectList = () => {
   noStore();
