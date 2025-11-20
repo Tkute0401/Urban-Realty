@@ -135,14 +135,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     <Box
       id={id}
       sx={{
-        opacity: 0,
-        animation: 'fadeInUp 0.4s ease-in-out forwards',
+        animation: 'fadeInUp 0.4s ease-in-out',
         '@keyframes fadeInUp': {
-          '0%': { 
+          from: { 
             opacity: 0, 
             transform: 'translateY(50px)' 
           },
-          '100%': { 
+          to: { 
             opacity: 1, 
             transform: 'translateY(0)' 
           }
