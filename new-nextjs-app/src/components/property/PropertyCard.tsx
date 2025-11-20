@@ -132,15 +132,33 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <div id={id}>
-      <Box
-        sx={{
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          '&:hover': {
-            transform: 'translateY(-8px) scale(1.02)'
-          }
-        }}
-      >
+    <Card
+      id={id}
+      sx={{
+        cursor: 'pointer',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        backgroundColor: 'var(--color-surface)',
+        border: isSelected ? '3px solid var(--color-primary)' : '1px solid var(--color-border)',
+        boxShadow: isSelected 
+          ? '0 22px 44px rgba(var(--color-primary-rgb), 0.25), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)' 
+          : '0 8px 28px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        width: '100%',
+        maxWidth: '420px',
+        height: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        background: 'linear-gradient(145deg, var(--color-surface) 0%, rgba(var(--color-primary-rgb), 0.02) 100%)',
+        '&:hover': {
+          boxShadow: '0 28px 56px rgba(var(--color-primary-rgb), 0.18), 0 0 0 1px rgba(var(--color-primary-rgb), 0.1)',
+          border: '2px solid var(--color-primary)',
+          transform: 'translateY(-6px)'
+        }
+      }}
+      onClick={handleClick}
+    >
       <Card 
         sx={{ 
           cursor: 'pointer',
@@ -423,9 +441,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           }
         }} />
       )}
-      </Card>
-      </Box>
-    </div>
+    </Card>
   );
 };
 
