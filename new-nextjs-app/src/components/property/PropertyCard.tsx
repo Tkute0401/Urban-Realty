@@ -132,15 +132,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <Box
-      id={id}
-      sx={{
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        '&:hover': {
-          transform: 'translateY(-8px) scale(1.02)'
-        }
-      }}
-    >
+    <div id={id}>
+      <Box
+        sx={{
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            transform: 'translateY(-8px) scale(1.02)'
+          }
+        }}
+      >
       <Card 
         sx={{ 
           cursor: 'pointer',
@@ -424,7 +424,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         }} />
       )}
       </Card>
-    </Box>
+      </Box>
+    </div>
   );
 };
 
