@@ -425,7 +425,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         }} />
       )}
       </Card>
-    </motion.div>
+    </Box>
   );
 };
 
