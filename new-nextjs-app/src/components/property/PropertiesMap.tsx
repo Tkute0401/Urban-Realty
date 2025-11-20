@@ -359,35 +359,43 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     }
 
     // Apply clustering if enabled and we have multiple markers
-    if (enableClustering && newMarkers.length > 1 && window.mappls?.MarkerClusterer) {
+    // Note: MarkerClusterer may not be available in all MAPPLS SDK versions
+    if (enableClustering && newMarkers.length > 1) {
       try {
-        // Remove existing cluster
-        if (clusterRef.current) {
-          clusterRef.current.clearMarkers();
-        }
-
-        // Create new cluster
-        clusterRef.current = new window.mappls.MarkerClusterer({
-          map: mapInstanceRef.current,
-          markers: newMarkers,
-          algorithm: new window.mappls.GridAlgorithm({ gridSize: 60 }),
-          renderer: {
-            render: ({ count, position }: any) => {
-              return new window.mappls.Marker({
-                position: position,
-                icon: {
-                  url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="20" cy="20" r="18" fill="#1976d2" opacity="0.8" stroke="#fff" stroke-width="2"/>
-                      <text x="20" y="26" font-size="14" font-weight="bold" fill="white" text-anchor="middle">${count}</text>
-                    </svg>
-                  `)}`,
-                  scaledSize: { width: 40, height: 40 }
-                }
-              });
-            }
+        // Check if MarkerClusterer is available (using type assertion for TypeScript)
+        const mapplsAny = window.mappls as any;
+        if (mapplsAny?.MarkerClusterer) {
+          // Remove existing cluster
+          if (clusterRef.current) {
+            clusterRef.current.clearMarkers();
           }
-        });
+
+          // Create new cluster
+          clusterRef.current = new mapplsAny.MarkerClusterer({
+            map: mapInstanceRef.current,
+            markers: newMarkers,
+            algorithm: mapplsAny.GridAlgorithm ? new mapplsAny.GridAlgorithm({ gridSize: 60 }) : undefined,
+            renderer: {
+              render: ({ count, position }: any) => {
+                return new window.mappls.Marker({
+                  position: position,
+                  icon: {
+                    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" fill="#1976d2" opacity="0.8" stroke="#fff" stroke-width="2"/>
+                        <text x="20" y="26" font-size="14" font-weight="bold" fill="white" text-anchor="middle">${count}</text>
+                      </svg>
+                    `)}`,
+                    scaledSize: { width: 40, height: 40 }
+                  }
+                });
+              }
+            }
+          });
+        } else {
+          // MarkerClusterer not available, use regular markers
+          markersRef.current = newMarkers;
+        }
       } catch (clusterError) {
         console.warn('Failed to create marker cluster:', clusterError);
         markersRef.current = newMarkers;
