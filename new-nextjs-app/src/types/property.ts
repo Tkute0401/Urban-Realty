@@ -108,5 +108,29 @@ export interface PropertyFilters {
   page?: number;
   limit?: number;
   sort?: string;
+  // Advanced filters
+  constructionStatus?: string[];
+  possessionDate?: string;
+  ageOfProperty?: number;
+  furnished?: boolean;
+  facing?: string;
+  floorRange?: { min?: number; max?: number };
+  parkingSpaces?: number;
+  // Proximity filters
+  nearSchools?: boolean;
+  nearHospitals?: boolean;
+  nearMalls?: boolean;
+  nearMetro?: boolean;
+  nearParks?: boolean;
+  // Additional filters
+  verified?: boolean;
+  hasVirtualTour?: boolean;
+  developer?: string;
+  // Commute filter
+  maxCommuteTime?: number;
+  commuteMode?: 'driving' | 'transit' | 'walking';
+  // Affordability filter
+  affordable?: boolean;
+  monthlyIncome?: number;
 }
 

@@ -132,6 +132,8 @@ app.use('/api/v1/agent', require('./src/api/routes/agentRoutes'));
 app.use('/media', require('./src/api/routes/mediaRoutes'));
 app.use('/api/v1/developers', require('./src/api/routes/developerRoutes'));
 app.use('/api/v1/projects', require('./routes/projectRoutes'));
+app.use('/api/v1/searches', require('./routes/searchRoutes'));
+app.use('/api/v1/locality', require('./routes/localityRoutes'));
 
 // Blog routes - MUST be registered before Next.js handler
 console.log('🔧 Loading blog routes...');

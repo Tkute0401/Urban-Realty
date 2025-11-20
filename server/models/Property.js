@@ -31,7 +31,12 @@ const PropertySchema = new mongoose.Schema({
       'Townhouse',
       'Land',
       'Commercial',
-      'PG'
+      'PG',
+      'Studio',
+      'Penthouse',
+      'Builder Floor',
+      'Farm House',
+      'Service Apartment'
     ],
     default: 'House'
   },
@@ -98,6 +103,28 @@ const PropertySchema = new mongoose.Schema({
   ageOfProperty: {
     type: Number,
     min: 0
+  },
+  furnished: {
+    type: Boolean,
+    default: false
+  },
+  facing: {
+    type: String,
+    enum: ['North', 'South', 'East', 'West', 'North-East', 'North-West', 'South-East', 'South-West', ''],
+    default: ''
+  },
+  floorRange: {
+    min: { type: Number, min: 0 },
+    max: { type: Number, min: 0 }
+  },
+  parkingSpaces: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  verified: {
+    type: Boolean,
+    default: false
   },
   approvals: [{
     _id: false,
@@ -366,6 +393,17 @@ PropertySchema.index({
   'address.state': 'text',
   buildingName: 'text'
 });
+
+// Performance indexes for filtering
+PropertySchema.index({ price: 1, area: 1 });
+PropertySchema.index({ 'address.city': 1, 'address.locality': 1 });
+PropertySchema.index({ constructionStatus: 1 });
+PropertySchema.index({ createdAt: -1 });
+PropertySchema.index({ views: -1 });
+PropertySchema.index({ featured: -1, createdAt: -1 });
+PropertySchema.index({ verified: 1 });
+PropertySchema.index({ type: 1, status: 1 });
+PropertySchema.index({ bedrooms: 1, bathrooms: 1 });
 
 // Delete existing model if it exists to prevent caching issues
 if (mongoose.models.Property) {

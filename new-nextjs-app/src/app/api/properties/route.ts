@@ -105,6 +105,91 @@ export async function GET(request: NextRequest) {
       console.log('🔍 Filtering by amenities:', amenities);
     }
 
+    // Advanced filters
+    const constructionStatus = searchParams.get('constructionStatus');
+    if (constructionStatus) {
+      const statusArray = constructionStatus.split(',');
+      filter.constructionStatus = { $in: statusArray };
+    }
+
+    const furnished = searchParams.get('furnished');
+    if (furnished !== null) {
+      filter.furnished = furnished === 'true';
+    }
+
+    const facing = searchParams.get('facing');
+    if (facing) {
+      filter.facing = facing;
+    }
+
+    const floorRangeMin = searchParams.get('floorRangeMin');
+    const floorRangeMax = searchParams.get('floorRangeMax');
+    if (floorRangeMin || floorRangeMax) {
+      filter.$or = filter.$or || [];
+      if (floorRangeMin) {
+        filter['floorRange.min'] = { $gte: Number(floorRangeMin) };
+      }
+      if (floorRangeMax) {
+        filter['floorRange.max'] = { $lte: Number(floorRangeMax) };
+      }
+    }
+
+    const parkingSpaces = searchParams.get('parkingSpaces');
+    if (parkingSpaces) {
+      filter.parkingSpaces = { $gte: Number(parkingSpaces) };
+    }
+
+    const verified = searchParams.get('verified');
+    if (verified !== null) {
+      filter.verified = verified === 'true';
+    }
+
+    const hasVirtualTour = searchParams.get('hasVirtualTour');
+    if (hasVirtualTour === 'true') {
+      filter.virtualTour = { $exists: true, $ne: null };
+    }
+
+    const developer = searchParams.get('developer');
+    if (developer) {
+      filter.developer = developer;
+    }
+
+    // Proximity filters
+    const nearSchools = searchParams.get('nearSchools');
+    if (nearSchools === 'true') {
+      filter['nearbyLocalities.hasSchool'] = true;
+    }
+
+    const nearHospitals = searchParams.get('nearHospitals');
+    if (nearHospitals === 'true') {
+      filter['nearbyLocalities.hasHospital'] = true;
+    }
+
+    const nearMalls = searchParams.get('nearMalls');
+    if (nearMalls === 'true') {
+      filter['nearbyLocalities.hasMall'] = true;
+    }
+
+    const nearMetro = searchParams.get('nearMetro');
+    if (nearMetro === 'true') {
+      filter['nearbyLocalities.hasTransport'] = true;
+    }
+
+    const nearParks = searchParams.get('nearParks');
+    if (nearParks === 'true') {
+      filter['nearbyLocalities.hasPark'] = true;
+    }
+
+    const possessionDate = searchParams.get('possessionDate');
+    if (possessionDate) {
+      filter.possessionDate = { $lte: new Date(possessionDate) };
+    }
+
+    const ageOfProperty = searchParams.get('ageOfProperty');
+    if (ageOfProperty) {
+      filter.ageOfProperty = { $lte: Number(ageOfProperty) };
+    }
+
     console.log('🔍 Final MongoDB filter:', JSON.stringify(filter, null, 2));
 
     // Calculate pagination

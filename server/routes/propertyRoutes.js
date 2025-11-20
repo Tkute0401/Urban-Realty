@@ -12,6 +12,16 @@ const parseFormData = require('../middleware/parseFormData');
 // @access  Public
 router.get('/', propertyController.getProperties);
 
+// @desc    Get property recommendations
+// @route   GET /api/v1/properties/recommendations
+// @access  Private
+router.get('/recommendations', protect, propertyController.getRecommendations);
+
+// @desc    Track user interaction with property
+// @route   POST /api/v1/properties/:id/interact
+// @access  Private
+router.post('/:id/interact', protect, propertyController.trackInteraction);
+
 // @desc    Get search suggestions and autocomplete
 // @route   GET /api/v1/properties/search-suggestions
 // @access  Public
@@ -26,6 +36,11 @@ router.get('/featured', propertyController.getFeaturedProperties);
 // @route   GET /api/v1/properties/radius/:zipcode/:distance
 // @access  Public
 router.get('/radius/:zipcode/:distance', propertyController.getPropertiesInRadius);
+
+// @desc    Get properties nearby a location
+// @route   GET /api/v1/properties/nearby
+// @access  Public
+router.get('/nearby', propertyController.getPropertiesNearby);
 
 // @desc    Get agent properties
 // @route   GET /api/v1/properties/agent

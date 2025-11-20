@@ -4,6 +4,9 @@ const asyncHandler = require('../middleware/async');
 const Property = require('../models/Property');
 const User = require('../models/User');
 const Developer = require('../models/Developer');
+const UserInteraction = require('../models/UserInteraction');
+const RecommendationService = require('../services/RecommendationService');
+const TravelTimeService = require('../services/TravelTimeService');
 const geocoder = require('../utils/hybridGeocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -49,7 +52,10 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   try {
     // 1. Initial query setup
     const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minArea', 'maxArea', 'bedrooms', 'bathrooms'];
+    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search', 'minArea', 'maxArea', 'bedrooms', 'bathrooms', 
+      'constructionStatus', 'furnished', 'facing', 'floorRangeMin', 'floorRangeMax', 'parkingSpaces', 'verified',
+      'nearSchools', 'nearHospitals', 'nearMalls', 'nearMetro', 'nearParks', 'hasVirtualTour', 'developer',
+      'maxCommuteTime', 'commuteMode', 'affordable', 'monthlyIncome', 'possessionDate', 'ageOfProperty'];
     excludedFields.forEach(el => delete queryObj[el]);
     
     let queryStr = JSON.stringify(queryObj);
@@ -90,6 +96,82 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       if (!validStatuses.includes(req.query.status)) {
         return next(new ErrorResponse(`Invalid status value. Must be one of: ${validStatuses.join(', ')}`, 400));
       }
+    }
+
+    // 8. Handle construction status (array)
+    if (req.query.constructionStatus) {
+      const statusArray = Array.isArray(req.query.constructionStatus) 
+        ? req.query.constructionStatus 
+        : req.query.constructionStatus.split(',');
+      query = query.where('constructionStatus').in(statusArray);
+    }
+
+    // 9. Handle furnished filter
+    if (req.query.furnished !== undefined) {
+      query = query.where('furnished').equals(req.query.furnished === 'true' || req.query.furnished === true);
+    }
+
+    // 10. Handle facing filter
+    if (req.query.facing) {
+      query = query.where('facing').equals(req.query.facing);
+    }
+
+    // 11. Handle floor range filter
+    if (req.query.floorRangeMin || req.query.floorRangeMax) {
+      const floorFilter = {};
+      if (req.query.floorRangeMin) floorFilter['floorRange.min'] = { $gte: Number(req.query.floorRangeMin) };
+      if (req.query.floorRangeMax) floorFilter['floorRange.max'] = { $lte: Number(req.query.floorRangeMax) };
+      if (Object.keys(floorFilter).length > 0) {
+        query = query.where(floorFilter);
+      }
+    }
+
+    // 12. Handle parking spaces filter
+    if (req.query.parkingSpaces) {
+      query = query.where('parkingSpaces').gte(Number(req.query.parkingSpaces));
+    }
+
+    // 13. Handle verified filter
+    if (req.query.verified !== undefined) {
+      query = query.where('verified').equals(req.query.verified === 'true' || req.query.verified === true);
+    }
+
+    // 14. Handle virtual tour filter
+    if (req.query.hasVirtualTour === 'true' || req.query.hasVirtualTour === true) {
+      query = query.where('virtualTour').exists(true).ne(null);
+    }
+
+    // 15. Handle developer filter
+    if (req.query.developer) {
+      query = query.where('developer').equals(req.query.developer);
+    }
+
+    // 16. Handle proximity filters (using nearbyLocalities field)
+    if (req.query.nearSchools === 'true' || req.query.nearSchools === true) {
+      query = query.where('nearbyLocalities.hasSchool').equals(true);
+    }
+    if (req.query.nearHospitals === 'true' || req.query.nearHospitals === true) {
+      query = query.where('nearbyLocalities.hasHospital').equals(true);
+    }
+    if (req.query.nearMalls === 'true' || req.query.nearMalls === true) {
+      query = query.where('nearbyLocalities.hasMall').equals(true);
+    }
+    if (req.query.nearMetro === 'true' || req.query.nearMetro === true) {
+      query = query.where('nearbyLocalities.hasTransport').equals(true);
+    }
+    if (req.query.nearParks === 'true' || req.query.nearParks === true) {
+      query = query.where('nearbyLocalities.hasPark').equals(true);
+    }
+
+    // 17. Handle possession date filter
+    if (req.query.possessionDate) {
+      const targetDate = new Date(req.query.possessionDate);
+      query = query.where('possessionDate').lte(targetDate);
+    }
+
+    // 18. Handle age of property filter
+    if (req.query.ageOfProperty) {
+      query = query.where('ageOfProperty').lte(Number(req.query.ageOfProperty));
     }
 
     // 8. Populate related data
@@ -153,6 +235,61 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       if (req.query.maxArea) areaFilter.$lte = Number(req.query.maxArea);
       countQuery.where('area', areaFilter);
     }
+    // Apply new filters to count query
+    if (req.query.constructionStatus) {
+      const statusArray = Array.isArray(req.query.constructionStatus) 
+        ? req.query.constructionStatus 
+        : req.query.constructionStatus.split(',');
+      countQuery.where('constructionStatus').in(statusArray);
+    }
+    if (req.query.furnished !== undefined) {
+      countQuery.where('furnished').equals(req.query.furnished === 'true' || req.query.furnished === true);
+    }
+    if (req.query.facing) {
+      countQuery.where('facing').equals(req.query.facing);
+    }
+    if (req.query.floorRangeMin || req.query.floorRangeMax) {
+      const floorFilter = {};
+      if (req.query.floorRangeMin) floorFilter['floorRange.min'] = { $gte: Number(req.query.floorRangeMin) };
+      if (req.query.floorRangeMax) floorFilter['floorRange.max'] = { $lte: Number(req.query.floorRangeMax) };
+      if (Object.keys(floorFilter).length > 0) {
+        countQuery.where(floorFilter);
+      }
+    }
+    if (req.query.parkingSpaces) {
+      countQuery.where('parkingSpaces').gte(Number(req.query.parkingSpaces));
+    }
+    if (req.query.verified !== undefined) {
+      countQuery.where('verified').equals(req.query.verified === 'true' || req.query.verified === true);
+    }
+    if (req.query.hasVirtualTour === 'true' || req.query.hasVirtualTour === true) {
+      countQuery.where('virtualTour').exists(true).ne(null);
+    }
+    if (req.query.developer) {
+      countQuery.where('developer').equals(req.query.developer);
+    }
+    if (req.query.nearSchools === 'true' || req.query.nearSchools === true) {
+      countQuery.where('nearbyLocalities.hasSchool').equals(true);
+    }
+    if (req.query.nearHospitals === 'true' || req.query.nearHospitals === true) {
+      countQuery.where('nearbyLocalities.hasHospital').equals(true);
+    }
+    if (req.query.nearMalls === 'true' || req.query.nearMalls === true) {
+      countQuery.where('nearbyLocalities.hasMall').equals(true);
+    }
+    if (req.query.nearMetro === 'true' || req.query.nearMetro === true) {
+      countQuery.where('nearbyLocalities.hasTransport').equals(true);
+    }
+    if (req.query.nearParks === 'true' || req.query.nearParks === true) {
+      countQuery.where('nearbyLocalities.hasPark').equals(true);
+    }
+    if (req.query.possessionDate) {
+      const targetDate = new Date(req.query.possessionDate);
+      countQuery.where('possessionDate').lte(targetDate);
+    }
+    if (req.query.ageOfProperty) {
+      countQuery.where('ageOfProperty').lte(Number(req.query.ageOfProperty));
+    }
     
     const total = await countQuery.countDocuments();
 
@@ -161,31 +298,79 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     // 13. Execute query
     const properties = await query;
 
-    // 14. Calculate distances if user location is provided
+    // 14. Calculate distances and travel times if user location is provided
     let propertiesWithDistance = properties;
     if (userLocation) {
-      propertiesWithDistance = properties.map(property => {
+      // Get user work location if available and commute filter is requested
+      let userWorkLocation = null;
+      if (req.user && req.query.maxCommuteTime) {
+        const user = await User.findById(req.user.id).select('workLocation');
+        if (user?.workLocation?.coordinates?.length === 2) {
+          userWorkLocation = {
+            lat: user.workLocation.coordinates[1],
+            lng: user.workLocation.coordinates[0]
+          };
+        }
+      }
+
+      const commuteMode = req.query.commuteMode || 'driving';
+      const maxCommuteTime = req.query.maxCommuteTime ? Number(req.query.maxCommuteTime) : null;
+
+      propertiesWithDistance = await Promise.all(properties.map(async (property) => {
+        const propertyObj = property.toObject();
+        
         if (property.location && property.location.coordinates) {
+          // Calculate straight-line distance
           const distance = calculateDistance(
             userLocation.coordinates[1], // user lat
             userLocation.coordinates[0], // user lng
             property.location.coordinates[1], // property lat
             property.location.coordinates[0]  // property lng
           );
-          return {
-            ...property.toObject(),
-            distance: Math.round(distance * 100) / 100 // Round to 2 decimal places
-          };
-        }
-        return {
-          ...property.toObject(),
-          distance: null
-        };
-      });
+          propertyObj.distance = Math.round(distance * 100) / 100;
 
-      // Sort by distance if user location is provided and no explicit sort
+          // Calculate travel time if work location is available
+          if (userWorkLocation) {
+            try {
+              const travelTime = await TravelTimeService.calculateTravelTime(
+                userWorkLocation.lat,
+                userWorkLocation.lng,
+                property.location.coordinates[1],
+                property.location.coordinates[0],
+                commuteMode
+              );
+              propertyObj.commuteTime = Math.round(travelTime.duration);
+              propertyObj.commuteDistance = Math.round(travelTime.distance * 100) / 100;
+              propertyObj.commuteMode = commuteMode;
+            } catch (error) {
+              console.error('Error calculating travel time:', error);
+              propertyObj.commuteTime = null;
+            }
+          }
+        } else {
+          propertyObj.distance = null;
+          propertyObj.commuteTime = null;
+        }
+
+        return propertyObj;
+      }));
+
+      // Filter by commute time if specified
+      if (maxCommuteTime !== null && userWorkLocation) {
+        propertiesWithDistance = propertiesWithDistance.filter(property => 
+          property.commuteTime !== null && property.commuteTime <= maxCommuteTime
+        );
+      }
+
+      // Sort by distance or commute time if user location is provided and no explicit sort
       if (!req.query.sort) {
         propertiesWithDistance.sort((a, b) => {
+          // Prefer commute time if available, otherwise use distance
+          if (a.commuteTime !== null && b.commuteTime !== null) {
+            return a.commuteTime - b.commuteTime;
+          }
+          if (a.commuteTime !== null) return -1;
+          if (b.commuteTime !== null) return 1;
           if (a.distance === null) return 1;
           if (b.distance === null) return -1;
           return a.distance - b.distance;
@@ -869,8 +1054,10 @@ exports.getPropertiesInRadius = asyncHandler(async (req, res, next) => {
   const lat = loc[0].latitude;
   const lng = loc[0].longitude;
 
-  // Calc radius using radians (distance in miles)
-  const radius = distance / 3963;
+  // Calc radius using radians (distance in km, convert to radians)
+  // Earth radius in km = 6371
+  const radiusInKm = parseFloat(distance);
+  const radius = radiusInKm / 6371;
 
   const properties = await Property.find({
     location: {
@@ -883,6 +1070,98 @@ exports.getPropertiesInRadius = asyncHandler(async (req, res, next) => {
     count: properties.length,
     data: properties
   });
+});
+
+// @desc    Get properties near a location (lat/lng) within radius
+// @route   GET /api/v1/properties/nearby
+// @access  Public
+exports.getPropertiesNearby = asyncHandler(async (req, res, next) => {
+  try {
+    const { lat, lng, radius = 5, ...otherFilters } = req.query;
+
+    if (!lat || !lng) {
+      return next(new ErrorResponse('Latitude and longitude are required', 400));
+    }
+
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
+    const radiusInKm = parseFloat(radius);
+    
+    // Convert km to radians (Earth radius = 6371 km)
+    const radiusInRadians = radiusInKm / 6371;
+
+    // Build base query with other filters
+    const query = Property.find({
+      location: {
+        $geoWithin: {
+          $centerSphere: [[longitude, latitude], radiusInRadians]
+        }
+      }
+    });
+
+    // Apply additional filters
+    if (otherFilters.type) {
+      query.where('type').equals(otherFilters.type);
+    }
+    if (otherFilters.status) {
+      query.where('status').equals(otherFilters.status);
+    }
+    if (otherFilters.minPrice) {
+      query.where('price').gte(Number(otherFilters.minPrice));
+    }
+    if (otherFilters.maxPrice) {
+      query.where('price').lte(Number(otherFilters.maxPrice));
+    }
+    if (otherFilters.bedrooms) {
+      query.where('bedrooms').gte(Number(otherFilters.bedrooms));
+    }
+    if (otherFilters.bathrooms) {
+      query.where('bathrooms').gte(Number(otherFilters.bathrooms));
+    }
+
+    // Use $geoNear for distance calculation and sorting
+    const properties = await Property.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [longitude, latitude]
+          },
+          distanceField: 'distance',
+          distanceMultiplier: 1, // Convert radians to km
+          maxDistance: radiusInRadians,
+          spherical: true,
+          query: {
+            ...(otherFilters.type && { type: otherFilters.type }),
+            ...(otherFilters.status && { status: otherFilters.status }),
+            ...(otherFilters.minPrice && { price: { $gte: Number(otherFilters.minPrice) } }),
+            ...(otherFilters.maxPrice && { price: { $lte: Number(otherFilters.maxPrice) } }),
+            ...(otherFilters.bedrooms && { bedrooms: { $gte: Number(otherFilters.bedrooms) } }),
+            ...(otherFilters.bathrooms && { bathrooms: { $gte: Number(otherFilters.bathrooms) } })
+          }
+        }
+      },
+      {
+        $limit: parseInt(otherFilters.limit) || 50
+      }
+    ]);
+
+    // Populate agent and developer
+    await Property.populate(properties, [
+      { path: 'agent', select: 'name email phone mobile' },
+      { path: 'developer', select: 'name logo' }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      count: properties.length,
+      center: { latitude, longitude },
+      radius: radiusInKm,
+      data: properties
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // @desc    Upload photo for property
@@ -1170,6 +1449,139 @@ const uploadVideoToCloudinary = async (file, folder = 'properties/videos') => {
     throw err;
   }
 };
+
+// @desc    Get property recommendations
+// @route   GET /api/v1/properties/recommendations
+// @access  Private
+exports.getRecommendations = asyncHandler(async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return next(new ErrorResponse('User authentication required', 401));
+    }
+
+    const {
+      limit = 10,
+      type = 'hybrid', // 'collaborative', 'content', 'hybrid', 'trending', 'similar'
+      propertyId, // For similar properties
+      exclude = []
+    } = req.query;
+
+    let recommendations = [];
+
+    if (type === 'similar' && propertyId) {
+      // Get similar properties to a specific property
+      const property = await Property.findById(propertyId);
+      if (!property) {
+        return next(new ErrorResponse('Property not found', 404));
+      }
+
+      recommendations = await Property.find({
+        _id: { $ne: propertyId, $nin: exclude },
+        type: property.type,
+        status: { $in: ['For Sale', 'For Rent'] },
+        location: {
+          $geoWithin: {
+            $centerSphere: [
+              property.location.coordinates,
+              10 / 6371 // 10km radius
+            ]
+          }
+        }
+      })
+        .populate('agent', 'name email phone')
+        .populate('developer', 'name logo')
+        .limit(parseInt(limit))
+        .lean();
+
+      recommendations = recommendations.map(rec => ({
+        ...rec,
+        relevanceScore: 0.8,
+        reasoning: `Similar ${property.type} in the same area`
+      }));
+    } else if (type === 'trending') {
+      recommendations = await RecommendationService.getTrendingProperties(
+        parseInt(limit),
+        exclude
+      );
+    } else {
+      recommendations = await RecommendationService.getPersonalizedRecommendations(
+        userId,
+        {
+          limit: parseInt(limit),
+          excludeProperties: exclude,
+          type
+        }
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      count: recommendations.length,
+      type,
+      data: recommendations
+    });
+  } catch (error) {
+    console.error('Error getting recommendations:', error);
+    next(error);
+  }
+});
+
+// @desc    Track user interaction with property
+// @route   POST /api/v1/properties/:id/interact
+// @access  Private
+exports.trackInteraction = asyncHandler(async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return next(new ErrorResponse('User authentication required', 401));
+    }
+
+    const { interactionType, duration, metadata } = req.body;
+    const propertyId = req.params.id;
+
+    // Validate interaction type
+    const validTypes = ['view', 'favorite', 'contact', 'share', 'search'];
+    if (!validTypes.includes(interactionType)) {
+      return next(new ErrorResponse(`Invalid interaction type. Must be one of: ${validTypes.join(', ')}`, 400));
+    }
+
+    // Check if property exists
+    const property = await Property.findById(propertyId);
+    if (!property) {
+      return next(new ErrorResponse('Property not found', 404));
+    }
+
+    // Create or update interaction
+    const interaction = await UserInteraction.findOneAndUpdate(
+      {
+        user: userId,
+        property: propertyId,
+        interactionType
+      },
+      {
+        user: userId,
+        property: propertyId,
+        interactionType,
+        duration: duration || 0,
+        metadata: metadata || {},
+        createdAt: new Date()
+      },
+      {
+        upsert: true,
+        new: true
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: interaction
+    });
+  } catch (error) {
+    console.error('Error tracking interaction:', error);
+    next(error);
+  }
+});
 
 // @desc    Get search suggestions and autocomplete
 // @route   GET /api/v1/properties/search-suggestions

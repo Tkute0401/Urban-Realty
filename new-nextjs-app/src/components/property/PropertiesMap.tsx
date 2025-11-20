@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, ToggleButtonGroup, ToggleButton, Chip } from '@mui/material';
+import { School, LocalHospital, ShoppingCart, Train, Park } from '@mui/icons-material';
 import { MAPPLS_CONFIG } from '../../config/maps';
 
 interface Property {
@@ -32,6 +33,8 @@ interface PropertiesMapProps {
   onMarkerClick?: (property: Property) => void;
   height?: string | number;
   searchQuery?: string;
+  showAmenities?: boolean;
+  enableClustering?: boolean;
 }
 
 const PropertiesMap: React.FC<PropertiesMapProps> = ({
@@ -40,17 +43,28 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   userLocation,
   onMarkerClick,
   height = '500px',
-  searchQuery
+  searchQuery,
+  showAmenities = false,
+  enableClustering = true
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const infoWindowsRef = useRef<any[]>([]);
+  const clusterRef = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [mapInitialized, setMapInitialized] = useState(false);
   const [containerId] = useState(() => `properties-map-container-${Math.random().toString(36).substr(2, 9)}`);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [amenityLayers, setAmenityLayers] = useState({
+    schools: false,
+    hospitals: false,
+    malls: false,
+    metro: false,
+    parks: false
+  });
 
 
 
@@ -254,10 +268,63 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
         continue; // Skip this marker and continue with others
       }
 
+      // Create info window content
+      const infoWindowContent = `
+        <div style="padding: 8px; min-width: 200px; font-family: Arial, sans-serif;">
+          <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold; color: #333;">
+            ${property.title || 'Property'}
+          </h3>
+          <p style="margin: 4px 0; font-size: 12px; color: #666;">
+            <strong>Price:</strong> ₹${property.price?.toLocaleString('en-IN') || 'N/A'}
+          </p>
+          ${property.address ? `
+            <p style="margin: 4px 0; font-size: 12px; color: #666;">
+              <strong>Location:</strong> ${property.address.street || ''} ${property.address.city || ''}
+            </p>
+          ` : ''}
+          <button 
+            onclick="window.openPropertyDetail && window.openPropertyDetail('${property._id}')"
+            style="margin-top: 8px; padding: 6px 12px; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;"
+          >
+            View Details
+          </button>
+        </div>
+      `;
+
+      // Create info window
+      let infoWindow: any = null;
+      try {
+        infoWindow = new window.mappls.InfoWindow({
+          content: infoWindowContent
+        });
+        infoWindowsRef.current.push(infoWindow);
+      } catch (infoError) {
+        console.warn('Failed to create info window:', infoError);
+      }
+
       // Add click listener
       try {
         marker.addListener('click', () => {
           console.log('Marker clicked:', property.title);
+          
+          // Close all other info windows
+          infoWindowsRef.current.forEach((iw: any) => {
+            try {
+              if (iw && iw.close) iw.close();
+            } catch (e) {
+              console.warn('Error closing info window:', e);
+            }
+          });
+
+          // Open info window for this marker
+          if (infoWindow) {
+            try {
+              infoWindow.open(mapInstanceRef.current, marker);
+            } catch (openError) {
+              console.warn('Failed to open info window:', openError);
+            }
+          }
+
           if (onMarkerClick) {
             onMarkerClick(property);
           }
@@ -291,10 +358,47 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       }
     }
 
-    markersRef.current = newMarkers;
+    // Apply clustering if enabled and we have multiple markers
+    if (enableClustering && newMarkers.length > 1 && window.mappls?.MarkerClusterer) {
+      try {
+        // Remove existing cluster
+        if (clusterRef.current) {
+          clusterRef.current.clearMarkers();
+        }
+
+        // Create new cluster
+        clusterRef.current = new window.mappls.MarkerClusterer({
+          map: mapInstanceRef.current,
+          markers: newMarkers,
+          algorithm: new window.mappls.GridAlgorithm({ gridSize: 60 }),
+          renderer: {
+            render: ({ count, position }: any) => {
+              return new window.mappls.Marker({
+                position: position,
+                icon: {
+                  url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="20" cy="20" r="18" fill="#1976d2" opacity="0.8" stroke="#fff" stroke-width="2"/>
+                      <text x="20" y="26" font-size="14" font-weight="bold" fill="white" text-anchor="middle">${count}</text>
+                    </svg>
+                  `)}`,
+                  scaledSize: { width: 40, height: 40 }
+                }
+              });
+            }
+          }
+        });
+      } catch (clusterError) {
+        console.warn('Failed to create marker cluster:', clusterError);
+        markersRef.current = newMarkers;
+      }
+    } else {
+      markersRef.current = newMarkers;
+    }
+
     setMapLoaded(true);
     setMapError(null);
-  }, [properties, selectedProperty, userLocation, onMarkerClick]);
+  }, [properties, selectedProperty, userLocation, onMarkerClick, enableClustering]);
 
   // Initialize map and markers
   useEffect(() => {
@@ -590,8 +694,138 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
   console.log('🔍 PropertiesMap render - mapLoaded:', mapLoaded, 'mapError:', mapError, 'scriptLoaded:', scriptLoaded);
 
+  // Add amenity markers
+  useEffect(() => {
+    if (!mapInitialized || !mapInstanceRef.current || !showAmenities) return;
+
+    // This would integrate with MAPPLS Places API or similar
+    // For now, we'll use the nearbyLocalities data from properties
+    const amenityMarkers: any[] = [];
+
+    properties.forEach(property => {
+      if (!property.location?.coordinates) return;
+
+      const lat = property.location.coordinates[1];
+      const lng = property.location.coordinates[0];
+
+      // Add school marker if property has nearby school
+      if (amenityLayers.schools && (property as any).nearbyLocalities?.hasSchool) {
+        try {
+          const marker = new window.mappls.Marker({
+            map: mapInstanceRef.current,
+            position: [lat + 0.001, lng + 0.001], // Offset slightly
+            icon: {
+              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#4CAF50" opacity="0.7"/>
+                  <text x="12" y="16" font-size="12" fill="white" text-anchor="middle">S</text>
+                </svg>
+              `)}`,
+              scaledSize: { width: 24, height: 24 }
+            },
+            title: 'School Nearby'
+          });
+          amenityMarkers.push(marker);
+        } catch (e) {
+          console.warn('Failed to add school marker:', e);
+        }
+      }
+
+      // Similar for other amenities...
+    });
+
+    return () => {
+      amenityMarkers.forEach(marker => {
+        try {
+          if (marker && marker.remove) marker.remove();
+        } catch (e) {
+          console.warn('Error removing amenity marker:', e);
+        }
+      });
+    };
+  }, [mapInitialized, amenityLayers, properties, showAmenities]);
+
+  // Setup global function for info window button
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).openPropertyDetail = (propertyId: string) => {
+        if (onMarkerClick) {
+          const property = properties.find(p => p._id === propertyId);
+          if (property) {
+            onMarkerClick(property);
+          }
+        }
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).openPropertyDetail;
+      }
+    };
+  }, [properties, onMarkerClick]);
+
   return (
     <Box sx={{ position: 'relative', height: height, borderRadius: '12px', overflow: 'hidden' }}>
+      {/* Amenity Layer Controls */}
+      {showAmenities && mapLoaded && (
+        <Box sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 1000,
+          background: 'rgba(255, 255, 255, 0.95)',
+          borderRadius: '8px',
+          padding: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1
+        }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, mb: 0.5 }}>
+            Nearby Amenities
+          </Typography>
+          <Chip
+            icon={<School />}
+            label="Schools"
+            size="small"
+            color={amenityLayers.schools ? 'primary' : 'default'}
+            onClick={() => setAmenityLayers(prev => ({ ...prev, schools: !prev.schools }))}
+            sx={{ mb: 0.5 }}
+          />
+          <Chip
+            icon={<LocalHospital />}
+            label="Hospitals"
+            size="small"
+            color={amenityLayers.hospitals ? 'primary' : 'default'}
+            onClick={() => setAmenityLayers(prev => ({ ...prev, hospitals: !prev.hospitals }))}
+            sx={{ mb: 0.5 }}
+          />
+          <Chip
+            icon={<ShoppingCart />}
+            label="Malls"
+            size="small"
+            color={amenityLayers.malls ? 'primary' : 'default'}
+            onClick={() => setAmenityLayers(prev => ({ ...prev, malls: !prev.malls }))}
+            sx={{ mb: 0.5 }}
+          />
+          <Chip
+            icon={<Train />}
+            label="Metro"
+            size="small"
+            color={amenityLayers.metro ? 'primary' : 'default'}
+            onClick={() => setAmenityLayers(prev => ({ ...prev, metro: !prev.metro }))}
+            sx={{ mb: 0.5 }}
+          />
+          <Chip
+            icon={<Park />}
+            label="Parks"
+            size="small"
+            color={amenityLayers.parks ? 'primary' : 'default'}
+            onClick={() => setAmenityLayers(prev => ({ ...prev, parks: !prev.parks }))}
+          />
+        </Box>
+      )}
+
       {!mapLoaded && (
         <Box sx={{
           position: 'absolute',

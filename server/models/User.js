@@ -74,6 +74,27 @@ const UserSchema = new mongoose.Schema({
       ref: 'Project'
     }
   ],
+  monthlyIncome: {
+    type: Number,
+    min: 0
+  },
+  workLocation: {
+    address: {
+      type: String,
+      trim: true
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      validate: {
+        validator: function(v) {
+          return !v || (v.length === 2 && 
+                 v[0] >= -180 && v[0] <= 180 && 
+                 v[1] >= -90 && v[1] <= 90);
+        },
+        message: props => `${props.value} is not a valid coordinate!`
+      }
+    }
+  },
   recentlyViewed: [
     {
       property: {
