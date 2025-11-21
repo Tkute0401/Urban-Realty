@@ -65,6 +65,9 @@ const PropertiesPageContent: React.FC = () => {
   const isInitializedRef = useRef<boolean>(false);
   const urlParamsRef = useRef<string>('');
   const isUpdatingUrlRef = useRef<boolean>(false);
+  const filtersRef = useRef(filters);
+  const paginationRef = useRef(pagination);
+  const userLocationRef = useRef(userLocation);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
@@ -125,51 +128,69 @@ const PropertiesPageContent: React.FC = () => {
     'Laundry', 'Storage', 'Conference Room', 'Kitchen'
   ];
 
+  // Update refs when values change
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+
+  useEffect(() => {
+    paginationRef.current = pagination;
+  }, [pagination]);
+
+  useEffect(() => {
+    userLocationRef.current = userLocation;
+  }, [userLocation]);
+
+  // Stable loadProperties function that uses refs to avoid dependency issues
   const loadProperties = useCallback(() => {
+    const currentFilters = filtersRef.current;
+    const currentPagination = paginationRef.current;
+    const currentUserLocation = userLocationRef.current;
+    
     const params: any = {
-      page: pagination.page,
+      page: currentPagination.page,
       limit: 12
     };
 
-    if (filters.search) params.search = filters.search;
-    if (filters.type) params.type = filters.type;
-    if (filters.city) params.city = filters.city;
-    if (filters.state) params.state = filters.state;
+    if (currentFilters.search) params.search = currentFilters.search;
+    if (currentFilters.type) params.type = currentFilters.type;
+    if (currentFilters.city) params.city = currentFilters.city;
+    if (currentFilters.state) params.state = currentFilters.state;
     
     // Check for price min/max with proper string validation
-    if (filters.priceMin && filters.priceMin.trim() !== '') {
-      const minPrice = Number(filters.priceMin);
+    if (currentFilters.priceMin && currentFilters.priceMin.trim() !== '') {
+      const minPrice = Number(currentFilters.priceMin);
       if (!isNaN(minPrice) && minPrice > 0) {
         params.minPrice = minPrice;
       }
     }
-    if (filters.priceMax && filters.priceMax.trim() !== '') {
-      const maxPrice = Number(filters.priceMax);
+    if (currentFilters.priceMax && currentFilters.priceMax.trim() !== '') {
+      const maxPrice = Number(currentFilters.priceMax);
       if (!isNaN(maxPrice) && maxPrice > 0) {
         params.maxPrice = maxPrice;
       }
     }
     
-    if (filters.bedrooms) params.bedrooms = Number(filters.bedrooms);
-    if (filters.bathrooms) params.bathrooms = Number(filters.bathrooms);
-    if (filters.amenities && Array.isArray(filters.amenities) && filters.amenities.length > 0) {
-      params.amenities = filters.amenities.join(',');
+    if (currentFilters.bedrooms) params.bedrooms = Number(currentFilters.bedrooms);
+    if (currentFilters.bathrooms) params.bathrooms = Number(currentFilters.bathrooms);
+    if (currentFilters.amenities && Array.isArray(currentFilters.amenities) && currentFilters.amenities.length > 0) {
+      params.amenities = currentFilters.amenities.join(',');
     }
-    if (filters.minArea) params.minArea = Number(filters.minArea);
-    if (filters.maxArea) params.maxArea = Number(filters.maxArea);
-    if (filters.propertyType !== 'ALL') {
-      params.status = filters.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
+    if (currentFilters.minArea) params.minArea = Number(currentFilters.minArea);
+    if (currentFilters.maxArea) params.maxArea = Number(currentFilters.maxArea);
+    if (currentFilters.propertyType !== 'ALL') {
+      params.status = currentFilters.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
     }
 
     // Add user location for distance-based sorting
-    if (userLocation) {
-      params.userLat = userLocation.latitude;
-      params.userLng = userLocation.longitude;
+    if (currentUserLocation) {
+      params.userLat = currentUserLocation.latitude;
+      params.userLng = currentUserLocation.longitude;
     }
 
     console.log('🔍 Loading properties with params:', params);
     getProperties(params);
-  }, [filters, pagination.page, userLocation, getProperties]);
+  }, [getProperties]); // Only depend on getProperties, use refs for everything else
 
   useEffect(() => {
     setMounted(true);
@@ -177,7 +198,8 @@ const PropertiesPageContent: React.FC = () => {
 
   // Separate effect for mobile detection to ensure consistent hook order
   useEffect(() => {
-    if (typeof window === 'undefined' || mobileCheckInitialized.current) return;
+    if (typeof window === 'undefined') return;
+    if (mobileCheckInitialized.current) return;
     
     mobileCheckInitialized.current = true;
     const smBreakpoint = 600; // Standard Material-UI sm breakpoint
@@ -186,7 +208,9 @@ const PropertiesPageContent: React.FC = () => {
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   // Helper to read and update filters from URL - use ref to avoid dependency issues
@@ -241,13 +265,17 @@ const PropertiesPageContent: React.FC = () => {
 
   // Safely read search params after mount to prevent hydration mismatch
   useEffect(() => {
-    if (!mounted || isClearingFilters || typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !mounted || isClearingFilters) {
+      return;
+    }
     updateFiltersFromUrl();
   }, [mounted, isClearingFilters, updateFiltersFromUrl]);
 
   // Listen to URL changes via popstate events and polling for router navigation
   useEffect(() => {
-    if (!mounted || typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !mounted) {
+      return;
+    }
 
     let pollInterval: NodeJS.Timeout | null = null;
     let lastUrl = window.location.href;
@@ -280,10 +308,19 @@ const PropertiesPageContent: React.FC = () => {
     };
   }, [mounted, updateFiltersFromUrl]);
 
+  // Load properties when mounted - use refs to avoid dependency chain issues
   useEffect(() => {
-    if (!mounted || typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !mounted) {
+      return;
+    }
     loadProperties();
   }, [mounted, loadProperties]);
+  
+  // Separate effect to trigger loadProperties when filters/pagination/userLocation change
+  useEffect(() => {
+    if (!mounted) return;
+    loadProperties();
+  }, [filters, pagination.page, userLocation, mounted, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
