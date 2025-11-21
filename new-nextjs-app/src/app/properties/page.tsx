@@ -65,9 +65,6 @@ const PropertiesPageContent: React.FC = () => {
   const isInitializedRef = useRef<boolean>(false);
   const urlParamsRef = useRef<string>('');
   const isUpdatingUrlRef = useRef<boolean>(false);
-  const filtersRef = useRef(filters);
-  const paginationRef = useRef(pagination);
-  const userLocationRef = useRef(userLocation);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
@@ -122,6 +119,12 @@ const PropertiesPageContent: React.FC = () => {
     affordable: false
   });
 
+  // Initialize refs after state declarations to avoid hook order issues
+  const filtersRef = useRef(filters);
+  const paginationRef = useRef(pagination);
+  const userLocationRef = useRef(userLocation);
+  const getPropertiesRef = useRef(getProperties);
+
   const amenityOptions = [
     'Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony',
     'WiFi', 'Air Conditioning', 'Furnished', 'Pet Friendly', 'Elevator',
@@ -141,11 +144,16 @@ const PropertiesPageContent: React.FC = () => {
     userLocationRef.current = userLocation;
   }, [userLocation]);
 
+  useEffect(() => {
+    getPropertiesRef.current = getProperties;
+  }, [getProperties]);
+
   // Stable loadProperties function that uses refs to avoid dependency issues
   const loadProperties = useCallback(() => {
     const currentFilters = filtersRef.current;
     const currentPagination = paginationRef.current;
     const currentUserLocation = userLocationRef.current;
+    const currentGetProperties = getPropertiesRef.current;
     
     const params: any = {
       page: currentPagination.page,
@@ -189,8 +197,8 @@ const PropertiesPageContent: React.FC = () => {
     }
 
     console.log('🔍 Loading properties with params:', params);
-    getProperties(params);
-  }, [getProperties]); // Only depend on getProperties, use refs for everything else
+    currentGetProperties(params);
+  }, []); // Empty deps - use refs for everything
 
   useEffect(() => {
     setMounted(true);
@@ -308,19 +316,13 @@ const PropertiesPageContent: React.FC = () => {
     };
   }, [mounted, updateFiltersFromUrl]);
 
-  // Load properties when mounted - use refs to avoid dependency chain issues
+  // Load properties when mounted or when filters/pagination/userLocation change
   useEffect(() => {
     if (typeof window === 'undefined' || !mounted) {
       return;
     }
     loadProperties();
-  }, [mounted, loadProperties]);
-  
-  // Separate effect to trigger loadProperties when filters/pagination/userLocation change
-  useEffect(() => {
-    if (!mounted) return;
-    loadProperties();
-  }, [filters, pagination.page, userLocation, mounted, loadProperties]);
+  }, [mounted, filters, pagination.page, userLocation, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
