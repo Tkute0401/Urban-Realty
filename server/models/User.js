@@ -87,9 +87,17 @@ const UserSchema = new mongoose.Schema({
       type: [Number], // [longitude, latitude]
       validate: {
         validator: function(v) {
-          return !v || (v.length === 2 && 
-                 v[0] >= -180 && v[0] <= 180 && 
-                 v[1] >= -90 && v[1] <= 90);
+          // Allow undefined, null, empty string, or empty array
+          if (!v || v === '' || (Array.isArray(v) && v.length === 0)) {
+            return true;
+          }
+          // If it's an array with values, validate it has exactly 2 valid coordinates
+          if (Array.isArray(v) && v.length === 2) {
+            return typeof v[0] === 'number' && typeof v[1] === 'number' &&
+                   v[0] >= -180 && v[0] <= 180 && 
+                   v[1] >= -90 && v[1] <= 90;
+          }
+          return false;
         },
         message: props => `${props.value} is not a valid coordinate!`
       }
