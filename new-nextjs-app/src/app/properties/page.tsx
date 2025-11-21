@@ -173,18 +173,20 @@ const PropertiesPageContent: React.FC = () => {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Separate effect for mobile detection to ensure consistent hook order
+  useEffect(() => {
+    if (typeof window === 'undefined' || mobileCheckInitialized.current) return;
     
-    // Check mobile after mount to prevent hydration issues - only initialize once
-    if (typeof window !== 'undefined' && !mobileCheckInitialized.current) {
-      mobileCheckInitialized.current = true;
-      const smBreakpoint = 600; // Standard Material-UI sm breakpoint
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth < smBreakpoint);
-      };
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
-      return () => window.removeEventListener('resize', checkMobile);
-    }
+    mobileCheckInitialized.current = true;
+    const smBreakpoint = 600; // Standard Material-UI sm breakpoint
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < smBreakpoint);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Helper to read and update filters from URL - use ref to avoid dependency issues
@@ -239,13 +241,13 @@ const PropertiesPageContent: React.FC = () => {
 
   // Safely read search params after mount to prevent hydration mismatch
   useEffect(() => {
-    if (!mounted || isClearingFilters) return;
+    if (!mounted || isClearingFilters || typeof window === 'undefined') return;
     updateFiltersFromUrl();
   }, [mounted, isClearingFilters, updateFiltersFromUrl]);
 
   // Listen to URL changes via popstate events and polling for router navigation
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || typeof window === 'undefined') return;
 
     let pollInterval: NodeJS.Timeout | null = null;
     let lastUrl = window.location.href;
@@ -279,9 +281,8 @@ const PropertiesPageContent: React.FC = () => {
   }, [mounted, updateFiltersFromUrl]);
 
   useEffect(() => {
-    if (mounted && filters) {
-      loadProperties();
-    }
+    if (!mounted || typeof window === 'undefined') return;
+    loadProperties();
   }, [mounted, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
