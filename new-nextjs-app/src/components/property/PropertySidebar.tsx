@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography, Button, Avatar, Divider } from '@mui/material';
-import { Phone, WhatsApp, Email, LocationOn } from '@mui/icons-material';
+import { Box, Typography, Avatar } from '@mui/material';
+import { Email, LocationOn } from '@mui/icons-material';
 import PremiumPaper from './PremiumPaper';
 import PropertyMap from './PropertyMap';
 import PremiumButton from './PremiumButton';
@@ -53,7 +53,6 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
   headerHeight = 0, 
   handleContactOpen 
 }) => {
-  const [contactMethod, setContactMethod] = useState<'phone' | 'whatsapp' | 'email'>('email');
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
   return (
@@ -96,24 +95,6 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
               'Ready to Move'}
           </Typography>
         </Box>
-        
-        <Divider sx={{ my: 3, borderColor: 'var(--color-border)' }} />
-        
-        <PremiumButton 
-          fullWidth
-          size="large"
-          onClick={() => setContactModalOpen(true)}
-          startIcon={<Email sx={{ fontSize: '1.4rem' }} />}
-          sx={{
-            py: 2,
-            fontSize: '1.1rem',
-            '&:hover': {
-              animation: `${pulse} 1.5s infinite`
-            }
-          }}
-        >
-          Contact Agent
-        </PremiumButton>
       </PremiumPaper>
 
       {/* Contact Agent Card */}
@@ -156,43 +137,21 @@ const PropertySidebar: React.FC<PropertySidebarProps> = ({
           </Box>
         </Box>
         
-        <Button
+        <PremiumButton 
           fullWidth
-          variant="contained"
-          startIcon={<Phone />}
-          onClick={() => {
-            setContactMethod('phone');
-            setContactModalOpen(true);
-          }}
+          size="large"
+          onClick={() => setContactModalOpen(true)}
+          startIcon={<Email sx={{ fontSize: '1.4rem' }} />}
           sx={{
-            mb: 2,
-            backgroundColor: 'var(--color-success)',
+            py: 2,
+            fontSize: '1.1rem',
             '&:hover': {
-              backgroundColor: 'var(--color-success-hover)'
+              animation: `${pulse} 1.5s infinite`
             }
           }}
         >
-          Call Agent
-        </Button>
-        
-        <Button
-          fullWidth
-          variant="contained"
-          startIcon={<WhatsApp />}
-          onClick={() => {
-            setContactMethod('whatsapp');
-            setContactModalOpen(true);
-          }}
-          sx={{
-            backgroundColor: 'var(--color-whatsapp)',
-            color: '#ffffff',
-            '&:hover': {
-              backgroundColor: 'var(--color-whatsapp-hover)'
-            }
-          }}
-        >
-          WhatsApp
-        </Button>
+          Contact Agent
+        </PremiumButton>
       </PremiumPaper>
 
       {/* Location Map */}
