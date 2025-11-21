@@ -273,17 +273,15 @@ const PropertiesPageContent: React.FC = () => {
 
   // Safely read search params after mount to prevent hydration mismatch
   useEffect(() => {
-    if (typeof window === 'undefined' || !mounted || isClearingFilters) {
-      return;
-    }
+    if (typeof window === 'undefined') return;
+    if (!mounted || isClearingFilters) return;
     updateFiltersFromUrl();
   }, [mounted, isClearingFilters, updateFiltersFromUrl]);
 
   // Listen to URL changes via popstate events and polling for router navigation
   useEffect(() => {
-    if (typeof window === 'undefined' || !mounted) {
-      return;
-    }
+    if (typeof window === 'undefined') return;
+    if (!mounted) return;
 
     let pollInterval: NodeJS.Timeout | null = null;
     let lastUrl = window.location.href;
