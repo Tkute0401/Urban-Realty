@@ -445,8 +445,6 @@ function SearchContent() {
               <Box sx={{ height: '80vh', width: '100%' }}>
                 <PropertyHeatMap
                   properties={properties}
-                  userLocation={userLocation}
-                  searchQuery={filters.search}
                 />
               </Box>
             )}
