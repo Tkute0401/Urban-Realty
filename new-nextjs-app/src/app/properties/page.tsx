@@ -57,9 +57,10 @@ const PropertiesPageContent: React.FC = () => {
   const { properties, similarProperties, loading, error, pagination, getProperties, getSimilarProperties } = useProperties();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
   const [mounted, setMounted] = useState(false);
+  
+  // Use useMediaQuery with noSsr option to prevent hydration mismatch
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'), { noSsr: true });
   const [isInitialized, setIsInitialized] = useState(false);
   const urlParamsRef = useRef<string>('');
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
