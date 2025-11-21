@@ -12,7 +12,7 @@ router.post(
     check('password', 'Password must be 6+ characters').isLength({ min: 6 }),
     check('role', 'Role is required').isIn(['buyer', 'individual_seller', 'agent', 'developer', 'admin']),
     check('mobile', 'Please include a valid mobile number').optional().matches(/^\+?[0-9]{10,15}$/),
-    check('reraId', 'RERA ID is required for agent and developer').if((value, { req }) => ['agent', 'developer'].includes(req.body.role)).not().isEmpty()
+    check('reraId', 'RERA ID must be a valid string').optional().isString()
   ],
   authController.register
 );

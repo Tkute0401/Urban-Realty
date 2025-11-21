@@ -232,14 +232,13 @@ const Register = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <FieldIndicator required helperText="Required for Agents and Developers" />
+                  <FieldIndicator optional helperText="Optional - RERA ID for Agents and Developers" />
                   <TextField
                     fullWidth
                     label="RERA ID"
                     name="reraId"
                     value={formData.reraId}
                     onChange={handleChange}
-                    required
                     sx={textFieldStyles}
                   />
                 </Grid>
