@@ -330,15 +330,24 @@ exports.toggleFavorite = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/project-favorites/:projectId
 // @access  Private
 exports.toggleProjectFavorite = asyncHandler(async (req, res, next) => {
+  console.log('🔧 toggleProjectFavorite called with:', {
+    projectId: req.params.projectId,
+    userId: req.user?.id,
+    method: req.method,
+    url: req.url
+  });
+
   const user = await User.findById(req.user.id);
   
   if (!user) {
+    console.error('❌ User not found:', req.user.id);
     return next(new ErrorResponse('User not found', 404));
   }
 
   // Validate projectId format
   const projectId = req.params.projectId;
   if (!projectId || !projectId.match(/^[0-9a-fA-F]{24}$/)) {
+    console.error('❌ Invalid project ID format:', projectId);
     return next(new ErrorResponse('Invalid project ID format', 400));
   }
 
