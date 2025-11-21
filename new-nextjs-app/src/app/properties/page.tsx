@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense, useCallback, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { 
   Box, 
   Typography, 
@@ -53,7 +53,7 @@ import '@/style-constants/z-index.css';
 
 const PropertiesPageContent: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  // Removed useSearchParams() to prevent hydration mismatches - using window.location.search instead
   const { properties, similarProperties, loading, error, pagination, getProperties, getSimilarProperties } = useProperties();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
@@ -221,57 +221,40 @@ const PropertiesPageContent: React.FC = () => {
     updateFiltersFromUrl();
   }, [mounted, isClearingFilters, updateFiltersFromUrl]);
 
-  // Also listen to searchParams changes (for router.replace/push)
-  useEffect(() => {
-    if (!mounted || isClearingFilters) return;
-    
-    // Use a small delay to ensure URL is updated after router navigation
-    const timeoutId = setTimeout(() => {
-      updateFiltersFromUrl();
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [mounted, isClearingFilters, searchParams, updateFiltersFromUrl]);
-
-  // Listen to URL changes via popstate and hashchange events
+  // Listen to URL changes via popstate events and polling for router navigation
   useEffect(() => {
     if (!mounted) return;
 
-    const handleUrlChange = () => {
-      // Small delay to ensure URL is updated
-      setTimeout(() => {
-        const currentSearchString = window.location.search;
-        if (urlParamsRef.current !== currentSearchString) {
-          urlParamsRef.current = currentSearchString;
-          
-          const params = new URLSearchParams(currentSearchString);
-          const search = params.get('search') || '';
-          const type = params.get('type') || '';
-          const city = params.get('city') || '';
-          const propertyType = params.get('propertyType') || 'ALL';
+    let pollInterval: NodeJS.Timeout | null = null;
+    let lastUrl = window.location.href;
 
-          setFilters(prev => {
-            const hasChanges = 
-              prev.search !== search ||
-              prev.type !== type ||
-              prev.city !== city ||
-              prev.propertyType !== propertyType;
-            
-            if (hasChanges) {
-              return { ...prev, search, type, city, propertyType };
-            }
-            return prev;
-          });
-        }
+    const checkUrlChange = () => {
+      const currentUrl = window.location.href;
+      if (currentUrl !== lastUrl) {
+        lastUrl = currentUrl;
+        updateFiltersFromUrl();
+      }
+    };
+
+    const handleUrlChange = () => {
+      setTimeout(() => {
+        checkUrlChange();
       }, 0);
     };
 
+    // Listen to browser navigation (back/forward)
     window.addEventListener('popstate', handleUrlChange);
+    
+    // Poll for URL changes (handles Next.js router.replace/push)
+    pollInterval = setInterval(checkUrlChange, 200);
     
     return () => {
       window.removeEventListener('popstate', handleUrlChange);
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
     };
-  }, [mounted]);
+  }, [mounted, updateFiltersFromUrl]);
 
   useEffect(() => {
     if (mounted && filters) {
