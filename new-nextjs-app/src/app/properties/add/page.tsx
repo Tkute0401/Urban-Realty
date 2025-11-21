@@ -1455,7 +1455,7 @@ const AddPropertyPageContent: React.FC = () => {
           <Grid item xs={12}>
             <SectionHeader variant="h6">Nearby Localities</SectionHeader>
             <PremiumPaper>
-              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', mb: 2 }}>
+              <Typography variant="body1" sx={{ color: 'var(--color-text-primary)', mb: 2 }}>
                 Check the facilities that are nearby and provide their names
               </Typography>
               
@@ -1474,7 +1474,7 @@ const AddPropertyPageContent: React.FC = () => {
                       />
                     }
                     label="School Nearby"
-                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                    sx={{ color: 'var(--color-text-primary)' }}
                   />
                   {formData.nearbyLocalities.hasSchool && (
                     <TextField
@@ -1525,7 +1525,7 @@ const AddPropertyPageContent: React.FC = () => {
                       />
                     }
                     label="Hospital Nearby"
-                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                    sx={{ color: 'var(--color-text-primary)' }}
                   />
                   {formData.nearbyLocalities.hasHospital && (
                     <TextField
@@ -1576,7 +1576,7 @@ const AddPropertyPageContent: React.FC = () => {
                       />
                     }
                     label="Mall Nearby"
-                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                    sx={{ color: 'var(--color-text-primary)' }}
                   />
                   {formData.nearbyLocalities.hasMall && (
                     <TextField
@@ -1627,7 +1627,7 @@ const AddPropertyPageContent: React.FC = () => {
                       />
                     }
                     label="Park Nearby"
-                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                    sx={{ color: 'var(--color-text-primary)' }}
                   />
                   {formData.nearbyLocalities.hasPark && (
                     <TextField
@@ -1678,7 +1678,7 @@ const AddPropertyPageContent: React.FC = () => {
                       />
                     }
                     label="Public Transport Nearby"
-                    sx={{ color: 'rgba(255, 255, 255, 0.85)' }}
+                    sx={{ color: 'var(--color-text-primary)' }}
                   />
                   {formData.nearbyLocalities.hasTransport && (
                     <TextField
