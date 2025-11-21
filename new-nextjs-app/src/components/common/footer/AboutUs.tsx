@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import Link from 'next/link';
-import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { BuildingOfficeIcon, UserGroupIcon, TrophyIcon, ChartBarIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useEffect, useContext } from 'react';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import { createThemeColors } from '@/lib/theme/colors';
@@ -144,32 +144,60 @@ const AboutUs = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group"
-              >
-                <div className="relative overflow-hidden rounded-xl mb-4 h-64">
-                  <img 
-                    src={member.image} 
-                    alt={member.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <h3 className="text-xl font-bold">{member.name}</h3>
-                    <Link href={member.path || '#'}>
-                      <p className="text-[var(--color-primary)] text-sm">{member.role}</p>
-                    </Link>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {team.map((member, index) => {
+              const initials = member.name
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+              
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group"
+                >
+                  <div 
+                    className="rounded-xl p-6 border transition-all hover:shadow-lg"
+                    style={{ 
+                      backgroundColor: colors.bg.primary,
+                      borderColor: `${colors.primary.main}33`
+                    }}
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <div 
+                        className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+                        style={{ 
+                          backgroundColor: `${colors.primary.main}20`,
+                          color: colors.primary.main
+                        }}
+                      >
+                        <span className="text-2xl font-bold">{initials}</span>
+                      </div>
+                      <h3 
+                        className="text-xl font-bold mb-2"
+                        style={{ color: colors.text.primary }}
+                      >
+                        {member.name}
+                      </h3>
+                      <Link href={member.path || '#'}>
+                        <p 
+                          className="text-sm transition-colors hover:opacity-80"
+                          style={{ color: colors.primary.main }}
+                        >
+                          {member.role}
+                        </p>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
