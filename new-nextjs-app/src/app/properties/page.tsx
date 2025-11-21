@@ -60,6 +60,24 @@ const PropertiesPageContent: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [mounted, setMounted] = useState(false);
+  const [urlParams, setUrlParams] = useState<{ search: string; type: string; city: string; propertyType: string }>({
+    search: '',
+    type: '',
+    city: '',
+    propertyType: 'ALL'
+  });
+  
+  // Helper to safely get search params
+  const getSearchParam = useCallback((key: string): string => {
+    if (typeof window === 'undefined' || !mounted) return '';
+    try {
+      return searchParams?.get(key) || '';
+    } catch {
+      // Fallback to window.location if searchParams fails
+      const params = new URLSearchParams(window.location.search);
+      return params.get(key) || '';
+    }
+  }, [searchParams, mounted]);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
@@ -170,16 +188,32 @@ const PropertiesPageContent: React.FC = () => {
     setMounted(true);
   }, []);
 
+  // Safely read search params after mount to prevent hydration mismatch
   useEffect(() => {
     if (!mounted || isClearingFilters) return;
 
-    const search = searchParams.get('search') || '';
-    const type = searchParams.get('type') || '';
-    const city = searchParams.get('city') || '';
-    const propertyType = searchParams.get('propertyType') || 'ALL';
+    try {
+      const search = getSearchParam('search');
+      const type = getSearchParam('type');
+      const city = getSearchParam('city');
+      const propertyType = getSearchParam('propertyType') || 'ALL';
 
-    setFilters(prev => ({ ...prev, search, type, city, propertyType }));
-  }, [searchParams, mounted, isClearingFilters]);
+      const newParams = { search, type, city, propertyType };
+      
+      // Only update if params actually changed to prevent infinite loops
+      if (
+        urlParams.search !== search ||
+        urlParams.type !== type ||
+        urlParams.city !== city ||
+        urlParams.propertyType !== propertyType
+      ) {
+        setUrlParams(newParams);
+        setFilters(prev => ({ ...prev, ...newParams }));
+      }
+    } catch (err) {
+      console.error('Error reading search params:', err);
+    }
+  }, [mounted, isClearingFilters, getSearchParam, urlParams]);
 
   useEffect(() => {
     if (mounted && filters) {
