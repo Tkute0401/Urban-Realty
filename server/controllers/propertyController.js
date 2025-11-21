@@ -423,7 +423,10 @@ exports.getAgentProperties = asyncHandler(async (req, res, next) => {
 // @access  Public
 exports.getProperty = asyncHandler(async (req, res, next) => {
   try {
-    console.log('🏠 Getting property with ID:', req.params.id);
+    // Handle both /:id and /slug/:slug routes
+    const identifier = req.params.slug || req.params.id;
+    
+    console.log('🏠 Getting property with ID/Slug:', identifier);
     console.log('🔧 Database state:', require('mongoose').connection.readyState);
     console.log('🔧 Request details:', {
       method: req.method,
@@ -434,7 +437,7 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
     });
     
     // Check if it's a MongoDB ObjectId or a slug
-    const isObjectId = req.params.id && req.params.id.match(/^[0-9a-fA-F]{24}$/);
+    const isObjectId = identifier && identifier.match(/^[0-9a-fA-F]{24}$/);
     
     // Find property and populate agent details
     console.log('🔍 Searching for property in database...');
@@ -442,21 +445,21 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
     try {
       if (isObjectId) {
         // It's an ObjectId, find by ID
-        console.log('🔧 Executing Property.findById with ID:', req.params.id);
-        property = await Property.findById(req.params.id)
+        console.log('🔧 Executing Property.findById with ID:', identifier);
+        property = await Property.findById(identifier)
           .populate('agent', 'name email phone mobile')
           .populate('developer', 'name logo');
       } else {
         // It's a slug, find by slug
-        console.log('🔧 Executing Property.findOne with slug:', req.params.id);
-        property = await Property.findOne({ slug: req.params.id })
+        console.log('🔧 Executing Property.findOne with slug:', identifier);
+        property = await Property.findOne({ slug: identifier })
           .populate('agent', 'name email phone mobile')
           .populate('developer', 'name logo');
         
         // If not found by slug, try by title (for backward compatibility)
         if (!property) {
           console.log('🔧 Property not found by slug, trying by title...');
-          const titleSlug = req.params.id.replace(/-/g, ' ');
+          const titleSlug = identifier.replace(/-/g, ' ');
           property = await Property.findOne({ 
             $or: [
               { title: { $regex: new RegExp(titleSlug, 'i') } },

@@ -136,6 +136,11 @@ router.put(
 );
 
 
+// @desc    Get single property by slug
+// @route   GET /api/v1/properties/slug/:slug
+// @access  Public
+router.get('/slug/:slug', propertyController.getProperty);
+
 // @desc    Get single property
 // @route   GET /api/v1/properties/:id
 // @access  Public
