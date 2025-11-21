@@ -336,15 +336,28 @@ exports.toggleProjectFavorite = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('User not found', 404));
   }
 
+  // Validate projectId format
+  const projectId = req.params.projectId;
+  if (!projectId || !projectId.match(/^[0-9a-fA-F]{24}$/)) {
+    return next(new ErrorResponse('Invalid project ID format', 400));
+  }
+
+  // Check if project exists
+  const Project = require('../models/Project');
+  const project = await Project.findById(projectId);
+  if (!project) {
+    return next(new ErrorResponse('Project not found', 404));
+  }
+
   // Ensure projectFavorites array exists
   if (!Array.isArray(user.projectFavorites)) {
     user.projectFavorites = [];
   }
 
   // Normalize ObjectId comparison by using string values
-  const projectId = req.params.projectId.toString();
+  const projectIdStr = projectId.toString();
   const projectFavorites = user.projectFavorites;
-  const index = projectFavorites.findIndex(id => id.toString() === projectId);
+  const index = projectFavorites.findIndex(id => id.toString() === projectIdStr);
 
   let isFavorite;
   if (index === -1) {
@@ -357,7 +370,12 @@ exports.toggleProjectFavorite = asyncHandler(async (req, res, next) => {
     isFavorite = false;
   }
   
-  await user.save();
+  try {
+    await user.save();
+  } catch (error) {
+    console.error('Error saving user favorites:', error);
+    return next(new ErrorResponse('Failed to update favorites', 500));
+  }
   
   res.status(200).json({
     success: true,
