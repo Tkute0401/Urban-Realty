@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Project = require('../models/Project');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 
@@ -352,7 +353,6 @@ exports.toggleProjectFavorite = asyncHandler(async (req, res, next) => {
   }
 
   // Check if project exists
-  const Project = require('../models/Project');
   const project = await Project.findById(projectId);
   if (!project) {
     return next(new ErrorResponse('Project not found', 404));
