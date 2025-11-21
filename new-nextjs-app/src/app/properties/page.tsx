@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Box, 
@@ -60,24 +60,8 @@ const PropertiesPageContent: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [mounted, setMounted] = useState(false);
-  const [urlParams, setUrlParams] = useState<{ search: string; type: string; city: string; propertyType: string }>({
-    search: '',
-    type: '',
-    city: '',
-    propertyType: 'ALL'
-  });
-  
-  // Helper to safely get search params
-  const getSearchParam = useCallback((key: string): string => {
-    if (typeof window === 'undefined' || !mounted) return '';
-    try {
-      return searchParams?.get(key) || '';
-    } catch {
-      // Fallback to window.location if searchParams fails
-      const params = new URLSearchParams(window.location.search);
-      return params.get(key) || '';
-    }
-  }, [searchParams, mounted]);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const urlParamsRef = useRef<string>('');
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
@@ -188,32 +172,106 @@ const PropertiesPageContent: React.FC = () => {
     setMounted(true);
   }, []);
 
-  // Safely read search params after mount to prevent hydration mismatch
-  useEffect(() => {
-    if (!mounted || isClearingFilters) return;
+  // Helper to read and update filters from URL
+  const updateFiltersFromUrl = useCallback(() => {
+    if (typeof window === 'undefined') return;
 
     try {
-      const search = getSearchParam('search');
-      const type = getSearchParam('type');
-      const city = getSearchParam('city');
-      const propertyType = getSearchParam('propertyType') || 'ALL';
-
-      const newParams = { search, type, city, propertyType };
+      const currentSearchString = window.location.search;
       
-      // Only update if params actually changed to prevent infinite loops
-      if (
-        urlParams.search !== search ||
-        urlParams.type !== type ||
-        urlParams.city !== city ||
-        urlParams.propertyType !== propertyType
-      ) {
-        setUrlParams(newParams);
-        setFilters(prev => ({ ...prev, ...newParams }));
+      // Only process if search string actually changed
+      if (urlParamsRef.current === currentSearchString && isInitialized) {
+        return;
+      }
+
+      urlParamsRef.current = currentSearchString;
+
+      // Always use window.location.search as source of truth to avoid hydration issues
+      const params = new URLSearchParams(currentSearchString);
+      const search = params.get('search') || '';
+      const type = params.get('type') || '';
+      const city = params.get('city') || '';
+      const propertyType = params.get('propertyType') || 'ALL';
+
+      // Update filters only if values changed
+      setFilters(prev => {
+        const hasChanges = 
+          prev.search !== search ||
+          prev.type !== type ||
+          prev.city !== city ||
+          prev.propertyType !== propertyType;
+        
+        if (hasChanges) {
+          return { ...prev, search, type, city, propertyType };
+        }
+        return prev;
+      });
+
+      if (!isInitialized) {
+        setIsInitialized(true);
       }
     } catch (err) {
       console.error('Error reading search params:', err);
     }
-  }, [mounted, isClearingFilters, getSearchParam, urlParams]);
+  }, [isInitialized]);
+
+  // Safely read search params after mount to prevent hydration mismatch
+  useEffect(() => {
+    if (!mounted || isClearingFilters) return;
+    updateFiltersFromUrl();
+  }, [mounted, isClearingFilters, updateFiltersFromUrl]);
+
+  // Also listen to searchParams changes (for router.replace/push)
+  useEffect(() => {
+    if (!mounted || isClearingFilters) return;
+    
+    // Use a small delay to ensure URL is updated after router navigation
+    const timeoutId = setTimeout(() => {
+      updateFiltersFromUrl();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [mounted, isClearingFilters, searchParams, updateFiltersFromUrl]);
+
+  // Listen to URL changes via popstate and hashchange events
+  useEffect(() => {
+    if (!mounted) return;
+
+    const handleUrlChange = () => {
+      // Small delay to ensure URL is updated
+      setTimeout(() => {
+        const currentSearchString = window.location.search;
+        if (urlParamsRef.current !== currentSearchString) {
+          urlParamsRef.current = currentSearchString;
+          
+          const params = new URLSearchParams(currentSearchString);
+          const search = params.get('search') || '';
+          const type = params.get('type') || '';
+          const city = params.get('city') || '';
+          const propertyType = params.get('propertyType') || 'ALL';
+
+          setFilters(prev => {
+            const hasChanges = 
+              prev.search !== search ||
+              prev.type !== type ||
+              prev.city !== city ||
+              prev.propertyType !== propertyType;
+            
+            if (hasChanges) {
+              return { ...prev, search, type, city, propertyType };
+            }
+            return prev;
+          });
+        }
+      }, 0);
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, [mounted]);
 
   useEffect(() => {
     if (mounted && filters) {
