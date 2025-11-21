@@ -62,6 +62,7 @@ const PropertiesPageContent: React.FC = () => {
   const mobileCheckInitialized = useRef(false);
   
   const [isInitialized, setIsInitialized] = useState(false);
+  const isInitializedRef = useRef<boolean>(false);
   const urlParamsRef = useRef<string>('');
   const isUpdatingUrlRef = useRef<boolean>(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
@@ -186,7 +187,7 @@ const PropertiesPageContent: React.FC = () => {
     }
   }, []);
 
-  // Helper to read and update filters from URL
+  // Helper to read and update filters from URL - use ref to avoid dependency issues
   const updateFiltersFromUrl = useCallback(() => {
     if (typeof window === 'undefined') return;
     
@@ -199,7 +200,7 @@ const PropertiesPageContent: React.FC = () => {
       const currentSearchString = window.location.search;
       
       // Only process if search string actually changed
-      if (urlParamsRef.current === currentSearchString && isInitialized) {
+      if (urlParamsRef.current === currentSearchString && isInitializedRef.current) {
         return;
       }
 
@@ -226,13 +227,15 @@ const PropertiesPageContent: React.FC = () => {
         return prev;
       });
 
-      if (!isInitialized) {
+      if (!isInitializedRef.current) {
+        isInitializedRef.current = true;
         setIsInitialized(true);
       }
     } catch (err) {
       console.error('Error reading search params:', err);
     }
-  }, [isInitialized]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - use refs for values that change
 
   // Safely read search params after mount to prevent hydration mismatch
   useEffect(() => {
