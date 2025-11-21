@@ -75,13 +75,7 @@ const PropertiesPageContent: React.FC = () => {
   const { user } = useAuth();
   const { comparisonProperties, addToComparison, removeFromComparison } = useComparison();
   
-  const handlePropertyClick = (property: any) => {
-    setSelectedProperty(property);
-    const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
-    router.push(`/properties/${slug}`);
-  };
-
-  
+  // All state hooks must be declared before any other logic to ensure consistent hook order
   const [showHomeTypeFilter, setShowHomeTypeFilter] = useState(false);
   const [showPriceFilter, setShowPriceFilter] = useState(false);
   const [showBedBathFilter, setShowBedBathFilter] = useState(false);
@@ -124,6 +118,13 @@ const PropertiesPageContent: React.FC = () => {
   const paginationRef = useRef(pagination);
   const userLocationRef = useRef(userLocation);
   const getPropertiesRef = useRef(getProperties);
+
+  // All hooks must be declared before any functions or other logic
+  const handlePropertyClick = (property: any) => {
+    setSelectedProperty(property);
+    const slug = property.slug || property.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || property._id;
+    router.push(`/properties/${slug}`);
+  };
 
   const amenityOptions = [
     'Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony',
@@ -315,6 +316,7 @@ const PropertiesPageContent: React.FC = () => {
   }, [mounted, updateFiltersFromUrl]);
 
   // Load properties when mounted or when filters/pagination/userLocation change
+  // Use refs inside loadProperties to get latest values without causing effect re-runs
   useEffect(() => {
     if (typeof window === 'undefined' || !mounted) {
       return;
