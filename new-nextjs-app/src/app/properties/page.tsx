@@ -63,6 +63,7 @@ const PropertiesPageContent: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'), { noSsr: true });
   const [isInitialized, setIsInitialized] = useState(false);
   const urlParamsRef = useRef<string>('');
+  const isUpdatingUrlRef = useRef<boolean>(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
