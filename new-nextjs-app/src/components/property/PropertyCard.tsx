@@ -42,7 +42,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const router = useRouter();
   const { user } = useAuth();
-  const { addToComparison, isInComparison, canAddMore } = useComparison();
+  const { addToComparison, removeFromComparison, isInComparison, canAddMore } = useComparison();
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -262,6 +262,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             onClick={(e) => {
               e.stopPropagation();
               if (isInComparison(property._id)) {
+                removeFromComparison(property._id);
                 return;
               }
               if (canAddMore) {

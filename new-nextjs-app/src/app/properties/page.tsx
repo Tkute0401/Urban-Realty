@@ -176,6 +176,11 @@ const PropertiesPageContent: React.FC = () => {
   // Helper to read and update filters from URL
   const updateFiltersFromUrl = useCallback(() => {
     if (typeof window === 'undefined') return;
+    
+    // Skip if we're currently updating the URL programmatically
+    if (isUpdatingUrlRef.current) {
+      return;
+    }
 
     try {
       const currentSearchString = window.location.search;
@@ -316,15 +321,24 @@ const PropertiesPageContent: React.FC = () => {
     
     // Update URL params for filters that can come from URL
     if (key === 'search' || key === 'city' || key === 'type' || key === 'propertyType') {
-      const params = new URLSearchParams();
-      if (newFilters.search) params.set('search', newFilters.search);
-      if (newFilters.city) params.set('city', newFilters.city);
-      if (newFilters.type) params.set('type', newFilters.type);
-      if (newFilters.propertyType && newFilters.propertyType !== 'ALL') {
-        params.set('propertyType', newFilters.propertyType);
-      }
-      const queryString = params.toString();
-      router.replace(queryString ? `/properties?${queryString}` : '/properties');
+      isUpdatingUrlRef.current = true;
+      setTimeout(() => {
+        const params = new URLSearchParams();
+        if (newFilters.search) params.set('search', newFilters.search);
+        if (newFilters.city) params.set('city', newFilters.city);
+        if (newFilters.type) params.set('type', newFilters.type);
+        if (newFilters.propertyType && newFilters.propertyType !== 'ALL') {
+          params.set('propertyType', newFilters.propertyType);
+        }
+        const queryString = params.toString();
+        router.replace(queryString ? `/properties?${queryString}` : '/properties');
+        
+        // Reset flag after a delay to allow URL to update
+        setTimeout(() => {
+          isUpdatingUrlRef.current = false;
+          urlParamsRef.current = window.location.search;
+        }, 100);
+      }, 0);
     }
     
     // Auto-trigger search for specific filters with updated state
@@ -391,6 +405,27 @@ const PropertiesPageContent: React.FC = () => {
     if (isMobile && showFiltersDrawer) {
       setShowFiltersDrawer(false);
     }
+    
+    // Update URL params - use setTimeout to avoid hydration race conditions
+    isUpdatingUrlRef.current = true;
+    setTimeout(() => {
+      const params = new URLSearchParams();
+      if (newFilters.search) params.set('search', newFilters.search);
+      if (newFilters.city) params.set('city', newFilters.city);
+      if (newFilters.type) params.set('type', newFilters.type);
+      if (newType !== 'ALL') {
+        params.set('propertyType', newType);
+      }
+      const queryString = params.toString();
+      // Use replace to avoid adding to history and prevent hydration issues
+      router.replace(queryString ? `/properties?${queryString}` : '/properties');
+      
+      // Reset flag after a delay to allow URL to update
+      setTimeout(() => {
+        isUpdatingUrlRef.current = false;
+        urlParamsRef.current = window.location.search;
+      }, 100);
+    }, 0);
     
     // Trigger search immediately with new filter
     loadPropertiesWithFilters(newFilters);
