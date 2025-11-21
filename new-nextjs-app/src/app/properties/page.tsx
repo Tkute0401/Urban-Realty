@@ -47,7 +47,7 @@ import RecommendedProperties from '@/components/property/RecommendedProperties';
 import SearchAutocomplete from '@/components/property/SearchAutocomplete';
 import { useComparison } from '@/contexts/ComparisonContext';
 import { useLocation } from '@/hooks/useLocation';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useAuth } from '@/contexts/AuthContext';
 import '@/style-constants/z-index.css';
 
@@ -58,9 +58,20 @@ const PropertiesPageContent: React.FC = () => {
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
-  // Use useMediaQuery with noSsr option to prevent hydration mismatch
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'), { noSsr: true });
+  // Check mobile after mount to prevent hydration issues
+  useEffect(() => {
+    if (!mounted || typeof window === 'undefined') return;
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < theme.breakpoints.values.sm);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [mounted, theme.breakpoints.values.sm]);
+  
   const [isInitialized, setIsInitialized] = useState(false);
   const urlParamsRef = useRef<string>('');
   const isUpdatingUrlRef = useRef<boolean>(false);
