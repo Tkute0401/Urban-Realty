@@ -59,18 +59,7 @@ const PropertiesPageContent: React.FC = () => {
   const theme = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  
-  // Check mobile after mount to prevent hydration issues
-  useEffect(() => {
-    if (!mounted || typeof window === 'undefined') return;
-    
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < theme.breakpoints.values.sm);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, [mounted, theme.breakpoints.values.sm]);
+  const mobileCheckInitialized = useRef(false);
   
   const [isInitialized, setIsInitialized] = useState(false);
   const urlParamsRef = useRef<string>('');
@@ -183,6 +172,18 @@ const PropertiesPageContent: React.FC = () => {
 
   useEffect(() => {
     setMounted(true);
+    
+    // Check mobile after mount to prevent hydration issues - only initialize once
+    if (typeof window !== 'undefined' && !mobileCheckInitialized.current) {
+      mobileCheckInitialized.current = true;
+      const smBreakpoint = 600; // Standard Material-UI sm breakpoint
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < smBreakpoint);
+      };
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }
   }, []);
 
   // Helper to read and update filters from URL
