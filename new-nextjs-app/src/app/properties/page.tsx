@@ -52,20 +52,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import '@/style-constants/z-index.css';
 
 const PropertiesPageContent: React.FC = () => {
+  // ALL HOOKS MUST BE CALLED FIRST IN A CONSISTENT ORDER
+  // Context hooks
   const router = useRouter();
-  // Removed useSearchParams() to prevent hydration mismatches - using window.location.search instead
   const { properties, similarProperties, loading, error, pagination, getProperties, getSimilarProperties } = useProperties();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
-  // Removed mounted state to avoid hook order issues - component is already client-side
-  const mounted = true;
-  const [isMobile, setIsMobile] = useState(false);
-  const mobileCheckInitialized = useRef(false);
+  const { user } = useAuth();
+  const { comparisonProperties, addToComparison, removeFromComparison } = useComparison();
   
+  // State hooks - all declared together
+  const [isMobile, setIsMobile] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const isInitializedRef = useRef<boolean>(false);
-  const urlParamsRef = useRef<string>('');
-  const isUpdatingUrlRef = useRef<boolean>(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [expandedSearch, setExpandedSearch] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState(false);
@@ -73,14 +71,19 @@ const PropertiesPageContent: React.FC = () => {
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [isClearingFilters, setIsClearingFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map' | 'heatmap'>('list');
-  const { user } = useAuth();
-  const { comparisonProperties, addToComparison, removeFromComparison } = useComparison();
-  
-  // All state hooks must be declared before any other logic to ensure consistent hook order
   const [showHomeTypeFilter, setShowHomeTypeFilter] = useState(false);
   const [showPriceFilter, setShowPriceFilter] = useState(false);
   const [showBedBathFilter, setShowBedBathFilter] = useState(false);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+  
+  // Ref hooks - all declared together
+  const mobileCheckInitialized = useRef(false);
+  const isInitializedRef = useRef<boolean>(false);
+  const urlParamsRef = useRef<string>('');
+  const isUpdatingUrlRef = useRef<boolean>(false);
+  
+  // Removed mounted state to avoid hook order issues - component is already client-side
+  const mounted = true;
   
   const [filters, setFilters] = useState({
     search: '',
