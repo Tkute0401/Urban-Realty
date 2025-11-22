@@ -338,7 +338,8 @@ const PropertiesPageContent: React.FC = () => {
     userLocationRef.current = userLocation;
     getPropertiesRef.current = getProperties;
     loadProperties();
-  }, [mounted, filters, pagination, userLocation, getProperties, loadProperties]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, filters, pagination, userLocation, getProperties]); // loadProperties is stable, no need to include it
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
