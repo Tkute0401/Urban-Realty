@@ -597,6 +597,8 @@ const PropertiesPageContent: React.FC = () => {
     (Array.isArray(value) ? value.length > 0 : true)
   ).length;
 
+  // Always render the same structure to ensure consistent hook order
+  // Use conditional rendering instead of early return
   if (!mounted) {
     return (
       <Box sx={{
