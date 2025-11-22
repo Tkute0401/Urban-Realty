@@ -57,7 +57,8 @@ const PropertiesPageContent: React.FC = () => {
   const { properties, similarProperties, loading, error, pagination, getProperties, getSimilarProperties } = useProperties();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
   const theme = useTheme();
-  const [mounted, setMounted] = useState(false);
+  // Removed mounted state to avoid hook order issues - component is already client-side
+  const mounted = true;
   const [isMobile, setIsMobile] = useState(false);
   const mobileCheckInitialized = useRef(false);
   
@@ -212,9 +213,7 @@ const PropertiesPageContent: React.FC = () => {
     currentGetProperties(params);
   }, []); // Empty deps - use refs for everything to maintain stability
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Removed mounted effect - component is client-side only
 
   // Separate effect for mobile detection to ensure consistent hook order
   useEffect(() => {
@@ -293,7 +292,7 @@ const PropertiesPageContent: React.FC = () => {
   // Listen to URL changes via popstate events and polling for router navigation
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!mounted) return;
+    // Component is client-side, no mounted check needed
 
     let pollInterval: NodeJS.Timeout | null = null;
     let lastUrl = window.location.href;
@@ -329,7 +328,7 @@ const PropertiesPageContent: React.FC = () => {
   // Load properties when mounted or when filters/pagination/userLocation change
   // Update refs first, then call loadProperties to ensure latest values
   useEffect(() => {
-    if (typeof window === 'undefined' || !mounted) {
+    if (typeof window === 'undefined') {
       return;
     }
     // Update refs synchronously before calling loadProperties
@@ -569,19 +568,7 @@ const PropertiesPageContent: React.FC = () => {
 
   // Always render the same structure to ensure consistent hook order
   // Use conditional rendering instead of early return
-  if (!mounted) {
-    return (
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: 'var(--color-bg)'
-      }}>
-        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-      </Box>
-    );
-  }
+  // Component is client-side, no loading state needed
 
   console.log('🔍 Properties page rendering:', {
     isMobile,
