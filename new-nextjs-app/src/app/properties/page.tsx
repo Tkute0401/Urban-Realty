@@ -133,16 +133,9 @@ const PropertiesPageContent: React.FC = () => {
     'Laundry', 'Storage', 'Conference Room', 'Kitchen'
   ];
 
-  // Update refs synchronously - no separate effects to avoid hook order issues
   // Stable loadProperties function that uses refs to avoid dependency issues
   // Accepts optional filterState and resetPage to support advanced search
   const loadProperties = useCallback((filterState?: any, resetPage: boolean = false) => {
-    // Update refs synchronously before using them
-    filtersRef.current = filters;
-    paginationRef.current = pagination;
-    userLocationRef.current = userLocation;
-    getPropertiesRef.current = getProperties;
-    
     const currentFilters = filterState || filtersRef.current;
     const currentPagination = paginationRef.current;
     const currentUserLocation = userLocationRef.current;
@@ -217,7 +210,7 @@ const PropertiesPageContent: React.FC = () => {
 
     console.log('🔍 Loading properties with params:', params);
     currentGetProperties(params);
-  }, [filters, pagination, userLocation, getProperties]); // Include deps but update refs synchronously
+  }, []); // Empty deps - use refs for everything to maintain stability
 
   useEffect(() => {
     setMounted(true);
@@ -334,12 +327,18 @@ const PropertiesPageContent: React.FC = () => {
   }, [mounted, updateFiltersFromUrl]);
 
   // Load properties when mounted or when filters/pagination/userLocation change
+  // Update refs first, then call loadProperties to ensure latest values
   useEffect(() => {
     if (typeof window === 'undefined' || !mounted) {
       return;
     }
+    // Update refs synchronously before calling loadProperties
+    filtersRef.current = filters;
+    paginationRef.current = pagination;
+    userLocationRef.current = userLocation;
+    getPropertiesRef.current = getProperties;
     loadProperties();
-  }, [mounted, loadProperties]);
+  }, [mounted, filters, pagination, userLocation, getProperties, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
