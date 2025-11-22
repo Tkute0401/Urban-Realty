@@ -288,9 +288,9 @@ const PropertiesPageContent: React.FC = () => {
   // Safely read search params after mount to prevent hydration mismatch
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!mounted || isClearingFilters) return;
+    if (isClearingFilters) return;
     updateFiltersFromUrl();
-  }, [mounted, isClearingFilters, updateFiltersFromUrl]);
+  }, [isClearingFilters, updateFiltersFromUrl]);
 
   // Listen to URL changes via popstate events and polling for router navigation
   useEffect(() => {
@@ -326,7 +326,7 @@ const PropertiesPageContent: React.FC = () => {
         clearInterval(pollInterval);
       }
     };
-  }, [mounted, updateFiltersFromUrl]);
+  }, [updateFiltersFromUrl]);
 
   // Load properties when mounted or when filters/pagination/userLocation change
   // Update refs first, then call loadProperties to ensure latest values
@@ -341,7 +341,7 @@ const PropertiesPageContent: React.FC = () => {
     getPropertiesRef.current = getProperties;
     loadProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, filters, pagination, userLocation, getProperties]); // loadProperties is stable, no need to include it
+  }, [filters, pagination, userLocation, getProperties]); // loadProperties is stable, no need to include it
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
