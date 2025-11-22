@@ -466,7 +466,7 @@ const PropertiesPageContent: React.FC = () => {
     }, 0);
     
     // Trigger search immediately with new filter
-    loadPropertiesWithFilters(newFilters);
+    loadProperties(newFilters);
   };
 
   const clearAllFilters = () => {
@@ -514,7 +514,7 @@ const PropertiesPageContent: React.FC = () => {
     router.replace('/properties');
     
     // Trigger search with cleared filters and reset to page 1
-    loadPropertiesWithFilters(clearedFilters, true);
+    loadProperties(clearedFilters, true);
     
     // Reset flag after a short delay to allow URL update to complete
     setTimeout(() => {
