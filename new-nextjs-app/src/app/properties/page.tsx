@@ -133,26 +133,16 @@ const PropertiesPageContent: React.FC = () => {
     'Laundry', 'Storage', 'Conference Room', 'Kitchen'
   ];
 
-  // Update refs when values change
-  useEffect(() => {
-    filtersRef.current = filters;
-  }, [filters]);
-
-  useEffect(() => {
-    paginationRef.current = pagination;
-  }, [pagination]);
-
-  useEffect(() => {
-    userLocationRef.current = userLocation;
-  }, [userLocation]);
-
-  useEffect(() => {
-    getPropertiesRef.current = getProperties;
-  }, [getProperties]);
-
+  // Update refs synchronously - no separate effects to avoid hook order issues
   // Stable loadProperties function that uses refs to avoid dependency issues
   // Accepts optional filterState and resetPage to support advanced search
   const loadProperties = useCallback((filterState?: any, resetPage: boolean = false) => {
+    // Update refs synchronously before using them
+    filtersRef.current = filters;
+    paginationRef.current = pagination;
+    userLocationRef.current = userLocation;
+    getPropertiesRef.current = getProperties;
+    
     const currentFilters = filterState || filtersRef.current;
     const currentPagination = paginationRef.current;
     const currentUserLocation = userLocationRef.current;
@@ -227,7 +217,7 @@ const PropertiesPageContent: React.FC = () => {
 
     console.log('🔍 Loading properties with params:', params);
     currentGetProperties(params);
-  }, []); // Empty deps - use refs for everything
+  }, [filters, pagination, userLocation, getProperties]); // Include deps but update refs synchronously
 
   useEffect(() => {
     setMounted(true);
@@ -344,17 +334,12 @@ const PropertiesPageContent: React.FC = () => {
   }, [mounted, updateFiltersFromUrl]);
 
   // Load properties when mounted or when filters/pagination/userLocation change
-  // Refs are updated by separate effects, so loadProperties will get latest values
   useEffect(() => {
     if (typeof window === 'undefined' || !mounted) {
       return;
     }
-    // Use a small delay to ensure refs are updated from the ref update effects
-    const timeoutId = setTimeout(() => {
-      loadProperties();
-    }, 0);
-    return () => clearTimeout(timeoutId);
-  }, [mounted, filters, pagination.page, userLocation, loadProperties]);
+    loadProperties();
+  }, [mounted, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
