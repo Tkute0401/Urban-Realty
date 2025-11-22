@@ -328,8 +328,9 @@ const PropertiesPageContent: React.FC = () => {
     };
   }, [updateFiltersFromUrl]);
 
-  // Load properties when mounted or when filters/pagination/userLocation change
-  // Update refs first, then call loadProperties to ensure latest values
+  // Load properties when filters/pagination.page/userLocation change
+  // Use ref to prevent infinite loops from pagination object reference changes
+  const lastLoadParamsRef = useRef<string>('');
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -339,9 +340,24 @@ const PropertiesPageContent: React.FC = () => {
     paginationRef.current = pagination;
     userLocationRef.current = userLocation;
     getPropertiesRef.current = getProperties;
-    loadProperties();
+    
+    // Create a stable key to prevent unnecessary re-loads
+    const loadKey = JSON.stringify({
+      search: filters.search,
+      type: filters.type,
+      city: filters.city,
+      propertyType: filters.propertyType,
+      page: pagination.page,
+      userLocation: userLocation ? `${userLocation.latitude},${userLocation.longitude}` : null
+    });
+    
+    // Only load if params actually changed
+    if (lastLoadParamsRef.current !== loadKey) {
+      lastLoadParamsRef.current = loadKey;
+      loadProperties();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, pagination, userLocation, getProperties]); // loadProperties is stable, no need to include it
+  }, [filters.search, filters.type, filters.city, filters.propertyType, pagination.page, userLocation, getProperties]); // Only depend on specific values, not whole objects
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
