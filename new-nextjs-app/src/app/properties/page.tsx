@@ -151,14 +151,15 @@ const PropertiesPageContent: React.FC = () => {
   }, [getProperties]);
 
   // Stable loadProperties function that uses refs to avoid dependency issues
-  const loadProperties = useCallback(() => {
-    const currentFilters = filtersRef.current;
+  // Accepts optional filterState and resetPage to support advanced search
+  const loadProperties = useCallback((filterState?: any, resetPage: boolean = false) => {
+    const currentFilters = filterState || filtersRef.current;
     const currentPagination = paginationRef.current;
     const currentUserLocation = userLocationRef.current;
     const currentGetProperties = getPropertiesRef.current;
     
     const params: any = {
-      page: currentPagination.page,
+      page: resetPage ? 1 : currentPagination.page,
       limit: 12
     };
 
@@ -191,6 +192,32 @@ const PropertiesPageContent: React.FC = () => {
     if (currentFilters.propertyType !== 'ALL') {
       params.status = currentFilters.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
     }
+
+    // Advanced filters
+    if (currentFilters.constructionStatus && Array.isArray(currentFilters.constructionStatus) && currentFilters.constructionStatus.length > 0) {
+      params.constructionStatus = currentFilters.constructionStatus.join(',');
+    }
+    if (currentFilters.furnished !== undefined) {
+      params.furnished = currentFilters.furnished;
+    }
+    if (currentFilters.facing) params.facing = currentFilters.facing;
+    if (currentFilters.floorRangeMin) params.floorRangeMin = Number(currentFilters.floorRangeMin);
+    if (currentFilters.floorRangeMax) params.floorRangeMax = Number(currentFilters.floorRangeMax);
+    if (currentFilters.parkingSpaces) params.parkingSpaces = Number(currentFilters.parkingSpaces);
+    if (currentFilters.verified !== undefined) {
+      params.verified = currentFilters.verified;
+    }
+    if (currentFilters.hasVirtualTour !== undefined) {
+      params.hasVirtualTour = currentFilters.hasVirtualTour;
+    }
+    if (currentFilters.nearSchools) params.nearSchools = currentFilters.nearSchools;
+    if (currentFilters.nearHospitals) params.nearHospitals = currentFilters.nearHospitals;
+    if (currentFilters.nearMalls) params.nearMalls = currentFilters.nearMalls;
+    if (currentFilters.nearMetro) params.nearMetro = currentFilters.nearMetro;
+    if (currentFilters.nearParks) params.nearParks = currentFilters.nearParks;
+    if (currentFilters.maxCommuteTime) params.maxCommuteTime = Number(currentFilters.maxCommuteTime);
+    if (currentFilters.commuteMode) params.commuteMode = currentFilters.commuteMode;
+    if (currentFilters.affordable) params.affordable = currentFilters.affordable;
 
     // Add user location for distance-based sorting
     if (currentUserLocation) {
@@ -402,57 +429,11 @@ const PropertiesPageContent: React.FC = () => {
     if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType' || key === 'priceMin' || key === 'priceMax') {
       console.log('🔍 Auto-triggering search for:', key);
       // Use the newFilters directly to avoid state synchronization issues
-      loadPropertiesWithFilters(newFilters);
+      loadProperties(newFilters);
     }
   };
 
-  const loadPropertiesWithFilters = useCallback((filterState: any, resetPage: boolean = false) => {
-    const params: any = {
-      page: resetPage ? 1 : pagination.page,
-      limit: 12
-    };
-
-    if (filterState.search) params.search = filterState.search;
-    if (filterState.type) params.type = filterState.type;
-    if (filterState.city) params.city = filterState.city;
-    if (filterState.state) params.state = filterState.state;
-    
-    // Check for price min/max with proper string validation
-    if (filterState.priceMin && filterState.priceMin.trim() !== '') {
-      const minPrice = Number(filterState.priceMin);
-      if (!isNaN(minPrice) && minPrice > 0) {
-        params.minPrice = minPrice;
-      }
-    }
-    if (filterState.priceMax && filterState.priceMax.trim() !== '') {
-      const maxPrice = Number(filterState.priceMax);
-      if (!isNaN(maxPrice) && maxPrice > 0) {
-        params.maxPrice = maxPrice;
-      }
-    }
-    
-    if (filterState.bedrooms) params.bedrooms = Number(filterState.bedrooms);
-    if (filterState.bathrooms) params.bathrooms = Number(filterState.bathrooms);
-    if (filterState.amenities && Array.isArray(filterState.amenities) && filterState.amenities.length > 0) {
-      params.amenities = filterState.amenities.join(',');
-    }
-    if (filterState.minArea) params.minArea = Number(filterState.minArea);
-    if (filterState.maxArea) params.maxArea = Number(filterState.maxArea);
-    if (filterState.propertyType !== 'ALL') {
-      params.status = filterState.propertyType === 'BUY' ? 'For Sale' : 'For Rent';
-    }
-
-    // Add user location for distance-based sorting
-    if (userLocation) {
-      params.userLat = userLocation.latitude;
-      params.userLng = userLocation.longitude;
-    }
-
-    console.log('🔍 Loading properties with filters:', params);
-    console.log('🔍 Price filters:', { priceMin: filterState.priceMin, priceMax: filterState.priceMax });
-    console.log('🔍 Amenities being sent:', filterState.amenities);
-    getProperties(params);
-  }, [pagination.page, userLocation, getProperties]);
+  // Removed loadPropertiesWithFilters - use loadProperties instead to avoid hook order issues
 
   const handlePropertyTypeChange = (newType: string) => {
     const newFilters = { ...filters, propertyType: newType };
