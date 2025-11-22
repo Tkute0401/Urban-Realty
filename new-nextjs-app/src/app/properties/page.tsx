@@ -344,12 +344,16 @@ const PropertiesPageContent: React.FC = () => {
   }, [mounted, updateFiltersFromUrl]);
 
   // Load properties when mounted or when filters/pagination/userLocation change
-  // Use refs inside loadProperties to get latest values without causing effect re-runs
+  // Refs are updated by separate effects, so loadProperties will get latest values
   useEffect(() => {
     if (typeof window === 'undefined' || !mounted) {
       return;
     }
-    loadProperties();
+    // Use a small delay to ensure refs are updated from the ref update effects
+    const timeoutId = setTimeout(() => {
+      loadProperties();
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [mounted, filters, pagination.page, userLocation, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
