@@ -48,8 +48,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasToken, setHasToken] = useState<boolean>(false);
   const router = useRouter();
-  const profileQuery = useProfileQuery(Boolean(sessionManager.getToken()));
+  
+  // Check token on mount - this ensures consistent hook calls
+  useEffect(() => {
+    setHasToken(Boolean(sessionManager.getToken()));
+  }, []);
+  
+  const profileQuery = useProfileQuery(hasToken);
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
   
