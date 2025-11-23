@@ -134,11 +134,11 @@ const PropertiesPageContent: React.FC = () => {
   ];
 
   // Simplified loadProperties function - always stable, accepts all values as parameters
-  // Accepts optional filterState and resetPage to support advanced search
-  const loadProperties = useCallback((filterState?: any, resetPage: boolean = false, currentPagination?: typeof pagination, currentUserLocation?: typeof userLocation) => {
-    const currentFilters = filterState || filters;
-    const paginationToUse = currentPagination || pagination;
-    const locationToUse = currentUserLocation || userLocation;
+  // Accepts filterState, resetPage, currentPagination, and currentUserLocation as parameters
+  const loadProperties = useCallback((filterState: any, resetPage: boolean = false, currentPagination: typeof pagination, currentUserLocation?: typeof userLocation) => {
+    const currentFilters = filterState;
+    const paginationToUse = currentPagination;
+    const locationToUse = currentUserLocation;
     
     const params: any = {
       page: resetPage ? 1 : paginationToUse.page,
@@ -209,7 +209,7 @@ const PropertiesPageContent: React.FC = () => {
 
     console.log('🔍 Loading properties with params:', params);
     getProperties(params);
-  }, [filters, getProperties]); // Only depend on filters and getProperties - pass pagination and userLocation as params
+  }, []); // Empty deps - getProperties is stable from context, filters are passed as param when needed
 
   // Removed mounted effect - component is client-side only
 
@@ -343,9 +343,9 @@ const PropertiesPageContent: React.FC = () => {
     // Only load if params actually changed
     if (lastLoadParamsRef.current !== loadKey) {
       lastLoadParamsRef.current = loadKey;
-      loadProperties(undefined, false, pagination, userLocation);
+      loadProperties(filters, false, pagination, userLocation);
     }
-  }, [filters.search, filters.type, filters.city, filters.propertyType, pagination.page, userLocation, pagination, loadProperties]);
+  }, [filters.search, filters.type, filters.city, filters.propertyType, pagination.page, userLocation, pagination, filters, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
