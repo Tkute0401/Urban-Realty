@@ -424,7 +424,7 @@ const PropertiesPageContent: React.FC = () => {
     if (key === 'bedrooms' || key === 'bathrooms' || key === 'amenities' || key === 'propertyType' || key === 'priceMin' || key === 'priceMax') {
       console.log('🔍 Auto-triggering search for:', key);
       // Use the newFilters directly to avoid state synchronization issues
-      loadProperties(newFilters);
+      loadProperties(newFilters, false, pagination, userLocation);
     }
   };
 
@@ -461,7 +461,7 @@ const PropertiesPageContent: React.FC = () => {
     }, 0);
     
     // Trigger search immediately with new filter
-    loadProperties(newFilters);
+    loadProperties(newFilters, false, pagination, userLocation);
   };
 
   const clearAllFilters = () => {
@@ -509,7 +509,7 @@ const PropertiesPageContent: React.FC = () => {
     router.replace('/properties');
     
     // Trigger search with cleared filters and reset to page 1
-    loadProperties(clearedFilters, true);
+    loadProperties(clearedFilters, true, pagination, userLocation);
     
     // Reset flag after a short delay to allow URL update to complete
     setTimeout(() => {
