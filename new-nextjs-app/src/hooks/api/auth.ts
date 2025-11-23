@@ -23,6 +23,7 @@ export function useProfileQuery(enabled: boolean = true) {
         },
         enabled,
         staleTime: 5 * 60 * 1000,
+        retry: false, // Don't retry on auth failures
     });
 }
 

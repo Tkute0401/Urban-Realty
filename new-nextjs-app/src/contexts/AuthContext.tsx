@@ -48,15 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasToken, setHasToken] = useState<boolean>(false);
   const router = useRouter();
   
-  // Check token on mount - this ensures consistent hook calls
-  useEffect(() => {
-    setHasToken(Boolean(sessionManager.getToken()));
-  }, []);
-  
-  const profileQuery = useProfileQuery(hasToken);
+  // Always call hooks with a stable value - we'll handle the token check in the effect
+  // This ensures hooks are ALWAYS called in the same order
+  const profileQuery = useProfileQuery(true);
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
   
@@ -80,8 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = sessionManager.getToken();
     if (!token) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔧 AuthContext - No token found, skipping profile load');
+        console.log('🔧 AuthContext - No token found, setting loading to false');
       }
+      setUser(null);
       setLoading(false);
       return;
     }
