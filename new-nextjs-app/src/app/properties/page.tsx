@@ -1,4 +1,4 @@
-'use client';
+'use client'; // Trigger new deployment
 
 import React, { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
