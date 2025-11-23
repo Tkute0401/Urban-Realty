@@ -138,13 +138,12 @@ const PropertiesPageContent: React.FC = () => {
     'Laundry', 'Storage', 'Conference Room', 'Kitchen'
   ];
 
-  // Stable loadProperties function that uses refs to avoid dependency issues
+  // Simplified loadProperties function - use values directly instead of refs
   // Accepts optional filterState and resetPage to support advanced search
   const loadProperties = useCallback((filterState?: any, resetPage: boolean = false) => {
-    const currentFilters = filterState || filtersRef.current;
-    const currentPagination = paginationRef.current;
-    const currentUserLocation = userLocationRef.current;
-    const currentGetProperties = getPropertiesRef.current;
+    const currentFilters = filterState || filters;
+    const currentPagination = pagination;
+    const currentUserLocation = userLocation;
     
     const params: any = {
       page: resetPage ? 1 : currentPagination.page,
@@ -214,8 +213,8 @@ const PropertiesPageContent: React.FC = () => {
     }
 
     console.log('🔍 Loading properties with params:', params);
-    currentGetProperties(params);
-  }, []); // Empty deps - use refs for everything to maintain stability
+    getProperties(params);
+  }, [filters, pagination, userLocation, getProperties]); // Include all deps - simpler approach
 
   // Removed mounted effect - component is client-side only
 
@@ -330,16 +329,11 @@ const PropertiesPageContent: React.FC = () => {
   }, [updateFiltersFromUrl]);
 
   // Load properties when filters/pagination.page/userLocation change
-  // Use ref to prevent infinite loops from pagination object reference changes
+  // Simplified approach - use a ref to track if we should load
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
-    // Update refs synchronously before calling loadProperties
-    filtersRef.current = filters;
-    paginationRef.current = pagination;
-    userLocationRef.current = userLocation;
-    getPropertiesRef.current = getProperties;
     
     // Create a stable key to prevent unnecessary re-loads
     const loadKey = JSON.stringify({
@@ -356,8 +350,7 @@ const PropertiesPageContent: React.FC = () => {
       lastLoadParamsRef.current = loadKey;
       loadProperties();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.search, filters.type, filters.city, filters.propertyType, pagination.page, userLocation, getProperties]); // Only depend on specific values, not whole objects
+  }, [filters.search, filters.type, filters.city, filters.propertyType, pagination.page, userLocation, loadProperties]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
