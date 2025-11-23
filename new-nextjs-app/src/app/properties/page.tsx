@@ -81,6 +81,7 @@ const PropertiesPageContent: React.FC = () => {
   const isInitializedRef = useRef<boolean>(false);
   const urlParamsRef = useRef<string>('');
   const isUpdatingUrlRef = useRef<boolean>(false);
+  const lastLoadParamsRef = useRef<string>('');
   
   // Removed mounted state to avoid hook order issues - component is already client-side
   const mounted = true;
@@ -330,7 +331,6 @@ const PropertiesPageContent: React.FC = () => {
 
   // Load properties when filters/pagination.page/userLocation change
   // Use ref to prevent infinite loops from pagination object reference changes
-  const lastLoadParamsRef = useRef<string>('');
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
