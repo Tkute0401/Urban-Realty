@@ -386,7 +386,7 @@ const PropertiesPageContent: React.FC = () => {
   }, []);
 
   const handleSearch = () => {
-    loadProperties();
+    loadProperties(filters, false, pagination, userLocation);
     if (isMobile && expandedSearch) {
       setExpandedSearch(false);
     }
@@ -1206,7 +1206,7 @@ const PropertiesPageContent: React.FC = () => {
               <Button
                 variant="contained"
                 onClick={() => {
-                  loadProperties();
+                  loadProperties(filters, false, pagination, userLocation);
                   setShowFiltersDrawer(false);
                 }}
                 sx={{
