@@ -118,12 +118,7 @@ const PropertiesPageContent: React.FC = () => {
     affordable: false
   });
 
-  // Initialize refs after state declarations to avoid hook order issues
-  // Use function initializers to ensure refs are always initialized with current values
-  const filtersRef = useRef<typeof filters>(filters);
-  const paginationRef = useRef<typeof pagination>(pagination);
-  const userLocationRef = useRef<typeof userLocation>(userLocation);
-  const getPropertiesRef = useRef<typeof getProperties>(getProperties);
+  // Removed unused refs to simplify hook structure
 
   // All hooks must be declared before any functions or other logic
   const handlePropertyClick = (property: any) => {
