@@ -21,23 +21,20 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   
   // Always initialize with 'light' to ensure consistent SSR/CSR
   const [theme, setTheme] = useState('light');
-  const [mounted, setMounted] = useState(false);
 
   // Load saved theme after mount to avoid hydration mismatch
   useEffect(() => {
-    setMounted(true);
     const savedTheme = localStorage.getItem('theme') || 'light';
     console.log('🔧 ThemeProvider - Loading saved theme:', savedTheme);
     setTheme(savedTheme);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
     console.log('🔧 ThemeProvider - Theme changed to:', theme);
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   const value = useMemo(() => ({
     theme,
