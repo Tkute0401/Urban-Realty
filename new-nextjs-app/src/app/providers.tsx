@@ -21,8 +21,7 @@ type ProvidersProps = { children: ReactNode }
 
 // Inner component to access theme context
 function ThemeIntegratedProviders({ children }: ProvidersProps) {
-  const { theme } = useContext(ThemeContext);
-  
+  // Create QueryClient first to ensure consistent hook order
   const queryClient = useMemo(() => new QueryClient({
     defaultOptions: {
       queries: {
@@ -35,6 +34,9 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
       },
     },
   }), [])
+  
+  // Get theme context AFTER creating QueryClient to ensure hook order
+  const { theme } = useContext(ThemeContext);
 
   // Initialize web vitals and performance monitoring
   useEffect(() => {
