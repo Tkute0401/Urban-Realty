@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useMemo, useState, useContext, useEffect } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material'
 import { createUrbanRealtyTheme } from '@/lib/theme/NewTheme'
@@ -16,27 +16,14 @@ import ErrorBoundary from '@/components/common/ErrorBoundary'
 import PerformanceMonitor from '@/components/PerformanceMonitor'
 import HydrationWrapper from '@/components/common/HydrationWrapper'
 import { reportWebVitals, setupPerformanceObserver } from '@/lib/performance/webVitals'
+import { queryClient } from '@/lib/react-query'
 
 type ProvidersProps = { children: ReactNode }
-
-// Create QueryClient OUTSIDE component to ensure it's truly stable
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-    },
-  },
-})
 
 // Inner component to access theme context
 function ThemeIntegratedProviders({ children }: ProvidersProps) {
   
-  // Get theme context AFTER creating QueryClient to ensure hook order
+  // Get theme context
   const { theme } = useContext(ThemeContext);
 
   // Initialize web vitals and performance monitoring
