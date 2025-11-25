@@ -116,13 +116,13 @@ const PropertiesPageContent: React.FC = () => {
   // Initialize refs after state declarations to avoid hook order issues
   // Use function initializers to ensure refs are always initialized with current values
   const filtersRef = useRef<typeof filters>(filters);
-  const paginationRef = useRef<typeof pagination>(pagination);
   const userLocationRef = useRef<typeof userLocation>(userLocation);
-  const getPropertiesRef = useRef<typeof getProperties>(getProperties);
   
   // Track if initial load has happened to prevent infinite loops
   const hasInitialLoadRef = useRef<boolean>(false);
   const lastLoadParamsRef = useRef<string>('');
+  // Track if a load is currently in progress to prevent concurrent calls
+  const isLoadingRef = useRef<boolean>(false);
 
   // All hooks must be declared before any functions or other logic
   const handlePropertyClick = (property: any) => {
@@ -144,23 +144,23 @@ const PropertiesPageContent: React.FC = () => {
   }, [filters]);
   
   useEffect(() => {
-    getPropertiesRef.current = getProperties;
-  }, [getProperties]);
-  
-  useEffect(() => {
     userLocationRef.current = userLocation;
   }, [userLocation]);
 
-  // Stable loadProperties function that uses refs to avoid dependency issues
-  // Accepts optional filterState and resetPage to support advanced search
+  // Stable loadProperties function - does NOT depend on any changing values
+  // Uses refs for all values to prevent re-creation and infinite loops
   const loadProperties = useCallback((filterState?: any, resetPage: boolean = false, forceLoad: boolean = false) => {
+    // Prevent concurrent loads
+    if (isLoadingRef.current && !forceLoad) {
+      console.log('🔍 Skipping load - already loading');
+      return;
+    }
+    
     const currentFilters = filterState || filtersRef.current;
-    const currentPagination = paginationRef.current;
     const currentUserLocation = userLocationRef.current;
-    const currentGetProperties = getPropertiesRef.current;
     
     const params: any = {
-      page: resetPage ? 1 : currentPagination.page,
+      page: resetPage ? 1 : 1, // Always start at page 1 for initial/filter loads
       limit: 12
     };
 
@@ -236,9 +236,15 @@ const PropertiesPageContent: React.FC = () => {
     }
     
     lastLoadParamsRef.current = paramsString;
+    isLoadingRef.current = true;
     console.log('🔍 Loading properties with params:', params);
-    currentGetProperties(params);
-  }, []); // Empty deps - uses refs for all values
+    
+    // Call getProperties directly - don't await, just fire and forget
+    // The context will update state when the response comes back
+    getProperties(params).finally(() => {
+      isLoadingRef.current = false;
+    });
+  }, [getProperties]); // Only depends on getProperties which is stable from context
 
   useEffect(() => {
     setMounted(true);
