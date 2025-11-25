@@ -8,11 +8,11 @@ interface HydrationWrapperProps {
 }
 
 /**
- * HydrationWrapper - Simplified to just pass through children
- * The conditional rendering was causing React error #310 by making hook calls conditional
- * Since we're using 'use client' throughout the app, we don't need this wrapper
+ * HydrationWrapper - Pass through children without conditional rendering
+ * Conditional rendering based on mount state causes React error #310
  */
 const HydrationWrapper = ({ children }: HydrationWrapperProps) => {
+  // Simply return children without any conditional logic
   return <>{children}</>;
 };
 
