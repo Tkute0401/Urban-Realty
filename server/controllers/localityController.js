@@ -20,3 +20,5 @@ exports.getLocalityInsights = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+

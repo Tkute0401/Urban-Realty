@@ -38,3 +38,5 @@ router.get('/:id/properties', searchController.getSearchProperties);
 
 module.exports = router;
 
+
+

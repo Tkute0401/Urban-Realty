@@ -22,6 +22,7 @@ type ProvidersProps = { children: ReactNode }
 
 // Memoized wrapper for all context providers that don't depend on theme
 // This prevents them from re-rendering when theme changes
+// Using a custom comparison function to ensure it only re-renders if children actually change
 const StableProviders = memo(({ children }: ProvidersProps) => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -58,6 +59,10 @@ const StableProviders = memo(({ children }: ProvidersProps) => {
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
+}, (prevProps, nextProps) => {
+  // Always return true to prevent re-renders unless children reference actually changes
+  // This ensures providers don't re-render when parent re-renders
+  return prevProps.children === nextProps.children;
 })
 
 StableProviders.displayName = 'StableProviders'

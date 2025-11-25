@@ -248,3 +248,5 @@ const ComparisonPage: React.FC = () => {
 
 export default ComparisonPage;
 
+
+

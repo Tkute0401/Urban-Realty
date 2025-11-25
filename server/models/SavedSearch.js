@@ -57,3 +57,5 @@ if (mongoose.models.SavedSearch) {
 
 module.exports = mongoose.model('SavedSearch', SavedSearchSchema);
 
+
+

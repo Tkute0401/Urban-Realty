@@ -47,3 +47,5 @@ if (mongoose.models.UserInteraction) {
 
 module.exports = mongoose.model('UserInteraction', UserInteractionSchema);
 
+
+

@@ -194,3 +194,5 @@ const RecommendedProperties: React.FC<RecommendedPropertiesProps> = ({
 
 export default RecommendedProperties;
 
+
+

@@ -9,3 +9,5 @@ router.get('/:city/:locality', localityController.getLocalityInsights);
 
 module.exports = router;
 
+
+
