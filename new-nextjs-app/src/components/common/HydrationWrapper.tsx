@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 interface HydrationWrapperProps {
   children: ReactNode;
@@ -8,21 +8,11 @@ interface HydrationWrapperProps {
 }
 
 /**
- * HydrationWrapper prevents hydration mismatches by ensuring
- * components only render on the client side after hydration is complete.
- * This prevents React errors #418 and #423 in production builds.
+ * HydrationWrapper - Simplified to just pass through children
+ * The conditional rendering was causing React error #310 by making hook calls conditional
+ * Since we're using 'use client' throughout the app, we don't need this wrapper
  */
-const HydrationWrapper = ({ children, fallback = null }: HydrationWrapperProps) => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <>{fallback}</>;
-  }
-
+const HydrationWrapper = ({ children }: HydrationWrapperProps) => {
   return <>{children}</>;
 };
 
