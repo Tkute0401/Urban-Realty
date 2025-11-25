@@ -576,20 +576,6 @@ const PropertiesPageContent: React.FC = () => {
 
   // Always render the same structure to ensure consistent hook order
   // Use conditional rendering instead of early return to prevent React error #310
-  if (!mounted) {
-    return (
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: 'var(--color-bg)'
-      }}>
-        <CircularProgress sx={{ color: 'var(--color-primary)' }} />
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{
       minHeight: '100vh',
@@ -597,6 +583,18 @@ const PropertiesPageContent: React.FC = () => {
       fontFamily: 'var(--font-family-sans, "Poppins", sans-serif)',
       overflow: 'hidden'
     }}>
+      {!mounted ? (
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          background: 'var(--color-bg)'
+        }}>
+          <CircularProgress sx={{ color: 'var(--color-primary)' }} />
+        </Box>
+      ) : (
+        <>
       <Box sx={{
         maxWidth: '100vw',
         mx: 'auto',
@@ -1944,6 +1942,8 @@ const PropertiesPageContent: React.FC = () => {
         </Box>
       )}
       </Box>
+        </>
+      )}
     </Box>
   );
 };
