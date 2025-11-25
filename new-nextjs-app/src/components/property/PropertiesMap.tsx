@@ -643,6 +643,77 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     return () => clearInterval(interval);
   }, [mapInitialized, addMarkersToMap]);
 
+  // Add amenity markers - MUST be before any early returns to maintain hook order
+  useEffect(() => {
+    if (!mapInitialized || !mapInstanceRef.current || !showAmenities) return;
+
+    // This would integrate with MAPPLS Places API or similar
+    // For now, we'll use the nearbyLocalities data from properties
+    const amenityMarkers: any[] = [];
+
+    properties.forEach(property => {
+      if (!property.location?.coordinates) return;
+
+      const lat = property.location.coordinates[1];
+      const lng = property.location.coordinates[0];
+
+      // Add school marker if property has nearby school
+      if (amenityLayers.schools && (property as any).nearbyLocalities?.hasSchool) {
+        try {
+          const marker = new window.mappls.Marker({
+            map: mapInstanceRef.current,
+            position: [lat + 0.001, lng + 0.001], // Offset slightly
+            icon: {
+              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#4CAF50" opacity="0.7"/>
+                  <text x="12" y="16" font-size="12" fill="white" text-anchor="middle">S</text>
+                </svg>
+              `)}`,
+              scaledSize: { width: 24, height: 24 }
+            },
+            title: 'School Nearby'
+          });
+          amenityMarkers.push(marker);
+        } catch (e) {
+          console.warn('Failed to add school marker:', e);
+        }
+      }
+
+      // Similar for other amenities...
+    });
+
+    return () => {
+      amenityMarkers.forEach(marker => {
+        try {
+          if (marker && marker.remove) marker.remove();
+        } catch (e) {
+          console.warn('Error removing amenity marker:', e);
+        }
+      });
+    };
+  }, [mapInitialized, amenityLayers, properties, showAmenities]);
+
+  // Setup global function for info window button - MUST be before any early returns to maintain hook order
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).openPropertyDetail = (propertyId: string) => {
+        if (onMarkerClick) {
+          const property = properties.find(p => p._id === propertyId);
+          if (property) {
+            onMarkerClick(property);
+          }
+        }
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).openPropertyDetail;
+      }
+    };
+  }, [properties, onMarkerClick]);
+
+  // Early returns AFTER all hooks to maintain consistent hook order
   if (!properties || properties.length === 0) {
     return (
       <Box sx={{
@@ -701,76 +772,6 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
   }
 
   console.log('🔍 PropertiesMap render - mapLoaded:', mapLoaded, 'mapError:', mapError, 'scriptLoaded:', scriptLoaded);
-
-  // Add amenity markers
-  useEffect(() => {
-    if (!mapInitialized || !mapInstanceRef.current || !showAmenities) return;
-
-    // This would integrate with MAPPLS Places API or similar
-    // For now, we'll use the nearbyLocalities data from properties
-    const amenityMarkers: any[] = [];
-
-    properties.forEach(property => {
-      if (!property.location?.coordinates) return;
-
-      const lat = property.location.coordinates[1];
-      const lng = property.location.coordinates[0];
-
-      // Add school marker if property has nearby school
-      if (amenityLayers.schools && (property as any).nearbyLocalities?.hasSchool) {
-        try {
-          const marker = new window.mappls.Marker({
-            map: mapInstanceRef.current,
-            position: [lat + 0.001, lng + 0.001], // Offset slightly
-            icon: {
-              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" fill="#4CAF50" opacity="0.7"/>
-                  <text x="12" y="16" font-size="12" fill="white" text-anchor="middle">S</text>
-                </svg>
-              `)}`,
-              scaledSize: { width: 24, height: 24 }
-            },
-            title: 'School Nearby'
-          });
-          amenityMarkers.push(marker);
-        } catch (e) {
-          console.warn('Failed to add school marker:', e);
-        }
-      }
-
-      // Similar for other amenities...
-    });
-
-    return () => {
-      amenityMarkers.forEach(marker => {
-        try {
-          if (marker && marker.remove) marker.remove();
-        } catch (e) {
-          console.warn('Error removing amenity marker:', e);
-        }
-      });
-    };
-  }, [mapInitialized, amenityLayers, properties, showAmenities]);
-
-  // Setup global function for info window button
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).openPropertyDetail = (propertyId: string) => {
-        if (onMarkerClick) {
-          const property = properties.find(p => p._id === propertyId);
-          if (property) {
-            onMarkerClick(property);
-          }
-        }
-      };
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        delete (window as any).openPropertyDetail;
-      }
-    };
-  }, [properties, onMarkerClick]);
 
   return (
     <Box sx={{ position: 'relative', height: height, borderRadius: '12px', overflow: 'hidden' }}>

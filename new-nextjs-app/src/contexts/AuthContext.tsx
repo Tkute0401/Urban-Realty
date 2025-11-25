@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!isMounted) return;
         
         if (response.success && response.data) {
-          const data = response.data;
+          const data = response.data as any;
           let userData;
           
           // Handle different response structures
@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(response.message || 'Login failed');
       }
       
-      const data = response.data;
+      const data = response.data as any;
       let token: string | undefined;
       let userData: any;
       
@@ -205,7 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(response.message || 'Registration failed');
       }
       
-      const data = response.data;
+      const data = response.data as any;
       let token: string | undefined;
       let userData: any;
       
