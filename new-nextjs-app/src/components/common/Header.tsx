@@ -171,12 +171,12 @@ const Header: React.FC = () => {
             {/* Mobile Menu */}
             {mobileMenuOpen && (
               <div className="mobile-menu">
-                <Link href="/properties" className="menu-item" onClick={handleMenuClose}>
+                <Link href="/properties" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                   <ListIcon className="menu-item-icon" />
                   <span>Browse Properties</span>
                 </Link>
                 
-                <Link href="/subscriptions" className="menu-item" onClick={handleMenuClose}>
+                <Link href="/subscriptions" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="menu-item-icon">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -196,7 +196,7 @@ const Header: React.FC = () => {
                 
                 {/* Role-specific menu items */}
                 {user?.role === 'admin' && (
-                  <Link href="/admin" className="menu-item" onClick={handleMenuClose}>
+                  <Link href="/admin" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                     <DashboardIcon className="menu-item-icon" />
                     <span>Admin Panel</span>
                   </Link>
@@ -204,11 +204,11 @@ const Header: React.FC = () => {
                 
                 {user?.role === 'agent' && (
                   <>
-                    <Link href="/agent" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/agent" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <DashboardIcon className="menu-item-icon" />
                       <span>Agent Dashboard</span>
                     </Link>
-                    <Link href="/add-property" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/add-property" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <AddIcon className="menu-item-icon" />
                       <span>Add Property</span>
                     </Link>
@@ -217,11 +217,11 @@ const Header: React.FC = () => {
                 
                 {user?.role === 'developer' && (
                   <>
-                    <Link href="/developer/dashboard" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/developer/dashboard" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <BuildingIcon className="menu-item-icon" />
                       <span>Developer Dashboard</span>
                     </Link>
-                    <Link href="/projects/add" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/projects/add" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <AddIcon className="menu-item-icon" />
                       <span>Add Project</span>
                     </Link>
@@ -230,7 +230,7 @@ const Header: React.FC = () => {
                 
                 {user ? (
                   <>
-                    <Link href="/profile" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/profile" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <PersonIcon className="menu-item-icon" />
                       <span>Profile</span>
                     </Link>
@@ -246,11 +246,11 @@ const Header: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/login" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <LoginIcon className="menu-item-icon" />
                       <span>Login</span>
                     </Link>
-                    <Link href="/register" className="menu-item" onClick={handleMenuClose}>
+                    <Link href="/register" className="menu-item" onClick={handleMenuClose} prefetch={false}>
                       <RegisterIcon className="menu-item-icon" />
                       <span>Register</span>
                     </Link>
@@ -262,12 +262,12 @@ const Header: React.FC = () => {
         ) : (
           /* Desktop Navigation */
           <nav className="nav-container">
-            <Link href="/properties" className="nav-item">
+            <Link href="/properties" className="nav-item" prefetch={false}>
               <ListIcon />
               <span>Browse</span>
             </Link>
 
-            <Link href="/subscriptions" className="nav-item">
+            <Link href="/subscriptions" className="nav-item" prefetch={false}>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="nav-icon">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -283,7 +283,7 @@ const Header: React.FC = () => {
 
             {/* Role-specific navigation items */}
             {user?.role === 'admin' && (
-              <Link href="/admin" className="nav-item nav-item-outlined">
+              <Link href="/admin" className="nav-item nav-item-outlined" prefetch={false}>
                 <DashboardIcon />
                 <span>Admin Panel</span>
               </Link>
@@ -291,7 +291,7 @@ const Header: React.FC = () => {
 
             {user?.role === 'agent' && (
               <>
-                <Link href="/agent" className="nav-item">
+                <Link href="/agent" className="nav-item" prefetch={false}>
                   <DashboardIcon />
                   <span>Dashboard</span>
                 </Link>
