@@ -16,7 +16,8 @@ const nextConfig = {
 
   // Enhanced compiler options for Railway
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    // Temporarily disable console removal to debug React error #310
+    removeConsole: false, // was: process.env.NODE_ENV === 'production',
   },
 
   // Webpack optimizations for Railway
