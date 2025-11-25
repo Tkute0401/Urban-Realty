@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useMemo, useState, useContext, useEffect } from 'react'
+import { ReactNode, useMemo, useState, useContext, useEffect, memo } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material'
@@ -20,6 +20,48 @@ import { queryClient } from '@/lib/react-query'
 
 type ProvidersProps = { children: ReactNode }
 
+// Memoized wrapper for all context providers that don't depend on theme
+// This prevents them from re-rendering when theme changes
+const StableProviders = memo(({ children }: ProvidersProps) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
+        <AuthProvider>
+          <PropertiesProvider>
+            <AgentsProvider>
+              <DevelopersProvider>
+                <ProjectsProvider>
+                  <ComparisonProvider>
+                    <HydrationWrapper>
+                      {children}
+                    </HydrationWrapper>
+                    
+                    {/* Performance monitoring - only in production */}
+                    {process.env.NODE_ENV === 'production' && (
+                      <PerformanceMonitor enableReporting={true} />
+                    )}
+                    
+                    {/* Development performance monitoring with console logging */}
+                    {process.env.NODE_ENV === 'development' && (
+                      <PerformanceMonitor 
+                        enableReporting={false} 
+                        enableConsoleLogging={true} 
+                      />
+                    )}
+                  </ComparisonProvider>
+                </ProjectsProvider>
+              </DevelopersProvider>
+            </AgentsProvider>
+          </PropertiesProvider>
+        </AuthProvider>
+      </ErrorBoundary>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  )
+})
+
+StableProviders.displayName = 'StableProviders'
+
 // Inner component to access theme context
 function ThemeIntegratedProviders({ children }: ProvidersProps) {
   
@@ -37,42 +79,12 @@ function ThemeIntegratedProviders({ children }: ProvidersProps) {
   const muiTheme = useMemo(() => createUrbanRealtyTheme(theme as 'light' | 'dark'), [theme])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <MuiThemeProvider theme={muiTheme}>
-        <CssBaseline />
-        <ErrorBoundary>
-          <AuthProvider>
-            <PropertiesProvider>
-              <AgentsProvider>
-                <DevelopersProvider>
-                  <ProjectsProvider>
-                    <ComparisonProvider>
-                      <HydrationWrapper>
-                        {children}
-                      </HydrationWrapper>
-                    
-                    {/* Performance monitoring - only in production */}
-                    {process.env.NODE_ENV === 'production' && (
-                      <PerformanceMonitor enableReporting={true} />
-                    )}
-                    
-                    {/* Development performance monitoring with console logging */}
-                    {process.env.NODE_ENV === 'development' && (
-                      <PerformanceMonitor 
-                        enableReporting={false} 
-                        enableConsoleLogging={true} 
-                      />
-                    )}
-                    </ComparisonProvider>
-                  </ProjectsProvider>
-                </DevelopersProvider>
-              </AgentsProvider>
-            </PropertiesProvider>
-          </AuthProvider>
-        </ErrorBoundary>
-      </MuiThemeProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <MuiThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      <StableProviders>
+        {children}
+      </StableProviders>
+    </MuiThemeProvider>
   )
 }
 
