@@ -119,6 +119,10 @@ const PropertiesPageContent: React.FC = () => {
   const paginationRef = useRef<typeof pagination>(pagination);
   const userLocationRef = useRef<typeof userLocation>(userLocation);
   const getPropertiesRef = useRef<typeof getProperties>(getProperties);
+  
+  // Track if initial load has happened to prevent infinite loops
+  const hasInitialLoadRef = useRef<boolean>(false);
+  const lastLoadParamsRef = useRef<string>('');
 
   // All hooks must be declared before any functions or other logic
   const handlePropertyClick = (property: any) => {
@@ -134,15 +138,22 @@ const PropertiesPageContent: React.FC = () => {
   ];
 
   // Update refs synchronously - no separate effects to avoid hook order issues
+  // Keep refs updated for use in loadProperties
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+  
+  useEffect(() => {
+    getPropertiesRef.current = getProperties;
+  }, [getProperties]);
+  
+  useEffect(() => {
+    userLocationRef.current = userLocation;
+  }, [userLocation]);
+
   // Stable loadProperties function that uses refs to avoid dependency issues
   // Accepts optional filterState and resetPage to support advanced search
-  const loadProperties = useCallback((filterState?: any, resetPage: boolean = false) => {
-    // Update refs synchronously before using them
-    filtersRef.current = filters;
-    paginationRef.current = pagination;
-    userLocationRef.current = userLocation;
-    getPropertiesRef.current = getProperties;
-    
+  const loadProperties = useCallback((filterState?: any, resetPage: boolean = false, forceLoad: boolean = false) => {
     const currentFilters = filterState || filtersRef.current;
     const currentPagination = paginationRef.current;
     const currentUserLocation = userLocationRef.current;
@@ -215,9 +226,19 @@ const PropertiesPageContent: React.FC = () => {
       params.userLng = currentUserLocation.longitude;
     }
 
+    // Create a string representation to check if params actually changed
+    const paramsString = JSON.stringify(params);
+    
+    // Prevent duplicate API calls with same params (unless forced)
+    if (!forceLoad && lastLoadParamsRef.current === paramsString) {
+      console.log('🔍 Skipping duplicate load with same params');
+      return;
+    }
+    
+    lastLoadParamsRef.current = paramsString;
     console.log('🔍 Loading properties with params:', params);
     currentGetProperties(params);
-  }, [filters, pagination, userLocation, getProperties]); // Include deps but update refs synchronously
+  }, []); // Empty deps - uses refs for all values
 
   useEffect(() => {
     setMounted(true);
@@ -333,13 +354,18 @@ const PropertiesPageContent: React.FC = () => {
     };
   }, [mounted, updateFiltersFromUrl]);
 
-  // Load properties when mounted or when filters/pagination/userLocation change
+  // Load properties only once on initial mount
   useEffect(() => {
     if (typeof window === 'undefined' || !mounted) {
       return;
     }
-    loadProperties();
-  }, [mounted, loadProperties]);
+    // Only load once on initial mount
+    if (!hasInitialLoadRef.current) {
+      hasInitialLoadRef.current = true;
+      loadProperties(undefined, false, true); // Force load on initial mount
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
 
   // Fetch similar properties when there are any filters applied
   useEffect(() => {
