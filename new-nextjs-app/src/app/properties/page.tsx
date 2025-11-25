@@ -567,8 +567,15 @@ const PropertiesPageContent: React.FC = () => {
     (Array.isArray(value) ? value.length > 0 : true)
   ).length;
 
+  console.log('🔍 Properties page rendering:', {
+    isMobile,
+    propertiesCount: properties.length,
+    userLocation,
+    mounted
+  });
+
   // Always render the same structure to ensure consistent hook order
-  // Use conditional rendering instead of early return
+  // Use conditional rendering instead of early return to prevent React error #310
   if (!mounted) {
     return (
       <Box sx={{
@@ -582,13 +589,6 @@ const PropertiesPageContent: React.FC = () => {
       </Box>
     );
   }
-
-  console.log('🔍 Properties page rendering:', {
-    isMobile,
-    propertiesCount: properties.length,
-    userLocation,
-    mounted
-  });
 
   return (
     <Box sx={{
