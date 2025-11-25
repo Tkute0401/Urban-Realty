@@ -19,21 +19,22 @@ import { reportWebVitals, setupPerformanceObserver } from '@/lib/performance/web
 
 type ProvidersProps = { children: ReactNode }
 
+// Create QueryClient OUTSIDE component to ensure it's truly stable
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
+  },
+})
+
 // Inner component to access theme context
 function ThemeIntegratedProviders({ children }: ProvidersProps) {
-  // Create QueryClient first to ensure consistent hook order
-  const queryClient = useMemo(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: 1,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        refetchOnReconnect: false,
-        staleTime: 5 * 60 * 1000,
-        gcTime: 10 * 60 * 1000,
-      },
-    },
-  }), [])
   
   // Get theme context AFTER creating QueryClient to ensure hook order
   const { theme } = useContext(ThemeContext);
