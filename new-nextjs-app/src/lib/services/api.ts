@@ -74,7 +74,12 @@ export const api = {
                 update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/properties/${id}`, payload)),
                 delete: (id: string) => unwrap<any>(http.delete(`/api/v1/properties/${id}`)),
                 featured: () => unwrap<any[]>(http.get("/api/v1/properties/featured")),
-                searchSuggestions: (query: string) => unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { query } })),
+                /**
+                 * Search suggestions / autocomplete for properties.
+                 * Backend expects the query string in the `q` parameter.
+                 */
+                searchSuggestions: (query: string) =>
+                        unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { q: query } })),
         },
         admin: {
                 stats: () => unwrap<any>(http.get("/api/v1/admin/stats")),
@@ -176,7 +181,12 @@ export const api = {
                 updateInquiry: (inquiryId: string, payload: { status?: string; response?: string }) => unwrap<any>(http.put(`/api/v1/developers/inquiries/${inquiryId}`, payload)),
         },
         search: {
-                suggestions: (query: string) => unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { query } })),
+                /**
+                 * General search suggestions helper.
+                 * Uses the same `/properties/search-suggestions` endpoint with `q` param.
+                 */
+                suggestions: (query: string) =>
+                        unwrap<any>(http.get("/api/v1/properties/search-suggestions", { params: { q: query } })),
         },
         contacts: {
                 list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/contacts", { params })),
