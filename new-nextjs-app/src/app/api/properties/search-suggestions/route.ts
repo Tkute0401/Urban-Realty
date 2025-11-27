@@ -5,98 +5,87 @@ import Property from '@/models/Property';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
     const limit = parseInt(searchParams.get('limit') || '10');
-    
+
     if (!query || query.length < 2) {
-      return NextResponse.json({ suggestions: [] });
+      return NextResponse.json({ cities: [], states: [], types: [], amenities: [] });
     }
-    
+
     const searchRegex = new RegExp(query, 'i');
-    const suggestions: string[] = [];
-    const seen = new Set<string>();
-    
-    // Search for property titles
+    const cities = new Set<string>();
+    const states = new Set<string>();
+    const types = new Set<string>();
+    const amenities = new Set<string>();
+
+    // Search for properties matching the query
     const properties = await Property.find({
       $or: [
         { title: searchRegex },
         { 'address.city': searchRegex },
         { 'address.state': searchRegex },
-        { type: searchRegex }
+        { type: searchRegex },
+        { amenities: searchRegex }
       ]
     })
-    .limit(20)
-    .select('title address.city address.state type amenities');
-    
-    // Add property titles
+      .limit(20)
+      .select('title address.city address.state type amenities');
+
+    // Categorize results
     properties.forEach(property => {
-      if (property.title && !seen.has(property.title)) {
-        seen.add(property.title);
-        suggestions.push(property.title);
+      // Add cities
+      if (property.address?.city && property.address.city.toLowerCase().includes(query.toLowerCase())) {
+        cities.add(property.address.city);
       }
-    });
-    
-    // Add cities with state
-    properties.forEach(property => {
-      if (property.address?.city) {
-        const cityState = property.address.state 
-          ? `${property.address.city}, ${property.address.state}`
-          : property.address.city;
-        if (!seen.has(cityState)) {
-          seen.add(cityState);
-          suggestions.push(cityState);
-        }
+
+      // Add states
+      if (property.address?.state && property.address.state.toLowerCase().includes(query.toLowerCase())) {
+        states.add(property.address.state);
       }
-    });
-    
-    // Add property types
-    const propertyTypes = ['Houses', 'Condos/Co-ops', 'Townhomes', 'Multi-family', 'Manufactured', 'Lots/Land', 'Apartments'];
-    propertyTypes.forEach(type => {
-      if (type.toLowerCase().includes(query.toLowerCase()) && !seen.has(type) && suggestions.length < limit) {
-        seen.add(type);
-        suggestions.push(type);
+
+      // Add property types
+      if (property.type && property.type.toLowerCase().includes(query.toLowerCase())) {
+        types.add(property.type);
       }
-    });
-    
-    // Add unique amenities from properties
-    const allAmenities = new Set<string>();
-    properties.forEach(property => {
+
+      // Add amenities
       if (property.amenities && Array.isArray(property.amenities)) {
         property.amenities.forEach((amenity: string) => {
           if (amenity && amenity.toLowerCase().includes(query.toLowerCase())) {
-            allAmenities.add(amenity);
+            amenities.add(amenity);
           }
         });
       }
     });
-    
-    allAmenities.forEach(amenity => {
-      if (!seen.has(amenity) && suggestions.length < limit) {
-        seen.add(amenity);
-        suggestions.push(amenity);
+
+    // Add popular property types if they match
+    const propertyTypes = ['Houses', 'Condos/Co-ops', 'Townhomes', 'Multi-family', 'Manufactured', 'Lots/Land', 'Apartments'];
+    propertyTypes.forEach(type => {
+      if (type.toLowerCase().includes(query.toLowerCase())) {
+        types.add(type);
       }
     });
-    
-    // Add popular locations as fallback if we don't have enough suggestions
-    const popularLocations = [
-      'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 
-      'Pune', 'Kolkata', 'Gurgaon', 'Noida', 'Ahmedabad'
-    ];
-    
-    popularLocations.forEach(location => {
-      if (location.toLowerCase().includes(query.toLowerCase()) && !seen.has(location) && suggestions.length < limit) {
-        seen.add(location);
-        suggestions.push(location);
+
+    // Add popular locations if they match
+    const popularCities = ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Pune', 'Kolkata', 'Gurgaon', 'Noida', 'Ahmedabad'];
+    popularCities.forEach(city => {
+      if (city.toLowerCase().includes(query.toLowerCase())) {
+        cities.add(city);
       }
     });
-    
-    // Return only the requested number of suggestions
-    return NextResponse.json({ suggestions: suggestions.slice(0, limit) });
+
+    // Convert sets to arrays and limit results
+    return NextResponse.json({
+      cities: Array.from(cities).slice(0, limit),
+      states: Array.from(states).slice(0, limit),
+      types: Array.from(types).slice(0, limit),
+      amenities: Array.from(amenities).slice(0, limit)
+    });
   } catch (error) {
     console.error('Error fetching search suggestions:', error);
-    return NextResponse.json({ suggestions: [] }, { status: 500 });
+    return NextResponse.json({ cities: [], states: [], types: [], amenities: [] }, { status: 500 });
   }
 }
 
