@@ -220,12 +220,12 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         }
 
         // Calculate center and zoom
-        let mapCenter: [number, number];
+        let mapCenter: { lat: number; lng: number };
         let mapZoom: number;
 
         if (userLocation) {
           // Center on user location
-          mapCenter = [userLocation.longitude, userLocation.latitude];
+          mapCenter = { lat: userLocation.latitude, lng: userLocation.longitude };
           mapZoom = 12;
           console.log('Initializing map centered on user location:', mapCenter);
         } else if (validProjects.length > 0) {
@@ -234,7 +234,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           const firstCoords = getProjectLngLat(firstProject);
 
           if (isValidCoordinates(firstCoords)) {
-            mapCenter = firstCoords as [number, number]; // [lng, lat]
+            const [lng, lat] = firstCoords as [number, number];
+            mapCenter = { lat, lng }; // {lat, lng} object format
             mapZoom = validProjects.length > 1 ? 6 : 12;
             console.log('Initializing map centered on first project:', {
               mapCenter,
@@ -248,12 +249,12 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
                 rawCoordinates: firstProject.location?.coordinates,
               }
             );
-            mapCenter = [77.209, 28.6139];
+            mapCenter = { lat: 28.6139, lng: 77.209 }; // Delhi coordinates
             mapZoom = 10;
           }
         } else {
           // Default to Delhi
-          mapCenter = [77.2090, 28.6139];
+          mapCenter = { lat: 28.6139, lng: 77.2090 };
           mapZoom = 10;
           console.log('Initializing map with default center (Delhi):', mapCenter);
         }
@@ -285,8 +286,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
           const marker = new window.mappls.Marker({
             map: mapInstanceRef.current,
-            // Mappls markers use [lng, lat] array format (GeoJSON standard)
-            position: [lng, lat],
+            // Mappls markers require position as object {lat, lng}
+            position: { lat, lng },
             icon: {
               url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                 <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
@@ -319,9 +320,9 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
                     : null;
 
                 const safePosition =
-                  positionFromMarker && Array.isArray(positionFromMarker)
+                  positionFromMarker && typeof positionFromMarker === 'object'
                     ? positionFromMarker
-                    : [lng, lat]; // fall back to marker coordinates [lng, lat]
+                    : { lat, lng }; // fall back to marker coordinates {lat, lng}
 
                 const infoWindow = new window.mappls.InfoWindow({
                   content: `
@@ -358,7 +359,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           try {
             const userMarker = new window.mappls.Marker({
               map: mapInstanceRef.current,
-              position: [userLocation.longitude, userLocation.latitude], // Mappls expects [lng, lat]
+              position: { lat: userLocation.latitude, lng: userLocation.longitude }, // Mappls expects {lat, lng}
               icon: {
                 url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
