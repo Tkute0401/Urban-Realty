@@ -64,22 +64,38 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
   // Safely extract [lng, lat] from a project, or null if invalid
   const getProjectLngLat = (project: Project): [number, number] | null => {
     try {
-      const raw = project.location?.coordinates?.coordinates as
-        | [number, number]
-        | undefined;
+      // Support both GeoJSON-style and flat coordinate shapes:
+      // 1) location.coordinates.coordinates -> [lng, lat]
+      // 2) location.coordinates -> [lng, lat]
+      let raw: [number, number] | undefined;
+
+      const anyProject = project as any;
+
+      if (
+        Array.isArray(anyProject.location?.coordinates?.coordinates) &&
+        anyProject.location.coordinates.coordinates.length === 2
+      ) {
+        raw = anyProject.location.coordinates.coordinates as [number, number];
+      } else if (
+        Array.isArray(anyProject.location?.coordinates) &&
+        anyProject.location.coordinates.length === 2
+      ) {
+        raw = anyProject.location.coordinates as [number, number];
+      }
 
       if (!isValidCoordinates(raw)) {
         return null;
       }
 
-      const lng = Number(raw[0]);
-      const lat = Number(raw[1]);
+      const lng = Number(raw![0]);
+      const lat = Number(raw![1]);
 
       return [lng, lat];
     } catch (e) {
       console.warn('Failed to extract coordinates from project', {
-        id: project?._id,
-        name: project?.name,
+        id: (project as any)?._id,
+        name: (project as any)?.name,
+        error: e,
       });
       return null;
     }
