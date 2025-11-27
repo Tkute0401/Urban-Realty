@@ -293,34 +293,45 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
             }
           });
 
-          // Add info window
-          if (project.name && isValidCoordinates([lng, lat])) {
-            try {
-              const infoWindow = new window.mappls.InfoWindow({
-                content: `
-                <div style="padding: 10px; max-width: 250px;">
-                  <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">
-                    ${project.name}
-                  </h3>
-                  <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">
-                    ${project.location.city || ''}, ${project.location.state || ''}
-                  </p>
-                </div>
-              `,
-                // Mappls InfoWindow expects [lng, lat]
-                position: [lng, lat],
-              });
+          // Add info window on demand when marker is clicked
+          if (project.name) {
+            marker.addListener('click', () => {
+              try {
+                const positionFromMarker =
+                  typeof (marker as any).getPosition === 'function'
+                    ? (marker as any).getPosition()
+                    : null;
 
-              marker.addListener('click', () => {
+                const safePosition =
+                  positionFromMarker && Array.isArray(positionFromMarker)
+                    ? positionFromMarker
+                    : [lat, lng]; // fall back to marker coordinates [lat, lng]
+
+                const infoWindow = new window.mappls.InfoWindow({
+                  content: `
+                    <div style="padding: 10px; max-width: 250px;">
+                      <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">
+                        ${project.name}
+                      </h3>
+                      <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">
+                        ${(project.location as any)?.city || ''}, ${(project.location as any)?.state || ''}
+                      </p>
+                    </div>
+                  `,
+                  // Mappls InfoWindow accepts the same LatLng-like as Marker position
+                  position: safePosition,
+                });
+
                 infoWindow.open(mapInstanceRef.current);
-              });
-            } catch (e) {
-              console.warn('Failed to create info window for project', {
-                id: project._id,
-                name: project.name,
-                error: e,
-              });
-            }
+              } catch (e) {
+                console.warn('Failed to create info window for project', {
+                  id: project._id,
+                  name: project.name,
+                  coords: { lng, lat },
+                  error: e,
+                });
+              }
+            });
           }
 
           return marker;
