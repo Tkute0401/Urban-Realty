@@ -47,13 +47,42 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   // Helper to validate coordinates array [lng, lat]
-  const isValidCoordinates = (coords?: [number, number]) => {
-    return Array.isArray(coords) &&
-      coords.length === 2 &&
-      typeof coords[0] === 'number' &&
-      typeof coords[1] === 'number' &&
-      isFinite(coords[0]) &&
-      isFinite(coords[1]);
+  const isValidCoordinates = (coords?: [number, number] | null) => {
+    if (!Array.isArray(coords) || coords.length !== 2) return false;
+
+    const lng = Number(coords[0]);
+    const lat = Number(coords[1]);
+
+    return (
+      !Number.isNaN(lng) &&
+      !Number.isNaN(lat) &&
+      Number.isFinite(lng) &&
+      Number.isFinite(lat)
+    );
+  };
+
+  // Safely extract [lng, lat] from a project, or null if invalid
+  const getProjectLngLat = (project: Project): [number, number] | null => {
+    try {
+      const raw = project.location?.coordinates?.coordinates as
+        | [number, number]
+        | undefined;
+
+      if (!isValidCoordinates(raw)) {
+        return null;
+      }
+
+      const lng = Number(raw[0]);
+      const lat = Number(raw[1]);
+
+      return [lng, lat];
+    } catch (e) {
+      console.warn('Failed to extract coordinates from project', {
+        id: project?._id,
+        name: project?.name,
+      });
+      return null;
+    }
   };
 
   // Load Mappls script
@@ -139,8 +168,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         }
 
         // Filter projects with valid coordinates
-        const validProjects = projects.filter(p => {
-          const coords = p.location?.coordinates?.coordinates as [number, number] | undefined;
+        const validProjects = projects.filter((p) => {
+          const coords = getProjectLngLat(p);
           return isValidCoordinates(coords);
         });
 
@@ -161,14 +190,24 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         } else if (validProjects.length > 0) {
           // Center on first project with valid coordinates
           const firstProject = validProjects[0];
-          const firstCoords = firstProject.location.coordinates.coordinates as [number, number];
+          const firstCoords = getProjectLngLat(firstProject);
+
           if (isValidCoordinates(firstCoords)) {
-            mapCenter = firstCoords; // [lng, lat]
-          mapZoom = validProjects.length > 1 ? 6 : 12;
-          console.log('Initializing map centered on first project:', mapCenter);
+            mapCenter = firstCoords as [number, number]; // [lng, lat]
+            mapZoom = validProjects.length > 1 ? 6 : 12;
+            console.log('Initializing map centered on first project:', {
+              mapCenter,
+              projectId: firstProject._id,
+            });
           } else {
-            console.warn('First project has invalid coordinates, falling back to default center');
-            mapCenter = [77.2090, 28.6139];
+            console.warn(
+              'First project has invalid coordinates after normalization, falling back to default center',
+              {
+                projectId: firstProject._id,
+                rawCoordinates: firstProject.location?.coordinates,
+              }
+            );
+            mapCenter = [77.209, 28.6139];
             mapZoom = 10;
           }
         } else {
@@ -188,24 +227,25 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         });
 
         // Add markers for each project
-        const newMarkers = validProjects.map(project => {
-          const coords = project.location.coordinates.coordinates as [number, number];
+        const newMarkers = validProjects.map((project) => {
+          const coords = getProjectLngLat(project);
 
           if (!isValidCoordinates(coords)) {
             console.warn('Skipping project with invalid coordinates:', {
               id: project._id,
               name: project.name,
-              coordinates: coords
+              coordinates: coords,
             });
             return null;
           }
 
-          const [lng, lat] = coords; // [lng, lat]
+          const [lng, lat] = coords as [number, number]; // [lng, lat]
           const isSelected = selectedProject?._id === project._id;
 
           const marker = new window.mappls.Marker({
             map: mapInstanceRef.current,
-            position: [lat, lng], // Mappls expects [lat, lng] format
+            // Mappls markers use [lat, lng]
+            position: [lat, lng],
             icon: {
               url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                 <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
@@ -229,9 +269,10 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           });
 
           // Add info window
-          if (project.name) {
-            const infoWindow = new window.mappls.InfoWindow({
-              content: `
+          if (project.name && isValidCoordinates([lng, lat])) {
+            try {
+              const infoWindow = new window.mappls.InfoWindow({
+                content: `
                 <div style="padding: 10px; max-width: 250px;">
                   <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">
                     ${project.name}
@@ -241,12 +282,20 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
                   </p>
                 </div>
               `,
-              position: [lng, lat] // Mappls expects [lng, lat] format
-            });
+                // Mappls InfoWindow expects [lng, lat]
+                position: [lng, lat],
+              });
 
-            marker.addListener('click', () => {
-              infoWindow.open(mapInstanceRef.current);
-            });
+              marker.addListener('click', () => {
+                infoWindow.open(mapInstanceRef.current);
+              });
+            } catch (e) {
+              console.warn('Failed to create info window for project', {
+                id: project._id,
+                name: project.name,
+                error: e,
+              });
+            }
           }
 
           return marker;
@@ -280,8 +329,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         if (validProjects.length > 1 && !userLocation) {
           // Mappls fitBounds expects an array of [lng, lat] coordinates
           const bounds = validProjects
-            .map(p => p.location.coordinates.coordinates as [number, number])
-            .filter(coords => isValidCoordinates(coords));
+            .map((p) => getProjectLngLat(p))
+            .filter((coords) => isValidCoordinates(coords)) as [number, number][];
 
           if (bounds.length > 0) {
             try {
