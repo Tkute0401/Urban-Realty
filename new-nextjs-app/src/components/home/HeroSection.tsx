@@ -18,6 +18,9 @@ import AccountSidebar from './AccountSidebar';
 import { useProperties } from '@/contexts/PropertiesContext';
 import { ThemeContext } from '@/contexts/ThemeProvider';
 import SearchAutocomplete from '@/components/property/SearchAutocomplete';
+import BudgetSelector, { BudgetRange } from '@/components/search/BudgetSelector';
+import BHKSelector from '@/components/search/BHKSelector';
+import PropertyTypeSelector from '@/components/search/PropertyTypeSelector';
 import '@/style-constants/z-index.css';
 
 // Theme toggle icons
@@ -63,6 +66,8 @@ const HeroSection = () => {
   const [localityStartIndex, setLocalityStartIndex] = useState(0);
   const [isAccountSidebarOpen, setIsAccountSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState('ALL');
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const [budgetRange, setBudgetRange] = useState<BudgetRange>({});
   const [citySearchQuery, setCitySearchQuery] = useState("");
   const { user } = useAuth();
   const { theme, toggle: toggleTheme } = useContext(ThemeContext);
@@ -127,6 +132,15 @@ const HeroSection = () => {
       if (params.propertyType) {
         setSelectedTab(params.propertyType === 'BUY' ? 'BUY' : params.propertyType === 'RENT' ? 'RENT' : 'ALL');
       }
+      if (params.type) {
+        setSelectedPropertyTypes(params.type.split(',').filter(Boolean));
+      }
+      if (params.priceMin || params.priceMax) {
+        setBudgetRange({
+          min: params.priceMin ? Number(params.priceMin) || undefined : undefined,
+          max: params.priceMax ? Number(params.priceMax) || undefined : undefined
+        });
+      }
     }
   }, [searchParams, availableCities]);
 
@@ -164,11 +178,14 @@ const HeroSection = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchText.trim() || selectedCity) {
+    if (searchText.trim() || selectedCity || selectedPropertyTypes.length > 0 || budgetRange.min || budgetRange.max) {
       const newSearchParams = new URLSearchParams();
       if (searchText.trim()) newSearchParams.set('search', searchText.trim());
       if (selectedCity) newSearchParams.set('city', selectedCity);
       if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+      if (selectedPropertyTypes.length > 0) newSearchParams.set('type', selectedPropertyTypes.join(','));
+      if (budgetRange.min) newSearchParams.set('priceMin', String(budgetRange.min));
+      if (budgetRange.max) newSearchParams.set('priceMax', String(budgetRange.max));
 
       router.push(`/search?${newSearchParams.toString()}`);
     }
@@ -191,6 +208,9 @@ const HeroSection = () => {
     if (searchText.trim()) newSearchParams.set('search', searchText.trim());
     newSearchParams.set('city', city);
     if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+    if (selectedPropertyTypes.length > 0) newSearchParams.set('type', selectedPropertyTypes.join(','));
+    if (budgetRange.min) newSearchParams.set('priceMin', String(budgetRange.min));
+    if (budgetRange.max) newSearchParams.set('priceMax', String(budgetRange.max));
   };
 
   const handleNextLocalities = () => {
@@ -522,6 +542,9 @@ const HeroSection = () => {
                   if (searchText.trim()) newSearchParams.set('search', searchText.trim());
                   if (selectedCity) newSearchParams.set('city', selectedCity);
                   if (tab !== 'ALL') newSearchParams.set('propertyType', tab);
+                  if (selectedPropertyTypes.length > 0) newSearchParams.set('type', selectedPropertyTypes.join(','));
+                  if (budgetRange.min) newSearchParams.set('priceMin', String(budgetRange.min));
+                  if (budgetRange.max) newSearchParams.set('priceMax', String(budgetRange.max));
                 }}
               >
                 <span className="relative z-10">{tab}</span>
@@ -535,6 +558,27 @@ const HeroSection = () => {
                 )}
               </button>
             ))}
+          </div>
+
+          {/* Inline filters row: property type + budget (and optional BHK for future use) */}
+          <div className="mb-1.5 sm:mb-2 flex flex-col sm:flex-row gap-1.5 sm:gap-2">
+            <div className="flex-1 min-w-[140px]">
+              <PropertyTypeSelector
+                value={selectedPropertyTypes}
+                onChange={setSelectedPropertyTypes}
+                category={selectedTab === 'COMMERCIAL' ? 'commercial' : 'all'}
+                multiselect
+                size="small"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <BudgetSelector
+                value={budgetRange}
+                onChange={setBudgetRange}
+                variant="dropdown"
+                size="small"
+              />
+            </div>
           </div>
 
           {/* Search input section */}
@@ -606,6 +650,9 @@ const HeroSection = () => {
                     if (suggestion.trim()) newSearchParams.set('search', suggestion.trim());
                     if (selectedCity) newSearchParams.set('city', selectedCity);
                     if (selectedTab !== 'ALL') newSearchParams.set('propertyType', selectedTab);
+                    if (selectedPropertyTypes.length > 0) newSearchParams.set('type', selectedPropertyTypes.join(','));
+                    if (budgetRange.min) newSearchParams.set('priceMin', String(budgetRange.min));
+                    if (budgetRange.max) newSearchParams.set('priceMax', String(budgetRange.max));
                     router.push(`/search?${newSearchParams.toString()}`);
                   }}
                   placeholder={selectedCity ?

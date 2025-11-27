@@ -21,7 +21,8 @@ import {
   Select,
   MenuItem,
   Paper,
-  Stack
+  Stack,
+  Chip as MuiChip
 } from '@mui/material';
 import { 
   Search, 
@@ -40,6 +41,8 @@ import SearchAutocomplete from '@/components/property/SearchAutocomplete';
 import PropertiesMap from '@/components/property/PropertiesMap';
 import PropertyHeatMap from '@/components/property/PropertyHeatMap';
 import { useLocation } from '@/hooks/useLocation';
+import QuickFilterBar from '@/components/search/QuickFilterBar';
+import AdvancedFiltersModal from '@/components/search/AdvancedFiltersModal';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 function SearchContent() {
@@ -56,6 +59,7 @@ function SearchContent() {
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map' | 'heatmap'>('list');
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
@@ -72,7 +76,8 @@ function SearchContent() {
     constructionStatus: [] as string[],
     furnished: undefined as boolean | undefined,
     verified: undefined as boolean | undefined,
-    hasVirtualTour: undefined as boolean | undefined
+    hasVirtualTour: undefined as boolean | undefined,
+    sort: 'relevance'
   });
 
   const amenityOptions = [
@@ -124,6 +129,10 @@ function SearchContent() {
     }
     if (filterState.hasVirtualTour !== undefined) {
       params.hasVirtualTour = filterState.hasVirtualTour;
+    }
+
+    if (filterState.sort) {
+      params.sort = filterState.sort;
     }
 
     if (userLocation) {
@@ -245,7 +254,7 @@ function SearchContent() {
     }}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Search and Filter Bar */}
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 2 }}>
           <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
             <Box sx={{ flex: 1, minWidth: '250px' }}>
               <SearchAutocomplete
@@ -351,6 +360,75 @@ function SearchContent() {
               </Button>
             ))}
           </Box>
+        </Box>
+
+        {/* Quick Filter Bar */}
+        <QuickFilterBar
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onMoreFiltersClick={() => setShowAdvancedFilters(true)}
+          activeFilterCount={activeFilterCount}
+        />
+
+        {/* Active filter chips */}
+        <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          {filters.city && (
+            <MuiChip label={`City: ${filters.city}`} onDelete={() => handleFilterChange('city', '')} />
+          )}
+          {filters.priceMin && (
+            <MuiChip
+              label={`Min ₹${filters.priceMin}`}
+              onDelete={() => handleFilterChange('priceMin', '')}
+            />
+          )}
+          {filters.priceMax && (
+            <MuiChip
+              label={`Max ₹${filters.priceMax}`}
+              onDelete={() => handleFilterChange('priceMax', '')}
+            />
+          )}
+          {filters.bedrooms && (
+            <MuiChip
+              label={`${filters.bedrooms}+ BHK`}
+              onDelete={() => handleFilterChange('bedrooms', '')}
+            />
+          )}
+          {filters.type && (
+            <MuiChip
+              label={filters.type.split(',').join(', ')}
+              onDelete={() => handleFilterChange('type', '')}
+            />
+          )}
+          {filters.constructionStatus.map((s) => (
+            <MuiChip
+              key={s}
+              label={s}
+              onDelete={() =>
+                handleFilterChange(
+                  'constructionStatus',
+                  filters.constructionStatus.filter((x) => x !== s)
+                )
+              }
+            />
+          ))}
+          {(filters.verified === true || filters.hasVirtualTour === true) && (
+            <>
+              {filters.verified === true && (
+                <MuiChip label="Verified only" onDelete={() => handleFilterChange('verified', undefined)} />
+              )}
+              {filters.hasVirtualTour === true && (
+                <MuiChip
+                  label="Has virtual tour"
+                  onDelete={() => handleFilterChange('hasVirtualTour', undefined)}
+                />
+              )}
+            </>
+          )}
+          {activeFilterCount > 0 && (
+            <Button size="small" onClick={clearAllFilters}>
+              Clear All
+            </Button>
+          )}
         </Box>
 
         {/* Results Header */}
@@ -696,6 +774,20 @@ function SearchContent() {
           </Stack>
         </Box>
       </Drawer>
+
+      <AdvancedFiltersModal
+        open={showAdvancedFilters}
+        onClose={() => setShowAdvancedFilters(false)}
+        filters={{
+          minArea: filters.minArea,
+          maxArea: filters.maxArea,
+          furnished: filters.furnished,
+          verified: filters.verified,
+          hasVirtualTour: filters.hasVirtualTour
+        }}
+        onChange={handleFilterChange}
+        onReset={clearAllFilters}
+      />
     </Box>
   );
 }
