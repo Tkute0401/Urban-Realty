@@ -217,7 +217,8 @@ function SearchContent() {
       constructionStatus: [],
       furnished: undefined,
       verified: undefined,
-      hasVirtualTour: undefined
+      hasVirtualTour: undefined,
+      sort: 'relevance'
     };
     setFilters(clearedFilters);
     loadPropertiesWithFilters(clearedFilters);
