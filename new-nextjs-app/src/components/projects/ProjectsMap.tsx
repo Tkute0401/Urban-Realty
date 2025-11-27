@@ -164,8 +164,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           const firstCoords = firstProject.location.coordinates.coordinates as [number, number];
           if (isValidCoordinates(firstCoords)) {
             mapCenter = firstCoords; // [lng, lat]
-            mapZoom = validProjects.length > 1 ? 6 : 12;
-            console.log('Initializing map centered on first project:', mapCenter);
+          mapZoom = validProjects.length > 1 ? 6 : 12;
+          console.log('Initializing map centered on first project:', mapCenter);
           } else {
             console.warn('First project has invalid coordinates, falling back to default center');
             mapCenter = [77.2090, 28.6139];
@@ -285,7 +285,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
           if (bounds.length > 0) {
             try {
-              mapInstanceRef.current.fitBounds(bounds);
+          mapInstanceRef.current.fitBounds(bounds);
             } catch (err) {
               console.warn('Failed to fit bounds for projects map, keeping current center/zoom', err);
             }
