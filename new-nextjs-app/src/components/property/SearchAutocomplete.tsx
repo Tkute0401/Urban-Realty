@@ -55,9 +55,15 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
   }, [getRecentSearches]);
 
   const fetchSuggestions = useCallback(async (query: string) => {
+    // Always open the dropdown while we are actively searching
+    setShowSuggestions(true);
+
     if (!query || query.length < 2) {
+      // For short queries, clear remote suggestions but keep dropdown
+      // so recent searches (when value is empty) can still show.
       setSuggestions([]);
-      setShowSuggestions(false);
+      setCategorizedSuggestions({});
+      setLoading(false);
       return;
     }
 
@@ -95,11 +101,14 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
         setCategorizedSuggestions({});
       }
       
+      // Keep dropdown open to show whatever suggestions we have
       setShowSuggestions(true);
     } catch (error) {
       console.error('Error fetching suggestions:', error);
       setSuggestions([]);
-      setShowSuggestions(false);
+      // Keep the dropdown open so the user at least sees an empty state
+      // instead of it silently disappearing on errors.
+      setShowSuggestions(true);
     } finally {
       setLoading(false);
     }
@@ -141,9 +150,9 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
       clearTimeout(blurTimeoutRef.current);
       blurTimeoutRef.current = null;
     }
-    if (value.length >= 2 && suggestions.length > 0) {
-      setShowSuggestions(true);
-    }
+    // Always show dropdown on focus; its contents (recent searches,
+    // loading spinner, or suggestions) are controlled separately.
+    setShowSuggestions(true);
   };
 
   const handleBlur = () => {
