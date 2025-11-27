@@ -69,21 +69,45 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
 
     try {
       setLoading(true);
-      // Try Next.js API route first, fallback to backend API
-      let response;
+
+      let response: Response | undefined;
+
+      // 1) Try the Next.js API route first
       try {
-        response = await fetch(`/api/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=10`);
+        response = await fetch(
+          `/api/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=10`
+        );
+
+        // If the Next.js route exists but returns a non-OK status (e.g. 404 in production),
+        // immediately fall back to the backend API.
+        if (!response.ok) {
+          console.warn(
+            'Search suggestions Next.js route returned',
+            response.status,
+            '- falling back to /api/v1/properties/search-suggestions'
+          );
+          response = await fetch(
+            `/api/v1/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=10`
+          );
+        }
       } catch (e) {
-        // Fallback to backend API
-        response = await fetch(`/api/v1/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=10`);
+        // 2) If calling the Next.js route itself fails (network/runtime),
+        // fall back to the backend API.
+        console.warn(
+          'Error calling /api/properties/search-suggestions, falling back to /api/v1/properties/search-suggestions',
+          e
+        );
+        response = await fetch(
+          `/api/v1/properties/search-suggestions?q=${encodeURIComponent(query)}&limit=10`
+        );
       }
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+
+      if (!response || !response.ok) {
+        throw new Error(`HTTP error! status: ${response ? response.status : 'no response'}`);
       }
-      
+
       const data = await response.json();
-      
+
       // Handle both old format (array) and new format (categorized)
       if (data.suggestions && Array.isArray(data.suggestions)) {
         setSuggestions(data.suggestions);
@@ -100,7 +124,7 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
         setSuggestions(data.suggestions || []);
         setCategorizedSuggestions({});
       }
-      
+
       // Keep dropdown open to show whatever suggestions we have
       setShowSuggestions(true);
     } catch (error) {
