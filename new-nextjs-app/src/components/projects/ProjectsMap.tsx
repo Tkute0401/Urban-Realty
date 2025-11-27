@@ -46,6 +46,16 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
+  // Helper to validate coordinates array [lng, lat]
+  const isValidCoordinates = (coords?: [number, number]) => {
+    return Array.isArray(coords) &&
+      coords.length === 2 &&
+      typeof coords[0] === 'number' &&
+      typeof coords[1] === 'number' &&
+      isFinite(coords[0]) &&
+      isFinite(coords[1]);
+  };
+
   // Load Mappls script
   useEffect(() => {
     const loadMapScript = () => {
@@ -129,9 +139,10 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         }
 
         // Filter projects with valid coordinates
-        const validProjects = projects.filter(
-          p => p.location?.coordinates?.coordinates?.length === 2
-        );
+        const validProjects = projects.filter(p => {
+          const coords = p.location?.coordinates?.coordinates as [number, number] | undefined;
+          return isValidCoordinates(coords);
+        });
 
         if (validProjects.length === 0) {
           setMapError('No projects with valid coordinates');
@@ -148,11 +159,18 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           mapZoom = 12;
           console.log('Initializing map centered on user location:', mapCenter);
         } else if (validProjects.length > 0) {
-          // Center on first project
+          // Center on first project with valid coordinates
           const firstProject = validProjects[0];
-          mapCenter = firstProject.location.coordinates.coordinates;
-          mapZoom = validProjects.length > 1 ? 6 : 12;
-          console.log('Initializing map centered on first project:', mapCenter);
+          const firstCoords = firstProject.location.coordinates.coordinates as [number, number];
+          if (isValidCoordinates(firstCoords)) {
+            mapCenter = firstCoords; // [lng, lat]
+            mapZoom = validProjects.length > 1 ? 6 : 12;
+            console.log('Initializing map centered on first project:', mapCenter);
+          } else {
+            console.warn('First project has invalid coordinates, falling back to default center');
+            mapCenter = [77.2090, 28.6139];
+            mapZoom = 10;
+          }
         } else {
           // Default to Delhi
           mapCenter = [77.2090, 28.6139];
@@ -171,7 +189,18 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
         // Add markers for each project
         const newMarkers = validProjects.map(project => {
-          const [lng, lat] = project.location.coordinates.coordinates;
+          const coords = project.location.coordinates.coordinates as [number, number];
+
+          if (!isValidCoordinates(coords)) {
+            console.warn('Skipping project with invalid coordinates:', {
+              id: project._id,
+              name: project.name,
+              coordinates: coords
+            });
+            return null;
+          }
+
+          const [lng, lat] = coords; // [lng, lat]
           const isSelected = selectedProject?._id === project._id;
 
           const marker = new window.mappls.Marker({
@@ -245,15 +274,22 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           }
         }
 
-        markersRef.current = newMarkers;
+        markersRef.current = newMarkers.filter(Boolean);
 
         // Fit bounds if multiple projects (only if no user location)
         if (validProjects.length > 1 && !userLocation) {
-          const bounds = validProjects.map(p => ({
-            lat: p.location.coordinates.coordinates[1],
-            lng: p.location.coordinates.coordinates[0]
-          }));
-          mapInstanceRef.current.fitBounds(bounds);
+          // Mappls fitBounds expects an array of [lng, lat] coordinates
+          const bounds = validProjects
+            .map(p => p.location.coordinates.coordinates as [number, number])
+            .filter(coords => isValidCoordinates(coords));
+
+          if (bounds.length > 0) {
+            try {
+              mapInstanceRef.current.fitBounds(bounds);
+            } catch (err) {
+              console.warn('Failed to fit bounds for projects map, keeping current center/zoom', err);
+            }
+          }
         }
 
         setMapLoaded(true);

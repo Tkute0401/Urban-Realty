@@ -66,6 +66,17 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     parks: false
   });
 
+  // Helper to validate property coordinates [lng, lat] and avoid (0,0)
+  const isValidCoordinates = (coords?: [number, number]) => {
+    return Array.isArray(coords) &&
+      coords.length === 2 &&
+      typeof coords[0] === 'number' &&
+      typeof coords[1] === 'number' &&
+      isFinite(coords[0]) &&
+      isFinite(coords[1]) &&
+      !(coords[0] === 0 && coords[1] === 0);
+  };
+
 
 
   // Load Mappls script
@@ -167,7 +178,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
     // Filter properties with valid coordinates
     const validProperties = properties.filter(property => 
-      property.location?.coordinates?.length === 2
+      isValidCoordinates(property.location?.coordinates as [number, number] | undefined)
     );
 
     console.log('PropertiesMap Debug:', {
@@ -482,7 +493,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
 
         // Filter properties with valid coordinates
         const validProperties = properties.filter(property => 
-          property.location?.coordinates?.length === 2
+          isValidCoordinates(property.location?.coordinates as [number, number] | undefined)
         );
 
         if (validProperties.length === 0) {
@@ -610,7 +621,7 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
     if (mapInitialized && mapInstanceRef.current && searchQuery && properties && properties.length > 0) {
       console.log('Centering map on search results for:', searchQuery);
       const validProperties = properties.filter(property => 
-        property.location?.coordinates?.length === 2
+        isValidCoordinates(property.location?.coordinates as [number, number] | undefined)
       );
       
       if (validProperties.length > 0) {
