@@ -306,7 +306,9 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
       let infoWindow: any = null;
       try {
         infoWindow = new window.mappls.InfoWindow({
-          content: infoWindowContent
+          content: infoWindowContent,
+          // Mappls InfoWindow expects a valid LngLatLike for position: [lng, lat]
+          position: [position.lng, position.lat]
         });
         infoWindowsRef.current.push(infoWindow);
       } catch (infoError) {
@@ -330,7 +332,8 @@ const PropertiesMap: React.FC<PropertiesMapProps> = ({
           // Open info window for this marker
           if (infoWindow) {
             try {
-              infoWindow.open(mapInstanceRef.current, marker);
+              // Position already set in constructor; just open on the map
+              infoWindow.open(mapInstanceRef.current);
             } catch (openError) {
               console.warn('Failed to open info window:', openError);
             }
