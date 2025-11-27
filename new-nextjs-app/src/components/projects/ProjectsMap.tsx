@@ -136,10 +136,10 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
       script.src = MAPPLS_CONFIG.getScriptUrl();
       script.async = true;
       script.defer = true;
-      
+
       script.onload = () => setScriptLoaded(true);
       script.onerror = () => setMapError('Failed to load Mappls Maps');
-      
+
       document.head.appendChild(script);
     };
 
@@ -192,13 +192,29 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           return;
         }
 
+        // DEBUG: Log incoming projects
+        console.log('🗺️ ProjectsMap - Total projects received:', projects.length);
+        console.log('🗺️ ProjectsMap - Sample project data:', projects[0]);
+
         // Filter projects with valid coordinates
         const validProjects = projects.filter((p) => {
           const coords = getProjectLngLat(p);
-          return isValidCoordinates(coords);
+          const isValid = isValidCoordinates(coords);
+
+          // DEBUG: Log each project's coordinate validation
+          console.log(`🗺️ Project "${p.name}":`, {
+            location: p.location,
+            extractedCoords: coords,
+            isValid: isValid
+          });
+
+          return isValid;
         });
 
+        console.log('🗺️ Valid projects with coordinates:', validProjects.length);
+
         if (validProjects.length === 0) {
+          console.error('🗺️ ERROR: No projects with valid coordinates found!');
           setMapError('No projects with valid coordinates');
           return;
         }
@@ -269,8 +285,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
           const marker = new window.mappls.Marker({
             map: mapInstanceRef.current,
-            // Mappls markers use [lat, lng]
-            position: [lat, lng],
+            // Mappls markers use [lng, lat] array format (GeoJSON standard)
+            position: [lng, lat],
             icon: {
               url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                 <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
@@ -305,7 +321,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
                 const safePosition =
                   positionFromMarker && Array.isArray(positionFromMarker)
                     ? positionFromMarker
-                    : [lat, lng]; // fall back to marker coordinates [lat, lng]
+                    : [lng, lat]; // fall back to marker coordinates [lng, lat]
 
                 const infoWindow = new window.mappls.InfoWindow({
                   content: `
@@ -342,7 +358,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           try {
             const userMarker = new window.mappls.Marker({
               map: mapInstanceRef.current,
-              position: [userLocation.latitude, userLocation.longitude], // Mappls expects [lat, lng]
+              position: [userLocation.longitude, userLocation.latitude], // Mappls expects [lng, lat]
               icon: {
                 url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
                   <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -370,7 +386,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
           if (bounds.length > 0) {
             try {
-          mapInstanceRef.current.fitBounds(bounds);
+              mapInstanceRef.current.fitBounds(bounds);
             } catch (err) {
               console.warn('Failed to fit bounds for projects map, keeping current center/zoom', err);
             }
@@ -387,7 +403,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
     // Delay to ensure DOM is fully ready
     const timer = setTimeout(initializeMap, 300);
-    
+
     return () => {
       clearTimeout(timer);
       markersRef.current.forEach(marker => {
@@ -465,7 +481,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           </Typography>
         </Box>
       )}
-      
+
       <div
         ref={mapRef}
         id={`projects-map-container-${Math.random().toString(36).substr(2, 9)}`}
