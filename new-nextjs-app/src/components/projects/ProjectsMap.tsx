@@ -45,6 +45,8 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [mapInitialized, setMapInitialized] = useState(false);
+  const [containerId] = useState(() => `projects-map-container-${Math.random().toString(36).substr(2, 9)}`);
 
   // Helper to validate coordinates array [lng, lat]
   const isValidCoordinates = (coords?: [number, number] | null) => {
@@ -64,12 +66,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
   // Safely extract [lng, lat] from a project, or null if invalid
   const getProjectLngLat = (project: Project): [number, number] | null => {
     try {
-      // Support multiple coordinate shapes:
-      // 1) GeoJSON-style: location.coordinates.coordinates -> [lng, lat]
-      // 2) Flat array:    location.coordinates -> [lng, lat]
-      // 3) Object:        location.coordinates -> { lng, lat } or { longitude, latitude }
       let raw: [number, number] | undefined;
-
       const anyProject = project as any;
 
       if (
@@ -91,27 +88,18 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         }
       }
 
-      if (!isValidCoordinates(raw)) {
-        return null;
-      }
-
-      const lng = Number(raw![0]);
-      const lat = Number(raw![1]);
-
-      return [lng, lat];
+      if (!isValidCoordinates(raw)) return null;
+      return [Number(raw![0]), Number(raw![1])];
     } catch (e) {
-      console.warn('Failed to extract coordinates from project', {
-        id: (project as any)?._id,
-        name: (project as any)?.name,
-        location: (project as any)?.location,
-        error: e,
-      });
+      console.warn('Failed to extract coordinates', e);
       return null;
     }
   };
 
   // Load Mappls script
   useEffect(() => {
+    if (typeof window === 'undefined' || scriptLoaded) return;
+
     const loadMapScript = () => {
       if (window.mappls) {
         setScriptLoaded(true);
@@ -120,13 +108,10 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
       const existingScript = document.querySelector('script[src*="mappls"]');
       if (existingScript) {
-        existingScript.addEventListener('load', () => {
-          setScriptLoaded(true);
-        });
+        existingScript.addEventListener('load', () => setScriptLoaded(true));
         return;
       }
 
-      // Use centralized API key configuration
       if (!MAPPLS_CONFIG.apiKey) {
         setMapError('Mappls API key not found');
         return;
@@ -136,46 +121,134 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
       script.src = MAPPLS_CONFIG.getScriptUrl();
       script.async = true;
       script.defer = true;
-
       script.onload = () => setScriptLoaded(true);
       script.onerror = () => setMapError('Failed to load Mappls Maps');
-
       document.head.appendChild(script);
     };
 
     loadMapScript();
-  }, []);
+  }, [scriptLoaded]);
 
-  // Initialize map and markers
-  useEffect(() => {
-    if (!scriptLoaded || !projects || projects.length === 0) {
-      return;
-    }
-
-    // Ensure mapRef.current exists
-    if (!mapRef.current) {
-      console.warn('Map ref not available');
-      return;
-    }
+  // Function to add markers
+  const addMarkersToMap = () => {
+    if (!mapInstanceRef.current) return;
 
     // Clean up existing markers
     markersRef.current.forEach(marker => {
       try {
-        marker.remove();
+        if (marker && marker.remove) marker.remove();
       } catch (e) {
         console.warn('Error removing marker:', e);
       }
     });
     markersRef.current = [];
 
-    // Clean up existing map
-    if (mapInstanceRef.current) {
+    const validProjects = projects.filter(p => isValidCoordinates(getProjectLngLat(p)));
+
+    console.log('🗺️ Adding markers for', validProjects.length, 'projects');
+
+    const newMarkers = validProjects.map((project) => {
+      const coords = getProjectLngLat(project);
+      if (!coords) return null;
+
+      const [lng, lat] = coords;
+      const isSelected = selectedProject?._id === project._id;
+
+      // Use [lat, lng] array format like PropertiesMap
+      const marker = new window.mappls.Marker({
+        map: mapInstanceRef.current,
+        position: [lat, lng], // [lat, lng] format
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+            <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0C8.373 0 3 5.373 3 12c0 8.25 12 28 12 28s12-19.75 12-28c0-6.627-5.373-12-12-12z" 
+                    fill="${isSelected ? 'var(--color-primary)' : 'var(--color-secondary)'}" 
+                    stroke="var(--color-white)" 
+                    stroke-width="2"/>
+              <circle cx="15" cy="12" r="5" fill="var(--color-white)"/>
+            </svg>
+          `)}`,
+          width: 30,
+          height: 40
+        }
+      });
+
+      // Add click listener
+      marker.addListener('click', () => {
+        if (onMarkerClick) onMarkerClick(project);
+      });
+
+      // Info window
+      if (project.name) {
+        marker.addListener('click', () => {
+          try {
+            const infoWindow = new window.mappls.InfoWindow({
+              content: `
+                <div style="padding: 10px; max-width: 250px;">
+                  <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">
+                    ${project.name}
+                  </h3>
+                  <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">
+                    ${(project.location as any)?.city || ''}, ${(project.location as any)?.state || ''}
+                  </p>
+                </div>
+              `,
+              position: [lat, lng] // [lat, lng] format
+            });
+            infoWindow.open(mapInstanceRef.current);
+          } catch (e) {
+            console.warn('Failed to create info window', e);
+          }
+        });
+      }
+
+      return marker;
+    });
+
+    // User location marker
+    if (userLocation) {
       try {
-        mapInstanceRef.current.remove();
+        new window.mappls.Marker({
+          map: mapInstanceRef.current,
+          position: [userLocation.latitude, userLocation.longitude], // [lat, lng]
+          icon: {
+            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+              <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="var(--color-success)" stroke="var(--color-success)" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4" fill="var(--color-white)"/>
+              </svg>
+            `)}`,
+            scaledSize: { width: 24, height: 24 }
+          }
+        });
       } catch (e) {
-        console.warn('Error removing map:', e);
+        console.warn('Failed to create user marker', e);
       }
     }
+
+    markersRef.current = newMarkers.filter(Boolean);
+
+    // Fit bounds
+    if (validProjects.length > 1 && !userLocation) {
+      const bounds = validProjects
+        .map(p => getProjectLngLat(p))
+        .filter(isValidCoordinates)
+        .map(coords => [coords![0], coords![1]]); // [lng, lat] for fitBounds (Mappls quirk: fitBounds usually takes [lng, lat] or [lat, lng] depending on version, sticking to [lng, lat] as per PropertiesMap)
+
+      if (bounds.length > 0) {
+        try {
+          // PropertiesMap uses [lng, lat] for fitBounds
+          mapInstanceRef.current.fitBounds(bounds);
+        } catch (err) {
+          console.warn('Failed to fit bounds', err);
+        }
+      }
+    }
+  };
+
+  // Initialize map
+  useEffect(() => {
+    if (!scriptLoaded || mapInitialized) return;
 
     const initializeMap = () => {
       try {
@@ -184,82 +257,29 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           return;
         }
 
-        // Verify the container element is valid and visible
-        const container = mapRef.current;
+        const container = document.getElementById(containerId) || mapRef.current;
         if (!container || !container.offsetParent) {
-          console.warn('Map container not ready, retrying...');
           setTimeout(initializeMap, 200);
           return;
         }
 
-        // DEBUG: Log incoming projects
-        console.log('🗺️ ProjectsMap - Total projects received:', projects.length);
-        console.log('🗺️ ProjectsMap - Sample project data:', projects[0]);
+        // Default center
+        let mapCenter = [28.6139, 77.2090]; // [lat, lng]
+        let mapZoom = 10;
 
-        // Filter projects with valid coordinates
-        const validProjects = projects.filter((p) => {
-          const coords = getProjectLngLat(p);
-          const isValid = isValidCoordinates(coords);
-
-          // DEBUG: Log each project's coordinate validation
-          console.log(`🗺️ Project "${p.name}":`, {
-            location: p.location,
-            extractedCoords: coords,
-            isValid: isValid
-          });
-
-          return isValid;
-        });
-
-        console.log('🗺️ Valid projects with coordinates:', validProjects.length);
-
-        if (validProjects.length === 0) {
-          console.error('🗺️ ERROR: No projects with valid coordinates found!');
-          setMapError('No projects with valid coordinates');
-          return;
-        }
-
-        // Calculate center and zoom
-        let mapCenter: { lat: number; lng: number };
-        let mapZoom: number;
-
+        // Try to find a better center
+        const validProjects = projects.filter(p => isValidCoordinates(getProjectLngLat(p)));
         if (userLocation) {
-          // Center on user location
-          mapCenter = { lat: userLocation.latitude, lng: userLocation.longitude };
+          mapCenter = [userLocation.latitude, userLocation.longitude];
           mapZoom = 12;
-          console.log('Initializing map centered on user location:', mapCenter);
         } else if (validProjects.length > 0) {
-          // Center on first project with valid coordinates
-          const firstProject = validProjects[0];
-          const firstCoords = getProjectLngLat(firstProject);
-
-          if (isValidCoordinates(firstCoords)) {
-            const [lng, lat] = firstCoords as [number, number];
-            mapCenter = { lat, lng }; // {lat, lng} object format
-            mapZoom = validProjects.length > 1 ? 6 : 12;
-            console.log('Initializing map centered on first project:', {
-              mapCenter,
-              projectId: firstProject._id,
-            });
-          } else {
-            console.warn(
-              'First project has invalid coordinates after normalization, falling back to default center',
-              {
-                projectId: firstProject._id,
-                rawCoordinates: firstProject.location?.coordinates,
-              }
-            );
-            mapCenter = { lat: 28.6139, lng: 77.209 }; // Delhi coordinates
-            mapZoom = 10;
+          const coords = getProjectLngLat(validProjects[0]);
+          if (coords) {
+            mapCenter = [coords[1], coords[0]]; // [lat, lng]
+            mapZoom = 12;
           }
-        } else {
-          // Default to Delhi
-          mapCenter = { lat: 28.6139, lng: 77.2090 };
-          mapZoom = 10;
-          console.log('Initializing map with default center (Delhi):', mapCenter);
         }
 
-        // Initialize map
         mapInstanceRef.current = new window.mappls.Map(container, {
           center: mapCenter,
           zoom: mapZoom,
@@ -268,161 +288,38 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           scrollWheel: true,
         });
 
-        // Add markers for each project
-        const newMarkers = validProjects.map((project) => {
-          const coords = getProjectLngLat(project);
-
-          if (!isValidCoordinates(coords)) {
-            console.warn('Skipping project with invalid coordinates:', {
-              id: project._id,
-              name: project.name,
-              coordinates: coords,
-            });
-            return null;
-          }
-
-          const [lng, lat] = coords as [number, number]; // [lng, lat]
-          const isSelected = selectedProject?._id === project._id;
-
-          const marker = new window.mappls.Marker({
-            map: mapInstanceRef.current,
-            // Mappls markers require position as object {lat, lng}
-            position: { lat, lng },
-            icon: {
-              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 0C8.373 0 3 5.373 3 12c0 8.25 12 28 12 28s12-19.75 12-28c0-6.627-5.373-12-12-12z" 
-                        fill="${isSelected ? 'var(--color-primary)' : 'var(--color-secondary)'}" 
-                        stroke="var(--color-white)" 
-                        stroke-width="2"/>
-                  <circle cx="15" cy="12" r="5" fill="var(--color-white)"/>
-                </svg>
-              `)}`,
-              width: 30,
-              height: 40
-            }
-          });
-
-          // Add click listener
-          marker.addListener('click', () => {
-            if (onMarkerClick) {
-              onMarkerClick(project);
-            }
-          });
-
-          // Add info window on demand when marker is clicked
-          if (project.name) {
-            marker.addListener('click', () => {
-              try {
-                const positionFromMarker =
-                  typeof (marker as any).getPosition === 'function'
-                    ? (marker as any).getPosition()
-                    : null;
-
-                const safePosition =
-                  positionFromMarker && typeof positionFromMarker === 'object'
-                    ? positionFromMarker
-                    : { lat, lng }; // fall back to marker coordinates {lat, lng}
-
-                const infoWindow = new window.mappls.InfoWindow({
-                  content: `
-                    <div style="padding: 10px; max-width: 250px;">
-                      <h3 style="margin: 0 0 5px 0; color: var(--color-text-primary); font-size: 14px; font-weight: bold;">
-                        ${project.name}
-                      </h3>
-                      <p style="margin: 0; color: var(--color-text-muted); font-size: 12px;">
-                        ${(project.location as any)?.city || ''}, ${(project.location as any)?.state || ''}
-                      </p>
-                    </div>
-                  `,
-                  // Mappls InfoWindow accepts the same LatLng-like as Marker position
-                  position: safePosition,
-                });
-
-                infoWindow.open(mapInstanceRef.current);
-              } catch (e) {
-                console.warn('Failed to create info window for project', {
-                  id: project._id,
-                  name: project.name,
-                  coords: { lng, lat },
-                  error: e,
-                });
-              }
-            });
-          }
-
-          return marker;
-        });
-
-        // Add user location marker if available
-        if (userLocation) {
-          try {
-            const userMarker = new window.mappls.Marker({
-              map: mapInstanceRef.current,
-              position: { lat: userLocation.latitude, lng: userLocation.longitude }, // Mappls expects {lat, lng}
-              icon: {
-                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" fill="var(--color-success)" stroke="var(--color-success)" stroke-width="2"/>
-                    <circle cx="12" cy="12" r="4" fill="var(--color-white)"/>
-                  </svg>
-                `)}`,
-                scaledSize: { width: 24, height: 24 }
-              }
-            });
-            console.log('User location marker created successfully');
-          } catch (error) {
-            console.warn('Failed to create user location marker:', error);
-          }
-        }
-
-        markersRef.current = newMarkers.filter(Boolean);
-
-        // Fit bounds if multiple projects (only if no user location)
-        if (validProjects.length > 1 && !userLocation) {
-          // Mappls fitBounds expects an array of [lng, lat] coordinates
-          const bounds = validProjects
-            .map((p) => getProjectLngLat(p))
-            .filter((coords) => isValidCoordinates(coords)) as [number, number][];
-
-          if (bounds.length > 0) {
-            try {
-              mapInstanceRef.current.fitBounds(bounds);
-            } catch (err) {
-              console.warn('Failed to fit bounds for projects map, keeping current center/zoom', err);
-            }
-          }
-        }
-
+        setMapInitialized(true);
         setMapLoaded(true);
-        setMapError(null);
+
+        // Add markers immediately
+        addMarkersToMap();
+
       } catch (error: any) {
         console.error('Error initializing map:', error);
-        setMapError(`Failed to initialize map: ${error?.message || 'Unknown error'}`);
+        setMapError(`Failed to initialize map: ${error?.message}`);
       }
     };
 
-    // Delay to ensure DOM is fully ready
     const timer = setTimeout(initializeMap, 300);
+    return () => clearTimeout(timer);
+  }, [scriptLoaded, mapInitialized]);
 
+  // Update markers when projects change
+  useEffect(() => {
+    if (mapInitialized && mapInstanceRef.current) {
+      addMarkersToMap();
+    }
+  }, [projects, selectedProject, userLocation, mapInitialized]);
+
+  // Cleanup
+  useEffect(() => {
     return () => {
-      clearTimeout(timer);
-      markersRef.current.forEach(marker => {
-        try {
-          marker.remove();
-        } catch (e) {
-          console.warn('Error cleaning up marker:', e);
-        }
-      });
-      if (mapInstanceRef.current) {
-        try {
-          mapInstanceRef.current.remove();
-        } catch (e) {
-          console.warn('Error cleaning up map:', e);
-        }
+      markersRef.current.forEach(m => m?.remove?.());
+      if (mapInstanceRef.current?.remove) {
+        try { mapInstanceRef.current.remove(); } catch (e) { }
       }
     };
-  }, [scriptLoaded, projects, selectedProject, onMarkerClick]);
+  }, []);
 
   if (!projects || projects.length === 0) {
     return (
@@ -447,7 +344,6 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
       <Box sx={{
         height: height,
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--color-surface)',
@@ -455,9 +351,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
         border: '1px solid var(--color-border)',
         p: 2
       }}>
-        <Typography variant="body2" sx={{ color: 'var(--color-text-muted)', textAlign: 'center' }}>
-          {mapError}
-        </Typography>
+        <Typography variant="body2" color="error">{mapError}</Typography>
       </Box>
     );
   }
@@ -473,8 +367,7 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           background: 'var(--color-surface)',
-          zIndex: 1,
-          p: 2
+          zIndex: 1
         }}>
           <CircularProgress size={40} sx={{ color: 'var(--color-primary)', mb: 2 }} />
           <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
@@ -485,14 +378,13 @@ const ProjectsMap: React.FC<ProjectsMapProps> = ({
 
       <div
         ref={mapRef}
-        id={`projects-map-container-${Math.random().toString(36).substr(2, 9)}`}
+        id={containerId}
         style={{
           width: '100%',
           height: '100%',
           borderRadius: '12px',
           border: '1px solid var(--color-border)',
-          minHeight: typeof height === 'string' ? height : `${height}px`,
-          position: 'relative'
+          minHeight: typeof height === 'string' ? height : `${height}px`
         }}
       />
     </Box>
