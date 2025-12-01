@@ -581,6 +581,193 @@ const ProjectList = () => {
           )}
         </Box>
       )}
+
+      {/* Filter Drawer */}
+      <Drawer
+        anchor={isMobile ? 'bottom' : 'right'}
+        open={showFiltersDrawer}
+        onClose={() => setShowFiltersDrawer(false)}
+        sx={{
+          '& .MuiPaper-root': {
+            maxHeight: isMobile ? '90vh' : '100vh',
+            borderTopLeftRadius: isMobile ? '16px' : 0,
+            borderTopRightRadius: isMobile ? '16px' : 0,
+            backgroundColor: 'var(--color-surface)',
+            color: 'var(--color-text-primary)',
+            width: isMobile ? '100%' : '400px'
+          }
+        }}
+      >
+        <Box sx={{ p: 2, borderBottom: '1px solid var(--color-border)' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Filters
+            </Typography>
+            <IconButton onClick={() => setShowFiltersDrawer(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+        </Box>
+
+        <Box sx={{ p: 2, overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+          {/* Location Filters */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+              Location
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="City"
+                  value={filters.city}
+                  onChange={(e) => handleFilterChange('city', e.target.value)}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="State"
+                  value={filters.state}
+                  onChange={(e) => handleFilterChange('state', e.target.value)}
+                  size="small"
+                />
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Price Range */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+              Price Range
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Min Price"
+                  type="number"
+                  value={filters.priceMin}
+                  onChange={(e) => handleFilterChange('priceMin', e.target.value)}
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  label="Max Price"
+                  type="number"
+                  value={filters.priceMax}
+                  onChange={(e) => handleFilterChange('priceMax', e.target.value)}
+                  size="small"
+                />
+              </Grid>
+            </Grid>
+          </Box>
+
+          {/* Project Status */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+              Project Status
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {['Completed', 'Under Construction', 'Planning', 'On Hold', 'Cancelled'].map(status => {
+                const isActive = filters.status.includes(status);
+                return (
+                  <Chip
+                    key={status}
+                    label={status}
+                    clickable
+                    size="small"
+                    variant={isActive ? 'filled' : 'outlined'}
+                    onClick={() => {
+                      const newStatus = isActive
+                        ? filters.status.filter(s => s !== status)
+                        : [...filters.status, status];
+                      handleFilterChange('status', newStatus);
+                    }}
+                    sx={{
+                      backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                      color: isActive ? 'white' : 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)'
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Project Type */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+              Project Type
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {['Residential', 'Commercial', 'Mixed-Use', 'Industrial'].map(type => {
+                const isActive = filters.type.includes(type);
+                return (
+                  <Chip
+                    key={type}
+                    label={type}
+                    clickable
+                    size="small"
+                    variant={isActive ? 'filled' : 'outlined'}
+                    onClick={() => {
+                      const newType = isActive
+                        ? filters.type.filter(t => t !== type)
+                        : [...filters.type, type];
+                      handleFilterChange('type', newType);
+                    }}
+                    sx={{
+                      backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
+                      color: isActive ? 'white' : 'var(--color-primary)',
+                      borderColor: 'var(--color-primary)'
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Developer */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+              Developer
+            </Typography>
+            <TextField
+              fullWidth
+              label="Developer Name"
+              value={filters.developer}
+              onChange={(e) => handleFilterChange('developer', e.target.value)}
+              size="small"
+            />
+          </Box>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{ p: 2, borderTop: '1px solid var(--color-border)' }}>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                clearAllFilters();
+                setShowFiltersDrawer(false);
+              }}
+              sx={{ flex: 1 }}
+            >
+              Clear All
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => setShowFiltersDrawer(false)}
+              sx={{ flex: 2, backgroundColor: 'var(--color-primary)' }}
+            >
+              Apply Filters
+            </Button>
+          </Stack>
+        </Box>
+      </Drawer>
     </Container>
   );
 };
