@@ -5,7 +5,6 @@ const Property = require('../models/Property');
 const ContactRequest = require('../models/ContactRequest');
 const Developer = require('../models/Developer');
 const Project = require('../models/Project');
-const SearchAnalyticsService = require('../services/SearchAnalyticsService');
 
 // @desc    Get all users
 // @route   GET /api/v1/admin/users
@@ -1675,94 +1674,5 @@ exports.getDeveloperStats = asyncHandler(async (req, res, next) => {
   } catch (err) {
     console.error('Error fetching developer stats:', err);
     next(new ErrorResponse('Failed to fetch developer statistics', 500));
-  }
-});
-
-// @desc    Get search analytics metrics
-// @route   GET /api/v1/admin/search-analytics/metrics
-// @access  Private/Admin
-exports.getSearchMetrics = asyncHandler(async (req, res, next) => {
-  try {
-    const days = parseInt(req.query.days) || 30;
-    const metrics = await SearchAnalyticsService.getConversionMetrics({ days });
-    
-    res.status(200).json({
-      success: true,
-      data: metrics
-    });
-  } catch (err) {
-    console.error('Error fetching search metrics:', err);
-    next(new ErrorResponse('Failed to fetch search metrics', 500));
-  }
-});
-
-// @desc    Get popular searches
-// @route   GET /api/v1/admin/search-analytics/popular
-// @access  Private/Admin
-exports.getPopularSearches = asyncHandler(async (req, res, next) => {
-  try {
-    const days = parseInt(req.query.days) || 30;
-    const limit = parseInt(req.query.limit) || 20;
-    const minResults = parseInt(req.query.minResults) || 0;
-    
-    const popularSearches = await SearchAnalyticsService.getPopularSearches({
-      days,
-      limit,
-      minResults
-    });
-    
-    res.status(200).json({
-      success: true,
-      data: popularSearches
-    });
-  } catch (err) {
-    console.error('Error fetching popular searches:', err);
-    next(new ErrorResponse('Failed to fetch popular searches', 500));
-  }
-});
-
-// @desc    Get zero-result searches
-// @route   GET /api/v1/admin/search-analytics/zero-results
-// @access  Private/Admin
-exports.getZeroResultSearches = asyncHandler(async (req, res, next) => {
-  try {
-    const days = parseInt(req.query.days) || 30;
-    const limit = parseInt(req.query.limit) || 20;
-    
-    const zeroResultSearches = await SearchAnalyticsService.getZeroResultSearches({
-      days,
-      limit
-    });
-    
-    res.status(200).json({
-      success: true,
-      data: zeroResultSearches
-    });
-  } catch (err) {
-    console.error('Error fetching zero-result searches:', err);
-    next(new ErrorResponse('Failed to fetch zero-result searches', 500));
-  }
-});
-
-// @desc    Get trending searches
-// @route   GET /api/v1/admin/search-analytics/trending
-// @access  Private/Admin
-exports.getTrendingSearches = asyncHandler(async (req, res, next) => {
-  try {
-    const hours = parseInt(req.query.hours) || 24;
-    const limit = parseInt(req.query.limit) || 10;
-    
-    const trendingSearches = await SearchAnalyticsService.getTrendingSearches({
-      hours,
-      limit
-    });
-    
-    res.status(200).json({
-      success: true,
-      data: trendingSearches
-    });
-  } catch (err) {
-    console.error('Error fetching trending searches:', err);
-    next(new ErrorResponse('Failed to fetch trending searches', 500));
   }
 });

@@ -97,11 +97,5 @@ router.delete('/projects/:id', protect, authorize('admin'), adminController.dele
 // Developer Statistics
 router.get('/developers/stats', protect, authorize('admin'), adminController.getDeveloperStats);
 
-// Search Analytics
-router.get('/search-analytics/metrics', protect, authorize('admin'), adminController.getSearchMetrics);
-router.get('/search-analytics/popular', protect, authorize('admin'), adminController.getPopularSearches);
-router.get('/search-analytics/zero-results', protect, authorize('admin'), adminController.getZeroResultSearches);
-router.get('/search-analytics/trending', protect, authorize('admin'), adminController.getTrendingSearches);
-
 module.exports = router;
 

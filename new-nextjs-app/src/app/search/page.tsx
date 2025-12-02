@@ -21,8 +21,7 @@ import {
   Select,
   MenuItem,
   Paper,
-  Stack,
-  Chip as MuiChip
+  Stack
 } from '@mui/material';
 import { 
   Search, 
@@ -41,8 +40,6 @@ import SearchAutocomplete from '@/components/property/SearchAutocomplete';
 import PropertiesMap from '@/components/property/PropertiesMap';
 import PropertyHeatMap from '@/components/property/PropertyHeatMap';
 import { useLocation } from '@/hooks/useLocation';
-import QuickFilterBar from '@/components/search/QuickFilterBar';
-import AdvancedFiltersModal from '@/components/search/AdvancedFiltersModal';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 function SearchContent() {
@@ -59,7 +56,6 @@ function SearchContent() {
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map' | 'heatmap'>('list');
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
@@ -76,19 +72,15 @@ function SearchContent() {
     constructionStatus: [] as string[],
     furnished: undefined as boolean | undefined,
     verified: undefined as boolean | undefined,
-    hasVirtualTour: undefined as boolean | undefined,
-    sort: searchParams.get('sort') || 'relevance'
+    hasVirtualTour: undefined as boolean | undefined
   });
-  
-  const [searchStartTime] = useState(Date.now());
-  const [searchMetadata, setSearchMetadata] = useState<any>(null);
 
   const amenityOptions = [
     'Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony',
     'WiFi', 'Air Conditioning', 'Furnished', 'Pet Friendly', 'Elevator'
   ];
 
-  const loadPropertiesWithFilters = useCallback(async (filterState: any) => {
+  const loadPropertiesWithFilters = useCallback((filterState: any) => {
     const params: any = {
       page: 1,
       limit: 50
@@ -132,13 +124,6 @@ function SearchContent() {
     }
     if (filterState.hasVirtualTour !== undefined) {
       params.hasVirtualTour = filterState.hasVirtualTour;
-    }
-
-    if (filterState.sort && filterState.sort !== 'relevance') {
-      params.sort = filterState.sort;
-    } else if (filterState.search || filterState.sort === 'relevance') {
-      // Use relevance sorting for search queries
-      params.sort = 'relevance';
     }
 
     if (userLocation) {
@@ -223,8 +208,7 @@ function SearchContent() {
       constructionStatus: [],
       furnished: undefined,
       verified: undefined,
-      hasVirtualTour: undefined,
-      sort: 'relevance'
+      hasVirtualTour: undefined
     };
     setFilters(clearedFilters);
     loadPropertiesWithFilters(clearedFilters);
@@ -261,7 +245,7 @@ function SearchContent() {
     }}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Search and Filter Bar */}
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
             <Box sx={{ flex: 1, minWidth: '250px' }}>
               <SearchAutocomplete
@@ -369,127 +353,19 @@ function SearchContent() {
           </Box>
         </Box>
 
-        {/* Quick Filter Bar */}
-        <QuickFilterBar
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onMoreFiltersClick={() => setShowAdvancedFilters(true)}
-          activeFilterCount={activeFilterCount}
-        />
-
-        {/* Active filter chips */}
-        <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {filters.city && (
-            <MuiChip label={`City: ${filters.city}`} onDelete={() => handleFilterChange('city', '')} />
-          )}
-          {filters.priceMin && (
-            <MuiChip
-              label={`Min ₹${filters.priceMin}`}
-              onDelete={() => handleFilterChange('priceMin', '')}
-            />
-          )}
-          {filters.priceMax && (
-            <MuiChip
-              label={`Max ₹${filters.priceMax}`}
-              onDelete={() => handleFilterChange('priceMax', '')}
-            />
-          )}
-          {filters.bedrooms && (
-            <MuiChip
-              label={`${filters.bedrooms}+ BHK`}
-              onDelete={() => handleFilterChange('bedrooms', '')}
-            />
-          )}
-          {filters.type && (
-            <MuiChip
-              label={filters.type.split(',').join(', ')}
-              onDelete={() => handleFilterChange('type', '')}
-            />
-          )}
-          {filters.constructionStatus.map((s) => (
-            <MuiChip
-              key={s}
-              label={s}
-              onDelete={() =>
-                handleFilterChange(
-                  'constructionStatus',
-                  filters.constructionStatus.filter((x) => x !== s)
-                )
-              }
-            />
-          ))}
-          {(filters.verified === true || filters.hasVirtualTour === true) && (
-            <>
-              {filters.verified === true && (
-                <MuiChip label="Verified only" onDelete={() => handleFilterChange('verified', undefined)} />
-              )}
-              {filters.hasVirtualTour === true && (
-                <MuiChip
-                  label="Has virtual tour"
-                  onDelete={() => handleFilterChange('hasVirtualTour', undefined)}
-                />
-              )}
-            </>
-          )}
-          {activeFilterCount > 0 && (
-            <Button size="small" onClick={clearAllFilters}>
-              Clear All
-            </Button>
-          )}
-        </Box>
-
         {/* Results Header */}
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" sx={{ color: 'var(--color-text-primary)', mb: 1 }}>
-              Search Results
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'var(--color-text-muted)', mb: 1 }}>
-              {activeTab === 0 
-                ? `Found ${properties.length} ${properties.length === 1 ? 'property' : 'properties'}`
-                : `Found ${filteredProjects.length} ${filteredProjects.length === 1 ? 'project' : 'projects'}`
-              }
-              {filters.search && ` for "${filters.search}"`}
-              {filters.city && ` in ${filters.city}`}
-              {searchMetadata?.sortedBy === 'relevance' && (
-                <Chip 
-                  label="Sorted by relevance" 
-                  size="small" 
-                  sx={{ ml: 1, fontSize: '0.75rem' }}
-                />
-              )}
-            </Typography>
-            {searchMetadata && (
-              <Typography variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
-                Search completed in {((Date.now() - searchStartTime) / 1000).toFixed(2)}s
-                {searchMetadata.parsedFilters && Object.keys(searchMetadata.parsedFilters).length > 0 && (
-                  <span> • Natural language query detected</span>
-                )}
-              </Typography>
-            )}
-          </Box>
-          
-          {/* Sort Dropdown */}
-          <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel>Sort By</InputLabel>
-            <Select
-              value={filters.sort}
-              label="Sort By"
-              onChange={(e) => handleFilterChange('sort', e.target.value)}
-              sx={{
-                backgroundColor: 'var(--color-surface)',
-                color: 'var(--color-text-primary)'
-              }}
-            >
-              <MenuItem value="relevance">Relevance</MenuItem>
-              <MenuItem value="-createdAt">Newest First</MenuItem>
-              <MenuItem value="createdAt">Oldest First</MenuItem>
-              <MenuItem value="-price">Price: High to Low</MenuItem>
-              <MenuItem value="price">Price: Low to High</MenuItem>
-              <MenuItem value="-area">Area: Large to Small</MenuItem>
-              <MenuItem value="area">Area: Small to Large</MenuItem>
-            </Select>
-          </FormControl>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h4" sx={{ color: 'var(--color-text-primary)', mb: 1 }}>
+            Search Results
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
+            {activeTab === 0 
+              ? `Found ${properties.length} ${properties.length === 1 ? 'property' : 'properties'}`
+              : `Found ${filteredProjects.length} ${filteredProjects.length === 1 ? 'project' : 'projects'}`
+            }
+            {filters.search && ` for "${filters.search}"`}
+            {filters.city && ` in ${filters.city}`}
+          </Typography>
         </Box>
 
         {/* Tabs */}
@@ -532,62 +408,9 @@ function SearchContent() {
                     <CircularProgress sx={{ color: 'var(--color-primary)' }} />
                   </Box>
                 ) : properties.length === 0 ? (
-                  <Box sx={{ mt: 2 }}>
-                    <Alert severity="info" sx={{ mb: 2 }}>
-                      <Typography variant="h6" sx={{ mb: 1 }}>
-                        No properties found
-                      </Typography>
-                      <Typography variant="body2" sx={{ mb: 2 }}>
-                        Try adjusting your search criteria or explore these suggestions:
-                      </Typography>
-                      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
-                        {filters.search && (
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => {
-                              const newFilters = { ...filters, search: '' };
-                              setFilters(newFilters);
-                              loadPropertiesWithFilters(newFilters);
-                            }}
-                          >
-                            Remove search term
-                          </Button>
-                        )}
-                        {filters.city && (
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            onClick={() => {
-                              const newFilters = { ...filters, city: '' };
-                              setFilters(newFilters);
-                              loadPropertiesWithFilters(newFilters);
-                            }}
-                          >
-                            Remove city filter
-                          </Button>
-                        )}
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={clearAllFilters}
-                        >
-                          Clear all filters
-                        </Button>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          onClick={() => {
-                            const newFilters = { ...filters, propertyType: 'ALL' };
-                            setFilters(newFilters);
-                            loadPropertiesWithFilters(newFilters);
-                          }}
-                        >
-                          Show all properties
-                        </Button>
-                      </Stack>
-                    </Alert>
-                  </Box>
+                  <Alert severity="info" sx={{ mt: 2 }}>
+                    No properties found. Try adjusting your search criteria.
+                  </Alert>
                 ) : (
                   <Grid container spacing={3}>
                     {properties.map((property, index) => (
@@ -873,20 +696,6 @@ function SearchContent() {
           </Stack>
         </Box>
       </Drawer>
-
-      <AdvancedFiltersModal
-        open={showAdvancedFilters}
-        onClose={() => setShowAdvancedFilters(false)}
-        filters={{
-          minArea: filters.minArea,
-          maxArea: filters.maxArea,
-          furnished: filters.furnished,
-          verified: filters.verified,
-          hasVirtualTour: filters.hasVirtualTour
-        }}
-        onChange={handleFilterChange}
-        onReset={clearAllFilters}
-      />
     </Box>
   );
 }
