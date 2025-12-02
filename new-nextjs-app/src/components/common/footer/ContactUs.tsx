@@ -116,8 +116,6 @@ const ContactUs = () => {
           <h3 className="font-poppins text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Phone</h3>
           <p className="mb-2" style={{ color: colors.text.muted }}>Main Office</p>
           <p className="text-lg" style={{ color: colors.text.primary }}>+91 9689772874</p>
-          <p className="mt-4 mb-2" style={{ color: colors.text.muted }}>Sales Department</p>
-          <p className="text-lg" style={{ color: colors.text.primary }}>+91 9689772863</p>
         </motion.div>
 
         <motion.div
