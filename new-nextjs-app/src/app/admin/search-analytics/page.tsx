@@ -29,7 +29,7 @@ import {
   TrendingUp,
   Search,
   Visibility,
-  Click,
+  MouseIcon,
   TrendingDown,
   BarChart
 } from '@mui/icons-material';
@@ -169,7 +169,7 @@ const SearchAnalyticsPage = () => {
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Click sx={{ fontSize: 32, color: '#4CAF50', mr: 1 }} />
+                <MouseIcon sx={{ fontSize: 32, color: '#4CAF50', mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   Total Clicks
                 </Typography>
