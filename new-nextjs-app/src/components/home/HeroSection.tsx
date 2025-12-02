@@ -560,27 +560,6 @@ const HeroSection = () => {
             ))}
           </div>
 
-          {/* Inline filters row: property type + budget (and optional BHK for future use) */}
-          <div className="mb-1.5 sm:mb-2 flex flex-col sm:flex-row gap-1.5 sm:gap-2">
-            <div className="flex-1 min-w-[140px]">
-              <PropertyTypeSelector
-                value={selectedPropertyTypes}
-                onChange={setSelectedPropertyTypes}
-                category={selectedTab === 'COMMERCIAL' ? 'commercial' : 'all'}
-                multiselect
-                size="small"
-              />
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <BudgetSelector
-                value={budgetRange}
-                onChange={setBudgetRange}
-                variant="dropdown"
-                size="small"
-              />
-            </div>
-          </div>
-
           {/* Search input section */}
           <div className="relative">
             <form onSubmit={handleSearch} className={`flex items-center backdrop-blur-md rounded-lg sm:rounded-xl overflow-visible border max-h-8 sm:max-h-10 md:max-h-12 ${theme === 'light'
