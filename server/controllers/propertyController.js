@@ -7,6 +7,10 @@ const Developer = require('../models/Developer');
 const UserInteraction = require('../models/UserInteraction');
 const RecommendationService = require('../services/RecommendationService');
 const TravelTimeService = require('../services/TravelTimeService');
+const SearchRankingService = require('../services/SearchRankingService');
+const SearchAnalyticsService = require('../services/SearchAnalyticsService');
+const SearchPersonalizationService = require('../services/SearchPersonalizationService');
+const { parseNaturalLanguageQuery, isNaturalLanguageQuery } = require('../utils/naturalLanguageParser');
 const geocoder = require('../utils/hybridGeocoder');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -80,13 +84,42 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       query = query.where('area', areaFilter);
     }
 
-    // 6. Handle search
+    // 6. Handle search with natural language parsing
+    let parsedFilters = {};
     if (req.query.search) {
+      // Parse natural language query if it appears to be one
+      if (isNaturalLanguageQuery(req.query.search)) {
+        parsedFilters = parseNaturalLanguageQuery(req.query.search);
+        // Merge parsed filters with existing query params (parsed filters take precedence)
+        if (parsedFilters.bedrooms && !req.query.bedrooms) {
+          req.query.bedrooms = parsedFilters.bedrooms;
+        }
+        if (parsedFilters.propertyType && !req.query.propertyType) {
+          req.query.propertyType = parsedFilters.propertyType;
+        }
+        if (parsedFilters.priceMin && !req.query.priceMin) {
+          req.query.priceMin = parsedFilters.priceMin;
+        }
+        if (parsedFilters.priceMax && !req.query.priceMax) {
+          req.query.priceMax = parsedFilters.priceMax;
+        }
+        if (parsedFilters.city && !req.query.city) {
+          req.query.city = parsedFilters.city;
+        }
+        if (parsedFilters.state && !req.query.state) {
+          req.query.state = parsedFilters.state;
+        }
+      }
+
+      // Enhanced search with more fields
       query = query.or([
         { title: { $regex: req.query.search, $options: 'i' } },
         { description: { $regex: req.query.search, $options: 'i' } },
         { 'address.city': { $regex: req.query.search, $options: 'i' } },
-        { 'address.state': { $regex: req.query.search, $options: 'i' } }
+        { 'address.state': { $regex: req.query.search, $options: 'i' } },
+        { 'address.locality': { $regex: req.query.search, $options: 'i' } },
+        { buildingName: { $regex: req.query.search, $options: 'i' } },
+        { type: { $regex: req.query.search, $options: 'i' } }
       ]);
     }
 
@@ -187,16 +220,20 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       };
     }
 
-    // 10. Sorting
-    if (req.query.sort) {
+    // 10. Sorting - check if relevance sorting is requested
+    const useRelevanceSorting = req.query.sort === 'relevance' || 
+                                (req.query.search && !req.query.sort && !userLocation);
+    
+    if (req.query.sort && req.query.sort !== 'relevance') {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
-    } else if (userLocation) {
+    } else if (userLocation && !useRelevanceSorting) {
       // Sort by distance if user location is provided
       query = query.sort({ 'location.coordinates': 1 });
-    } else {
+    } else if (!useRelevanceSorting) {
       query = query.sort('-createdAt');
     }
+    // If relevance sorting, we'll sort after fetching results
 
     // 11. Field limiting
     if (req.query.fields) {
@@ -226,7 +263,10 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
         { title: { $regex: req.query.search, $options: 'i' } },
         { description: { $regex: req.query.search, $options: 'i' } },
         { 'address.city': { $regex: req.query.search, $options: 'i' } },
-        { 'address.state': { $regex: req.query.search, $options: 'i' } }
+        { 'address.state': { $regex: req.query.search, $options: 'i' } },
+        { 'address.locality': { $regex: req.query.search, $options: 'i' } },
+        { buildingName: { $regex: req.query.search, $options: 'i' } },
+        { type: { $regex: req.query.search, $options: 'i' } }
       ]);
     }
     if (req.query.minArea || req.query.maxArea) {
@@ -293,10 +333,43 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
     
     const total = await countQuery.countDocuments();
 
-    query = query.skip(skip).limit(limit);
+    // For relevance sorting, we need to fetch more results to rank them properly
+    const fetchLimit = useRelevanceSorting ? Math.min(limit * 3, 100) : limit;
+    query = query.skip(skip).limit(fetchLimit);
 
     // 13. Execute query
-    const properties = await query;
+    let properties = await query;
+
+    // 13a. Apply relevance scoring and ranking if needed
+    if (useRelevanceSorting && properties.length > 0) {
+      const searchParams = {
+        searchQuery: req.query.search || '',
+        priceMin: req.query.priceMin ? parseFloat(req.query.priceMin) : null,
+        priceMax: req.query.priceMax ? parseFloat(req.query.priceMax) : null,
+        city: req.query.city || parsedFilters.city || null,
+        state: req.query.state || parsedFilters.state || null,
+        userLocation: userLocation ? {
+          coordinates: userLocation.coordinates
+        } : null,
+        bedrooms: req.query.bedrooms || parsedFilters.bedrooms || null,
+        bathrooms: req.query.bathrooms || null,
+        propertyType: req.query.propertyType || parsedFilters.propertyType || null
+      };
+
+      // Rank properties by relevance
+      properties = SearchRankingService.rankProperties(properties, searchParams);
+
+      // Apply personalization if user is logged in
+      if (req.user && req.user.id) {
+        properties = await SearchPersonalizationService.personalizeResults(
+          properties,
+          req.user.id
+        );
+      }
+
+      // Limit to requested page size after ranking
+      properties = properties.slice(0, limit);
+    }
 
     // 14. Calculate distances and travel times if user location is provided
     let propertiesWithDistance = properties;
@@ -378,7 +451,29 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       }
     }
 
-    // 15. Send response
+    // 15. Log search analytics (async, don't wait)
+    if (req.query.search || Object.keys(req.query).length > 0) {
+      const sessionId = req.headers['x-session-id'] || 
+                       req.cookies?.sessionId || 
+                       SearchAnalyticsService.generateSessionId();
+      
+      SearchAnalyticsService.logSearch({
+        query: req.query.search || '',
+        userId: req.user?.id || null,
+        sessionId,
+        resultsCount: propertiesWithDistance.length,
+        filters: {
+          ...req.query,
+          parsedFilters
+        },
+        userAgent: req.headers['user-agent'] || '',
+        ipAddress: req.ip || req.connection.remoteAddress || ''
+      }).catch(err => {
+        console.error('Error logging search analytics:', err);
+      });
+    }
+
+    // 16. Send response
     res.status(200).json({
       success: true,
       count: propertiesWithDistance.length,
@@ -391,6 +486,12 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
       userLocation: userLocation ? {
         latitude: userLocation.coordinates[1],
         longitude: userLocation.coordinates[0]
+      } : null,
+      searchMetadata: req.query.search ? {
+        originalQuery: req.query.search,
+        parsedFilters: Object.keys(parsedFilters).length > 0 ? parsedFilters : null,
+        isNaturalLanguage: isNaturalLanguageQuery(req.query.search),
+        sortedBy: useRelevanceSorting ? 'relevance' : (req.query.sort || 'default')
       } : null,
       data: propertiesWithDistance
     });
@@ -1594,76 +1695,215 @@ exports.getSearchSuggestions = asyncHandler(async (req, res, next) => {
     const { q, limit = 10 } = req.query;
     
     if (!q || q.length < 2) {
+      // Return trending/popular searches when query is empty or too short
+      const trendingSearches = await SearchAnalyticsService.getTrendingSearches({ limit: 5, hours: 24 });
       return res.status(200).json({
         success: true,
-        suggestions: []
+        cities: [],
+        states: [],
+        types: [],
+        amenities: [],
+        neighborhoods: [],
+        trending: trendingSearches.map(t => t.query)
       });
     }
 
     const searchRegex = new RegExp(q, 'i');
+    const suggestionLimit = parseInt(limit);
 
-    // Get unique suggestions from multiple fields
-    const suggestions = await Property.aggregate([
-      {
-        $match: {
-          $or: [
-            { 'address.city': searchRegex },
-            { 'address.state': searchRegex },
-            { type: searchRegex },
-            { title: searchRegex },
-            { amenities: searchRegex }
-          ]
-        }
-      },
-      {
-        $project: {
-          city: '$address.city',
-          state: '$address.state',
-          type: '$type',
-          amenities: '$amenities'
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          cities: { $addToSet: '$city' },
-          states: { $addToSet: '$state' },
-          types: { $addToSet: '$type' },
-          allAmenities: { $push: '$amenities' }
-        }
-      },
-      {
-        $project: {
-          all: {
-            $concatArrays: [
-              { $filter: { input: '$cities', as: 'city', cond: { $ne: ['$$city', null] } } },
-              { $filter: { input: '$states', as: 'state', cond: { $ne: ['$$state', null] } } },
-              { $filter: { input: '$types', as: 'type', cond: { $ne: ['$$type', null] } } },
-              { $reduce: { input: '$allAmenities', initialValue: [], in: { $concatArrays: ['$$value', { $filter: { input: '$$this', as: 'am', cond: { $ne: ['$$am', null] } } }] } } }
-            ]
+    // Get categorized suggestions with property counts using aggregation
+    const [citiesResult, statesResult, typesResult, amenitiesResult, neighborhoodsResult] = await Promise.all([
+      // Cities with property counts
+      Property.aggregate([
+        {
+          $match: {
+            'address.city': searchRegex,
+            status: { $in: ['For Sale', 'For Rent'] }
+          }
+        },
+        {
+          $group: {
+            _id: '$address.city',
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1, _id: 1 }
+        },
+        {
+          $limit: suggestionLimit
+        },
+        {
+          $project: {
+            name: '$_id',
+            count: 1,
+            _id: 0
           }
         }
-      },
-      {
-        $project: {
-          suggestions: {
-            $slice: ['$all', parseInt(limit)]
+      ]),
+
+      // States with property counts
+      Property.aggregate([
+        {
+          $match: {
+            'address.state': searchRegex,
+            status: { $in: ['For Sale', 'For Rent'] }
+          }
+        },
+        {
+          $group: {
+            _id: '$address.state',
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1, _id: 1 }
+        },
+        {
+          $limit: suggestionLimit
+        },
+        {
+          $project: {
+            name: '$_id',
+            count: 1,
+            _id: 0
           }
         }
-      }
+      ]),
+
+      // Property types with counts
+      Property.aggregate([
+        {
+          $match: {
+            type: searchRegex,
+            status: { $in: ['For Sale', 'For Rent'] }
+          }
+        },
+        {
+          $group: {
+            _id: '$type',
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1, _id: 1 }
+        },
+        {
+          $limit: suggestionLimit
+        },
+        {
+          $project: {
+            name: '$_id',
+            count: 1,
+            _id: 0
+          }
+        }
+      ]),
+
+      // Amenities with counts
+      Property.aggregate([
+        {
+          $match: {
+            amenities: searchRegex,
+            status: { $in: ['For Sale', 'For Rent'] }
+          }
+        },
+        {
+          $unwind: '$amenities'
+        },
+        {
+          $match: {
+            amenities: searchRegex
+          }
+        },
+        {
+          $group: {
+            _id: '$amenities',
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1, _id: 1 }
+        },
+        {
+          $limit: suggestionLimit
+        },
+        {
+          $project: {
+            name: '$_id',
+            count: 1,
+            _id: 0
+          }
+        }
+      ]),
+
+      // Neighborhoods/Localities with counts
+      Property.aggregate([
+        {
+          $match: {
+            'address.locality': searchRegex,
+            status: { $in: ['For Sale', 'For Rent'] }
+          }
+        },
+        {
+          $group: {
+            _id: '$address.locality',
+            count: { $sum: 1 },
+            city: { $first: '$address.city' }
+          }
+        },
+        {
+          $sort: { count: -1, _id: 1 }
+        },
+        {
+          $limit: suggestionLimit
+        },
+        {
+          $project: {
+            name: '$_id',
+            count: 1,
+            city: 1,
+            _id: 0
+          }
+        }
+      ])
     ]);
 
-    const flatSuggestions = suggestions[0]?.suggestions || [];
-    
+    // Get popular searches that match the query
+    const popularSearches = await SearchAnalyticsService.getPopularSearches({ 
+      limit: 5, 
+      days: 30,
+      minResults: 1
+    });
+    const matchingPopular = popularSearches
+      .filter(s => s.query.toLowerCase().includes(q.toLowerCase()))
+      .slice(0, 3)
+      .map(s => s.query);
+
+    // Format response with categorized suggestions
     res.status(200).json({
       success: true,
-      suggestions: flatSuggestions
+      cities: citiesResult.map(c => ({ name: c.name, count: c.count })),
+      states: statesResult.map(s => ({ name: s.name, count: s.count })),
+      types: typesResult.map(t => ({ name: t.name, count: t.count })),
+      amenities: amenitiesResult.map(a => ({ name: a.name, count: a.count })),
+      neighborhoods: neighborhoodsResult.map(n => ({ 
+        name: n.name, 
+        count: n.count,
+        city: n.city 
+      })),
+      popular: matchingPopular
     });
   } catch (error) {
     console.error('Error getting search suggestions:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get search suggestions'
+      error: 'Failed to get search suggestions',
+      cities: [],
+      states: [],
+      types: [],
+      amenities: [],
+      neighborhoods: []
     });
   }
 });

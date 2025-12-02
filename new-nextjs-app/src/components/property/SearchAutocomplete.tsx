@@ -1,8 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { TextField, List, ListItem, ListItemText, Paper, Box, CircularProgress, Typography, Divider, Chip } from '@mui/material';
-import { Search, LocationOn, Home, TrendingUp, History, Star } from '@mui/icons-material';
+import { TextField, List, ListItem, ListItemText, Paper, Box, CircularProgress, Typography, Divider, Chip, Skeleton } from '@mui/material';
+import { Search, LocationOn, Home, TrendingUp, History, Star, Place } from '@mui/icons-material';
+
+interface SuggestionItem {
+  name: string;
+  count?: number;
+  city?: string;
+  isPopular?: boolean;
+}
 
 interface SearchAutocompleteProps {
   value: string;
@@ -21,17 +28,22 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
 }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [categorizedSuggestions, setCategorizedSuggestions] = useState<{
-    cities?: string[];
-    states?: string[];
-    types?: string[];
-    amenities?: string[];
+    cities?: SuggestionItem[];
+    states?: SuggestionItem[];
+    types?: SuggestionItem[];
+    amenities?: SuggestionItem[];
+    neighborhoods?: SuggestionItem[];
     recent?: string[];
     popular?: string[];
+    trending?: string[];
   }>({});
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsListRef = useRef<HTMLDivElement>(null);
 
   // Get recent searches from localStorage
   const getRecentSearches = useCallback(() => {
@@ -108,16 +120,20 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
 
       const data = await response.json();
 
-      // Handle both old format (array) and new format (categorized)
+      // Handle both old format (array) and new format (categorized with counts)
       if (data.suggestions && Array.isArray(data.suggestions)) {
         setSuggestions(data.suggestions);
         setCategorizedSuggestions({});
       } else if (data.cities || data.states || data.types || data.amenities) {
+        // New format with counts and additional data
         setCategorizedSuggestions({
           cities: data.cities || [],
           states: data.states || [],
           types: data.types || [],
-          amenities: data.amenities || []
+          amenities: data.amenities || [],
+          neighborhoods: data.neighborhoods || [],
+          popular: data.popular || [],
+          trending: data.trending || []
         });
         setSuggestions([]);
       } else {
@@ -183,19 +199,107 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
     // Delay hiding suggestions to allow clicking on them
     blurTimeoutRef.current = setTimeout(() => {
       setShowSuggestions(false);
+      setSelectedIndex(-1);
     }, 200);
+  };
+
+  // Highlight matching text in suggestion
+  const highlightText = (text: string, query: string) => {
+    if (!query || !text) return text;
+    const regex = new RegExp(`(${query})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <span key={index} style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+          {part}
+        </span>
+      ) : (
+        <span key={index}>{part}</span>
+      )
+    );
+  };
+
+  // Get all suggestions as a flat list for keyboard navigation
+  const getAllSuggestions = useCallback(() => {
+    const all: Array<{ text: string; type: string; count?: number }> = [];
+    
+    if (categorizedSuggestions.cities) {
+      categorizedSuggestions.cities.forEach(city => {
+        all.push({ text: city.name, type: 'city', count: city.count });
+      });
+    }
+    if (categorizedSuggestions.states) {
+      categorizedSuggestions.states.forEach(state => {
+        all.push({ text: state.name, type: 'state', count: state.count });
+      });
+    }
+    if (categorizedSuggestions.types) {
+      categorizedSuggestions.types.forEach(type => {
+        all.push({ text: type.name, type: 'type', count: type.count });
+      });
+    }
+    if (categorizedSuggestions.amenities) {
+      categorizedSuggestions.amenities.forEach(amenity => {
+        all.push({ text: amenity.name, type: 'amenity', count: amenity.count });
+      });
+    }
+    if (categorizedSuggestions.neighborhoods) {
+      categorizedSuggestions.neighborhoods.forEach(neighborhood => {
+        all.push({ text: neighborhood.name, type: 'neighborhood', count: neighborhood.count });
+      });
+    }
+    if (categorizedSuggestions.popular) {
+      categorizedSuggestions.popular.forEach(pop => {
+        all.push({ text: pop, type: 'popular' });
+      });
+    }
+    
+    return all;
+  }, [categorizedSuggestions]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const allSuggestions = getAllSuggestions();
+    const recentSearches = !value ? getRecentSearches() : [];
+    const totalItems = allSuggestions.length + recentSearches.length;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev < totalItems - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      if (selectedIndex < recentSearches.length) {
+        handleSuggestionClick(recentSearches[selectedIndex]);
+      } else {
+        const suggestion = allSuggestions[selectedIndex - recentSearches.length];
+        if (suggestion) {
+          handleSuggestionClick(suggestion.text);
+        }
+      }
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setSelectedIndex(-1);
+    }
   };
 
   return (
     <Box ref={containerRef} sx={{ position: 'relative', width: '100%' }}>
       <TextField
+        inputRef={inputRef}
         fullWidth
         variant="outlined"
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setSelectedIndex(-1);
+        }}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         sx={{
           ...sx,
           '& .MuiOutlinedInput-root': {
@@ -241,8 +345,10 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
           onMouseDown={(e) => e.preventDefault()} // Prevent blur when clicking inside
         >
           {loading && suggestions.length === 0 && Object.keys(categorizedSuggestions).length === 0 ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 2 }}>
-              <CircularProgress size={24} sx={{ color: 'var(--color-primary)' }} />
+            <Box sx={{ p: 2 }}>
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} variant="text" width="100%" height={40} sx={{ mb: 1 }} />
+              ))}
             </Box>
           ) : (
             <Box sx={{ p: 1 }}>
@@ -260,16 +366,18 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                       key={`recent-${index}`}
                       component="div"
                       onClick={() => handleSuggestionClick(recent)}
+                      selected={selectedIndex === index}
                       sx={{
                         py: 1,
                         px: 2,
                         cursor: 'pointer',
+                        backgroundColor: selectedIndex === index ? 'var(--color-primary-light)' : 'transparent',
                         '&:hover': { backgroundColor: 'var(--color-primary-light)' }
                       }}
                     >
                       <History sx={{ fontSize: 18, mr: 1.5, color: 'var(--color-text-muted)' }} />
                       <ListItemText
-                        primary={recent}
+                        primary={highlightText(recent, value)}
                         sx={{
                           '& .MuiListItemText-primary': {
                             color: 'var(--color-text-primary)',
@@ -294,30 +402,48 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                           Cities
                         </Typography>
                       </Box>
-                      {categorizedSuggestions.cities.map((city, index) => (
-                        <ListItem
-                          key={`city-${index}`}
-                          component="div"
-                          onClick={() => handleSuggestionClick(city)}
-                          sx={{
-                            py: 1,
-                            px: 2,
-                            cursor: 'pointer',
-                            '&:hover': { backgroundColor: 'var(--color-primary-light)' }
-                          }}
-                        >
-                          <LocationOn sx={{ fontSize: 18, mr: 1.5, color: '#4CAF50' }} />
-                          <ListItemText
-                            primary={city}
+                      {categorizedSuggestions.cities.map((city, index) => {
+                        const itemIndex = getRecentSearches().length + index;
+                        return (
+                          <ListItem
+                            key={`city-${index}`}
+                            component="div"
+                            onClick={() => handleSuggestionClick(city.name || city)}
+                            selected={selectedIndex === itemIndex}
                             sx={{
-                              '& .MuiListItemText-primary': {
-                                color: 'var(--color-text-primary)',
-                                fontSize: '0.9rem'
-                              }
+                              py: 1,
+                              px: 2,
+                              cursor: 'pointer',
+                              backgroundColor: selectedIndex === itemIndex ? 'var(--color-primary-light)' : 'transparent',
+                              '&:hover': { backgroundColor: 'var(--color-primary-light)' }
                             }}
-                          />
-                        </ListItem>
-                      ))}
+                          >
+                            <LocationOn sx={{ fontSize: 18, mr: 1.5, color: '#4CAF50' }} />
+                            <ListItemText
+                              primary={highlightText(typeof city === 'string' ? city : city.name, value)}
+                              secondary={typeof city === 'object' && city.count ? `${city.count} properties` : undefined}
+                              sx={{
+                                '& .MuiListItemText-primary': {
+                                  color: 'var(--color-text-primary)',
+                                  fontSize: '0.9rem'
+                                },
+                                '& .MuiListItemText-secondary': {
+                                  color: 'var(--color-text-muted)',
+                                  fontSize: '0.75rem'
+                                }
+                              }}
+                            />
+                            {typeof city === 'object' && city.isPopular && (
+                              <Chip 
+                                icon={<TrendingUp sx={{ fontSize: 14 }} />}
+                                label="Popular" 
+                                size="small" 
+                                sx={{ ml: 1, height: 20, fontSize: '0.7rem' }}
+                              />
+                            )}
+                          </ListItem>
+                        );
+                      })}
                     </>
                   )}
 
@@ -329,30 +455,41 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                           States
                         </Typography>
                       </Box>
-                      {categorizedSuggestions.states.map((state, index) => (
-                        <ListItem
-                          key={`state-${index}`}
-                          component="div"
-                          onClick={() => handleSuggestionClick(state)}
-                          sx={{
-                            py: 1,
-                            px: 2,
-                            cursor: 'pointer',
-                            '&:hover': { backgroundColor: 'var(--color-primary-light)' }
-                          }}
-                        >
-                          <LocationOn sx={{ fontSize: 18, mr: 1.5, color: '#2196F3' }} />
-                          <ListItemText
-                            primary={state}
+                      {categorizedSuggestions.states.map((state, index) => {
+                        const itemIndex = getRecentSearches().length + 
+                                         (categorizedSuggestions.cities?.length || 0) + index;
+                        return (
+                          <ListItem
+                            key={`state-${index}`}
+                            component="div"
+                            onClick={() => handleSuggestionClick(typeof state === 'string' ? state : state.name)}
+                            selected={selectedIndex === itemIndex}
                             sx={{
-                              '& .MuiListItemText-primary': {
-                                color: 'var(--color-text-primary)',
-                                fontSize: '0.9rem'
-                              }
+                              py: 1,
+                              px: 2,
+                              cursor: 'pointer',
+                              backgroundColor: selectedIndex === itemIndex ? 'var(--color-primary-light)' : 'transparent',
+                              '&:hover': { backgroundColor: 'var(--color-primary-light)' }
                             }}
-                          />
-                        </ListItem>
-                      ))}
+                          >
+                            <LocationOn sx={{ fontSize: 18, mr: 1.5, color: '#2196F3' }} />
+                            <ListItemText
+                              primary={highlightText(typeof state === 'string' ? state : state.name, value)}
+                              secondary={typeof state === 'object' && state.count ? `${state.count} properties` : undefined}
+                              sx={{
+                                '& .MuiListItemText-primary': {
+                                  color: 'var(--color-text-primary)',
+                                  fontSize: '0.9rem'
+                                },
+                                '& .MuiListItemText-secondary': {
+                                  color: 'var(--color-text-muted)',
+                                  fontSize: '0.75rem'
+                                }
+                              }}
+                            />
+                          </ListItem>
+                        );
+                      })}
                     </>
                   )}
 
@@ -364,30 +501,42 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                           Property Types
                         </Typography>
                       </Box>
-                      {categorizedSuggestions.types.map((type, index) => (
-                        <ListItem
-                          key={`type-${index}`}
-                          component="div"
-                          onClick={() => handleSuggestionClick(type)}
-                          sx={{
-                            py: 1,
-                            px: 2,
-                            cursor: 'pointer',
-                            '&:hover': { backgroundColor: 'var(--color-primary-light)' }
-                          }}
-                        >
-                          <Home sx={{ fontSize: 18, mr: 1.5, color: '#FF9800' }} />
-                          <ListItemText
-                            primary={type}
+                      {categorizedSuggestions.types.map((type, index) => {
+                        const itemIndex = getRecentSearches().length + 
+                                         (categorizedSuggestions.cities?.length || 0) +
+                                         (categorizedSuggestions.states?.length || 0) + index;
+                        return (
+                          <ListItem
+                            key={`type-${index}`}
+                            component="div"
+                            onClick={() => handleSuggestionClick(typeof type === 'string' ? type : type.name)}
+                            selected={selectedIndex === itemIndex}
                             sx={{
-                              '& .MuiListItemText-primary': {
-                                color: 'var(--color-text-primary)',
-                                fontSize: '0.9rem'
-                              }
+                              py: 1,
+                              px: 2,
+                              cursor: 'pointer',
+                              backgroundColor: selectedIndex === itemIndex ? 'var(--color-primary-light)' : 'transparent',
+                              '&:hover': { backgroundColor: 'var(--color-primary-light)' }
                             }}
-                          />
-                        </ListItem>
-                      ))}
+                          >
+                            <Home sx={{ fontSize: 18, mr: 1.5, color: '#FF9800' }} />
+                            <ListItemText
+                              primary={highlightText(typeof type === 'string' ? type : type.name, value)}
+                              secondary={typeof type === 'object' && type.count ? `${type.count} properties` : undefined}
+                              sx={{
+                                '& .MuiListItemText-primary': {
+                                  color: 'var(--color-text-primary)',
+                                  fontSize: '0.9rem'
+                                },
+                                '& .MuiListItemText-secondary': {
+                                  color: 'var(--color-text-muted)',
+                                  fontSize: '0.75rem'
+                                }
+                              }}
+                            />
+                          </ListItem>
+                        );
+                      })}
                     </>
                   )}
 
@@ -399,30 +548,145 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                           Amenities
                         </Typography>
                       </Box>
-                      {categorizedSuggestions.amenities.map((amenity, index) => (
-                        <ListItem
-                          key={`amenity-${index}`}
-                          component="div"
-                          onClick={() => handleSuggestionClick(amenity)}
-                          sx={{
-                            py: 1,
-                            px: 2,
-                            cursor: 'pointer',
-                            '&:hover': { backgroundColor: 'var(--color-primary-light)' }
-                          }}
-                        >
-                          <Star sx={{ fontSize: 18, mr: 1.5, color: '#9C27B0' }} />
-                          <ListItemText
-                            primary={amenity}
+                      {categorizedSuggestions.amenities.map((amenity, index) => {
+                        const itemIndex = getRecentSearches().length + 
+                                         (categorizedSuggestions.cities?.length || 0) +
+                                         (categorizedSuggestions.states?.length || 0) +
+                                         (categorizedSuggestions.types?.length || 0) + index;
+                        return (
+                          <ListItem
+                            key={`amenity-${index}`}
+                            component="div"
+                            onClick={() => handleSuggestionClick(typeof amenity === 'string' ? amenity : amenity.name)}
+                            selected={selectedIndex === itemIndex}
                             sx={{
-                              '& .MuiListItemText-primary': {
-                                color: 'var(--color-text-primary)',
-                                fontSize: '0.9rem'
-                              }
+                              py: 1,
+                              px: 2,
+                              cursor: 'pointer',
+                              backgroundColor: selectedIndex === itemIndex ? 'var(--color-primary-light)' : 'transparent',
+                              '&:hover': { backgroundColor: 'var(--color-primary-light)' }
                             }}
-                          />
-                        </ListItem>
-                      ))}
+                          >
+                            <Star sx={{ fontSize: 18, mr: 1.5, color: '#9C27B0' }} />
+                            <ListItemText
+                              primary={highlightText(typeof amenity === 'string' ? amenity : amenity.name, value)}
+                              secondary={typeof amenity === 'object' && amenity.count ? `${amenity.count} properties` : undefined}
+                              sx={{
+                                '& .MuiListItemText-primary': {
+                                  color: 'var(--color-text-primary)',
+                                  fontSize: '0.9rem'
+                                },
+                                '& .MuiListItemText-secondary': {
+                                  color: 'var(--color-text-muted)',
+                                  fontSize: '0.75rem'
+                                }
+                              }}
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {/* Neighborhoods */}
+                  {categorizedSuggestions.neighborhoods && categorizedSuggestions.neighborhoods.length > 0 && (
+                    <>
+                      <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1, mt: 1 }}>
+                        <Place sx={{ fontSize: 18, mr: 1, color: '#00BCD4' }} />
+                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                          Neighborhoods
+                        </Typography>
+                      </Box>
+                      {categorizedSuggestions.neighborhoods.map((neighborhood, index) => {
+                        const itemIndex = getRecentSearches().length + 
+                                         (categorizedSuggestions.cities?.length || 0) +
+                                         (categorizedSuggestions.states?.length || 0) +
+                                         (categorizedSuggestions.types?.length || 0) +
+                                         (categorizedSuggestions.amenities?.length || 0) + index;
+                        return (
+                          <ListItem
+                            key={`neighborhood-${index}`}
+                            component="div"
+                            onClick={() => handleSuggestionClick(neighborhood.name)}
+                            selected={selectedIndex === itemIndex}
+                            sx={{
+                              py: 1,
+                              px: 2,
+                              cursor: 'pointer',
+                              backgroundColor: selectedIndex === itemIndex ? 'var(--color-primary-light)' : 'transparent',
+                              '&:hover': { backgroundColor: 'var(--color-primary-light)' }
+                            }}
+                          >
+                            <Place sx={{ fontSize: 18, mr: 1.5, color: '#00BCD4' }} />
+                            <ListItemText
+                              primary={highlightText(neighborhood.name, value)}
+                              secondary={neighborhood.city ? `${neighborhood.city} • ${neighborhood.count || 0} properties` : `${neighborhood.count || 0} properties`}
+                              sx={{
+                                '& .MuiListItemText-primary': {
+                                  color: 'var(--color-text-primary)',
+                                  fontSize: '0.9rem'
+                                },
+                                '& .MuiListItemText-secondary': {
+                                  color: 'var(--color-text-muted)',
+                                  fontSize: '0.75rem'
+                                }
+                              }}
+                            />
+                          </ListItem>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {/* Popular Searches */}
+                  {categorizedSuggestions.popular && categorizedSuggestions.popular.length > 0 && (
+                    <>
+                      <Divider sx={{ my: 1 }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1 }}>
+                        <TrendingUp sx={{ fontSize: 18, mr: 1, color: '#FF5722' }} />
+                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                          Popular Searches
+                        </Typography>
+                      </Box>
+                      {categorizedSuggestions.popular.map((popular, index) => {
+                        const itemIndex = getRecentSearches().length + 
+                                         (categorizedSuggestions.cities?.length || 0) +
+                                         (categorizedSuggestions.states?.length || 0) +
+                                         (categorizedSuggestions.types?.length || 0) +
+                                         (categorizedSuggestions.amenities?.length || 0) +
+                                         (categorizedSuggestions.neighborhoods?.length || 0) + index;
+                        return (
+                          <ListItem
+                            key={`popular-${index}`}
+                            component="div"
+                            onClick={() => handleSuggestionClick(popular)}
+                            selected={selectedIndex === itemIndex}
+                            sx={{
+                              py: 1,
+                              px: 2,
+                              cursor: 'pointer',
+                              backgroundColor: selectedIndex === itemIndex ? 'var(--color-primary-light)' : 'transparent',
+                              '&:hover': { backgroundColor: 'var(--color-primary-light)' }
+                            }}
+                          >
+                            <TrendingUp sx={{ fontSize: 18, mr: 1.5, color: '#FF5722' }} />
+                            <ListItemText
+                              primary={highlightText(popular, value)}
+                              sx={{
+                                '& .MuiListItemText-primary': {
+                                  color: 'var(--color-text-primary)',
+                                  fontSize: '0.9rem'
+                                }
+                              }}
+                            />
+                            <Chip 
+                              label="Popular" 
+                              size="small" 
+                              sx={{ ml: 1, height: 20, fontSize: '0.7rem', bgcolor: '#FF5722', color: 'white' }}
+                            />
+                          </ListItem>
+                        );
+                      })}
                     </>
                   )}
                 </>

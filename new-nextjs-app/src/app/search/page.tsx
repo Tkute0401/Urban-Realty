@@ -77,15 +77,18 @@ function SearchContent() {
     furnished: undefined as boolean | undefined,
     verified: undefined as boolean | undefined,
     hasVirtualTour: undefined as boolean | undefined,
-    sort: 'relevance'
+    sort: searchParams.get('sort') || 'relevance'
   });
+  
+  const [searchStartTime] = useState(Date.now());
+  const [searchMetadata, setSearchMetadata] = useState<any>(null);
 
   const amenityOptions = [
     'Parking', 'Swimming Pool', 'Gym', 'Security', 'Garden', 'Balcony',
     'WiFi', 'Air Conditioning', 'Furnished', 'Pet Friendly', 'Elevator'
   ];
 
-  const loadPropertiesWithFilters = useCallback((filterState: any) => {
+  const loadPropertiesWithFilters = useCallback(async (filterState: any) => {
     const params: any = {
       page: 1,
       limit: 50
@@ -131,8 +134,11 @@ function SearchContent() {
       params.hasVirtualTour = filterState.hasVirtualTour;
     }
 
-    if (filterState.sort) {
+    if (filterState.sort && filterState.sort !== 'relevance') {
       params.sort = filterState.sort;
+    } else if (filterState.search || filterState.sort === 'relevance') {
+      // Use relevance sorting for search queries
+      params.sort = 'relevance';
     }
 
     if (userLocation) {
@@ -433,18 +439,57 @@ function SearchContent() {
         </Box>
 
         {/* Results Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ color: 'var(--color-text-primary)', mb: 1 }}>
-            Search Results
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
-            {activeTab === 0 
-              ? `Found ${properties.length} ${properties.length === 1 ? 'property' : 'properties'}`
-              : `Found ${filteredProjects.length} ${filteredProjects.length === 1 ? 'project' : 'projects'}`
-            }
-            {filters.search && ` for "${filters.search}"`}
-            {filters.city && ` in ${filters.city}`}
-          </Typography>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h4" sx={{ color: 'var(--color-text-primary)', mb: 1 }}>
+              Search Results
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'var(--color-text-muted)', mb: 1 }}>
+              {activeTab === 0 
+                ? `Found ${properties.length} ${properties.length === 1 ? 'property' : 'properties'}`
+                : `Found ${filteredProjects.length} ${filteredProjects.length === 1 ? 'project' : 'projects'}`
+              }
+              {filters.search && ` for "${filters.search}"`}
+              {filters.city && ` in ${filters.city}`}
+              {searchMetadata?.sortedBy === 'relevance' && (
+                <Chip 
+                  label="Sorted by relevance" 
+                  size="small" 
+                  sx={{ ml: 1, fontSize: '0.75rem' }}
+                />
+              )}
+            </Typography>
+            {searchMetadata && (
+              <Typography variant="caption" sx={{ color: 'var(--color-text-muted)' }}>
+                Search completed in {((Date.now() - searchStartTime) / 1000).toFixed(2)}s
+                {searchMetadata.parsedFilters && Object.keys(searchMetadata.parsedFilters).length > 0 && (
+                  <span> • Natural language query detected</span>
+                )}
+              </Typography>
+            )}
+          </Box>
+          
+          {/* Sort Dropdown */}
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel>Sort By</InputLabel>
+            <Select
+              value={filters.sort}
+              label="Sort By"
+              onChange={(e) => handleFilterChange('sort', e.target.value)}
+              sx={{
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text-primary)'
+              }}
+            >
+              <MenuItem value="relevance">Relevance</MenuItem>
+              <MenuItem value="-createdAt">Newest First</MenuItem>
+              <MenuItem value="createdAt">Oldest First</MenuItem>
+              <MenuItem value="-price">Price: High to Low</MenuItem>
+              <MenuItem value="price">Price: Low to High</MenuItem>
+              <MenuItem value="-area">Area: Large to Small</MenuItem>
+              <MenuItem value="area">Area: Small to Large</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
 
         {/* Tabs */}
@@ -487,9 +532,62 @@ function SearchContent() {
                     <CircularProgress sx={{ color: 'var(--color-primary)' }} />
                   </Box>
                 ) : properties.length === 0 ? (
-                  <Alert severity="info" sx={{ mt: 2 }}>
-                    No properties found. Try adjusting your search criteria.
-                  </Alert>
+                  <Box sx={{ mt: 2 }}>
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      <Typography variant="h6" sx={{ mb: 1 }}>
+                        No properties found
+                      </Typography>
+                      <Typography variant="body2" sx={{ mb: 2 }}>
+                        Try adjusting your search criteria or explore these suggestions:
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
+                        {filters.search && (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                              const newFilters = { ...filters, search: '' };
+                              setFilters(newFilters);
+                              loadPropertiesWithFilters(newFilters);
+                            }}
+                          >
+                            Remove search term
+                          </Button>
+                        )}
+                        {filters.city && (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                              const newFilters = { ...filters, city: '' };
+                              setFilters(newFilters);
+                              loadPropertiesWithFilters(newFilters);
+                            }}
+                          >
+                            Remove city filter
+                          </Button>
+                        )}
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={clearAllFilters}
+                        >
+                          Clear all filters
+                        </Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => {
+                            const newFilters = { ...filters, propertyType: 'ALL' };
+                            setFilters(newFilters);
+                            loadPropertiesWithFilters(newFilters);
+                          }}
+                        >
+                          Show all properties
+                        </Button>
+                      </Stack>
+                    </Alert>
+                  </Box>
                 ) : (
                   <Grid container spacing={3}>
                     {properties.map((property, index) => (

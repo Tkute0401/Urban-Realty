@@ -385,13 +385,26 @@ PropertySchema.pre('deleteOne', { document: true, query: false }, async function
 // Index for geospatial queries
 PropertySchema.index({ location: '2dsphere' });
 
-// Index for text search
+// Index for text search (enhanced with weights)
 PropertySchema.index({
   title: 'text',
   description: 'text',
   'address.city': 'text',
   'address.state': 'text',
-  buildingName: 'text'
+  'address.locality': 'text',
+  buildingName: 'text',
+  type: 'text'
+}, {
+  weights: {
+    title: 10,
+    'address.city': 8,
+    'address.locality': 7,
+    'address.state': 6,
+    buildingName: 5,
+    type: 4,
+    description: 2
+  },
+  name: 'text_search_index'
 });
 
 // Performance indexes for filtering
@@ -404,6 +417,25 @@ PropertySchema.index({ featured: -1, createdAt: -1 });
 PropertySchema.index({ verified: 1 });
 PropertySchema.index({ type: 1, status: 1 });
 PropertySchema.index({ bedrooms: 1, bathrooms: 1 });
+
+// Compound indexes for common search patterns
+PropertySchema.index({ 'address.city': 1, type: 1, status: 1, price: 1 });
+PropertySchema.index({ 'address.state': 1, type: 1, status: 1 });
+PropertySchema.index({ status: 1, price: 1, area: 1 });
+PropertySchema.index({ status: 1, bedrooms: 1, bathrooms: 1 });
+PropertySchema.index({ verified: 1, featured: 1, createdAt: -1 });
+PropertySchema.index({ 'address.city': 1, price: 1, area: 1 });
+PropertySchema.index({ type: 1, price: 1, createdAt: -1 });
+
+// Index for search with filters combination
+PropertySchema.index({ 
+  'address.city': 1, 
+  type: 1, 
+  status: 1, 
+  price: 1, 
+  bedrooms: 1,
+  bathrooms: 1
+});
 
 // Delete existing model if it exists to prevent caching issues
 if (mongoose.models.Property) {
