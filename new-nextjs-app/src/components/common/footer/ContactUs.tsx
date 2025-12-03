@@ -135,8 +135,6 @@ const ContactUs = () => {
           <h3 className="font-poppins text-xl font-bold mb-3" style={{ color: colors.text.primary }}>Email</h3>
           <p className="mb-2" style={{ color: colors.text.muted }}>General Inquiries</p>
           <p className="text-lg" style={{ color: colors.text.primary }}>info@squarefooot.com</p>
-          <p className="mt-4 mb-2" style={{ color: colors.text.muted }}>Support</p>
-          <p className="text-lg" style={{ color: colors.text.primary }}>support@squarefooot.com</p>
         </motion.div>
 
         <motion.div
@@ -290,31 +288,6 @@ const ContactUs = () => {
             </div>
           </form>
         </motion.div>
-      </div>
-
-      {/* Map */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
-        <h2 
-          className="font-poppins text-3xl font-bold mb-12 text-center"
-          style={{ color: colors.text.primary }}
-        >
-          Our Location
-        </h2>
-        <div 
-          className="h-96 w-full rounded-xl overflow-hidden border"
-          style={{ 
-            backgroundColor: colors.bg.secondary,
-            borderColor: `${colors.primary.main}33`
-          }}
-        >
-          {/* Replace with your actual map component or iframe */}
-          <div 
-            className="w-full h-full flex items-center justify-center"
-            style={{ color: colors.text.muted }}
-          >
-            <p>Map integration would go here</p>
-          </div>
-        </div>
       </div>
     </section>
   );
