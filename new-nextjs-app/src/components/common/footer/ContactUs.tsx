@@ -83,8 +83,8 @@ const ContactUs = () => {
               Get In <span style={{ color: colors.primary.main }}>Touch</span>
             </h1>
             <p 
-              className="max-w-2xl mx-auto text-lg"
-              style={{ color: colors.text.secondary }}
+              className="max-w-2xl mx-auto text-lg font-medium"
+              style={{ color: 'white' }}
             >
               We&apos;re here to help you with all your real estate needs. Reach out to our team for personalized assistance.
             </p>
