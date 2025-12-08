@@ -412,15 +412,14 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <img src="/vite.png" alt="Logo" className="h-8 w-auto object-contain" />
-            <span className="font-poppins font-bold" style={{ color: '#f9fafb' }}>SQUAREFOOT</span>
           </div>
           
           <div className="text-center md:text-right">
             <p className="font-poppins text-xs" style={{ color: '#d1d5db' }}>
-              © {new Date().getFullYear()} SQUAREFOOT, Inc. All rights reserved.
+              © {new Date().getFullYear()} SQUAREFOOOT, Inc. All rights reserved.
             </p>
             <p className="font-poppins text-xs mt-1" style={{ color: '#d1d5db' }}>
-              SQUAREFOOT® is a registered trademark of SQUAREFOOT, Inc.
+              SQUAREFOOOT® is a registered trademark of SQUAREFOOOT, Inc.
             </p>
           </div>
         </div>
