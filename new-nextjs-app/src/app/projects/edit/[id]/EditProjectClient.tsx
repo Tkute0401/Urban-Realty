@@ -590,9 +590,11 @@ const EditProjectClient: React.FC<EditProjectClientProps> = ({ projectId }) => {
       });
       setTimeout(() => router.push(`/projects/${projectId}`), 1500);
     } catch (err: any) {
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to update project');
       setSnackbar({
         open: true,
-        message: err.message || 'Failed to update project',
+        message: errorMessage,
         severity: 'error'
       });
     } finally {

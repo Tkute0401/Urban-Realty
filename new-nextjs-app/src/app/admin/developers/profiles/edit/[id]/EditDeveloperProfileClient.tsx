@@ -183,8 +183,10 @@ const EditDeveloperProfileClient = ({ id }: EditDeveloperProfileClientProps) => 
       }
     } catch (err: any) {
       console.error('Error fetching developer profile:', err);
-      setError(err.response?.data?.message || 'Failed to load developer profile');
-      setSnackbarMessage(err.response?.data?.message || 'Failed to load developer profile');
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to load developer profile');
+      setError(errorMessage);
+      setSnackbarMessage(errorMessage);
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
@@ -276,7 +278,8 @@ const EditDeveloperProfileClient = ({ id }: EditDeveloperProfileClientProps) => 
       setTimeout(() => router.push('/admin/developers/profiles'), 1500);
     } catch (err: any) {
       console.error('Submission error:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to update developer profile';
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to update developer profile');
       setError(errorMessage);
       setSnackbarMessage(errorMessage);
       setSnackbarOpen(true);

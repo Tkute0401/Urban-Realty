@@ -505,30 +505,8 @@ const AddProjectClient = () => {
       setTimeout(() => router.push('/projects'), 1500);
     } catch (err: any) {
       // Extract the actual error message from various error formats
-      let errorMessage = 'Failed to create project';
-      
-      if (err) {
-        // Check for ApiError with responseBody
-        if (err.responseBody?.message) {
-          errorMessage = err.responseBody.message;
-        }
-        // Check for axios-style error response
-        else if (err.response?.data?.message) {
-          errorMessage = err.response.data.message;
-        }
-        // Check for direct message property
-        else if (err.message) {
-          errorMessage = err.message;
-        }
-        // Check for error string in responseBody
-        else if (typeof err.responseBody === 'string') {
-          errorMessage = err.responseBody;
-        }
-        // Check for error object in responseBody
-        else if (err.responseBody && typeof err.responseBody === 'object') {
-          errorMessage = (err.responseBody as any).message || JSON.stringify(err.responseBody);
-        }
-      }
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to create project');
       
       setSnackbar({
         open: true,

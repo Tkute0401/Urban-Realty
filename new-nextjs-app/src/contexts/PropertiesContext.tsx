@@ -194,7 +194,9 @@ export const PropertiesProvider: React.FC<{ children: ReactNode }> = ({ children
       return newProperty;
     } catch (err) {
       console.error('Error creating property:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create property');
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to create property');
+      setError(errorMessage);
       throw err;
     } finally {
       setLoading(false);

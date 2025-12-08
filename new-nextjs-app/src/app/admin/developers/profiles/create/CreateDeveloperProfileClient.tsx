@@ -204,7 +204,8 @@ const CreateDeveloperProfileClient = () => {
       setTimeout(() => router.push('/admin/developers/profiles'), 1500);
     } catch (err: any) {
       console.error('Submission error:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to create developer profile';
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to create developer profile');
       setError(errorMessage);
       setSnackbarMessage(errorMessage);
       setSnackbarOpen(true);

@@ -50,15 +50,23 @@ const ContactUs = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send contact request');
+        const errorData = await response.json().catch(() => ({}));
+        const error = new Error(errorData.message || errorData.error || 'Failed to send contact request');
+        (error as any).response = { status: response.status, data: errorData };
+        throw error;
       }
 
       const result = await response.json();
       console.log('Contact request sent:', result);
       reset();
+      
+      // Show success message
+      alert('Thank you! Your message has been sent successfully. We will get back to you soon.');
     } catch (error) {
       console.error('Contact form error:', error);
-      // Error handling is done globally via toast
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(error, 'Failed to send your message. Please try again.');
+      alert(errorMessage);
     }
   };
 

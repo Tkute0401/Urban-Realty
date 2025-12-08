@@ -177,7 +177,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return { success: true };
     } catch (err: any) {
-      const message = err?.message || 'Login failed. Please try again.';
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const message = extractErrorMessage(err, 'Login failed. Please try again.');
       setError(message);
       return { success: false, error: message };
     } finally {
@@ -243,7 +244,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       return { success: true };
     } catch (err: any) {
-      const message = err?.message || 'Registration failed';
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const message = extractErrorMessage(err, 'Registration failed. Please try again.');
       setError(message);
       return { success: false, error: message };
     } finally {

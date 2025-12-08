@@ -605,7 +605,9 @@ const EditPropertyClient: React.FC<EditPropertyClientProps> = ({ propertyId }) =
       setTimeout(() => router.push(`/properties/${propertyId}`), 1500);
     } catch (err: any) {
       console.error('Error updating property:', err);
-      setSnackbarMessage(err.response?.data?.error || err.message || 'Failed to update property');
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to update property');
+      setSnackbarMessage(errorMessage);
       setSnackbarOpen(true);
     } finally {
       setSaving(false);

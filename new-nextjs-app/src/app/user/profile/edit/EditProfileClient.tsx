@@ -101,7 +101,9 @@ const EditProfileClient = () => {
         setError('Failed to update profile');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to update profile');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

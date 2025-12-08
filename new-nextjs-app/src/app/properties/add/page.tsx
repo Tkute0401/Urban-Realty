@@ -493,7 +493,9 @@ const AddPropertyPageContent: React.FC = () => {
       setTimeout(() => router.push('/properties'), 1500);
     } catch (err) {
       console.error('Submission error:', err);
-      setSnackbarMessage(err instanceof Error ? err.message : 'Failed to create property');
+      const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
+      const errorMessage = extractErrorMessage(err, 'Failed to create property');
+      setSnackbarMessage(errorMessage);
       setSnackbarOpen(true);
     } finally {
       setIsSubmitting(false);
