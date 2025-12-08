@@ -82,7 +82,7 @@ const ActionButton = styled(Button)(({ theme }) => ({
 }));
 
 const AddProjectClient = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { createProject, loading, error } = useProjects();
   const { developers, getDevelopers, loading: developersLoading, myDeveloperProfile, getMyDeveloperProfile, loading: developerProfileLoading } = useDevelopers();
   const router = useRouter();
@@ -143,7 +143,12 @@ const AddProjectClient = () => {
   const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
-    if (user?.role !== 'developer') {
+    // Wait for auth to finish loading before checking role
+    if (authLoading) {
+      return;
+    }
+    
+    if (!user || user?.role !== 'developer') {
       router.push('/');
     } else {
       // Check if developer has a profile
@@ -160,7 +165,7 @@ const AddProjectClient = () => {
       };
       checkDeveloperProfile();
     }
-  }, [user, router, getDevelopers, getMyDeveloperProfile]);
+  }, [user, authLoading, router, getDevelopers, getMyDeveloperProfile]);
 
   const handleInputChange = (field, value) => {
     if (field.includes('.')) {
@@ -519,14 +524,20 @@ const AddProjectClient = () => {
     }
   };
 
-  if (user?.role !== 'developer') {
+  // Show loading state while auth is loading
+  if (authLoading) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error">
-          Access denied. This page is only available for developer users.
-        </Alert>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <CircularProgress />
+        </Box>
       </Container>
     );
+  }
+
+  // Only check role after auth has finished loading
+  if (!user || user?.role !== 'developer') {
+    return null; // Will redirect via useEffect
   }
 
   // Show loading state while checking developer profile
