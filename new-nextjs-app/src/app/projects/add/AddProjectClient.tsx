@@ -84,11 +84,12 @@ const ActionButton = styled(Button)(({ theme }) => ({
 const AddProjectClient = () => {
   const { user } = useAuth();
   const { createProject, loading, error } = useProjects();
-  const { developers, getDevelopers, loading: developersLoading } = useDevelopers();
+  const { developers, getDevelopers, loading: developersLoading, myDeveloperProfile, getMyDeveloperProfile, loading: developerProfileLoading } = useDevelopers();
   const router = useRouter();
   
   const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
+  const [profileCheckComplete, setProfileCheckComplete] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -145,10 +146,21 @@ const AddProjectClient = () => {
     if (user?.role !== 'developer') {
       router.push('/');
     } else {
-      // Fetch developers list for multi-select
-      getDevelopers();
+      // Check if developer has a profile
+      const checkDeveloperProfile = async () => {
+        try {
+          await getMyDeveloperProfile();
+          setProfileCheckComplete(true);
+          // Fetch developers list for multi-select
+          getDevelopers();
+        } catch (err) {
+          console.error('Error checking developer profile:', err);
+          setProfileCheckComplete(true);
+        }
+      };
+      checkDeveloperProfile();
     }
-  }, [user, router, getDevelopers]);
+  }, [user, router, getDevelopers, getMyDeveloperProfile]);
 
   const handleInputChange = (field, value) => {
     if (field.includes('.')) {
@@ -386,6 +398,16 @@ const AddProjectClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Check if developer profile exists
+    if (!myDeveloperProfile) {
+      setSnackbar({
+        open: true,
+        message: 'Please create a developer profile first before adding projects',
+        severity: 'error'
+      });
+      return;
+    }
+    
     if (!formData.name || !formData.description) {
       setSnackbar({
         open: true,
@@ -525,6 +547,66 @@ const AddProjectClient = () => {
         <Alert severity="error">
           Access denied. This page is only available for developer users.
         </Alert>
+      </Container>
+    );
+  }
+
+  // Show loading state while checking developer profile
+  if (!profileCheckComplete || developerProfileLoading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  // Show prompt if developer profile doesn't exist
+  if (!myDeveloperProfile) {
+    return (
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Alert 
+          severity="warning" 
+          sx={{ mb: 3 }}
+          action={
+            <Button 
+              color="inherit" 
+              size="small" 
+              onClick={() => router.push('/developers/add')}
+              sx={{ fontWeight: 600 }}
+            >
+              Create Profile
+            </Button>
+          }
+        >
+          <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+            Developer Profile Required
+          </Typography>
+          <Typography variant="body2">
+            You need to create a developer profile before you can add projects. 
+            Please create your developer profile first to get started.
+          </Typography>
+        </Alert>
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => router.push('/developers/add')}
+            sx={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-primary-contrast)',
+              fontWeight: 600,
+              px: 4,
+              py: 1.5,
+              '&:hover': {
+                backgroundColor: 'var(--color-primary-hover)',
+              }
+            }}
+          >
+            Create Developer Profile
+          </Button>
+        </Box>
       </Container>
     );
   }
