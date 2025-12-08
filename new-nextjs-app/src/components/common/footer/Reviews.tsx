@@ -2,7 +2,158 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { StarIcon, ChatBubbleLeftRightIcon, ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { StarIcon, ChatBubbleLeftRightIcon, ArrowLeftIcon, ArrowRightIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  featuredImage?: string;
+  category?: string;
+  publishedAt: string;
+  authorName?: string;
+}
+
+const BlogPostsPreview = () => {
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/v1/blogs?limit=3&sort=-publishedAt');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          setBlogs(Array.isArray(data.data) ? data.data : []);
+        } else {
+          setBlogs([]);
+        }
+      } catch (err) {
+        console.error('Error fetching blogs:', err);
+        setBlogs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary)]"></div>
+      </div>
+    );
+  }
+
+  if (blogs.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="text-center py-12"
+      >
+        <p className="text-[var(--color-text-secondary)] mb-6">
+          No blog posts available at the moment. Check back soon!
+        </p>
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-[var(--color-white)] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base"
+        >
+          View All Blogs
+          <ArrowRightIcon className="w-5 h-5" />
+        </Link>
+      </motion.div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {blogs.map((blog, index) => (
+          <motion.div
+            key={blog._id}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            viewport={{ once: true }}
+            className="bg-[var(--color-bg-secondary)] rounded-xl border border-[var(--color-primary)]/20 overflow-hidden hover:shadow-lg transition-shadow"
+          >
+            <Link href={`/blog/${blog.slug}`}>
+              {blog.featuredImage ? (
+                <div className="relative h-48 sm:h-56 overflow-hidden">
+                  <img
+                    src={blog.featuredImage}
+                    alt={blog.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              ) : (
+                <div className="h-48 sm:h-56 bg-[var(--color-primary)]/10 flex items-center justify-center">
+                  <BookOpenIcon className="w-16 h-16 text-[var(--color-primary)]/30" />
+                </div>
+              )}
+              <div className="p-4 sm:p-6">
+                {blog.category && (
+                  <span className="inline-block px-3 py-1 text-xs font-semibold text-[var(--color-primary)] bg-[var(--color-primary)]/10 rounded-full mb-3">
+                    {blog.category}
+                  </span>
+                )}
+                <h3 className="text-lg sm:text-xl font-bold text-[var(--color-text)] mb-2 line-clamp-2 hover:text-[var(--color-primary)] transition-colors">
+                  {blog.title}
+                </h3>
+                <p className="text-sm sm:text-base text-[var(--color-text-secondary)] mb-4 line-clamp-3">
+                  {blog.excerpt}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs sm:text-sm text-[var(--color-text-muted)]">
+                    {formatDate(blog.publishedAt)}
+                  </div>
+                  <div className="flex items-center gap-1 text-[var(--color-primary)] text-sm font-semibold">
+                    Read More
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+      
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="text-center pt-4"
+      >
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-[var(--color-white)] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base"
+        >
+          View All Blogs
+          <ArrowRightIcon className="w-5 h-5" />
+        </Link>
+      </motion.div>
+    </div>
+  );
+};
 
 const Reviews = () => {
   console.log('🔧 Reviews component rendering...');
@@ -235,24 +386,27 @@ const Reviews = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+      {/* Blogs Section */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="bg-[var(--color-surface)] p-6 sm:p-8 md:p-12 rounded-xl border border-[var(--color-primary)]/20 text-center"
+          viewport={{ once: true }}
+          className="text-center mb-8 sm:mb-12"
         >
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6">
-            Ready to Share Your Experience?
-          </h2>
-          <p className="text-[var(--color-text-secondary)] mb-6 sm:mb-8 text-sm sm:text-base max-w-2xl mx-auto">
-            We&apos;d love to hear about your journey with SQUAREFOOT. Your feedback helps us improve and serve you better.
+          <div className="flex flex-col sm:flex-row items-center justify-center mb-4">
+            <BookOpenIcon className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--color-primary)] sm:mr-3 mb-3 sm:mb-0" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold font-poppins">
+              Read Blogs about <span className="text-[var(--color-primary)]">Properties</span>
+            </h2>
+          </div>
+          <p className="text-[var(--color-text-muted)] max-w-3xl mx-auto text-sm sm:text-base md:text-lg px-2">
+            Discover expert insights, market trends, and practical guides to help you make informed property decisions.
           </p>
-          <button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-[var(--color-white)] font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg transition-colors shadow-lg text-sm sm:text-base">
-            Write a Review
-          </button>
         </motion.div>
+
+        <BlogPostsPreview />
       </section>
     </div>
   );
