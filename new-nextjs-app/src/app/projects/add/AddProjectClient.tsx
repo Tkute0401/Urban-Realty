@@ -86,11 +86,11 @@ const AddProjectClient = () => {
   const { createProject, loading, error } = useProjects();
   const { developers, getDevelopers, loading: developersLoading, myDeveloperProfile, getMyDeveloperProfile, loading: developerProfileLoading } = useDevelopers();
   const router = useRouter();
-  
+
   const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   const [profileCheckComplete, setProfileCheckComplete] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -132,7 +132,7 @@ const AddProjectClient = () => {
     isAvailable: true,
     unitsAvailable: ''
   });
-  
+
   // File upload states
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [selectedFloorPlans, setSelectedFloorPlans] = useState<File[]>([]);
@@ -147,14 +147,17 @@ const AddProjectClient = () => {
     if (authLoading) {
       return;
     }
-    
-    if (!user || user?.role !== 'developer') {
+
+    // Allow both admin and developer roles
+    if (!user || (user?.role !== 'developer' && user?.role !== 'admin')) {
       router.push('/');
     } else {
-      // Check if developer has a profile
+      // Check if developer has a profile (only for developers, admins can skip this)
       const checkDeveloperProfile = async () => {
         try {
-          await getMyDeveloperProfile();
+          if (user?.role === 'developer') {
+            await getMyDeveloperProfile();
+          }
           setProfileCheckComplete(true);
           // Fetch developers list for multi-select
           getDevelopers();
@@ -250,12 +253,12 @@ const AddProjectClient = () => {
         isAvailable: newConfiguration.isAvailable,
         unitsAvailable: newConfiguration.unitsAvailable ? parseInt(newConfiguration.unitsAvailable) : undefined
       };
-      
+
       setFormData(prev => ({
         ...prev,
         configurations: [...prev.configurations, config]
       }));
-      
+
       setNewConfiguration({
         name: '',
         type: '2BHK',
@@ -339,7 +342,7 @@ const AddProjectClient = () => {
   // Geocoding function using OpenStreetMap
   const geocodeAddress = async (address: string) => {
     if (!address.trim()) return null;
-    
+
     setIsGeocoding(true);
     try {
       // Use OpenStreetMap Nominatim for geocoding
@@ -351,7 +354,7 @@ const AddProjectClient = () => {
           }
         }
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data && data.length > 0) {
@@ -361,7 +364,7 @@ const AddProjectClient = () => {
           };
         }
       }
-      
+
       // Fallback to city-based coordinates if API fails
       const cityCoordinates: { [key: string]: [number, number] } = {
         'delhi': [77.2090, 28.6139],
@@ -376,7 +379,7 @@ const AddProjectClient = () => {
         'lucknow': [80.9462, 26.8467],
         'nashik': [73.7898, 19.9975]
       };
-      
+
       const addressLower = address.toLowerCase();
       for (const [city, coords] of Object.entries(cityCoordinates)) {
         if (addressLower.includes(city)) {
@@ -386,7 +389,7 @@ const AddProjectClient = () => {
           };
         }
       }
-      
+
       // Default to Delhi if no city match found
       return {
         type: 'Point',
@@ -402,9 +405,9 @@ const AddProjectClient = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if developer profile exists
-    if (!myDeveloperProfile) {
+
+    // Check if developer profile exists (only required for developers, not admins)
+    if (!myDeveloperProfile && user?.role === 'developer') {
       setSnackbar({
         open: true,
         message: 'Please create a developer profile first before adding projects',
@@ -412,7 +415,7 @@ const AddProjectClient = () => {
       });
       return;
     }
-    
+
     if (!formData.name || !formData.description) {
       setSnackbar({
         open: true,
@@ -434,10 +437,10 @@ const AddProjectClient = () => {
 
     setSaving(true);
     setUploadProgress(0);
-    
+
     try {
       const formDataToSend = new FormData();
-      
+
       // Append all form data
       Object.keys(formData).forEach(key => {
         if (typeof formData[key] === 'object' && formData[key] !== null) {
@@ -471,11 +474,11 @@ const AddProjectClient = () => {
       selectedImages.forEach((file, index) => {
         formDataToSend.append('images', file);
       });
-      
+
       selectedFloorPlans.forEach((file, index) => {
         formDataToSend.append('floorPlans', file);
       });
-      
+
       // Add brochure URLs if provided
       if (brochureUrls.length > 0) {
         formDataToSend.append('brochures', JSON.stringify(brochureUrls.map(b => ({
@@ -483,7 +486,7 @@ const AddProjectClient = () => {
           name: b.name || 'Brochure'
         }))));
       }
-      
+
       selectedVirtualTours.forEach((file, index) => {
         formDataToSend.append('virtualTours', file);
       });
@@ -501,7 +504,7 @@ const AddProjectClient = () => {
       setUploadProgress(50);
       await createProject(formDataToSend);
       setUploadProgress(100);
-      
+
       setSnackbar({
         open: true,
         message: 'Project created successfully!',
@@ -512,7 +515,7 @@ const AddProjectClient = () => {
       // Extract the actual error message from various error formats
       const { extractErrorMessage } = await import('@/lib/utils/extractErrorMessage');
       const errorMessage = extractErrorMessage(err, 'Failed to create project');
-      
+
       setSnackbar({
         open: true,
         message: errorMessage,
@@ -536,7 +539,7 @@ const AddProjectClient = () => {
   }
 
   // Only check role after auth has finished loading
-  if (!user || user?.role !== 'developer') {
+  if (!user || (user?.role !== 'developer' && user?.role !== 'admin')) {
     return null; // Will redirect via useEffect
   }
 
@@ -551,17 +554,17 @@ const AddProjectClient = () => {
     );
   }
 
-  // Show prompt if developer profile doesn't exist
-  if (!myDeveloperProfile) {
+  // Show prompt if developer profile doesn't exist (only for developers, not admins)
+  if (!myDeveloperProfile && user?.role === 'developer') {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert 
-          severity="warning" 
+        <Alert
+          severity="warning"
           sx={{ mb: 3 }}
           action={
-            <Button 
-              color="inherit" 
-              size="small" 
+            <Button
+              color="inherit"
+              size="small"
               onClick={() => router.push('/developers/add')}
               sx={{ fontWeight: 600 }}
             >
@@ -573,7 +576,7 @@ const AddProjectClient = () => {
             Developer Profile Required
           </Typography>
           <Typography variant="body2">
-            You need to create a developer profile before you can add projects. 
+            You need to create a developer profile before you can add projects.
             Please create your developer profile first to get started.
           </Typography>
         </Alert>
@@ -623,7 +626,7 @@ const AddProjectClient = () => {
             <Business />
             Basic Information
           </SectionHeader>
-          
+
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <FieldIndicator required helperText="Enter a unique project name" />
@@ -644,7 +647,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <FieldIndicator optional helperText="Select the type of development" />
               <FormControl fullWidth>
@@ -671,7 +674,7 @@ const AddProjectClient = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <FieldIndicator optional helperText="Current status of the project" />
               <FormControl fullWidth>
@@ -695,7 +698,7 @@ const AddProjectClient = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
+
             <Grid item xs={12}>
               <FieldIndicator optional helperText="Select one or more developers for this project. Your developer profile will be automatically included." />
               <Autocomplete
@@ -731,7 +734,7 @@ const AddProjectClient = () => {
                 )}
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <FieldIndicator required helperText="Detailed description of the project" />
               <TextField
@@ -753,7 +756,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <FieldIndicator optional helperText="Brief summary for project cards (500 characters max)" />
               <TextField
@@ -790,7 +793,7 @@ const AddProjectClient = () => {
             <LocationOn />
             Location Information
           </SectionHeader>
-          
+
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <FieldIndicator optional helperText="Complete project address for better visibility" />
@@ -810,7 +813,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <FieldIndicator optional helperText="City where project is located" />
               <TextField
@@ -829,7 +832,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <FieldIndicator optional helperText="State or province" />
               <TextField
@@ -848,7 +851,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={4}>
               <FieldIndicator optional helperText="Postal/ZIP code" />
               <TextField
@@ -875,7 +878,7 @@ const AddProjectClient = () => {
             <CurrencyRupee />
             Pricing Information
           </SectionHeader>
-          
+
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <TextField
@@ -895,7 +898,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -914,7 +917,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -933,7 +936,7 @@ const AddProjectClient = () => {
                 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -961,7 +964,7 @@ const AddProjectClient = () => {
             <Apartment />
             Project Configurations
           </SectionHeader>
-          
+
           <Typography variant="body2" sx={{ mb: 3, color: 'var(--color-text-muted)' }}>
             Add different unit configurations (e.g., 2BHK, 3BHK) with their specific details
           </Typography>
@@ -971,7 +974,7 @@ const AddProjectClient = () => {
             <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
               Add New Configuration
             </Typography>
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
@@ -991,7 +994,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel sx={{ color: 'var(--color-text-muted)' }}>Unit Type</InputLabel>
@@ -1018,7 +1021,7 @@ const AddProjectClient = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              
+
               <Grid item xs={6} md={3}>
                 <TextField
                   fullWidth
@@ -1037,7 +1040,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={6} md={3}>
                 <TextField
                   fullWidth
@@ -1056,7 +1059,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -1076,7 +1079,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -1096,7 +1099,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -1115,7 +1118,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
@@ -1134,7 +1137,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <FormControlLabel
                   control={
@@ -1155,7 +1158,7 @@ const AddProjectClient = () => {
                   sx={{ color: 'var(--color-text-primary)' }}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -1176,7 +1179,7 @@ const AddProjectClient = () => {
                   }}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button
@@ -1217,7 +1220,7 @@ const AddProjectClient = () => {
               <Typography variant="h6" sx={{ mb: 2, color: 'var(--color-text-primary)' }}>
                 Added Configurations ({formData.configurations.length})
               </Typography>
-              
+
               {formData.configurations.map((config, index) => (
                 <Card key={index} sx={{ mb: 2, border: '1px solid var(--color-border)' }}>
                   <CardContent>
@@ -1318,7 +1321,7 @@ const AddProjectClient = () => {
             <CloudUpload />
             Media & Documents
           </SectionHeader>
-          
+
           <Grid container spacing={3}>
             {/* Images Upload */}
             <Grid item xs={12} md={6}>
@@ -1352,7 +1355,7 @@ const AddProjectClient = () => {
                   Upload Images
                 </Button>
               </label>
-              
+
               {selectedImages.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   {selectedImages.map((file, index) => (
@@ -1399,7 +1402,7 @@ const AddProjectClient = () => {
                   Upload Floor Plans
                 </Button>
               </label>
-              
+
               {selectedFloorPlans.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   {selectedFloorPlans.map((file, index) => (
@@ -1420,7 +1423,7 @@ const AddProjectClient = () => {
                 <PictureAsPdf sx={{ mr: 1, verticalAlign: 'middle' }} />
                 Brochures (Max 3) - URL Only
               </Typography>
-              
+
               <Box sx={{ mb: 2 }}>
                 <Typography variant="body2" sx={{ mb: 1, color: 'var(--color-text-secondary)' }}>
                   Enter brochure URL (Google Drive, Dropbox, AWS S3, etc.)
@@ -1464,7 +1467,7 @@ const AddProjectClient = () => {
                   </Button>
                 </Box>
               </Box>
-              
+
               {/* Display URLs */}
               {brochureUrls.length > 0 && (
                 <Box sx={{ mt: 2 }}>
@@ -1514,7 +1517,7 @@ const AddProjectClient = () => {
                   Upload Virtual Tours
                 </Button>
               </label>
-              
+
               {selectedVirtualTours.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   {selectedVirtualTours.map((file, index) => (
@@ -1537,7 +1540,7 @@ const AddProjectClient = () => {
             <Map />
             Location Geocoding
           </SectionHeader>
-          
+
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Alert severity="info" sx={{ mb: 2 }}>
@@ -1579,7 +1582,7 @@ const AddProjectClient = () => {
           >
             Cancel
           </Button>
-          
+
           <ActionButton
             type="submit"
             startIcon={<Save />}
@@ -1596,8 +1599,8 @@ const AddProjectClient = () => {
         onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} 
+        <Alert
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
         >
