@@ -1,0 +1,1685 @@
+{
+  "timestamp": "2025-12-08T08:44:58.272Z",
+  "baseUrl": "https://www.squarefooot.com",
+  "summary": {
+    "totalPages": 11,
+    "seo": {
+      "average": "76.0",
+      "total": 0
+    },
+    "aeo": {
+      "average": "40.3",
+      "total": 0
+    },
+    "geo": {
+      "average": "66.0",
+      "total": 0
+    }
+  },
+  "pages": [
+    {
+      "url": "https://www.squarefooot.com/",
+      "seo": {
+        "url": "https://www.squarefooot.com/",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Find Your Dream Property | Squarefooot - Buy, Sell, Rent Real Estate",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Discover thousands of properties with Squarefooot. Search homes, apartments, and commercial spaces for sale or rent. Expert real estate agents, competitive prices, and seamless property transactions nationwide.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "1 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "29 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, WebSite"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "find property,dream home,real estate search,property finder,homes for sale,apartments for rent,real estate listings,property search engine,buy house online,rent apartment,property marketplace"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/properties",
+      "seo": {
+        "url": "https://www.squarefooot.com/properties",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Squarefooot - Premier Real Estate Platform | Buy, Sell, Rent Properties",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Discover your dream property with Squarefooot. Browse thousands of homes, apartments, and commercial properties. Expert agents, competitive prices, and seamless transactions.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "2 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "5/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "1 schema(s): RealEstateAgent"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "real estate,properties for sale,properties for rent,buy property,sell property,rent property,real estate agents,property listings,homes for sale,apartments for rent,commercial real estate,property investment,real estate platform"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/properties",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/properties",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/properties/buy",
+      "seo": {
+        "url": "https://www.squarefooot.com/properties/buy",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Squarefooot - Premier Real Estate Platform | Buy, Sell, Rent Properties",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Discover your dream property with Squarefooot. Browse thousands of homes, apartments, and commercial properties. Expert agents, competitive prices, and seamless transactions.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://urban-realty-production.up.railway.app"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "2 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "5/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "1 schema(s): RealEstateAgent"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "real estate,properties for sale,properties for rent,buy property,sell property,rent property,real estate agents,property listings,homes for sale,apartments for rent,commercial real estate,property investment,real estate platform"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/properties/buy",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/properties/buy",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/properties/rent",
+      "seo": {
+        "url": "https://www.squarefooot.com/properties/rent",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Squarefooot - Premier Real Estate Platform | Buy, Sell, Rent Properties",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Discover your dream property with Squarefooot. Browse thousands of homes, apartments, and commercial properties. Expert agents, competitive prices, and seamless transactions.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://urban-realty-production.up.railway.app"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "2 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "5/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "1 schema(s): RealEstateAgent"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "real estate,properties for sale,properties for rent,buy property,sell property,rent property,real estate agents,property listings,homes for sale,apartments for rent,commercial real estate,property investment,real estate platform"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/properties/rent",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/properties/rent",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/about",
+      "seo": {
+        "url": "https://www.squarefooot.com/about",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "About Squarefooot - Leading Real Estate Platform Since 2020 | Squarefooot",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Learn about Squarefooot, your trusted real estate partner. We connect buyers, sellers, and renters with dream properties through innovative technology and expert guidance. Discover our mission, values, and commitment to exceptional service.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com/about"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "4 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "36 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, AboutPage"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "about urban realty,real estate company,property platform,real estate services,company history,real estate mission,property experts,real estate team,trusted real estate,property platform story"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/about",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/about",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/contact",
+      "seo": {
+        "url": "https://www.squarefooot.com/contact",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Contact Squarefooot - Get Expert Real Estate Assistance | Squarefooot",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Contact Squarefooot for expert real estate assistance. Whether you&#x27;re buying, selling, or renting, our professional team is here to help. Get in touch via phone, email, or our contact form.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com/contact"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "3 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, ContactPage"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "contact urban realty,real estate contact,property assistance,real estate help,contact real estate agents,property support,real estate inquiry,contact form,real estate phone number,property consultation"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/contact",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content detected (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 42,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/contact",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/blog",
+      "seo": {
+        "url": "https://www.squarefooot.com/blog",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Real Estate Blog | Property Tips, Market Insights &amp; Guides | Squarefooot | Squarefooot",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Explore our comprehensive real estate blog featuring property buying guides, market insights, investment tips, home improvement advice, and expert real estate advice. Stay informed with the latest trends in the property market.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com/blog"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "2 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, Blog"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "real estate blog,property blog,real estate tips,property buying guide,real estate market insights,property investment advice,home buying tips,real estate news,property market trends,real estate guides,property advice,home selling tips"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/blog",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/blog",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/developers",
+      "seo": {
+        "url": "https://www.squarefooot.com/developers",
+        "tests": [
+          {
+            "test": "Title tag exists and optimal length (30-60 chars)",
+            "status": "pass",
+            "value": "Real Estate Developers | Squarefooot | Squarefooot"
+          },
+          {
+            "test": "Meta description exists and optimal length (120-160 chars)",
+            "status": "pass",
+            "value": "Browse our network of trusted real estate developers. Find developers for your next property investment or development project."
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://urban-realty-production.up.railway.app/developers"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "2 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "36 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "1 schema(s): RealEstateAgent"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "real estate developers,property developers,construction companies,real estate investment,property development,developer listings"
+          }
+        ],
+        "score": 79,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/developers",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/developers",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/emi-calculator",
+      "seo": {
+        "url": "https://www.squarefooot.com/emi-calculator",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "EMI Calculator - Calculate Home Loan EMI | Squarefooot | Squarefooot",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Calculate your home loan EMI with our free EMI calculator. Get instant results for loan amount, interest rate, and tenure. Plan your property purchase with accurate EMI calculations.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com/emi-calculator"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "2 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, WebApplication"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "emi calculator,home loan emi calculator,loan calculator,mortgage calculator,property loan calculator,real estate finance,home loan planning,property financing,loan emi calculation,mortgage planning"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/emi-calculator",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content detected (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 42,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/emi-calculator",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/career",
+      "seo": {
+        "url": "https://www.squarefooot.com/career",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "Careers - Join Squarefooot Team | Real Estate Jobs | Squarefooot",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Explore exciting career opportunities at Squarefooot. Join our team of real estate professionals and grow your career in property development, sales, and customer service.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com/career"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "3 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, WebPage"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "urban realty careers,real estate jobs,property careers,real estate agent jobs,property developer jobs,real estate sales careers,property management careers,real estate marketing jobs,property consultant careers,real estate company jobs"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/career",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/career",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    },
+    {
+      "url": "https://www.squarefooot.com/how-we-work",
+      "seo": {
+        "url": "https://www.squarefooot.com/how-we-work",
+        "tests": [
+          {
+            "test": "Title tag exists but length not optimal",
+            "status": "warning",
+            "value": "How We Work - Our Real Estate Process | Squarefooot | Squarefooot",
+            "expected": "30-60 characters"
+          },
+          {
+            "test": "Meta description exists but length not optimal",
+            "status": "warning",
+            "value": "Learn about Squarefooot&#x27;s streamlined real estate process. Discover how we help clients buy, sell, and rent properties with our proven methodology and expert guidance.",
+            "expected": "120-160 characters"
+          },
+          {
+            "test": "Canonical URL present",
+            "status": "pass",
+            "value": "https://squarefooot.com/how-we-work"
+          },
+          {
+            "test": "Robots meta tag present",
+            "status": "pass",
+            "value": "index, follow"
+          },
+          {
+            "test": "H1 tag missing",
+            "status": "fail"
+          },
+          {
+            "test": "Heading hierarchy incomplete",
+            "status": "warning"
+          },
+          {
+            "test": "All images have alt tags",
+            "status": "pass",
+            "value": "3 images"
+          },
+          {
+            "test": "Internal links present",
+            "status": "pass",
+            "value": "34 internal links"
+          },
+          {
+            "test": "Open Graph tags present",
+            "status": "pass",
+            "value": "4/5 tags"
+          },
+          {
+            "test": "Twitter Card tags present",
+            "status": "pass",
+            "value": "4/4 tags"
+          },
+          {
+            "test": "Structured data (JSON-LD) present",
+            "status": "pass",
+            "value": "2 schema(s): RealEstateAgent, WebPage"
+          },
+          {
+            "test": "Meta keywords present (optional)",
+            "status": "pass",
+            "value": "how we work,real estate process,property buying process,property selling process,real estate methodology,property consultation process,real estate services,property transaction process,real estate workflow,property assistance process"
+          }
+        ],
+        "score": 69,
+        "maxScore": 92
+      },
+      "aeo": {
+        "url": "https://www.squarefooot.com/how-we-work",
+        "tests": [
+          {
+            "test": "FAQ Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "HowTo Schema missing (AEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Article Schema missing (AEO opportunity for blog pages)",
+            "status": "info"
+          },
+          {
+            "test": "Question-based content not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Definition/explanation content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "List/step content present (AEO)",
+            "status": "pass"
+          },
+          {
+            "test": "Rich snippet schemas not detected (AEO opportunity)",
+            "status": "info"
+          },
+          {
+            "test": "Semantic HTML present (AEO)",
+            "status": "pass"
+          }
+        ],
+        "score": 35,
+        "maxScore": 90
+      },
+      "geo": {
+        "url": "https://www.squarefooot.com/how-we-work",
+        "tests": [
+          {
+            "test": "Geo meta tags missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "LocalBusiness/Organization schema with address present",
+            "status": "pass",
+            "value": "1 schema(s)"
+          },
+          {
+            "test": "Address information present",
+            "status": "pass"
+          },
+          {
+            "test": "Geographic coordinates missing (GEO opportunity)",
+            "status": "warning"
+          },
+          {
+            "test": "Location-based keywords present",
+            "status": "pass"
+          },
+          {
+            "test": "Area served information present",
+            "status": "pass"
+          },
+          {
+            "test": "Phone number present (GEO)",
+            "status": "pass"
+          },
+          {
+            "test": "hCard microdata not detected (optional)",
+            "status": "info"
+          }
+        ],
+        "score": 66,
+        "maxScore": 100
+      }
+    }
+  ],
+  "sitemap": {
+    "status": "pass",
+    "tests": [
+      {
+        "test": "Sitemap accessible",
+        "status": "pass",
+        "value": "12 URLs found"
+      },
+      {
+        "test": "Sitemap XML valid",
+        "status": "pass"
+      }
+    ]
+  },
+  "robots": {
+    "status": "pass",
+    "tests": [
+      {
+        "test": "Robots.txt accessible",
+        "status": "pass"
+      },
+      {
+        "test": "Sitemap reference in robots.txt",
+        "status": "pass"
+      }
+    ]
+  }
+}
