@@ -8,13 +8,10 @@ import {
     Button,
     Box,
     MobileStepper,
-    IconButton,
     useTheme,
     Stack
 } from '@mui/material';
 import {
-    KeyboardArrowLeft,
-    KeyboardArrowRight,
     WhatsApp,
     Phone
 } from '@mui/icons-material';
@@ -26,6 +23,8 @@ interface ProjectListingCardProps {
 const ProjectListingCard: React.FC<ProjectListingCardProps> = ({ project }) => {
     const theme = useTheme();
     const [activeStep, setActiveStep] = useState(0);
+    const [touchStart, setTouchStart] = useState(0);
+    const [touchEnd, setTouchEnd] = useState(0);
 
     // Extract images from project
     const images = project.images && project.images.length > 0
@@ -34,15 +33,44 @@ const ProjectListingCard: React.FC<ProjectListingCardProps> = ({ project }) => {
 
     const maxSteps = images.length;
 
-    const handleNext = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setActiveStep((prevActiveStep) => (prevActiveStep + 1) % maxSteps);
+    // Touch handlers for swipe
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setTouchStart(e.targetTouches[0].clientX);
     };
 
-    const handleBack = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setActiveStep((prevActiveStep) => (prevActiveStep - 1 + maxSteps) % maxSteps);
+    const handleTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
     };
+
+    const handleTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        if (isLeftSwipe && activeStep < maxSteps - 1) {
+            setActiveStep(activeStep + 1);
+        }
+
+        if (isRightSwipe && activeStep > 0) {
+            setActiveStep(activeStep - 1);
+        }
+
+        setTouchStart(0);
+        setTouchEnd(0);
+    };
+
+    // Auto-advance slides every 4 seconds (only if more than 1 image)
+    React.useEffect(() => {
+        if (maxSteps <= 1) return;
+
+        const interval = setInterval(() => {
+            setActiveStep((prev) => (prev + 1) % maxSteps);
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [maxSteps]);
 
     // Contact information
     const CALL_NUMBER = '7391990834';
@@ -75,7 +103,12 @@ const ProjectListingCard: React.FC<ProjectListingCardProps> = ({ project }) => {
             }}
         >
             {/* Image Slider Section */}
-            <Box sx={{ position: 'relative', width: '100%', height: { xs: 220, sm: 240, md: 260 } }}>
+            <Box
+                sx={{ position: 'relative', width: '100%', height: { xs: 220, sm: 240, md: 260 } }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
                 {/* Current Image */}
                 <Box
                     component="img"
@@ -85,7 +118,9 @@ const ProjectListingCard: React.FC<ProjectListingCardProps> = ({ project }) => {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        display: 'block'
+                        display: 'block',
+                        userSelect: 'none',
+                        transition: 'opacity 0.3s ease'
                     }}
                 />
 
@@ -108,47 +143,7 @@ const ProjectListingCard: React.FC<ProjectListingCardProps> = ({ project }) => {
                     {activeStep + 1} / {maxSteps}
                 </Box>
 
-                {/* Navigation Arrows - Only show if more than 1 image */}
-                {maxSteps > 1 && (
-                    <>
-                        <IconButton
-                            onClick={handleBack}
-                            sx={{
-                                position: 'absolute',
-                                left: 8,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 1)',
-                                },
-                                width: { xs: 32, sm: 36 },
-                                height: { xs: 32, sm: 36 },
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                            }}
-                        >
-                            <KeyboardArrowLeft />
-                        </IconButton>
-                        <IconButton
-                            onClick={handleNext}
-                            sx={{
-                                position: 'absolute',
-                                right: 8,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 1)',
-                                },
-                                width: { xs: 32, sm: 36 },
-                                height: { xs: 32, sm: 36 },
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                            }}
-                        >
-                            <KeyboardArrowRight />
-                        </IconButton>
-                    </>
-                )}
+
 
                 {/* Stepper Dots */}
                 {maxSteps > 1 && (
