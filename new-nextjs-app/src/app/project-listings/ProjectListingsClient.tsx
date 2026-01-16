@@ -12,15 +12,14 @@ const ProjectListingsClient = () => {
     const [displayProjects, setDisplayProjects] = useState<any[]>([]);
 
     useEffect(() => {
-        // Fetch all published projects
-        getProjects({ isPublished: true });
+        // Fetch all projects
+        getProjects({});
     }, [getProjects]);
 
     useEffect(() => {
-        // Filter only published projects
+        // Set projects to display
         if (projects && projects.length > 0) {
-            const published = projects.filter((project: any) => project.isPublished !== false);
-            setDisplayProjects(published);
+            setDisplayProjects(projects);
         } else {
             setDisplayProjects([]);
         }
