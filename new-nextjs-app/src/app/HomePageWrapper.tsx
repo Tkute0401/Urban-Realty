@@ -21,9 +21,9 @@ function HomePageLoading() {
 function HomePageContent() {
   return (
     <div className="font-poppins bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
-      <HeroSection/>
-      <PropertiesSection />
+      <HeroSection />
       <PopularProjectsSection />
+      <PropertiesSection />
       <PopularDevelopersSection />
       <ServiceBlocksGroup />
       <OwnerServiceBlock />
