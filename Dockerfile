@@ -72,33 +72,32 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy the built Next.js application
-COPY --from=builder /app/new-nextjs-app/public ./new-nextjs-app/public
-COPY --from=builder /app/new-nextjs-app/.next ./new-nextjs-app/.next
-COPY --from=builder /app/new-nextjs-app/next.config.js ./new-nextjs-app/
-COPY --from=builder /app/new-nextjs-app/package.json ./new-nextjs-app/
+COPY --from=builder --chown=nextjs:nodejs /app/new-nextjs-app/public ./new-nextjs-app/public
+COPY --from=builder --chown=nextjs:nodejs /app/new-nextjs-app/.next ./new-nextjs-app/.next
+COPY --from=builder --chown=nextjs:nodejs /app/new-nextjs-app/next.config.js ./new-nextjs-app/
+COPY --from=builder --chown=nextjs:nodejs /app/new-nextjs-app/package.json ./new-nextjs-app/
 
 # Copy backend files
-COPY --from=builder /app/server ./server
-COPY --from=builder /app/shared ./shared
-COPY --from=builder /app/uploads ./uploads
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/package-lock.json* ./
-COPY --from=builder /app/ecosystem.config.js ./
-COPY --from=builder /app/server.js ./
-COPY --from=builder /app/start-server.js ./
-COPY --from=builder /app/build-nextjs.js ./
+COPY --from=builder --chown=nextjs:nodejs /app/server ./server
+COPY --from=builder --chown=nextjs:nodejs /app/shared ./shared
+COPY --from=builder --chown=nextjs:nodejs /app/uploads ./uploads
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
+COPY --from=builder --chown=nextjs:nodejs /app/package-lock.json* ./
+COPY --from=builder --chown=nextjs:nodejs /app/ecosystem.config.js ./
+COPY --from=builder --chown=nextjs:nodejs /app/server.js ./
+COPY --from=builder --chown=nextjs:nodejs /app/start-server.js ./
+COPY --from=builder --chown=nextjs:nodejs /app/build-nextjs.js ./
 
 # Copy root node_modules for backend dependencies
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Install PM2 globally for process management
 RUN npm install -g pm2
 
-# Create logs directory
-RUN mkdir -p /app/logs
+# Create logs directory and set permissions
+RUN mkdir -p /app/logs && chown nextjs:nodejs /app/logs
 
 # Set correct permissions
-RUN chown -R nextjs:nodejs /app
 RUN chmod +x /app/server.js
 RUN chmod +x /app/start-server.js
 USER nextjs
