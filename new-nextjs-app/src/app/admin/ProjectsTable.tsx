@@ -55,7 +55,9 @@ import {
   CheckCircle,
   PauseCircle,
   Cancel,
-  Sync
+  Sync,
+  Publish,
+  Unpublished as UnpublishedIcon
 } from '@mui/icons-material';
 import http from '@/lib/services/http';
 
@@ -247,6 +249,22 @@ const ProjectsTable = () => {
     handleMenuClose();
   };
 
+  const handlePublishToggle = async () => {
+    if (selectedProject) {
+      try {
+        const newStatus = !selectedProject.isPublished;
+        await http.put(`/api/v1/admin/projects/${selectedProject._id}`, {
+          isPublished: newStatus
+        });
+        await fetchProjects();
+        // Show success message or toast
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Failed to update publish status');
+      }
+    }
+    handleMenuClose();
+  };
+
   const handleDeleteClick = async () => {
     if (selectedProject && window.confirm('Are you sure you want to delete this project?')) {
       try {
@@ -344,6 +362,7 @@ const ProjectsTable = () => {
               <TableCell>Status</TableCell>
               <TableCell>Location</TableCell>
               <TableCell>Units</TableCell>
+              <TableCell>Visibility</TableCell>
               <TableCell>Created</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
@@ -425,6 +444,14 @@ const ProjectsTable = () => {
                   </Typography>
                 </TableCell>
                 <TableCell>
+                  <Chip
+                    label={project.isPublished ? 'Published' : 'Draft'}
+                    color={project.isPublished ? 'success' : 'default'}
+                    size="small"
+                    variant={project.isPublished ? 'filled' : 'outlined'}
+                  />
+                </TableCell>
+                <TableCell>
                   <Typography variant="body2">
                     {formatDate(project.createdAt)}
                   </Typography>
@@ -455,6 +482,19 @@ const ProjectsTable = () => {
         <MenuItem onClick={handleEditClick}>
           <Edit sx={{ mr: 1 }} />
           Edit
+        </MenuItem>
+        <MenuItem onClick={handlePublishToggle}>
+          {selectedProject?.isPublished ? (
+            <>
+              <UnpublishedIcon sx={{ mr: 1 }} />
+              Unpublish
+            </>
+          ) : (
+            <>
+              <Publish sx={{ mr: 1 }} />
+              Publish
+            </>
+          )}
         </MenuItem>
         <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
           <Delete sx={{ mr: 1 }} />

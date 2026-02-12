@@ -1559,7 +1559,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/admin/projects/:id
 // @access  Private/Admin
 exports.updateProject = asyncHandler(async (req, res, next) => {
-  const { name, description, type, status, location, totalUnits, totalArea, unitTypes, amenities, features } = req.body;
+  const { name, description, type, status, location, totalUnits, totalArea, unitTypes, amenities, features, isPublished, isFeatured, isActive } = req.body;
   const projectId = req.params.id;
 
   const project = await Project.findById(projectId);
@@ -1580,6 +1580,10 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   if (unitTypes) updateFields.unitTypes = unitTypes;
   if (amenities) updateFields.amenities = amenities;
   if (features) updateFields.features = features;
+  if (isPublished !== undefined) updateFields.isPublished = isPublished;
+  if (isFeatured !== undefined) updateFields.isFeatured = isFeatured;
+  if (isActive !== undefined) updateFields.isActive = isActive;
+
 
   const updatedProject = await Project.findByIdAndUpdate(
     projectId,

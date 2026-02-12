@@ -160,6 +160,7 @@ const syncProjectsFromSheet = async (adminUserId) => {
                             isFeatured: false,
                             agent: adminUserId // Assigned to admin
                         });
+                        console.log(`Created draft project: ${name}`);
 
                         newCount++;
                     }
