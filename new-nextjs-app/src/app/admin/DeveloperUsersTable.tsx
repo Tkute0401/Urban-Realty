@@ -231,7 +231,8 @@ const DeveloperUsersTable = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedUser(null);
+    // Do not clear selectedUser here as it's needed for dialogs and actions
+    // setSelectedUser(null); 
   };
 
   const handleEditClick = () => {
