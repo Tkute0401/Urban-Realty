@@ -16,7 +16,7 @@ const PopularProjectsSection: React.FC = () => {
 
   useEffect(() => {
     // Fetch latest 3 projects
-    getProjects({ limit: 3, sort: '-createdAt' });
+    getProjects({ limit: 3, sort: '-createdAt', isPublished: true });
   }, [getProjects]);
 
   const getStatusColor = (status: string) => {
@@ -127,7 +127,7 @@ const PopularProjectsSection: React.FC = () => {
               Discover the latest and most popular development projects
             </Typography>
           </Box>
-          
+
           <Button
             variant="contained"
             endIcon={<ArrowForward />}

@@ -13,7 +13,7 @@ const ProjectListingsClient = () => {
 
     useEffect(() => {
         // Fetch all projects
-        getProjects({});
+        getProjects({ isPublished: true });
     }, [getProjects]);
 
     useEffect(() => {
