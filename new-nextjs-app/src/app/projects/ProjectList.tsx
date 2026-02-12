@@ -5,14 +5,14 @@ import { useProjects } from '../../contexts/ProjectsContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { unstable_noStore as noStore } from 'next/cache';
 import { useRouter } from 'next/navigation';
-import { 
-  Box, Grid, Typography, CircularProgress, Button, 
+import {
+  Box, Grid, Typography, CircularProgress, Button,
   Container, Card, CardContent, CardMedia, Chip,
   Stack, useMediaQuery, useTheme, IconButton, Tooltip,
   Drawer, TextField, FormControl, InputLabel, Select, MenuItem, Paper
 } from '@mui/material';
-import { 
-  Add, Business, LocationOn, CalendarToday, 
+import {
+  Add, Business, LocationOn, CalendarToday,
   Visibility, Edit, Delete, MoreVert, Map as MapIcon, MyLocation,
   FilterList, Close, ViewList, Search as SearchIcon
 } from '@mui/icons-material';
@@ -23,7 +23,7 @@ import { useLocation } from '../../hooks/useLocation';
 
 const ProjectList = () => {
   noStore();
-  
+
   const { projects, myProjects, similarProjects, loading, error, getProjects, getMyProjects, getSimilarProjects, deleteProject } = useProjects();
   const { user } = useAuth();
   const { location: userLocation, loading: locationLoading, error: locationError, requestLocation } = useLocation();
@@ -31,13 +31,13 @@ const ProjectList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   const [showMyProjects, setShowMyProjects] = useState(false);
   const [showMap, setShowMap] = useState(!isTablet); // Hide map on mobile/tablet by default
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  
+
   const [filters, setFilters] = useState({
     search: '',
     city: '',
@@ -50,8 +50,10 @@ const ProjectList = () => {
   });
 
   const loadProjectsWithFilters = useCallback((filterState: any) => {
-    const params: any = {};
-    
+    const params: any = {
+      isPublished: true // Only show published projects in public list
+    };
+
     if (filterState.search) {
       // Client-side filtering for search
     }
@@ -76,12 +78,12 @@ const ProjectList = () => {
     if (filterState.developer) {
       params.developer = filterState.developer;
     }
-    
+
     if (userLocation) {
       params.userLat = userLocation.latitude;
       params.userLng = userLocation.longitude;
     }
-    
+
     getProjects(params);
   }, [getProjects, userLocation]);
 
@@ -89,7 +91,7 @@ const ProjectList = () => {
     if (user?.role === 'developer' || user?.role === 'agent') {
       getMyProjects();
     }
-    
+
     loadProjectsWithFilters(filters);
   }, [user, getMyProjects, filters, loadProjectsWithFilters]);
 
@@ -146,7 +148,7 @@ const ProjectList = () => {
   // Filter projects client-side
   const filteredProjects = useMemo(() => {
     let result = showMyProjects ? myProjects : projects;
-    
+
     if (filters.search) {
       const query = filters.search.toLowerCase();
       result = result.filter((project: any) => {
@@ -157,30 +159,30 @@ const ProjectList = () => {
         return name.includes(query) || description.includes(query) || city.includes(query) || state.includes(query);
       });
     }
-    
+
     if (filters.status && filters.status.length > 0) {
       result = result.filter((project: any) => filters.status.includes(project.status));
     }
-    
+
     if (filters.type && filters.type.length > 0) {
       result = result.filter((project: any) => filters.type.includes(project.type));
     }
-    
+
     if (filters.priceMin) {
       const minPrice = Number(filters.priceMin);
       result = result.filter((project: any) => project.startingPrice && project.startingPrice >= minPrice);
     }
-    
+
     if (filters.priceMax) {
       const maxPrice = Number(filters.priceMax);
       result = result.filter((project: any) => project.startingPrice && project.startingPrice <= maxPrice);
     }
-    
+
     return result;
   }, [showMyProjects, myProjects, projects, filters]);
 
   const displayProjects = filteredProjects;
-  
+
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -232,7 +234,7 @@ const ProjectList = () => {
                 placeholder="Search projects by name, location..."
               />
             </Box>
-            
+
             <Button
               variant="outlined"
               onClick={() => setShowFiltersDrawer(true)}
@@ -310,7 +312,7 @@ const ProjectList = () => {
               Developer Projects
             </Typography>
           </Box>
-          
+
           {(user?.role === 'developer' || user?.role === 'agent') && (
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
@@ -362,11 +364,11 @@ const ProjectList = () => {
             </Box>
           )}
         </Box>
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="body1" sx={{ color: 'var(--color-text-muted)' }}>
-            {showMyProjects 
-              ? `Your projects (${myProjects.length})` 
+            {showMyProjects
+              ? `Your projects (${myProjects.length})`
               : `Browse all development projects (${projects.length})`
             }
           </Typography>
@@ -404,7 +406,7 @@ const ProjectList = () => {
             {showMyProjects ? 'No Projects Yet' : 'No Projects Found'}
           </Typography>
           <Typography variant="body1" sx={{ color: 'var(--color-text-muted)', mb: 3 }}>
-            {showMyProjects 
+            {showMyProjects
               ? 'Start by adding your first development project.'
               : 'No development projects are currently available.'
             }
@@ -429,10 +431,10 @@ const ProjectList = () => {
           {/* Similar Projects Section - Only show when not showing "My Projects" */}
           {!showMyProjects && similarProjects && similarProjects.length > 0 && (
             <Box sx={{ width: '100%', mt: 6 }}>
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  color: 'var(--color-primary)', 
+              <Typography
+                variant="h5"
+                sx={{
+                  color: 'var(--color-primary)',
                   mb: 3,
                   fontWeight: 600,
                   textAlign: 'left'
@@ -440,12 +442,12 @@ const ProjectList = () => {
               >
                 You might also like:
               </Typography>
-              
+
               <Grid container spacing={3}>
                 {similarProjects.map((project) => (
                   <Grid item xs={12} sm={6} md={4} key={project._id}>
-                    <Card 
-                      sx={{ 
+                    <Card
+                      sx={{
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -466,11 +468,11 @@ const ProjectList = () => {
                         alt={project.name}
                         sx={{ objectFit: 'cover' }}
                       />
-                      
+
                       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                        <Typography 
-                          variant="h6" 
-                          sx={{ 
+                        <Typography
+                          variant="h6"
+                          sx={{
                             color: 'var(--color-text-primary)',
                             fontWeight: 600,
                             lineHeight: 1.2,
@@ -490,15 +492,15 @@ const ProjectList = () => {
 
                         {/* Status and Type Chips */}
                         <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                          <Chip 
-                            label={project.status} 
-                            size="small" 
+                          <Chip
+                            label={project.status}
+                            size="small"
                             color={getStatusColor(project.status) as any}
                             variant="outlined"
                           />
-                          <Chip 
-                            label={project.type} 
-                            size="small" 
+                          <Chip
+                            label={project.type}
+                            size="small"
                             color={getTypeColor(project.type) as any}
                             variant="outlined"
                           />
@@ -540,8 +542,8 @@ const ProjectList = () => {
       ) : (
         <Box sx={{ display: 'flex', gap: 3, height: showMap ? '600px' : 'auto' }}>
           {/* Projects Grid */}
-          <Box sx={{ 
-            flex: showMap ? '0 0 50%' : '1', 
+          <Box sx={{
+            flex: showMap ? '0 0 50%' : '1',
             overflow: showMap ? 'auto' : 'visible',
             pr: showMap ? 2 : 0
           }}>
@@ -555,8 +557,8 @@ const ProjectList = () => {
                       border: selectedProject?._id === project._id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
                     }}
                   />
-            </Grid>
-          ))}
+                </Grid>
+              ))}
             </Grid>
           </Box>
 
