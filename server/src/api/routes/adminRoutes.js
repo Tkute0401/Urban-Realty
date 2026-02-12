@@ -74,6 +74,7 @@ router.delete('/media/:id', protect, authorize('admin'), mediaController.deleteM
 // ==================== DEVELOPER MANAGEMENT ====================
 
 // Developer Users Management
+router.get('/developers/users/unlinked', protect, authorize('admin'), adminController.getUnlinkedDeveloperUsers); // Specific route first
 router.get('/developers/users', protect, authorize('admin'), adminController.getDeveloperUsers);
 router.get('/developers/users/:id', protect, authorize('admin'), adminController.getDeveloperUser);
 router.post('/developers/users', protect, authorize('admin'), adminController.createDeveloperUser);
@@ -81,11 +82,16 @@ router.put('/developers/users/:id', protect, authorize('admin'), adminController
 router.delete('/developers/users/:id', protect, authorize('admin'), adminController.deleteDeveloperUser);
 
 // Developer Profiles Management
+router.get('/developers/profiles/unlinked', protect, authorize('admin'), adminController.getUnlinkedDeveloperProfiles); // Specific route first
 router.get('/developers/profiles', protect, authorize('admin'), adminController.getDeveloperProfiles);
 router.get('/developers/profiles/:id', protect, authorize('admin'), adminController.getDeveloperProfile);
 router.post('/developers/profiles', protect, authorize('admin'), adminController.createDeveloperProfile);
 router.put('/developers/profiles/:id', protect, authorize('admin'), adminController.updateDeveloperProfile);
 router.delete('/developers/profiles/:id', protect, authorize('admin'), adminController.deleteDeveloperProfile);
+
+// Developer Linking
+router.post('/developers/link', protect, authorize('admin'), adminController.linkDeveloperProfile);
+router.post('/developers/unlink', protect, authorize('admin'), adminController.unlinkDeveloperProfile);
 
 // Project Management
 router.get('/projects', protect, authorize('admin'), adminController.getProjects);
