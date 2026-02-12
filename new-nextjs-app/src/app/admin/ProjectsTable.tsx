@@ -330,7 +330,7 @@ const ProjectsTable = () => {
         <Box display="flex" gap={2}>
           <Button
             variant="outlined"
-            startIcon={syncing ? <CircularProgress size={20} size={20} /> : <Sync />}
+            startIcon={syncing ? <CircularProgress size={20} /> : <Sync />}
             onClick={handleSync}
             disabled={syncing}
           >
