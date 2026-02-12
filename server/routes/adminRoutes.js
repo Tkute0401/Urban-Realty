@@ -93,6 +93,7 @@ router.put('/developers/profiles/:id', protect, authorize('admin'), adminControl
 router.delete('/developers/profiles/:id', protect, authorize('admin'), adminController.deleteDeveloperProfile);
 
 // Project Management
+router.post('/projects/sync', protect, authorize('admin'), adminController.syncProjects);
 router.get('/projects', protect, authorize('admin'), adminController.getProjects);
 router.get('/projects/:id', protect, authorize('admin'), adminController.getProject);
 router.post('/projects', protect, authorize('admin'), adminController.createProject);

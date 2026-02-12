@@ -39,22 +39,23 @@ import {
   FormControlLabel,
   Switch
 } from '@mui/material';
-import { 
-  MoreVert, 
-  Edit, 
-  Delete, 
+import {
+  MoreVert,
+  Edit,
+  Delete,
   Add,
   Business,
   LocationOn,
   CalendarToday,
-  Close, 
+  Close,
   Save,
   Visibility,
   Home,
   Construction,
   CheckCircle,
   PauseCircle,
-  Cancel
+  Cancel,
+  Sync
 } from '@mui/icons-material';
 import http from '@/lib/services/http';
 
@@ -132,6 +133,7 @@ const ProjectsTable = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const projectTypes = [
     'Residential',
@@ -217,6 +219,22 @@ const ProjectsTable = () => {
     setSelectedProject(null);
   };
 
+  const handleSync = async () => {
+    try {
+      setSyncing(true);
+      const response = await http.post('/api/v1/admin/projects/sync');
+      if (response.data.success) {
+        alert(response.data.message || 'Sync completed successfully');
+        fetchProjects();
+      }
+    } catch (err: any) {
+      console.error('Sync failed:', err);
+      setError(err.response?.data?.message || 'Sync failed');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const handleEditClick = () => {
     if (selectedProject) {
       router.push(`/admin/projects/edit/${selectedProject._id}`);
@@ -291,13 +309,23 @@ const ProjectsTable = () => {
         <Typography variant="h4" component="h1">
           Projects Management
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => router.push('/admin/projects/add')}
-        >
-          Add Project
-        </Button>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="outlined"
+            startIcon={syncing ? <CircularProgress size={20} size={20} /> : <Sync />}
+            onClick={handleSync}
+            disabled={syncing}
+          >
+            {syncing ? 'Syncing...' : 'Sync Sheet'}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => router.push('/admin/projects/add')}
+          >
+            Add Project
+          </Button>
+        </Box>
       </Box>
 
       {error && (
@@ -444,7 +472,7 @@ const ProjectsTable = () => {
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12}>
                 <Card>
-                  <CardHeader 
+                  <CardHeader
                     title={selectedProject.name}
                     subheader={`${selectedProject.type} Project`}
                   />

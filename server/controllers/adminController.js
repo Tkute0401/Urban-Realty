@@ -5,13 +5,14 @@ const Property = require('../models/Property');
 const ContactRequest = require('../models/ContactRequest');
 const Developer = require('../models/Developer');
 const Project = require('../models/Project');
+const { syncProjectsFromSheet } = require('../services/SheetSyncService');
 
 // @desc    Get all users
 // @route   GET /api/v1/admin/users
 // @access  Private/Admin
 exports.getUsers = asyncHandler(async (req, res, next) => {
   const users = await User.find().sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: users.length,
@@ -24,13 +25,13 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
-  
+
   if (!user) {
     return next(
       new ErrorResponse(`User not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: user
@@ -43,7 +44,7 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 exports.updateUser = asyncHandler(async (req, res, next) => {
   const { name, email, mobile, role, occupation } = req.body;
   const userId = req.params.id;
-  if (occupation==undefined) occupation='';
+  if (occupation == undefined) occupation = '';
 
   const updateFields = {};
   if (name) updateFields.name = name;
@@ -54,11 +55,11 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 
   // Check if email is being updated and if it's already in use
   if (email) {
-    const existingUser = await User.findOne({ 
+    const existingUser = await User.findOne({
       email: { $regex: new RegExp(`^${email}$`, 'i') },
       _id: { $ne: userId }
     });
-    
+
     if (existingUser) {
       return next(new ErrorResponse('Email already in use', 400));
     }
@@ -85,18 +86,18 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.deleteUser = asyncHandler(async (req, res, next) => {
   const user = await User.findByIdAndDelete(req.params.id);
-  
+
   if (!user) {
     return next(
       new ErrorResponse(`User not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   // Delete all properties associated with this user if they're an agent
   if (user.role === 'agent') {
     await Property.deleteMany({ agent: user._id });
   }
-  
+
   res.status(200).json({
     success: true,
     data: {}
@@ -110,7 +111,7 @@ exports.getProperties = asyncHandler(async (req, res, next) => {
   const properties = await Property.find()
     .populate('agent', 'name email mobile')
     .sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: properties.length,
@@ -155,13 +156,13 @@ exports.getPropertyStats = asyncHandler(async (req, res, next) => {
 exports.getProperty = asyncHandler(async (req, res, next) => {
   const property = await Property.findById(req.params.id)
     .populate('agent', 'name email mobile');
-  
+
   if (!property) {
     return next(
       new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: property
@@ -173,13 +174,13 @@ exports.getProperty = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.deleteProperty = asyncHandler(async (req, res, next) => {
   const property = await Property.findByIdAndDelete(req.params.id);
-  
+
   if (!property) {
     return next(
       new ErrorResponse(`Property not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: {}
@@ -191,7 +192,7 @@ exports.deleteProperty = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.getAgents = asyncHandler(async (req, res, next) => {
   const agents = await User.find({ role: 'agent' }).sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: agents.length,
@@ -207,16 +208,16 @@ exports.getAgent = asyncHandler(async (req, res, next) => {
     _id: req.params.id,
     role: 'agent'
   });
-  
+
   if (!agent) {
     return next(
       new ErrorResponse(`Agent not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   // Get agent's properties
   const properties = await Property.find({ agent: agent._id });
-  
+
   res.status(200).json({
     success: true,
     data: {
@@ -235,13 +236,13 @@ exports.verifyAgent = asyncHandler(async (req, res, next) => {
     { isVerified: true },
     { new: true, runValidators: true }
   );
-  
+
   if (!agent || agent.role !== 'agent') {
     return next(
       new ErrorResponse(`Agent not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: agent
@@ -257,7 +258,7 @@ exports.getContactRequests = asyncHandler(async (req, res, next) => {
     .populate('agent', 'name email mobile')
     .populate('user', 'name email mobile')
     .sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: contacts.length,
@@ -272,7 +273,7 @@ exports.getContactStats = asyncHandler(async (req, res, next) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
@@ -308,13 +309,13 @@ exports.getContactRequest = asyncHandler(async (req, res, next) => {
     .populate('property', 'title price')
     .populate('agent', 'name email mobile')
     .populate('user', 'name email mobile');
-  
+
   if (!contact) {
     return next(
       new ErrorResponse(`Contact request not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: contact
@@ -326,13 +327,13 @@ exports.getContactRequest = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.deleteContactRequest = asyncHandler(async (req, res, next) => {
   const contact = await ContactRequest.findByIdAndDelete(req.params.id);
-  
+
   if (!contact) {
     return next(
       new ErrorResponse(`Contact request not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: {}
@@ -407,14 +408,14 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
           { $group: { _id: null, total: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } }
         ])
       ]),
-      
+
       // User growth data
       User.aggregate([
         { $match: { createdAt: { $gte: thirtyDaysAgo } } },
         { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
         { $sort: { _id: 1 } }
       ]),
-      
+
       // Property statistics
       Promise.all([
         Property.aggregate([
@@ -424,14 +425,14 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
           { $group: { _id: { $cond: [{ $lt: ["$price", 100000] }, "Under $100k", { $cond: [{ $lt: ["$price", 500000] }, "$100k-$500k", { $cond: [{ $lt: ["$price", 1000000] }, "$500k-$1M", "Over $1M"] }] }] }, count: { $sum: 1 } } }
         ])
       ]),
-      
+
       // Revenue data
       User.aggregate([
         { $match: { subscriptionStatus: { $ne: 'free' } } },
         { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, revenue: { $sum: { $cond: [{ $eq: ['$subscriptionStatus', 'basic'] }, 9.99, { $cond: [{ $eq: ['$subscriptionStatus', 'premium'] }, 19.99, 49.99] }] } } } },
         { $sort: { _id: 1 } }
       ]),
-      
+
       // Top agents
       User.aggregate([
         { $match: { role: 'agent' } },
@@ -441,14 +442,14 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
         { $sort: { revenue: -1 } },
         { $limit: 10 }
       ]),
-      
+
       // Location stats
       Property.aggregate([
         { $group: { _id: "$location", propertiesCount: { $sum: 1 }, avgPrice: { $avg: "$price" } } },
         { $sort: { propertiesCount: -1 } },
         { $limit: 10 }
       ]),
-      
+
       // Activity log (simplified)
       Promise.all([
         User.find().sort('-createdAt').limit(10).select('name createdAt'),
@@ -479,10 +480,10 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
         },
         revenueData: revenueData.map(item => ({ month: item._id, revenue: item.revenue })),
         topAgents: topAgents.map(agent => ({ ...agent, rating: (Math.random() * 2 + 3).toFixed(1) })),
-        locationStats: locationStats.map(location => ({ 
-          name: location._id, 
-          propertiesCount: location.propertiesCount, 
-          avgPrice: Math.round(location.avgPrice).toLocaleString() 
+        locationStats: locationStats.map(location => ({
+          name: location._id,
+          propertiesCount: location.propertiesCount,
+          avgPrice: Math.round(location.avgPrice).toLocaleString()
         })),
         activityLog: [
           ...userGrowth.slice(0, 5).map(user => ({ type: 'user', description: `New user registered: ${user.name}`, timestamp: user.createdAt })),
@@ -503,7 +504,7 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
 exports.getReports = asyncHandler(async (req, res, next) => {
   try {
     const { type, dateRange, startDate, endDate } = req.query;
-    
+
     let dateFilter = {};
     if (dateRange && dateRange !== 'custom') {
       const days = parseInt(dateRange);
@@ -693,7 +694,7 @@ const generateAgentReport = async (dateFilter) => {
 exports.exportReport = asyncHandler(async (req, res, next) => {
   try {
     const { type, format, dateRange, startDate, endDate } = req.query;
-    
+
     // This is a placeholder implementation
     // In a real application, you would generate the actual file
     const reportData = {
@@ -728,7 +729,7 @@ exports.exportReport = asyncHandler(async (req, res, next) => {
 
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', `attachment; filename=report-${type}-${new Date().toISOString().split('T')[0]}.${fileExtension}`);
-    
+
     if (format === 'json') {
       res.json(reportData);
     } else {
@@ -893,16 +894,16 @@ exports.createBackup = asyncHandler(async (req, res, next) => {
     // For now, we'll simulate a backup creation process
     const backupId = `backup-${Date.now()}`;
     const backupDate = new Date();
-    
+
     // Simulate backup process
     console.log('Creating backup:', backupId);
-    
+
     // Here you could:
     // 1. Create a database dump
     // 2. Archive uploaded files
     // 3. Create configuration snapshots
     // 4. Upload to cloud storage (AWS S3, Google Cloud, etc.)
-    
+
     const backupInfo = {
       id: backupId,
       createdAt: backupDate,
@@ -935,7 +936,7 @@ exports.restoreBackup = asyncHandler(async (req, res, next) => {
     // In a real application, you would restore from an actual backup
     // For now, we'll simulate a restore process
     console.log('Restoring backup:', id);
-    
+
     // Here you could:
     // 1. Validate backup integrity
     // 2. Stop running services
@@ -943,7 +944,7 @@ exports.restoreBackup = asyncHandler(async (req, res, next) => {
     // 4. Restore files from archive
     // 5. Restore configurations
     // 6. Restart services
-    
+
     const restoreInfo = {
       backupId: id,
       restoredAt: new Date(),
@@ -986,64 +987,64 @@ exports.getSubscriptionAnalytics = asyncHandler(async (req, res, next) => {
 
     // Get all subscriptions
     const subscriptions = await Subscription.find().populate('user plan');
-    
+
     // Get all users
     const users = await User.find();
 
     // Calculate analytics
     const totalSubscribers = subscriptions.length;
     const activeSubscribers = subscriptions.filter(sub => sub.status === 'active').length;
-    
+
     // Calculate monthly revenue (assuming monthly billing cycle)
     const monthlyRevenue = subscriptions
       .filter(sub => sub.status === 'active' && sub.billingCycle === 'monthly')
       .reduce((total, sub) => total + (sub.plan?.price || 0), 0);
-    
+
     // Calculate yearly revenue
     const yearlyRevenue = subscriptions
       .filter(sub => sub.status === 'active' && sub.billingCycle === 'yearly')
       .reduce((total, sub) => total + (sub.plan?.price || 0), 0);
-    
+
     // Convert yearly to monthly equivalent for comparison
     const yearlyMonthlyEquivalent = yearlyRevenue / 12;
     const totalMonthlyRevenue = monthlyRevenue + yearlyMonthlyEquivalent;
-    
+
     // Calculate revenue growth (placeholder - in real app, compare with previous month)
     const revenueGrowth = 5.2; // Placeholder growth percentage
-    
+
     // Get active plans count
     const activePlans = await Subscription.distinct('plan');
     const planTypes = activePlans.length;
-    
+
     // Calculate churn rate (placeholder - in real app, calculate based on cancelled subscriptions)
     const churnRate = 2.1; // Placeholder churn percentage
-    
+
     // Plan distribution
     const planDistribution = await Subscription.aggregate([
       { $match: { status: 'active' } },
       { $group: { _id: '$plan', count: { $sum: 1 } } },
       { $lookup: { from: 'subscriptions', localField: '_id', foreignField: 'plan', as: 'planDetails' } }
     ]);
-    
+
     const totalActive = planDistribution.reduce((sum, plan) => sum + plan.count, 0);
     const planDistributionWithPercentage = planDistribution.map(plan => ({
       name: plan.planDetails[0]?.name || 'Unknown Plan',
       subscribers: plan.count,
       percentage: totalActive > 0 ? Math.round((plan.count / totalActive) * 100) : 0
     }));
-    
+
     // Status distribution
     const statusDistribution = await Subscription.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } }
     ]);
-    
+
     const totalSubs = statusDistribution.reduce((sum, status) => sum + status.count, 0);
     const statusDistributionWithPercentage = statusDistribution.map(status => ({
       status: status._id,
       count: status.count,
       percentage: totalSubs > 0 ? Math.round((status.count / totalSubs) * 100) : 0
     }));
-    
+
     // Recent subscriptions
     const recentSubscriptions = subscriptions
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -1117,7 +1118,7 @@ exports.getDeveloperUsers = asyncHandler(async (req, res, next) => {
   const developers = await User.find({ role: 'developer' })
     .populate('developerId', 'name logo website')
     .sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: developers.length,
@@ -1133,16 +1134,16 @@ exports.getDeveloperUser = asyncHandler(async (req, res, next) => {
     _id: req.params.id,
     role: 'developer'
   }).populate('developerId');
-  
+
   if (!developer) {
     return next(
       new ErrorResponse(`Developer user not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   // Get developer's projects
   const projects = await Project.find({ developers: developer.developerId });
-  
+
   res.status(200).json({
     success: true,
     data: {
@@ -1159,10 +1160,10 @@ exports.createDeveloperUser = asyncHandler(async (req, res, next) => {
   const { name, email, mobile, password, occupation, professionalInfo } = req.body;
 
   // Check if user already exists
-  const existingUser = await User.findOne({ 
+  const existingUser = await User.findOne({
     email: { $regex: new RegExp(`^${email}$`, 'i') }
   });
-  
+
   if (existingUser) {
     return next(new ErrorResponse('User with this email already exists', 400));
   }
@@ -1202,11 +1203,11 @@ exports.updateDeveloperUser = asyncHandler(async (req, res, next) => {
 
   // Check if email is being updated and if it's already in use
   if (email) {
-    const existingUser = await User.findOne({ 
+    const existingUser = await User.findOne({
       email: { $regex: new RegExp(`^${email}$`, 'i') },
       _id: { $ne: userId }
     });
-    
+
     if (existingUser) {
       return next(new ErrorResponse('Email already in use', 400));
     }
@@ -1236,7 +1237,7 @@ exports.deleteDeveloperUser = asyncHandler(async (req, res, next) => {
     _id: req.params.id,
     role: 'developer'
   });
-  
+
   if (!user) {
     return next(
       new ErrorResponse(`Developer user not found with id of ${req.params.id}`, 404)
@@ -1255,7 +1256,7 @@ exports.deleteDeveloperUser = asyncHandler(async (req, res, next) => {
 
   // Delete the user
   await User.findByIdAndDelete(req.params.id);
-  
+
   res.status(200).json({
     success: true,
     data: {}
@@ -1271,7 +1272,7 @@ exports.getDeveloperProfiles = asyncHandler(async (req, res, next) => {
   const developers = await Developer.find()
     .populate('userId', 'name email mobile')
     .sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: developers.length,
@@ -1285,16 +1286,16 @@ exports.getDeveloperProfiles = asyncHandler(async (req, res, next) => {
 exports.getDeveloperProfile = asyncHandler(async (req, res, next) => {
   const developer = await Developer.findById(req.params.id)
     .populate('userId', 'name email mobile');
-  
+
   if (!developer) {
     return next(
       new ErrorResponse(`Developer profile not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   // Get developer's projects
   const projects = await Project.find({ developers: developer._id });
-  
+
   res.status(200).json({
     success: true,
     data: {
@@ -1308,14 +1309,14 @@ exports.getDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/admin/developers/profiles
 // @access  Private/Admin
 exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
-  const { 
-    userId, 
-    name, 
-    description, 
-    website, 
-    foundedYear, 
-    headquarters, 
-    contact, 
+  const {
+    userId,
+    name,
+    description,
+    website,
+    foundedYear,
+    headquarters,
+    contact,
     socialMedia,
     completedProjects,
     ongoingProjects,
@@ -1335,10 +1336,10 @@ exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
   }
 
   // Check if developer name already exists
-  const existingName = await Developer.findOne({ 
+  const existingName = await Developer.findOne({
     name: { $regex: new RegExp(`^${name}$`, 'i') }
   });
-  
+
   if (existingName) {
     return next(new ErrorResponse('Developer with this name already exists', 400));
   }
@@ -1376,16 +1377,16 @@ exports.createDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/admin/developers/profiles/:id
 // @access  Private/Admin
 exports.updateDeveloperProfile = asyncHandler(async (req, res, next) => {
-  const { 
-    name, 
-    description, 
-    website, 
-    foundedYear, 
-    headquarters, 
-    contact, 
-    socialMedia, 
-    team, 
-    specializations, 
+  const {
+    name,
+    description,
+    website,
+    foundedYear,
+    headquarters,
+    contact,
+    socialMedia,
+    team,
+    specializations,
     awards,
     completedProjects,
     ongoingProjects,
@@ -1412,11 +1413,11 @@ exports.updateDeveloperProfile = asyncHandler(async (req, res, next) => {
 
   // Check if developer name is being updated and if it's already in use
   if (name) {
-    const existingDeveloper = await Developer.findOne({ 
+    const existingDeveloper = await Developer.findOne({
       name: { $regex: new RegExp(`^${name}$`, 'i') },
       _id: { $ne: developerId }
     });
-    
+
     if (existingDeveloper) {
       return next(new ErrorResponse('Developer with this name already exists', 400));
     }
@@ -1443,7 +1444,7 @@ exports.updateDeveloperProfile = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.deleteDeveloperProfile = asyncHandler(async (req, res, next) => {
   const developer = await Developer.findById(req.params.id);
-  
+
   if (!developer) {
     return next(
       new ErrorResponse(`Developer profile not found with id of ${req.params.id}`, 404)
@@ -1460,7 +1461,7 @@ exports.deleteDeveloperProfile = asyncHandler(async (req, res, next) => {
 
   // Delete the developer profile
   await Developer.findByIdAndDelete(req.params.id);
-  
+
   res.status(200).json({
     success: true,
     data: {}
@@ -1476,7 +1477,7 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
   const projects = await Project.find()
     .populate('developers', 'name logo website')
     .sort('-createdAt');
-  
+
   res.status(200).json({
     success: true,
     count: projects.length,
@@ -1490,13 +1491,13 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 exports.getProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id)
     .populate('developers', 'name logo website contact');
-  
+
   if (!project) {
     return next(
       new ErrorResponse(`Project not found with id of ${req.params.id}`, 404)
     );
   }
-  
+
   res.status(200).json({
     success: true,
     data: project
@@ -1511,7 +1512,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 
   // Ensure developers is an array
   const developerIds = Array.isArray(developers) ? developers : (developers ? [developers] : []);
-  
+
   if (developerIds.length === 0) {
     return next(new ErrorResponse('At least one developer is required', 400));
   }
@@ -1539,10 +1540,10 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   });
 
   // Update project counts for all developers
-  const statusField = status === 'Completed' ? 'completedProjects' : 
-                     status === 'Under Construction' ? 'ongoingProjects' : 
-                     'upcomingProjects';
-  await Promise.all(developerIds.map(devId => 
+  const statusField = status === 'Completed' ? 'completedProjects' :
+    status === 'Under Construction' ? 'ongoingProjects' :
+      'upcomingProjects';
+  await Promise.all(developerIds.map(devId =>
     Developer.findByIdAndUpdate(devId, {
       $inc: { [statusField]: 1 }
     })
@@ -1590,17 +1591,17 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   if (status && status !== oldStatus) {
     // Update counts for all developers associated with this project
     const developerIds = oldDevelopers;
-    const oldStatusField = oldStatus === 'Completed' ? 'completedProjects' : 
-                          oldStatus === 'Under Construction' ? 'ongoingProjects' : 
-                          'upcomingProjects';
-    const newStatusField = status === 'Completed' ? 'completedProjects' : 
-                          status === 'Under Construction' ? 'ongoingProjects' : 
-                          'upcomingProjects';
-    
+    const oldStatusField = oldStatus === 'Completed' ? 'completedProjects' :
+      oldStatus === 'Under Construction' ? 'ongoingProjects' :
+        'upcomingProjects';
+    const newStatusField = status === 'Completed' ? 'completedProjects' :
+      status === 'Under Construction' ? 'ongoingProjects' :
+        'upcomingProjects';
+
     // Update counts for all developers
-    await Promise.all(developerIds.map(devId => 
+    await Promise.all(developerIds.map(devId =>
       Developer.findByIdAndUpdate(devId, {
-        $inc: { 
+        $inc: {
           [oldStatusField]: -1,
           [newStatusField]: 1
         }
@@ -1619,7 +1620,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.deleteProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
-  
+
   if (!project) {
     return next(
       new ErrorResponse(`Project not found with id of ${req.params.id}`, 404)
@@ -1628,10 +1629,10 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
 
   // Update developer's project counts for all developers
   const developerIds = project.developers || [];
-  const statusField = project.status === 'Completed' ? 'completedProjects' : 
-                     project.status === 'Under Construction' ? 'ongoingProjects' : 
-                     'upcomingProjects';
-  await Promise.all(developerIds.map(devId => 
+  const statusField = project.status === 'Completed' ? 'completedProjects' :
+    project.status === 'Under Construction' ? 'ongoingProjects' :
+      'upcomingProjects';
+  await Promise.all(developerIds.map(devId =>
     Developer.findByIdAndUpdate(devId, {
       $inc: { [statusField]: -1 }
     })
@@ -1639,7 +1640,7 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
 
   // Delete the project
   await Project.findByIdAndDelete(req.params.id);
-  
+
   res.status(200).json({
     success: true,
     data: {}
@@ -1675,4 +1676,16 @@ exports.getDeveloperStats = asyncHandler(async (req, res, next) => {
     console.error('Error fetching developer stats:', err);
     next(new ErrorResponse('Failed to fetch developer statistics', 500));
   }
+});
+
+// @desc    Sync projects from Google Sheet
+// @route   POST /api/v1/admin/projects/sync
+// @access  Private/Admin
+exports.syncProjects = asyncHandler(async (req, res, next) => {
+  const result = await syncProjectsFromSheet(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    data: result
+  });
 });
