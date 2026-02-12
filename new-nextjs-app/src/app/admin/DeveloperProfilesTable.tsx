@@ -51,7 +51,9 @@ import {
   LocationOn,
   CalendarToday,
   Group,
-  Star
+  Star,
+  PersonAdd,
+  LinkOff
 } from '@mui/icons-material';
 import http from '@/lib/services/http';
 
