@@ -223,54 +223,7 @@ const DeveloperProfilesTable = () => {
     }
   };
 
-  useEffect(() => {
-    if (connectUserDialogOpen) {
-      fetchUnlinkedUsers();
-    }
-  }, [connectUserDialogOpen]);
 
-  const fetchUnlinkedUsers = async () => {
-    try {
-      setLoadingUnlinked(true);
-      const response = await api.admin.getUnlinkedDeveloperUsers();
-      setUnlinkedUsers(response.data);
-    } catch (err) {
-      console.error('Failed to fetch unlinked users:', err);
-    } finally {
-      setLoadingUnlinked(false);
-    }
-  };
-
-  const handleConnectUser = async () => {
-    if (!selectedProfile || !selectedUserIdToLink) return;
-
-    try {
-      await api.admin.linkDeveloper({
-        userId: selectedUserIdToLink,
-        developerId: selectedProfile._id
-      });
-      setConnectUserDialogOpen(false);
-      setSelectedUserIdToLink('');
-      fetchDeveloperProfiles();
-      alert('User connected successfully');
-    } catch (err: any) {
-      setError(err.message || 'Failed to connect user');
-    }
-  };
-
-  const handleUnlinkUser = async () => {
-    if (!selectedProfile || !selectedProfile.userId || !window.confirm('Are you sure you want to unlink this user?')) return;
-
-    try {
-      await api.admin.unlinkDeveloper({
-        developerId: selectedProfile._id
-      });
-      handleMenuClose();
-      fetchDeveloperProfiles();
-    } catch (err: any) {
-      setError(err.message || 'Failed to unlink user');
-    }
-  };
 
   const fetchDeveloperProfiles = async () => {
     try {
