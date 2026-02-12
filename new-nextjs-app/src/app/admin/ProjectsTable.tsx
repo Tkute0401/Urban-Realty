@@ -370,20 +370,22 @@ const ProjectsTable = () => {
           <TableBody>
             {projects.map((project) => (
               <TableRow key={project._id}>
-                <TableCell>
+                <TableCell sx={{ maxWidth: 300 }}>
                   <Box display="flex" alignItems="center">
-                    <Home sx={{ mr: 2, color: 'primary.main' }} />
-                    <Box>
-                      <Typography variant="body2" fontWeight="medium">
+                    <Home sx={{ mr: 2, color: 'primary.main', flexShrink: 0 }} />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="body2" fontWeight="medium" noWrap>
                         {project.name}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 200 }}>
-                        {project.shortDescription || project.description}
-                      </Typography>
+                      <Tooltip title={project.shortDescription || project.description || ''}>
+                        <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+                          {project.shortDescription || project.description}
+                        </Typography>
+                      </Tooltip>
                     </Box>
                   </Box>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ maxWidth: 250 }}>
                   <Box>
                     {(project.developers || []).slice(0, 2).map((developer: any, index: number) => (
                       <Box key={developer._id || index} display="flex" alignItems="center" sx={{ mb: index < Math.min((project.developers || []).length, 2) - 1 ? 1 : 0 }}>
@@ -393,12 +395,12 @@ const ProjectsTable = () => {
                         >
                           <Business />
                         </Avatar>
-                        <Box>
-                          <Typography variant="body2" fontWeight="medium">
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="body2" fontWeight="medium" noWrap>
                             {typeof developer === 'string' ? developer : developer?.name || 'Unknown'}
                           </Typography>
                           {developer?.website && (
-                            <Link href={developer.website} target="_blank" variant="caption">
+                            <Link href={developer.website} target="_blank" variant="caption" noWrap display="block">
                               Website
                             </Link>
                           )}
