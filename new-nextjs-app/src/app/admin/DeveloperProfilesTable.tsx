@@ -36,15 +36,15 @@ import {
   Avatar,
   Link
 } from '@mui/material';
-import { 
-  MoreVert, 
-  Edit, 
-  Delete, 
+import {
+  MoreVert,
+  Edit,
+  Delete,
   Add,
   Business,
   Email,
   Phone,
-  Close, 
+  Close,
   Save,
   Visibility,
   Language,
@@ -119,6 +119,13 @@ const DeveloperProfilesTable = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+
+  // Linking related state
+  const [connectUserDialogOpen, setConnectUserDialogOpen] = useState(false);
+  const [unlinkedUsers, setUnlinkedUsers] = useState<any[]>([]);
+  const [selectedUserIdToLink, setSelectedUserIdToLink] = useState('');
+  const [loadingUnlinked, setLoadingUnlinked] = useState(false);
+
   const [editFormData, setEditFormData] = useState({
     name: '',
     description: '',
@@ -166,6 +173,104 @@ const DeveloperProfilesTable = () => {
   useEffect(() => {
     fetchDeveloperProfiles();
   }, []);
+
+  useEffect(() => {
+    if (connectUserDialogOpen) {
+      fetchUnlinkedUsers();
+    }
+  }, [connectUserDialogOpen]);
+
+  const fetchUnlinkedUsers = async () => {
+    try {
+      setLoadingUnlinked(true);
+      const response = await api.admin.getUnlinkedDeveloperUsers();
+      setUnlinkedUsers(response.data);
+    } catch (err) {
+      console.error('Failed to fetch unlinked users:', err);
+    } finally {
+      setLoadingUnlinked(false);
+    }
+  };
+
+  const handleConnectUser = async () => {
+    if (!selectedProfile || !selectedUserIdToLink) return;
+
+    try {
+      await api.admin.linkDeveloper({
+        userId: selectedUserIdToLink,
+        developerId: selectedProfile._id
+      });
+      setConnectUserDialogOpen(false);
+      setSelectedUserIdToLink('');
+      fetchDeveloperProfiles();
+      alert('User connected successfully');
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect user');
+    }
+  };
+
+  const handleUnlinkUser = async () => {
+    if (!selectedProfile || !selectedProfile.userId || !window.confirm('Are you sure you want to unlink this user?')) return;
+
+    try {
+      await api.admin.unlinkDeveloper({
+        developerId: selectedProfile._id
+      });
+      handleMenuClose();
+      fetchDeveloperProfiles();
+    } catch (err: any) {
+      setError(err.message || 'Failed to unlink user');
+    }
+  };
+
+  useEffect(() => {
+    if (connectUserDialogOpen) {
+      fetchUnlinkedUsers();
+    }
+  }, [connectUserDialogOpen]);
+
+  const fetchUnlinkedUsers = async () => {
+    try {
+      setLoadingUnlinked(true);
+      const response = await api.admin.getUnlinkedDeveloperUsers();
+      setUnlinkedUsers(response.data);
+    } catch (err) {
+      console.error('Failed to fetch unlinked users:', err);
+    } finally {
+      setLoadingUnlinked(false);
+    }
+  };
+
+  const handleConnectUser = async () => {
+    if (!selectedProfile || !selectedUserIdToLink) return;
+
+    try {
+      await api.admin.linkDeveloper({
+        userId: selectedUserIdToLink,
+        developerId: selectedProfile._id
+      });
+      setConnectUserDialogOpen(false);
+      setSelectedUserIdToLink('');
+      fetchDeveloperProfiles();
+      alert('User connected successfully');
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect user');
+    }
+  };
+
+  const handleUnlinkUser = async () => {
+    if (!selectedProfile || !selectedProfile.userId || !window.confirm('Are you sure you want to unlink this user?')) return;
+
+    try {
+      await api.admin.unlinkDeveloper({
+        developerId: selectedProfile._id
+      });
+      handleMenuClose();
+      fetchDeveloperProfiles();
+    } catch (err: any) {
+      setError(err.message || 'Failed to unlink user');
+    }
+  };
 
   const fetchDeveloperProfiles = async () => {
     try {
@@ -244,8 +349,8 @@ const DeveloperProfilesTable = () => {
 
     try {
       // Convert foundedYear to number if it exists and is not empty
-      const foundedYearValue = editFormData.foundedYear && editFormData.foundedYear.toString().trim() 
-        ? parseInt(editFormData.foundedYear.toString()) 
+      const foundedYearValue = editFormData.foundedYear && editFormData.foundedYear.toString().trim()
+        ? parseInt(editFormData.foundedYear.toString())
         : undefined;
 
       // Clean up empty strings and prepare submission data
@@ -270,7 +375,7 @@ const DeveloperProfilesTable = () => {
           instagram: editFormData.socialMedia?.instagram?.trim() || undefined
         }
       };
-      
+
       await http.put(`/api/v1/admin/developers/profiles/${selectedProfile._id}`, submitData);
       await fetchDeveloperProfiles();
       setEditDialogOpen(false);
@@ -493,11 +598,126 @@ const DeveloperProfilesTable = () => {
           <Edit sx={{ mr: 1 }} />
           Edit
         </MenuItem>
+
+        {/* Link/Unlink User Actions */}
+        {selectedProfile && !selectedProfile.userId && (
+          <MenuItem onClick={() => {
+            setConnectUserDialogOpen(true);
+            handleMenuClose();
+          }}>
+            <PersonAdd sx={{ mr: 1 }} />
+            Connect User
+          </MenuItem>
+        )}
+
+        {selectedProfile && selectedProfile.userId && (
+          <MenuItem onClick={handleUnlinkUser} sx={{ color: 'warning.main' }}>
+            <LinkOff sx={{ mr: 1 }} />
+            Unlink User
+          </MenuItem>
+        )}
+
         <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
           <Delete sx={{ mr: 1 }} />
           Delete
         </MenuItem>
       </Menu>
+
+      {/* Connect User Dialog */}
+      <Dialog open={connectUserDialogOpen} onClose={() => setConnectUserDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Connect Developer User</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Select a developer user account to link with <strong>{selectedProfile?.name}</strong>.
+              This will give the user access to manage this profile and its projects.
+            </Typography>
+
+            {loadingUnlinked ? (
+              <Box display="flex" justifyContent="center" p={2}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : unlinkedUsers.length > 0 ? (
+              <FormControl fullWidth>
+                <InputLabel>Select User</InputLabel>
+                <Select
+                  value={selectedUserIdToLink}
+                  label="Select User"
+                  onChange={(e) => setSelectedUserIdToLink(e.target.value)}
+                >
+                  {unlinkedUsers.map((user) => (
+                    <MenuItem key={user._id} value={user._id}>
+                      {user.name} ({user.email})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <Alert severity="info">
+                No unlinked developer users found. Create a new developer user first.
+              </Alert>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConnectUserDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleConnectUser}
+            variant="contained"
+            disabled={!selectedUserIdToLink || loading}
+          >
+            Connect
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Connect User Dialog */}
+      <Dialog open={connectUserDialogOpen} onClose={() => setConnectUserDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Connect Developer User</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Select a developer user account to link with <strong>{selectedProfile?.name}</strong>.
+              This will give the user access to manage this profile and its projects.
+            </Typography>
+
+            {loadingUnlinked ? (
+              <Box display="flex" justifyContent="center" p={2}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : unlinkedUsers.length > 0 ? (
+              <FormControl fullWidth>
+                <InputLabel>Select User</InputLabel>
+                <Select
+                  value={selectedUserIdToLink}
+                  label="Select User"
+                  onChange={(e) => setSelectedUserIdToLink(e.target.value)}
+                >
+                  {unlinkedUsers.map((user) => (
+                    <MenuItem key={user._id} value={user._id}>
+                      {user.name} ({user.email})
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <Alert severity="info">
+                No unlinked developer users found. Create a new developer user first.
+              </Alert>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConnectUserDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleConnectUser}
+            variant="contained"
+            disabled={!selectedUserIdToLink || loading}
+          >
+            Connect
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Create Dialog */}
       <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
@@ -674,159 +894,159 @@ const DeveloperProfilesTable = () => {
         <form onSubmit={handleEditSubmit}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Developer Name"
-                value={editFormData.name}
-                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                required
-              />
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Developer Name"
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  multiline
+                  rows={3}
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Website"
+                  value={editFormData.website}
+                  onChange={(e) => setEditFormData({ ...editFormData, website: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Founded Year"
+                  type="number"
+                  value={editFormData.foundedYear}
+                  onChange={(e) => setEditFormData({ ...editFormData, foundedYear: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Divider sx={{ my: 2 }}>
+                  <Typography variant="subtitle2">Location</Typography>
+                </Divider>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="City"
+                  value={editFormData.headquarters.city}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    headquarters: { ...editFormData.headquarters, city: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="State"
+                  value={editFormData.headquarters.state}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    headquarters: { ...editFormData.headquarters, state: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Country"
+                  value={editFormData.headquarters.country}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    headquarters: { ...editFormData.headquarters, country: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Divider sx={{ my: 2 }}>
+                  <Typography variant="subtitle2">Contact Information</Typography>
+                </Divider>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Contact Email"
+                  type="email"
+                  value={editFormData.contact.email}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    contact: { ...editFormData.contact, email: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Contact Phone"
+                  value={editFormData.contact.phone}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    contact: { ...editFormData.contact, phone: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Divider sx={{ my: 2 }}>
+                  <Typography variant="subtitle2">Social Media</Typography>
+                </Divider>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Facebook"
+                  value={editFormData.socialMedia.facebook}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    socialMedia: { ...editFormData.socialMedia, facebook: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Twitter"
+                  value={editFormData.socialMedia.twitter}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    socialMedia: { ...editFormData.socialMedia, twitter: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="LinkedIn"
+                  value={editFormData.socialMedia.linkedin}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    socialMedia: { ...editFormData.socialMedia, linkedin: e.target.value }
+                  })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Instagram"
+                  value={editFormData.socialMedia.instagram}
+                  onChange={(e) => setEditFormData({
+                    ...editFormData,
+                    socialMedia: { ...editFormData.socialMedia, instagram: e.target.value }
+                  })}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description"
-                multiline
-                rows={3}
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Website"
-                value={editFormData.website}
-                onChange={(e) => setEditFormData({ ...editFormData, website: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Founded Year"
-                type="number"
-                value={editFormData.foundedYear}
-                onChange={(e) => setEditFormData({ ...editFormData, foundedYear: e.target.value })}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }}>
-                <Typography variant="subtitle2">Location</Typography>
-              </Divider>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="City"
-                value={editFormData.headquarters.city}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  headquarters: { ...editFormData.headquarters, city: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="State"
-                value={editFormData.headquarters.state}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  headquarters: { ...editFormData.headquarters, state: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                fullWidth
-                label="Country"
-                value={editFormData.headquarters.country}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  headquarters: { ...editFormData.headquarters, country: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }}>
-                <Typography variant="subtitle2">Contact Information</Typography>
-              </Divider>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Contact Email"
-                type="email"
-                value={editFormData.contact.email}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  contact: { ...editFormData.contact, email: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Contact Phone"
-                value={editFormData.contact.phone}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  contact: { ...editFormData.contact, phone: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }}>
-                <Typography variant="subtitle2">Social Media</Typography>
-              </Divider>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Facebook"
-                value={editFormData.socialMedia.facebook}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  socialMedia: { ...editFormData.socialMedia, facebook: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Twitter"
-                value={editFormData.socialMedia.twitter}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  socialMedia: { ...editFormData.socialMedia, twitter: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="LinkedIn"
-                value={editFormData.socialMedia.linkedin}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  socialMedia: { ...editFormData.socialMedia, linkedin: e.target.value }
-                })}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Instagram"
-                value={editFormData.socialMedia.instagram}
-                onChange={(e) => setEditFormData({
-                  ...editFormData,
-                  socialMedia: { ...editFormData.socialMedia, instagram: e.target.value }
-                })}
-              />
-            </Grid>
-          </Grid>
           </DialogContent>
           <DialogActions>
             <Button type="button" onClick={() => setEditDialogOpen(false)}>
@@ -847,7 +1067,7 @@ const DeveloperProfilesTable = () => {
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12}>
                 <Card>
-                  <CardHeader 
+                  <CardHeader
                     title={selectedProfile.name}
                     avatar={
                       <Avatar src={selectedProfile.logo?.url} sx={{ width: 60, height: 60 }}>
@@ -879,7 +1099,7 @@ const DeveloperProfilesTable = () => {
                       <Grid item xs={12}>
                         <Typography variant="subtitle2" color="text.secondary">Location</Typography>
                         <Typography variant="body1">
-                          {selectedProfile.headquarters ? 
+                          {selectedProfile.headquarters ?
                             `${selectedProfile.headquarters.city || ''} ${selectedProfile.headquarters.state || ''} ${selectedProfile.headquarters.country || ''}`.trim() || 'Not specified'
                             : 'Not specified'
                           }

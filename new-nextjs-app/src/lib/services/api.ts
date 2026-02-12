@@ -30,36 +30,36 @@ export const api = {
                 register: (payload: { name: string; email: string; password: string }) => unwrap<{ user: any }>(http.post("/api/v1/auth/register", payload)),
                 profile: () => unwrap<any>(http.get("/api/v1/auth/me")),
                 // Favorites
-				favoritesList: () => unwrap<any[]>(http.get("/api/v1/auth/favorites")),
-				addFavorite: (propertyId: string) => unwrap<any>(http.put(`/api/v1/auth/favorites/${propertyId}`, {})),
-				removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/api/v1/auth/favorites/${propertyId}`)),
-				favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)),
-				getFavoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)), 
-				/**
-				 * Toggle favorite state safely. If desiredState is provided, it enforces that state.
-				 * If not provided, it tries PUT first and on 400 falls back to DELETE.
-				 */
-				toggleFavorite: async (propertyId: string, desiredState?: boolean) => {
-					try {
-						if (desiredState === true) {
-							return await api.auth.addFavorite(propertyId);
-						}
-						if (desiredState === false) {
-							return await api.auth.removeFavorite(propertyId);
-						}
-						// Unknown state: attempt PUT as default, then fallback to DELETE on 400
-						else {
-                                                        const res = await api.auth.addFavorite(propertyId);
-						        return res;
-                                                }
-					} catch (err: any) {
-						// If server returns 400 for duplicate add, try DELETE as fallback
-						if (err?.statusCode === 400 || err?.options?.statusCode === 400) {
-							return await api.auth.removeFavorite(propertyId);
-						}
-						throw err;
-					}
-				},
+                favoritesList: () => unwrap<any[]>(http.get("/api/v1/auth/favorites")),
+                addFavorite: (propertyId: string) => unwrap<any>(http.put(`/api/v1/auth/favorites/${propertyId}`, {})),
+                removeFavorite: (propertyId: string) => unwrap<any>(http.delete(`/api/v1/auth/favorites/${propertyId}`)),
+                favoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)),
+                getFavoriteStatus: (propertyId: string) => unwrap<{ isFavorite: boolean }>(http.get(`/api/v1/auth/favorites/${propertyId}/status`)),
+                /**
+                 * Toggle favorite state safely. If desiredState is provided, it enforces that state.
+                 * If not provided, it tries PUT first and on 400 falls back to DELETE.
+                 */
+                toggleFavorite: async (propertyId: string, desiredState?: boolean) => {
+                        try {
+                                if (desiredState === true) {
+                                        return await api.auth.addFavorite(propertyId);
+                                }
+                                if (desiredState === false) {
+                                        return await api.auth.removeFavorite(propertyId);
+                                }
+                                // Unknown state: attempt PUT as default, then fallback to DELETE on 400
+                                else {
+                                        const res = await api.auth.addFavorite(propertyId);
+                                        return res;
+                                }
+                        } catch (err: any) {
+                                // If server returns 400 for duplicate add, try DELETE as fallback
+                                if (err?.statusCode === 400 || err?.options?.statusCode === 400) {
+                                        return await api.auth.removeFavorite(propertyId);
+                                }
+                                throw err;
+                        }
+                },
                 // Recently viewed
                 recentlyViewedList: () => unwrap<any[]>(http.get("/api/v1/auth/recently-viewed")),
                 addRecentlyViewed: (propertyId: string) => unwrap<any>(http.post(`/api/v1/auth/recently-viewed/${propertyId}`, {})),
@@ -107,14 +107,19 @@ export const api = {
                 uploadMedia: (formData: FormData, config?: any) => unwrap<any>(http.post("/api/v1/admin/media/upload", formData, config)),
                 updateMedia: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/admin/media/${id}`, payload)),
                 deleteMedia: (id: string) => unwrap<any>(http.delete(`/api/v1/admin/media/${id}`)),
+                // Developer Linking
+                getUnlinkedDeveloperUsers: () => unwrap<any[]>(http.get("/api/v1/admin/developers/users/unlinked")),
+                getUnlinkedDeveloperProfiles: () => unwrap<any[]>(http.get("/api/v1/admin/developers/profiles/unlinked")),
+                linkDeveloper: (payload: { userId: string; developerId: string }) => unwrap<any>(http.post("/api/v1/admin/developers/link", payload)),
+                unlinkDeveloper: (payload: { userId?: string; developerId?: string }) => unwrap<any>(http.post("/api/v1/admin/developers/unlink", payload)),
         },
         // Inquiries APIs
         inquiries: {
-            create: (payload: any) => unwrap<any>(http.post("/api/v1/inquiries", payload)),
-            list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/inquiries", { params })),
-            getById: (id: string) => unwrap<any>(http.get(`/api/v1/inquiries/${id}`)),
-            update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/inquiries/${id}`, payload)),
-            delete: (id: string) => unwrap<any>(http.delete(`/api/v1/inquiries/${id}`)),
+                create: (payload: any) => unwrap<any>(http.post("/api/v1/inquiries", payload)),
+                list: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get("/api/v1/inquiries", { params })),
+                getById: (id: string) => unwrap<any>(http.get(`/api/v1/inquiries/${id}`)),
+                update: (id: string, payload: any) => unwrap<any>(http.put(`/api/v1/inquiries/${id}`, payload)),
+                delete: (id: string) => unwrap<any>(http.delete(`/api/v1/inquiries/${id}`)),
         },
         agent: {
                 // Agent self-access endpoints (logged-in agent accessing their own data)
@@ -124,7 +129,7 @@ export const api = {
                 properties: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/properties/agent/${params?.agentId || ''}`, { params })),
                 projects: (params?: Record<string, any>) => unwrap<PaginatedResult<any>>(http.get(`/api/v1/agent/projects`, { params })),
                 updateLead: (leadId: string, payload: { status?: string }) => unwrap<any>(http.put(`/api/v1/contacts/${leadId}`, payload)),
-                
+
                 // Admin endpoints for accessing any agent's data (admin only)
                 adminDashboard: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/api/v1/agent/${agentId}/dashboard`, { params })),
                 adminAnalytics: (agentId: string, params?: Record<string, any>) => unwrap<any>(http.get(`/api/v1/agent/${agentId}/analytics`, { params })),

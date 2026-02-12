@@ -87,10 +87,16 @@ router.delete('/developers/users/:id', protect, authorize('admin'), adminControl
 
 // Developer Profiles Management
 router.get('/developers/profiles', protect, authorize('admin'), adminController.getDeveloperProfiles);
+router.get('/developers/profiles/unlinked', protect, authorize('admin'), adminController.getUnlinkedDeveloperProfiles); // New route
 router.get('/developers/profiles/:id', protect, authorize('admin'), adminController.getDeveloperProfile);
 router.post('/developers/profiles', protect, authorize('admin'), adminController.createDeveloperProfile);
 router.put('/developers/profiles/:id', protect, authorize('admin'), adminController.updateDeveloperProfile);
 router.delete('/developers/profiles/:id', protect, authorize('admin'), adminController.deleteDeveloperProfile);
+
+// Developer Linking
+router.get('/developers/users/unlinked', protect, authorize('admin'), adminController.getUnlinkedDeveloperUsers); // New route
+router.post('/developers/link', protect, authorize('admin'), adminController.linkDeveloperProfile); // New route
+router.post('/developers/unlink', protect, authorize('admin'), adminController.unlinkDeveloperProfile); // New route
 
 // Project Management
 router.post('/projects/sync', protect, authorize('admin'), adminController.syncProjects);

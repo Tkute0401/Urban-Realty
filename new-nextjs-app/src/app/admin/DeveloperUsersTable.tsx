@@ -35,19 +35,20 @@ import {
   CardHeader,
   Divider
 } from '@mui/material';
-import { 
-  MoreVert, 
-  Edit, 
-  Delete, 
+import {
+  MoreVert,
+  Edit,
+  Delete,
   Add,
   Business,
   Email,
   Phone,
-  Close, 
+  Close,
   Save,
   PersonAdd,
   Visibility,
-  BusinessCenter
+  BusinessCenter,
+  LinkOff
 } from '@mui/icons-material';
 import http from '@/lib/services/http';
 import FieldIndicator from '@/components/ui/FieldIndicator';
@@ -90,6 +91,13 @@ const DeveloperUsersTable = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [createProfileDialogOpen, setCreateProfileDialogOpen] = useState(false);
+
+  // Linking related state
+  const [connectProfileDialogOpen, setConnectProfileDialogOpen] = useState(false);
+  const [unlinkedProfiles, setUnlinkedProfiles] = useState<any[]>([]);
+  const [selectedProfileIdToLink, setSelectedProfileIdToLink] = useState('');
+  const [loadingUnlinked, setLoadingUnlinked] = useState(false);
+
   const [editFormData, setEditFormData] = useState({
     name: '',
     email: '',
@@ -153,6 +161,55 @@ const DeveloperUsersTable = () => {
   useEffect(() => {
     fetchDeveloperUsers();
   }, []);
+
+  useEffect(() => {
+    if (connectProfileDialogOpen) {
+      fetchUnlinkedProfiles();
+    }
+  }, [connectProfileDialogOpen]);
+
+  const fetchUnlinkedProfiles = async () => {
+    try {
+      setLoadingUnlinked(true);
+      const response = await api.admin.getUnlinkedDeveloperProfiles();
+      setUnlinkedProfiles(response.data);
+    } catch (err) {
+      console.error('Failed to fetch unlinked profiles:', err);
+    } finally {
+      setLoadingUnlinked(false);
+    }
+  };
+
+  const handleConnectProfile = async () => {
+    if (!selectedUser || !selectedProfileIdToLink) return;
+
+    try {
+      await api.admin.linkDeveloper({
+        userId: selectedUser._id,
+        developerId: selectedProfileIdToLink
+      });
+      setConnectProfileDialogOpen(false);
+      setSelectedProfileIdToLink('');
+      fetchDeveloperUsers();
+      alert('Profile connected successfully');
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect profile');
+    }
+  };
+
+  const handleUnlinkProfile = async () => {
+    if (!selectedUser || !selectedUser.developerId || !window.confirm('Are you sure you want to unlink this profile?')) return;
+
+    try {
+      await api.admin.unlinkDeveloper({
+        userId: selectedUser._id
+      });
+      handleMenuClose();
+      fetchDeveloperUsers();
+    } catch (err: any) {
+      setError(err.message || 'Failed to unlink profile');
+    }
+  };
 
   const fetchDeveloperUsers = async () => {
     try {
@@ -302,7 +359,7 @@ const DeveloperUsersTable = () => {
         userId: selectedUser._id,
         foundedYear: createProfileFormData.foundedYear ? parseInt(createProfileFormData.foundedYear) : undefined
       };
-      
+
       await http.post('/api/v1/admin/developers/profiles', profileData);
       await fetchDeveloperUsers();
       setCreateProfileDialogOpen(false);
@@ -468,9 +525,24 @@ const DeveloperUsersTable = () => {
           Edit
         </MenuItem>
         {selectedUser && !selectedUser.developerId && (
-          <MenuItem onClick={handleCreateProfileClick}>
+          <MenuItem onClick={() => {
+            setConnectProfileDialogOpen(true);
+            handleMenuClose();
+          }}>
             <BusinessCenter sx={{ mr: 1 }} />
-            Create Developer Profile
+            Connect Existing Profile
+          </MenuItem>
+        )}
+        {selectedUser && !selectedUser.developerId && (
+          <MenuItem onClick={handleCreateProfileClick}>
+            <Add sx={{ mr: 1 }} />
+            Create New Profile
+          </MenuItem>
+        )}
+        {selectedUser && selectedUser.developerId && (
+          <MenuItem onClick={handleUnlinkProfile} sx={{ color: 'warning.main' }}>
+            <LinkOff sx={{ mr: 1 }} />
+            Unlink Profile
           </MenuItem>
         )}
         <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
@@ -478,6 +550,54 @@ const DeveloperUsersTable = () => {
           Delete
         </MenuItem>
       </Menu>
+
+      {/* Connect Profile Dialog */}
+      <Dialog open={connectProfileDialogOpen} onClose={() => setConnectProfileDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Connect Developer Profile</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Select an existing developer profile to link with <strong>{selectedUser?.name}</strong>.
+              The user will become the manager of the selected profile.
+            </Typography>
+
+            {loadingUnlinked ? (
+              <Box display="flex" justifyContent="center" p={2}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : unlinkedProfiles.length > 0 ? (
+              <FormControl fullWidth>
+                <InputLabel>Select Profile</InputLabel>
+                <Select
+                  value={selectedProfileIdToLink}
+                  label="Select Profile"
+                  onChange={(e) => setSelectedProfileIdToLink(e.target.value)}
+                >
+                  {unlinkedProfiles.map((profile) => (
+                    <MenuItem key={profile._id} value={profile._id}>
+                      {profile.name} {profile.website && `(${profile.website})`}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <Alert severity="info">
+                No unlinked developer profiles found. Create a new one instead.
+              </Alert>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConnectProfileDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleConnectProfile}
+            variant="contained"
+            disabled={!selectedProfileIdToLink || loading}
+          >
+            Connect
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Create Dialog */}
       <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
