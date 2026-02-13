@@ -247,7 +247,8 @@ const DeveloperProfilesTable = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedProfile(null);
+    // Do not clear selectedProfile here as it's needed for dialogs and actions
+    // setSelectedProfile(null);
   };
 
   const handleEditClick = () => {

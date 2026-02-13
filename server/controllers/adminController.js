@@ -1810,3 +1810,112 @@ exports.syncProjects = asyncHandler(async (req, res, next) => {
     data: result
   });
 });
+
+// @desc    Get unlinked developer users
+// @route   GET /api/v1/admin/developers/users/unlinked
+// @access  Private/Admin
+exports.getUnlinkedDeveloperUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find({
+    role: 'developer',
+    $or: [{ developerId: { $exists: false } }, { developerId: null }]
+  }).select('name email mobile occupation');
+
+  res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users
+  });
+});
+
+// @desc    Get unlinked developer profiles
+// @route   GET /api/v1/admin/developers/profiles/unlinked
+// @access  Private/Admin
+exports.getUnlinkedDeveloperProfiles = asyncHandler(async (req, res, next) => {
+  const profiles = await Developer.find({
+    $or: [{ userId: { $exists: false } }, { userId: null }]
+  }).select('name website email');
+
+  res.status(200).json({
+    success: true,
+    count: profiles.length,
+    data: profiles
+  });
+});
+
+// @desc    Link developer profile to user
+// @route   POST /api/v1/admin/developers/link
+// @access  Private/Admin
+exports.linkDeveloperProfile = asyncHandler(async (req, res, next) => {
+  const { userId, developerId } = req.body;
+
+  if (!userId || !developerId) {
+    return next(new ErrorResponse('Please provide both userId and developerId', 400));
+  }
+
+  const user = await User.findById(userId);
+  const developer = await Developer.findById(developerId);
+
+  if (!user) return next(new ErrorResponse('User not found', 404));
+  if (!developer) return next(new ErrorResponse('Developer profile not found', 404));
+
+  // Check if already linked
+  if (user.developerId) return next(new ErrorResponse('User is already linked to a developer profile', 400));
+  if (developer.userId) return next(new ErrorResponse('Developer profile is already linked to a user', 400));
+
+  user.developerId = developerId;
+  developer.userId = userId;
+
+  await user.save();
+  await developer.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Developer profile linked to user successfully',
+    data: {
+      user: { _id: user._id, name: user.name, developerId: user.developerId },
+      developer: { _id: developer._id, name: developer.name, userId: developer.userId }
+    }
+  });
+});
+
+// @desc    Unlink developer profile from user
+// @route   POST /api/v1/admin/developers/unlink
+// @access  Private/Admin
+exports.unlinkDeveloperProfile = asyncHandler(async (req, res, next) => {
+  const { userId, developerId } = req.body;
+
+  let user, developer;
+
+  if (userId) {
+    user = await User.findById(userId);
+    if (!user) return next(new ErrorResponse('User not found', 404));
+    if (user.developerId) {
+      developer = await Developer.findById(user.developerId);
+    }
+  } else if (developerId) {
+    developer = await Developer.findById(developerId);
+    if (!developer) return next(new ErrorResponse('Developer profile not found', 404));
+    if (developer.userId) {
+      user = await User.findById(developer.userId);
+    }
+  }
+
+  if (!user && !developer) {
+    return next(new ErrorResponse('Please provide userId or developerId to unlink', 400));
+  }
+
+  if (user && user.developerId) {
+    user.developerId = undefined;
+    await user.save();
+  }
+
+  if (developer && developer.userId) {
+    developer.userId = undefined;
+    await developer.save();
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Developer profile unlinked successfully'
+  });
+});
