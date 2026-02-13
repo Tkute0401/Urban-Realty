@@ -9,11 +9,11 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // Radius of the Earth in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c; // Distance in kilometers
   return distance;
 };
@@ -90,28 +90,28 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 exports.getProject = asyncHandler(async (req, res, next) => {
   // Check if it's a MongoDB ObjectId or a slug
   const isObjectId = req.params.id && req.params.id.match(/^[0-9a-fA-F]{24}$/);
-  
+
   let project;
   if (isObjectId) {
     // It's an ObjectId, find by ID
     project = await Project.findById(req.params.id)
-      .populate('developers', 'name logo website email phone')
+      .populate('developers', 'name logo website email phone description foundedYear headquarters ongoingProjects completedProjects')
       .populate('agent', 'name email mobile');
   } else {
     // It's a slug, find by slug or name
     const slug = req.params.id;
     project = await Project.findOne({ slug: slug })
-      .populate('developers', 'name logo website email phone')
+      .populate('developers', 'name logo website email phone description foundedYear headquarters ongoingProjects completedProjects')
       .populate('agent', 'name email mobile');
-    
+
     // If not found by slug, try by name (for backward compatibility)
     if (!project) {
       const nameSlug = slug.replace(/-/g, ' ');
-      project = await Project.findOne({ 
+      project = await Project.findOne({
         name: { $regex: new RegExp(`^${nameSlug}$`, 'i') }
       })
-      .populate('developers', 'name logo website email phone')
-      .populate('agent', 'name email mobile');
+        .populate('developers', 'name logo website email phone description foundedYear headquarters ongoingProjects completedProjects')
+        .populate('agent', 'name email mobile');
     }
   }
 
@@ -153,7 +153,7 @@ exports.getMyProjects = asyncHandler(async (req, res, next) => {
   if (req.user.role === 'developer') {
     // Find developer profile for current user
     const developer = await Developer.findOne({ userId: req.user.id });
-    
+
     if (!developer) {
       return res.status(200).json({
         success: true,
@@ -201,10 +201,10 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   if (req.body.brochures) {
     try {
       // Parse brochures if it's a JSON string, otherwise use as-is
-      const brochuresData = typeof req.body.brochures === 'string' 
-        ? JSON.parse(req.body.brochures) 
+      const brochuresData = typeof req.body.brochures === 'string'
+        ? JSON.parse(req.body.brochures)
         : req.body.brochures;
-      
+
       // Handle both array and single object
       if (Array.isArray(brochuresData)) {
         brochureUrls = brochuresData;
@@ -220,13 +220,13 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   if (req.user.role === 'developer') {
     // Find developer profile for current user
     const developer = await Developer.findOne({ userId: req.user.id });
-    
+
     if (!developer) {
       return next(
         new ErrorResponse('Developer profile not found. Please create your developer profile first.', 404)
       );
     }
-    
+
     // If developers array is provided, ensure current developer is included
     if (req.body.developers && Array.isArray(req.body.developers)) {
       if (!req.body.developers.includes(developer._id.toString())) {
@@ -248,7 +248,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   } else if (req.user.role === 'agent') {
     // For agents, set the agent field to current user
     req.body.agent = req.user.id;
-    
+
     // Developers are optional for agents, but if provided, convert to array
     if (req.body.developer && !req.body.developers) {
       req.body.developers = Array.isArray(req.body.developer) ? req.body.developer : [req.body.developer];
@@ -257,11 +257,11 @@ exports.createProject = asyncHandler(async (req, res, next) => {
     // For admin users, convert single developer to array if developers not provided
     req.body.developers = Array.isArray(req.body.developer) ? req.body.developer : [req.body.developer];
   }
-  
+
   // Validate that either developers or agent is present
   const hasDevelopers = req.body.developers && Array.isArray(req.body.developers) && req.body.developers.length > 0;
   const hasAgent = req.body.agent;
-  
+
   if (!hasDevelopers && !hasAgent) {
     return next(
       new ErrorResponse('Either developers or agent must be specified for the project', 400)
@@ -316,7 +316,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 
   // Process brochures - URLs only
   let brochures = [];
-  
+
   // Process brochure URLs from req.body (if provided)
   if (brochureUrls.length > 0) {
     brochures = brochureUrls.map(b => {
@@ -332,7 +332,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
           // If URL parsing fails, use default name
         }
       }
-      
+
       return {
         url: b.url ? String(b.url) : '',
         publicId: b.publicId || '', // Optional, can be empty for external URLs
@@ -358,7 +358,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
   if (req.body.location?.address) {
     try {
       const geocoder = require('../utils/hybridGeocoder');
-      
+
       // First try with simplified address (city + state + country) for better success rate
       let addressString = [
         req.body.location.city,
@@ -368,7 +368,7 @@ exports.createProject = asyncHandler(async (req, res, next) => {
 
       console.log('🗺️ Project geocoding with simplified address:', addressString);
       let loc = await geocoder.geocode(addressString);
-      
+
       // If simplified address fails, try with more details
       if (!loc || loc.length === 0) {
         console.log('🗺️ Simplified project geocoding failed, trying with full address...');
@@ -378,17 +378,17 @@ exports.createProject = asyncHandler(async (req, res, next) => {
           req.body.location.state,
           req.body.location.country || 'India'
         ].filter(Boolean).join(', ');
-        
+
         console.log('🗺️ Project geocoding with full address:', addressString);
         loc = await geocoder.geocode(addressString);
       }
-      
+
       if (loc && loc.length > 0) {
         console.log('✅ Project geocoding successful:', {
           coordinates: [loc[0].longitude, loc[0].latitude],
           formattedAddress: loc[0].formattedAddress
         });
-        
+
         coordinates = {
           type: 'Point',
           coordinates: [loc[0].longitude, loc[0].latitude]
@@ -528,13 +528,13 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   // Check if user is developer and owns this project (must be in developers array)
   if (req.user.role === 'developer') {
     const developer = await Developer.findOne({ userId: req.user.id });
-    
+
     if (!developer) {
       return next(
         new ErrorResponse('Developer profile not found', 404)
       );
     }
-    
+
     // Check if developer is in the developers array
     const developerIds = project.developers.map(d => d.toString());
     if (!developerIds.includes(developer._id.toString())) {
@@ -543,7 +543,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
       );
     }
   }
-  
+
   // Check if user is agent and owns this project (must be the agent who created it)
   if (req.user.role === 'agent') {
     if (!project.agent || project.agent.toString() !== req.user.id) {
@@ -558,10 +558,10 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   if (req.body.brochures) {
     try {
       // Parse brochures if it's a JSON string, otherwise use as-is
-      const brochuresData = typeof req.body.brochures === 'string' 
-        ? JSON.parse(req.body.brochures) 
+      const brochuresData = typeof req.body.brochures === 'string'
+        ? JSON.parse(req.body.brochures)
         : req.body.brochures;
-      
+
       // Handle both array and single object
       if (Array.isArray(brochuresData)) {
         brochureUrls = brochuresData;
@@ -608,7 +608,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
 
   // Process new brochures - URLs only
   let newBrochures = [];
-  
+
   // Process brochure URLs from req.body (if provided)
   if (brochureUrls.length > 0) {
     newBrochures = brochureUrls.map(b => {
@@ -624,7 +624,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
           // If URL parsing fails, use default name
         }
       }
-      
+
       return {
         url: b.url ? String(b.url) : '',
         publicId: b.publicId || '', // Optional, can be empty for external URLs
@@ -633,7 +633,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
       };
     }).filter(b => b.url); // Only include brochures with valid URLs
   }
-  
+
   // Add new brochures to existing ones
   if (newBrochures.length > 0) {
     project.brochures = [...project.brochures, ...newBrochures];
@@ -656,28 +656,28 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
 
   // Handle existing media preservation
   if (req.body.existingImages) {
-    const existingImages = Array.isArray(req.body.existingImages) 
+    const existingImages = Array.isArray(req.body.existingImages)
       ? req.body.existingImages.map(img => JSON.parse(img))
       : [JSON.parse(req.body.existingImages)];
     project.images = existingImages;
   }
 
   if (req.body.existingFloorPlans) {
-    const existingFloorPlans = Array.isArray(req.body.existingFloorPlans) 
+    const existingFloorPlans = Array.isArray(req.body.existingFloorPlans)
       ? req.body.existingFloorPlans.map(fp => JSON.parse(fp))
       : [JSON.parse(req.body.existingFloorPlans)];
     project.floorPlans = existingFloorPlans;
   }
 
   if (req.body.existingBrochures) {
-    const existingBrochures = Array.isArray(req.body.existingBrochures) 
+    const existingBrochures = Array.isArray(req.body.existingBrochures)
       ? req.body.existingBrochures.map(b => JSON.parse(b))
       : [JSON.parse(req.body.existingBrochures)];
     project.brochures = existingBrochures;
   }
 
   if (req.body.existingVirtualTours) {
-    const existingVirtualTours = Array.isArray(req.body.existingVirtualTours) 
+    const existingVirtualTours = Array.isArray(req.body.existingVirtualTours)
       ? req.body.existingVirtualTours.map(vt => JSON.parse(vt))
       : [JSON.parse(req.body.existingVirtualTours)];
     project.virtualTours = existingVirtualTours;
@@ -691,7 +691,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressString)}&limit=1&countrycodes=in`
       );
       const data = await response.json();
-      
+
       if (data && data.length > 0) {
         const loc = data[0];
         cleanReqBody.location.coordinates = {
@@ -726,7 +726,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
   // Parse numeric and date fields before updating
   const numericFields = ['totalUnits', 'totalArea', 'startingPrice', 'pricePerSqFt'];
   const dateFields = ['launchDate', 'possessionDate', 'constructionStartDate', 'estimatedCompletionDate'];
-  
+
   numericFields.forEach(field => {
     if (cleanReqBody[field] !== undefined) {
       const parsed = parseNumber(cleanReqBody[field]);
@@ -777,7 +777,7 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     if (req.user.role === 'developer') {
       const developer = await Developer.findOne({ userId: req.user.id });
       if (developer) {
-        const devIds = Array.isArray(cleanReqBody.developers) 
+        const devIds = Array.isArray(cleanReqBody.developers)
           ? cleanReqBody.developers.map(d => d.toString())
           : [cleanReqBody.developers.toString()];
         if (!devIds.includes(developer._id.toString())) {
@@ -787,19 +787,19 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
       }
     } else {
       // Admin can set developers array directly
-      project.developers = Array.isArray(cleanReqBody.developers) 
-        ? cleanReqBody.developers 
+      project.developers = Array.isArray(cleanReqBody.developers)
+        ? cleanReqBody.developers
         : [cleanReqBody.developers];
     }
   }
 
   // Update other project fields (excluding the ones we've already handled)
   Object.keys(cleanReqBody).forEach(key => {
-    if (cleanReqBody[key] !== undefined && 
-        !numericFields.includes(key) && 
-        !dateFields.includes(key) &&
-        key !== 'developers' && 
-        key !== 'priceRange') {
+    if (cleanReqBody[key] !== undefined &&
+      !numericFields.includes(key) &&
+      !dateFields.includes(key) &&
+      key !== 'developers' &&
+      key !== 'priceRange') {
       project[key] = cleanReqBody[key];
     }
   });
@@ -831,13 +831,13 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
   // Check if user is developer and owns this project (must be in developers array)
   if (req.user.role === 'developer') {
     const developer = await Developer.findOne({ userId: req.user.id });
-    
+
     if (!developer) {
       return next(
         new ErrorResponse('Developer profile not found', 404)
       );
     }
-    
+
     // Check if developer is in the developers array
     const developerIds = project.developers.map(d => d.toString());
     if (!developerIds.includes(developer._id.toString())) {
@@ -846,7 +846,7 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
       );
     }
   }
-  
+
   // Check if user is agent and owns this project (must be the agent who created it)
   if (req.user.role === 'agent') {
     if (!project.agent || project.agent.toString() !== req.user.id) {
