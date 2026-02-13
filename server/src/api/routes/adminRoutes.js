@@ -94,6 +94,7 @@ router.post('/developers/link', protect, authorize('admin'), adminController.lin
 router.post('/developers/unlink', protect, authorize('admin'), adminController.unlinkDeveloperProfile);
 
 // Project Management
+router.post('/projects/sync', protect, authorize('admin'), adminController.syncProjects);
 router.get('/projects', protect, authorize('admin'), adminController.getProjects);
 router.get('/projects/:id', protect, authorize('admin'), adminController.getProject);
 router.post('/projects', protect, authorize('admin'), adminController.createProject);
