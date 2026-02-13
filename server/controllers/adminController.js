@@ -1859,8 +1859,21 @@ exports.linkDeveloperProfile = asyncHandler(async (req, res, next) => {
   if (!developer) return next(new ErrorResponse('Developer profile not found', 404));
 
   // Check if already linked
-  if (user.developerId) return next(new ErrorResponse('User is already linked to a developer profile', 400));
-  if (developer.userId) return next(new ErrorResponse('Developer profile is already linked to a user', 400));
+  if (user.developerId) {
+    const existingDev = await Developer.findById(user.developerId);
+    if (existingDev) {
+      return next(new ErrorResponse('User is already linked to a developer profile', 400));
+    }
+    // If linked profile doesn't exist, allow overwriting (orphaned link)
+  }
+
+  if (developer.userId) {
+    const existingUser = await User.findById(developer.userId);
+    if (existingUser) {
+      return next(new ErrorResponse('Developer profile is already linked to a user', 400));
+    }
+    // If linked user doesn't exist, allow overwriting (orphaned link)
+  }
 
   user.developerId = developerId;
   developer.userId = userId;
