@@ -1831,9 +1831,34 @@ exports.getUnlinkedDeveloperUsers = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/admin/developers/profiles/unlinked
 // @access  Private/Admin
 exports.getUnlinkedDeveloperProfiles = asyncHandler(async (req, res, next) => {
-  const profiles = await Developer.find({
-    $or: [{ userId: { $exists: false } }, { userId: null }]
-  }).select('name website email');
+  // Find profiles that are either explicitly unlinked (userId is null/missing)
+  // OR implicitly unlinked (userId exists but points to a non-existent user - orphaned)
+  const profiles = await Developer.aggregate([
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'linkedUser'
+      }
+    },
+    {
+      $match: {
+        $or: [
+          { userId: { $exists: false } },
+          { userId: null },
+          { linkedUser: { $size: 0 } } // User ID exists but no matching user found
+        ]
+      }
+    },
+    {
+      $project: {
+        name: 1,
+        website: 1,
+        email: 1
+      }
+    }
+  ]);
 
   res.status(200).json({
     success: true,
