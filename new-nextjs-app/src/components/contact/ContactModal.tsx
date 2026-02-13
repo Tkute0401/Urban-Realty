@@ -40,7 +40,7 @@ interface ContactModalProps {
     avatar?: string;
     company?: string;
     role?: string;
-  };
+  } | null;
   propertyInfo?: {
     id: string;
     title: string;
@@ -67,11 +67,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
   const handleDirectContact = (method: 'phone' | 'email' | 'whatsapp') => {
     if (!contactInfo) return;
 
-    const message = propertyInfo 
+    const message = propertyInfo
       ? `Hi, I'm interested in your property: ${propertyInfo.title}`
       : projectInfo
-      ? `Hi, I'm interested in your project: ${projectInfo.name}`
-      : 'Hi, I would like to get in touch with you.';
+        ? `Hi, I'm interested in your project: ${projectInfo.name}`
+        : 'Hi, I would like to get in touch with you.';
 
     switch (method) {
       case 'phone':
@@ -116,17 +116,17 @@ const ContactModal: React.FC<ContactModalProps> = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: '16px',
-          backgroundColor: (theme) => 
-            theme.palette.mode === 'dark' 
-              ? 'rgba(30, 30, 45, 0.98)' 
+          backgroundColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(30, 30, 45, 0.98)'
               : 'rgba(255, 255, 255, 0.98)',
           border: '1px solid var(--color-border)',
           backdropFilter: 'blur(10px)',
@@ -140,9 +140,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
         }
       }}
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
+      <DialogTitle sx={{
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'space-between',
         pb: 1
       }}>
@@ -162,31 +162,31 @@ const ContactModal: React.FC<ContactModalProps> = ({
         <Card sx={{ mb: 3, bgcolor: 'var(--color-bg-primary)' }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Avatar 
-                src={contactInfo.avatar}
-                sx={{ 
-                  width: 56, 
+              <Avatar
+                src={contactInfo?.avatar}
+                sx={{
+                  width: 56,
                   height: 56,
                   bgcolor: 'var(--color-primary)',
                   color: 'var(--color-text-inverse)'
                 }}
               >
-                {contactInfo.name?.charAt(0)}
+                {contactInfo?.name?.charAt(0)}
               </Avatar>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  {contactInfo.name}
+                  {contactInfo?.name}
                 </Typography>
-                {contactInfo.company && (
+                {contactInfo?.company && (
                   <Typography variant="body2" sx={{ color: 'var(--color-text-muted)' }}>
                     {contactInfo.company}
                   </Typography>
                 )}
-                {contactInfo.role && (
-                  <Chip 
-                    label={contactInfo.role} 
-                    size="small" 
-                    color="primary" 
+                {contactInfo?.role && (
+                  <Chip
+                    label={contactInfo.role}
+                    size="small"
+                    color="primary"
                     variant="outlined"
                     sx={{ mt: 0.5 }}
                   />
@@ -195,9 +195,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
             </Box>
 
             {(propertyInfo || projectInfo) && (
-              <Box sx={{ 
-                p: 2, 
-                bgcolor: 'var(--color-bg-secondary)', 
+              <Box sx={{
+                p: 2,
+                bgcolor: 'var(--color-bg-secondary)',
                 borderRadius: '8px',
                 border: '1px solid var(--color-border)'
               }}>
@@ -221,9 +221,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
             Direct Contact Options
           </Typography>
-          
+
           <Grid container spacing={2}>
-            {contactInfo.phone && (
+            {contactInfo?.phone && (
               <Grid item xs={12} sm={4}>
                 <Button
                   fullWidth
@@ -242,8 +242,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 </Button>
               </Grid>
             )}
-            
-            {contactInfo.email && (
+
+            {contactInfo?.email && (
               <Grid item xs={12} sm={4}>
                 <Button
                   fullWidth
@@ -262,8 +262,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 </Button>
               </Grid>
             )}
-            
-            {contactInfo.phone && (
+
+            {contactInfo?.phone && (
               <Grid item xs={12} sm={4}>
                 <Button
                   fullWidth
@@ -284,7 +284,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             )}
           </Grid>
 
-          {(!contactInfo.phone && !contactInfo.email) && (
+          {(!contactInfo?.phone && !contactInfo?.email) && (
             <Alert severity="info" sx={{ mt: 2 }}>
               Contact information not available for direct contact.
             </Alert>
@@ -294,7 +294,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
 
       <DialogContent sx={{ pt: 0, pb: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button 
+          <Button
             onClick={onClose}
             sx={{ color: 'var(--color-text-secondary)' }}
           >
